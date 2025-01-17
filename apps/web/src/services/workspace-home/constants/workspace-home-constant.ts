@@ -2,6 +2,7 @@ import { i18n } from '@/translations';
 
 import * as styles from '@/styles/colors';
 
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -38,6 +39,11 @@ export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [
         icon: 'ic_service_cost-analysis',
         label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'),
         to: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+    },
+    {
+        icon: 'ic_service_alert',
+        label: i18n.t('MENU.ALERT_MANAGER_SERVICE'),
+        to: ALERT_MANAGER_ROUTE.SERVICE._NAME,
     },
 ];
 

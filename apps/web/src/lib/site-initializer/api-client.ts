@@ -122,15 +122,25 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('provider', data);
     },
-    '/identity/role/create': (data) => {
+    '/identity/role/create': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.sync('role', data);
+        allReferenceStore.load('role', { force: true });
     },
     '/identity/role/update': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('role', data);
+    },
+    '/identity/role-binding/create': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('user', { force: true });
+    },
+    '/identity/role-binding/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('user', { force: true });
     },
     '/inventory/region/create': (data) => {
         useAllReferenceStore(pinia);
@@ -187,15 +197,45 @@ const getAfterCallApiMap = () => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('service_account', data);
     },
-    '/identity/user/create': (data) => {
+    '/identity/user/create': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.sync('user', data);
+        allReferenceStore.load('user', { force: true });
     },
     '/identity/user/update': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('user', data);
+    },
+    '/identity/user/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('user', { force: true });
+    },
+    '/identity/user-group/create': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('user_group', { force: true });
+    },
+    '/identity/user-group/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('user_group', data);
+    },
+    '/identity/user-group/add-users': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('user_group', data);
+    },
+    '/identity/user-group/remove-users': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('user_group', data);
+    },
+    '/identity/user-group/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('user_group', { force: true });
     },
     '/monitoring/webhook/create': (data) => {
         useAllReferenceStore(pinia);
@@ -293,6 +333,36 @@ const getAfterCallApiMap = () => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('workspace', data);
+    },
+    '/alert-manager/service/create': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('service', { force: true });
+    },
+    '/alert-manager/service/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('service', { force: true });
+    },
+    '/alert-manager/service/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('service', data);
+    },
+    '/alert-manager/webhook/create': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('webhook', { force: true });
+    },
+    '/alert-manager/webhook/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('webhook', { force: true });
+    },
+    '/alert-manager/webhook/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
     },
 });
 

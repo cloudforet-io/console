@@ -8,14 +8,19 @@ import {
 } from '@cloudforet/mirinae';
 
 
+import type { UserChannelCreateParameters } from '@/schema/alert-manager/user-channel/api-verbs/create';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelCreateParameters } from '@/schema/notification/project-channel/api-verbs/create';
 import type { ChannelSchedule } from '@/schema/notification/type';
-import type { UserChannelCreateParameters } from '@/schema/notification/user-channel/api-verbs/create';
+import type { UserChannelCreateParameters as UserChannelCreateParametersV1 } from '@/schema/notification/user-channel/api-verbs/create';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationAddFormData from '@/services/my-page/components/NotificationAddFormData.vue';
@@ -34,6 +39,9 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
+const domainStore = useDomainStore();
+
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const state = reactive({
     isDataValid: false,
@@ -48,19 +56,32 @@ const state = reactive({
     schedule: undefined as ChannelSchedule|undefined,
     isScheduled: false,
     isScheduleValid: true,
+
+    // V2
+    schemaForm: {},
+    scheduleSettingData: {},
+    isInputValid: false,
 });
 
 const createUserChannel = async () => {
     try {
-        await SpaceConnector.clientV2.notification.userChannel.create<UserChannelCreateParameters>({
-            protocol_id: props.protocolId,
-            name: state.channelName,
-            data: state.data,
-            is_subscribe: state.topicMode,
-            subscriptions: state.topicList,
-            schedule: state.schedule,
-            is_scheduled: state.isScheduled,
-        });
+        const fetcher = isAlertManagerVersionV2
+            ? SpaceConnector.clientV2.alertManager.userChannel.create<UserChannelCreateParameters>({
+                protocol_id: props.protocolId,
+                name: state.channelName,
+                schedule: state.scheduleSettingData,
+                data: state.schemaForm,
+                tags: {},
+            }) : SpaceConnector.clientV2.notification.userChannel.create<UserChannelCreateParametersV1>({
+                protocol_id: props.protocolId,
+                name: state.channelName,
+                data: state.data,
+                is_subscribe: state.topicMode,
+                subscriptions: state.topicList,
+                schedule: state.schedule,
+                is_scheduled: state.isScheduled,
+            });
+        await fetcher;
         showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
@@ -88,7 +109,7 @@ const createProjectChannel = async () => {
 
 const onClickSave = async () => {
     try {
-        if (props.projectId) await createProjectChannel();
+        if (!isAlertManagerVersionV2 && props.projectId) await createProjectChannel();
         else await createUserChannel();
         router.back();
     } catch (e) {
@@ -98,12 +119,20 @@ const onClickSave = async () => {
 
 const onChangeData = (value: NotificationAddFormDataPayload) => {
     state.channelName = value.channelName;
-    state.data = value.data;
     state.notificationLevel = value.level;
     state.isDataValid = value.isValid;
+    if (!isAlertManagerVersionV2) {
+        state.data = value.data;
+    }
+    state.schemaForm = value.data;
+    state.isInputValid = value.isValid;
 };
 
-const onChangeSchedule = ({ schedule, is_scheduled, isScheduleValid }: NotificationAddFormSchedulePayload) => {
+const onChangeSchedule = (schedule_value: ScheduleSettingFormType) => {
+    state.scheduleSettingData = schedule_value;
+};
+
+const onChangeScheduleV1 = ({ schedule, is_scheduled, isScheduleValid }: NotificationAddFormSchedulePayload) => {
     state.schedule = schedule;
     state.isScheduled = is_scheduled;
     state.isScheduleValid = isScheduleValid;
@@ -136,9 +165,13 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
                 <h4 class="sub-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
                 </h4>
-                <notification-add-schedule @change="onChangeSchedule" />
+                <notification-add-schedule @changeV1="onChangeScheduleV1"
+                                           @change="onChangeSchedule"
+                />
             </p-pane-layout>
-            <p-pane-layout class="content-wrapper">
+            <p-pane-layout v-if="!isAlertManagerVersionV2"
+                           class="content-wrapper"
+            >
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
                 </h3>
@@ -155,9 +188,18 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
             >
                 {{ $t('COMMON.TAGS.CANCEL') }}
             </p-button>
-            <p-button style-type="primary"
+            <p-button v-if="!isAlertManagerVersionV2"
+                      style-type="primary"
                       class="text-button"
                       :disabled="!state.isDataValid || !state.isScheduleValid || !state.isTopicValid"
+                      @click="onClickSave"
+            >
+                {{ $t('COMMON.TAGS.SAVE') }}
+            </p-button>
+            <p-button v-else
+                      style-type="primary"
+                      class="text-button"
+                      :disabled="!state.isInputValid"
                       @click="onClickSave"
             >
                 {{ $t('COMMON.TAGS.SAVE') }}

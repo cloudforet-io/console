@@ -6,7 +6,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PEmpty, PStatus, PTab, PDataTable, PBadge, PTooltip, PSelectDropdown,
+    PEmpty, PStatus, PTab, PDataTable, PBadge, PTooltip, PSelectDropdown, PTag,
 } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
@@ -58,14 +58,14 @@ const storeState = reactive({
 });
 const state = reactive({
     fieldByMode: computed(() => (userPageState.isAdminMode
-        ? { name: 'role_type', label: 'Admin Role', sortable: false }
-        : { name: 'role_binding', label: 'Role', sortable: false })),
+        ? [{ name: 'role_type', label: 'Admin Role', sortable: false }]
+        : [{ name: 'role_binding', label: 'Role', sortable: false }, { name: 'user_group', label: 'User Group', sortable: false }])),
     field: computed(() => ([
         { name: 'user_id', label: 'User ID', sortable: false },
         { name: 'name', label: 'Name', sortable: false },
         { name: 'state', label: 'State', sortable: false },
         { name: 'type', label: 'Type', sortable: false },
-        state.fieldByMode,
+        ...state.fieldByMode,
         { name: 'tags', label: 'Tags' },
         { name: 'auth_type', label: 'Auth Type', sortable: false },
         { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
@@ -299,8 +299,19 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                             <span v-else>{{ value.name }}</span>
                         </div>
                     </template>
+                    <template #col-user_group-format="{value}">
+                        <div v-if="value.length > 0">
+                            <p-tag v-for="(v, i) in value"
+                                   :key="`${v}-${i}`"
+                                   :deletable="false"
+                            >
+                                {{ v.name }}
+                            </p-tag>
+                        </div>
+                        <div v-else />
+                    </template>
                     <template #col-tags-format="{value}">
-                        <template v-if="!!Object.keys(value).length">
+                        <template v-if="value !== undefined && Object.keys(value).length > 0">
                             <p-badge v-for="([key, val], idx) in Object.entries(value)"
                                      :key="`${key}-${val}-${idx}`"
                                      badge-type="subtle"

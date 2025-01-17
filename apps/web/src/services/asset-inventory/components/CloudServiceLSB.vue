@@ -19,25 +19,21 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 import { useUserStore } from '@/store/user/user-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteOptions, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
     LSBItem, LSBMenu,
 } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
+import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory-v1/components/CloudServiceLSBDropdownMenuItem.vue';
 import {
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY,
-} from '@/services/asset-inventory/constants/cloud-service-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+} from '@/services/asset-inventory-v1/constants/cloud-service-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
+import { useCloudServicePageStore } from '@/services/asset-inventory-v1/stores/cloud-service-page-store';
+import type { CloudServiceDetailPageParams } from '@/services/asset-inventory-v1/types/cloud-service-detail-page-type';
 
 const PROJECT_MENU_ID = 'project';
 const SERVICE_ACCOUNT_MENU_ID = 'service-account';
@@ -47,14 +43,11 @@ const REGION_MENU_ID = 'region';
 
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
-const gnbStore = useGnbStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const userStore = useUserStore();
 
 const route = useRoute();
@@ -62,45 +55,16 @@ const router = useRouter();
 
 const storeState = reactive({
     currentGrantInfo: computed(() => userStore.state.currentGrantInfo),
-    favoriteItems: computed(() => favoriteGetters.cloudServiceItems),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
-        || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME)),
+    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME
+        || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME)),
     detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
         if (state.isCloudServiceDetailPage) return route.params as unknown as CloudServiceDetailPageParams;
         return undefined;
     }),
-    favoriteItemMap: computed(() => {
-        const result: Record<string, FavoriteConfig> = {};
-        storeState.favoriteItems?.forEach((d) => {
-            result[d.itemId] = d;
-        });
-        return result;
-    }),
-    starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => {
-        const labelArr = d.name.split('.');
-        return {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: `${d.parents[0].label} [${d.label}]`,
-            id: d.name,
-            imgIcon: d.icon,
-            to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: d.provider,
-                    group: labelArr[1],
-                    name: labelArr[2],
-                },
-            }),
-            favoriteOptions: {
-                type: FAVORITE_TYPE.CLOUD_SERVICE,
-                id: d.name,
-            },
-        };
-    })),
     cloudServiceMainMenuSet: computed<LSBItem[]>(() => ([
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
@@ -126,7 +90,7 @@ const state = reactive({
                 label: state.detailPageParams.group,
                 id: selectedItem?.group,
                 isBackLink: true,
-                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME }),
+                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME }),
                 titleIcon: get(selectedItem, ['tags', 'spaceone:icon'], ''),
             },
         ];
@@ -135,11 +99,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.ITEM,
                 label: d.name,
                 id: d.cloud_service_type_key,
-                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } }),
-                favoriteOptions: {
-                    type: FAVORITE_TYPE.CLOUD_SERVICE,
-                    id: d.cloud_service_type_key,
-                },
+                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } }),
             });
         });
         return results;
@@ -157,18 +117,6 @@ const state = reactive({
         },
         ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
     ]),
-    favoriteOptions: computed<FavoriteOptions>(() => {
-        if (!state.isCloudServiceDetailPage) {
-            return {
-                type: FAVORITE_TYPE.MENU,
-                id: 'cloud_service',
-            };
-        }
-        return {
-            type: FAVORITE_TYPE.CLOUD_SERVICE,
-            id: cloudServiceDetailPageState.selectedCloudServiceType?.cloud_service_type_key || '',
-        };
-    }),
 });
 const providerState = reactive({
     contextMenuItems: computed(() => [
@@ -193,7 +141,7 @@ const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) =
 
 const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
     await router.replace(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: params.provider,
             group: params.group,
@@ -209,14 +157,11 @@ const handleSelectProvider = (selected: string) => {
 };
 
 /* Watchers */
-watch([() => state.detailPageParams, () => storeState.currentGrantInfo.scope], async ([params, scope]) => {
-    if (scope === 'USER') return;
+watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async ([params, grantInfo]) => {
+    if (grantInfo?.scope === 'USER') return;
     if (!params) return;
     await initCloudServiceDetailLSB(params);
     if (!params.name) await routeToFirstCloudServiceType(params);
-}, { immediate: true });
-watch(() => state.favoriteOptions, (favoriteOptions) => {
-    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 </script>
 

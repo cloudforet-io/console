@@ -5,6 +5,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
+import { alertManagerV1IntegralRoutes } from '@/router/alert-manager-v1-integral-routes';
 import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
@@ -48,7 +49,9 @@ const initRouter = (domainId?: string) => {
     if (!domainId) {
         SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
     } else {
-        SpaceRouter.init(integralRoutes, afterGrantedCallback, userStore);
+        const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
+        const routes = isAlertManagerVersionV2 ? integralRoutes : alertManagerV1IntegralRoutes;
+        SpaceRouter.init(routes, afterGrantedCallback, userStore);
     }
     isRouterInitialized = true;
 };

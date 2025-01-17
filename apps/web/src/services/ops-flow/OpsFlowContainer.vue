@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="route.meta.lsbVisible"
+        <vertical-page-layout v-if="route.meta?.lsbVisible"
                               class="ops-flow-container"
         >
             <template #sidebar>

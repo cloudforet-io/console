@@ -49,12 +49,12 @@ export const useFavoriteStore = defineStore('favorite', () => {
         menuItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.MENU)),
         projectItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT)),
         projectGroupItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT_GROUP)),
-        cloudServiceItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.CLOUD_SERVICE)),
         metricItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.METRIC)),
         metricExampleItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.METRIC_EXAMPLE)),
         dashboardItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.DASHBOARD)),
         costAnalysisItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.COST_ANALYSIS)),
         securityItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.SECURITY)),
+        serviceItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.SERVICE)),
         workspaceItems: computed(() => state.favoriteWorkspaceMenuList.map((item) => item.data)),
     });
 

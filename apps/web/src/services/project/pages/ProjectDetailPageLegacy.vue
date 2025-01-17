@@ -77,7 +77,7 @@ const state = reactive({
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
-        let results: Route[] = [
+        const results: Route[] = [
             { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
@@ -86,19 +86,7 @@ const state = reactive({
                 to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
-        if (route.name === PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME) {
-            results = results.concat([
-                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
-                { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
-            ]);
-        } else if (route.name === PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
-            results = results.concat([
-                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
-                { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
-            ]);
-        } else {
-            results.push({ name: state.item?.name });
-        }
+        results.push({ name: state.item?.name });
         return results;
     }),
     counts: computed(() => ({
@@ -109,14 +97,7 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
-    isHeaderVisible: computed<boolean>(() => {
-        const excludeRoutes = [
-            PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
-            PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
-            PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
-        ];
-        return route.name ? !excludeRoutes.includes(route.name) : true;
-    }),
+    isHeaderVisible: computed<boolean>(() => !route.name),
     isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === projectDetailPageState.projectId)),
 });
 

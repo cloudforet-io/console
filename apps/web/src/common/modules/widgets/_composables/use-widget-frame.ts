@@ -28,8 +28,8 @@ import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-fiel
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import type { MetricFilter } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -124,7 +124,7 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<W
         const _metricId = dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
         if (_metricId) {
             return getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     metricId: _metricId,
                 },

@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 import { APP_STATE_COLOR } from '@/services/iam/constants/app-constant';
 import { USER_MFA_COLOR, USER_STATE_COLOR } from '@/services/iam/constants/user-constant';
 
-export const calculateTime = (lastAccessedDay, timezone) => {
+export const calculateTime = (lastAccessedDay, timezone): number => {
     const today = dayjs().toISOString();
     const lastAccessedTime = iso8601Formatter(lastAccessedDay, timezone);
     const todayTime = iso8601Formatter(today, timezone);

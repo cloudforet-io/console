@@ -138,7 +138,7 @@ const checkModalConfirm = async () => {
                     :header-title="appPageState.modal.title"
                     :theme-color="appPageState.modal.themeColor"
                     :loading="appPageState.modal.loading"
-                    modal-size="md"
+                    size="md"
                     class="app-management-status-modal"
                     @confirm="checkModalConfirm"
                     @cancel="handleClose"

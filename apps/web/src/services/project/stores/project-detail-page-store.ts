@@ -33,7 +33,7 @@ interface ProjectDetailPageState {
     webhookList?: WebhookModel[],
     selectedWebhookItemIdx: number[],
 }
-export const useProjectDetailPageStore = defineStore('page-project-detail', () => {
+export const useProjectDetailPageStore = defineStore('page-project-v1-detail', () => {
     const state = reactive<ProjectDetailPageState>({
         loading: false,
         projectId: undefined,

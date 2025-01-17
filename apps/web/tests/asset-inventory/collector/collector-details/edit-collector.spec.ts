@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+import getRandomId from '@/lib/random-id-generator';
+
 test.describe('Edit Collector', () => {
     let page;
 
@@ -13,7 +15,7 @@ test.describe('Edit Collector', () => {
     });
 
     // Make random string for key/value.
-    const random = () => Math.random();
+    const random = () => getRandomId();
     const randomKey = `Key-${random()}`;
     const randomValue = `Value-${random()}`;
 

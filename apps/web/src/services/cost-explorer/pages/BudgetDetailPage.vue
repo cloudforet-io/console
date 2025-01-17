@@ -10,7 +10,10 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
+
+import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -31,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
     budgetId: '',
 });
 
+const domainStore = useDomainStore();
 const userStore = useUserStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -44,6 +48,7 @@ const state = reactive({
             budgetId: state.budgetData?.budget_id,
         },
     })),
+    isAlertManagerVersionV2: computed<boolean>(() => (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId)),
 });
 
 (async () => {
@@ -91,7 +96,7 @@ const state = reactive({
                 :budget-loading="state.loading"
                 class="summary"
             />
-            <budget-detail-notifications v-if="!state.isWorkspaceTarget"
+            <budget-detail-notifications v-if="!state.isAlertManagerVersionV2 && !state.isWorkspaceTarget"
                                          class="alert"
                                          :currency="state.budgetData?.currency"
             />

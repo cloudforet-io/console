@@ -7,14 +7,19 @@ import {
 } from '@cloudforet/mirinae';
 
 
+import type { UserChannelDisableParameters } from '@/schema/alert-manager/user-channel/api-verbs/disable';
+import type { UserChannelEnableParameters } from '@/schema/alert-manager/user-channel/api-verbs/enable';
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
 import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
 import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
-import type { UserChannelDeleteParameters } from '@/schema/notification/user-channel/api-verbs/delete';
-import type { UserChannelDisableParameters } from '@/schema/notification/user-channel/api-verbs/disable';
-import type { UserChannelEnableParameters } from '@/schema/notification/user-channel/api-verbs/enable';
+import type { UserChannelDeleteParameters as UserChannelDeleteParametersV1 } from '@/schema/notification/user-channel/api-verbs/delete';
+import type { UserChannelDisableParameters as UserChannelDisableParametersV1 } from '@/schema/notification/user-channel/api-verbs/disable';
+import type { UserChannelEnableParameters as UserChannelEnableParametersV1 } from '@/schema/notification/user-channel/api-verbs/enable';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -30,7 +35,7 @@ import NotificationChannelItemSchedule
     from '@/services/my-page/components/NotificationChannelItemSchedule.vue';
 import NotificationChannelItemTopic
     from '@/services/my-page/components/NotificationChannelItemTopic.vue';
-import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 
 const STATE_TYPE = {
     ENABLED: 'ENABLED',
@@ -38,13 +43,16 @@ const STATE_TYPE = {
 } as const;
 
 const props = withDefaults(defineProps<{
-    channelData: NotiChannelItem;
+    channelData: Partial<NotiChannelItemV1> & Partial<NotiChannelItem>;
     projectId?: string;
     manageDisabled?: boolean;
 }>(), {
     projectId: undefined,
     manageDisabled: false,
 });
+
+const domainStore = useDomainStore();
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const emit = defineEmits<{(event: 'change'): void;
     (event: 'confirm'): void;
@@ -53,9 +61,10 @@ const emit = defineEmits<{(event: 'change'): void;
 type EditTarget = 'name' | 'data' | 'notification_level' | 'schedule' | 'topic';
 const state = reactive({
     isActivated: props.channelData.state === STATE_TYPE.ENABLED,
-    userChannelId: props.channelData.user_channel_id,
+    userChannelId: isAlertManagerVersionV2 ? props.channelData.channel_id : props.channelData.user_channel_id,
     projectChannelId: props.channelData.project_channel_id,
     editTarget: undefined as EditTarget | undefined,
+    scheduleData: props.channelData.schedule,
 });
 const checkDeleteState = reactive({
     visible: false,
@@ -78,9 +87,14 @@ const enableProjectChannel = async () => {
 const enableUserChannel = async () => {
     try {
         if (!state.userChannelId) throw new Error('User channel id is not defined');
-        await SpaceConnector.clientV2.notification.userChannel.enable<UserChannelEnableParameters>({
-            user_channel_id: state.userChannelId,
-        });
+        const fetcher = isAlertManagerVersionV2
+            ? SpaceConnector.clientV2.alertManager.userChannel.enable<UserChannelEnableParameters>({
+                channel_id: state.userChannelId,
+            })
+            : SpaceConnector.clientV2.notification.userChannel.enable<UserChannelEnableParametersV1>({
+                user_channel_id: state.userChannelId,
+            });
+        await fetcher;
         state.isActivated = true;
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
     } catch (e) {
@@ -89,7 +103,7 @@ const enableUserChannel = async () => {
 };
 
 const enableChannel = async () => {
-    if (props.projectId) await enableProjectChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await enableProjectChannel();
     else await enableUserChannel();
 };
 
@@ -110,9 +124,13 @@ const disableProjectChannel = async () => {
 const disableUserChannel = async () => {
     try {
         if (!state.userChannelId) throw new Error('User channel id is not defined');
-        await SpaceConnector.clientV2.notification.userChannel.disable<UserChannelDisableParameters>({
-            user_channel_id: state.userChannelId,
-        });
+        const fetcher = isAlertManagerVersionV2
+            ? SpaceConnector.clientV2.alertManager.userChannel.disable<UserChannelDisableParameters>({
+                channel_id: state.userChannelId,
+            }) : SpaceConnector.clientV2.notification.userChannel.disable<UserChannelDisableParametersV1>({
+                user_channel_id: state.userChannelId,
+            });
+        await fetcher;
         state.isActivated = false;
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
     } catch (e) {
@@ -122,7 +140,7 @@ const disableUserChannel = async () => {
 };
 
 const disableChannel = async () => {
-    if (props.projectId) await disableProjectChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await disableProjectChannel();
     else await disableUserChannel();
 };
 
@@ -163,9 +181,13 @@ const deleteProjectChannel = async () => {
 const deleteUserChannel = async () => {
     try {
         if (!state.userChannelId) throw new Error('User channel id is not defined');
-        await SpaceConnector.clientV2.notification.userChannel.delete<UserChannelDeleteParameters>({
-            user_channel_id: state.userChannelId,
-        });
+        const fetcher = isAlertManagerVersionV2
+            ? SpaceConnector.clientV2.alertManager.userChannel.delete<UserChannelDisableParameters>({
+                channel_id: state.userChannelId,
+            }) : SpaceConnector.clientV2.notification.userChannel.delete<UserChannelDeleteParametersV1>({
+                user_channel_id: state.userChannelId,
+            });
+        await fetcher;
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
@@ -176,8 +198,10 @@ const deleteUserChannel = async () => {
 };
 
 const deleteChannelConfirm = async () => {
-    if (props.projectId) await deleteProjectChannel();
-    else await deleteUserChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await deleteProjectChannel();
+    if (isAlertManagerVersionV2) {
+        await deleteUserChannel();
+    }
 };
 
 const onEdit = (value?: EditTarget) => {
@@ -233,13 +257,14 @@ const onEdit = (value?: EditTarget) => {
                                                 @edit="onEdit"
             />
             <p-divider />
-            <notification-channel-item-topic :channel-data="props.channelData"
+            <notification-channel-item-topic v-if="!isAlertManagerVersionV2"
+                                             :channel-data="props.channelData"
                                              :project-id="props.projectId"
                                              :disable-edit="(state.editTarget && state.editTarget !== 'topic') || props.manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
-            <p-divider />
+            <p-divider v-if="!isAlertManagerVersionV2" />
         </ul>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"

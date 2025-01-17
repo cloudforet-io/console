@@ -10,18 +10,21 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
+
+import config from '@/lib/config';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
-import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 
 const props = withDefaults(defineProps<{
-    channelData: NotiChannelItem;
+    channelData: Partial<NotiChannelItemV1> & Partial<NotiChannelItem>;
     projectId?: string;
     disableEdit?: boolean;
 }>(), {
@@ -34,6 +37,9 @@ const emit = defineEmits<{(event: 'change'): void;
 
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+const domainStore = useDomainStore();
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
+
 const {
     state: notificationItemState,
     cancelEdit,
@@ -41,7 +47,7 @@ const {
     updateUserChannel,
     updateProjectChannel,
 } = useNotificationItem<Record<string, any>>({
-    userChannelId: props.channelData.user_channel_id,
+    userChannelId: isAlertManagerVersionV2 ? props.channelData.channel_id : props.channelData.user_channel_id,
     projectChannelId: props.channelData.project_channel_id,
     isEditMode: false,
     dataForEdit: cloneDeep(props.channelData.data),
@@ -95,7 +101,7 @@ const setValueList = () => {
 };
 
 const saveChangedData = async () => {
-    if (props.projectId) await updateProjectChannel('data', notificationItemState.dataForEdit);
+    if (!isAlertManagerVersionV2 && props.projectId) await updateProjectChannel('data', notificationItemState.dataForEdit);
     else await updateUserChannel('data', notificationItemState.dataForEdit);
     setValueList();
 };

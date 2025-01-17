@@ -1,0 +1,38 @@
+export const ALERT_STATUS = {
+    TRIGGERED: 'TRIGGERED',
+    ACKNOWLEDGED: 'ACKNOWLEDGED',
+    RESOLVED: 'RESOLVED',
+    IGNORED: 'IGNORED',
+} as const;
+
+export const ALERT_URGENCY = {
+    HIGH: 'HIGH',
+    LOW: 'LOW',
+} as const;
+
+export const ALERT_SEVERITY = {
+    CRITICAL: 'CRITICAL',
+    ERROR: 'ERROR',
+    WARNING: 'WARNING',
+    INFO: 'INFO',
+} as const;
+
+export const ALERT_TRIGGERED_TYPE = {
+    USER: 'USER',
+    WEBHOOK: 'WEBHOOK',
+} as const;
+
+export const ALERT_HISTORY_ACTION = {
+    TRIGGERED: 'TRIGGERED',
+    ACKNOWLEDGED: 'ACKNOWLEDGED',
+    RESOLVED: 'RESOLVED',
+    NOTIFIED_SUCCESS: 'NOTIFIED_SUCCESS',
+    NOTIFIED_FAILURE: 'NOTIFIED_FAILURE',
+    NOTIFIED_SKIPPED: 'NOTIFIED_SKIPPED',
+    EVENT_PUSHED: 'EVENT_PUSHED',
+} as const;
+
+export const ALERT_HISTORY_NOTIFICATION_STATE = {
+    SUCCESS: 'SUCCESS',
+    FAILURE: 'FAILURE',
+} as const;

@@ -93,7 +93,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
-assetInventorySettingsStore.initState(userStore.state.userId);
+
+assetInventorySettingsStore.initState();
 
 const route = useRoute();
 const router = useRouter();
@@ -124,7 +125,7 @@ const state = reactive({
 const typeOptionState = reactive({
     loading: true,
     totalCount: 0,
-    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
+    timezone: computed(() => userStore.state.timezone || 'UTC'),
     selectIndex: [] as number[],
 });
 

@@ -56,6 +56,7 @@ const Template: Story = {
                         :show-password="showPassword"
                         :appearance-type="appearanceType"
                         :page-size="pageSize"
+                        :hide-spin-button="hideSpinButton"
             >
                 <template v-if="inputRightSlot" #input-right>
                     <span v-html="inputRightSlot"></span>
@@ -263,6 +264,9 @@ export const PasswordType: Story = {
                 <br/>
                 <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type</p>
                 <p-text-input value="password" type="password" appearance-type="masking" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type, with \`skipMaskToggleTabIndex\` true</p>
+                <p-text-input value="password" type="password" appearance-type="masking" skip-mask-toggle-tab-index />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type, with \`showPassword\` false</p>
                 <p-text-input value="password" type="password" appearance-type="masking" :show-password="false" />

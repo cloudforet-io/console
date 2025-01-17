@@ -73,6 +73,7 @@ const state = reactive({
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_at: user?.last_accessed_at,
     }))),
+    // refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map)
 });
 const tableState = reactive({
     userTableFields: computed<DataTableFieldType[]>(() => {
@@ -88,6 +89,7 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'type', label: 'Type', sortable: false },
                 { name: 'role_binding', label: 'Role', sortable: false },
+                { name: 'user_group', label: 'User Group', sortable: false },
             );
         }
         const baseFields = [
@@ -389,6 +391,49 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
+            </template>
+            <template v-if="!userPageState.isAdminMode"
+                      #col-user_group-format="{value}"
+            >
+                <div v-if="value.length > 0 && value.length < 4">
+                    <p-badge v-for="(val, idx) in value"
+                             :key="`${val.id}-${idx}`"
+                             badge-type="subtle"
+                             shape="square"
+                             style-type="gray200"
+                             class="mr-2"
+                    >
+                        {{ val.name }}
+                    </p-badge>
+                </div>
+                <div v-else-if="value.length > 3"
+                     class="flex"
+                >
+                    <div v-for="(val, idx) in value"
+                         :key="`${val.id}-${idx}`"
+                    >
+                        <p-badge
+                            v-if="idx < 3"
+                            badge-type="subtle"
+                            shape="square"
+                            style-type="gray200"
+                            class="mr-2"
+                        >
+                            {{ val.name }}
+                        </p-badge>
+                        <p-badge
+                            v-if="idx === 3"
+                            badge-type="subtle"
+                            shape="round"
+                            style-type="blue300"
+                            class="mr-2"
+                        >
+                            + {{ value.length - 3 }}
+                        </p-badge>
+                        <div v-else-if="idx > 3" />
+                    </div>
+                </div>
+                <div v-else />
             </template>
         </p-toolbox-table>
         <user-management-remove-modal v-if="modalState.visible"

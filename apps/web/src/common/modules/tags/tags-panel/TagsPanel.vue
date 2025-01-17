@@ -23,7 +23,7 @@ import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vu
 
 import type {
     CloudServiceTagTableItem,
-} from '@/services/asset-inventory/types/cloud-service-detail-tag-type';
+} from '@/services/asset-inventory-v1/types/cloud-service-detail-tag-type';
 
 const props = withDefaults(defineProps<{
     resourceKey: string;

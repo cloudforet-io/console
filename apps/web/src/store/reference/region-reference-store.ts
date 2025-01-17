@@ -9,11 +9,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -37,6 +39,8 @@ let lastLoadedTime = 0;
 
 export const useRegionReferenceStore = defineStore('reference-region', () => {
     const userStore = useUserStore();
+    const domainStore = useDomainStore();
+
     const state = reactive({
         items: null as RegionReferenceMap | null,
     });
@@ -66,7 +70,10 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
 
         const referenceMap: RegionReferenceMap = {};
         try {
-            const response = await SpaceConnector.clientV2.inventory.region.list<RegionListParameters, ListResponse<RegionModel>>({
+            const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
+            const regionFetcher = !isAlertManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.region.list : SpaceConnector.clientV2.inventory.region.list;
+
+            const response = await regionFetcher<RegionListParameters, ListResponse<RegionModel>>({
                 query: {
                     only: ['name', 'region_code', 'tags', 'provider'],
                 },

@@ -51,6 +51,7 @@ export const getTextInputArgs = (): Args => {
         rightExtraSlot: '',
         inputRightSlot: '',
         rightEdgeSlot: '',
+        hideSpinButton: false,
     };
 };
 
@@ -216,6 +217,21 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
             control: 'object',
         },
+        hideSpinButton: {
+            name: 'hideSpinButton',
+            type: { name: 'boolean' },
+            description: 'Whether to hide spin button at number type or not.',
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: 'boolean',
+        },
         visibleMenu: {
             name: 'visibleMenu',
             type: { name: 'boolean' },
@@ -353,6 +369,22 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
             },
             control: { type: 'number', min: 0 },
+        },
+        skipMaskToggleTabIndex: {
+            name: 'skipMaskToggleTabIndex',
+            type: { name: 'boolean' },
+            description: 'Whether to skip tab indexing of show/hide toggle button(password type and masking appearanceType) or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'true',
+                },
+            },
+            control: 'boolean',
         },
         // attrs
         inputAttrs: {

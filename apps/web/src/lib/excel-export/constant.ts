@@ -7,11 +7,14 @@ export const FILE_NAME_PREFIX = Object.freeze({
     workspace: 'workspace',
     collector: 'collector',
     projectWebhook: 'project_webhook',
+    webhook: 'webhook',
     alert: 'alert',
     costAnalysis: 'cost_analysis',
     budget: 'budget',
     policy: 'policy',
     cloudServiceLog: 'cloud_service_log',
     metricExplorer: 'metric_explorer',
+    notifications: 'notifications',
+    escalationPolicy: 'escalation_policy',
 });
 // export type FILE_NAME_PREFIX = typeof FILE_NAME_PREFIX[keyof typeof FILE_NAME_PREFIX]

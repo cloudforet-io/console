@@ -21,7 +21,6 @@ import type {
     ConfigData,
 } from '@/lib/helper/config-data-helper';
 import {
-    convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData,
@@ -80,9 +79,6 @@ const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData =
     }
     if (itemType === RECENT_TYPE.PROJECT_GROUP) {
         return convertProjectGroupConfigToReferenceData([recentConfig], storeState.projectGroups)[0];
-    }
-    if (itemType === RECENT_TYPE.CLOUD_SERVICE_TYPE || itemType === RECENT_TYPE.SECURITY) {
-        return convertCloudServiceConfigToReferenceData([recentConfig], storeState.cloudServiceTypes)[0];
     }
     if (itemType === RECENT_TYPE.COST_ANALYSIS) {
         return convertCostAnalysisConfigToReferenceData([recentConfig], storeState.costQuerySets, storeState.costDataSource)[0];
