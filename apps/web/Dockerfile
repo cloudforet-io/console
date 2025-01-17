@@ -35,7 +35,8 @@ ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
 RUN mkdir -p ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx && \
-    chown -R nginx:nginx ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx
+    chown -R nginx:nginx ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx && \
+    chmod -R 755 ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY apps/web/pkg/nginx.conf /etc/nginx/nginx.conf
