@@ -48,8 +48,8 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
 
 export const ALERT_CHANNEL_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'type', label: 'Type' },
-    { name: 'name', label: 'Name' },
     { name: 'target', label: 'Target' },
+    { name: 'name', label: 'Name' },
     { name: 'state', label: 'State' },
     { name: 'error_message', label: 'Message' },
 ];

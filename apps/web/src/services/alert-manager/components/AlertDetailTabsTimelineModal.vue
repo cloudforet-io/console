@@ -159,7 +159,6 @@ const handleClickCopy = () => {
                         <p-select-dropdown :menu="state.typeFields"
                                            :selection-label="$t('ALERT_MANAGER.ALERTS.TYPE')"
                                            style-type="rounded"
-                                           use-fixed-menu-style
                                            :selected.sync="state.selectedType"
                                            class="service-dropdown"
                         />
