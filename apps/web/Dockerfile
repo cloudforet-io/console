@@ -23,36 +23,27 @@ ENV FORCE_COLOR=1
 
 RUN npx turbo build --filter=web... --output-logs=new-only --summarize
 
-FROM nginx:1.21.6-alpine AS runner
-
-## setting CAP_NET_BIND_SERVICE to allow nginx to bind to port 80
-RUN apk add --no-cache libcap
-RUN setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx
+FROM nginx AS runner
 
 ENV PORT 80
 ENV ROOT_PATH /var/www
 ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
-RUN mkdir -p ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx && \
-    chown -R nginx:nginx ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx && \
-    chmod -R 755 ${LOG_PATH}/nginx /var/cache/nginx /var/run/nginx
+RUN mkdir -p ${LOG_PATH}/nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
-COPY apps/web/pkg/nginx.conf /etc/nginx/nginx.conf
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
 
 # forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout ${LOG_PATH}/nginx/spaceone-access.log \
-    && ln -sf /dev/stderr ${LOG_PATH}/nginx/spaceone-error.log
+RUN ln -sf /dev/stdout /var/log/nginx/spaceone-access.log \
+    && ln -sf /dev/stderr /var/log/nginx/spaceone-error.log
 
 COPY --from=installer /app/apps/web/dist/. ${ROOT_PATH}/
 
-# Change ownership of application files and settings
-RUN chown -R nginx:nginx ${ROOT_PATH} ${NGINX_CONF_PATH}
-
-# Change to non-root user
-USER nginx
+# Enable only for turbo debugging purposes
+#RUN mkdir -p ${LOG_PATH}/turbo
+#COPY --from=installer /app/.turbo/runs/. ${LOG_PATH}/turbo
 
 EXPOSE ${PORT}
 
