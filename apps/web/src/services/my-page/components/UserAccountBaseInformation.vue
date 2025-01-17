@@ -156,7 +156,7 @@ watch(() => userStore.state.language, (language) => {
                         />
                         <p-field-group class="input-form">
                             <p-text-input v-model="state.userId"
-                                          disabled
+                                          readonly
                                           class="text-input"
                             />
                         </p-field-group>
@@ -182,7 +182,7 @@ watch(() => userStore.state.language, (language) => {
                         <p-field-group class="input-form">
                             <p-text-input :value="state.roleType"
                                           class="text-input"
-                                          disabled
+                                          readonly
                             />
                         </p-field-group>
                     </div>
@@ -240,7 +240,8 @@ watch(() => userStore.state.language, (language) => {
     .base-information-wrapper {
         max-width: 33.5rem;
         .input-form-wrapper {
-            @apply flex flex-wrap;
+            @apply flex flex-wrap items-center;
+            margin-bottom: 1rem;
             .field-title {
                 min-width: 7.75rem;
                 flex-shrink: 1;
@@ -270,5 +271,10 @@ watch(() => userStore.state.language, (language) => {
 /* custom design-system component - p-definition-table */
 :deep(.p-definition-table) {
     min-height: unset;
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    margin-bottom: unset;
 }
 </style>
