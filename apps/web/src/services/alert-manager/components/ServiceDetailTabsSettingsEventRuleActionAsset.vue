@@ -86,7 +86,7 @@ const state = reactive({
         match_asset: false,
         merge_asset_labels: false,
     },
-    rule: { key: 'resources' },
+    key: 'resources',
     selectedProvider: [] as DataSelectorItem[],
     selectedAssetList: [] as DataSelectorItem[],
     provider: [] as DataSelectorItem[],
@@ -101,9 +101,7 @@ const updateStateFromEventRuleInfo = (): void => {
 
     if (actions.match_asset) {
         state.selectedActions.match_asset = true;
-        state.rule = {
-            key: actions.match_asset?.rule?.key || 'resources',
-        };
+        state.key = actions.match_asset?.key || 'resources';
         state.selectedTempAssetRadio = actions.match_asset.create_temporary_asset ? 'CREATE' : 'DO_NOT_CREATE';
         const assetTypes = actions.match_asset?.asset_types || [];
         const provider = storeState.cloudServiceType[assetTypes[0]]?.data?.provider;
@@ -140,7 +138,7 @@ const handleUpdateToggle = (action: string, value: boolean) => {
     state.selectedActions[action] = value;
     if (value) {
         if (action === 'match_asset') {
-            state.rule = { key: 'resources' };
+            state.key = 'resources';
             state.selectedProvider = [];
             state.selectedAssetList = [];
             state.selectedTempAssetRadio = 'CREATE';
@@ -152,11 +150,11 @@ const handleUpdateToggle = (action: string, value: boolean) => {
 };
 
 watch([
-    () => state.selectedActions, () => state.rule, () => state.selectedAssetList, () => state.selectedTempAssetRadio, () => state.period,
-], ([selectedActions, rule, assetList, tempAsset, period]) => {
+    () => state.selectedActions, () => state.key, () => state.selectedAssetList, () => state.selectedTempAssetRadio, () => state.period,
+], ([selectedActions, key, assetList, tempAsset, period]) => {
     emit('change-form', {
         match_asset: selectedActions.match_asset ? {
-            rule,
+            key,
             asset_types: assetList?.map((asset) => asset.name),
             create_temporary_asset: tempAsset === 'CREATE',
         } : undefined,
@@ -279,7 +277,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                     {{ $t('ALERT_MANAGER.EVENT_RULE.POLICY') }}
                                 </p-field-title>
                                 <p-field-group class="input-box">
-                                    <p-text-input v-model="state.rule.key"
+                                    <p-text-input v-model="state.key"
                                                   block
                                                   :style="state.isMobileSize ? 'width: 200px;': ''"
                                     />
