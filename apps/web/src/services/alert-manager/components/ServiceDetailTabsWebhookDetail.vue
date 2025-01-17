@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
 import {
-    computed, reactive, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import { isEmpty } from 'lodash';
@@ -10,6 +11,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
@@ -40,11 +42,12 @@ import ServiceDetailTabsWebhookDetailRawDataModal
 import { alertManagerStateFormatter } from '@/services/alert-manager/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import {
-    WEBHOOK_DEFINITION_FIELDS,
-    WEBHOOK_ERROR_TABLE_FIELDS, WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS, WEBHOOK_MESSAGE_TABLE_FIELDS,
+    WEBHOOK_DEFINITION_FIELDS, WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS, WEBHOOK_MESSAGE_TABLE_FIELDS,
 } from '@/services/alert-manager/constants/webhook-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager/types/alert-manager-type';
+
+const EXTRA_WIDTH = 315; // created_at width + show_button width + padding
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -53,6 +56,10 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const errorTableRef = ref<HTMLElement|null>(null);
+
+const { width } = useElementSize(errorTableRef);
 
 const storeState = reactive({
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
@@ -76,6 +83,11 @@ const tabState = reactive({
 
         return [...defaultTabs, ...additionalTabs];
     }),
+    webhookErrorTableFields: computed<DataTableFieldType[]>(() => ([
+        { name: 'created_at', label: 'Created', width: '11rem' },
+        { name: 'message', label: 'Error Message', width: `${width.value - EXTRA_WIDTH}px` },
+        { name: 'show_button', label: ' ', width: '6.625rem' },
+    ])),
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
 });
 const state = reactive({
@@ -300,15 +312,16 @@ watch(() => storeState.selectedWebhookId, async () => {
                         />
                     </template>
                 </p-heading-layout>
-                <p-toolbox-table searchable
+                <p-toolbox-table ref="errorTableRef"
+                                 searchable
                                  search-type="query"
                                  sort-by="created_at"
                                  :query-tags="queryTags"
                                  :loading="state.errorListLoading"
                                  :total-count="state.errorTotalCount"
-                                 :fields="WEBHOOK_ERROR_TABLE_FIELDS"
+                                 :fields="tabState.webhookErrorTableFields"
                                  :items="state.refinedErrorList"
-                                 class="border-none"
+                                 class="w-full border-none"
                                  @change="handleChange"
                                  @refresh="fetchWebhookErrorList"
                 >
@@ -316,7 +329,11 @@ watch(() => storeState.selectedWebhookId, async () => {
                         {{ iso8601Formatter(value, storeState.timezone) }}
                     </template>
                     <template #col-message-format="{ value }">
-                        {{ value }}
+                        <p class="truncate"
+                           :style="{'max-width': width - EXTRA_WIDTH + 'px'}"
+                        >
+                            {{ value }}
+                        </p>
                     </template>
                     <template #col-show_button-format="{ item }">
                         <p-button style-type="tertiary"

@@ -96,7 +96,7 @@ const state = reactive({
 
                 if (condition.key === 'severity') return true;
 
-                return condition.value.trim() !== '';
+                return condition?.value.toString().trim() !== '';
             });
 
             if (!areConditionsValid) return false;
