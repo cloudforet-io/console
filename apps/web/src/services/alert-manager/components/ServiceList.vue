@@ -156,7 +156,7 @@ onMounted(async () => {
                                 {{ $t('ALERT_MANAGER.SERVICE.NO_DATA') }}
                             </p-button>
                         </template>
-                        {{ $t('ALERT_MANAGER.SERVICE.NO_DATA') }}
+                        {{ $t('ALERT_MANAGER.SERVICE.NO_DATA_DESC') }}
                     </p-empty>
                 </div>
             </template>

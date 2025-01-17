@@ -58,7 +58,7 @@ const tableState = reactive({
         {
             type: 'item',
             name: 'STATE',
-            label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.IN_USE'),
+            label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.DEFAULT'),
             disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
         },
         {
@@ -244,7 +244,7 @@ onUnmounted(() => {
                              :color="green[500]"
                              class="mr-1"
                         />
-                        {{ $t('ALERT_MANAGER.ESCALATION_POLICY.IN_USE') }}
+                        {{ $t('ALERT_MANAGER.ESCALATION_POLICY.DEFAULT') }}
                     </p-badge>
                 </div>
             </template>

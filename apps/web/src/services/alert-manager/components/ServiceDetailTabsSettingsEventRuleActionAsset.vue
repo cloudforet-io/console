@@ -411,7 +411,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
     .temp-asset-group {
         @apply flex-1 flex items-center;
         .temp-asset-desc {
-            @apply flex-1 flex items-center gap-1 text-gray-500 text-label-sm;
+            @apply flex-1 flex items-center justify-end gap-1 text-gray-500 text-label-sm;
         }
     }
     &.is-mobile {

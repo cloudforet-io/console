@@ -71,7 +71,7 @@ const tabState = reactive({
         }
         const additionalTabs: TabItem[] = [
             { label: i18n.t('ALERT_MANAGER.WEBHOOK.ERROR'), name: WEBHOOK_DETAIL_TABS.ERROR },
-            { label: i18n.t('ALERT_MANAGER.WEBHOOK.MESSAGE'), name: WEBHOOK_DETAIL_TABS.MESSAGE },
+            { label: i18n.t('ALERT_MANAGER.WEBHOOK.MSG_FORMAT'), name: WEBHOOK_DETAIL_TABS.MESSAGE },
         ];
 
         return [...defaultTabs, ...additionalTabs];
