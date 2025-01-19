@@ -63,9 +63,9 @@ jobs:
             
             if (reviewState === 'approved' || reviewState === 'changes_requested') {
               // Labels to remove based on review state
-              const labelsToRemove = reviewState === 'approved' 
-                ? ['pending/review', 'changes_requested'] 
-                : ['pending/review', 'changes_requested/review'];
+              const labelsToRemove = ['pending/review']
+              if (reviewState === 'approved') labelsToRemove.push('changes_requested/review')
+              else if (reviewState === 'changes_requested') labelsToRemove.push('approved/review')
 
               // Remove each label individually
               for (const label of labelsToRemove) {
