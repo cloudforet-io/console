@@ -62,17 +62,21 @@ jobs:
             console.log('reviewState', reviewState)
             
             if (reviewState === 'approved' || reviewState === 'changes_requested') {
-              // Remove 'pending/review' label if the review state is approved or changes_requested
+              // Labels to remove based on review state
+              const labelsToRemove = reviewState === 'approved' 
+                ? ['pending/review', 'changes_requested'] 
+                : ['pending/review', 'changes_requested/review'];
+
               try {
-                await github.rest.issues.removeLabel({
+                await github.rest.issues.removeLabels({
                   owner,
                   repo,
                   issue_number: prNumber,
-                  name: 'pending/review'
+                  names: labelsToRemove
                 });
               } catch (error) {
                 if (error.status === 404) {
-                  console.log('Label not found, skipping removal');
+                  console.log('One or more labels not found, skipping removal');
                 } else {
                   throw error;
                 }
