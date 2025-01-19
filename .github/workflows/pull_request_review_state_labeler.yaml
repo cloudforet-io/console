@@ -67,18 +67,21 @@ jobs:
                 ? ['pending/review', 'changes_requested'] 
                 : ['pending/review', 'changes_requested/review'];
 
-              try {
-                await github.rest.issues.deleteLabels({
-                  owner,
-                  repo,
-                  issue_number: prNumber,
-                  names: labelsToRemove
-                });
-              } catch (error) {
-                if (error.status === 404) {
-                  console.log('One or more labels not found, skipping removal');
-                } else {
-                  throw error;
+              // Remove each label individually
+              for (const label of labelsToRemove) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner,
+                    repo,
+                    issue_number: prNumber,
+                    name: label
+                  });
+                } catch (error) {
+                  if (error.status === 404) {
+                    console.log(`Label ${label} not found, skipping removal`);
+                  } else {
+                    throw error;
+                  }
                 }
               }
 
