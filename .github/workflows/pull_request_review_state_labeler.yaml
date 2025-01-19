@@ -59,6 +59,7 @@ jobs:
             const repo = context.repo.repo;
             
             const reviewState = context.payload.review.state
+            console.log('reviewState', reviewState)
             
             // Remove 'pending/review' label if the review state is approved or changes_requested
             if (reviewState === 'approved' || reviewState === 'changes_requested') {
