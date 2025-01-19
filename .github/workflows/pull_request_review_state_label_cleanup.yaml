@@ -1,4 +1,4 @@
-name: "[Pull Request] Review Label Cleanup"
+name: "[Pull Request] Review State Label Cleanup"
 
 on:
   pull_request_target:
