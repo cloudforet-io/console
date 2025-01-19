@@ -68,7 +68,7 @@ jobs:
                 : ['pending/review', 'changes_requested/review'];
 
               try {
-                await github.rest.issues.removeLabels({
+                await github.rest.issues.deleteLabels({
                   owner,
                   repo,
                   issue_number: prNumber,
