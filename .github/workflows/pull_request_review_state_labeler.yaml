@@ -61,8 +61,8 @@ jobs:
             const reviewState = context.payload.review.state
             console.log('reviewState', reviewState)
             
-            // Remove 'pending/review' label if the review state is approved or changes_requested
             if (reviewState === 'approved' || reviewState === 'changes_requested') {
+              // Remove 'pending/review' label if the review state is approved or changes_requested
               try {
                 await github.rest.issues.removeLabel({
                   owner,
@@ -77,6 +77,14 @@ jobs:
                   throw error;
                 }
               }
+
+              // Add 'approved/review' or 'changes_requested/review' label
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: prNumber,
+                labels: [reviewState + '/review']
+              });
             }
 
 
