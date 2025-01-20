@@ -32,7 +32,7 @@
       ],
       "cache": true
     },
-    "storybook#build": {
+    "mirinae-storybook#build": {
       "outputs": ["./.storybook-static/**"],
       "inputs": [
         "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",

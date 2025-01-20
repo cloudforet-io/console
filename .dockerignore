@@ -18,7 +18,7 @@ deploy
 # Output
 out
 **/dist
-apps/storybook/.out
+apps/mirinae-storybook/.out
 packages/mirinae/css
 packages/mirinae/types
 

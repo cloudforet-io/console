@@ -12,8 +12,9 @@ import VueRouter from 'vue-router';
 import SvgIcon from 'vue-svgicon';
 import webFontLoader from 'webfontloader';
 
-import screens from '@/styles/screens.cjs';
-import { fontUrls, webFonts } from '@/styles/web-fonts.cjs';
+import screens from 'mirinae-foundation/screens.cjs';
+
+import { fontUrls, webFonts } from 'mirinae-foundation/web-fonts.cjs';
 
 import SpaceOneTheme from './CloudforetTheme';
 

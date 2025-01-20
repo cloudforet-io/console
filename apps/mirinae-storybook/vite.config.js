@@ -1,7 +1,9 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue2';
-import commonjs from '@rollup/plugin-commonjs';
 import path from 'path';
+
+import commonjs from '@rollup/plugin-commonjs';
+import vue from '@vitejs/plugin-vue2';
+import { defineConfig } from 'vite';
+
 
 export default defineConfig({
     plugins: [vue()],
@@ -12,9 +14,9 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        include: ['@/styles/colors.cjs', '@/styles/web-fonts.cjs', '@/styles/screens.cjs', '@/styles/variables.cjs', '@/styles/font-size.cjs', '@/index'],
+        include: ['@/styles/colors.cjs', 'mirinae-foundation/web-fonts.cjs', 'mirinae-foundation/screens.cjs', '@/styles/variables.cjs', '@/index'],
     },
     rollupInputOptions: {
-        plugins: [commonjs()]
-    }
+        plugins: [commonjs()],
+    },
 });
