@@ -15,7 +15,7 @@ const props = defineProps<{
 <template>
     <p-collapsible-panel class="task-name-field"
                          :line-clamp="1"
-                         :recursive="true"
+                         :enable-deep-clamp="true"
     >
         <p-link :text="props.name"
                 :to="{
