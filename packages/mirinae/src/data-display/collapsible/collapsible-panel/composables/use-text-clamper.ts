@@ -37,7 +37,7 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
         return lineCount;
     };
 
-    const trunkedText = (node: Node, lineLimit: number) => {
+    const clampNestedText = (node: Node, lineLimit: number) => {
         if (!node) return;
         const stack: Node[] = [node];
         let remainingLine = lineLimit;
@@ -170,7 +170,7 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
         if (!contentRef) return;
 
         resetTrunkedText();
-        trunkedText(contentRef, lineClamp);
+        clampNestedText(contentRef, lineClamp);
         if (!isCollapsed) {
             resetTrunkedText();
         }
