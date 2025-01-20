@@ -128,7 +128,9 @@ const handleResetVariables = () => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
-        <dashboard-variables-more-button v-if="!state.isSharedDashboard" />
+        <dashboard-variables-more-button v-if="!state.isSharedDashboard"
+                                         :widget-mode="props.widgetMode"
+        />
         <portal to="dashboard-detail-page">
             <dashboard-manage-variable-overlay :visible="state.showOverlay" />
         </portal>
