@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PHeadingLayout, PCard, PIconButton, PI,
@@ -37,6 +40,8 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const route = useRoute();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -106,6 +111,18 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
     state.selectModalVisible = true;
     state.modalType = type;
 };
+
+onMounted(() => {
+    if (route.query.escalationPolicyId) {
+        serviceDetailPageStore.setSelectedEscalationPolicyId(route.query.escalationPolicyId as string);
+    }
+});
+
+onUnmounted(() => {
+    replaceUrlQuery({
+        escalationPolicyId: undefined,
+    });
+});
 </script>
 
 <template>
