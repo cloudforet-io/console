@@ -99,7 +99,7 @@ import { PButton, PDataLoader, PIconButton } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';
-import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
+import type { UserProfileUpdatePasswordParameters } from '@/schema/identity/user-profile/api-verbs/update-password';
 import { i18n } from '@/translations';
 
 import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
@@ -184,8 +184,8 @@ const handleClickButton = () => {
         }
         sendResetEmail(userIdInput.value, state.domainId);
     } else {
-        const request = {
-            password: passwordInput.value,
+        const request: UserProfileUpdatePasswordParameters = {
+            new_password: passwordInput.value,
         };
         postResetPassword(request);
     }
@@ -236,11 +236,10 @@ const sendResetEmail = async (userId, domainId) => {
         state.loading = false;
     }
 };
-const postResetPassword = async (request) => {
+const postResetPassword = async (request: UserProfileUpdatePasswordParameters) => {
     state.loading = true;
     try {
-        const userInfo = await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
-        await userStore.setUserInfo(userInfo);
+        await SpaceConnector.clientV2.identity.userProfile.updatePassword<UserProfileUpdatePasswordParameters>(request);
         SpaceConnector.flushToken();
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {

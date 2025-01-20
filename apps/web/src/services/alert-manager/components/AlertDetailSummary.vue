@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PPaneLayout, PSelectDropdown, PI, PBadge,
+    PPaneLayout, PSelectDropdown, PI, PBadge, PLink,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -11,22 +11,32 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
+
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray, red } from '@/styles/colors';
 
 import { calculateTime } from '@/services/alert-manager/composables/alert-table-data';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({
     alertStatus: 'TRIGGERED',
@@ -119,6 +129,25 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
                     </span>
                 </template>
             </p-select-dropdown>
+        </div>
+        <div class="content-wrapper">
+            <span class="title">{{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE') }}</span>
+            <p-link :text="storeState.escalationPolicy[storeState.alertInfo.escalation_policy_id].label"
+                    action-icon="internal-link"
+                    new-tab
+                    :to="getProperRouteLocation({
+                        name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                        params: {
+                            serviceId: storeState.alertInfo.service_id,
+                        },
+                        query: {
+                            tab: SERVICE_DETAIL_TABS.SETTINGS,
+                            escalationPolicyId: storeState.alertInfo.escalation_policy_id,
+                        },
+                    })"
+                    highlight
+                    class="leading-8"
+            />
         </div>
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.DURATION') }}</span>
