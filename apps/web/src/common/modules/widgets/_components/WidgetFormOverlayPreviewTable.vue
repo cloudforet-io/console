@@ -281,7 +281,7 @@ const queryResult = useQuery({
         page: state.page,
         vars: dashboardDetailGetters.dashboardInfo?.vars,
     }),
-    enabled: computed(() => storeState.selectedDataTableId !== undefined),
+    enabled: computed(() => storeState.selectedDataTableId !== undefined && storeState.selectedDataTable !== undefined),
     staleTime: WIDGET_LOAD_STALE_TIME,
     retry: 2,
 });

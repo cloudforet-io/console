@@ -54,7 +54,10 @@ const state = reactive({
         }
         if (state.fixedValue) return state.fixedValue;
         if (state.multiselectable) {
-            return state.menuItems.filter((d) => state.fieldValue.data?.includes(d.name));
+            return state.fieldValue.data?.map((d) => {
+                const validMenuItem = state.menuItems.find((item) => item.name === d);
+                return validMenuItem || { name: d, label: d };
+            }) || [];
         }
         return state.fieldValue.data;
     }),
