@@ -2,8 +2,6 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
-import { isEmpty } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PCard,
@@ -98,7 +96,7 @@ const state = reactive({
 
                 if (condition.key === 'severity') return true;
 
-                return condition.value.trim() !== '';
+                return condition?.value.toString().trim() !== '';
             });
 
             if (!areConditionsValid) return false;
@@ -106,7 +104,7 @@ const state = reactive({
 
         if (state.actions) {
             if (state.actions.match_asset?.create_temporary_asset) {
-                const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && !isEmpty(state.actions.match_asset.rule);
+                const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && state.actions.match_asset.key !== '';
                 if (!matchAssetValid) return false;
             }
             if (state.actions.merge_asset_labels?.period !== undefined) {
@@ -138,7 +136,7 @@ const state = reactive({
                 if (i.key === 'labels') {
                     return {
                         key: i.key,
-                        value: Number(i.value),
+                        value: i.operator === 'size_gte' || i.operator === 'size_lte' ? Number(i.value) || 0 : i.value,
                         operator: i.operator,
                     };
                 }

@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -16,7 +17,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 interface AlertPageStoreState {
     alertList: AlertModel[]
     totalAlertCount: number;
-    alertListParams?: AlertListParameters;
+    alertListQuery?: Query;
+    selectedServiceId: string;
+    selectedStatus: string;
+    selectedUrgency: string;
+    selectedSearchFilter?: string[];
 }
 
 export const useAlertPageStore = defineStore('page-alert', () => {
@@ -25,7 +30,11 @@ export const useAlertPageStore = defineStore('page-alert', () => {
     const state = reactive<AlertPageStoreState>({
         alertList: [],
         totalAlertCount: 0,
-        alertListParams: undefined,
+        alertListQuery: undefined,
+        selectedServiceId: '',
+        selectedStatus: 'OPEN',
+        selectedUrgency: 'ALL',
+        selectedSearchFilter: undefined,
     });
     const getters = {
         serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((i) => ({
@@ -34,15 +43,27 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         }))),
     };
     const mutations = {
-        setAlertListParams(params: AlertListParameters) {
-            state.alertListParams = params;
+        setAlertListQuery(query: Query) {
+            state.alertListQuery = query;
+        },
+        setSelectedServiceId(serviceId: string) {
+            state.selectedServiceId = serviceId;
+        },
+        setSelectedStatus(status: string) {
+            state.selectedStatus = status;
+        },
+        setSelectedUrgency(urgency: string) {
+            state.selectedUrgency = urgency;
+        },
+        setSelectedSearchFilter(searchFilter?: string[]) {
+            state.selectedSearchFilter = searchFilter;
         },
     };
     const actions = {
         async init() {
             state.alertList = [];
             state.totalAlertCount = 0;
-            state.alertListParams = undefined;
+            state.alertListQuery = undefined;
         },
         async fetchAlertsList(params?: AlertListParameters) {
             try {

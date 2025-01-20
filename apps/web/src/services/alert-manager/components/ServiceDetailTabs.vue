@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import AlertsManagementTable from '@/services/alert-manager/components/AlertsManagementTable.vue';
+import ServiceDetailTabsAlert from '@/services/alert-manager/components/ServiceDetailTabsAlert.vue';
 import ServiceDetailTabsNotifications from '@/services/alert-manager/components/ServiceDetailTabsNotifications.vue';
 import ServiceDetailTabsNotificationsDetail
     from '@/services/alert-manager/components/ServiceDetailTabsNotificationsDetail.vue';
@@ -109,7 +109,7 @@ watch(() => tabState.activeTab, (activeTab) => {
                 <service-detail-tabs-overview />
             </template>
             <template #alerts>
-                <alerts-management-table />
+                <service-detail-tabs-alert />
             </template>
             <template #settings>
                 <service-detail-tabs-settings-container />

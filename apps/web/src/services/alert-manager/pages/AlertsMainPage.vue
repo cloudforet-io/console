@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PHeadingLayout, PHeading, PButton } from '@cloudforet/mirinae';
 
@@ -7,9 +7,6 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 
 import AlertCreateModal from '@/services/alert-manager/components/AlertCreateModal.vue';
 import AlertsManagementTable from '@/services/alert-manager/components/AlertsManagementTable.vue';
-import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
-
-const alertPageStore = useAlertPageStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -20,11 +17,6 @@ const state = reactive({
 const handleClickCreateButton = () => {
     state.createModalVisible = true;
 };
-
-onUnmounted(() => {
-    alertPageStore.init();
-    alertPageStore.$dispose();
-});
 </script>
 
 <template>
