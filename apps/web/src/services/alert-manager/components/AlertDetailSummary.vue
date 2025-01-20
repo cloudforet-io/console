@@ -15,10 +15,13 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray, red } from '@/styles/colors';
 
 import { calculateTime } from '@/services/alert-manager/composables/alert-table-data';
+import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 
 const alertDetailPageStore = useAlertDetailPageStore();
@@ -28,6 +31,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
@@ -131,7 +135,16 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
             <p-link :text="storeState.escalationPolicy[storeState.alertInfo.escalation_policy_id].label"
                     action-icon="internal-link"
                     new-tab
-                    :to="{}"
+                    :to="getProperRouteLocation({
+                        name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
+                        params: {
+                            serviceId: storeState.alertInfo.service_id,
+                        },
+                        query: {
+                            tab: SERVICE_DETAIL_TABS.SETTINGS,
+                            escalationPolicyId: storeState.alertInfo.escalation_policy_id,
+                        },
+                    })"
                     highlight
                     class="leading-8"
             />
