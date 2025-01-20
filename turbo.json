@@ -41,6 +41,16 @@
       ],
       "cache": true
     },
+    "web-storybook#build": {
+      "dependsOn": ["@cloudforet/mirinae#build", "@cloudforet/mirinae#transpile", "@cloudforet/utils#build", "@cloudforet/core-lib#build"],
+      "outputs": ["./.storybook-static/**"],
+      "inputs": [
+        "../web/src/common/**", "../web/postcss.config.js", "../web/tailwind.config.js",  "../web/package.json",
+        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+      ],
+      "cache": false
+    },
     "transpile": {
       "dependsOn": ["^transpile"],
       "outputs": ["./types/**"],

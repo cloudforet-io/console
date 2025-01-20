@@ -19,6 +19,7 @@ deploy
 out
 **/dist
 apps/mirinae-storybook/.out
+apps/web-storybook/.out
 packages/mirinae/css
 packages/mirinae/types
 
