@@ -241,7 +241,7 @@ const queryResults = useQueries({
     ],
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isLoading || queryResults.value?.[0].isRefetching);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || queryResults.value?.[0].isPending);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResults.value?.[0].error?.message as string;

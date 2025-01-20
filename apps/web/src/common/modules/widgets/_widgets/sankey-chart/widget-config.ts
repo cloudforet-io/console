@@ -5,7 +5,7 @@ const sankeyChart: WidgetConfig = {
     widgetName: 'sankeyChart',
     meta: {
         title: 'Sankey Chart',
-        sizes: ['md'],
+        sizes: ['md', 'full'],
         defaultValidationConfig: {
             defaultMaxCount: 1,
         },

@@ -36,6 +36,7 @@ interface VariableMenuItem extends MenuItem {
 interface Props {
     isManageable?: boolean;
     disabled?: boolean;
+    widgetMode?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -180,7 +181,7 @@ const {
                         @select="handleSelectVariable"
                         @update:search-text="handleUpdateSearchText"
         >
-            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
+            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard && !props.widgetMode"
                       #bottom
             >
                 <p-button class="manage-variable-button"

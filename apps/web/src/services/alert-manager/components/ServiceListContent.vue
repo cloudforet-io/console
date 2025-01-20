@@ -7,11 +7,11 @@ import {
     PSelectCard, PI, PLazyImg, PDivider, PTextButton,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
@@ -25,13 +25,11 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 
 interface Props {
     list: ServiceModel[];
-    escalationPolicyList: EscalationPolicyModel[];
     type: 'alert' | 'healthy';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     list: undefined,
-    escalationPolicyList: undefined,
     type: undefined,
 });
 
@@ -46,6 +44,7 @@ const router = useRouter();
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
+    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({
     isCollapsed: false,
@@ -61,10 +60,6 @@ const getWebhookIcon = (id: string): string|undefined => {
     const webhook = storeState.webhook[id].data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
-};
-const getEscalationPolicyName = (id: string): string => {
-    const escalationPolicy = props.escalationPolicyList.find((item) => item.escalation_policy_id === id);
-    return escalationPolicy?.name || '';
 };
 
 const handleClickCollapsibleTitle = () => {
@@ -226,7 +221,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                                     </p>
                                     <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id, item.escalation_policy_id)">
                                         <p class="truncate text-blue-700 pr-1 pl-1">
-                                            {{ getEscalationPolicyName(item.escalation_policy_id) }}
+                                            {{ storeState.escalationPolicy[item.escalation_policy_id].label }}
                                         </p>
                                     </p-text-button>
                                 </div>
