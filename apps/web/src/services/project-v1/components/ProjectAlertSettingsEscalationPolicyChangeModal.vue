@@ -122,7 +122,7 @@ const listEscalationPolicies = async () => {
                 label: d.name,
                 isDefault: d.is_default,
             },
-            created_at: iso8601Formatter(d.created_at, state.timezone),
+            created_at: iso8601Formatter(d.created_at, state.timezone || ''),
         })) ?? [];
         setSelectIndex();
     } catch (e) {

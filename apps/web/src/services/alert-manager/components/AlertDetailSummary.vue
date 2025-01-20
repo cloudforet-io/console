@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PPaneLayout, PSelectDropdown, PI, PBadge,
+    PPaneLayout, PSelectDropdown, PI, PBadge, PLink,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -10,6 +10,9 @@ import { ALERT_URGENCY, ALERT_STATUS } from '@/schema/alert-manager/alert/consta
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
@@ -21,12 +24,15 @@ import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-d
 const alertDetailPageStore = useAlertDetailPageStore();
 const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({
     alertStatus: 'TRIGGERED',
@@ -119,6 +125,16 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
                     </span>
                 </template>
             </p-select-dropdown>
+        </div>
+        <div class="content-wrapper">
+            <span class="title">{{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE') }}</span>
+            <p-link :text="storeState.escalationPolicy[storeState.alertInfo.escalation_policy_id].label"
+                    action-icon="internal-link"
+                    new-tab
+                    :to="{}"
+                    highlight
+                    class="leading-8"
+            />
         </div>
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ALERTS.DURATION') }}</span>
