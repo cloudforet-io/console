@@ -274,7 +274,7 @@ watch(() => storeState.service.service_id, (id) => {
                                       block
                         />
                         <div v-if="action.name === 'change_status'"
-                             class="field-title change-status flex gap-2"
+                             class="field-title change-status flex gap-2 justify-between"
                         >
                             <p-select-dropdown :menu="state.statusDropdownList"
                                                use-fixed-menu-style

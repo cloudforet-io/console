@@ -30,4 +30,6 @@ export type AlertHistoryNotificationChannelInfoType = {
     name: string;
     plugin_id: string;
     error_message?: string;
+    user_group_id?: string;
+    user_id?: string;
 };

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PBadge, PDefinitionTable, PPaneLayout, PLink,
+    PBadge, PDefinitionTable, PPaneLayout, PLink, PTextButton,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -10,6 +12,8 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertSeverityType } from '@/schema/alert-manager/alert/type';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -17,10 +21,14 @@ import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-servi
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import AlertDetailInfoTableDescription from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 type BadgeInfo = {
     badgeType: string;
@@ -32,6 +40,10 @@ const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+
+const router = useRouter();
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -88,13 +100,23 @@ const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
         return {} as BadgeInfo;
     }
 };
-const getAssetInfo = (assetId: string) => {
-    const assetTypeData = storeState.cloudServiceTypeInfo[assetId]?.data;
-    return {
-        provider: assetTypeData?.provider,
-        group: assetTypeData?.group,
-        name: assetTypeData?.cloud_service_type_key,
-    };
+
+const handleRouteViewButton = async (id: string) => {
+    try {
+        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+            cloud_service_id: id,
+        });
+        window.open(router.resolve(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: response.provider,
+                group: response.cloud_service_group,
+                name: response.cloud_service_type,
+            },
+        })).href, '_blank');
+    } catch (e: any) {
+        ErrorHandler.handleError(e, true);
+    }
 };
 </script>
 
@@ -136,16 +158,13 @@ const getAssetInfo = (assetId: string) => {
                         <p class="resource-item truncate">
                             {{ item?.name }}
                         </p>
-                        <p-link :text="i18n.t('ALERT_MANAGER.ALERTS.VIEW_RESOURCE')"
-                                :to="{
-                                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                                    params: getAssetInfo(item.asset_id)
-                                }"
-                                size="md"
-                                highlight
-                                action-icon="internal-link"
-                                new-tab
-                        />
+                        <p-text-button v-if="item.asset_id"
+                                       style-type="highlight"
+                                       icon-right="ic_arrow-right-up"
+                                       @click="handleRouteViewButton(item.asset_id)"
+                        >
+                            {{ $t('ALERT_MANAGER.ALERTS.VIEW_RESOURCE') }}
+                        </p-text-button>
                     </div>
                 </template>
             </template>

@@ -60,10 +60,10 @@ const state = reactive({
         { name: 'labels', label: i18n.t('ALERT_MANAGER.EVENT_RULE.LABEL_LABELS') },
     ])),
     severityDropdownList: computed<SelectDropdownMenuItem[]>(() => [
-        { name: ALERT_SEVERITY.CRITICAL, label: i18n.t('ALERT_MANAGER.ALERTS.CRITICAL') },
-        { name: ALERT_SEVERITY.ERROR, label: i18n.t('ALERT_MANAGER.ALERTS.ERROR') },
-        { name: ALERT_SEVERITY.WARNING, label: i18n.t('ALERT_MANAGER.ALERTS.WARNING') },
-        { name: ALERT_SEVERITY.INFO, label: i18n.t('ALERT_MANAGER.ALERTS.INFO') },
+        { name: ALERT_SEVERITY.CRITICAL, label: 'Critical' },
+        { name: ALERT_SEVERITY.ERROR, label: 'Error' },
+        { name: ALERT_SEVERITY.WARNING, label: 'Warning' },
+        { name: ALERT_SEVERITY.INFO, label: 'Info' },
     ]),
 });
 
@@ -178,13 +178,19 @@ const handleClickDelete = (idx) => {
                                            use-fixed-menu-style
                                            is-fixed-width
                         />
-                        <div v-if="condition.key === 'labels' && (condition.operator === 'size_gte' || condition.operator === 'size_lte')"
+                        <div v-if="condition.key === 'labels'"
+                             :key="condition.operator"
                              class="input"
                         >
-                            <p-text-input v-model="condition.value"
+                            <p-text-input v-if="condition.operator === 'size_gte' || condition.operator === 'size_lte'"
+                                          v-model="condition.value"
                                           type="number"
                                           :min="0"
                                           :max="100"
+                                          block
+                            />
+                            <p-text-input v-else
+                                          v-model="condition.value"
                                           block
                             />
                         </div>

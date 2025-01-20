@@ -113,6 +113,8 @@ const state = reactive({
     formattedMemberItems: {} as Record<MembersType, string[]>,
 });
 
+const formatRoleType = (roleType: RoleType) => roleType?.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
+
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.formattedMemberItems = value;
 };
@@ -234,10 +236,10 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
                                         <span>{{ item?.label }}</span>
                                     </div>
                                     <p class="member-info-content">
-                                        <span v-if="!state.isMobileSize && item.type === MEMBERS_TYPE.USER"
+                                        <span v-if="!state.isMobileSize"
                                               class="text-gray-500"
                                         >
-                                            {{ item?.roleType }}
+                                            {{ item.type === MEMBERS_TYPE.USER ? formatRoleType(item?.roleType) : $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}
                                         </span>
                                         <p-icon-button name="ic_delete"
                                                        size="sm"

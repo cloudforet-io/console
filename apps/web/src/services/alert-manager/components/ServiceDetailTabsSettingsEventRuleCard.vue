@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { isEmpty } from 'lodash';
 
@@ -9,6 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
+import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
 import {
     EVENT_RULE_CONDITIONS_POLICY,
     EVENT_RULE_SCOPE,
@@ -99,11 +101,11 @@ const state = reactive({
                                 value: matchAssetValue.asset_types.map((i) => storeState.cloudServiceType[i].label).join(', '),
                             });
                         }
-                        if (matchAssetValue.rule) {
+                        if (matchAssetValue.key) {
                             result[type].push({
                                 label: i18n.t('ALERT_MANAGER.EVENT_RULE.POLICY'),
-                                name: 'rule',
-                                value: matchAssetValue.rule,
+                                name: 'key',
+                                value: matchAssetValue.key,
                             });
                         }
                         result[type].push({
@@ -142,6 +144,26 @@ const state = reactive({
     modalVisible: false,
 });
 
+const formatState = (value: AlertStatusType): TranslateResult => {
+    switch (value) {
+    case ALERT_STATUS.TRIGGERED: return i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED');
+    case ALERT_STATUS.ACKNOWLEDGED: return i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED');
+    case ALERT_STATUS.IGNORED: return i18n.t('ALERT_MANAGER.ALERTS.IGNORED');
+    case ALERT_STATUS.RESOLVED: return i18n.t('ALERT_MANAGER.ALERTS.RESOLVED');
+    default: return '';
+    }
+};
+const formatOperator = (value: string): TranslateResult => {
+    switch (value) {
+    case 'contain': return i18n.t('ALERT_MANAGER.EVENT_RULE.CONTAINS');
+    case 'not_contain': return i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_CONTAIN');
+    case 'eq': return i18n.t('ALERT_MANAGER.EVENT_RULE.EQUALS');
+    case 'not': return i18n.t('ALERT_MANAGER.EVENT_RULE.DOES_NOT_EQUAL');
+    case 'size_gte': return i18n.t('ALERT_MANAGER.EVENT_RULE.AT_LEAST');
+    case 'size_lte': return i18n.t('ALERT_MANAGER.EVENT_RULE.LESS_THAN_EQUAL');
+    default: return '';
+    }
+};
 const getWebhookIcon = (): string|undefined => {
     const webhook = storeState.webhook[storeState.eventRuleInfo?.webhook_id]?.data;
     if (!webhook) return undefined;
@@ -271,7 +293,7 @@ const handleDeleteEventRule = () => {
                                 </div>
                                 <p class="flex gap-1 text-paragraph-md text-gray-700">
                                     <span class="text-blue-800">{{ condition.key }}</span>
-                                    <span>{{ condition.operator }}</span>
+                                    <span>{{ formatOperator(condition.operator) }}</span>
                                     <span class="text-blue-800">{{ condition.value }}</span>
                                 </p>
                             </div>
@@ -321,14 +343,14 @@ const handleDeleteEventRule = () => {
                                             <template v-if="action.name === 'change_service'">
                                                 {{ storeState.service[action.value]?.label || action.value }}
                                             </template>
-                                            <template v-else-if="action.name === 'rule'">
-                                                <span>{{ action.value.key || '--' }}</span>
+                                            <template v-else-if="action.name === 'key'">
+                                                <span>{{ action.value || '--' }}</span>
                                             </template>
                                             <template v-else-if="action.name === 'change_urgency'">
                                                 {{ action.value === EVENT_RULE_URGENCY.HIGH ? $t('ALERT_MANAGER.EVENT_RULE.HIGH') : $t('ALERT_MANAGER.EVENT_RULE.LOW') }}
                                             </template>
                                             <template v-else-if="action.name === 'change_status'">
-                                                {{ action.value === ALERT_STATUS.IGNORED ? $t('ALERT_MANAGER.ALERTS.IGNORED') : $t('ALERT_MANAGER.ALERTS.TRIGGERED') }}
+                                                {{ formatState(action.value) }}
                                             </template>
                                             <template v-else-if="action.name === 'change_escalation_policy'">
                                                 {{ storeState.escalationPolicy[action.value]?.label || action.value }}

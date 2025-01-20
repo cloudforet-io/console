@@ -15,6 +15,7 @@ const ServiceDetailPage = () => import('@/services/alert-manager/pages/ServiceDe
 const ServiceCreatePage = () => import('@/services/alert-manager/pages/ServiceCreatePage.vue');
 const ServiceDetailWebhookCreatePage = () => import('@/services/alert-manager/pages/ServiceDetailWebhookCreatePage.vue');
 const ServiceDetailNotificationsCreatePage = () => import('@/services/alert-manager/pages/ServiceDetailNotificationsCreatePage.vue');
+const AlertContainer = () => import('@/services/alert-manager/AlertContainer.vue');
 const AlertsMainPage = () => import('@/services/alert-manager/pages/AlertsMainPage.vue');
 const AlertsDetailPage = () => import('@/services/alert-manager/pages/AlertsDetailPage.vue');
 
@@ -86,7 +87,7 @@ const alertManagerRoute: RouteConfig = {
                 menuId: MENU_ID.ALERTS,
                 translationId: MENU_INFO_MAP[MENU_ID.ALERTS].translationId,
             },
-            component: { template: '<router-view />' },
+            component: AlertContainer as any,
             children: [
                 {
                     path: '/',
