@@ -13,8 +13,6 @@ import {
 import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
@@ -52,7 +50,6 @@ const state = reactive({
     serviceList: [] as ServiceModel[],
     alertServiceList: computed<ServiceModel[]>(() => state.serviceList.filter((item) => !isEmpty(item?.alerts.TRIGGERED) || !isEmpty(item?.alerts.ACKNOWLEDGED))),
     healthyServiceList: computed<ServiceModel[]>(() => state.serviceList.filter((item) => isEmpty(item?.alerts.TRIGGERED) && isEmpty(item?.alerts.ACKNOWLEDGED))),
-    escalationPolicyList: [] as EscalationPolicyModel[],
 });
 
 const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -92,18 +89,8 @@ const fetchServiceList = async () => {
         state.loading = false;
     }
 };
-const fetchEscalationPolicy = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>();
-        state.escalationPolicyList = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.escalationPolicyList = [];
-    }
-};
 
 onMounted(async () => {
-    await fetchEscalationPolicy();
     await fetchServiceList();
 });
 </script>
@@ -129,11 +116,9 @@ onMounted(async () => {
         >
             <div class="flex flex-col gap-4">
                 <service-list-content :list="state.alertServiceList"
-                                      :escalation-policy-list="state.escalationPolicyList"
                                       type="alert"
                 />
                 <service-list-content :list="state.healthyServiceList"
-                                      :escalation-policy-list="state.escalationPolicyList"
                                       type="healthy"
                 />
             </div>
