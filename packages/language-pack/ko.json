@@ -1413,6 +1413,7 @@
 			"ROLE": "권한",
 			"SEND_LINK": "사용자에게 비밀번호 재설정 이메일 발송",
 			"SET_MANUALLY": "관리자가 대신 비밀번호 설정",
+			"SUCCESS_PASSWORD_CHECK": "비밀번호가 성공적으로 인증되었습니다.",
 			"TIMEZONE": "타임존",
 			"TITLE": "개인 정보"
 		},
