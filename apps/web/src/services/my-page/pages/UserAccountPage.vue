@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { debounce } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
@@ -25,6 +23,7 @@ import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import UserAccountBaseInformation from '@/services/my-page/components/UserAccountBaseInformation.vue';
 import UserAccountChangePassword from '@/services/my-page/components/UserAccountChangePassword.vue';
@@ -60,12 +59,11 @@ const state = reactive({
     }),
     readonlyMode: computed(() => {
         const isLocalUser = storeState.authType === 'LOCAL';
-        return isLocalUser ? !passwordFormState.isPasswordChecked : false;
+        return isLocalUser ? !passwordFormState.isTokenChecked : false;
     }),
 });
 
 const passwordFormState = reactive({
-    isPasswordChecked: false,
     passwordCheckModalVisible: false,
     password: '',
     certifiedPassword: '',
@@ -76,12 +74,8 @@ const passwordFormState = reactive({
 });
 
 const passwordCheckFecher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.issue);
-const handleChangePassword = debounce(async () => {
-    if (!passwordFormState.password) {
-        passwordFormState.isTokenChecked = undefined;
-        passwordFormState.invalidText = '';
-        return;
-    }
+
+const handleConfirmPasswordCheckModal = async () => {
     passwordFormState.loading = true;
     try {
         const result = await passwordCheckFecher<TokenIssueParameters, TokenIssueModel>({
@@ -97,6 +91,8 @@ const handleChangePassword = debounce(async () => {
                 passwordFormState.certifiedPassword = passwordFormState.password;
                 passwordFormState.isTokenChecked = true;
                 passwordFormState.invalidText = '';
+                passwordFormState.passwordCheckModalVisible = false;
+                showSuccessMessage(i18n.t('COMMON.PROFILE.SUCCESS_PASSWORD_CHECK'));
             } else {
                 passwordFormState.isTokenChecked = false;
                 passwordFormState.invalidText = i18n.t('COMMON.PROFILE.CURRENT_PASSWORD_INVALID');
@@ -107,6 +103,8 @@ const handleChangePassword = debounce(async () => {
             passwordFormState.certifiedPassword = passwordFormState.password;
             passwordFormState.isTokenChecked = true;
             passwordFormState.invalidText = '';
+            passwordFormState.passwordCheckModalVisible = false;
+            showSuccessMessage(i18n.t('COMMON.PROFILE.SUCCESS_PASSWORD_CHECK'));
         } else {
             passwordFormState.isTokenChecked = false;
             passwordFormState.invalidText = i18n.t('COMMON.PROFILE.CURRENT_PASSWORD_INVALID');
@@ -114,11 +112,6 @@ const handleChangePassword = debounce(async () => {
     } finally {
         passwordFormState.loading = false;
     }
-}, 800);
-
-const handleConfirmPasswordCheckModal = () => {
-    passwordFormState.isPasswordChecked = true;
-    passwordFormState.passwordCheckModalVisible = false;
 };
 const handleOpenPasswordCheckModal = () => {
     passwordFormState.passwordCheckModalVisible = true;
@@ -140,7 +133,7 @@ const handleClickCancel = () => {
                 <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
             </template>
             <template #extra>
-                <p-button v-if="!passwordFormState.isPasswordChecked && storeState.authType === 'LOCAL'"
+                <p-button v-if="!passwordFormState.isTokenChecked && storeState.authType === 'LOCAL'"
                           @click="handleOpenPasswordCheckModal"
                 >
                     {{ $t('COMMON.PROFILE.EDIT_ACCOUNT_INFO') }}
@@ -180,7 +173,7 @@ const handleClickCancel = () => {
         <p-button-modal :header-title="$t('COMMON.PROFILE.PASSWORD_CHECK_TITLE')"
                         :visible.sync="passwordFormState.passwordCheckModalVisible"
                         :loading="passwordFormState.loading"
-                        :disabled="!passwordFormState.isTokenChecked"
+                        :disabled="passwordFormState.password.length < 8"
                         size="sm"
                         @confirm="handleConfirmPasswordCheckModal"
                         @cancel="handleClickCancel"
@@ -198,10 +191,8 @@ const handleClickCancel = () => {
                                           type="password"
                                           placeholder="Password"
                                           appearance-type="masking"
-                                          :readonly="passwordFormState.loading"
                                           :invalid="invalid"
                                           block
-                                          @update:value="handleChangePassword"
                             />
                         </template>
                     </p-field-group>
