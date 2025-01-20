@@ -2,13 +2,13 @@
 import { computed, reactive } from 'vue';
 
 import { useWindowSize } from '@vueuse/core';
+import screens from 'mirinae-foundation/screens.cjs';
 import type { Location } from 'vue-router';
 
 import PCopyButton from '@/controls/buttons/copy-button/PCopyButton.vue';
 import PI from '@/foundation/icons/PI.vue';
 import type { Route } from '@/navigation/breadcrumbs/type';
 
-import screens from '@/styles/screens.cjs';
 
 interface Props {
     route: Route;

@@ -115,6 +115,7 @@
     "concurrently": "^7.6.0",
     "eslint-config-custom": "*",
     "postcss-config-custom": "*",
+    "mirinae-foundation": "*",
     "resolve-url-loader": "^3.1.5",
     "rollup-plugin-copy": "^3.4.0",
     "ts-loader": "^8.4.0",
