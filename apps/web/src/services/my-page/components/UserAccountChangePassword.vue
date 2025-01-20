@@ -6,7 +6,7 @@ import {
     PButton, PFieldGroup, PTextInput, PFieldTitle, PDefinitionTable,
 } from '@cloudforet/mirinae';
 
-import type { UpdatePasswordParameters } from '@/schema/identity/user-profile/api-verbs/update-password';
+import type { UserProfileUpdatePasswordParameters } from '@/schema/identity/user-profile/api-verbs/update-password';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -78,7 +78,7 @@ const resetPasswordForm = () => {
     });
 };
 const handleClickPasswordConfirm = async () => {
-    const userParam: UpdatePasswordParameters = {
+    const userParam: UserProfileUpdatePasswordParameters = {
         new_password: password.value,
         current_password: state.currentPassword,
     };
@@ -87,10 +87,10 @@ const handleClickPasswordConfirm = async () => {
 };
 
 /* API */
-const updateUser = async (userParam: UpdatePasswordParameters) => {
+const updateUser = async (userParam: UserProfileUpdatePasswordParameters) => {
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.identity.userProfile.updatePassword<UpdatePasswordParameters>(userParam);
+        await SpaceConnector.clientV2.identity.userProfile.updatePassword<UserProfileUpdatePasswordParameters>(userParam);
         state.currentPassword = userParam.new_password;
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
     } catch (e: any) {
