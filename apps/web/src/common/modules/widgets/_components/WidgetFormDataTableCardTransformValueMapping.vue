@@ -128,10 +128,10 @@ const handleClickAddCase = () => {
 const handleClickDeleteCase = (idx: number) => {
     casesInfo.value.splice(idx, 1);
 };
-const handleClickExpand = (idx: number) => {
-    state.expandCaseMap[idx] = !state.expandCaseMap[idx];
-    state.expandCaseMap = { ...state.expandCaseMap };
-};
+// const handleClickExpand = (idx: number) => {
+//     state.expandCaseMap[idx] = !state.expandCaseMap[idx];
+//     state.expandCaseMap = { ...state.expandCaseMap };
+// };
 const handleUpdateBasedOn = (key: string) => {
     keyInfo.value = key;
 };
@@ -247,11 +247,11 @@ watch(() => state.invalid, (_invalid) => {
                                    :disabled="casesInfo.length === 1"
                                    @click="handleClickDeleteCase(cIdx)"
                     />
-                    <p-icon-button name="ic_arrows-expand-all"
-                                   size="sm"
-                                   class="expand-button"
-                                   @click="handleClickExpand(cIdx)"
-                    />
+                    <!--                    <p-icon-button name="ic_arrows-expand-all"-->
+                    <!--                                   size="sm"-->
+                    <!--                                   class="expand-button"-->
+                    <!--                                   @click="handleClickExpand(cIdx)"-->
+                    <!--                    />-->
                 </div>
 
                 <div class="grid grid-cols-12 gap-2">
@@ -319,7 +319,6 @@ watch(() => state.invalid, (_invalid) => {
             @apply bg-white rounded border border-gray-150;
             position: relative;
             padding: 0.5rem;
-            z-index: 1;
             margin-bottom: 0.5rem;
             &.expanded {
                 width: 35rem;
