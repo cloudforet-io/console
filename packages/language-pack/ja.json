@@ -1413,6 +1413,7 @@
 			"ROLE": "権限",
 			"SEND_LINK": "パスワードリセットメール送信",
 			"SET_MANUALLY": "管理者がパスワードを設定する",
+			"SUCCESS_PASSWORD_CHECK": "パスワードが正常に確認されました。",
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},

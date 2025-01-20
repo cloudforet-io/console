@@ -1413,6 +1413,7 @@
 			"ROLE": "Role",
 			"SEND_LINK": "Send user a password reset link",
 			"SET_MANUALLY": "Set password manually",
+			"SUCCESS_PASSWORD_CHECK": "Password successfully verified",
 			"TIMEZONE": "Time Zone",
 			"TITLE": "Profile"
 		},
