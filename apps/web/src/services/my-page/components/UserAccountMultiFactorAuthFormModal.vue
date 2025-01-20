@@ -18,8 +18,6 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 import UserAccountMultiFactorAuthModalMSInfo
@@ -90,13 +88,6 @@ const handleChangeInput = (value: string) => {
 };
 const handleClickCancel = async () => {
     resetFormData();
-    if (storeState.userId === state.userInfo.user_id) {
-        try {
-            await userStore.updateUser(state.userInfo);
-        } catch (e: any) {
-            ErrorHandler.handleError(e);
-        }
-    }
     if (storeState.isSwitchModal && state.otherType) {
         multiFactorAuthStore.setEnableMfaMap({
             [storeState.selectedType]: true,
@@ -112,11 +103,8 @@ const handleClickVerifyButton = async () => {
         state.userInfo = await postValidationMfaCode({
             verify_code: validationState.verificationCode,
         }) as UserInfoType;
-        if (storeState.userId === state.userInfo.user_id) {
-            await userStore.updateUser(state.userInfo);
-            if (state.userInfo.mfa) {
-                userStore.setMfa(state.userInfo.mfa);
-            }
+        if (storeState.userId === state.userInfo.user_id && state.userInfo.mfa) {
+            userStore.setMfa(state.userInfo.mfa);
         }
         resetFormData();
         if (storeState.isReSyncModal || storeState.isSwitchModal) {
