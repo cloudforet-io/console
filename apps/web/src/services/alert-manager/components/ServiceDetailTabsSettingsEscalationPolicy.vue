@@ -40,6 +40,7 @@ import ServiceDetailTabsSettingsEscalationPolicyFormModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicyFormModal.vue';
 import ServiceDetailTabsSettingsEscalationPolicyStateModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
+import { ALERT_STATUS_FILTERS } from '@/services/alert-manager/constants/alert-table-constant';
 import {
     ALERT_EXCEL_FIELDS,
     ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS,
@@ -52,14 +53,6 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-
-const finishConditionLabel = {
-    OPEN: 'Open',
-    TRIGGERED: 'Triggered',
-    ACKNOWLEDGED: 'Acknowledged',
-    RESOLVED: 'Resolved',
-    IGNORED: 'Ignored',
-};
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -259,7 +252,7 @@ onUnmounted(() => {
                 {{ value?.count || 0 }}
             </template>
             <template #col-finish_condition-format="{value}">
-                {{ finishConditionLabel[value] }}
+                {{ ALERT_STATUS_FILTERS[value][0] + ALERT_STATUS_FILTERS[value].slice(1).toLowerCase() }}
             </template>
             <template #col-rules-format="{value}">
                 <div class="flex gap-3">
