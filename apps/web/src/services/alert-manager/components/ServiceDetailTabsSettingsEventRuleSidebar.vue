@@ -22,6 +22,7 @@ import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-st
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -31,8 +32,6 @@ import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-c
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { TreeNode } from '@/services/project/tree/type';
-
-
 
 interface Props {
   hideSidebar: boolean;
@@ -51,6 +50,7 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { width } = useWindowSize();
 const { getProperRouteLocation } = useProperRouteLocation();
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
 const router = useRouter();
@@ -238,19 +238,21 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                     <p class="font-bold">
                         {{ $t('ALERT_MANAGER.EVENT_RULE.SIDE_BAR_TITLE') }}
                     </p>
-                    <p-button v-if="!state.isEditMode"
-                              size="sm"
-                              style-type="tertiary"
-                              @click="state.isEditMode = true"
-                    >
-                        {{ $t('ALERT_MANAGER.EVENT_RULE.SET_ORDER') }}
-                    </p-button>
-                    <p-button v-else
-                              size="sm"
-                              @click="handleSaveOrder"
-                    >
-                        {{ $t('ALERT_MANAGER.EVENT_RULE.SAVE') }}
-                    </p-button>
+                    <template v-if="hasReadWriteAccess">
+                        <p-button v-if="!state.isEditMode"
+                                  size="sm"
+                                  style-type="tertiary"
+                                  @click="state.isEditMode = true"
+                        >
+                            {{ $t('ALERT_MANAGER.EVENT_RULE.SET_ORDER') }}
+                        </p-button>
+                        <p-button v-else
+                                  size="sm"
+                                  @click="handleSaveOrder"
+                        >
+                            {{ $t('ALERT_MANAGER.EVENT_RULE.SAVE') }}
+                        </p-button>
+                    </template>
                 </div>
                 <p-search class="namespace-search"
                           block
@@ -283,7 +285,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                         width="1rem"
                                         height="1rem"
                             />
-                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id].label }}</span>
+                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
                         </div>
                         <draggable v-if="title.isOpen"
                                    v-model="title.children"
