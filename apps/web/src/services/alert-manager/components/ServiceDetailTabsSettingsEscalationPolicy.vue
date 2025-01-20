@@ -40,6 +40,7 @@ import ServiceDetailTabsSettingsEscalationPolicyFormModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicyFormModal.vue';
 import ServiceDetailTabsSettingsEscalationPolicyStateModal
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
+import { ALERT_STATUS_FILTERS } from '@/services/alert-manager/constants/alert-table-constant';
 import {
     ALERT_EXCEL_FIELDS,
     ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS, ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS,
@@ -99,11 +100,10 @@ const { queryTags } = queryTagHelper;
 const initSelectedEscalationPolicy = () => {
     state.selectIndex = state.items.findIndex((item) => item.escalation_policy_id === storeState.selectedEscalationPolicyId);
 };
-const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
-    const allChannels = rules.flatMap((item) => item.channels);
-    const uniqueChannels = new Set(allChannels);
-    return uniqueChannels.size;
-};
+const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): { step: number; connectedChannelCnt: number; }[] => rules.map((rule, stepIdx) => ({
+    step: stepIdx + 1,
+    connectedChannelCnt: rule.channels.length,
+}));
 const handleActionModal = (type: EscalationPolicyModalType) => {
     modalState.visible = true;
     modalState.type = type;
@@ -251,8 +251,24 @@ onUnmounted(() => {
             <template #col-repeat-format="{value}">
                 {{ value?.count || 0 }}
             </template>
+            <template #col-finish_condition-format="{value}">
+                {{ ALERT_STATUS_FILTERS[value][0] + ALERT_STATUS_FILTERS[value].slice(1).toLowerCase() }}
+            </template>
             <template #col-rules-format="{value}">
-                {{ getConnectChannelCount(value) }}
+                <div class="flex gap-3">
+                    <div v-for="channelInfo in getConnectChannelCount(value)"
+                         :key="channelInfo.step"
+                    >
+                        <p-badge badge-type="solid-outline"
+                                 style-type="gray500"
+                        >
+                            STEP {{ channelInfo.step }}
+                        </p-badge>
+                        <span>
+                            {{ channelInfo.connectedChannelCnt }}
+                        </span>
+                    </div>
+                </div>
             </template>
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
