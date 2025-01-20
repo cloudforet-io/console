@@ -7,6 +7,7 @@ export const ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'name', label: 'Name' },
     { name: 'repeat', label: 'Repeat Time' },
     { name: 'rules', label: 'Connected Channel' },
+    { name: 'finish_condition', label: 'Finish Condition' },
     { name: 'created_at', label: 'Created' },
 ];
 export const ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS: KeyItemSet[] = [{
