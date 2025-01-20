@@ -5,7 +5,7 @@ export const getCollapsiblePanelArgs = (): Args => ({
     'v-model': '',
     isCollapsed: true,
     lineClamp: 2,
-    recursive: false,
+    enableDeepClamp: false,
     defaultSlot: faker.lorem.sentence(40),
 });
 
@@ -63,8 +63,8 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
         },
         control: 'number',
     },
-    recursive: {
-        name: 'recursive',
+    enableDeepClamp: {
+        name: 'enableDeepClamp',
         type: { name: 'boolean' },
         description: 'When set to true, text clamping is applied recursively to nested elements, treating text within both inline and block elements as a single line.',
         table: {

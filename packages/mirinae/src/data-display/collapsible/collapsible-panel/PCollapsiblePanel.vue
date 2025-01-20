@@ -5,12 +5,12 @@
                  class="text fake"
                  :style="{'-webkit-line-clamp': lineClamp}"
             >
-                <slot v-if="!recursive" />
+                <slot v-if="!enableDeepClamp" />
             </div>
             <div ref="contentRef"
                  class="text"
             >
-                <slot v-if="recursive || (lineClamp !== 0 || !proxyIsCollapsed)" />
+                <slot v-if="enableDeepClamp || (lineClamp !== 0 || !proxyIsCollapsed)" />
             </div>
         </div>
         <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow"
@@ -26,7 +26,7 @@ import {
 } from 'vue';
 
 import {
-    useRecursiveTextClamper,
+    useDeepTextClamper,
     useSimpleTextClamper,
 } from '@/data-display/collapsible/collapsible-panel/composables/use-text-clamper';
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
@@ -51,7 +51,7 @@ export default defineComponent({
             type: Number,
             default: 2,
         },
-        recursive: {
+        enableDeepClamp: {
             type: Boolean,
             default: false,
         },
@@ -64,12 +64,12 @@ export default defineComponent({
         });
 
         const simpleTextClamper = useSimpleTextClamper(PAD, props.lineClamp);
-        const recursiveTextClamper = useRecursiveTextClamper(props.lineClamp);
+        const deepTextClamper = useDeepTextClamper(props.lineClamp);
 
         const updateClamping = () => {
             nextTick(() => {
-                if (props.recursive) {
-                    recursiveTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef);
+                if (props.enableDeepClamp) {
+                    deepTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef);
                 } else {
                     simpleTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef, state.fakeTextRef);
                 }
@@ -95,8 +95,8 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            isOverflow: computed(() => (props.recursive
-                ? recursiveTextClamper.state.isOverflow
+            isOverflow: computed(() => (props.enableDeepClamp
+                ? deepTextClamper.state.isOverflow
                 : simpleTextClamper.state.isOverflow)),
         };
     },

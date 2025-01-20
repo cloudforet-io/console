@@ -123,7 +123,7 @@ export const LineClamp: Story = {
     }),
 };
 
-export const RecursiveBasic: Story = {
+export const DeepClampBasic: Story = {
     render: (args, { argTypes }) => ({
         props: Object.keys(argTypes),
         i18n: I18nConnector.i18n,
@@ -132,7 +132,7 @@ export const RecursiveBasic: Story = {
             <div class="h-full w-full overflow p-8">
                 <p-collapsible-panel
                     v-model="proxyIsCollapsed"
-                    :recursive="true"
+                    :enable-deep-clamp="true"
                     :line-clamp="1"
                 >
                   <div>
@@ -157,7 +157,7 @@ export const RecursiveBasic: Story = {
     }),
 };
 
-export const MultiElements: Story = {
+export const NestedElements: Story = {
     render: (args, { argTypes }) => ({
         props: Object.keys(argTypes),
         i18n: I18nConnector.i18n,
@@ -166,7 +166,7 @@ export const MultiElements: Story = {
                   <div class="h-full w-full overflow p-8">
                     <div class="p-4 mb-8">
                       <p class="text-xl font-bold mb-2 border-b">Line Clamp: 5</p>
-                      <p-collapsible-panel :line-clamp="5" :recursive="true">
+                      <p-collapsible-panel :line-clamp="5" :enable-deep-clamp="true">
                         <div style=" height: 300px; border: 1px solid gray; padding: 20px;">
                           <div class="target2">
                             {{contents1}}
@@ -180,7 +180,7 @@ export const MultiElements: Story = {
                     </div>
                     <div class="p-4 mb-8">
                       <p class="text-xl font-bold mb-2 border-b">Line Clamp: 7</p>
-                      <p-collapsible-panel :line-clamp="7" :recursive="true">
+                      <p-collapsible-panel :line-clamp="7" :enable-deep-clamp="true">
                         <div style=" height: 300px; border: 1px solid gray; padding: 20px;">
                           <div class="target2">
                             {{contents1}}
@@ -218,7 +218,7 @@ export const MultiInlineElements: Story = {
             <div class="h-full w-full overflow p-8">
                 <p-collapsible-panel
                     v-model="proxyIsCollapsed"
-                    :recursive="true"
+                    :enable-deep-clamp="true"
                     :line-clamp="2"
                 >
                   <div>  
@@ -255,7 +255,7 @@ export const Advance: Story = {
             <div class="h-full w-full overflow p-8">
                 <p-collapsible-panel
                     v-model="proxyIsCollapsed"
-                    :recursive="true"
+                    :enable-deep-clamp="true"
                     :line-clamp="1"
                 >
                   <p-link :text="contents"></p-link>

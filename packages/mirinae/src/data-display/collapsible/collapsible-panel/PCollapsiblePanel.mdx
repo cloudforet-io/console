@@ -14,8 +14,8 @@ Collapsible Panel is a component that can be expanded or collapsed.
 
 # Types
 There are two types based on behavior:
-- [simpleClamp](#line-clamp)
-- [recursive](#recursive)
+- [SimpleClamp](#line-clamp)
+- [DeepClamp](#deepclamp)
 
 <br/>
 <br/>
@@ -32,27 +32,27 @@ There are two types based on behavior:
 <br/>
 <br/>
 
-# Recursive
-```recursive (Boolean)```
+## DeepClamp
+```DeepClamp (Boolean)```
 
 This prop controls the text clamping (truncation) method. <br/>
 When set to `true`, text clamping is applied recursively to nested elements, <br/>
 **treating text within both inline and block elements as a single line.** <br/>
 When set to `false`, text clamping only applies to the top-level element, improving performance.
 
-**Tip**: Use `recursive: true` when dealing with nested text structures or multi-level elements to enforce text length constraints.
+**Tip**: Use `enableDeepClamp: true` when dealing with nested text structures or multi-level elements to enforce text length constraints.
 **Motivation**: The simple clamping method had issues where clamping was not applied properly when multiple nested child elements were present.
 
 <br/>
 
-## Recursive Basic
-<Canvas of={PCollapsiblePanelStories.RecursiveBasic} />
+## DeepClamp Basic
+<Canvas of={PCollapsiblePanelStories.DeepClampBasic} />
 
 <br/>
 <br/>
 
-## Multi Elements
-<Canvas of={PCollapsiblePanelStories.MultiElements} />
+## Nested Elements
+<Canvas of={PCollapsiblePanelStories.NestedElements} />
 
 <br/>
 <br/>
@@ -64,7 +64,7 @@ When set to `false`, text clamping only applies to the top-level element, improv
 <br/>
 
 ## Advanced
-With PLink
+The example below demonstrates how `CollapsiblePanel` integrates with `PLink` for interactive content
 <Canvas of={PCollapsiblePanelStories.Advance} />
 
 <br/>

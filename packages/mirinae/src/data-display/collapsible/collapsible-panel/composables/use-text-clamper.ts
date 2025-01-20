@@ -6,7 +6,7 @@ interface TextClamper {
 }
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion, no-continue, no-restricted-syntax */
-export const useRecursiveTextClamper = (lineClamp : number):TextClamper => {
+export const useDeepTextClamper = (lineClamp : number):TextClamper => {
     const state = reactive({
         isOverflow: false,
         clampedElement: null as null|HTMLElement,
