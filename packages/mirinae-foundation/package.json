@@ -1,4 +1,7 @@
 {
   "name": "mirinae-foundation",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
 }
