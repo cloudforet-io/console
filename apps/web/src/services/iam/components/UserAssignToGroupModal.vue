@@ -115,4 +115,7 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
     height: 22rem;
     overflow: auto;
 }
+:deep(.dropdown-context-menu) {
+    left: unset !important;
+}
 </style>
