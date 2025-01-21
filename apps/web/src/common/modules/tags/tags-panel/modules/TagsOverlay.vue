@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { isEmpty } from 'lodash';
 
-import PairFieldLayout from '@/common/components/pair-field-layout/PairFieldLayout.vue';
+import PairsForm from '@/common/components/forms/pairs-form/PairsForm.vue';
 import type { Tag } from '@/common/modules/tags/type';
 
 const props = withDefaults(defineProps<{
@@ -29,12 +29,12 @@ const state = reactive({
 </script>
 
 <template>
-    <pair-field-layout :title="props.title ?? $t('COMMON.TAGS.TITLE')"
-                       :pairs="props.tags"
-                       :loading="props.loading"
-                       class="tags-overlay"
-                       @save="emit('update', $event)"
-                       @close="emit('close')"
+    <pairs-form :title="props.title ?? $t('COMMON.TAGS.TITLE')"
+                :pairs="props.tags"
+                :loading="props.loading"
+                class="tags-overlay"
+                @save="emit('update', $event)"
+                @close="emit('close')"
     >
         <template #description>
             <div v-if="state.noItem"
@@ -50,7 +50,7 @@ const state = reactive({
                 {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
             </div>
         </template>
-    </pair-field-layout>
+    </pairs-form>
 </template>
 
 <style lang="postcss" scoped>
