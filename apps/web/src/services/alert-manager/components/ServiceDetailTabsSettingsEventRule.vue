@@ -9,6 +9,8 @@ import { PButton, PDataLoader, screens } from '@cloudforet/mirinae';
 import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
 import ServiceDetailTabsSettingsEventRuleCard
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleCard.vue';
 import ServiceDetailTabsSettingsEventRuleFormCard
@@ -21,6 +23,7 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+const { hasReadWriteAccess } = usePageEditableStatus();
 const { width } = useWindowSize();
 
 const storeState = reactive({
@@ -88,7 +91,8 @@ onUnmounted(() => {
                     <p class="text-paragraph-md text-gray-500 whitespace-pre-wrap text-center">
                         {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_HELP_TEXT') }}
                     </p>
-                    <p-button icon-left="ic_plus_bold"
+                    <p-button v-if="hasReadWriteAccess"
+                              icon-left="ic_plus_bold"
                               class="self-start mx-auto"
                               @click="handleClickAddRule"
                     >
@@ -101,8 +105,8 @@ onUnmounted(() => {
                                                          :hide-sidebar.sync="state.hideSidebar"
                                                          :items="storeState.items"
         />
-        <service-detail-tabs-settings-event-rule-scope-modal v-if="storeState.modalVisible"
-                                                             :visible="storeState.modalVisible"
+        <service-detail-tabs-settings-event-rule-scope-modal v-if="hasReadWriteAccess && storeState.modalVisible"
+                                                             :visible="hasReadWriteAccess && storeState.modalVisible"
                                                              :scope.sync="state.selectedScope"
                                                              :selected-webhook.sync="state.selectedWebhook"
         />

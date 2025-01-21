@@ -4548,6 +4548,7 @@
 				"INFO": {
 					"ACCOUNT_ID": "アカウントID",
 					"ACKNOWLEDGED": "確認時間",
+					"ACKNOWLEDGED_BY": "確認",
 					"ALERT_ID": "アラートID",
 					"ALT_E_UPDATE_DESCRIPTION": "説明修正に失敗",
 					"ALT_E_UPDATE_PROJECT": "プロジェクトの更新に失敗しました",
@@ -4566,12 +4567,16 @@
 					"EXTRA_INFO": "追加情報",
 					"PROJECT": "プロジェクト",
 					"RESOLVED": "完了時間",
+					"RESOLVED_BY": "解決",
 					"RULE": "ルール",
 					"SAVE_CHANGES": "変更内容を保存",
+					"SERVICE": "サービス",
 					"SEVERITY": "緊急度",
 					"STATUS_DETAILS": "ステータスの詳細",
 					"STATUS_MSG": "状態メッセージ",
-					"TRIGGERED_BY": "生成"
+					"TRIGGERED_BY": "生成",
+					"TRIGGERED_TYPE": "生成タイプ",
+					"WEBHOOK": "ウェプフク"
 				},
 				"NOTE": {
 					"ADD_NOTE": "ノート追加",

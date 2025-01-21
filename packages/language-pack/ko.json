@@ -4548,6 +4548,7 @@
 				"INFO": {
 					"ACCOUNT_ID": "어카운트 아이디",
 					"ACKNOWLEDGED": "확인 시간",
+					"ACKNOWLEDGED_BY": "확인",
 					"ALERT_ID": "얼럿 ID",
 					"ALT_E_UPDATE_DESCRIPTION": "설명 수정 실패",
 					"ALT_E_UPDATE_PROJECT": "프로젝트 수정 실패",
@@ -4566,12 +4567,16 @@
 					"EXTRA_INFO": "추가 정보",
 					"PROJECT": "프로젝트",
 					"RESOLVED": "완료 시간",
+					"RESOLVED_BY": "처리",
 					"RULE": "규칙",
 					"SAVE_CHANGES": "변경사항 저장",
+					"SERVICE": "서비스",
 					"SEVERITY": "심각도",
 					"STATUS_DETAILS": "상태 상세 정보",
 					"STATUS_MSG": "상태 메세지",
-					"TRIGGERED_BY": "생성"
+					"TRIGGERED_BY": "생성",
+					"TRIGGERED_TYPE": "생성 타입",
+					"WEBHOOK": "웹훅"
 				},
 				"NOTE": {
 					"ADD_NOTE": "노트 추가",

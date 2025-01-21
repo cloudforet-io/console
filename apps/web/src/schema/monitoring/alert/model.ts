@@ -2,7 +2,7 @@ import type {
     AlertResource, AlertSeverity, AlertState, AlertUrgency,
 } from '@/schema/monitoring/alert/type';
 
-export interface AlertModel {
+export interface AlertModelV1 {
     alert_number: number;
     alert_id: string;
     title: string;
