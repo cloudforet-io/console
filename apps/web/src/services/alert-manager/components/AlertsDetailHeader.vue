@@ -35,7 +35,7 @@ const storeState = reactive({
     selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
-    selectedSearchFilter: computed<string|undefined>(() => alertPageState.selectedSearchFilter),
+    selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [

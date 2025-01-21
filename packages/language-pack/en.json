@@ -253,7 +253,7 @@
 			"ALT_S_UPDATE_SERVICE": "Service successfully updated",
 			"CREATE_SERVICE_DESC": "Provide a name for your technical service that clearly identifies a specific component of your tech stack to monitor, manage on-call responsibilities, and manually raise incidents for.",
 			"CREATE_SERVICE_TITLE": "Create New Service",
-			"CREATE_WEBHOOK_TITLE": "Create New Webhook",
+			"CREATE_WEBHOOK_TITLE": "Create Webhook",
 			"DEFAULT_ESCALATION_POLICY": "Default Escalation Policy",
 			"DETAILS": "View Details",
 			"EMPTY_MEMBER": "No Service Member",
@@ -297,7 +297,7 @@
 			"VALIDATION_KEY_HYPHEN": "The first and last characters cannot be hyphens.",
 			"VALIDATION_KEY_UNIQUE": "A service with this key name already exists.",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
-			"VIEW_ALL_OPEN_ALERTS": "View all open alerts",
+			"VIEW_ALL": "View all",
 			"WEBHOOK": "Webhook ({cnt})"
 		},
 		"SET_UP": "Set Up",
