@@ -4,6 +4,7 @@ import type { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collaps
 export interface CollapsibleItem<T = string> {
     name?: string;
     title?: string;
+    enableDeepClamp?: boolean;
     data: T;
 }
 
