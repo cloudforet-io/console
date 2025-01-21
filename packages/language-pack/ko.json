@@ -323,6 +323,8 @@
 			"HELP": "가이드",
 			"LABEL_NAME": "이름",
 			"LABEL_STATE": "상태",
+			"MESSAGE_FORMAT_DESC": "웹훅을 통해 전송될 메세지 형식을 설정하세요.",
+			"MESSAGE_FORMAT_VALUE_DESC": "원본 데이터 필드를 변환하여 사용할 필드로 지정합니다.",
 			"MODAL_DELETE_BUTTON": "삭제",
 			"MODAL_DELETE_CONTENT_1": "이 웹훅으로 더 이상 이벤트를 수신할 수 없으며, 이 작업은 취소 할 수 없습니다.",
 			"MODAL_DELETE_CONTENT_2": "확인을 위해 {webhookName} 을 입력해주세요.",
@@ -1301,6 +1303,14 @@
 		"INFO_BUTTON": {
 			"INFO": "Info"
 		},
+		"MESSAGE_FORMAT": {
+			"ADD": "추가",
+			"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
+			"INVALID_NO_KEY": "키가 입력되지 않았습니다.",
+			"INVALID_NO_VALUE": "값이 입력되지 않았습니다.",
+			"KEY": "From",
+			"VALUE": "To"
+		},
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "비활성화를 위한 이메일 인증이 필요합니다.",
@@ -1413,6 +1423,7 @@
 			"ROLE": "권한",
 			"SEND_LINK": "사용자에게 비밀번호 재설정 이메일 발송",
 			"SET_MANUALLY": "관리자가 대신 비밀번호 설정",
+			"SUCCESS_PASSWORD_CHECK": "비밀번호가 성공적으로 인증되었습니다.",
 			"TIMEZONE": "타임존",
 			"TITLE": "개인 정보"
 		},
@@ -1470,14 +1481,16 @@
 		"STARRED_NO_DATA": "즐겨찾기 없음",
 		"SUCCESS": "성공 ",
 		"TAGS": {
-			"ADD": "추가",
-			"ADD_TAG": "태그 추가",
+			"ADD": "태그 추가",
 			"ADD_TAG_DESC": "태그를 추가하여 리소스를 관리하세요.",
 			"ALT_E_UPDATE": "태그 수정 실패",
 			"ALT_S_UPDATE": "태그 수정 완료",
 			"CANCEL": "취소",
 			"CLICK_TO_ADD_TAG": "아래 버튼을 눌러 태그를 추가합니다.",
 			"EDIT": "편집",
+			"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
+			"INVALID_NO_KEY": "키가 입력되지 않았습니다.",
+			"INVALID_NO_VALUE": "값이 입력되지 않았습니다.",
 			"KEY": "키",
 			"KEY_VALUE_DESC": "키는 문자, 숫자 및 밑줄만 포함할 수 있습니다.",
 			"NO_TAGS": "관련된 태그가 없습니다.",

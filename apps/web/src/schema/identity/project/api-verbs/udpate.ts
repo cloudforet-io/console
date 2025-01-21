@@ -1,4 +1,4 @@
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/modules/tags/type';
 
 
 export interface ProjectUpdateParameters {

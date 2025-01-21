@@ -17,9 +17,9 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import TagsInput from '@/common/components/inputs/TagsInput.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
+import type { Tag } from '@/common/modules/tags/type';
 
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
