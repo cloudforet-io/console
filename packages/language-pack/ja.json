@@ -253,7 +253,7 @@
 			"ALT_S_UPDATE_SERVICE": "サービスが正常に更新されました",
 			"CREATE_SERVICE_DESC": "モニタリング、障害対応の管理、手動でアラートを作成できるように、技術スタックの特定のコンポーネントを明確に識別できるサービス名を設定してください。",
 			"CREATE_SERVICE_TITLE": "新しいサービスを作成",
-			"CREATE_WEBHOOK_TITLE": "新しいウェブフックの作成",
+			"CREATE_WEBHOOK_TITLE": "ウェブフックの作成",
 			"DEFAULT_ESCALATION_POLICY": "デフォルトエスカレーションポリシー",
 			"DETAILS": "詳細情報",
 			"EMPTY_MEMBER": "サービスメンバーがいません",
@@ -297,7 +297,7 @@
 			"VALIDATION_KEY_HYPHEN": " 最初と最後の文字にはハイフンを使用できません。",
 			"VALIDATION_KEY_UNIQUE": "同じ名前のキーがすでに存在します。",
 			"VALIDATION_NAME_UNIQUE": "同じ名前のサービスはすでに存在します。",
-			"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る",
+			"VIEW_ALL": "すべて表示",
 			"WEBHOOK": "ウェプフク ({cnt})"
 		},
 		"SET_UP": "設定",
