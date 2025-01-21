@@ -118,7 +118,8 @@ onMounted(async () => {
                 <service-list-content :list="state.alertServiceList"
                                       type="alert"
                 />
-                <service-list-content :list="state.healthyServiceList"
+                <service-list-content v-if="state.healthyServiceList.length > 0"
+                                      :list="state.healthyServiceList"
                                       type="healthy"
                 />
             </div>
