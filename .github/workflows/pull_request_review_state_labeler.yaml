@@ -14,8 +14,8 @@ jobs:
   update-labels:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if it is self approved review PR
-        id: check_self_approved
+      - name: Get PR information
+        id: pr_info
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -23,17 +23,29 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            
+            // Get current labels
             const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
               owner,
               repo,
               issue_number: prNumber
             });
-
+            
             const hasSelfApprovedReview = currentLabels.some(label => label.name === 'self_approved/review');
-            core.setOutput('isSelfApprovedPR', hasSelfApprovedReview);
+            
+            // Check reviewers only for pull_request_target event
+            const hasReviewers = github.event_name === 'pull_request_target' ? 
+              (context.payload.pull_request.requested_reviewers && 
+               context.payload.pull_request.requested_reviewers.length > 0) : false;
+            
+            core.setOutput('hasSelfApprovedReview', hasSelfApprovedReview);
+            core.setOutput('hasReviewers', hasReviewers);
 
-      - name: Add 'pending/review' label based on PR label on pull_request_target event
-        if: github.event_name == 'pull_request_target' && steps.check_self_approved.outputs.isSelfApprovedPR == 'false'
+      - name: Add pending review label on PR creation or update
+        if: |
+          github.event_name == 'pull_request_target' && 
+          steps.pr_info.outputs.hasSelfApprovedReview == 'false' && 
+          steps.pr_info.outputs.hasReviewers == 'false'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,10 +53,13 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+
+            // Double check if the PR has self approved review label
             const hasSelfApprovedReview = context.payload.pull_request.labels.some(label => label.name === 'self_approved/review');
             if(hasSelfApprovedReview) {
               return;
             }
+
             await github.rest.issues.addLabels({
               owner,
               repo,
@@ -52,8 +67,10 @@ jobs:
               labels: ['pending/review']
             });
 
-      - name: Add or remove labels based on review state on pull_request_review event
-        if: github.event_name == 'pull_request_review' && steps.check_self_approved.outputs.isSelfApprovedPR == 'false'
+      - name: Update labels based on review state
+        if: |
+          github.event_name == 'pull_request_review' && 
+          steps.pr_info.outputs.hasSelfApprovedReview == 'false'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +106,7 @@ jobs:
                 }
               }
 
-              // Add 'approved/review' or 'changes_requested/review' label
+              // Add new review state label
               await github.rest.issues.addLabels({
                 owner,
                 repo,
