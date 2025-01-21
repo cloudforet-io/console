@@ -115,7 +115,8 @@ onMounted(async () => {
                        class="loader-wrapper"
         >
             <div class="flex flex-col gap-4">
-                <service-list-content :list="state.alertServiceList"
+                <service-list-content v-if="state.alertServiceList.length > 0"
+                                      :list="state.alertServiceList"
                                       type="alert"
                 />
                 <service-list-content v-if="state.healthyServiceList.length > 0"
