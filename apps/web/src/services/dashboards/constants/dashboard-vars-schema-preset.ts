@@ -17,6 +17,19 @@ export const DASHBOARD_VARS_SCHEMA_PRESET: DashboardGlobalVariablesSchema = {
                 selectionType: 'multi',
             },
         },
+        project_group_id: {
+            key: 'project_group_id',
+            name: 'Project Group',
+            method: 'dynamic',
+            type: 'reference',
+            use: true,
+            reference: {
+                resourceType: 'identity.ProjectGroup',
+            },
+            options: {
+                selectionType: 'multi',
+            },
+        },
         service_account_id: {
             key: 'service_account_id',
             name: 'Service Account',
