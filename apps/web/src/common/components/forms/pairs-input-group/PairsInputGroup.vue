@@ -12,55 +12,62 @@ import {
 import { i18n } from '@/translations';
 
 import type {
-    Tag, TagItem, ValidationData,
+    Pair, PairItem, ValidationData,
+    PairType,
 } from '@/common/components/forms/pairs-input-group/type';
 
 const props = withDefaults(defineProps<{
-    tags?: Tag;
+    pairs?: Pair;
     disabled?: boolean;
     isValid?: boolean;
     showValidation?: boolean;
     showHeader?: boolean;
     isAdministration?: boolean;
+    type: PairType;
+    keyAlias: string;
+    valueAlias: string;
 }>(), {
-    tags: () => ({}),
+    pairs: () => ({}),
     disabled: false,
     isValid: true,
     showValidation: false,
     showHeader: false,
     isAdministration: false,
+    type: 'TAGS',
+    keyAlias: 'key',
+    valueAlias: 'value',
 });
 
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
-    (e: 'update-tags', tags: Tag): void;
+    (e: 'update-pairs', pairs: Pair): void;
 }>();
 
-const dictToArray = (dict): TagItem[] => Object.keys(dict).map((k) => ({ key: k, value: dict[k] }));
+const dictToArray = (dict): PairItem[] => Object.keys(dict).map((k) => ({ [props.keyAlias]: k, [props.valueAlias]: dict[k] }));
 
-const arrayToDict = (arr: TagItem[]): Tag => {
+const arrayToDict = (arr: PairItem[]): Pair => {
     const dict = {};
     if (Array.isArray(arr)) {
-        arr.forEach(({ key, value }) => {
-            if (key !== '') dict[key] = value;
+        arr.forEach((arrItem) => {
+            if (arrItem[props.keyAlias] !== '') dict[props.keyAlias] = arrItem[props.valueAlias];
         });
     }
     return dict;
 };
 
 const state = reactive({
-    items: dictToArray(props.tags) as TagItem[],
+    items: dictToArray(props.pairs) as PairItem[],
     keyValidations: computed<ValidationData[]>(() => {
-        const keys = state.items.map((item) => item.key);
+        const keys = state.items.map((item) => item[props.keyAlias]);
         return state.items.map((item) => {
             const validation: ValidationData = { isValid: true, message: '' };
-            if (!item.key || !item.key.toString().length) {
+            if (!item[props.keyAlias] || !item[props.keyAlias].toString().length) {
                 validation.isValid = false;
-                validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_NO_KEY');
+                validation.message = i18n.t(`COMMON.${props.type}.INVALID_NO_KEY`);
             } else {
-                const isDuplicated = keys.filter((k) => k === item.key).length > 1;
+                const isDuplicated = keys.filter((k) => k === item[props.keyAlias]).length > 1;
                 if (isDuplicated) {
                     validation.isValid = false;
-                    validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_DUPLICATED_KEY');
+                    validation.message = i18n.t(`COMMON.${props.type}.INVALID_DUPLICATED_KEY`);
                 }
             }
             return validation;
@@ -68,9 +75,9 @@ const state = reactive({
     }),
     valueValidations: computed<ValidationData[]>(() => state.items.map((item) => {
         const validation: ValidationData = { isValid: true, message: '' };
-        if (!item.value || !item.value.toString().length) {
+        if (!item[props.valueAlias] || !item[props.valueAlias].toString().length) {
             validation.isValid = false;
-            validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_NO_VALUE');
+            validation.message = i18n.t(`COMMON.${props.type}.INVALID_NO_VALUE`);
         }
         return validation;
     })),
@@ -83,7 +90,7 @@ const state = reactive({
 
 /* Event */
 const handleAddPair = () => {
-    state.items.push({ key: '', value: '' });
+    state.items.push({ [props.keyAlias]: '', [props.valueAlias]: '' });
 };
 const handleDeletePair = (idx: number) => {
     const _items = [...state.items];
@@ -91,14 +98,14 @@ const handleDeletePair = (idx: number) => {
     state.items = _items;
 };
 
-const handleInputKey = (idx, val) => {
+const handleInputKeySection = (idx, val) => {
     const _items = [...state.items];
-    _items[idx].key = val;
+    _items[idx][props.keyAlias] = val;
     state.items = _items;
 };
-const handleInputValue = (idx, val) => {
+const handleInputValueSection = (idx, val) => {
     const _items = [...state.items];
-    _items[idx].value = val;
+    _items[idx][props.valueAlias] = val;
     state.items = _items;
 };
 
@@ -107,16 +114,16 @@ watch(() => state.isAllValid, (after) => {
     emit('update:is-valid', after);
 }, { immediate: true });
 watch(() => state.items, (items) => {
-    emit('update-tags', arrayToDict(items));
+    emit('update-pairs', arrayToDict(items));
 });
-const stopTagInit = watch(() => props.tags, (tags) => {
-    if (!isEmpty(tags)) state.items = dictToArray(tags);
-    if (stopTagInit) stopTagInit();
+const stopPairInit = watch(() => props.pairs, (pairs) => {
+    if (!isEmpty(pairs)) state.items = dictToArray(pairs);
+    if (stopPairInit) stopPairInit();
 });
 </script>
 
 <template>
-    <div class="tags-input-group">
+    <div class="pairs-input-group">
         <slot name="add-button"
               :disabled="props.disabled"
               :handle-add-pair="handleAddPair"
@@ -126,34 +133,34 @@ const stopTagInit = watch(() => props.tags, (tags) => {
                       icon-left="ic_plus_bold"
                       @click="handleAddPair"
             >
-                <span>{{ props.isAdministration ? $t('COMMON.TAGS.ADD') : $t('COMMON.TAGS.ADD_TAG') }}</span>
+                <span>{{ props.isAdministration ? $t('COMMON.BUTTONS.ADD') : $t(`COMMON.${props.type}.ADD`) }}</span>
             </p-button>
         </slot>
         <div v-if="props.showHeader"
-             class="tag-header"
+             class="pair-header"
         >
             <div class="key">
-                <span>{{ $t('COMMON.COMPONENTS.TAGS.KEY') }}</span>
+                <span>{{ $t('COMMON.TAGS.KEY') }}</span>
             </div>
             <div class="value">
-                <span>{{ $t('COMMON.COMPONENTS.TAGS.VALUE') }}</span>
+                <span>{{ $t('COMMON.TAGS.VALUE') }}</span>
             </div>
         </div>
         <div :class="props.isAdministration && 'is-administration'">
             <div v-for="(item, idx) in state.items"
                  :key="idx"
-                 class="tags-group"
+                 class="pair-group"
             >
                 <p-field-group :invalid-text="state.keyValidations[idx].message"
                                :invalid="props.showValidation && !state.keyValidations[idx].isValid"
                                class="input-box key"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="item.key"
+                        <p-text-input :value="item[props.keyAlias]"
                                       :invalid="invalid"
-                                      :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
+                                      :placeholder="props.keyAlias"
                                       :disabled="props.disabled"
-                                      @update:value="handleInputKey(idx, ...arguments)"
+                                      @update:value="handleInputKeySection(idx, ...arguments)"
                         />
                     </template>
                 </p-field-group>
@@ -163,11 +170,11 @@ const stopTagInit = watch(() => props.tags, (tags) => {
                                class="input-box value"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="item.value"
+                        <p-text-input :value="item[props.valueAlias]"
                                       :invalid="invalid"
-                                      :placeholder="$t('COMMON.COMPONENTS.TAGS.VALUE')"
+                                      :placeholder="props.valueAlias"
                                       :disabled="props.disabled"
-                                      @update:value="handleInputValue(idx, ...arguments)"
+                                      @update:value="handleInputValueSection(idx, ...arguments)"
                         />
                     </template>
                 </p-field-group>
@@ -181,14 +188,11 @@ const stopTagInit = watch(() => props.tags, (tags) => {
 </template>
 
 <style lang="postcss" scoped>
-.tags-input-group {
+.pairs-input-group {
     .add-button {
         margin: 1rem 0 1.5rem;
-        .p-i-icon {
-            margin-right: 0.5rem;
-        }
     }
-    .tag-header {
+    .pair-header {
         @apply py-4;
         .key {
             @apply inline-block font-bold;
@@ -199,7 +203,7 @@ const stopTagInit = watch(() => props.tags, (tags) => {
             width: 20rem;
         }
     }
-    .tags-group {
+    .pair-group {
         display: flex;
         margin-bottom: 0.5rem;
 
