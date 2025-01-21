@@ -180,7 +180,7 @@ watch(
                           :resource-type="props.resourceType"
                           :loading="state.loading"
                           @close="closeTag"
-                          @update="handleTagUpdate"
+                          @confirm="handleTagUpdate"
             />
         </transition>
     </div>

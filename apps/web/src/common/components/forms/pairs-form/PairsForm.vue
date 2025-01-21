@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<{
     valueAlias: 'value',
 });
 
-const emit = defineEmits<{(e: 'save', pairs: Pair): void;
+const emit = defineEmits<{(e: 'confirm', pairs: Pair): void;
     (e: 'close'): void;
 }>();
 
@@ -38,7 +38,7 @@ const handleCloseOverlay = () => {
 };
 const handleSaveTags = async () => {
     if (!state.isPairsValid) return;
-    emit('save', state.newPairs);
+    emit('confirm', state.newPairs);
 };
 
 const handleUpdateTags = (tags?: Pair) => {

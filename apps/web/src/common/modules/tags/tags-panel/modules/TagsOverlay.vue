@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
     loading: false,
 });
 
-const emit = defineEmits<{(e: 'update', tags: Tag): void;
+const emit = defineEmits<{(e: 'confirm', tags: Tag): void;
     (e: 'close'): void;
 }>();
 
@@ -33,7 +33,7 @@ const state = reactive({
                 :pairs="props.tags"
                 :loading="props.loading"
                 class="tags-overlay"
-                @save="emit('update', $event)"
+                @confirm="emit('confirm', $event)"
                 @close="emit('close')"
     >
         <template #description>
