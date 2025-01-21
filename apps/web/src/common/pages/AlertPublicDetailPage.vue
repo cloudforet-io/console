@@ -293,18 +293,14 @@ const handleRouteToSignInWithRedirectPath = () => {
                             <template #data-escalation_policy_id>
                                 {{ tableState.escalationPolicyName }}
                             </template>
-                            <template v-if="state.alertVersion === 'v1'"
-                                      #data-project_id
-                            >
+                            <template #data-project_id>
                                 <p class="content-wrapper">
                                     <span class="project">
                                         {{ state.alertData?.project_name ?? state.alertData?.project_id }}
                                     </span>
                                 </p>
                             </template>
-                            <template v-if="state.alertVersion === 'v1'"
-                                      #data-account="{ value }"
-                            >
+                            <template #data-account="{ value }">
                                 {{ value }}
                             </template>
                             <template #data-resources="{ value }">
@@ -320,9 +316,7 @@ const handleRouteToSignInWithRedirectPath = () => {
                                     </p>
                                 </template>
                             </template>
-                            <template v-if="state.alertVersion === 'v1'"
-                                      #data-responder
-                            >
+                            <template #data-responder>
                                 {{ state.alertData?.responder }}
                             </template>
                             <template #data-created_at>
@@ -343,9 +337,7 @@ const handleRouteToSignInWithRedirectPath = () => {
                                     </span>
                                 </p>
                             </template>
-                            <template v-if="state.alertVersion === 'v2'"
-                                      #data-triggered_type
-                            >
+                            <template #data-triggered_type>
                                 <p-badge badge-type="solid-outline"
                                          style-type="indigo500"
                                 >
