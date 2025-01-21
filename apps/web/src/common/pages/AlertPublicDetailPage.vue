@@ -14,7 +14,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModel, AlertModelV1 } from '@/schema/monitoring/alert/model';
 import { i18n, setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
@@ -31,23 +31,32 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 const router = useRouter();
 
 interface Props {
-    alertUrl?: string;
-    language?: string;
+  alertUrl?: string;
+  language?: string;
 }
 
 const props = defineProps<Props>();
 
+interface PublicAlertModelV1 extends AlertModelV1 {
+  project_name: string;
+  domain_settings: {
+    timezone: string;
+    language: string;
+  };
+}
+
 interface PublicAlertModel extends AlertModel {
-    project_name: string;
-    domain_settings: {
-        timezone: string;
-        language: string;
-    };
+  service_name: string;
+  domain_settings: {
+    timezone: string;
+    language: string;
+  }
 }
 
 const state = reactive({
     loading: true,
-    alertData: {} as Partial<PublicAlertModel>,
+    alertVersion: '',
+    alertData: {} as Partial<PublicAlertModelV1> & Partial<PublicAlertModel>,
     alertId: '',
     duration: computed(() => calculateTime(state.alertData?.created_at)),
     timezone: computed(() => state.alertData?.domain_settings?.timezone ?? 'UTC'),
@@ -55,21 +64,42 @@ const state = reactive({
 });
 
 const tableState = reactive({
-    fields: computed(() => [
-        { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
-        { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
-        { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
-        { name: 'escalation_policy_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'), disableCopy: true },
-        { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
-        { name: 'triggered_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'), disableCopy: true },
-        { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), disableCopy: true },
-        { name: 'resources', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE'), disableCopy: true },
-        { name: 'responder', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESPONDER'), disableCopy: true },
-        { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
-        { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
-        { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
-    ]),
-    escalationPolicyName: '',
+    fields: computed(() => {
+        let fieldPerVersion;
+        if (state.alertVersion === 'v1') {
+            fieldPerVersion = [
+                { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
+                { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), disableCopy: true },
+                { name: 'responder', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESPONDER'), disableCopy: true },
+            ];
+        } else {
+            fieldPerVersion = [
+                { name: 'service_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SERVICE'), disableCopy: true },
+                { name: 'triggered_type', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_TYPE'), disableCopy: true },
+                { name: 'acknowledged_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED_BY'), disableCopy: true },
+                { name: 'resolved_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED_BY'), disableCopy: true },
+                { name: 'webhook_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.WEBHOOK'), disableCopy: true },
+            ];
+        }
+        return [
+            { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
+            { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
+            { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
+            { name: 'escalation_policy_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'), disableCopy: true },
+            { name: 'triggered_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'), disableCopy: true },
+            { name: 'resources', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE'), disableCopy: true },
+            { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
+            { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
+            { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
+            ...fieldPerVersion,
+        ];
+    }),
+    escalationPolicyName: computed(() => {
+        if (state.alertVersion === 'v2') {
+            return state.alertData.escalation_policy_name;
+        }
+        return '';
+    }),
     webhooks: {},
     alertStateList: computed(() => ([
         { name: ALERT_STATE.TRIGGERED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.TRIGGERED') },
@@ -106,6 +136,12 @@ const fetchData = async () => {
         try {
             const response = await axios.get(alertFetchUrl as string);
             state.alertData = response?.data;
+            if (Object.keys(state.alertData).includes('version')
+          && state.alertData.version === 'v2') {
+                state.alertVersion = 'v2';
+            } else if (!Object.keys(state.alertData).includes('version')) {
+                state.alertVersion = 'v1';
+            }
         } catch (e) {
             console.error(e);
             await router.push({ name: ERROR_ROUTE.EXPIRED_LINK._NAME });
@@ -159,7 +195,9 @@ const handleRouteToSignInWithRedirectPath = () => {
                    @click-back-button="router.go(-1)"
         >
             <template #title-right-extra>
-                <span class="alert-number">#{{ state.alertData?.alert_number }}</span>
+                <span v-if="state.alertVersion === 'v1'"
+                      class="alert-number"
+                >#{{ state.alertData?.alert_number }}</span>
             </template>
         </p-heading>
         <section class="detail-contents-wrapper">
@@ -168,9 +206,14 @@ const handleRouteToSignInWithRedirectPath = () => {
                     <p-pane-layout class="alert-detail-summary">
                         <p class="content-wrapper">
                             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
-                            <template v-if="state.alertData?.state !== ALERT_STATE.ERROR">
+                            <template v-if="state.alertVersion === 'v1' && state.alertData?.state !== ALERT_STATE.ERROR">
                                 <span :class="{'text-alert': state.alertData.state === ALERT_STATE.TRIGGERED}">
                                     {{ tableState.alertStateList.find(d => d.name === state.alertData?.state)?.label }}
+                                </span>
+                            </template>
+                            <template v-else-if="state.alertVersion === 'v2' && state.alertData?.status !== ALERT_STATE.ERROR">
+                                <span :class="{'text-alert': state.alertData.status === ALERT_STATE.TRIGGERED}">
+                                    {{ tableState.alertStateList.find(d => d.name === state.alertData?.status)?.label }}
                                 </span>
                             </template>
                             <template v-else>
@@ -202,7 +245,9 @@ const handleRouteToSignInWithRedirectPath = () => {
                                 {{ tableState.alertUrgencyList.find(d => d.name === state.alertData?.urgency)?.label }}
                             </span>
                         </p>
-                        <p class="content-wrapper">
+                        <p v-if="state.alertVersion === 'v1'"
+                           class="content-wrapper"
+                        >
                             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}</span>
                             <span v-if="state.alertData?.assignee"
                                   class="email"
@@ -248,14 +293,18 @@ const handleRouteToSignInWithRedirectPath = () => {
                             <template #data-escalation_policy_id>
                                 {{ tableState.escalationPolicyName }}
                             </template>
-                            <template #data-project_id>
+                            <template v-if="state.alertVersion === 'v1'"
+                                      #data-project_id
+                            >
                                 <p class="content-wrapper">
                                     <span class="project">
                                         {{ state.alertData?.project_name ?? state.alertData?.project_id }}
                                     </span>
                                 </p>
                             </template>
-                            <template #data-account="{ value }">
+                            <template v-if="state.alertVersion === 'v1'"
+                                      #data-account="{ value }"
+                            >
                                 {{ value }}
                             </template>
                             <template #data-resources="{ value }">
@@ -271,7 +320,9 @@ const handleRouteToSignInWithRedirectPath = () => {
                                     </p>
                                 </template>
                             </template>
-                            <template #data-responder>
+                            <template v-if="state.alertVersion === 'v1'"
+                                      #data-responder
+                            >
                                 {{ state.alertData?.responder }}
                             </template>
                             <template #data-created_at>
@@ -284,6 +335,22 @@ const handleRouteToSignInWithRedirectPath = () => {
                             <template #data-resolved_at>
                                 <span v-if="state.alertData.resolved_at"> {{ iso8601Formatter(state.alertData.resolved_at, state.timezone) }}</span>
                                 <span v-else>--</span>
+                            </template>
+                            <template #data-service_id>
+                                <p class="content-wrapper">
+                                    <span class="service">
+                                        {{ state.alertData?.service_name ?? state.alertData?.service_id }}
+                                    </span>
+                                </p>
+                            </template>
+                            <template v-if="state.alertVersion === 'v2'"
+                                      #data-triggered_type
+                            >
+                                <p-badge badge-type="solid-outline"
+                                         style-type="indigo500"
+                                >
+                                    {{ state.alertData.triggered_type }}
+                                </p-badge>
                             </template>
                             <template #data-additional_info="{value}">
                                 <span v-if="Object.keys(value)?.length === 0">
