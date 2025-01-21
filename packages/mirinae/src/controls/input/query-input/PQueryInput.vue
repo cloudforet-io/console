@@ -151,20 +151,23 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
 }>();
 
 /* input focusing */
+const targetRef = ref<HTMLElement|null>(null);
+const menuRef = ref<null|typeof PContextMenu>(null);
 const inputRef = ref<HTMLElement|null>(null);
 const { focused: isInputFocused } = useFocus(inputRef);
 
 /* context menu style */
 const proxyVisibleMenu = useProxyValue<boolean>('visibleMenu', props, emit);
 const {
-    targetRef, contextMenuStyle,
+    contextMenuStyle,
 } = useContextMenuStyle({
     useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+    targetRef,
+    menuRef,
     visibleMenu: proxyVisibleMenu,
 });
 
 /* query search */
-const menuRef = ref<null|typeof PContextMenu>(null);
 const {
     state: querySearchState,
     focus, blur, hideMenu, showMenu,
