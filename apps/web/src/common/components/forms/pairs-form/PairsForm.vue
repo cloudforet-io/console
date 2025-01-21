@@ -5,22 +5,22 @@ import type { TranslateResult } from 'vue-i18n';
 import { PButton, PIconButton, PPaneLayout } from '@cloudforet/mirinae';
 
 import PairsInputGroup from '@/common/components/forms/pairs-input-group/PairsInputGroup.vue';
-import type { Pair, PairType } from '@/common/components/forms/pairs-input-group/type';
+import type {
+    Pair, PairConfig, I18nLabels,
+} from '@/common/components/forms/pairs-input-group/type';
 
 const props = withDefaults(defineProps<{
     title?: TranslateResult;
     pairs?: Pair;
     loading?: boolean;
-    type?: PairType;
-    keyAlias?: string;
-    valueAlias?: string;
+    pairConfig?: PairConfig;
+    i18nLabels?: I18nLabels;
 }>(), {
     title: undefined,
     pairs: () => ({}),
     loading: false,
-    type: 'TAGS',
-    keyAlias: 'key',
-    valueAlias: 'value',
+    pairConfig: undefined,
+    i18nLabels: undefined,
 });
 
 const emit = defineEmits<{(e: 'confirm', pairs: Pair): void;
@@ -71,11 +71,10 @@ onMounted(() => {
                 <pairs-input-group :pairs="state.newPairs"
                                    :disabled="props.loading"
                                    show-validation
-                                   :type="props.type"
                                    :is-valid.sync="state.isPairsValid"
                                    :show-header="state.showHeader"
-                                   :key-alias="props.keyAlias"
-                                   :value-alias="props.valueAlias"
+                                   :i18n-labels="props.i18nLabels"
+                                   :pair-config="props.pairConfig"
                                    @update-pairs="handleUpdateTags"
                 />
             </p-pane-layout>

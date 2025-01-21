@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 
 import type {
     Pair, PairItem, ValidationData,
-    PairType,
+    I18nLabels, PairConfig,
 } from '@/common/components/forms/pairs-input-group/type';
 
 const props = withDefaults(defineProps<{
@@ -23,9 +23,8 @@ const props = withDefaults(defineProps<{
     showValidation?: boolean;
     showHeader?: boolean;
     isAdministration?: boolean;
-    type: PairType;
-    keyAlias: string;
-    valueAlias: string;
+    pairConfig?: PairConfig;
+    i18nLabels?: I18nLabels;
 }>(), {
     pairs: () => ({}),
     disabled: false,
@@ -33,22 +32,31 @@ const props = withDefaults(defineProps<{
     showValidation: false,
     showHeader: false,
     isAdministration: false,
-    type: 'TAGS',
-    keyAlias: 'key',
-    valueAlias: 'value',
+    pairConfig: () => ({
+        keyLabel: 'key',
+        valueLabel: 'value',
+    }),
+    i18nLabels: () => ({
+        INVALID_DUPLICATE_KEY: i18n.t('COMMON.TAGS.INVALID_DUPLICATED_KEY'),
+        INVALID_KEY: i18n.t('COMMON.TAGS.INVALID_NO_KEY'),
+        INVALID_VALUE: i18n.t('COMMON.TAGS.INVALID_NO_VALUE'),
+        ADD_PAIR_BUTTON: i18n.t('COMMON.TAGS.ADD'),
+        KEY_LABEL: i18n.t('COMMON.TAGS.KEY'),
+        VALUE_LABEL: i18n.t('COMMON.TAGS.VALUE'),
+    }),
 });
 
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
     (e: 'update-pairs', pairs: Pair): void;
 }>();
 
-const dictToArray = (dict): PairItem[] => Object.keys(dict).map((k) => ({ [props.keyAlias]: k, [props.valueAlias]: dict[k] }));
+const dictToArray = (dict): PairItem[] => Object.keys(dict).map((k) => ({ [props.pairConfig.keyLabel]: k, [props.pairConfig.valueLabel]: dict[k] }));
 
 const arrayToDict = (arr: PairItem[]): Pair => {
     const dict = {};
     if (Array.isArray(arr)) {
         arr.forEach((arrItem) => {
-            if (arrItem[props.keyAlias] !== '') dict[props.keyAlias] = arrItem[props.valueAlias];
+            if (arrItem[props.pairConfig.keyLabel] !== '') dict[props.pairConfig.keyLabel] = arrItem[props.pairConfig.valueLabel];
         });
     }
     return dict;
@@ -57,17 +65,17 @@ const arrayToDict = (arr: PairItem[]): Pair => {
 const state = reactive({
     items: dictToArray(props.pairs) as PairItem[],
     keyValidations: computed<ValidationData[]>(() => {
-        const keys = state.items.map((item) => item[props.keyAlias]);
+        const keys = state.items.map((item) => item[props.pairConfig.keyLabel]);
         return state.items.map((item) => {
             const validation: ValidationData = { isValid: true, message: '' };
-            if (!item[props.keyAlias] || !item[props.keyAlias].toString().length) {
+            if (!item[props.pairConfig.keyLabel] || !item[props.pairConfig.keyLabel].toString().length) {
                 validation.isValid = false;
-                validation.message = i18n.t(`COMMON.${props.type}.INVALID_NO_KEY`);
+                validation.message = props.i18nLabels?.INVALID_KEY || '';
             } else {
-                const isDuplicated = keys.filter((k) => k === item[props.keyAlias]).length > 1;
+                const isDuplicated = keys.filter((k) => k === item[props.pairConfig.keyLabel]).length > 1;
                 if (isDuplicated) {
                     validation.isValid = false;
-                    validation.message = i18n.t(`COMMON.${props.type}.INVALID_DUPLICATED_KEY`);
+                    validation.message = props.i18nLabels?.INVALID_DUPLICATE_KEY || '';
                 }
             }
             return validation;
@@ -75,9 +83,9 @@ const state = reactive({
     }),
     valueValidations: computed<ValidationData[]>(() => state.items.map((item) => {
         const validation: ValidationData = { isValid: true, message: '' };
-        if (!item[props.valueAlias] || !item[props.valueAlias].toString().length) {
+        if (!item[props.pairConfig.valueLabel] || !item[props.pairConfig.valueLabel].toString().length) {
             validation.isValid = false;
-            validation.message = i18n.t(`COMMON.${props.type}.INVALID_NO_VALUE`);
+            validation.message = props.i18nLabels?.INVALID_VALUE || '';
         }
         return validation;
     })),
@@ -90,7 +98,7 @@ const state = reactive({
 
 /* Event */
 const handleAddPair = () => {
-    state.items.push({ [props.keyAlias]: '', [props.valueAlias]: '' });
+    state.items.push({ [props.pairConfig.keyLabel]: '', [props.pairConfig.valueLabel]: '' });
 };
 const handleDeletePair = (idx: number) => {
     const _items = [...state.items];
@@ -100,12 +108,12 @@ const handleDeletePair = (idx: number) => {
 
 const handleInputKeySection = (idx, val) => {
     const _items = [...state.items];
-    _items[idx][props.keyAlias] = val;
+    _items[idx][props.pairConfig.keyLabel] = val;
     state.items = _items;
 };
 const handleInputValueSection = (idx, val) => {
     const _items = [...state.items];
-    _items[idx][props.valueAlias] = val;
+    _items[idx][props.pairConfig.valueLabel] = val;
     state.items = _items;
 };
 
@@ -133,17 +141,17 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
                       icon-left="ic_plus_bold"
                       @click="handleAddPair"
             >
-                <span>{{ props.isAdministration ? $t('COMMON.BUTTONS.ADD') : $t(`COMMON.${props.type}.ADD`) }}</span>
+                <span>{{ props.i18nLabels?.ADD_PAIR_BUTTON }}</span>
             </p-button>
         </slot>
         <div v-if="props.showHeader"
              class="pair-header"
         >
             <div class="key">
-                <span>{{ $t(`COMMON.${props.type}.KEY`) }}</span>
+                <span>{{ props.i18nLabels?.KEY_LABEL || '' }}</span>
             </div>
             <div class="value">
-                <span>{{ $t(`COMMON.${props.type}.VALUE`) }}</span>
+                <span>{{ props.i18nLabels?.VALUE_LABEL || '' }}</span>
             </div>
         </div>
         <div :class="props.isAdministration && 'is-administration'">
@@ -156,9 +164,9 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
                                class="input-box key"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="item[props.keyAlias]"
+                        <p-text-input :value="item[props.pairConfig.keyLabel]"
                                       :invalid="invalid"
-                                      :placeholder="props.keyAlias"
+                                      :placeholder="props.pairConfig.keyLabel"
                                       :disabled="props.disabled"
                                       @update:value="handleInputKeySection(idx, ...arguments)"
                         />
@@ -170,9 +178,9 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
                                class="input-box value"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="item[props.valueAlias]"
+                        <p-text-input :value="item[props.pairConfig.valueLabel]"
                                       :invalid="invalid"
-                                      :placeholder="props.valueAlias"
+                                      :placeholder="props.pairConfig.valueLabel"
                                       :disabled="props.disabled"
                                       @update:value="handleInputValueSection(idx, ...arguments)"
                         />
