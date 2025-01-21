@@ -140,10 +140,10 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
              class="pair-header"
         >
             <div class="key">
-                <span>{{ $t('COMMON.TAGS.KEY') }}</span>
+                <span>{{ $t(`COMMON.${props.type}.KEY`) }}</span>
             </div>
             <div class="value">
-                <span>{{ $t('COMMON.TAGS.VALUE') }}</span>
+                <span>{{ $t(`COMMON.${props.type}.VALUE`) }}</span>
             </div>
         </div>
         <div :class="props.isAdministration && 'is-administration'">

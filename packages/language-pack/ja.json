@@ -323,6 +323,8 @@
 			"HELP": "ヘルプ",
 			"LABEL_NAME": "名前",
 			"LABEL_STATE": "状態",
+			"MESSAGE_FORMAT_DESC": "ウェブフックを通じて送信されるメッセージ形式を設定してください。",
+			"MESSAGE_FORMAT_VALUE_DESC": "元のデータフィールドを変換して、使用するフィールドを指定します。",
 			"MODAL_DELETE_BUTTON": "削除",
 			"MODAL_DELETE_CONTENT_1": "このウェプフクでこれ以上イベントを受信することができず、この作業は取り消すことができません。",
 			"MODAL_DELETE_CONTENT_2": "確認のため、{webhookName}を入力してください。",
@@ -1301,6 +1303,14 @@
 		"INFO_BUTTON": {
 			"INFO": "Info"
 		},
+		"MESSAGE_FORMAT": {
+			"ADD": "追加",
+			"INVALID_DUPLICATED_KEY": "すでに登録されているキーです",
+			"INVALID_NO_KEY": "キーが入力されていません",
+			"INVALID_NO_VALUE": "値が入力されていません",
+			"KEY": "From",
+			"VALUE": "To"
+		},
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "無効化するには、メール認証が必要です。",
@@ -1471,14 +1481,16 @@
 		"STARRED_NO_DATA": "お気に入りがありません。",
 		"SUCCESS": "成功",
 		"TAGS": {
-			"ADD": "追加",
-			"ADD_TAG": "タグの追加",
+			"ADD": "タグの追加",
 			"ADD_TAG_DESC": "タグを追加して、リソースを管理します",
 			"ALT_E_UPDATE": "タグの編集に失敗",
 			"ALT_S_UPDATE": "タグの編集完了",
 			"CANCEL": "キャンセル",
 			"CLICK_TO_ADD_TAG": "下のボタンを押して、タグを追加します。",
 			"EDIT": "編集",
+			"INVALID_DUPLICATED_KEY": "すでに登録されているキーです",
+			"INVALID_NO_KEY": "キーが入力されていません",
+			"INVALID_NO_VALUE": "値が入力されていません",
 			"KEY": "キー",
 			"KEY_VALUE_DESC": "キーは、英字、数字、およびアンダーバーのみ使用できます",
 			"NO_TAGS": "関連したタグがありません",

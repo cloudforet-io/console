@@ -323,6 +323,8 @@
 			"HELP": "Help",
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
+			"MESSAGE_FORMAT_DESC": "Set the message format to be sent through the webhook.",
+			"MESSAGE_FORMAT_VALUE_DESC": "Convert the source data fields and specify the fields to be used.",
 			"MODAL_DELETE_BUTTON": "Delete this webhook",
 			"MODAL_DELETE_CONTENT_1": "You can no longer receive events with this webhook, and this action cannot be undone.",
 			"MODAL_DELETE_CONTENT_2": "Type {webhookName} to Confirm.",
@@ -1301,6 +1303,14 @@
 		"INFO_BUTTON": {
 			"INFO": "Info"
 		},
+		"MESSAGE_FORMAT": {
+			"ADD": "Add",
+			"INVALID_DUPLICATED_KEY": "duplicated key",
+			"INVALID_NO_KEY": "no key",
+			"INVALID_NO_VALUE": "no value",
+			"KEY": "From",
+			"VALUE": "To"
+		},
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "To turn off, you need to verifiy with your email.",
@@ -1471,14 +1481,16 @@
 		"STARRED_NO_DATA": "No starred items",
 		"SUCCESS": "Success",
 		"TAGS": {
-			"ADD": "Add",
-			"ADD_TAG": "Add Tag",
+			"ADD": "Add Tag",
 			"ADD_TAG_DESC": "Add associated tags.",
 			"ALT_E_UPDATE": "Failed to Update Tag",
 			"ALT_S_UPDATE": "Tag successfully updated ",
 			"CANCEL": "Cancel",
 			"CLICK_TO_ADD_TAG": "Click a button to add tags.",
 			"EDIT": "Edit",
+			"INVALID_DUPLICATED_KEY": "duplicated key",
+			"INVALID_NO_KEY": "no key",
+			"INVALID_NO_VALUE": "no value",
 			"KEY": "Key",
 			"KEY_VALUE_DESC": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 			"NO_TAGS": "No associated tags found.",

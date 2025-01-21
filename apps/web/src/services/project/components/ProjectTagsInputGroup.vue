@@ -122,7 +122,7 @@ const stopTagInit = watch(() => props.tags, (tags) => {
                       icon-left="ic_plus_bold"
                       @click="handleAddPair"
             >
-                <span>{{ $t('COMMON.TAGS.ADD_TAG') }}</span>
+                <span>{{ $t('COMMON.TAGS.ADD') }}</span>
             </p-button>
         </slot>
         <div>
