@@ -4535,6 +4535,7 @@
 				"INFO": {
 					"ACCOUNT_ID": "Account ID",
 					"ACKNOWLEDGED": "Acknowledged",
+					"ACKNOWLEDGED_BY": "Acknowledged By",
 					"ALERT_ID": "Alert ID",
 					"ALT_E_UPDATE_DESCRIPTION": "Failed to Update Description",
 					"ALT_E_UPDATE_PROJECT": "Failed to Update Project",
@@ -4553,12 +4554,16 @@
 					"EXTRA_INFO": "Extra Info.",
 					"PROJECT": "Project",
 					"RESOLVED": "Resolved",
+					"RESOLVED_BY": "Resolved By",
 					"RULE": "Rule",
 					"SAVE_CHANGES": "Save Changes",
+					"SERVICE": "Service",
 					"SEVERITY": "Severity",
 					"STATUS_DETAILS": "Status Details",
 					"STATUS_MSG": "Status Message",
-					"TRIGGERED_BY": "Triggered By"
+					"TRIGGERED_BY": "Triggered By",
+					"TRIGGERED_TYPE": "Triggered Type",
+					"WEBHOOK": "Webhook"
 				},
 				"NOTE": {
 					"ADD_NOTE": "Add Note",
