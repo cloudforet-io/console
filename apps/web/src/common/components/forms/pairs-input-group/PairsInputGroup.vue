@@ -53,10 +53,15 @@ const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
 const dictToArray = (dict): PairItem[] => Object.keys(dict).map((k) => ({ [props.pairConfig.keyLabel]: k, [props.pairConfig.valueLabel]: dict[k] }));
 
 const arrayToDict = (arr: PairItem[]): Pair => {
-    const dict = {};
+    const dict: Record<string, string> = {};
     if (Array.isArray(arr)) {
         arr.forEach((arrItem) => {
-            if (arrItem[props.pairConfig.keyLabel] !== '') dict[props.pairConfig.keyLabel] = arrItem[props.pairConfig.valueLabel];
+            const key = arrItem[props.pairConfig.keyLabel];
+            const value = arrItem[props.pairConfig.valueLabel];
+
+            if (typeof key === 'string' && key.trim() !== '') {
+                dict[key] = String(value);
+            }
         });
     }
     return dict;
