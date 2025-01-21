@@ -323,7 +323,10 @@
 			"HELP": "Help",
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
+			"MESSAGE_FORMAT_ADD_BUTTON": "Add",
 			"MESSAGE_FORMAT_DESC": "Set the message format to be sent through the webhook.",
+			"MESSAGE_FORMAT_INVALID_DUPLICATED": "Duplicated input",
+			"MESSAGE_FORMAT_INVALID_INPUT": "Please enter text.",
 			"MESSAGE_FORMAT_VALUE_DESC": "Convert the source data fields and specify the fields to be used.",
 			"MODAL_DELETE_BUTTON": "Delete this webhook",
 			"MODAL_DELETE_CONTENT_1": "You can no longer receive events with this webhook, and this action cannot be undone.",
@@ -1302,14 +1305,6 @@
 		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
-		},
-		"MESSAGE_FORMAT": {
-			"ADD": "Add",
-			"INVALID_DUPLICATED_KEY": "duplicated key",
-			"INVALID_NO_KEY": "no key",
-			"INVALID_NO_VALUE": "no value",
-			"KEY": "From",
-			"VALUE": "To"
 		},
 		"MFA_MODAL": {
 			"ALT": {

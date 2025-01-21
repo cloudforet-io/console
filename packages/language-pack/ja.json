@@ -323,7 +323,10 @@
 			"HELP": "ヘルプ",
 			"LABEL_NAME": "名前",
 			"LABEL_STATE": "状態",
+			"MESSAGE_FORMAT_ADD_BUTTON": "追加",
 			"MESSAGE_FORMAT_DESC": "ウェブフックを通じて送信されるメッセージ形式を設定してください。",
+			"MESSAGE_FORMAT_INVALID_DUPLICATED": "重複した入力",
+			"MESSAGE_FORMAT_INVALID_INPUT": "テキストが入力されていません",
 			"MESSAGE_FORMAT_VALUE_DESC": "元のデータフィールドを変換して、使用するフィールドを指定します。",
 			"MODAL_DELETE_BUTTON": "削除",
 			"MODAL_DELETE_CONTENT_1": "このウェプフクでこれ以上イベントを受信することができず、この作業は取り消すことができません。",
@@ -1302,14 +1305,6 @@
 		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
-		},
-		"MESSAGE_FORMAT": {
-			"ADD": "追加",
-			"INVALID_DUPLICATED_KEY": "すでに登録されているキーです",
-			"INVALID_NO_KEY": "キーが入力されていません",
-			"INVALID_NO_VALUE": "値が入力されていません",
-			"KEY": "From",
-			"VALUE": "To"
 		},
 		"MFA_MODAL": {
 			"ALT": {

@@ -34,9 +34,10 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
-import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 import { sortTableItems } from '@/common/utils/table-sort';
 
+import ServiceDetailTabsWebhookDetailMessageOverlay
+    from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetailMessageOverlay.vue';
 import ServiceDetailTabsWebhookDetailRawDataModal
     from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetailRawDataModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager/composables/refined-table-data';
@@ -388,12 +389,11 @@ watch(() => storeState.selectedWebhookId, async () => {
                               @changeSort="handleChangeMessageSort"
                 />
                 <transition name="slide-up">
-                    <tags-overlay v-if="messageState.editFormVisible"
-                                  :title="$t('ALERT_MANAGER.WEBHOOK.MSG_FORMAT')"
-                                  :tags="messageState.formats"
-                                  :loading="messageState.loading"
-                                  @close="handleEditMessageFormat(false)"
-                                  @update="fetchMessageUpdate"
+                    <service-detail-tabs-webhook-detail-message-overlay v-if="messageState.editFormVisible"
+                                                                        :formats="messageState.formats"
+                                                                        :loading="messageState.loading"
+                                                                        @close="handleEditMessageFormat(false)"
+                                                                        @confirm="fetchMessageUpdate"
                     />
                 </transition>
             </div>

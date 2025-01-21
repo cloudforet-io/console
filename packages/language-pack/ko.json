@@ -323,7 +323,10 @@
 			"HELP": "가이드",
 			"LABEL_NAME": "이름",
 			"LABEL_STATE": "상태",
+			"MESSAGE_FORMAT_ADD_BUTTON": "추가",
 			"MESSAGE_FORMAT_DESC": "웹훅을 통해 전송될 메세지 형식을 설정하세요.",
+			"MESSAGE_FORMAT_INVALID_DUPLICATED": "중복된 값이 존재합니다.",
+			"MESSAGE_FORMAT_INVALID_INPUT": "텍스트가 입력되지 않았습니다.",
 			"MESSAGE_FORMAT_VALUE_DESC": "원본 데이터 필드를 변환하여 사용할 필드로 지정합니다.",
 			"MODAL_DELETE_BUTTON": "삭제",
 			"MODAL_DELETE_CONTENT_1": "이 웹훅으로 더 이상 이벤트를 수신할 수 없으며, 이 작업은 취소 할 수 없습니다.",
@@ -1302,14 +1305,6 @@
 		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
-		},
-		"MESSAGE_FORMAT": {
-			"ADD": "추가",
-			"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
-			"INVALID_NO_KEY": "키가 입력되지 않았습니다.",
-			"INVALID_NO_VALUE": "값이 입력되지 않았습니다.",
-			"KEY": "From",
-			"VALUE": "To"
 		},
 		"MFA_MODAL": {
 			"ALT": {
