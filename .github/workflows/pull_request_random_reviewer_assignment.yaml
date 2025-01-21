@@ -13,7 +13,8 @@ jobs:
   pick-random-reviewer:
     if: |
       github.repository_owner == 'cloudforet-io' && 
-      contains(github.event.pull_request.labels.*.name, 'self_approved/review')
+      !contains(github.event.pull_request.labels.*.name, 'self_approved/review') &&
+      github.event.pull_request.requested_reviewers.length == 0
     
     runs-on: ubuntu-latest
     
@@ -24,23 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Check existing reviewers
-        id: check_reviewers
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
-            });
-            
-            const hasReviewers = pr.data.requested_reviewers.length > 0;
-            console.log('Has existing reviewers:', hasReviewers);
-            core.setOutput('has_reviewers', hasReviewers);
-
       - name: Pick Random Reviewer
-        if: steps.check_reviewers.outputs.has_reviewers == 'false'
         id: pick_random_reviewer 
         uses: actions/github-script@v6
         with:
@@ -57,7 +42,6 @@ jobs:
             core.setOutput('randomReviewer2', randomReviewer2);
 
       - name: Add Comment
-        if: steps.check_reviewers.outputs.has_reviewers == 'false'
         uses: actions/github-script@v6
         with:
           script: |
@@ -69,7 +53,6 @@ jobs:
             });
       
       - name: Add Reviewers
-        if: steps.check_reviewers.outputs.has_reviewers == 'false'
         id: add_reviewers
         uses: actions/github-script@v6
         with:
@@ -81,9 +64,7 @@ jobs:
               reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
             });
 
-      
       - name: Check if the PR author is an organization member and add as assignee
-        if: steps.check_reviewers.outputs.has_reviewers == 'false'
         uses: actions/github-script@v6
         with:
           script: |
