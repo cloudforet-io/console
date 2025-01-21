@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButtonModal, PButton } from '@cloudforet/mirinae';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserGroupCreateParameters } from '@/schema/identity/user-group/api-verbs/create';
 import type { UserGroupUpdateParameters } from '@/schema/identity/user-group/api-verbs/update';
@@ -32,7 +32,13 @@ const state = reactive({
     loading: false,
     groupName: '',
     description: '',
+    disabled: false,
 });
+
+/* Watcher */
+watch(() => state.groupName, (groupName) => {
+    state.disabled = groupName.length > 0;
+}, { immediate: true });
 
 /* Component */
 const handleConfirm = async () => {
@@ -114,8 +120,10 @@ const fetchUpdateUserGroup = async (params: UserGroupUpdateParameters) => {
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE || userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
                     size="md"
                     :loading="state.loading"
+                    :disabled="!state.disabled"
                     @cancel="handleClose"
                     @close="handleClose"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <div class="modal-contents">
@@ -123,18 +131,14 @@ const fetchUpdateUserGroup = async (params: UserGroupUpdateParameters) => {
             </div>
         </template>
         <template #confirm-button>
-            <p-button v-if="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE"
-                      theme="primary"
-                      @click="handleConfirm"
-            >
+            <span v-if="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE">
+
                 {{ $t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.CONFIRM') }}
-            </p-button>
-            <p-button v-else-if="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
-                      theme="primary"
-                      @click="handleConfirm"
-            >
+            </span>
+            <span v-else-if="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE">
+
                 {{ $t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE') }}
-            </p-button>
+            </span>
         </template>
     </p-button-modal>
 </template>
