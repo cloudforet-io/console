@@ -7,7 +7,7 @@ import { isEqual } from 'lodash';
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVariableSchemaProperty, DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -18,10 +18,6 @@ import DashboardGlobalVariableFilter
 import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesMoreButton.vue';
-import {
-    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP,
-    MANAGED_DASHBOARD_VARIABLES_SCHEMA,
-} from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -53,19 +49,7 @@ const storeState = reactive({
 });
 const state = reactive({
     showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableProperties: computed<Record<string, DashboardVariableSchemaProperty>>(() => {
-        const _defaultDashboardVariables: Record<string, DashboardVariableSchemaProperty> = {};
-        if (storeState.isAdminMode) {
-            _defaultDashboardVariables.workspace = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
-        }
-        if (!props.isProjectDashboard) {
-            _defaultDashboardVariables.project = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key];
-        }
-        _defaultDashboardVariables.service_account = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key];
-        _defaultDashboardVariables.region = MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key];
-        return _defaultDashboardVariables;
-    }),
-    newGlobalVariables: computed<DashboardGlobalVariable[]>(() => {
+    globalVariables: computed<DashboardGlobalVariable[]>(() => {
         const properties = dashboardDetailGetters.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
         const _usedProperties: DashboardGlobalVariable[] = Object.values(properties).filter((d) => d.use);
         return getOrderedGlobalVariables(_usedProperties);
@@ -73,7 +57,7 @@ const state = reactive({
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
-        state.newGlobalVariables.forEach((_var) => {
+        state.globalVariables.forEach((_var) => {
             if (!isEqual(dashboardDetailGetters.dashboardInfo?.vars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
                 results.push(_var.key);
             }
@@ -99,7 +83,7 @@ const handleResetVariables = () => {
     <div v-if="!dashboardDetailState.loadingDashboard"
          :class="{'dashboard-variables-select-dropdown': true, 'detail-page': !props.widgetMode}"
     >
-        <template v-for="(property, idx) in state.newGlobalVariables">
+        <template v-for="(property, idx) in state.globalVariables">
             <div :key="`${property.name}-${idx}`">
                 <dashboard-global-variable-filter :variable="property" />
                 <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(property.key)" />
