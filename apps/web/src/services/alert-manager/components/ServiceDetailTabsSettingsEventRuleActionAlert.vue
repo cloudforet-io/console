@@ -31,8 +31,8 @@ import type {
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
 
-import type { TagItem } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { TagItem } from '@/common/modules/tags/type';
 
 import { gray } from '@/styles/colors';
 

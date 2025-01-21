@@ -1,6 +1,6 @@
 import type { SchemaModel } from '@/schema/identity/schema/model';
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/modules/tags/type';
 
 
 // Service Account Forms
