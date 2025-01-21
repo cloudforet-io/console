@@ -19,9 +19,8 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import type { Tag } from '@/common/modules/tags/type';
 
 
 /**

@@ -17,9 +17,9 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
+import type { Tag } from '@/common/modules/tags/type';
 
 import type {
     CloudServiceTagTableItem,

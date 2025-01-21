@@ -13,19 +13,7 @@ import { i18n } from '@/translations';
 
 import type {
     Tag, TagItem, ValidationData,
-} from '@/common/components/forms/tags-input-group/type';
-
-const dictToArray = (dict): TagItem[] => Object.keys(dict).map((k) => ({ key: k, value: dict[k] }));
-
-const arrayToDict = (arr: TagItem[]): Tag => {
-    const dict = {};
-    if (Array.isArray(arr)) {
-        arr.forEach(({ key, value }) => {
-            if (key !== '') dict[key] = value;
-        });
-    }
-    return dict;
-};
+} from '@/common/components/forms/pairs-input-group/type';
 
 const props = withDefaults(defineProps<{
     tags?: Tag;
@@ -42,9 +30,23 @@ const props = withDefaults(defineProps<{
     showHeader: false,
     isAdministration: false,
 });
+
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
     (e: 'update-tags', tags: Tag): void;
 }>();
+
+const dictToArray = (dict): TagItem[] => Object.keys(dict).map((k) => ({ key: k, value: dict[k] }));
+
+const arrayToDict = (arr: TagItem[]): Tag => {
+    const dict = {};
+    if (Array.isArray(arr)) {
+        arr.forEach(({ key, value }) => {
+            if (key !== '') dict[key] = value;
+        });
+    }
+    return dict;
+};
+
 const state = reactive({
     items: dictToArray(props.tags) as TagItem[],
     keyValidations: computed<ValidationData[]>(() => {

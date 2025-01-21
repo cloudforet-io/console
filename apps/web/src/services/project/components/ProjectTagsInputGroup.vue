@@ -12,8 +12,9 @@ import {
 import { i18n } from '@/translations';
 
 import type {
-    Tag, TagItem, ValidationData,
-} from '@/common/components/forms/tags-input-group/type';
+    ValidationData,
+} from '@/common/components/forms/pairs-input-group/type';
+import type { Tag, TagItem } from '@/common/modules/tags/type';
 
 const dictToArray = (dict): TagItem[] => Object.keys(dict).map((k) => ({ key: k, value: dict[k] }));
 

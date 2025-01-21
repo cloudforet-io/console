@@ -12,10 +12,10 @@
                 </p>
             </div>
         </template>
-        <tags-input-group :tags="collectorFormState.tags"
-                          show-validation
-                          :is-valid.sync="state.isTagsValid"
-                          @update-tags="handleUpdateTags"
+        <pairs-input-group :pairs="collectorFormState.tags"
+                           show-validation
+                           :is-valid.sync="state.isTagsValid"
+                           @update-pairs="handleUpdateTags"
         />
     </p-field-group>
 </template>
@@ -26,8 +26,8 @@ import { reactive, watch } from 'vue';
 
 import { PFieldGroup } from '@cloudforet/mirinae';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import PairsInputGroup from '@/common/components/forms/pairs-input-group/PairsInputGroup.vue';
+import type { Tag } from '@/common/modules/tags/type';
 
 import { useCollectorFormStore } from '@/services/asset-inventory-v1/stores/collector-form-store';
 

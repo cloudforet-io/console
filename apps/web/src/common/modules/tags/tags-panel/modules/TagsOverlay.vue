@@ -6,8 +6,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { isEmpty } from 'lodash';
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
-import PairLayoutWrapper from '@/common/components/pair-layout-wrapper/PairLayoutWrapper.vue';
+import PairFieldLayout from '@/common/components/pair-field-layout/PairFieldLayout.vue';
+import type { Tag } from '@/common/modules/tags/type';
 
 const props = withDefaults(defineProps<{
     title?: TranslateResult;
@@ -19,7 +19,9 @@ const props = withDefaults(defineProps<{
     loading: false,
 });
 
-const emit = defineEmits<{(e: 'update', tags: Tag): void;}>();
+const emit = defineEmits<{(e: 'update', tags: Tag): void;
+    (e: 'close'): void;
+}>();
 
 const state = reactive({
     noItem: computed(() => isEmpty(props.tags)),
@@ -27,11 +29,12 @@ const state = reactive({
 </script>
 
 <template>
-    <pair-layout-wrapper :title="props.title ?? $t('COMMON.TAGS.TITLE')"
-                         :pairs="props.tags"
-                         :loading="props.loading"
-                         class="tags-overlay"
-                         @save="emit('update', $event)"
+    <pair-field-layout :title="props.title ?? $t('COMMON.TAGS.TITLE')"
+                       :pairs="props.tags"
+                       :loading="props.loading"
+                       class="tags-overlay"
+                       @save="emit('update', $event)"
+                       @close="emit('close')"
     >
         <template #description>
             <div v-if="state.noItem"
@@ -47,7 +50,7 @@ const state = reactive({
                 {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
             </div>
         </template>
-    </pair-layout-wrapper>
+    </pair-field-layout>
 </template>
 
 <style lang="postcss" scoped>

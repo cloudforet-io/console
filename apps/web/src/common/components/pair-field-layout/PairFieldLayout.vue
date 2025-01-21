@@ -4,12 +4,12 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { PButton, PIconButton, PPaneLayout } from '@cloudforet/mirinae';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import PairsInputGroup from '@/common/components/forms/pairs-input-group/PairsInputGroup.vue';
+import type { Pair } from '@/common/components/forms/pairs-input-group/type';
 
 const props = withDefaults(defineProps<{
     title?: TranslateResult;
-    pairs?: Record<string, any>;
+    pairs?: Pair;
     loading?: boolean;
 }>(), {
     title: undefined,
@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
     loading: false,
 });
 
-const emit = defineEmits<{(e: 'save', pairs: Record<string, any>): void;
+const emit = defineEmits<{(e: 'save', pairs: Pair): void;
     (e: 'close'): void;
 }>();
 
@@ -35,7 +35,7 @@ const handleSaveTags = async () => {
     emit('save', state.newPairs);
 };
 
-const handleUpdateTags = (tags?: Tag) => {
+const handleUpdateTags = (tags?: Pair) => {
     state.newPairs = tags;
 };
 
@@ -62,17 +62,17 @@ onMounted(() => {
             </div>
             <p-pane-layout class="pair-panel">
                 <slot name="description" />
-                <tags-input-group :tags="state.newPairs"
-                                  :disabled="props.loading"
-                                  show-validation
-                                  :is-valid.sync="state.isPairsValid"
-                                  :show-header="state.showHeader"
-                                  @update-tags="handleUpdateTags"
+                <pairs-input-group :pairs="state.newPairs"
+                                   :disabled="props.loading"
+                                   show-validation
+                                   :is-valid.sync="state.isPairsValid"
+                                   :show-header="state.showHeader"
+                                   @update-pairs="handleUpdateTags"
                 />
             </p-pane-layout>
             <div class="buttons">
                 <p-button style-type="tertiary"
-                          @click="$emit('close')"
+                          @click="handleCloseOverlay"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
@@ -126,7 +126,7 @@ onMounted(() => {
             overflow-y: auto;
         }
         .buttons {
-            @apply flex mb-8 pr-6 justify-end;
+            @apply flex mb-8 pr-6 justify-end gap-4;
         }
     }
 }

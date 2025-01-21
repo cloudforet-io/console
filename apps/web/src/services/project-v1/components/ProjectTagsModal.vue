@@ -10,8 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import type { Tag } from '@/common/modules/tags/type';
 
 import ProjectTagsInputGroup from '@/services/project-v1/components/ProjectTagsInputGroup.vue';
 

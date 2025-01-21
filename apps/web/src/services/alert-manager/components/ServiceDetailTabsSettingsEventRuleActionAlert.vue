@@ -31,7 +31,7 @@ import type {
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import { i18n } from '@/translations';
 
-import type { TagItem } from '@/common/components/forms/tags-input-group/type';
+import type { PairItem } from '@/common/components/forms/pairs-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
@@ -108,7 +108,7 @@ const state = reactive({
     selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH as EventRuleUrgencyType,
     selectedEscalationPolicyId: storeState.service.escalation_policy_id,
     labels: [] as InputItem[],
-    additionalInfoTags: [{ key: '', value: '' }] as TagItem[],
+    additionalInfoTags: [{ key: '', value: '' }] as PairItem[],
 });
 
 const updateStateFromEventRuleInfo = (): void => {
