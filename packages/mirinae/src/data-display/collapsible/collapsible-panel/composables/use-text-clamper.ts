@@ -5,7 +5,7 @@ interface TextClamper {
     runTextClamper: (isCollapsed: boolean, contentRef : HTMLElement | null, fakeTextRef? : HTMLElement | null) => void;
 }
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion, no-continue, no-restricted-syntax */
+/* eslint-disable no-continue */
 export const useDeepTextClamper = (lineClamp : number):TextClamper => {
     const state = reactive({
         isOverflow: false,
@@ -27,8 +27,7 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
 
         let lineHeight = parseFloat(computedStyle.lineHeight);
 
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(lineHeight)) {
+        if (Number.isNaN(lineHeight)) {
             const fontSize = parseFloat(computedStyle.fontSize);
             lineHeight = fontSize * 1.2;
         }
@@ -54,23 +53,25 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
             }
 
             if (currentNode.nodeType === Node.TEXT_NODE) {
-                if (!currentNode.textContent?.trim()) {
-                    continue;
-                }
-                const parentElement = currentNode.parentElement!;
-                const displayStyle = window.getComputedStyle(parentElement!).display;
+                const textContent = currentNode.textContent?.trim();
+                if (!textContent) continue;
+
+                const parentElement = currentNode.parentElement;
+                if (!parentElement) continue;
+
+                const displayStyle = window.getComputedStyle(parentElement).display;
                 let contentLineCount = 0;
 
                 if (displayStyle === 'inline') {
-                    contentLineCount = calculateLineCount(parentElement!);
+                    contentLineCount = calculateLineCount(parentElement);
                 } else {
-                    const span = createHiddenSpan(currentNode.textContent!);
-                    const parentPosition = parentElement!.style.position;
-                    parentElement!.style.position = 'relative';
-                    parentElement!.appendChild(span);
+                    const span = createHiddenSpan(textContent);
+                    const parentPosition = parentElement.style.position;
+                    parentElement.style.position = 'relative';
+                    parentElement.appendChild(span);
 
                     contentLineCount = calculateLineCount(span);
-                    parentElement!.style.position = parentPosition;
+                    parentElement.style.position = parentPosition;
                     span.remove();
                 }
                 if (remainingLine <= contentLineCount) {
@@ -91,6 +92,7 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
         } else {
             state.isOverflow = true;
         }
+
         // isClampStarted is used to determine if the clamp has been applied at a higher level - because it operates recursively
         if (!state.isClampApplied) {
             applyClampStyle(element, lineLimit);
@@ -102,9 +104,10 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
         state.isClampApplied = false;
         if (state.clampedElement) resetClampStyle(state.clampedElement);
 
-        for (const node of state.hiddenNodesMap.keys()) {
+        state.hiddenNodesMap.forEach((_, node) => {
             restoreNode(node);
-        }
+        });
+
         state.hiddenNodesMap.clear();
     };
     const restoreNode = (node: Node) => {
