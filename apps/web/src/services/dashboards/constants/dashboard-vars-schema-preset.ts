@@ -4,19 +4,6 @@ import type { DashboardGlobalVariablesSchema } from '@/schema/dashboard/_types/d
 
 export const DASHBOARD_VARS_SCHEMA_PRESET: DashboardGlobalVariablesSchema = {
     properties: {
-        project_id: {
-            key: 'project_id',
-            name: 'Project',
-            method: 'dynamic',
-            type: 'reference',
-            use: true,
-            reference: {
-                resourceType: 'identity.Project',
-            },
-            options: {
-                selectionType: 'multi',
-            },
-        },
         project_group_id: {
             key: 'project_group_id',
             name: 'Project Group',
@@ -25,6 +12,19 @@ export const DASHBOARD_VARS_SCHEMA_PRESET: DashboardGlobalVariablesSchema = {
             use: true,
             reference: {
                 resourceType: 'identity.ProjectGroup',
+            },
+            options: {
+                selectionType: 'multi',
+            },
+        },
+        project_id: {
+            key: 'project_id',
+            name: 'Project',
+            method: 'dynamic',
+            type: 'reference',
+            use: true,
+            reference: {
+                resourceType: 'identity.Project',
             },
             options: {
                 selectionType: 'multi',

@@ -15,7 +15,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const state = reactive({
-    groupByItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys.filter((item) => item.key !== 'project_group_id').map((d) => ({
+    groupByItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
         name: d.key,
         label: d.name,
     }))),
