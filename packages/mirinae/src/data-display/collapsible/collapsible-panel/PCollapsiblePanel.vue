@@ -29,11 +29,12 @@ import {
     useDeepTextClamper,
     useSimpleTextClamper,
 } from '@/data-display/collapsible/collapsible-panel/composables/use-text-clamper';
+import type { CollapsiblePanelProps } from '@/data-display/collapsible/collapsible-panel/type';
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
 const PAD = 2;
-export default defineComponent({
+export default defineComponent<CollapsiblePanelProps>({
     name: 'PCollapsiblePanel',
     components: { PCollapsibleToggle },
     model: {
@@ -63,8 +64,8 @@ export default defineComponent({
             contentRef: null as null|HTMLElement,
         });
 
-        const simpleTextClamper = useSimpleTextClamper(PAD, props.lineClamp);
-        const deepTextClamper = useDeepTextClamper(props.lineClamp);
+        const simpleTextClamper = useSimpleTextClamper(PAD, props.lineClamp || 2);
+        const deepTextClamper = useDeepTextClamper(props.lineClamp || 2);
 
         const updateClamping = () => {
             nextTick(() => {
