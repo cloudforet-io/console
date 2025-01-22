@@ -1,3 +1,4 @@
+import ProjectGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/project-group-variable-model';
 import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
 import RegionVariableModel from '@/lib/variable-models/managed-model/resource-model/region-variable-model';
 import ServiceAccountVariableModel
@@ -7,6 +8,10 @@ import UserVariableModel from '@/lib/variable-models/managed-model/resource-mode
 
 
 export const DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST = [
+    {
+        name: ProjectGroupVariableModel.meta.resourceType,
+        label: ProjectGroupVariableModel.meta.name,
+    },
     {
         name: ProjectVariableModel.meta.resourceType,
         label: ProjectVariableModel.meta.name,
