@@ -80,6 +80,9 @@ const state = reactive({
 
     refinedAlertList: computed<AlertModel[]>(() => storeState.alertList.map((alert) => ({
         ...alert,
+        duration: alert.status === ALERT_STATUS.RESOLVED
+            ? calculateTime(alert?.resolved_at, storeState.timezone) || '0m'
+            : calculateTime(alert?.created_at, storeState.timezone) || '0m',
         created_at: iso8601Formatter(alert.created_at, storeState.timezone),
     }))),
     alertStateLabels: getAlertStateI18n(),
@@ -414,11 +417,6 @@ watch(() => storeState.serviceId, async (serviceId) => {
             </template>
             <template #col-triggered_by-format="{ value }">
                 <span>{{ getCreatedByNames(value) }}</span>
-            </template>
-            <template #col-duration-format="{ item }">
-                <span>{{ item.status === ALERT_STATUS.RESOLVED
-                    ? calculateTime(item?.resolved_at, storeState.timezone) || '0m'
-                    : calculateTime(item?.created_at, storeState.timezone) || '0m' }}</span>
             </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
