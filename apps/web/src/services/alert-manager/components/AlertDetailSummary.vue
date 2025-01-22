@@ -43,8 +43,8 @@ const state = reactive({
     alertUrgency: 'HIGH',
     duration: computed<string>(() => (
         storeState.alertInfo.status === ALERT_STATUS.RESOLVED
-            ? calculateTime(storeState.alertInfo?.resolved_at, storeState.timezone)
-            : calculateTime(storeState.alertInfo?.created_at, storeState.timezone)
+            ? calculateTime(storeState.alertInfo?.resolved_at, storeState.timezone) || '0m'
+            : calculateTime(storeState.alertInfo?.created_at, storeState.timezone) || '0m'
     )),
     alertStateList: computed<SelectDropdownMenuItem[]>(() => ([
         { name: ALERT_STATUS.TRIGGERED, label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED') },
@@ -56,6 +56,8 @@ const state = reactive({
         { name: ALERT_URGENCY.LOW, label: i18n.t('ALERT_MANAGER.ALERTS.LOW') },
     ])),
 });
+
+const getEscalationInfo = (id: string) => storeState.escalationPolicy[id]?.label || '';
 
 const handleChangeAlertState = async (alertState: AlertStatusType) => {
     await alertDetailPageStore.updateAlertDetail({
@@ -132,7 +134,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
         </div>
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE') }}</span>
-            <p-link :text="storeState.escalationPolicy[storeState.alertInfo.escalation_policy_id].label"
+            <p-link :text="getEscalationInfo(storeState.alertInfo.escalation_policy_id)"
                     action-icon="internal-link"
                     new-tab
                     :to="getProperRouteLocation({
@@ -146,6 +148,7 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
                         },
                     })"
                     highlight
+                    size="md"
                     class="leading-8"
             />
         </div>

@@ -121,6 +121,12 @@ const handleSelectDropdown = (type: 'start' | 'end', value: number) => {
     }
 };
 
+const areDayArraysEqual = (selectedDayButton: DayType[], compareDays: DayType[]) => {
+    if (selectedDayButton.length !== compareDays.length) return false;
+    const selectedDaySet = new Set(selectedDayButton);
+    return compareDays.every((day) => selectedDaySet.has(day));
+};
+
 
 watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx]) => {
     emit('update-form', {
@@ -128,6 +134,16 @@ watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.
         TIMEZONE: storeState.timezone,
         ...state.scheduleDayForm,
     });
+}, { immediate: true });
+
+watch(() => state.selectedDayButton, (selectedDayButton) => {
+    const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI'] as DayType[];
+    const everyDay = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as DayType[];
+    if (areDayArraysEqual(selectedDayButton, weekDays)) {
+        state.selectedRadioIdx = 0;
+    } else if (areDayArraysEqual(selectedDayButton, everyDay)) {
+        state.selectedRadioIdx = 1;
+    }
 }, { immediate: true });
 
 onMounted(() => {

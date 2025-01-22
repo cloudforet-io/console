@@ -253,7 +253,7 @@
 			"ALT_S_UPDATE_SERVICE": "Service successfully updated",
 			"CREATE_SERVICE_DESC": "Provide a name for your technical service that clearly identifies a specific component of your tech stack to monitor, manage on-call responsibilities, and manually raise incidents for.",
 			"CREATE_SERVICE_TITLE": "Create New Service",
-			"CREATE_WEBHOOK_TITLE": "Create New Webhook",
+			"CREATE_WEBHOOK_TITLE": "Create Webhook",
 			"DEFAULT_ESCALATION_POLICY": "Default Escalation Policy",
 			"DETAILS": "View Details",
 			"EMPTY_MEMBER": "No Service Member",
@@ -272,6 +272,7 @@
 			"MEMBER": "Member",
 			"MEMBERS": "Members",
 			"MODAL_DELETE_DESC": "Check the connected webhooks and alerts of the service.",
+			"MODAL_DELETE_NO_DATA": "Are you sure you want to delete this service?",
 			"MODAL_DELETE_TITLE": "Are you sure you want to delete this service?",
 			"MODAL_EDIT_TITLE": "Update Service",
 			"MODAL_MEMBER_PLACEHOLDER": "Select a member or more",
@@ -297,7 +298,7 @@
 			"VALIDATION_KEY_HYPHEN": "The first and last characters cannot be hyphens.",
 			"VALIDATION_KEY_UNIQUE": "A service with this key name already exists.",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
-			"VIEW_ALL_OPEN_ALERTS": "View all open alerts",
+			"VIEW_ALL": "View all",
 			"WEBHOOK": "Webhook ({cnt})"
 		},
 		"SET_UP": "Set Up",
@@ -323,7 +324,10 @@
 			"HELP": "Help",
 			"LABEL_NAME": "Name",
 			"LABEL_STATE": "State",
+			"MESSAGE_FORMAT_ADD_BUTTON": "Add",
 			"MESSAGE_FORMAT_DESC": "Set the message format to be sent through the webhook.",
+			"MESSAGE_FORMAT_INVALID_DUPLICATED": "Duplicated input",
+			"MESSAGE_FORMAT_INVALID_INPUT": "Please enter text.",
 			"MESSAGE_FORMAT_VALUE_DESC": "Convert the source data fields and specify the fields to be used.",
 			"MODAL_DELETE_BUTTON": "Delete this webhook",
 			"MODAL_DELETE_CONTENT_1": "You can no longer receive events with this webhook, and this action cannot be undone.",
@@ -1302,14 +1306,6 @@
 		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
-		},
-		"MESSAGE_FORMAT": {
-			"ADD": "Add",
-			"INVALID_DUPLICATED_KEY": "duplicated key",
-			"INVALID_NO_KEY": "no key",
-			"INVALID_NO_VALUE": "no value",
-			"KEY": "From",
-			"VALUE": "To"
 		},
 		"MFA_MODAL": {
 			"ALT": {
@@ -4548,6 +4544,7 @@
 				"INFO": {
 					"ACCOUNT_ID": "Account ID",
 					"ACKNOWLEDGED": "Acknowledged",
+					"ACKNOWLEDGED_BY": "Acknowledged By",
 					"ALERT_ID": "Alert ID",
 					"ALT_E_UPDATE_DESCRIPTION": "Failed to Update Description",
 					"ALT_E_UPDATE_PROJECT": "Failed to Update Project",
@@ -4566,12 +4563,16 @@
 					"EXTRA_INFO": "Extra Info.",
 					"PROJECT": "Project",
 					"RESOLVED": "Resolved",
+					"RESOLVED_BY": "Resolved By",
 					"RULE": "Rule",
 					"SAVE_CHANGES": "Save Changes",
+					"SERVICE": "Service",
 					"SEVERITY": "Severity",
 					"STATUS_DETAILS": "Status Details",
 					"STATUS_MSG": "Status Message",
-					"TRIGGERED_BY": "Triggered By"
+					"TRIGGERED_BY": "Triggered By",
+					"TRIGGERED_TYPE": "Triggered Type",
+					"WEBHOOK": "Webhook"
 				},
 				"NOTE": {
 					"ADD_NOTE": "Add Note",

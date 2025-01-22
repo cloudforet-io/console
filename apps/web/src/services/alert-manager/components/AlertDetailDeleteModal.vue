@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
@@ -33,6 +33,7 @@ const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
 });
 const router = useRouter();
+const route = useRoute();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
@@ -53,7 +54,12 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.alertManager.alert.delete<AlertDeleteParameters>({
             alert_id: storeState.alertInfo.alert_id,
         });
-        await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+        const serviceId = route.params?.serviceId;
+        if (serviceId) {
+            await router.go(-1);
+        } else {
+            await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+        }
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
     } catch (e) {
         ErrorHandler.handleError(e, true);

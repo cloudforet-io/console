@@ -212,7 +212,7 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
             width: 15rem;
         }
         .value {
-            @apply inline-block font-bold;
+            @apply inline-block font-bold pl-2;
             width: 20rem;
         }
     }

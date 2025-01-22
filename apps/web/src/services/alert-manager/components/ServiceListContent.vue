@@ -56,6 +56,7 @@ const state = reactive({
     }),
 });
 
+const getEscalationPolicyLabel = (id: string): string => storeState.escalationPolicy[id]?.label || '';
 const getWebhookIcon = (id: string): string|undefined => {
     const webhook = storeState.webhook[id].data;
     if (!webhook) return undefined;
@@ -221,7 +222,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
                                     </p>
                                     <p-text-button @click.stop="handleClickEscalationPolicy(item.service_id, item.escalation_policy_id)">
                                         <p class="truncate text-blue-700 pr-1 pl-1">
-                                            {{ storeState.escalationPolicy[item.escalation_policy_id].label }}
+                                            {{ getEscalationPolicyLabel(item.escalation_policy_id) }}
                                         </p>
                                     </p-text-button>
                                 </div>

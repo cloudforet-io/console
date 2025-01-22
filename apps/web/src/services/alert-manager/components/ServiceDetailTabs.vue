@@ -69,6 +69,7 @@ watch(() => tabState.activeTab, (activeTab) => {
         mode: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.mode,
         webhookId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.webhookId,
         eventRuleId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.eventRuleId,
+        escalationPolicyId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.escalationPolicyId,
     });
 });
 </script>
