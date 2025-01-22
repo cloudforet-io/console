@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -12,6 +15,8 @@ import ServiceList from '@/services/alert-manager/components/ServiceList.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
 const router = useRouter();
+
+const allReferenceStore = useAllReferenceStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -22,6 +27,10 @@ const handleClickCreateButton = () => {
         name: ALERT_MANAGER_ROUTE.SERVICE.CREATE._NAME,
     }));
 };
+
+onMounted(() => {
+    allReferenceStore.load('escalation_policy', { force: true });
+});
 </script>
 
 <template>

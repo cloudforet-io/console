@@ -12,7 +12,7 @@ import CostTagKeyVariableModel
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GROUP_BY_FILTER_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
 
@@ -37,8 +37,8 @@ export const useCostDataSourceFilterMenuItems = ({
 }: UseCostDataSourceFilterMenuItems): UseCostDataSourceFiltersReturn => {
     const state = reactive({
         managedGroupByItems: computed<CostDataSourceFilterMenuItem[]>(() => {
-            if (isAdminMode.value) return Object.values(GROUP_BY_ITEM_MAP);
-            return Object.values(GROUP_BY_ITEM_MAP).filter((item) => item.name !== 'workspace_id');
+            if (isAdminMode.value) return Object.values(GROUP_BY_FILTER_ITEM_MAP);
+            return Object.values(GROUP_BY_FILTER_ITEM_MAP).filter((item) => item.name !== 'workspace_id');
         }),
         additionalInfoGroupByItems: computed<CostDataSourceFilterMenuItem[]>(() => {
             if (state.metadataAdditionalInfoItems.length) return state.metadataAdditionalInfoItems;

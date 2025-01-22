@@ -86,3 +86,12 @@ export const NAME_FORM_MODAL_TYPE = {
 } as const;
 
 export const SIZE_UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
+
+export const PROJECT_GROUP_LABEL_INFO = {
+    name: 'Project Group',
+    key: 'project_group_id',
+    reference: {
+        resource_type: 'identity.ProjectGroup',
+        reference_key: 'project_group_id',
+    },
+} as const;

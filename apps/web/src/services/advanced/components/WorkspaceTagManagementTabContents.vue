@@ -139,7 +139,7 @@ watch([() => props.activeTab, () => state.selectedWorkspace], async () => {
                           resource-key="user_id"
                           :loading="tableState.loading"
                           @close="handleCloseTag"
-                          @update="handleTagUpdate"
+                          @confirm="handleTagUpdate"
             />
         </transition>
     </div>

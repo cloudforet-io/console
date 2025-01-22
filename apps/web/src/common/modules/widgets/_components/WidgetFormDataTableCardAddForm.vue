@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { range } from 'lodash';
+import { cloneDeep, range } from 'lodash';
 
 import {
     PFieldGroup, PSelectDropdown, PTextInput,
@@ -26,6 +26,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
+
+import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 
 
 
@@ -130,6 +132,12 @@ const reservedLabelState = reactive({
 const groupByState = reactive({
     items: computed(() => {
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
+            return costDataSourceMenuItems.value.filter((d) => d.name !== 'project_group_id');
+        }
+        return [...assetFilterState.metricItems];
+    }),
+    filterItems: computed(() => {
+        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return costDataSourceMenuItems.value;
         }
         return [...assetFilterState.metricFilterItems];
@@ -144,7 +152,18 @@ const assetFilterState = reactive({
             return labelInfo.key !== 'workspace_id';
         }) : [];
     }),
-    metricFilterItems: computed<MenuItem[]>(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
+    metricItems: computed<MenuItem[]>(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
+    metricFilterItems: computed<MenuItem[]>(() => {
+        const _refinedLabelKeys = cloneDeep(assetFilterState.refinedLabelKeys);
+        const projectLabelInfoIndex = _refinedLabelKeys.find((d) => d.key === 'project_id');
+        if (projectLabelInfoIndex) {
+            _refinedLabelKeys.splice(projectLabelInfoIndex, 0, PROJECT_GROUP_LABEL_INFO);
+        }
+        return _refinedLabelKeys.map((d) => ({
+            name: d.key,
+            label: d.name,
+        }));
+    }),
 });
 
 /* Events */
@@ -212,7 +231,7 @@ watch([
                                              :source-type="props.sourceType"
                                              :source-id="props.sourceId"
                                              :source-key="props.sourceKey"
-                                             :filter-items="groupByState.items"
+                                             :filter-items="groupByState.filterItems"
                                              :filter.sync="state.proxyFilter"
         />
         <p-field-group :label="$t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_FIELD_NAME')"

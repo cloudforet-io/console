@@ -17,10 +17,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import PairsInputGroup from '@/common/components/forms/pairs-input-group/PairsInputGroup.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+import type { Tag } from '@/common/modules/tags/type';
 
 import { alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager-v1/helpers/alert-badge-helper';
 import { useProjectDetailPageStore } from '@/services/project-v1/stores/project-detail-page-store';
@@ -288,9 +288,9 @@ const handleStopProcessingChange = (value: boolean) => {
                     </p-select-dropdown>
                 </div>
                 <div class="form-box additional-information">
-                    <tags-input-group show-header
-                                      :tags="state.additionalInfoTags"
-                                      @update-tags="handleUpdateAdditionalInformation"
+                    <pairs-input-group show-header
+                                       :pairs="state.additionalInfoTags"
+                                       @update-pairs="handleUpdateAdditionalInformation"
                     >
                         <template #add-button="{handleAddPair}">
                             <div class="top-part">
@@ -304,7 +304,7 @@ const handleStopProcessingChange = (value: boolean) => {
                                 </p-button>
                             </div>
                         </template>
-                    </tags-input-group>
+                    </pairs-input-group>
                 </div>
             </div>
         </div>
@@ -371,7 +371,7 @@ const handleStopProcessingChange = (value: boolean) => {
             @apply text-gray-600;
         }
 
-        /* customize tags-input-group */
+        /* customize pairs-input-group */
         :deep(&.additional-information) {
             display: block;
             .top-part {
@@ -423,7 +423,7 @@ const handleStopProcessingChange = (value: boolean) => {
                 }
             }
 
-            /* customize tags-input-group */
+            /* customize pairs-input-group */
             :deep(&.additional-information) {
                 .p-field-group {
                     width: 45%;

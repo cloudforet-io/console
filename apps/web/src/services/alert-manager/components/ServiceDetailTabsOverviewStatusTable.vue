@@ -281,9 +281,10 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                         >
                             <p-text-button style-type="highlight"
                                            class="ml-auto mr-auto"
+                                           size="sm"
                                            @click="handleRouteAlertsTab"
                             >
-                                {{ $t('ALERT_MANAGER.SERVICE.VIEW_ALL_OPEN_ALERTS') }}
+                                {{ $t('ALERT_MANAGER.SERVICE.VIEW_ALL') }}
                             </p-text-button>
                         </td>
                     </template>

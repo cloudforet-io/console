@@ -47,6 +47,7 @@ const state = reactive({
         alerts: storeState.service.alerts.TOTAL.HIGH + storeState.service.alerts.TOTAL.LOW,
         webhook: storeState.service.webhooks?.length || 0,
     })),
+    noData: computed<boolean>(() => state.data.alerts === 0 && state.data.webhook === 0),
 });
 const handleConfirm = async () => {
     state.loading = true;
@@ -66,7 +67,7 @@ const handleClose = () => {
 
 <template>
     <p-button-modal class="service-detail-delete-modal"
-                    :header-title="$t('ALERT_MANAGER.SERVICE.MODAL_DELETE_TITLE')"
+                    :header-title="!state.noData ? $t('ALERT_MANAGER.SERVICE.MODAL_DELETE_TITLE') : $t('ALERT_MANAGER.SERVICE.MODAL_DELETE_NO_DATA')"
                     size="sm"
                     theme-color="alert"
                     :fade="true"
@@ -77,10 +78,13 @@ const handleClose = () => {
                     @cancel="handleClose"
                     @close="handleClose"
     >
-        <template #body>
+        <template v-if="!state.noData"
+                  #body
+        >
             <div class="flex flex-col gap-2 pt-4 pb-2">
                 <span>{{ $t('ALERT_MANAGER.SERVICE.MODAL_DELETE_DESC') }}</span>
-                <p-definition-table :fields="state.fields"
+                <p-definition-table v-if="!state.noData"
+                                    :fields="state.fields"
                                     :data="state.data"
                                     :skeleton-rows="2"
                                     class="definition-table"
@@ -88,6 +92,11 @@ const handleClose = () => {
                                     disable-copy
                 />
             </div>
+        </template>
+        <template v-if="state.noData"
+                  #confirm-button
+        >
+            {{ $t('COMMON.BUTTONS.DELETE') }}
         </template>
     </p-button-modal>
 </template>

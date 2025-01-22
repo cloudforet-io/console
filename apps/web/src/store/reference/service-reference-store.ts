@@ -9,13 +9,17 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap,
     ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export type ServiceItem = Required<Pick<ReferenceItem<ServiceModel>, 'key'|'label'|'name'|'data'>>;
 export type ServiceReferenceMap = ReferenceMap<ServiceItem>;
@@ -25,6 +29,7 @@ let lastLoadedTime = 0;
 
 export const useServiceReferenceStore = defineStore('reference-service', () => {
     const userStore = useUserStore();
+    const domainStore = useDomainStore();
 
     const state = reactive({
         items: null as ServiceReferenceMap | null,
@@ -45,6 +50,9 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
     });
 
     const load = async (options?: ReferenceLoadOptions) => {
+        const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
+        if (!isAlertManagerVersionV2) return;
+
         const currentTime = new Date().getTime();
 
         if (
@@ -59,21 +67,25 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
             },
         };
 
-        const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>(params);
+        try {
+            const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>(params);
 
-        const serviceReferenceMap: ServiceReferenceMap = {};
+            const serviceReferenceMap: ServiceReferenceMap = {};
 
-        results?.forEach((service) => {
-            serviceReferenceMap[service.service_id] = {
-                key: service.service_key,
-                label: service.name,
-                name: service.service_id,
-                data: service,
-            };
-        });
+            results?.forEach((service) => {
+                serviceReferenceMap[service.service_id] = {
+                    key: service.service_key,
+                    label: service.name,
+                    name: service.service_id,
+                    data: service,
+                };
+            });
 
-        state.items = serviceReferenceMap;
-        lastLoadedTime = currentTime;
+            state.items = serviceReferenceMap;
+            lastLoadedTime = currentTime;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
     };
 
     const sync = async (service: ServiceModel) => {

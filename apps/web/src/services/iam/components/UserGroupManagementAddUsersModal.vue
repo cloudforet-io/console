@@ -130,4 +130,7 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
         overflow: auto;
     }
 }
+:deep(.dropdown-context-menu) {
+    left: unset !important;
+}
 </style>

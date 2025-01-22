@@ -74,7 +74,7 @@ const fetchAssignToUserGroup = async (params: UserGroupAddUsersParameters) => {
 
 /* Watcher */
 watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_selected_users, nv_user_list]) => {
-    if (nv_selected_users.length === 1 && nv_user_list.length > 0) {
+    if (nv_selected_users.length === 1 && nv_user_list.length > 0 && Object.keys(nv_selected_users[0]).includes('userGroup')) {
         state.excludedSelectedIds = nv_selected_users[0]?.user_group.map((userGroup) => userGroup.user_group_id);
     }
 }, { deep: true, immediate: true });
@@ -114,5 +114,8 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
     @apply flex flex-col gap-1;
     height: 22rem;
     overflow: auto;
+}
+:deep(.dropdown-context-menu) {
+    left: unset !important;
 }
 </style>

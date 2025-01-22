@@ -1,5 +1,9 @@
 name: "[Pull Request] Review State Labeler"
 
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   pull_request_review:
     types: [submitted, edited, dismissed]
