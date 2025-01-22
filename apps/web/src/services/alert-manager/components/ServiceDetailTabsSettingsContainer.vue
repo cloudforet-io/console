@@ -27,7 +27,7 @@ watch(() => state.isSettingMode, async (isSettingMode) => {
     await serviceDetailPageStore.fetchEventRuleList({
         service_id: storeState.serviceInfo.service_id,
     });
-});
+}, { immediate: true });
 onUnmounted(() => {
     serviceDetailPageStore.setCurrentTab(undefined);
 });
