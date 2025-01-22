@@ -92,11 +92,13 @@ const state = reactive({
     matchesWidthMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'eq',
-            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EQUALS'),
+            // label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EQUALS'),
+            label: 'Value',
         },
         {
             name: 'regex',
-            label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.REGEX'),
+            // label: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.REGEX'),
+            label: 'Regex',
         },
     ])),
     expandCaseMap: {} as Record<number, boolean>,
