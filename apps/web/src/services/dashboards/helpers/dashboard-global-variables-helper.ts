@@ -6,10 +6,11 @@ import { DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/da
 
 export const getOrderedGlobalVariables = (variables: DashboardGlobalVariable[]): DashboardGlobalVariable[] => {
     const _presetKeys: string[] = Object.keys(DASHBOARD_VARS_SCHEMA_PRESET.properties);
+    console.debug('preset keys', _presetKeys, variables);
     const _presetItems = variables.filter((d) => _presetKeys.includes(d.key));
     const _customItems = variables.filter((d) => !_presetKeys.includes(d.key));
     return [
-        ...orderBy(_presetItems, 'name', 'asc'),
+        ..._presetItems,
         ...orderBy(_customItems, 'name', 'asc'),
     ];
 };
