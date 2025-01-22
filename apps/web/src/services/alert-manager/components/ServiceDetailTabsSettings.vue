@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
@@ -105,6 +105,7 @@ const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
     if (type === SERVICE_SETTING_CARD.EVENT_RULE) {
         replaceUrlQuery({
             mode: 'eventRule',
+            escalationPolicyId: undefined,
         });
         return;
     }
@@ -116,12 +117,6 @@ onMounted(() => {
     if (route.query.escalationPolicyId) {
         serviceDetailPageStore.setSelectedEscalationPolicyId(route.query.escalationPolicyId as string);
     }
-});
-
-onUnmounted(() => {
-    replaceUrlQuery({
-        escalationPolicyId: undefined,
-    });
 });
 </script>
 

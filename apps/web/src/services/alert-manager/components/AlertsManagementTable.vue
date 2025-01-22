@@ -417,8 +417,8 @@ watch(() => storeState.serviceId, async (serviceId) => {
             </template>
             <template #col-duration-format="{ item }">
                 <span>{{ item.status === ALERT_STATUS.RESOLVED
-                    ? calculateTime(item?.resolved_at, storeState.timezone)
-                    : calculateTime(item?.created_at, storeState.timezone) }}</span>
+                    ? calculateTime(item?.resolved_at, storeState.timezone) || '0m'
+                    : calculateTime(item?.created_at, storeState.timezone) || '0m' }}</span>
             </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
