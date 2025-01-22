@@ -272,6 +272,7 @@
 			"MEMBER": "멤버",
 			"MEMBERS": "멤버",
 			"MODAL_DELETE_DESC": "서비스의 연결된 웹훅과 알림을 확인하세요.",
+			"MODAL_DELETE_NO_DATA": "이 서비스를 삭제하시겠습니까?",
 			"MODAL_DELETE_TITLE": "이 서비스를 삭제하시겠습니까?",
 			"MODAL_EDIT_TITLE": "서비스 이름 수정",
 			"MODAL_MEMBER_PLACEHOLDER": "멤버 선택",
