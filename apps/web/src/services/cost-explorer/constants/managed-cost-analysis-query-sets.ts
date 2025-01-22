@@ -1,6 +1,8 @@
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import {
+    GRANULARITY, GROUP_BY, GROUP_BY_FILTER_ITEM_MAP,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
 export const DYNAMIC_COST_QUERY_SET_PARAMS = 'dynamic';
@@ -33,7 +35,7 @@ const DEFAULT_MANAGED_COST_QUERY_SET_LIST: Partial<CostQuerySetModel>[] = [
             },
             metadata: {
                 filters_schema: {
-                    enabled_properties: Object.keys(GROUP_BY_ITEM_MAP),
+                    enabled_properties: Object.keys(GROUP_BY_FILTER_ITEM_MAP),
                 },
             },
         },
@@ -51,7 +53,7 @@ const DEFAULT_MANAGED_COST_QUERY_SET_LIST: Partial<CostQuerySetModel>[] = [
             },
             metadata: {
                 filters_schema: {
-                    enabled_properties: Object.keys(GROUP_BY_ITEM_MAP),
+                    enabled_properties: Object.keys(GROUP_BY_FILTER_ITEM_MAP),
                 },
             },
         },
@@ -72,7 +74,7 @@ export const MANAGED_COST_QUERY_SET_LIST: Partial<CostQuerySetModel>[] = [
             },
             metadata: {
                 filters_schema: {
-                    enabled_properties: Object.keys(GROUP_BY_ITEM_MAP),
+                    enabled_properties: Object.keys(GROUP_BY_FILTER_ITEM_MAP),
                 },
             },
         },
