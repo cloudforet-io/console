@@ -79,7 +79,6 @@ const tableState = reactive({
                 { name: 'triggered_type', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_TYPE'), disableCopy: true },
                 { name: 'acknowledged_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED_BY'), disableCopy: true },
                 { name: 'resolved_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED_BY'), disableCopy: true },
-                { name: 'webhook_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.WEBHOOK'), disableCopy: true },
             ];
         }
         return [
@@ -339,8 +338,15 @@ const handleRouteToSignInWithRedirectPath = () => {
                                 </p>
                             </template>
                             <template #data-triggered_type>
-                                <p-badge badge-type="solid-outline"
+                                <p-badge v-if="state.alertData.triggered_type === 'USER'"
+                                         badge-type="solid-outline"
                                          style-type="indigo500"
+                                >
+                                    {{ state.alertData.triggered_type }}
+                                </p-badge>
+                                <p-badge v-else
+                                         badge-type="solid-outline"
+                                         style-type="gray900"
                                 >
                                     {{ state.alertData.triggered_type }}
                                 </p-badge>
