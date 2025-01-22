@@ -281,6 +281,7 @@ onMounted(() => {
                         <p-select-dropdown :menu="state.labelFieldItems"
                                            :selected="fieldsInfo?.column"
                                            appearance-type="badge"
+                                           is-fixed-width
                                            :invalid="state.columnFieldInvalid"
                                            :disabled="state.columnFieldInvalid"
                                            block
