@@ -15,12 +15,14 @@ const props = withDefaults(defineProps<{
     loading?: boolean;
     pairConfig?: PairConfig;
     i18nLabels?: I18nLabels;
+    isLongValue?: boolean;
 }>(), {
     title: undefined,
     pairs: () => ({}),
     loading: false,
     pairConfig: undefined,
     i18nLabels: undefined,
+    isLongValue: false,
 });
 
 const emit = defineEmits<{(e: 'confirm', pairs: Pair): void;
@@ -71,6 +73,7 @@ onMounted(() => {
                 <pairs-input-group :pairs="state.newPairs"
                                    :disabled="props.loading"
                                    show-validation
+                                   :is-long-value="props.isLongValue"
                                    :is-valid.sync="state.isPairsValid"
                                    :show-header="state.showHeader"
                                    :i18n-labels="props.i18nLabels"
