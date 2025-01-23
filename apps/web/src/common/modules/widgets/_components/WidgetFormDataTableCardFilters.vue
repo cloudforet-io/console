@@ -5,6 +5,7 @@ import {
 } from 'vue';
 
 import {
+    cloneDeep,
     debounce,
     isArray,
     isEmpty, unset,
@@ -47,6 +48,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableSourceType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
+import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
@@ -119,10 +121,15 @@ const state = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => {
+        const _refinedLabelKeys = cloneDeep(metricLabelsInfo || []);
+        const projectLabelInfoIndex = _refinedLabelKeys.findIndex((d) => d.key === 'project_id');
+        if (projectLabelInfoIndex > -1) {
+            _refinedLabelKeys.splice(projectLabelInfoIndex, 0, PROJECT_GROUP_LABEL_INFO);
+        }
+        return _refinedLabelKeys.filter((labelInfo) => {
             if (storeState.isAdminMode) return true;
             return labelInfo.key !== 'workspace_id';
-        }) : [];
+        });
     }),
 });
 
