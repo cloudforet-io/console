@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -107,7 +107,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             const { status, response } = await fetcher({
                 query: {
                     ...fetchApiQueryHelper.data,
-                    sort: [{ key: 'created_at', desc: true }],
+                    sort: [{ key: 'name', desc: false }],
                 },
             });
             if (status === 'succeed') {
@@ -144,7 +144,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             const res: ListResponse<FolderModel> = await fetcher({
                 query: {
                     ...folderApiQueryHelper.data,
-                    sort: [{ key: 'created_at', desc: true }],
+                    sort: [{ key: 'name', desc: false }],
                 },
             });
             const results = res.results || [];
@@ -187,9 +187,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
             : SpaceConnector.clientV2.dashboard.publicDashboard.create;
         const result = await fetcher<DashboardCreateParams, DashboardModel>(params);
         if (dashboardType === 'PRIVATE') {
-            state.privateDashboardItems.push(result as PrivateDashboardModel);
+            const newDashboardItems = [...state.privateDashboardItems, result as PrivateDashboardModel];
+            state.privateDashboardItems = sortBy(newDashboardItems, 'name');
         } else {
-            state.publicDashboardItems.push(result as PublicDashboardModel);
+            const newDashboardItems = [...state.publicDashboardItems, result as PublicDashboardModel];
+            state.publicDashboardItems = sortBy(newDashboardItems, 'name');
         }
         return result;
     };
