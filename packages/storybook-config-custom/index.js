@@ -1,21 +1,23 @@
-import { dirname, join } from 'path';
+// import { dirname, join } from 'path';
+import { create } from '@storybook/theming/create';
+import { addons } from '@storybook/manager-api';
 
-function getAbsolutePath(value) {
-    return dirname(require.resolve(join(value, 'package.json')));
-}
+// function getAbsolutePath(value) {
+//     return dirname(require.resolve(join(value, 'package.json')));
+// }
 export const mainConfig = {
     staticDirs: ['../public'],
     addons: [
-        getAbsolutePath('@storybook/addon-links'),
-        getAbsolutePath('@storybook/addon-essentials'),
-        getAbsolutePath('@storybook/addon-interactions'),
-        getAbsolutePath('@storybook/addon-designs'),
-        getAbsolutePath('@storybook/addon-storysource'),
-        getAbsolutePath('@storybook/addon-a11y'),
-        getAbsolutePath('@storybook/addon-mdx-gfm'),
+        '@storybook/addon-links',
+        '@storybook/addon-essentials',
+        '@storybook/addon-interactions',
+        '@storybook/addon-designs',
+        '@storybook/addon-storysource',
+        '@storybook/addon-a11y',
+        '@storybook/addon-mdx-gfm',
     ],
     framework: {
-        name: getAbsolutePath('@storybook/vue-vite'),
+        name: '@storybook/vue-vite',
         options: {},
     },
     previewHead: (head) => `
@@ -53,4 +55,13 @@ export const mainConfig = {
       </style>
       ${body}
     `,
+};
+
+export const createTheme = (themeVars) => create(themeVars);
+
+export const setConfig = (config) => {
+    addons.setConfig({
+        ...config,
+        theme: createTheme(config.theme),
+    });
 };

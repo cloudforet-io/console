@@ -14,9 +14,10 @@ import screens from 'mirinae-foundation/screens.cjs';
 
 import { fontUrls, webFonts } from 'mirinae-foundation/web-fonts.cjs';
 
-import SpaceOneTheme from './CloudforetTheme';
 import SpaceDesignSystem from '@cloudforet/mirinae';
 
+import CloudforetTheme from './CloudforetTheme';
+import { createTheme } from 'storybook-config-custom';
 import '@/styles/style.pcss';
 import '@cloudforet/mirinae/css/light-style.css';
 import '@cloudforet/mirinae/dist/style.css';
@@ -63,7 +64,7 @@ const preview = {
             }
             return null;
         },
-        theme: SpaceOneTheme,
+        theme: createTheme(CloudforetTheme),
     },
     viewport: {
         viewports,

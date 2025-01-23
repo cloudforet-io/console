@@ -11,15 +11,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "eslint-config-custom": "*",
-    "postcss-config-custom": "*",
-    "mirinae-foundation": "*",
-    "tsconfig": "*",
-    "storybook-config-custom": "*",
     "@cloudforet/core-lib": "*",
     "@cloudforet/language-pack": "*",
     "@cloudforet/mirinae": "*",
     "@cloudforet/utils": "*",
-    "@storybook/theming": "^7.6.10"
+    "eslint-config-custom": "*",
+    "mirinae-foundation": "*",
+    "postcss-config-custom": "*",
+    "storybook-config-custom": "*",
+    "tsconfig": "*"
   }
 }

@@ -16,7 +16,8 @@ import screens from 'mirinae-foundation/screens.cjs';
 
 import { fontUrls, webFonts } from 'mirinae-foundation/web-fonts.cjs';
 
-import SpaceOneTheme from './CloudforetTheme';
+import CloudforetTheme from './CloudforetTheme';
+import { createTheme } from 'storybook-config-custom';
 
 Vue.use(VueRouter);
 Vue.use(VueI18n);
@@ -64,7 +65,7 @@ const preview = {
             }
             return null;
         },
-        theme: SpaceOneTheme,
+        theme: createTheme(CloudforetTheme),
     },
     viewport: {
         viewports,

@@ -14,7 +14,7 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        include: ['@/styles/colors.cjs', 'mirinae-foundation/web-fonts.cjs', 'mirinae-foundation/screens.cjs', '@/styles/variables.cjs', '@/index'],
+        include: ['mirinae-foundation/web-fonts.cjs', 'mirinae-foundation/screens.cjs', '@/styles/colors.cjs'],
     },
     rollupInputOptions: {
         plugins: [commonjs()],

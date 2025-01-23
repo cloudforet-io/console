@@ -1,9 +1,9 @@
-import { addons } from '@storybook/manager-api';
 
-import SpaceOneTheme from './CloudforetTheme';
+import CloudforetThemeVar from './CloudforetTheme';
+import { setConfig } from 'storybook-config-custom';
 
 // window.STORYBOOK_GA_ID = 'UA-159327743-4';
 
-addons.setConfig({
-  theme: SpaceOneTheme
-});
+setConfig({
+  theme: CloudforetThemeVar,
+})

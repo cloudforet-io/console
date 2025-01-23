@@ -12,10 +12,9 @@
   "license": "ISC",
   "devDependencies": {
     "eslint-config-custom": "*",
-    "postcss-config-custom": "*",
     "mirinae-foundation": "*",
-    "tsconfig": "*",
+    "postcss-config-custom": "*",
     "storybook-config-custom": "*",
-    "@storybook/theming": "^7.6.10"
+    "tsconfig": "*"
   }
 }
