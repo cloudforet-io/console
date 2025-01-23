@@ -1,37 +1,38 @@
-import '@/styles/style.pcss';
-
 import Vue from 'vue';
 
-import { i18n, I18nConnector } from '@/translations';
+
+import { i18n } from '@/translations';
 import VTooltip from 'v-tooltip';
 import velocity from 'velocity-animate';
 import Fragment from 'vue-fragment';
 import VueI18n from 'vue-i18n';
 import Notifications from 'vue-notification';
 import VueRouter from 'vue-router';
-import SvgIcon from 'vue-svgicon';
 import webFontLoader from 'webfontloader';
 
-import screens from '@/styles/screens.cjs';
-import { fontUrls, webFonts } from '@/styles/web-fonts.cjs';
+import screens from 'mirinae-foundation/screens.cjs';
 
-import SpaceOneTheme from './CloudforetTheme';
+import { fontUrls, webFonts } from 'mirinae-foundation/web-fonts.cjs';
+
+import SpaceDesignSystem from '@cloudforet/mirinae';
+
+import CloudforetTheme from './CloudforetTheme';
+import { createTheme } from 'storybook-config-custom';
+import '@/styles/style.pcss';
+import '@cloudforet/mirinae/css/light-style.css';
+import '@cloudforet/mirinae/dist/style.css';
 
 Vue.use(VueRouter);
 Vue.use(VueI18n);
 Vue.use(Notifications, { velocity });
-Vue.use(SvgIcon, {
-    tagName: 'svgicon',
-    classPrefix: 'p-i',
-});
+
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+Vue.use(SpaceDesignSystem, { vueI18n: i18n });
 
 Vue.prototype.toJSON = function () {
     return this;
 };
-
-I18nConnector.i18n = i18n;
 
 webFontLoader.load({
     google: {
@@ -63,7 +64,7 @@ const preview = {
             }
             return null;
         },
-        theme: SpaceOneTheme,
+        theme: createTheme(CloudforetTheme),
     },
     viewport: {
         viewports,

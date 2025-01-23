@@ -1,32 +1,26 @@
-import { join, dirname } from "path";
-import type { StorybookConfig } from "@storybook/vue-vite";
+// import { dirname, join } from 'path';
+import { create } from '@storybook/theming/create';
+import { addons } from '@storybook/manager-api';
 
-function getAbsolutePath(value) {
-  return dirname(require.resolve(join(value, "package.json")));
-}
-
-/** @type { import('@storybook/vue-vite').StorybookConfig } */
-const config: StorybookConfig = {
-  staticDirs: ['../public'],
-  stories: [
-    '../../../packages/mirinae/src/**/*.mdx',
-    '../../../packages/mirinae/src/**/*.stories.@(js|jsx|ts|tsx)',
-  ],
-  addons: [
-    getAbsolutePath("@storybook/addon-links"),
-    getAbsolutePath("@storybook/addon-essentials"),
-    getAbsolutePath("@storybook/addon-interactions"),
-    getAbsolutePath("@storybook/addon-designs"),
-    getAbsolutePath("@storybook/addon-storysource"),
-    getAbsolutePath("@storybook/addon-a11y"),
-    getAbsolutePath("@storybook/addon-mdx-gfm"),
-  ],
-  framework: {
-    name: getAbsolutePath("@storybook/vue-vite") as "@storybook/vue-vite",
-    options: {},
-  },
-  previewHead: (head) => {
-    return `
+// function getAbsolutePath(value) {
+//     return dirname(require.resolve(join(value, 'package.json')));
+// }
+export const mainConfig = {
+    staticDirs: ['../public'],
+    addons: [
+        '@storybook/addon-links',
+        '@storybook/addon-essentials',
+        '@storybook/addon-interactions',
+        '@storybook/addon-designs',
+        '@storybook/addon-storysource',
+        '@storybook/addon-a11y',
+        '@storybook/addon-mdx-gfm',
+    ],
+    framework: {
+        name: '@storybook/vue-vite',
+        options: {},
+    },
+    previewHead: (head) => `
       ${head}
       <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -41,10 +35,8 @@ const config: StorybookConfig = {
             padding-bottom: 8px !important;
         }  
       </style>
-      `
-  },
-  previewBody: (body) => {
-    return `
+      `,
+    previewBody: (body) => `
       <style>
         .sb-show-main.sb-main-centered #storybook-root {
             padding: 0;
@@ -62,8 +54,14 @@ const config: StorybookConfig = {
         }
       </style>
       ${body}
-    `
-  }
+    `,
 };
 
-export default config;
+export const createTheme = (themeVars) => create(themeVars);
+
+export const setConfig = (config) => {
+    addons.setConfig({
+        ...config,
+        theme: createTheme(config.theme),
+    });
+};

@@ -46,6 +46,8 @@ import {
 } from 'vue';
 
 
+import screens from 'mirinae-foundation/screens.cjs';
+
 import { useTab } from '@/hooks/use-tab/use-tab';
 import {
     BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE,
@@ -53,7 +55,6 @@ import {
 import type { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
-import screens from '@/styles/screens.cjs';
 
 
 export default {

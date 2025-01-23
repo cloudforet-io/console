@@ -3,10 +3,11 @@ import {
     reactive, computed, onMounted, onUnmounted, onBeforeMount, ref,
 } from 'vue';
 
+import screens from 'mirinae-foundation/screens.cjs';
+
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
 
-import screens from '@/styles/screens.cjs';
 
 const MOBILE_WIDTH = '312';
 

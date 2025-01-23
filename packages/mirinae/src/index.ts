@@ -14,10 +14,10 @@ export default mirinaeOptions;
 export { messages } from './translations';
 
 /* Styles */
-export { default as colors } from './styles/colors.cjs';
-export { default as screens } from './styles/screens.cjs';
+export { default as colors } from 'mirinae-foundation/colors.cjs';
+export { default as screens } from 'mirinae-foundation/screens.cjs';
 export { default as styleVariables } from './styles/variables.cjs';
-export { default as fonts } from './styles/web-fonts.cjs';
+export { default as fonts } from 'mirinae-foundation/web-fonts.cjs';
 
 /* Components */
 export * from './components';
