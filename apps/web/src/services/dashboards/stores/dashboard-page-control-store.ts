@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue';
 
+import { sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { QueryTag } from '@cloudforet/mirinae/src/controls/search/query-search-tags/type';
@@ -94,12 +95,14 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         // public (only for dashboard page, so project dashboards are excluded)
         publicDashboardItems: computed<PublicDashboardModel[]>(() => {
             const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
-            if (storeState.isAdminMode) return _v2DashboardItems;
-            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+            const _sortedV2DashboardItems = sortBy(_v2DashboardItems, 'name');
+            if (storeState.isAdminMode) return _sortedV2DashboardItems;
+            return _sortedV2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
         }),
         publicFolderItems: computed<PublicFolderModel[]>(() => {
-            if (storeState.isAdminMode) return dashboardState.publicFolderItems;
-            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+            const sortedFolderItems = sortBy(dashboardState.publicFolderItems, 'name');
+            if (storeState.isAdminMode) return sortedFolderItems;
+            return sortedFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
         }),
         publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
         publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
@@ -111,8 +114,12 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
             };
         }),
         // private
-        privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version !== '1.0')),
-        privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
+        privateDashboardItems: computed<PrivateDashboardModel[]>(() => {
+            const _v2DashboardItems = dashboardState.privateDashboardItems.filter((d) => d.version !== '1.0');
+            const _sortedV2DashboardItems = sortBy(_v2DashboardItems, 'name');
+            return _sortedV2DashboardItems;
+        }),
+        privateFolderItems: computed<PrivateFolderModel[]>(() => sortBy(dashboardState.privateFolderItems, 'name')),
         privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
         privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
             const _selectedPrivateIdList: string[] = Object.entries(state.selectedPrivateIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
