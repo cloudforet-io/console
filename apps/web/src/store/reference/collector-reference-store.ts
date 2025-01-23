@@ -9,13 +9,11 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
-import config from '@/lib/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -31,7 +29,6 @@ let lastLoadedTime = 0;
 
 export const useCollectorReferenceStore = defineStore('reference-collector', () => {
     const userStore = useUserStore();
-    const domainStore = useDomainStore();
 
     const state = reactive({
         items: null as CollectorReferenceMap | null,
@@ -62,8 +59,7 @@ export const useCollectorReferenceStore = defineStore('reference-collector', () 
 
         const referenceMap: CollectorReferenceMap = {};
         try {
-            const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
-            const collectorFetcher = !isAlertManagerVersionV2 ? SpaceConnector.clientV2.inventoryV2.collector.list : SpaceConnector.clientV2.inventory.collector.list;
+            const collectorFetcher = SpaceConnector.clientV2.inventory.collector.list;
 
             const response = await collectorFetcher<CollectorListParameters, ListResponse<CollectorModel>>({
                 query: {
