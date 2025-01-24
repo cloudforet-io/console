@@ -81,7 +81,7 @@ const state = reactive({
         { name: EVENT_RULE_CONDITIONS_POLICY.ANY, label: i18n.t('ALERT_MANAGER.EVENT_RULE.SET_CONDITION') },
     ]),
     selectedPolicyButton: EVENT_RULE_CONDITIONS_POLICY.ALWAYS as EventRuleConditionsPolicyType,
-    conditionsPolicy: 'ALL' as EventRuleConditionsPolicyType,
+    conditionsPolicy: EVENT_RULE_CONDITIONS_POLICY.ALL as EventRuleConditionsPolicyType,
     conditions: [] as EventRuleConditionsDataType[],
     stopProcessing: false,
     actions: undefined as EventRuleActionsType|undefined,
@@ -181,7 +181,7 @@ const {
 const initializeState = () => {
     setForm('name', '');
     state.selectedPolicyButton = EVENT_RULE_CONDITIONS_POLICY.ALWAYS;
-    state.conditionsPolicy = 'ALL';
+    state.conditionsPolicy = EVENT_RULE_CONDITIONS_POLICY.ALL;
     state.conditions = [{
         key: 'title',
         value: '',
@@ -198,8 +198,21 @@ const updateStateFromEventRuleInfo = () => {
     state.selectedPolicyButton = eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         : EVENT_RULE_CONDITIONS_POLICY.ANY;
-    state.conditionsPolicy = eventRuleInfo.conditions_policy;
-    state.conditions = eventRuleInfo.conditions || [{
+    if (state.selectedPolicyButton !== EVENT_RULE_CONDITIONS_POLICY.ALWAYS) {
+        state.conditionsPolicy = eventRuleInfo.conditions_policy;
+    }
+
+    state.conditions = eventRuleInfo.conditions.map((i) => {
+        if (i.key.includes('additional_info')) {
+            return {
+                key: 'additional_info',
+                value: i.value,
+                operator: i.operator,
+                subKey: i.key.split('.')[1],
+            };
+        }
+        return i;
+    }) || [{
         key: 'title',
         value: '',
         operator: 'contain',
