@@ -1,20 +1,13 @@
 {
-  "name": "storybook",
+  "name": "storybook-config-custom",
   "version": "1.0.0",
-  "description": "",
+  "private": true,
+  "type": "module",
   "main": "index.js",
-  "scripts": {
-    "dev": "storybook dev -p 6006",
-    "build": "storybook build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
     "@storybook/addon-a11y": "^7.6.10",
     "@storybook/addon-designs": "^7.0.9",
-    "@storybook/addon-docs": "^7.6.10",
     "@storybook/addon-essentials": "^7.6.10",
     "@storybook/addon-interactions": "^7.6.10",
     "@storybook/addon-links": "^7.6.10",
@@ -22,8 +15,7 @@
     "@storybook/addon-storysource": "^7.6.10",
     "@storybook/blocks": "^7.6.10",
     "@storybook/manager-api": "^7.6.10",
-    "@storybook/test": "^7.6.10",
-    "@storybook/theming": "^7.6.10",
+    "@storybook/theming": "^7.6.20",
     "@storybook/vue": "^7.6.10",
     "@storybook/vue-vite": "^7.6.10",
     "@vitejs/plugin-vue2": "^2.3.1",

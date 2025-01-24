@@ -46,7 +46,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
+import AutoSyncState from '@/common/components/badge/auto-sync-state/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';

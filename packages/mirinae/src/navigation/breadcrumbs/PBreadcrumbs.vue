@@ -4,13 +4,13 @@ import {
 } from 'vue';
 
 import { useWindowSize } from '@vueuse/core';
+import screens from 'mirinae-foundation/screens.cjs';
 
 import type { MenuItem } from '@/controls/context-menu/type';
 import BreadcrumbsEllipsisItem from '@/navigation/breadcrumbs/modules/BreadcrumbsEllipsisItem.vue';
 import BreadcrumbsItem from '@/navigation/breadcrumbs/modules/BreadcrumbsItem.vue';
 import type { Route } from '@/navigation/breadcrumbs/type';
 
-import screens from '@/styles/screens.cjs';
 
 interface Props {
     routes: Route[];

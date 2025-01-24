@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const tailwindConfig = require('../../packages/mirinae/tailwind.config.cjs');
+const tailwindConfig = require('postcss-config-custom/tailwind.config.cjs');
 
 module.exports = {
     content: [

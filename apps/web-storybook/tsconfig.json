@@ -1,0 +1,22 @@
+{
+    "extends": "tsconfig/base.json",
+    "compilerOptions": {
+        "types": ["vitest/globals"],
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["../web/src/*"]
+        },
+        "allowImportingTsExtensions": true,
+        "noEmit": true
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.js",
+        "../web/src/common/**/*.@(ts|js|cjs|vue|mdx)"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        ".out"
+    ]
+}

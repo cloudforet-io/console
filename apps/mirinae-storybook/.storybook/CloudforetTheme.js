@@ -1,6 +1,4 @@
-import { create } from '@storybook/theming/create';
- 
-export default create({
+export default {
     base: 'light',
     colorPrimary: '#6638B6',
     colorSecondary: 'rgba(102, 56, 182, 0.9)',
@@ -29,4 +27,4 @@ export default create({
     brandTitle: 'Mirinae Design System',
     brandUrl: 'https://github.com/cloudforet-io/mirinae',
     brandImage: './images/SpaceONE_logoTypeA.svg',
-});
+};

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue';
+import { semanticFontSize, lineHeight, letterSpacing } from 'mirinae-foundation/font-size.cjs';
 
 import { getTypographyParameters } from '@/foundation/typography/stroy-helper';
 
-import { semanticFontSize, lineHeight, letterSpacing } from '@/styles/font-size.cjs';
 
 
 const meta : Meta = {
