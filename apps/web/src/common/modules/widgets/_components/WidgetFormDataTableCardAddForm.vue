@@ -155,8 +155,8 @@ const assetFilterState = reactive({
     metricItems: computed<MenuItem[]>(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
     metricFilterItems: computed<MenuItem[]>(() => {
         const _refinedLabelKeys = cloneDeep(assetFilterState.refinedLabelKeys);
-        const projectLabelInfoIndex = _refinedLabelKeys.find((d) => d.key === 'project_id');
-        if (projectLabelInfoIndex) {
+        const projectLabelInfoIndex = _refinedLabelKeys.findIndex((d) => d.key === 'project_id');
+        if (projectLabelInfoIndex > -1) {
             _refinedLabelKeys.splice(projectLabelInfoIndex, 0, PROJECT_GROUP_LABEL_INFO);
         }
         return _refinedLabelKeys.map((d) => ({
