@@ -12,8 +12,8 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';

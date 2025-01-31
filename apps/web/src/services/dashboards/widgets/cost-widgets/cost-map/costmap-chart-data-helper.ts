@@ -1,4 +1,4 @@
-import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
+import type { CostDataField } from '@/api-clients/dashboard/_types/widget-type';
 
 import type { ReferenceMap } from '@/store/reference/type';
 

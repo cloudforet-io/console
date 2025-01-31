@@ -18,7 +18,7 @@ import { PTextPagination, PToolboxTable } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 

@@ -6,8 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import type {
     DashboardLayout,
     DashboardLayoutWidgetInfo,
@@ -18,15 +18,15 @@ import type {
     DashboardVariablesSchema,
     DashboardVars,
     DashboardGlobalVariablesSchema,
-} from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardGetParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardGetParameters } from '@/schema/dashboard/public-dashboard/api-verbs/get';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardGetParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/get';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -6,7 +6,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PI, PIconButton } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 

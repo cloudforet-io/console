@@ -27,7 +27,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import { numberFormatter } from '@cloudforet/utils';
 
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

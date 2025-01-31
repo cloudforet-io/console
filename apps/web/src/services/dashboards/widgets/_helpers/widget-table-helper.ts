@@ -2,9 +2,9 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy } from 'lodash';
 
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
-import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { Granularity } from '@/api-clients/dashboard/_types/widget-type';
 
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 

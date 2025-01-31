@@ -5,7 +5,7 @@ import {
 
 import { PTextButton } from '@cloudforet/mirinae';
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 
 import TagsInput from '@/common/components/inputs/TagsInput.vue';
 

@@ -9,7 +9,7 @@ import { PButtonTab, PButton } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';

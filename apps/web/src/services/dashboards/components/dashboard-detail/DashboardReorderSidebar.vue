@@ -9,8 +9,8 @@ import {
     PI, PButton,
 } from '@cloudforet/mirinae';
 
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';

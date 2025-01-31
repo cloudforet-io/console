@@ -7,9 +7,9 @@ import {
     PButton, PButtonModal, PCheckbox, PSearch, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

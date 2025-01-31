@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { BudgetUsageListParameters } from '@/schema/cost-analysis/budget-usage/api-verbs/list';
 import type { BudgetUsageModel } from '@/schema/cost-analysis/budget-usage/model';
 import type { BudgetGetParameters } from '@/schema/cost-analysis/budget/api-verbs/get';

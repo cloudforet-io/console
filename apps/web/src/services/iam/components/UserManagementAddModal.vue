@@ -9,8 +9,8 @@ import { cloneDeep, isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { Tags } from '@/schema/_common/model';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';

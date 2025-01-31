@@ -15,10 +15,10 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { Page } from '@/schema/_common/type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { Page } from '@/api-clients/_common/schema/type';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

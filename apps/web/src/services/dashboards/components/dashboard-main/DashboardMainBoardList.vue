@@ -9,9 +9,9 @@ import {
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

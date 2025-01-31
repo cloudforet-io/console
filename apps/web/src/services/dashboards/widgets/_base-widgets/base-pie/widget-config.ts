@@ -1,5 +1,5 @@
-import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 
 const basePieWidgetConfig: WidgetConfig = {
     widget_config_id: 'basePie',

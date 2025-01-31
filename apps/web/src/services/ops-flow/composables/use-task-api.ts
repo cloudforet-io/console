@@ -1,7 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TaskChangeAssigneeParameters } from '@/schema/opsflow/task/api-verbs/change-assignee';
 import type { TaskChangeStatusParameters } from '@/schema/opsflow/task/api-verbs/change-status';
 import type { TaskCreateParameters } from '@/schema/opsflow/task/api-verbs/create';

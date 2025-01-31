@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';

@@ -29,7 +29,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';

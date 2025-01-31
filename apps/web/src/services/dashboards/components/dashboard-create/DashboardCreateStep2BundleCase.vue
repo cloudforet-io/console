@@ -10,10 +10,10 @@ import {
 } from '@cloudforet/mirinae';
 import { getClonedName } from '@cloudforet/utils';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { SpaceRouter } from '@/router';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 

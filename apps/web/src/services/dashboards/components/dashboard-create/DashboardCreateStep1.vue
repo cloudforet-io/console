@@ -10,7 +10,7 @@ import {
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 import { i18n } from '@/translations';
 

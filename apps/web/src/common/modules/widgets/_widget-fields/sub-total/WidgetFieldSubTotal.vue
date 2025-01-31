@@ -5,8 +5,8 @@ import {
     PFieldTitle, PToggleButton, PI, PTooltip, PCheckbox,
 } from '@cloudforet/mirinae';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';

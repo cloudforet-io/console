@@ -3,7 +3,7 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
 import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
 import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';

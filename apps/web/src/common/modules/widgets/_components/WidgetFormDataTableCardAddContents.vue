@@ -8,9 +8,9 @@ import { isArray, isEqual, uniq } from 'lodash';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -12,7 +12,7 @@ import type { InputItem } from '@cloudforet/mirinae/src/controls/input/text-inpu
 import type {
     DashboardGlobalVariable,
     TextAnyVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 

@@ -5,7 +5,7 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

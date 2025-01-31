@@ -8,13 +8,13 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@cloudforet/mirinae';
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { PrivateFolderCreateParameters } from '@/schema/dashboard/private-folder/api-verbs/create';
-import type { PrivateFolderUpdateParameters } from '@/schema/dashboard/private-folder/api-verbs/update';
-import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
-import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
-import type { PublicFolderUpdateParameters } from '@/schema/dashboard/public-folder/api-verbs/update';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { PrivateFolderCreateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/create';
+import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
+import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
+import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 

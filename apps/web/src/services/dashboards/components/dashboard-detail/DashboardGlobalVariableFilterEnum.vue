@@ -13,7 +13,7 @@ import type {
     DashboardGlobalVariable,
     NumberEnumVariable,
     TextEnumVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 

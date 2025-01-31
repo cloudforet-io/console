@@ -8,8 +8,8 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { getClonedName } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type {
     DashboardType,
     DashboardFolderType,
@@ -18,15 +18,15 @@ import type {
     DashboardListParams,
     DashboardUpdateParams,
     DashboardDeleteParams,
-} from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderCreateParams, FolderModel } from '@/schema/dashboard/_types/folder-type';
-import type { WidgetListParams, WidgetModel } from '@/schema/dashboard/_types/widget-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderCreateParams, FolderModel } from '@/api-clients/dashboard/_types/folder-type';
+import type { WidgetListParams, WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
+import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

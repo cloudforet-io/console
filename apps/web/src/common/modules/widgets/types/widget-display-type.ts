@@ -1,9 +1,9 @@
 import type {
     DashboardOptions,
     DashboardVars,
-} from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';

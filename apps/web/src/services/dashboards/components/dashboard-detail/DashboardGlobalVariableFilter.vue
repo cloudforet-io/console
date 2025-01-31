@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import DashboardGlobalVariableFilterEnum
     from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterEnum.vue';

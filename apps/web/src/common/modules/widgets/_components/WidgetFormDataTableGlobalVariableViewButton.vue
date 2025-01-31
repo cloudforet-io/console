@@ -5,7 +5,7 @@ import { computed, reactive } from 'vue';
 
 import { PButton, PPopover, PCopyButton } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';

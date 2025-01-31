@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { Tags, TimeStamp } from '@/api-clients/_common/schema/model';
 import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-verbs/update';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';

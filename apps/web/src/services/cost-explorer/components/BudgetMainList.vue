@@ -12,9 +12,9 @@ import {
     PDataLoader,
 } from '@cloudforet/mirinae';
 
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import { SpaceRouter } from '@/router';
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type {
     BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,

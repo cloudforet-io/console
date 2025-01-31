@@ -8,7 +8,7 @@ import {
     PFieldGroup, PJsonSchemaForm, PTextInput,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';

@@ -1,5 +1,5 @@
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { ColorSchemaValue } from '@/common/modules/widgets/_widget-fields/color-schema/type';

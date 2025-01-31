@@ -6,13 +6,13 @@ import {
     PButtonModal, PCodeEditor, PButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetModel } from '@/schema/dashboard/_types/widget-type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';

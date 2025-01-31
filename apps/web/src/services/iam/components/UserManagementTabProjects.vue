@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';

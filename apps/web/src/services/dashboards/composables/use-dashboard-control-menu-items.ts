@@ -3,8 +3,8 @@ import { computed } from 'vue';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
 
 

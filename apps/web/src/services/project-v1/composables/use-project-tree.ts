@@ -3,7 +3,7 @@ import { cloneDeep, get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query, Sort } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';

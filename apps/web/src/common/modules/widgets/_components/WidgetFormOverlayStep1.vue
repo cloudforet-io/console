@@ -9,8 +9,8 @@ import {
     PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

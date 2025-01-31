@@ -6,7 +6,7 @@ import { flattenDeep } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 

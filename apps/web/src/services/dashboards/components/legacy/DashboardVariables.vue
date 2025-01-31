@@ -5,7 +5,7 @@ import { isEqual, xor } from 'lodash';
 
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 

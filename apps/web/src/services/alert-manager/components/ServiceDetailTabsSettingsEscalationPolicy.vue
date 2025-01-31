@@ -19,7 +19,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';

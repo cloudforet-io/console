@@ -10,8 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { DashboardChangeFolderParams } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
+import type { DashboardChangeFolderParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

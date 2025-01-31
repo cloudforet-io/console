@@ -11,8 +11,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';

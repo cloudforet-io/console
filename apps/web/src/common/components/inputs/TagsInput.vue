@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';

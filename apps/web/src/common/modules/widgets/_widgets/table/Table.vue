@@ -10,12 +10,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
-import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
-import type { PublicWidgetLoadSumParameters } from '@/schema/dashboard/public-widget/api-verbs/load-sum';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetLoadParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load';
+import type { PrivateWidgetLoadSumParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load-sum';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetLoadParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load';
+import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load-sum';
 import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';

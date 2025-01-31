@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { Capability, PluginState, RegistryType } from '@/schema/repository/plugin/type';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 

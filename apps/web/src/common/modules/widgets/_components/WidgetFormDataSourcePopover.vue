@@ -11,11 +11,11 @@ import {
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
 
-import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
-import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
+import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

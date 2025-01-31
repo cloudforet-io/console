@@ -15,8 +15,8 @@ import type {
     DashboardVariablesSchema,
     DashboardVariables as IDashboardVariables,
     DashboardLayoutWidgetInfo,
-} from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import type { WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 
 import { gray } from '@/styles/colors';
 

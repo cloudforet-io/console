@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { MembersType, ServiceOptionsType } from '@/schema/alert-manager/service/type';
 
 export interface ServiceCreateParameters {

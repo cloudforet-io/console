@@ -8,7 +8,7 @@ import {
     PIconButton,
 } from '@cloudforet/mirinae';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 

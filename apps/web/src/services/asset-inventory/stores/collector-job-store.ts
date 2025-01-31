@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { Schedule } from '@/schema/inventory/collector/type';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';

@@ -21,9 +21,9 @@ import type {
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardListParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardListParams, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
