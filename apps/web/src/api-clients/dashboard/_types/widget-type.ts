@@ -1,5 +1,6 @@
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type {
     WIDGET_OPTION_FILTER_KEY_MAP, WIDGET_OPTION_KEYS,
     ASSET_DATA_FIELD_MAP, CHART_TYPE,
@@ -14,6 +15,8 @@ import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/sc
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
+import type { DataInfo, LabelsInfo } from '@/common/modules/widgets/types/widget-model';
 
 
 
@@ -133,5 +136,13 @@ export type InheritOptions = Partial<Record<WidgetOptionKey, {
     enabled?: boolean;
     variable_key?: string;
 }>>;
+
+export type WidgetLoadResponse = ListResponse<Record<string, string|number>> & {
+    labels_info: LabelsInfo;
+    data_info: DataInfo;
+    order: string[];
+};
+
+export type DataTableLoadResponse = ListResponse<Record<string, string|number>>;
 
 
