@@ -1,0 +1,20 @@
+{
+  "name": "unified-storybook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "storybook dev -p 6008",
+    "build": "storybook build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint-config-custom": "*",
+    "mirinae-foundation": "*",
+    "postcss-config-custom": "*",
+    "storybook-config-custom": "*",
+    "tsconfig": "*"
+  }
+}
