@@ -17,7 +17,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDoubleCheckModal } from '@cloudforet/mirinae';
 
 
-import type { BudgetDeleteParameters } from '@/schema/cost-analysis/budget/api-verbs/delete';
+import type { BudgetDeleteParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/delete';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

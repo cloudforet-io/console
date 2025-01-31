@@ -4,8 +4,8 @@ import { useRoute } from 'vue-router/composables';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

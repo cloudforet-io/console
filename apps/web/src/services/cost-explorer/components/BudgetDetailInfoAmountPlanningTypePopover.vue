@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 
 import { PPopover } from '@cloudforet/mirinae';
 
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

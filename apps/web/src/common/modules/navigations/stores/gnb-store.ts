@@ -5,10 +5,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CostQuerySetListParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/list';
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 

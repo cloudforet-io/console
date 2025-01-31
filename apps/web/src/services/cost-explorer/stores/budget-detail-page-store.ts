@@ -4,12 +4,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { BudgetUsageListParameters } from '@/schema/cost-analysis/budget-usage/api-verbs/list';
-import type { BudgetUsageModel } from '@/schema/cost-analysis/budget-usage/model';
-import type { BudgetGetParameters } from '@/schema/cost-analysis/budget/api-verbs/get';
-import type { BudgetSetNotificationParameters } from '@/schema/cost-analysis/budget/api-verbs/set-notification';
-import type { BudgetUpdateParameters } from '@/schema/cost-analysis/budget/api-verbs/update';
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
+import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
+import type { BudgetGetParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/get';
+import type { BudgetSetNotificationParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/set-notification';
+import type { BudgetUpdateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/update';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

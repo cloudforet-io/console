@@ -12,7 +12,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { i18n } from '@/translations';
 

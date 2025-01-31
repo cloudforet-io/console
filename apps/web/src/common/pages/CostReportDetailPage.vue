@@ -15,9 +15,8 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
-import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
-import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { CostReportGetParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/get';
+import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
@@ -38,6 +37,8 @@ import { gray } from '@/styles/colors';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+
+import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 
 
 const router = useRouter();
