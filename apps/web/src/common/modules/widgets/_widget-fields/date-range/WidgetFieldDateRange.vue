@@ -10,7 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import {

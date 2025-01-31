@@ -2,8 +2,8 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import { WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/display/type';

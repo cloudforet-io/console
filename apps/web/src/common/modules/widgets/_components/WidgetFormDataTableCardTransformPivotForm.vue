@@ -11,9 +11,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
 import { i18n } from '@/translations';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';

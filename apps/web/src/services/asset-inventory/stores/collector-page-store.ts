@@ -6,7 +6,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorModel } from '@/schema/inventory/collector/model';

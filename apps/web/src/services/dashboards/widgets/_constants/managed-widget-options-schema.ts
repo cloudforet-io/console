@@ -1,7 +1,7 @@
 import type {
     WidgetFilterOptionKey, WidgetOptionKey,
     WidgetOptionsSchemaProperty,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { MANAGED_VARIABLE_MODEL_KEY_MAP } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 

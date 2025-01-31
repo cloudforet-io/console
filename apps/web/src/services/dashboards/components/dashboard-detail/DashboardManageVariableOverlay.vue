@@ -10,8 +10,8 @@ import {
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
 
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import { SpaceRouter } from '@/router';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

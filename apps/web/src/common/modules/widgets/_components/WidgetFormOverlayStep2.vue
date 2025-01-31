@@ -11,7 +11,7 @@ import {
 
 import type {
     DashboardOptions, DashboardVars,
-} from '@/schema/dashboard/_types/dashboard-type';
+} from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

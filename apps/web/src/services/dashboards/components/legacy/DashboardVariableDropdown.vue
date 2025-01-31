@@ -15,7 +15,7 @@ import type {
     AutocompleteHandler,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { DashboardVariableSchemaProperty, DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariableSchemaProperty, DashboardVariables } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

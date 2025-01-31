@@ -9,7 +9,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceGroupCreateParameters } from '@/schema/identity/workspace-group/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';

@@ -7,15 +7,15 @@ import {
 } from '@cloudforet/mirinae';
 import { getClonedName } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { DashboardType, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
+import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
+import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardType, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetModel } from '@/schema/dashboard/_types/widget-type';
-import type { PrivateDashboardCreateParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
-import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
-import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 

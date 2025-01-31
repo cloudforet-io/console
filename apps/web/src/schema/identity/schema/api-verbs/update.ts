@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 
 export interface SchemaUpdateParameters {
     schema_id: string;

@@ -11,7 +11,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';

@@ -15,8 +15,8 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';

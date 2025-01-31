@@ -4,8 +4,8 @@ import { computed, isRef } from 'vue';
 
 import dayjs from 'dayjs';
 
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';

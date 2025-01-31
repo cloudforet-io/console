@@ -7,7 +7,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PJsonSchemaForm } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 

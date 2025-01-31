@@ -2,8 +2,8 @@ import { ref } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import { widgetFieldDefaultValueSetterRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';

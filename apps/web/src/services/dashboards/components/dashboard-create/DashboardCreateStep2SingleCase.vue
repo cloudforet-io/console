@@ -9,10 +9,10 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { DashboardCreateParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { SpaceRouter } from '@/router';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardCreateParams } from '@/schema/dashboard/_types/dashboard-type';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -20,7 +20,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import {
     SERVICE_CHANNEL_FORWARD_TYPE,

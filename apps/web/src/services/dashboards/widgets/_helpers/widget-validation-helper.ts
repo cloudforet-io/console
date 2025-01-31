@@ -2,13 +2,13 @@ import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
 
-import type { DashboardLayoutWidgetInfo, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardLayoutWidgetInfo, DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     InheritOptions,
     WidgetConfig,
     WidgetFilterOptionKey,
     WidgetOptionsSchema,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';

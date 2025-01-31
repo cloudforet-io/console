@@ -11,10 +11,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTooltip } from '@cloudforet/mirinae';
 import { getContrastingColor, numberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetLoadParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetLoadParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load';
 import { i18n } from '@/translations';
 
 import WidgetCustomLegend from '@/common/modules/widgets/_components/WidgetCustomLegend.vue';

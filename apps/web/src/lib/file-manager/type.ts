@@ -1,3 +1,3 @@
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 
 export type FileManagerResourceGroupType = ResourceGroupType|'USER'|'PUBLIC';

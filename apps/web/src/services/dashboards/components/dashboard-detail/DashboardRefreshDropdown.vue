@@ -8,8 +8,8 @@ import type { TranslateResult } from 'vue-i18n';
 import { PIconButton, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';
+import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/api-clients/dashboard/_constants/dashboard-constant';
+import type { RefreshIntervalOption } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

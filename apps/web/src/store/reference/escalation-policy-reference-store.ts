@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { EscalationPolicyListParameters as EscalationPolicyListParametersV1 } from '@/schema/monitoring/escalation-policy/api-verbs/list';

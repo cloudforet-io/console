@@ -1,9 +1,9 @@
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
 
 type DashboardModel = PublicDashboardModel | PrivateDashboardModel;

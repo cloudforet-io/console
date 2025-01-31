@@ -1,4 +1,4 @@
-import type { ResourceGroupType, ContentsType } from '@/schema/_common/type';
+import type { ResourceGroupType, ContentsType } from '@/api-clients/_common/schema/type';
 import type { PostBoardType } from '@/schema/board/post/type';
 import type { FileModel } from '@/schema/file-manager/model';
 

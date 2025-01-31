@@ -17,7 +17,7 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/cont
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';

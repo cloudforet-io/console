@@ -6,8 +6,8 @@ import { isEqual } from 'lodash';
 
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 

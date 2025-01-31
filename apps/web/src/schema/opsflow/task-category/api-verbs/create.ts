@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 import type { TaskStatusType, TaskStatusOptionWithOptionalId } from '@/schema/opsflow/task/type';
 

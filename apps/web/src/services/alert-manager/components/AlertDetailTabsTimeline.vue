@@ -9,7 +9,7 @@ import {
     PButton, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus, PTextButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertHistoryParameters } from '@/schema/alert-manager/alert/api-verbs/history';
 import { ALERT_HISTORY_ACTION } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel, AlertHistoryModel } from '@/schema/alert-manager/alert/model';

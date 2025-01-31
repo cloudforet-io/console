@@ -14,7 +14,7 @@ import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/button
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import { i18n } from '@/translations';
 

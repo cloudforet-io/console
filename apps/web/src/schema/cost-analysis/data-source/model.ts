@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type { CostDataSourceSecretType, CostDataSourceState, CostDataSourceType } from '@/schema/cost-analysis/data-source/type';
 
 

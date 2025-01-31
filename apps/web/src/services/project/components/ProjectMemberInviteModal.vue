@@ -10,12 +10,12 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAddUsersParameters } from '@/schema/identity/project/api-verbs/add-users';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';

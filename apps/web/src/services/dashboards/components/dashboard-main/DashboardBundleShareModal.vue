@@ -8,12 +8,12 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
-import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicFolderShareParameters } from '@/schema/dashboard/public-folder/api-verbs/share';
-import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-folder/api-verbs/unshare';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import type { PublicDashboardShareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/share';
+import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/unshare';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderShareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/share';
+import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/unshare';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

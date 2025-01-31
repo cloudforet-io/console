@@ -80,7 +80,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 

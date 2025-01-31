@@ -11,18 +11,18 @@ import {
     PDataLoader, PEmpty, PButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
-import type { PrivateWidgetDeleteParameters } from '@/schema/dashboard/private-widget/api-verbs/delete';
-import type { PrivateWidgetUpdateParameters } from '@/schema/dashboard/private-widget/api-verbs/update';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
-import type { PublicWidgetDeleteParameters } from '@/schema/dashboard/public-widget/api-verbs/delete';
-import type { PublicWidgetUpdateParameters } from '@/schema/dashboard/public-widget/api-verbs/update';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
+import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
+import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
+import type { PublicWidgetDeleteParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/delete';
+import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

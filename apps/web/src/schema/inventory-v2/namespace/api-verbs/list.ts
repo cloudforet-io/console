@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type { NamespaceCategory } from '@/schema/inventory-v2/namespace/type';
 
 

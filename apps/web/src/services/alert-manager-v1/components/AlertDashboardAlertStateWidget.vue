@@ -14,7 +14,7 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';

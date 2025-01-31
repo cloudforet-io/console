@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { EventRuleChangeOrderParameters } from '@/schema/monitoring/event-rule/api-verbs/change-order';
 import type { EventRuleDeleteParameters } from '@/schema/monitoring/event-rule/api-verbs/delete';
 import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';

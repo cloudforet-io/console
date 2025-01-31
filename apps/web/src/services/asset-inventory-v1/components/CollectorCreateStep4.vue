@@ -59,8 +59,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import { SpaceRouter } from '@/router';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
 import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
 import type { CollectorModel } from '@/schema/inventory/collector/model';

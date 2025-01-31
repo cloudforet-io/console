@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetFiltersMap } from '@/api-clients/dashboard/_types/widget-type';
 
 import { arrayToQueryString, queryStringToArray } from '@/lib/router-query-string';
 

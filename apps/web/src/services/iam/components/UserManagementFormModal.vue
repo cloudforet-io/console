@@ -6,9 +6,9 @@ import { cloneDeep, isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { Tags } from '@/schema/_common/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';

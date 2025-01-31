@@ -13,7 +13,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PTextPagination } from '@cloudforet/mirinae';
 
-import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { ASSET_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
 import type { ReferenceMap } from '@/store/reference/type';

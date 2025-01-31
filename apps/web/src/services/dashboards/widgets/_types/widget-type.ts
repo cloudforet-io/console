@@ -5,11 +5,11 @@ import type {
     DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
-} from '@/schema/dashboard/_types/dashboard-type';
+} from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     InheritOptions,
     WidgetOptions, WidgetSize,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 

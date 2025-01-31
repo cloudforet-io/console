@@ -4,8 +4,8 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardType, AdminDashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardType, AdminDashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { DashboardTemplateListParameters } from '@/schema/repository/dashboard-template/api-verbs/list';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 

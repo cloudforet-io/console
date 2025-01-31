@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
 
-import type { PrivateFolderDeleteParameters } from '@/schema/dashboard/private-folder/api-verbs/delete';
-import type { PublicFolderDeleteParameters } from '@/schema/dashboard/public-folder/api-verbs/delete';
+import type { PrivateFolderDeleteParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/delete';
+import type { PublicFolderDeleteParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

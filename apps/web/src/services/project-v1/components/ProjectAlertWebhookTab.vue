@@ -24,7 +24,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';
 import type { WebhookDisableParameters } from '@/schema/monitoring/webhook/api-verbs/disable';
 import type { WebhookEnableParameters } from '@/schema/monitoring/webhook/api-verbs/enable';

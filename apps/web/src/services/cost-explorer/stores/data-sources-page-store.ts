@@ -7,8 +7,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DataSourceAccountAnalyzeParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/analyze';
 import type { CostDataSourceAccountListParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/list';
 import type { CostDataSourceAccountResetParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/reset';

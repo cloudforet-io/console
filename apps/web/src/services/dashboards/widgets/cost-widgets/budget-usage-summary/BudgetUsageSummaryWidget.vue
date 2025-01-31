@@ -12,7 +12,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton, PProgressBar } from '@cloudforet/mirinae';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { CurrencySymbol } from '@/store/display/type';

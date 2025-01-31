@@ -7,7 +7,7 @@ import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
 } from '@cloudforet/mirinae';
 
-import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariableSchemaProperty } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';

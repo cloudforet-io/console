@@ -10,8 +10,8 @@ import {
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
-import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import { WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';

@@ -1,5 +1,5 @@
-import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
-import type { InheritOptions, WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+import type { DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { InheritOptions, WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 
 
 export const getInitialWidgetInheritOptions = (

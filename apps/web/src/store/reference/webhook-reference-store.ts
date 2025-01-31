@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { WebhookListParameters as WebhookListParametersV1 } from '@/schema/monitoring/webhook/api-verbs/list';

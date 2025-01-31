@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CommentModel } from '@/schema/opsflow/comment/model';
 import type { EventListParameters } from '@/schema/opsflow/event/api-verbs/list';
 import type { EventModel } from '@/schema/opsflow/event/model';

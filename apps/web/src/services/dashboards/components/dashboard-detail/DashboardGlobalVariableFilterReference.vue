@@ -12,7 +12,7 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dro
 import type {
     DashboardGlobalVariable,
     ReferenceVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

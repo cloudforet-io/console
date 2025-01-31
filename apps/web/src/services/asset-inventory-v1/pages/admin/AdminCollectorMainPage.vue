@@ -13,8 +13,8 @@ import {
     PButton, PHeading, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 

@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TaskTypeCreateParameters } from '@/schema/opsflow/task-type/api-verbs/create';
 import type { TaskTypeDeleteParameters } from '@/schema/opsflow/task-type/api-verbs/delete';
 import type { TaskTypeGetParameters } from '@/schema/opsflow/task-type/api-verbs/get';

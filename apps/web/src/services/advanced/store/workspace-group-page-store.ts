@@ -7,7 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';

@@ -8,7 +8,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';

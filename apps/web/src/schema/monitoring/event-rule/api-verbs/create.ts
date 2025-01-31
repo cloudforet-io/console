@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
 import type {
     EventRuleActions, EventRuleCondition,

@@ -14,7 +14,7 @@ import { PLink, PDataTable, PIconButton } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';

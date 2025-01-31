@@ -5,7 +5,7 @@ import {
 
 import type {
     AssetDataField, ChartType, CostDataField, Granularity,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { CURRENCY } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';

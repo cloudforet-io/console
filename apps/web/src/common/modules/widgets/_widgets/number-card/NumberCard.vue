@@ -13,10 +13,10 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetLoadSumParameters } from '@/schema/dashboard/public-widget/api-verbs/load-sum';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetLoadSumParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load-sum';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load-sum';
 import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';

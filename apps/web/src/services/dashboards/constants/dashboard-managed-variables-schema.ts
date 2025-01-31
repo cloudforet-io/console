@@ -1,4 +1,4 @@
-import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import {
     MANAGED_VARIABLE_MODEL_KEY_MAP,

@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';

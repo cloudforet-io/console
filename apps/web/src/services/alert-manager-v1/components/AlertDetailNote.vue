@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/create';
 import type { NoteDeleteParameters } from '@/schema/monitoring/note/api-verbs/delete';
 import type { NoteListParameters } from '@/schema/monitoring/note/api-verbs/list';

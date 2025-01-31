@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { PTag, PFieldTitle, PEmpty } from '@cloudforet/mirinae';
 import { isNotEmpty } from '@cloudforet/utils';
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 
 const props = withDefaults(defineProps<{
     tags: Tags;

@@ -9,8 +9,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';

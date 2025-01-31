@@ -10,7 +10,7 @@ import {
     PDivider, PFieldTitle, PLink, PSpinner, PStatus, screens,
 } from '@cloudforet/mirinae';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';

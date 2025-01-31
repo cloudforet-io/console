@@ -3,9 +3,9 @@ import bytes from 'bytes';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { byteFormatter, customNumberFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { DataTableGetParameters } from '@/schema/dashboard/public-data-table/api-verbs/get';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { DataTableGetParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/get';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';

@@ -15,7 +15,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PSkeleton } from '@cloudforet/mirinae';
 
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { COST_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';

@@ -14,7 +14,7 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { i18n } from '@/translations';

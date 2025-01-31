@@ -10,7 +10,7 @@ import type { Location } from 'vue-router/types/router';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import type {
     BaseWidgetState,

@@ -1,6 +1,6 @@
 import { mergeWith } from 'lodash';
 
-import type { WidgetConfig, BaseConfigInfo } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetConfig, BaseConfigInfo } from '@/api-clients/dashboard/_types/widget-type';
 
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-config-list-constant';
 

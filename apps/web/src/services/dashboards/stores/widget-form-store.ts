@@ -4,10 +4,10 @@ import { computed, reactive } from 'vue';
 import { flattenDeep, union } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardLayoutWidgetInfo } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     InheritOptions, WidgetConfig, WidgetOptions,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 

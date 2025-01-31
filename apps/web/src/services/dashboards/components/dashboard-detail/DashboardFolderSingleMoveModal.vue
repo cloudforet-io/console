@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { DashboardChangeFolderParams } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardChangeFolderParams } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

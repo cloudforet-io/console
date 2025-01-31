@@ -10,7 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
 import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';

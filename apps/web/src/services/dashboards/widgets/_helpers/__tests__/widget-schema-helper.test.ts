@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { DashboardVariableSchemaProperty, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
-import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
+import type { DashboardVariableSchemaProperty, DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/api-clients/dashboard/_types/widget-type';
 
 import {
     getInitialSchemaProperties, getNonInheritedWidgetOptionNamesAmongUsedVariables,

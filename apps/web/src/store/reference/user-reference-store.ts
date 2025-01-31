@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE } from '@/schema/identity/role/constant';

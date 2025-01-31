@@ -7,7 +7,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariable, ManualVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable, ManualVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';

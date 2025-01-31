@@ -17,8 +17,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@cloudforet/mirinae';
 import { sortArrayInObjectArray } from '@cloudforet/utils';
 
-import { CHART_TYPE, COST_DATA_FIELD_MAP, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import { CHART_TYPE, COST_DATA_FIELD_MAP, WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';

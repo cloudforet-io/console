@@ -5,12 +5,12 @@ import { defineStore } from 'pinia';
 import type { QueryTag } from '@cloudforet/mirinae/src/controls/search/query-search-tags/type';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

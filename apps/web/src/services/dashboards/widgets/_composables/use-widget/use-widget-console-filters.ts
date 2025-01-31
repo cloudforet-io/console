@@ -6,7 +6,7 @@ import { flattenDeep, isEmpty } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetFiltersMap } from '@/api-clients/dashboard/_types/widget-type';
 
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';

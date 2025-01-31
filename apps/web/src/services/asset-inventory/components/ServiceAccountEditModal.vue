@@ -7,7 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';

@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
 import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
 import { METRIC_TYPE } from '@/schema/inventory/metric/constant';

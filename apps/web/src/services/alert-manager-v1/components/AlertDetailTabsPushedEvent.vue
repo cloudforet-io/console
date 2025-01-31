@@ -11,7 +11,7 @@ import {
     PButton, PButtonModal, PI, PCodeEditor, PToolbox, PEmpty,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { EventListParameters } from '@/schema/monitoring/event/api-verbs/list';
 import type { EventModel } from '@/schema/monitoring/event/model';
 

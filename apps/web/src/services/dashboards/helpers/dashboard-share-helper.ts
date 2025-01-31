@@ -2,13 +2,13 @@ import { cloneDeep, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardLayout } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardLayout } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 

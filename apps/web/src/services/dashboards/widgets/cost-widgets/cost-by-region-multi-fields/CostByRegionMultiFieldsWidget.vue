@@ -14,7 +14,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@cloudforet/mirinae';
 
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { COST_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
 
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 

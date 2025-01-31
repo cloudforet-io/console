@@ -7,11 +7,11 @@ import { cloneDeep } from 'lodash';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 

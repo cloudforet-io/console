@@ -4,7 +4,7 @@ import { isObjectEqual } from '@cloudforet/utils';
 
 import type {
     InheritOptions, WidgetConfig, WidgetFiltersMap, WidgetOptions,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';

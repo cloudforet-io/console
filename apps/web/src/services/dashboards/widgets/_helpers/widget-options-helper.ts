@@ -1,9 +1,9 @@
 import { isEqual, merge } from 'lodash';
 
-import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariables } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     InheritOptions, WidgetConfig, WidgetOptions, WidgetFilterKey,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { setFilterAndGetWidgetFiltersMap } from '@/services/dashboards/widgets/_helpers/widget-options-filters-helper';
 

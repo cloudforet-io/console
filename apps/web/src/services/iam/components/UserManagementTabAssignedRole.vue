@@ -11,7 +11,7 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { i18n } from '@/translations';

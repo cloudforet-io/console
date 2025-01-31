@@ -10,7 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import type { PostModel } from '@/schema/board/post/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';

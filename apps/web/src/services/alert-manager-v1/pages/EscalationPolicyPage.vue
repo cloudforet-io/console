@@ -16,7 +16,7 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/cont
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { EscalationPolicyDeleteParameters } from '@/schema/monitoring/escalation-policy/api-verbs/delete';
 import type {
     EscalationPolicyListParameters,

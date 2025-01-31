@@ -25,7 +25,7 @@ import costTrendStacked from '@/services/dashboards/widgets/cost-widgets/cost-tr
 import costTrend from '@/services/dashboards/widgets/cost-widgets/cost-trend/widget-config';
 import monthlyCost from '@/services/dashboards/widgets/cost-widgets/monthly-cost/widget-config';
 
-import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 import type { BaseWidgetConfigKey, WidgetConfigKey } from '@/services/dashboards/widgets/_types/widget-list-type';
 
 export const BASE_WIDGET_CONFIG_KEYS = [

@@ -6,7 +6,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';

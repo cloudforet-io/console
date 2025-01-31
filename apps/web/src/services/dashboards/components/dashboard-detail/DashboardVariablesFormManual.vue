@@ -8,7 +8,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type {
     DashboardGlobalVariable, ManualVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';

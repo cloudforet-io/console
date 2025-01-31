@@ -15,7 +15,7 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
 import type { WebhookListErrorSParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
 import type { WebhookUpdateMessageFormatParameters } from '@/schema/alert-manager/webhook/api-verbs/update-message-format';

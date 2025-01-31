@@ -10,7 +10,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

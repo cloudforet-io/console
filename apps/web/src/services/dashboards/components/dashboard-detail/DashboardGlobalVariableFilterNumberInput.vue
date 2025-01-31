@@ -15,8 +15,8 @@ import type { InputItem } from '@cloudforet/mirinae/src/controls/input/text-inpu
 import type {
     DashboardGlobalVariable,
     NumberAnyVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';

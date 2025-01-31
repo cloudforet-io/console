@@ -1,4 +1,4 @@
-import type { WidgetFilterKey, WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetFilterKey, WidgetFiltersMap } from '@/api-clients/dashboard/_types/widget-type';
 
 import { setFilterAndGetWidgetFiltersMap } from '@/services/dashboards/widgets/_helpers/widget-options-filters-helper';
 

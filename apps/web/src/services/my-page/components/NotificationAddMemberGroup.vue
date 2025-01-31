@@ -9,7 +9,7 @@ import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';

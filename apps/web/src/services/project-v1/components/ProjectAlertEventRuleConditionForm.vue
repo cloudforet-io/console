@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';

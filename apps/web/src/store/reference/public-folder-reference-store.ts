@@ -5,9 +5,9 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { PublicFolderListParameters } from '@/schema/dashboard/public-folder/api-verbs/list';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/list';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap,

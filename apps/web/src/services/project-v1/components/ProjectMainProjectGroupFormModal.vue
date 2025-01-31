@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';

@@ -10,7 +10,7 @@ import {
     PHeading, PToolboxTable, PLink, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserProfileGetWorkspacesParameters } from '@/schema/identity/user-profile/api-verbs/get-workspaces';
 import type { MyWorkspaceModel } from '@/schema/identity/user-profile/model';
 

@@ -9,7 +9,7 @@ import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-vi
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

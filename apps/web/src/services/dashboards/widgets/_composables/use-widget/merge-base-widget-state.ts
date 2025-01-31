@@ -5,8 +5,8 @@ import type {
     DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
-} from '@/schema/dashboard/_types/dashboard-type';
-import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/api-clients/dashboard/_types/widget-type';
 
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
