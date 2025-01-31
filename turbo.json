@@ -2,7 +2,7 @@
   "globalDependencies": [
     "turbo.json", "package.json", "package-lock.json"
   ],
-  "pipeline": {
+  "tasks": {
     "@cloudforet/utils#build": {
       "outputs": ["./dist/**"],
       "inputs": [
@@ -75,6 +75,7 @@
       "cache": true
     },
     "dev": {
+      "persistent": true,
       "cache": false
     },
     "lint": {
