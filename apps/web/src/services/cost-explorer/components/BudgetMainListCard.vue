@@ -6,7 +6,7 @@ import {
     PDivider, PI, PBadge, PStatus,
 } from '@cloudforet/mirinae';
 
-import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
+import type { BudgetUsageAnalyzeResult } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

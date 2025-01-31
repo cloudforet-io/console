@@ -14,11 +14,11 @@ import {
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import { SpaceRouter } from '@/router';
 import type {
     BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,
-} from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
+} from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
+import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

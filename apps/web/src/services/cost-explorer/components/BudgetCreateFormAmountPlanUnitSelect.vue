@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { PFieldTitle, PSelectCard } from '@cloudforet/mirinae';
 
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
 

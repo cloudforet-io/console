@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
 import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

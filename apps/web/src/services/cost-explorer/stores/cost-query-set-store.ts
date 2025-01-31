@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

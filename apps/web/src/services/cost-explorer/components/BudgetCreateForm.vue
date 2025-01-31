@@ -8,9 +8,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton } from '@cloudforet/mirinae';
 
 
+import type { BudgetCreateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/create';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { SpaceRouter } from '@/router';
-import type { BudgetCreateParameters } from '@/schema/cost-analysis/budget/api-verbs/create';
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

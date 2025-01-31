@@ -6,7 +6,7 @@ import {
     PDivider, PHeading, PIconButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

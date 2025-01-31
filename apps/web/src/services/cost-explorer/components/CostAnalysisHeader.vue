@@ -8,8 +8,8 @@ import {
     PIconButton, PHeading, PLazyImg, PDivider, PI, PHeadingLayout, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import type { CostQuerySetDeleteParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/delete';
 import { SpaceRouter } from '@/router';
-import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';

@@ -1,4 +1,4 @@
-import type { CostModel } from '@/schema/cost-analysis/cost/model';
+import type { CostModel } from '@/api-clients/cost-analysis/cost/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

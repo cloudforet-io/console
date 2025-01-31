@@ -1,4 +1,4 @@
-import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
 import type { RoleType } from '@/schema/identity/role/type';
 
 export type CostReportDataAnalyzeResult = {

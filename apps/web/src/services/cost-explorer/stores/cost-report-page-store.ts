@@ -7,12 +7,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
-import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
-import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
-import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
-import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
-import type { CostReportModel, CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
+import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
+import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
+import type { CostReportGetParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/get';
+import type { CostReportGetUrlParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/get-url';
+import type { CostReportListParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/list';
+import type { CostReportModel, CostReportDataLinkInfoModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
 
 import type { Currency } from '@/store/display/type';
 

@@ -1,7 +1,7 @@
 import { cloneDeep, find } from 'lodash';
 
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 

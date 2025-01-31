@@ -6,7 +6,7 @@ import {
 import { PPaneLayout, PHeading } from '@cloudforet/mirinae';
 
 
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
 import BudgetCreateFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/components/BudgetCreateFormAmountPlanLastMonthsCost.vue';

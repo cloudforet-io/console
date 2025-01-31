@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
