@@ -27,6 +27,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
@@ -48,14 +49,26 @@ const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
     bundleCaseType: computed(() => {
         if (!isEmpty(dashboardCreatePageState.selectedOotbIdMap)) return 'TEMPLATE';
         return 'EXISTING';
@@ -75,8 +88,8 @@ const state = reactive({
             type: 'DASHBOARD',
         }));
     }),
-    existingPublicDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.publicDashboardItems.map((d) => d.name)),
-    existingPrivateDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.privateDashboardItems.map((d) => d.name)),
+    existingPublicDashboardNameList: computed<string[]>(() => state.publicDashboardItems.map((d) => d.name)),
+    existingPrivateDashboardNameList: computed<string[]>(() => state.privateDashboardItems.map((d) => d.name)),
 });
 
 /* Util */

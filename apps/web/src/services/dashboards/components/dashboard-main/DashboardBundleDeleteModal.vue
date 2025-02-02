@@ -8,6 +8,7 @@ import type { PrivateFolderDeleteParameters } from '@/api-clients/dashboard/priv
 import type { PublicFolderDeleteParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -18,6 +19,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
@@ -43,10 +45,39 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
+    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+});
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -54,7 +85,7 @@ const state = reactive({
         let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
         // single case
         if (props.folderId) {
-            const _childrenIdList = dashboardPageControlGetters.allDashboardItems.filter((d) => d.folder_id === props.folderId);
+            const _childrenIdList = queryState.allDashboardItems.filter((d) => d.folder_id === props.folderId);
             _selectedIdMap = {
                 [props.folderId]: true,
                 ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
@@ -62,7 +93,7 @@ const state = reactive({
         } else if (dashboardPageControlState.folderModalType === 'PRIVATE') { // bundle case
             _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
         }
-        return getSelectedDataTableItems(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems, _selectedIdMap);
+        return getSelectedDataTableItems(queryState.allFolderItems, queryState.allDashboardItems, _selectedIdMap);
     }),
 });
 

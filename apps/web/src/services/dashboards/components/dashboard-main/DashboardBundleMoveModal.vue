@@ -22,6 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
@@ -38,12 +39,23 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
     selectedIdMap: computed<Record<string, boolean>>(() => {
         if (dashboardPageControlState.folderModalType === 'PUBLIC') {
             return dashboardPageControlState.selectedPublicIdMap;
@@ -55,9 +67,9 @@ const state = reactive({
         .filter(([key]) => key.includes('dash'))
         .map(([key]) => key)),
     availableFolderItems: computed<FolderModel[]>(() => {
-        if (dashboardPageControlState.folderModalType === 'PRIVATE') return dashboardPageControlGetters.privateFolderItems;
-        if (storeState.isAdminMode) return dashboardPageControlGetters.publicFolderItems;
-        return dashboardPageControlGetters.publicFolderItems.filter((d) => !(d.shared && d.scope === 'WORKSPACE'));
+        if (dashboardPageControlState.folderModalType === 'PRIVATE') return state.privateFolderItems;
+        if (storeState.isAdminMode) return state.publicFolderItems;
+        return state.publicFolderItems.filter((d) => !(d.shared && d.scope === 'WORKSPACE'));
     }),
     headerTitle: computed<TranslateResult>(() => i18n.t('DASHBOARDS.ALL_DASHBOARDS.MOVE_DASHBOARDS', { count: state.targetDashboardIdList.length })),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {

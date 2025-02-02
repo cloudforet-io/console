@@ -12,12 +12,14 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DashboardChangeFolderParams } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
@@ -32,12 +34,26 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
-
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
         const defaultItem = {
             label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.NO_PARENT_FOLDER'),
@@ -46,7 +62,7 @@ const state = reactive({
         if (props.dashboardId.startsWith('public')) {
             return [
                 defaultItem,
-                ...dashboardPageControlGetters.publicFolderItems.map((folder) => ({
+                ...state.publicFolderItems.map((folder) => ({
                     label: folder.name,
                     name: folder.folder_id,
                 })),
@@ -54,7 +70,7 @@ const state = reactive({
         }
         return [
             defaultItem,
-            ...dashboardPageControlGetters.privateFolderItems.map((folder) => ({
+            ...state.privateFolderItems.map((folder) => ({
                 label: folder.name,
                 name: folder.folder_id,
             })),
@@ -94,7 +110,7 @@ watch(() => state.proxyVisible, (visible) => {
         state.selectedFolderId = '';
         dashboardPageControlStore.reset();
     } else {
-        const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
+        const _folderId = [...state.publicFolderItems, ...state.privateFolderItems].find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
         if (_folderId) state.selectedFolderId = _folderId;
     }
 }, { immediate: true });

@@ -26,6 +26,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
@@ -67,12 +68,37 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
+    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+});
+
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -97,7 +123,7 @@ const state = reactive({
         if (!state.changeFolderStructure) {
             let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
             if (props.folderId) {
-                const _childrenIdList = dashboardPageControlGetters.allDashboardItems.filter((d) => d.folder_id === props.folderId);
+                const _childrenIdList = queryState.allDashboardItems.filter((d) => d.folder_id === props.folderId);
                 _selectedIdMap = {
                     [props.folderId]: true,
                     ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
@@ -105,7 +131,7 @@ const state = reactive({
             } else if (dashboardPageControlState.folderModalType === 'PRIVATE') {
                 _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
             }
-            return getSelectedDataTableItems(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems, _selectedIdMap);
+            return getSelectedDataTableItems(queryState.allFolderItems, queryState.allDashboardItems, _selectedIdMap);
         }
 
         // 2. Change Folder Structure
@@ -114,9 +140,9 @@ const state = reactive({
             _targetDashboardList = _targetDashboardList.filter((d) => d.folder_id === props.folderId);
         } else {
             const _selectedIdMap = dashboardPageControlState.folderModalType === 'PRIVATE' ? dashboardPageControlState.selectedPrivateIdMap : dashboardPageControlState.selectedPublicIdMap;
-            _targetDashboardList = dashboardPageControlGetters.allDashboardItems.filter((d) => _selectedIdMap[d.dashboard_id]);
+            _targetDashboardList = queryState.allDashboardItems.filter((d) => _selectedIdMap[d.dashboard_id]);
         }
-        return getChangedFolderModalTableItems(dashboardPageControlGetters.allFolderItems, _targetDashboardList);
+        return getChangedFolderModalTableItems(queryState.allFolderItems, _targetDashboardList);
     }),
     disableModalConfirm: computed<boolean>(() => {
         if (!state.changeFolderStructure) return false; // 1. Use Existing Folder Structure
@@ -136,13 +162,13 @@ const state = reactive({
         if (!state.changeFolderStructure) return undefined;
         if (state.selectedFolderStructure === 'new_folder') return folderName.value;
         if (state.selectedFolderStructure === 'select_folder') {
-            return dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === state.selectedFolderId);
+            return queryState.allFolderItems.find((f) => f.folder_id === state.selectedFolderId);
         }
         return undefined;
     }),
     // 2.1. Create New Folder
     existingNameList: computed<string[]>(() => { // NOTE: only for 'create new folder' case
-        const _targetFolderItems = state.isNewFolderPrivate ? dashboardPageControlGetters.privateFolderItems : dashboardPageControlGetters.publicFolderItems;
+        const _targetFolderItems = state.isNewFolderPrivate ? queryState.privateFolderItems : queryState.publicFolderItems;
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             return _targetFolderItems.filter((d) => d.folder_id !== state.selectedFolder?.folder_id).map((d) => d.name);
         }
@@ -151,7 +177,7 @@ const state = reactive({
     isNewFolderPrivate: false,
     // 2.2. Select Existing Folder
     existingFolderMenuItems: computed<SelectDropdownMenuItem[]>(() => {
-        const _allFolderItems: FolderModel[] = [...dashboardPageControlGetters.publicFolderItems, ...dashboardPageControlGetters.privateFolderItems];
+        const _allFolderItems: FolderModel[] = [...queryState.publicFolderItems, ...queryState.privateFolderItems];
         return _allFolderItems.map((folder) => ({
             label: folder.name,
             name: folder.folder_id,
