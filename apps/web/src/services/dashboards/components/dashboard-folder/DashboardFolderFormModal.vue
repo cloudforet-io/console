@@ -28,6 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
@@ -51,7 +52,13 @@ const userStore = useUserStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
@@ -59,17 +66,22 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     isPrivate: false,
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
     selectedFolder: computed<FolderModel|undefined>(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             if (props.folderId?.startsWith('private')) {
-                return dashboardPageControlGetters.privateFolderItems.find((d) => d.folder_id === props.folderId);
+                return state.privateFolderItems.find((d) => d.folder_id === props.folderId);
             }
-            return dashboardPageControlGetters.publicFolderItems.find((d) => d.folder_id === props.folderId);
+            return state.publicFolderItems.find((d) => d.folder_id === props.folderId);
         }
         return undefined;
     }),
     existingNameList: computed<string[]>(() => {
-        const _targetFolderItems = state.isPrivate ? dashboardPageControlGetters.privateFolderItems : dashboardPageControlGetters.publicFolderItems;
+        const _targetFolderItems = state.isPrivate ? state.privateFolderItems : state.publicFolderItems;
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             return _targetFolderItems.filter((d) => d.folder_id !== state.selectedFolder?.folder_id).map((d) => d.name);
         }

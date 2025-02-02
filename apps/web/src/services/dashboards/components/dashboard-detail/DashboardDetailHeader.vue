@@ -19,6 +19,7 @@ import { gray } from '@/styles/colors';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -33,9 +34,33 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
+    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+});
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
@@ -43,7 +68,6 @@ const storeState = reactive({
 const { getControlMenuItems } = useDashboardControlMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
-    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
 });
 const state = reactive({
     isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared),
@@ -74,8 +98,8 @@ const state = reactive({
         return '';
     }),
     folderName: computed<string|undefined>(() => {
-        const _folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
-        const folder = dashboardPageControlGetters.allFolderItems.find((d) => d.folder_id === _folderId);
+        const _folderId = queryState.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
+        const folder = queryState.allFolderItems.find((d) => d.folder_id === _folderId);
         return folder?.name;
     }),
 });

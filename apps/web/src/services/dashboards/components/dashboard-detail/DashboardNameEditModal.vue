@@ -8,13 +8,14 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
 interface Props {
@@ -29,9 +30,14 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string): void;
 }>();
 
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+} = useDashboardQuery();
+
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const {
     forms: {
         _name,
@@ -52,16 +58,25 @@ const {
         return '';
     },
 });
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
     originName: computed<string>(() => {
-        const _dashboard = dashboardPageControlGetters.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId);
+        const _dashboard = [...state.publicDashboardItems, ...state.privateDashboardItems].find((item: DashboardModel) => item.dashboard_id === props.dashboardId);
         return _dashboard?.name || '';
     }),
     dashboardNameList: computed<string[]>(() => {
-        if (props.dashboardId.startsWith('private')) return dashboardPageControlGetters.privateDashboardItems.map((d) => d.name);
-        return dashboardPageControlGetters.publicDashboardItems.map((d) => d.name);
+        if (props.dashboardId.startsWith('private')) return state.privateDashboardItems.map((d) => d.name);
+        return state.publicDashboardItems.map((d) => d.name);
     }),
 });
 

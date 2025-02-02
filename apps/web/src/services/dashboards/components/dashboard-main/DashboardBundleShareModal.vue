@@ -26,6 +26,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -50,7 +51,31 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
+    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+});
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -58,8 +83,8 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     targetFolderId: computed<string|undefined>(() => props.folderId || state.targetDashboardItem?.folder_id),
-    targetFolderItem: computed<PublicFolderModel|undefined>(() => dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === state.targetFolderId)),
-    targetDashboardItem: computed<PublicDashboardModel|undefined>(() => dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)),
+    targetFolderItem: computed<PublicFolderModel|undefined>(() => queryState.allFolderItems.find((f) => f.folder_id === state.targetFolderId)),
+    targetDashboardItem: computed<PublicDashboardModel|undefined>(() => queryState.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)),
     isShared: computed<boolean>(() => {
         if (props.folderId) return !!state.targetFolderItem?.shared;
         return !!state.targetDashboardItem?.shared;
@@ -81,7 +106,7 @@ const state = reactive({
             name: _folderName,
             type: 'FOLDER',
         }];
-        const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
+        const _dashboardItems: DashboardDataTableItem[] = queryState.allDashboardItems
             .filter((d) => d.folder_id === state.targetFolderId)
             .map((d) => ({
                 id: d.dashboard_id,

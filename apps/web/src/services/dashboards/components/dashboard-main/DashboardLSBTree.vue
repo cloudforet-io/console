@@ -10,6 +10,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -31,6 +33,7 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 interface Props {
     dashboards: DashboardModel[];
+    folders: (PrivateFolderModel|PublicFolderModel)[];
     type: 'PRIVATE' | 'PUBLIC';
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -41,7 +44,6 @@ const route = useRoute();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
@@ -52,19 +54,12 @@ const storeState = reactive({
 const { getControlMenuItems } = useDashboardControlMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
-    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
-    folderList: computed(() => dashboardPageControlGetters.allFolderItems),
 });
 const state = reactive({
     currentParentPathIds: [] as string[],
     currentFolderId: undefined as string|undefined,
     treeDisplayMap: {} as TreeDisplayMap,
-    dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (props.type === 'PRIVATE') {
-            return getDashboardTreeData(dashboardPageControlGetters.privateFolderItems, props.dashboards);
-        }
-        return getDashboardTreeData(dashboardPageControlGetters.publicFolderItems, props.dashboards);
-    }),
+    dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(props.folders, props.dashboards)),
     selectedTreeId: undefined as string|undefined,
 });
 
@@ -80,7 +75,7 @@ const init = (dashboardId?: string, _onMounted?: boolean) => {
         return;
     }
     state.selectedTreeId = dashboardId as string;
-    const folderId = dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === dashboardId)?.folder_id;
+    const folderId = props.dashboards.find((d) => d.dashboard_id === dashboardId)?.folder_id;
     if (_onMounted && folderId) {
         updateTreeDisplayMap(folderId);
     }

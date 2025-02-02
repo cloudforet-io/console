@@ -26,12 +26,12 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 
@@ -48,14 +48,24 @@ const dashboardStore = useDashboardStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
+
+/* Query */
+const {
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
     folderMenuItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -66,7 +76,7 @@ const state = reactive({
         if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
             return [
                 defaultItem,
-                ...dashboardPageControlGetters.privateFolderItems.map((folder) => ({
+                ...state.privateFolderItems.map((folder) => ({
                     label: folder.name,
                     name: folder.folder_id,
                 })),
@@ -74,7 +84,7 @@ const state = reactive({
         }
         return [
             defaultItem,
-            ...dashboardPageControlGetters.publicFolderItems.map((folder) => ({
+            ...state.publicFolderItems.map((folder) => ({
                 label: folder.name,
                 name: folder.folder_id,
             })),

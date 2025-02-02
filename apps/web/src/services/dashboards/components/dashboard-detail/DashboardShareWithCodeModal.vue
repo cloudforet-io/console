@@ -14,6 +14,7 @@ import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/privat
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -22,8 +23,8 @@ import { copyAnyData } from '@/lib/helper/copy-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 
@@ -41,15 +42,32 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string): void;
 }>();
 
+const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+});
+
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    targetDashboard: computed<DashboardModel>(() => dashboardPageControlGetters.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId)),
+    targetDashboard: computed<DashboardModel>(() => queryState.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId)),
     loading: false,
     isCopied: false,
     sharedDashboard: {} as SharedDashboardInfo,

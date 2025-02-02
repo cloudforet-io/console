@@ -12,6 +12,7 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -23,18 +24,17 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 
 interface Props {
     visible: boolean;
 }
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -42,14 +42,35 @@ const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
 
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+    publicFolderItems,
+    privateFolderItems,
+} = useDashboardQuery();
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     currentDashboardId: computed<string>(() => dashboardDetailState.dashboardId || ''),
     currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties)),
     keyword: '',
     selectedDashboardId: '' as string|undefined,
-    publicDashboardItems: computed<PublicDashboardModel[]>(() => dashboardPageControlGetters.publicDashboardItems.filter((item) => item.dashboard_id !== state.currentDashboardId)),
-    privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardPageControlGetters.privateDashboardItems.filter((item) => item.dashboard_id !== state.currentDashboardId)),
+    publicDashboardItems: computed<PublicDashboardModel[]>(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId);
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed<PrivateDashboardModel[]>(() => privateDashboardItems.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId)),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderItems.value;
+        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderItems.value),
     allDashboardItems: computed<PrivateDashboardModel[]>(() => [...state.publicDashboardItems, ...state.privateDashboardItems]),
     selectedDashboardVariables: computed<DashboardGlobalVariable[]>(() => {
         const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);
@@ -135,7 +156,7 @@ watch(() => state.selectedDashboardId, () => {
         <template #body>
             <div class="import-contents">
                 <div class="left-dashboard-variable-tree-contents">
-                    <l-s-b-collapsible-menu-item v-if="state.publicDashboardItems.length || dashboardPageControlGetters.publicFolderItems.length"
+                    <l-s-b-collapsible-menu-item v-if="state.publicDashboardItems.length || publicFolderItems.length"
                                                  class="category-menu-item mt-1"
                                                  :item="{
                                                      type: 'collapsible',
@@ -148,11 +169,12 @@ watch(() => state.selectedDashboardId, () => {
                         <template #collapsible-contents>
                             <dashboard-manage-variable-import-modal-tree type="PUBLIC"
                                                                          :dashboards="state.publicDashboardItems"
+                                                                         :folders="state.publicFolderItems"
                                                                          :selected.sync="state.selectedDashboardId"
                             />
                         </template>
                     </l-s-b-collapsible-menu-item>
-                    <l-s-b-collapsible-menu-item v-if="state.privateDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"
+                    <l-s-b-collapsible-menu-item v-if="state.privateDashboardItems.length || privateFolderItems.length"
                                                  class="category-menu-item mt-1"
                                                  :item="{
                                                      type: 'collapsible',
@@ -165,6 +187,7 @@ watch(() => state.selectedDashboardId, () => {
                         <template #collapsible-contents>
                             <dashboard-manage-variable-import-modal-tree type="PRIVATE"
                                                                          :dashboards="state.privateDashboardItems"
+                                                                         :folders="state.privateFolderItems"
                                                                          :selected.sync="state.selectedDashboardId"
                             />
                         </template>

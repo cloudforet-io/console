@@ -14,15 +14,17 @@ import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-ty
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardCreateBlankBoardItem from '@/services/dashboards/components/dashboard-create/DashboardCreateBlankBoardItem.vue';
 import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -31,11 +33,31 @@ const emit = defineEmits<{(e: 'click-next'): void }>();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+});
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+
 const state = reactive({
     templates: [] as DashboardTemplateModel[],
     blankTemplate: computed<BoardSet[]>(() => ([{
@@ -61,7 +83,7 @@ const state = reactive({
     }),
     allExistingLabels: computed<string[]>(() => {
         const _ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
-        const _existingTemplates = getFilteredTemplates(dashboardPageControlGetters.allDashboardItems, '', [], []);
+        const _existingTemplates = getFilteredTemplates(queryState.allDashboardItems, '', [], []);
 
         const _ootbLabels = flatMapDeep(_ootbTemplates.map((d) => d.labels ?? []));
         const _existingLabels = flatMapDeep(_existingTemplates.map((d) => d.labels ?? []));
