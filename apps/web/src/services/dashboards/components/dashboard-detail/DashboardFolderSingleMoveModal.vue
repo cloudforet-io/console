@@ -3,17 +3,25 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { DashboardChangeFolderParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type {
+    PrivateDashboardChangeFolderParameters,
+} from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/change-folder';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
+import type {
+    PublicDashboardChangeFolderParameters,
+} from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/change-folder';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -24,6 +32,8 @@ import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashb
 
 
 
+
+type DashboardModel = PrivateFolderModel | PublicFolderModel;
 interface Props {
     visible: boolean;
     dashboardId: string;
@@ -35,13 +45,15 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 
 /* Query */
 const {
     publicFolderItems,
     privateFolderItems,
+    keys,
+    api,
+    queryClient,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -80,28 +92,40 @@ const state = reactive({
 });
 
 /* Api */
-const updateDashboard = async (dashboardId: string): Promise<void> => {
-    try {
-        const _isPrivate = dashboardId.startsWith('private');
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateDashboard.changeFolder : SpaceConnector.clientV2.dashboard.publicDashboard.changeFolder;
-        const params: DashboardChangeFolderParams = {
-            dashboard_id: dashboardId,
-        };
-        if (state.selectedFolderId) {
-            params.folder_id = state.selectedFolderId;
-        }
-        await fetcher(params);
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
-    } catch (e) {
-        showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);
+const changeFolderFn = (params: PrivateDashboardChangeFolderParameters | PublicDashboardChangeFolderParameters): Promise<DashboardModel> => {
+    const _isPrivate = props.dashboardId.startsWith('private');
+    if (_isPrivate) {
+        return api.privateDashboardAPI.changeFolder(params as PrivateDashboardChangeFolderParameters);
     }
+    return api.publicDashboardAPI.changeFolder(params as PublicDashboardChangeFolderParameters);
 };
+const { mutate: changeFolder } = useMutation(
+    {
+        mutationFn: changeFolderFn,
+        onSuccess: () => {
+            showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
+            const isPrivate = props.dashboardId.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onError: (e) => {
+            showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);
+        },
+        onSettled: () => {
+            state.proxyVisible = false;
+        },
+    },
+);
 
 /* Event */
 const handleFormConfirm = async () => {
-    await updateDashboard(props.dashboardId);
-    await dashboardStore.load();
-    state.proxyVisible = false;
+    const params: DashboardChangeFolderParams = {
+        dashboard_id: props.dashboardId,
+    };
+    if (state.selectedFolderId) {
+        params.folder_id = state.selectedFolderId;
+    }
+    changeFolder(params);
 };
 
 /* Watcher */
