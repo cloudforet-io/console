@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -13,7 +14,6 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -34,7 +34,6 @@ interface Props {
     visible: boolean;
 }
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -48,6 +47,9 @@ const {
     privateDashboardItems,
     publicFolderItems,
     privateFolderItems,
+    keys,
+    functions,
+    queryClient,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -89,30 +91,23 @@ const state = reactive({
 
 
 /* Api */
-const updateUseDashboardVarsSchema = async (dashboardId: string) => {
-    try {
-        const _dashboardVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        state.selectedDashboardVariables
-            .filter((variable) => state.selectedVariableKeys.includes(variable.key))
-            .forEach((variable) => {
-                _dashboardVarsSchemaProperties[variable.key] = {
-                    ...variable,
-                    use: false,
-                    created_by: userStore.state.userId,
-                };
-            });
-        await dashboardStore.updateDashboard(dashboardId, {
-            dashboard_id: dashboardId,
-            vars_schema: {
-                properties: _dashboardVarsSchemaProperties,
-            },
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
-    }
-};
-
+const { mutate } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+            showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
+        },
+        onSettled() {
+            state.proxyVisible = false;
+        },
+    },
+);
 
 /* Event */
 const handleChangeSelectedVariableKeys = (selected: string[]) => {
@@ -124,11 +119,24 @@ const handleChangeAllSelectedVariables = (selected: boolean) => {
 const handleClickClearAll = () => {
     state.selectedVariableKeys = [];
 };
-const handleConfirmImportVariables = async () => {
-    await updateUseDashboardVarsSchema(state.currentDashboardId);
-    state.proxyVisible = false;
+const handleConfirmImportVariables = () => {
+    const _dashboardVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+    state.selectedDashboardVariables
+        .filter((variable) => state.selectedVariableKeys.includes(variable.key))
+        .forEach((variable) => {
+            _dashboardVarsSchemaProperties[variable.key] = {
+                ...variable,
+                use: false,
+                created_by: userStore.state.userId,
+            };
+        });
+    mutate({
+        dashboard_id: state.currentDashboardId,
+        vars_schema: {
+            properties: _dashboardVarsSchemaProperties,
+        },
+    });
 };
-
 
 const isDuplicatedVariableName = (variable: DashboardGlobalVariable): boolean => state.currentDashboardVariables.some((currentVariable) => currentVariable.name === variable.name
     || currentVariable.key === variable.key);

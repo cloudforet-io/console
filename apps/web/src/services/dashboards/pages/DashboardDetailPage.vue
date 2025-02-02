@@ -4,14 +4,17 @@ import {
     onUnmounted, reactive, ref, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PDivider, PI,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -29,6 +32,7 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -40,7 +44,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const gnbStore = useGnbStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
@@ -50,6 +53,13 @@ const { breadcrumbs } = useBreadcrumbs();
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -76,16 +86,26 @@ const handleRefresh = async () => {
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
-const handleUpdateDashboardVariables = async (params) => {
-    state.dashboardVariablesLoading = true;
-    try {
-        await dashboardStore.updateDashboard(props.dashboardId, params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.dashboardVariablesLoading = false;
-    }
+const handleUpdateDashboardVariables = (params) => {
+    updateDashboard({
+        dashboard_id: props.dashboardId,
+        ...params,
+    });
 };
+
+const { mutate: updateDashboard, isPending: loading } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleError(e);
+        },
+    },
+);
 
 watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     /* NOTE: The dashboard data is reset in first entering case */
@@ -149,13 +169,13 @@ onUnmounted(() => {
             >
                 <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
                                      class="variable-selector-wrapper"
-                                     :loading="state.dashboardVariablesLoading"
+                                     :loading="loading"
                                      @update="handleUpdateDashboardVariables"
                 />
                 <dashboard-variables-v2 v-else
                                         class="variable-selector-wrapper"
                                         :disable-save-button="dashboardDetailGetters.disableManageButtons"
-                                        :loading="state.dashboardVariablesLoading"
+                                        :loading="loading"
                                         @update="handleUpdateDashboardVariables"
                 />
             </div>

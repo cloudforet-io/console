@@ -2,6 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -11,10 +12,11 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import { getClonedName } from '@cloudforet/utils';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,6 +29,7 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
@@ -36,6 +39,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 
+type DashboardModel = PrivateDashboardModel | PublicDashboardModel;
 interface GlobalVariableTableItem {
     key: string;
     name: string;
@@ -48,11 +52,17 @@ interface Props {
     visible: boolean;
 }
 const props = defineProps<Props>();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const userStore = useUserStore();
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
@@ -91,6 +101,17 @@ const state = reactive({
         const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
         return _varsKeys.includes(state.selectedVariableKey);
     }),
+    actionType: 'DELETE' as 'DELETE'|'CLONE'|'UPDATE',
+    successMessage: computed(() => {
+        if (state.updateType === 'DELETE') return i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_DELETE_DASHBOARD_VARS_SCHEMA');
+        if (state.updateType === 'CLONE') return i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_CLONE_DASHBOARD_VARS_SCHEMA');
+        return i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA');
+    }),
+    failMessage: computed(() => {
+        if (state.updateType === 'DELETE') return i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_DELETE_DASHBOARD_VARS_SCHEMA');
+        if (state.updateType === 'CLONE') return i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_CLONE_DASHBOARD_VARS_SCHEMA');
+        return i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA');
+    }),
 });
 
 /* Util */
@@ -106,76 +127,79 @@ const isPresetVarsSchemaProperty = (key: string): boolean => {
 
 /* Api */
 const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
-    try {
-        const _varsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        delete _varsSchemaProperties[variableKey];
-        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
-        const _tempVars = cloneDeep(dashboardDetailState.vars);
-        delete _vars[variableKey];
-        delete _tempVars[variableKey];
-        dashboardDetailStore.setVars(_tempVars);
-        await dashboardStore.updateDashboard(dashboardId, {
-            dashboard_id: dashboardId,
-            vars_schema: {
-                properties: _varsSchemaProperties,
-            },
-            vars: _vars,
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_DELETE_DASHBOARD_VARS_SCHEMA'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_DELETE_DASHBOARD_VARS_SCHEMA'));
-    }
+    const _varsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+    delete _varsSchemaProperties[variableKey];
+    const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+    const _tempVars = cloneDeep(dashboardDetailState.vars);
+    delete _vars[variableKey];
+    delete _tempVars[variableKey];
+    dashboardDetailStore.setVars(_tempVars);
+    mutate({
+        dashboard_id: dashboardId,
+        vars_schema: {
+            properties: _varsSchemaProperties,
+        },
+        vars: _vars,
+    });
 };
 const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
-    try {
-        const _clonedProperty = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey]);
-        const _varsNameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
-        const _varsKeyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.key);
-        _clonedProperty.key = getClonedName(_varsKeyList, _clonedProperty.key, 'clone_');
-        _clonedProperty.name = getClonedName(_varsNameList, _clonedProperty.name);
-        await dashboardStore.updateDashboard(dashboardId, {
-            dashboard_id: dashboardId,
-            vars_schema: {
-                properties: {
-                    ...dashboardDetailGetters.dashboardVarsSchemaProperties,
-                    [_clonedProperty.key]: {
-                        ..._clonedProperty,
-                        use: false,
-                        created_by: userStore.state.userId,
-                    },
+    const _clonedProperty = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey]);
+    const _varsNameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
+    const _varsKeyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.key);
+    _clonedProperty.key = getClonedName(_varsKeyList, _clonedProperty.key, 'clone_');
+    _clonedProperty.name = getClonedName(_varsNameList, _clonedProperty.name);
+    mutate({
+        dashboard_id: dashboardId,
+        vars_schema: {
+            properties: {
+                ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                [_clonedProperty.key]: {
+                    ..._clonedProperty,
+                    use: false,
+                    created_by: userStore.state.userId,
                 },
             },
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_CLONE_DASHBOARD_VARS_SCHEMA'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_CLONE_DASHBOARD_VARS_SCHEMA'));
-    }
+        },
+    });
 };
-const updateUseDashboardVarsSchema = async (dashboardId: string, variableKey: string, use: boolean) => {
-    try {
-        const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
-        const _tempVars = cloneDeep(dashboardDetailState.vars);
-        delete _vars[variableKey];
-        delete _tempVars[variableKey];
-        await dashboardStore.updateDashboard(dashboardId, {
-            dashboard_id: dashboardId,
-            vars_schema: {
-                properties: {
-                    ...dashboardDetailGetters.dashboardVarsSchemaProperties,
-                    [variableKey]: {
-                        ...dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey],
-                        use,
-                    },
+const updateUseDashboardVarsSchema = (dashboardId: string, variableKey: string, use: boolean) => {
+    const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+    const _tempVars = cloneDeep(dashboardDetailState.vars);
+    delete _vars[variableKey];
+    delete _tempVars[variableKey];
+    dashboardDetailStore.setVars(_tempVars);
+    mutate({
+        dashboard_id: dashboardId,
+        vars_schema: {
+            properties: {
+                ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                [variableKey]: {
+                    ...dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey],
+                    use,
                 },
             },
-            vars: _vars,
-        });
-        dashboardDetailStore.setVars(_tempVars);
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
-    }
+        },
+        vars: _vars,
+    });
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: DashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+            showSuccessMessage(state.successMessage, '');
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, state.failMessage);
+        },
+        onSettled() {
+            if (state.actionType === 'DELETE') state.deleteModalVisible = false;
+        },
+    },
+);
 
 /* Event */
 const handleClickCreateButton = () => {
@@ -196,10 +220,12 @@ const handleClickEditButton = (variableKey: string) => {
 };
 const handleClickCloneButton = (variableKey: string) => {
     if (!dashboardDetailState.dashboardId) return;
+    state.actionType = 'CLONE';
     cloneDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey);
 };
 const handleToggleUse = (variableKey: string, val: boolean) => {
     if (!dashboardDetailState.dashboardId) return;
+    state.actionType = 'UPDATE';
     updateUseDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey, val);
 };
 const handleCloseOverlay = () => {
@@ -210,8 +236,8 @@ const handleCloseOverlay = () => {
 };
 const handleConfirmDelete = () => {
     if (!dashboardDetailState.dashboardId || !state.selectedVariableKey) return;
+    state.actionType = 'DELETE';
     deleteDashboardVarsSchema(dashboardDetailState.dashboardId, state.selectedVariableKey);
-    state.deleteModalVisible = false;
 };
 </script>
 

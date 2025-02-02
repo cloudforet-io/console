@@ -3,6 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
 
@@ -10,15 +11,15 @@ import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DateRange, DashboardOptions } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
-
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateCustomModal.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
 
 interface Props {
     dateRange?: DateRange;
@@ -29,10 +30,17 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { i18nDayjs } = useI18nDayjs();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
+
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
@@ -100,7 +108,8 @@ const handleSelectMonthMenuItem = (selected: string) => {
     }
 
     if (!dashboardDetailGetters.disableManageButtons && !props.widgetMode) {
-        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+        mutate({
+            dashboard_id: dashboardDetailState.dashboardId,
             options: {
                 ...dashboardDetailGetters.dashboardInfo?.options || {},
                 date_range: state.selectedDateRange,
@@ -142,6 +151,17 @@ const setInitialDateRange = () => {
     // The Last index is 'Custom' menu index.
     return state.monthMenuItems.length - 1;
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+    },
+);
 
 watch(() => props.dateRange, () => {
     state.selectedMonthMenuItem = state.monthMenuItems[setInitialDateRange()];

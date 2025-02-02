@@ -5,16 +5,20 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { PIconButton, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/api-clients/dashboard/_constants/dashboard-constant';
 import type { RefreshIntervalOption } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);
 
@@ -31,10 +35,16 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh'): void;
 }>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -91,7 +101,8 @@ const handleSelectRefreshIntervalOption = (option) => {
     executeRefreshInterval();
 
     if (!dashboardDetailGetters.disableManageButtons) {
-        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+        mutate({
+            dashboard_id: dashboardDetailState.dashboardId,
             options: {
                 ...dashboardDetailGetters.dashboardInfo?.options || {},
                 refresh_interval_option: option,
@@ -99,6 +110,17 @@ const handleSelectRefreshIntervalOption = (option) => {
         });
     }
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+    },
+);
 
 watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {
     if (!dashboardId) {

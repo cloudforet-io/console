@@ -12,7 +12,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { DashboardCreateParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { DashboardCreateParams, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     PrivateDashboardCreateParameters,
 } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
@@ -23,7 +23,6 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -52,7 +51,6 @@ const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
@@ -60,12 +58,21 @@ const userStore = useUserStore();
 
 /* Query */
 const {
+    publicDashboardItems,
+    privateDashboardItems,
     publicFolderItems,
     privateFolderItems,
     keys,
     api,
     queryClient,
 } = useDashboardQuery();
+
+const getDashboardNameList = (dashboardType: DashboardType) => {
+    if (dashboardType === 'PRIVATE') {
+        return (privateDashboardItems.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
+    }
+    return publicDashboardItems.value.filter((i) => i.version !== '1.0').map((item) => item.name);
+};
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -77,7 +84,7 @@ const state = reactive({
         return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
     privateFolderItems: computed(() => privateFolderItems.value),
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
+    dashboardNameList: computed<string[]>(() => getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
     folderMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const defaultItem = {
