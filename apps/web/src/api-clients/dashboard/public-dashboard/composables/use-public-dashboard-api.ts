@@ -39,7 +39,6 @@ export const usePublicDashboardApi = () => {
             return SpaceConnector.clientV2.dashboard.publicDashboard.get<PublicDashboardGetParameters, PublicDashboardModel>(params);
         },
         async list(params: PublicDashboardListParameters) {
-            console.debug('[LIST TRIGGER]');
             return SpaceConnector.clientV2.dashboard.publicDashboard.list<PublicDashboardListParameters, ListResponse<PublicDashboardModel>>(params);
         },
     };
