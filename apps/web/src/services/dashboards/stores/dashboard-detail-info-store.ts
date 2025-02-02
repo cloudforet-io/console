@@ -347,9 +347,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesInitMap(_variablesInitMap);
     };
     //
-    const deleteDashboard = async (dashboardId: string) => {
-        await dashboardStore.deleteDashboard(dashboardId);
-    };
     const listDashboardWidgets = async () => {
         if (!state.dashboardId) return;
         try {
@@ -385,7 +382,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardInfo,
         deleteDashboardWidget,
         resetVariables,
-        deleteDashboard,
         listDashboardWidgets,
     };
 
