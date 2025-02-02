@@ -16,7 +16,7 @@ export const usePrivateDashboardApi = () => {
 
     const actions = {
         async create(params: PrivateDashboardCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.privateDashboard.list<PrivateDashboardCreateParameters, PrivateDashboardModel>(params);
+            return SpaceConnector.clientV2.dashboard.privateDashboard.create<PrivateDashboardCreateParameters, PrivateDashboardModel>(params);
         },
         async update(params: PrivateDashboardUpdateParameters) {
             return SpaceConnector.clientV2.dashboard.privateDashboard.update<PrivateDashboardUpdateParameters, PrivateDashboardModel>(params);
@@ -25,13 +25,13 @@ export const usePrivateDashboardApi = () => {
             return SpaceConnector.clientV2.dashboard.privateDashboard.changeFolder<PrivateDashboardChangeFolderParameters, PrivateDashboardModel>(params);
         },
         async delete(params: PrivateDashboardDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.privateDashboard.unshare<PrivateDashboardDeleteParameters>(params);
+            return SpaceConnector.clientV2.dashboard.privateDashboard.delete<PrivateDashboardDeleteParameters>(params);
         },
         async get(params: PrivateDashboardGetParameters) {
-            return SpaceConnector.clientV2.dashboard.privateDashboard.unshare<PrivateDashboardGetParameters, PrivateDashboardModel>(params);
+            return SpaceConnector.clientV2.dashboard.privateDashboard.get<PrivateDashboardGetParameters, PrivateDashboardModel>(params);
         },
         async list(params: PrivateDashboardListParameters) {
-            return SpaceConnector.clientV2.dashboard.privateDashboard.unshare<PrivateDashboardListParameters, ListResponse<PrivateDashboardModel>>(params);
+            return SpaceConnector.clientV2.dashboard.privateDashboard.list<PrivateDashboardListParameters, ListResponse<PrivateDashboardModel>>(params);
         },
     };
 
