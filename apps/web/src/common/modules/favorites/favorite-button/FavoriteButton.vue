@@ -12,7 +12,6 @@ import type { MetricExampleModel } from '@/schema/inventory/metric-example/model
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
@@ -41,6 +40,8 @@ import type { FavoriteType, FavoriteConfig } from '@/common/modules/favorites/fa
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+
 interface Props {
     itemId: string;
     favoriteType: FavoriteType;
@@ -63,11 +64,15 @@ const workspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteStoreGetters = favoriteStore.getters;
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 const displayStore = useDisplayStore();
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+} = useDashboardQuery();
 
 const emit = defineEmits<{(e: 'click-favorite'): void;
 }>();
@@ -120,7 +125,7 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
 const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): ReferenceData|undefined => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([favoriteConfig], [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems])[0];
+        return convertDashboardConfigToReferenceData([favoriteConfig], [...publicDashboardItems.value, ...privateDashboardItems.value])[0];
     }
     if (itemType === FAVORITE_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([favoriteConfig], storeState.projects)[0];

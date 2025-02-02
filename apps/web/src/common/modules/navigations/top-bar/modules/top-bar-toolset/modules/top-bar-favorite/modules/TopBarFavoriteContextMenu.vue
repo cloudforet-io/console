@@ -17,7 +17,6 @@ import type { MetricExampleModel } from '@/schema/inventory/metric-example/model
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -52,6 +51,7 @@ import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/T
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -72,8 +72,6 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -81,6 +79,12 @@ const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 const userStore = useUserStore();
 const displayStore = useDisplayStore();
+
+/* Query */
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+} = useDashboardQuery();
 
 const router = useRouter();
 const route = useRoute();
@@ -199,7 +203,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems],
+            [...publicDashboardItems.value, ...privateDashboardItems.value],
         );
     }),
     favoriteMetricItems: computed<ReferenceData[]>(() => {
@@ -316,7 +320,6 @@ const init = async () => {
         favoriteStore.fetchFavorite(),
         gnbStore.fetchMetricExample(),
         gnbStore.fetchCostQuerySet(),
-        dashboardStore.load(),
         // HACK: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
     ]);
     state.loading = false;
