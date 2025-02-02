@@ -3,6 +3,8 @@ import {
     computed, defineExpose, reactive, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PI, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@cloudforet/mirinae';
@@ -11,7 +13,12 @@ import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-in
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type {
+    PrivateDashboardCreateParameters,
+} from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -33,7 +40,8 @@ import {
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
-
+type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
+type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 
 interface Props {
     isValid: boolean;
@@ -54,6 +62,9 @@ const userStore = useUserStore();
 const {
     publicFolderItems,
     privateFolderItems,
+    keys,
+    api,
+    queryClient,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -113,7 +124,39 @@ const {
 });
 
 /* Api */
-const createSingleDashboard = async () => {
+const createDashboard = (params: DashboardCreateParameters): Promise<DashboardModel> => {
+    if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
+        return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
+    }
+    return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
+};
+
+const { mutate } = useMutation(
+    {
+        mutationFn: createDashboard,
+        onSuccess: (dashboard: DashboardModel) => {
+            dashboardCreatePageStore.setDashboardCreated(true);
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onError: (e) => {
+            showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'), e);
+        },
+        onSettled(data) {
+            if (data?.dashboard_id) {
+                SpaceRouter.router.push(getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: { dashboardId: data.dashboard_id },
+                }));
+            }
+        },
+    },
+);
+
+/* Event */
+const handleConfirm = async () => {
+    dashboardCreatePageStore.setLoading(true);
     const _dashboardParams: DashboardCreateParams = {
         name: dashboardName.value,
         labels: state.labels.map((item) => item.name),
@@ -121,35 +164,12 @@ const createSingleDashboard = async () => {
         folder_id: state.selectedFolderId,
         vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
     };
-    try {
-        if (storeState.isAdminMode) {
-            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-        } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
-            (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
-        }
-        const _dashboardType = dashboardCreatePageState.dashboardScope === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC';
-        const res = await dashboardStore.createDashboard(_dashboardType, _dashboardParams);
-        dashboardCreatePageStore.setDashboardCreated(true);
-        return res.dashboard_id;
-    } catch (e) {
-        showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'), e);
-        return undefined;
+    if (storeState.isAdminMode) {
+        (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+    } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
+        (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
     }
-};
-
-/* Event */
-const handleConfirm = async () => {
-    dashboardCreatePageStore.setLoading(true);
-    const createdDashboardId = await createSingleDashboard();
-    await dashboardStore.load();
-    if (createdDashboardId) {
-        await SpaceRouter.router.push(getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: createdDashboardId,
-            },
-        }));
-    }
+    mutate(_dashboardParams as DashboardCreateParameters);
 };
 
 /* Watcher */
