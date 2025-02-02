@@ -40,8 +40,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 
-
-
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 type GetDashboardParameters = PublicDashboardGetParameters | PrivateDashboardGetParameters;
 const DEFAULT_REFRESH_INTERVAL = '5m';
@@ -304,15 +302,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }
     };
     const deleteDashboardWidget = async (widgetId?: string) => {
-        if (!widgetId) return;
+        if (!widgetId) return undefined;
         const _dashboardLayouts = cloneDeep(getters.dashboardLayouts ?? []);
         const deletedWidgetIndex = _dashboardLayouts[0]?.widgets?.findIndex((d) => d === widgetId);
-        if (!deletedWidgetIndex || deletedWidgetIndex === -1) return;
+        if (!deletedWidgetIndex || deletedWidgetIndex === -1) return undefined;
         _dashboardLayouts[0]?.widgets?.splice(deletedWidgetIndex, 1);
-        await dashboardStore.updateDashboard(state.dashboardId as string, {
-            dashboard_id: state.dashboardId || '',
-            layouts: _dashboardLayouts,
-        });
+        return _dashboardLayouts;
     };
     // HACK: only for 1.0 dashboard
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {

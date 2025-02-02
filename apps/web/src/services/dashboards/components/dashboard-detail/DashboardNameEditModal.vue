@@ -3,13 +3,15 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -18,6 +20,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
+
+type DashboardModel = PrivateDashboardModel | PublicDashboardModel;
 interface Props {
     visible: boolean;
     dashboardId: string;
@@ -34,10 +38,12 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 const {
     publicDashboardItems,
     privateDashboardItems,
+    keys,
+    functions,
+    queryClient,
 } = useDashboardQuery();
 
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const {
     forms: {
         _name,
@@ -50,7 +56,7 @@ const {
     _name: '',
 }, {
     _name(value: string) {
-        if (state.loading) return '';
+        if (loading.value) return '';
         if (value === state.originName) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
@@ -62,7 +68,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     publicDashboardItems: computed(() => {
         const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
@@ -80,25 +85,31 @@ const state = reactive({
     }),
 });
 
-const updateDashboard = async () => {
-    try {
-        await dashboardStore.updateDashboard(props.dashboardId, {
-            dashboard_id: props.dashboardId,
-            name: _name.value,
-        });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
-    }
-};
+const { mutate, isPending: loading } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: DashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
+        },
+        onSettled() {
+            state.proxyVisible = false;
+        },
+    },
+);
 
 const handleConfirm = async () => {
-    state.loading = true;
-    await updateDashboard();
-    state.proxyVisible = false;
-    state.loading = false;
+    mutate({
+        dashboard_id: props.dashboardId,
+        name: _name.value,
+    });
 };
 
-const handleUpdateVisible = (visible) => {
+const handleUpdateVisible = (visible: boolean) => {
     state.proxyVisible = visible;
 };
 
@@ -118,8 +129,8 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
-                           :invalid="!state.loading && invalidState._name"
-                           :invalid-text="state.loading ? '' : invalidTexts._name"
+                           :invalid="!loading && invalidState._name"
+                           :invalid-text="loading ? '' : invalidTexts._name"
                            required
             >
                 <template #default="{invalid}">

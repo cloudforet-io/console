@@ -4,6 +4,7 @@ import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -12,11 +13,13 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
 import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
@@ -49,6 +52,7 @@ import DashboardReorderSidebar from '@/services/dashboards/components/dashboard-
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -79,6 +83,15 @@ const displayStore = useDisplayStore();
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
+
+
 const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
@@ -320,7 +333,11 @@ const handleWidgetMounted = (widgetId: string) => {
 const handleDeleteModalConfirm = async () => {
     const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
     // 1. remove from dashboard layouts
-    await dashboardDetailStore.deleteDashboardWidget(_targetWidgetId);
+    const changedLayouts = await dashboardDetailStore.deleteDashboardWidget(_targetWidgetId);
+    await updateDashboard({
+        dashboard_id: dashboardDetailState.dashboardId || '',
+        layouts: changedLayouts,
+    });
     // 2. delete widget
     await deleteWidget(_targetWidgetId);
     // 3. delete widget from mounted map
@@ -335,6 +352,17 @@ const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
     widgetGenerateStore.setShowOverlay(true);
 };
+
+const { mutateAsync: updateDashboard } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+    },
+);
 
 /* Watcher */
 watch(() => dashboardDetailState.dashboardWidgets, (widgets) => {

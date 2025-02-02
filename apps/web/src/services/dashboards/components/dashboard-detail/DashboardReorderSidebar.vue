@@ -5,28 +5,39 @@ import {
 } from 'vue';
 import draggable from 'vuedraggable';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PI, PButton,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';
 
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 const displayStore = useDisplayStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
+
 const state = reactive({
     widgetList: computed<WidgetModel[]>(() => {
         const results: WidgetModel[] = [];
@@ -44,19 +55,32 @@ const state = reactive({
 });
 
 /* Event */
-const handleChangeWidgetOrder = async () => {
+const handleChangeWidgetOrder = () => {
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
     const _updatedLayouts = [{ widgets: _widgetIdList }];
-    await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+    mutate({
         dashboard_id: dashboardDetailState.dashboardId || '',
         layouts: _updatedLayouts,
     });
-    dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets]);
 };
 const getWidgetDefaultName = (widgetType: string): string => {
     const _config = getWidgetConfig(widgetType);
     return _config?.meta?.title || widgetType;
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onSettled: () => {
+            dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets]);
+        },
+    },
+);
 
 watch(() => dashboardDetailState.dashboardId, (after, before) => {
     if (after !== before) {

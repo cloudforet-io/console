@@ -2,13 +2,17 @@
 import { onClickOutside } from '@vueuse/core';
 import { reactive, ref } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -18,25 +22,41 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const labelPopoverRef = ref<HTMLElement|null>(null);
+
+/* Query */
+const {
+    keys,
+    functions,
+    queryClient,
+} = useDashboardQuery();
 
 const state = reactive({
     visible: false,
 });
 
 const handleUpdateLabels = async (labels: string[]) => {
-    try {
-        await dashboardStore.updateDashboard(props.dashboardId, {
-            dashboard_id: props.dashboardId,
-            labels,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+    mutate({
+        dashboard_id: props.dashboardId,
+        labels,
+    });
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: functions.updateDashboardFn,
+        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleError(e);
+        },
+    },
+);
 
 onClickOutside(labelPopoverRef, () => { state.visible = false; });
 </script>

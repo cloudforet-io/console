@@ -3,7 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@cloudforet/mirinae';
@@ -19,7 +20,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -49,7 +49,6 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 
@@ -57,6 +56,10 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 const {
     publicFolderItems,
     privateFolderItems,
+    keys,
+    api,
+    functions,
+    queryClient,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -109,12 +112,17 @@ const {
     },
 });
 
-/* Api */
-const createFolder = async () => {
-    try {
+/* Event */
+const handleFormConfirm = async () => {
+    if (!isAllValid) return;
+    if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
+        const params: FolderUpdateParams = {
+            folder_id: state.selectedFolder?.folder_id as string,
+            name: name.value as string,
+        };
+        updateFolder(params);
+    } else {
         const _isPrivate = storeState.isWorkspaceMember ? true : state.isPrivate;
-
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
             name: name.value as string,
             tags: { created_by: userStore.state.userId },
@@ -122,46 +130,56 @@ const createFolder = async () => {
         if (!_isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
         }
-        const createdFolder = await fetcher(params);
-        dashboardPageControlStore.setNewIdList([
-            ...dashboardPageControlState.newIdList,
-            createdFolder.folder_id,
-        ]);
-        showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
-        state.proxyVisible = false;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_CREATE_FOLDER'));
+        createFolder(params);
     }
-};
-const updateFolderName = async () => {
-    try {
-        const _isPrivate = props.folderId?.startsWith('private');
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.update : SpaceConnector.clientV2.dashboard.publicFolder.update;
-        const params: FolderUpdateParams = {
-            folder_id: state.selectedFolder?.folder_id as string,
-            name: name.value as string,
-        };
-        await fetcher(params);
-        state.proxyVisible = false;
-        showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_UPDATE_FOLDER'));
-    }
-};
-
-/* Event */
-const handleFormConfirm = async () => {
-    if (!isAllValid) return;
-    if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
-        await updateFolderName();
-    } else {
-        await createFolder();
-    }
-    await dashboardStore.load();
 };
 const handleUpdatePrivate = (value: boolean) => {
     state.isPrivate = value;
 };
+
+const createFolderFn = (params: PrivateFolderCreateParameters | PublicFolderCreateParameters): Promise<FolderModel> => {
+    const _isPrivate = storeState.isWorkspaceMember ? true : state.isPrivate;
+    if (_isPrivate) {
+        return api.privateFolderAPI.create(params as PrivateFolderCreateParameters);
+    }
+    return api.publicFolderAPI.create(params as PublicFolderCreateParameters);
+};
+const { mutate: createFolder } = useMutation(
+    {
+        mutationFn: createFolderFn,
+        onSuccess: (folder: PublicFolderModel|PrivateFolderModel) => {
+            dashboardPageControlStore.setNewIdList([
+                ...dashboardPageControlState.newIdList,
+                folder.folder_id,
+            ]);
+            showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
+            state.proxyVisible = false;
+
+            const isPrivate = folder.folder_id.startsWith('private');
+            const folderListQueryKey = isPrivate ? keys.privateFolderListQueryKey : keys.publicFolderListQueryKey;
+            queryClient.invalidateQueries({ queryKey: folderListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_CREATE_FOLDER'));
+        },
+    },
+);
+const { mutate: updateFolder } = useMutation(
+    {
+        mutationFn: functions.updateFolderFn,
+        onSuccess: (folder: PublicFolderModel|PrivateFolderModel) => {
+            showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
+            state.proxyVisible = false;
+
+            const isPrivate = folder.folder_id.startsWith('private');
+            const folderListQueryKey = isPrivate ? keys.privateFolderListQueryKey : keys.publicFolderListQueryKey;
+            queryClient.invalidateQueries({ queryKey: folderListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_UPDATE_FOLDER'));
+        },
+    },
+);
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
