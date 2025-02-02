@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
@@ -9,18 +11,19 @@ import { getClonedName } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { DashboardType, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -32,13 +35,14 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 
 type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
+type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 interface Props {
     visible: boolean;
     dashboardId: string;
@@ -50,12 +54,19 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
+
+
+const {
+    publicDashboardItems,
+    privateDashboardItems,
+    keys,
+    api,
+    queryClient,
+} = useDashboardQuery();
+
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
-const dashboardStore = useDashboardStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
 const {
     forms: {
@@ -84,19 +95,24 @@ const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
     dashboardType: computed<DashboardType>(() => {
         if (state.isPrivate) return 'PRIVATE';
         return 'PUBLIC';
     }),
     isPrivate: true,
-    targetDashboard: computed<DashboardModel>(() => dashboardPageControlGetters.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId)),
+    targetDashboard: computed<DashboardModel>(() => [...state.publicDashboardItems, ...state.privateDashboardItems].find((item: DashboardModel) => item.dashboard_id === props.dashboardId)),
     dashboardNameList: computed<string[]>(() => {
         if (props.dashboardId.startsWith('private')) {
-            return dashboardPageControlGetters.privateDashboardItems.map((item) => item.name);
+            return state.privateDashboardItems.map((item) => item.name);
         }
-        return dashboardPageControlGetters.publicDashboardItems.map((item) => item.name);
+        return state.publicDashboardItems.map((item) => item.name);
     }),
 });
 
@@ -121,54 +137,65 @@ const handleUpdateVisible = (visible) => {
     state.proxyVisible = visible;
 };
 
-const cloneDashboard = async (): Promise<string|undefined> => {
-    try {
-        state.loading = true;
-        const _dashboardWidgets = await listDashboardWidgets(props.dashboardId);
-
-        const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, _dashboardWidgets, storeState.costDataSource);
-        const _sharedDashboard: DashboardCreateParameters = {
-            name: name.value,
-            layouts: _sharedLayouts,
-            options: state.targetDashboard.options || {},
-            labels: state.targetDashboard.labels || [],
-            tags: { created_by: userStore.state.userId },
-            vars: state.targetDashboard.vars,
-            vars_schema: state.targetDashboard.vars_schema,
-        };
-        if (storeState.isWorkspaceMember) {
-            state.isPrivate = true;
-        } else if (storeState.isAdminMode) {
-            state.isPrivate = false;
-            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-        } else if (!state.isPrivate) {
-            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = state.targetDashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
-        }
-        const res = await dashboardStore.createDashboard(state.dashboardType, _sharedDashboard);
-        return res.dashboard_id;
-    } catch (e) {
-        showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
-    } finally {
-        state.loading = false;
-    }
-    return undefined;
-};
-
 /* Event */
 const handleChangePrivate = (val: boolean) => {
     state.isPrivate = val;
 };
 const handleConfirm = async () => {
     if (!isAllValid) return;
-    const clonedDashboardId = await cloneDashboard();
-    state.proxyVisible = false;
-    if (clonedDashboardId) {
-        await SpaceRouter.router.push(getProperRouteLocation({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: { dashboardId: clonedDashboardId },
-        }));
+    const _dashboardWidgets = await listDashboardWidgets(props.dashboardId);
+
+    const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, _dashboardWidgets, storeState.costDataSource);
+    const _sharedDashboard: DashboardCreateParameters = {
+        name: name.value,
+        layouts: _sharedLayouts,
+        options: state.targetDashboard.options || {},
+        labels: state.targetDashboard.labels || [],
+        tags: { created_by: userStore.state.userId },
+        vars: state.targetDashboard.vars,
+        vars_schema: state.targetDashboard.vars_schema,
+    };
+    if (storeState.isWorkspaceMember) {
+        state.isPrivate = true;
+    } else if (storeState.isAdminMode) {
+        state.isPrivate = false;
+        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+    } else if (!state.isPrivate) {
+        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = state.targetDashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
     }
+
+    mutate(_sharedDashboard as PrivateDashboardCreateParameters);
 };
+
+const createDashboard = (params: DashboardCreateParameters): Promise<DashboardModel> => {
+    if (state.isPrivate) {
+        return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
+    }
+    return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
+};
+
+const { mutate, isPending: dashboardCloneLoading } = useMutation(
+    {
+        mutationFn: createDashboard,
+        onSuccess: (dashboard: DashboardModel) => {
+            const isPrivate = dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        },
+        onError: (e) => {
+            showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
+        },
+        onSettled(data) {
+            state.proxyVisible = false;
+            if (data?.dashboard_id) {
+                SpaceRouter.router.push(getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: { dashboardId: data.dashboard_id },
+                }));
+            }
+        },
+    },
+);
 
 watch(() => props.visible, (visible) => {
     if (visible) {
@@ -183,7 +210,7 @@ watch(() => props.visible, (visible) => {
                     :header-title="$t('DASHBOARDS.FORM.CLONE_TITLE')"
                     size="sm"
                     :disabled="!isAllValid"
-                    :loading="state.loading"
+                    :loading="dashboardCloneLoading"
                     class="dashboard-clone-modal"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
@@ -207,7 +234,7 @@ watch(() => props.visible, (visible) => {
                            class="mt-6"
             >
                 <p-toggle-button :value="state.isPrivate"
-                                 :disabled="state.loading"
+                                 :disabled="dashboardCloneLoading"
                                  @change-toggle="handleChangePrivate"
                 />
             </p-field-group>
