@@ -18,7 +18,7 @@ export const usePublicDashboardApi = () => {
 
     const actions = {
         async create(params: PublicDashboardCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDashboard.list<PublicDashboardCreateParameters, PublicDashboardModel>(params);
+            return SpaceConnector.clientV2.dashboard.publicDashboard.create<PublicDashboardCreateParameters, PublicDashboardModel>(params);
         },
         async update(params: PublicDashboardUpdateParameters) {
             return SpaceConnector.clientV2.dashboard.publicDashboard.update<PublicDashboardUpdateParameters, PublicDashboardModel>(params);
