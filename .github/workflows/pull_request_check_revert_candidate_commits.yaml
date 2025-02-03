@@ -1,4 +1,4 @@
-name: PR Check revert candidate commits
+name: [Pull Request] Check Revert Candidate Commits
 
 on:
   pull_request:
