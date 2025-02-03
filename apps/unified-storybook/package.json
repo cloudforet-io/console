@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "storybook dev -p 6008",
+    "unified-storybook-dev": "storybook dev -p 6008",
     "build": "storybook build"
   },
   "keywords": [],

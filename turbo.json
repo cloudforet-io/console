@@ -78,6 +78,10 @@
       "persistent": true,
       "cache": false
     },
+    "unified-storybook-dev": {
+      "persistent": true,
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"],
       "outputs": [],
