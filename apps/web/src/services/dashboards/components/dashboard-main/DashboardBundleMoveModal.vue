@@ -4,7 +4,6 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
 } from '@cloudforet/mirinae';
@@ -15,7 +14,6 @@ import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -36,7 +34,6 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 
@@ -44,6 +41,9 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 const {
     publicFolderItems,
     privateFolderItems,
+    api,
+    keys,
+    queryClient,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -101,7 +101,9 @@ const state = reactive({
 const updateDashboard = async (dashboardId: string): Promise<boolean> => {
     try {
         const _isPrivate = dashboardId.startsWith('private');
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateDashboard.changeFolder : SpaceConnector.clientV2.dashboard.publicDashboard.changeFolder;
+        const fetcher = _isPrivate
+            ? api.privateDashboardAPI.changeFolder
+            : api.publicDashboardAPI.changeFolder;
         const params: DashboardChangeFolderParams = {
             dashboard_id: dashboardId,
         };
@@ -125,7 +127,8 @@ const handleFormConfirm = async () => {
     } if (failCount > 0) {
         ErrorHandler.handleRequestError(new Error(''), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_MOVE_DASHBOARD', { count: failCount }));
     }
-    await dashboardStore.load();
+    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
     dashboardPageControlStore.reset();
     state.proxyVisible = false;
 };

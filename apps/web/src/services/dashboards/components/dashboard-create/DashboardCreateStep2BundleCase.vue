@@ -18,7 +18,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -44,7 +43,6 @@ const TABLE_FIELDS = [
 ];
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
@@ -55,6 +53,9 @@ const userStore = useUserStore();
 const {
     publicDashboardItems,
     privateDashboardItems,
+    keys,
+    api,
+    queryClient,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -125,7 +126,10 @@ const createBundleOotb = async () => {
         if (storeState.isWorkspaceMember) {
             _createType = 'PRIVATE';
         }
-        _promises.push(dashboardStore.createDashboard(_createType, _dashboardParams));
+        const fetcher = _createType === 'PRIVATE'
+            ? api.privateDashboardAPI.create
+            : api.publicDashboardAPI.create;
+        _promises.push(fetcher(_dashboardParams));
     }));
     const _results = await Promise.allSettled(_promises);
     const _fulfilledResults = _results.filter((r) => r.status === 'fulfilled');
@@ -148,7 +152,8 @@ const handleChangePrivate = (id: string, value: boolean) => {
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
     await createBundleOotb();
-    await dashboardStore.load();
+    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
     await SpaceRouter.router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE._NAME,
     }));
