@@ -1,0 +1,26 @@
+# SpaceONE Unified Storybook Overview
+<br/><br/>
+
+## Introduction
+This Storybook integrates both the **Web Console Storybook** and the **Universal Component Library (Mirinae) Storybook** into a single system.
+<br/><br/>
+
+## Components
+<br/>
+
+### Universal Component Library Storybook
+|  | Role | Framework |
+|------|------------------------------------------------|----------------|
+| Mirinae | Provides common UI components that can be reused across various web projects. | Vue 2.7 + Composition API (Vite-based) |
+
+### Project Storybook
+|  | Role | Framework |
+|------|------------------------------------------------|----------------|
+| Web Console | Provides project-specific components and hooks used in the web console. | Vue 2.7 + Composition API (Vite-based, project-specific configurations applied) |
+
+## Purpose
+This unified Storybook aims to achieve the following goals:
+1. **Consistent Component Management**: Systematically manages both universal and project-specific components, ensuring reliable component state management for planners, designers, and developers alike.
+2. **Maximizing Reusability**: Supports maintaining a consistent UI guide across various projects by leveraging universal components.
+3. **Scalability and Integration**: Designed to seamlessly integrate additional project-specific Storybooks and new universal component libraries in the future.
+4. **Testing and Documentation**: Facilitates safe usage of components by providing comprehensive testing and documentation for developers.
