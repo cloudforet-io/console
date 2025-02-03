@@ -6,18 +6,16 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/update';
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import { usePrivateFolderApi } from '@/api-clients/dashboard/private-folder/composables/use-private-folder-api';
 import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
-import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
-import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -25,10 +23,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-type DashboardUpdateParameters = PrivateDashboardUpdateParameters | PublicDashboardUpdateParameters;
-type FolderUpdateParameters = PrivateFolderUpdateParameters | PublicFolderUpdateParameters;
-type DashboardModel = PrivateDashboardModel | PublicDashboardModel;
-type FolderModel = PrivateFolderModel | PublicFolderModel;
 
 export const useDashboardQuery = () => {
     const { publicDashboardAPI, publicDashboardListQueryKey } = usePublicDashboardApi();
@@ -136,14 +130,14 @@ export const useDashboardQuery = () => {
     });
 
     /* Functions */
-    const updateDashboardFn = (params: DashboardUpdateParameters): Promise<DashboardModel> => {
+    const updateDashboardFn = (params: DashboardUpdateParams): Promise<DashboardModel> => {
         const _isPrivate = params.dashboard_id.startsWith('private');
         if (_isPrivate) {
             return privateDashboardAPI.update(params as PrivateDashboardUpdateParameters);
         }
         return publicDashboardAPI.update(params as PublicDashboardUpdateParameters);
     };
-    const updateFolderFn = (params: FolderUpdateParameters): Promise<FolderModel> => {
+    const updateFolderFn = (params: FolderUpdateParams): Promise<FolderModel> => {
         const _isPrivate = params.folder_id.startsWith('private');
         if (_isPrivate) {
             return privateFolderAPI.update(params as PrivateFolderUpdateParameters);

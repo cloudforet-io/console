@@ -11,13 +11,11 @@ import { getClonedName } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -41,8 +39,6 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
 
-type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
-type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 interface Props {
     visible: boolean;
     dashboardId: string;
@@ -146,7 +142,7 @@ const handleConfirm = async () => {
     const _dashboardWidgets = await listDashboardWidgets(props.dashboardId);
 
     const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, _dashboardWidgets, storeState.costDataSource);
-    const _sharedDashboard: DashboardCreateParameters = {
+    const _sharedDashboard: DashboardCreateParams = {
         name: name.value,
         layouts: _sharedLayouts,
         options: state.targetDashboard.options || {},
@@ -167,7 +163,7 @@ const handleConfirm = async () => {
     mutate(_sharedDashboard as PrivateDashboardCreateParameters);
 };
 
-const createDashboard = (params: DashboardCreateParameters): Promise<DashboardModel> => {
+const createDashboard = (params: DashboardCreateParams): Promise<DashboardModel> => {
     if (state.isPrivate) {
         return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
     }

@@ -7,8 +7,7 @@ import { useMutation } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,7 +20,6 @@ import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboa
 
 
 
-type DashboardModel = PrivateDashboardModel | PublicDashboardModel;
 interface Props {
     visible: boolean;
     dashboardId: string;

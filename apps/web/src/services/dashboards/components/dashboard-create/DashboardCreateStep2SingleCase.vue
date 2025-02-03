@@ -12,13 +12,11 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { DashboardCreateParams, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     PrivateDashboardCreateParameters,
 } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -38,9 +36,6 @@ import {
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-
-type DashboardCreateParameters = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
-type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
 
 interface Props {
     isValid: boolean;
@@ -131,7 +126,7 @@ const {
 });
 
 /* Api */
-const createDashboard = (params: DashboardCreateParameters): Promise<DashboardModel> => {
+const createDashboard = (params: DashboardCreateParams): Promise<DashboardModel> => {
     if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
         return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
     }
@@ -176,7 +171,7 @@ const handleConfirm = async () => {
     } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
         (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
     }
-    mutate(_dashboardParams as DashboardCreateParameters);
+    mutate(_dashboardParams as DashboardCreateParams);
 };
 
 /* Watcher */

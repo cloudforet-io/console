@@ -15,8 +15,7 @@ import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mir
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,7 +29,6 @@ import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboa
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
-type DashboardModel = PrivateDashboardModel | PublicDashboardModel;
 interface VariableMenuItem extends MenuItem {
     use?: boolean;
 }

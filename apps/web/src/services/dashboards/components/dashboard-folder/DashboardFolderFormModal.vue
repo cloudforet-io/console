@@ -10,11 +10,10 @@ import {
 } from '@cloudforet/mirinae';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { FolderCreateParams, FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
 import type { PrivateFolderCreateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/create';
-import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
-import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
@@ -31,11 +30,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
-
-
-type FolderModel = PublicFolderModel | PrivateFolderModel;
-type FolderCreateParams = PublicFolderCreateParameters | PrivateFolderCreateParameters;
-type FolderUpdateParams = PublicFolderUpdateParameters | PrivateFolderUpdateParameters;
 interface Props {
     visible: boolean;
     folderId?: string;

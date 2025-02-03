@@ -12,8 +12,7 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import { getClonedName } from '@cloudforet/utils';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -39,7 +38,6 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 
-type DashboardModel = PrivateDashboardModel | PublicDashboardModel;
 interface GlobalVariableTableItem {
     key: string;
     name: string;
