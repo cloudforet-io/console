@@ -37,7 +37,7 @@ const state = reactive({
                 :pair-config="{ keyLabel: 'from', valueLabel: 'to' }"
                 :i18n-labels="state.i18nLabels"
                 class="service-detail-tabs-webhook-detail-message-overlay"
-                is-long-value
+                is-block
                 @confirm="emit('confirm', $event)"
                 @close="emit('close')"
     >
