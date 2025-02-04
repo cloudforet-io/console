@@ -2,9 +2,12 @@ import { cloneDeep, isEmpty, isEqual } from 'lodash';
 
 import { isObjectEqual } from '@cloudforet/utils';
 
+import type { DashboardLayoutWidgetInfo } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     InheritOptions, WidgetConfig, WidgetFiltersMap, WidgetOptions,
 } from '@/api-clients/dashboard/_types/widget-type';
+
+import getRandomId from '@/lib/random-id-generator';
 
 import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
@@ -67,3 +70,9 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
         schema_properties: schemaProperties.length ? schemaProperties : undefined,
     };
 };
+
+// only for 1.0 legacy dashboard
+export const getDashboardWidgetInfoList = (widgets: DashboardLayoutWidgetInfo[] = []) => widgets.map((info) => ({
+    ...info,
+    widget_key: info.widget_key ?? getRandomId(),
+})) ?? [];
