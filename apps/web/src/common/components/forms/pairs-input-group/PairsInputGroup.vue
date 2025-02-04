@@ -25,6 +25,7 @@ const props = withDefaults(defineProps<{
     isAdministration?: boolean;
     pairConfig?: PairConfig;
     i18nLabels?: I18nLabels;
+    isBlock?: boolean;
 }>(), {
     pairs: () => ({}),
     disabled: false,
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<{
         KEY_LABEL: i18n.t('COMMON.TAGS.KEY'),
         VALUE_LABEL: i18n.t('COMMON.TAGS.VALUE'),
     }),
+    isBlock: false,
 });
 
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
@@ -151,6 +153,7 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
         </slot>
         <div v-if="props.showHeader"
              class="pair-header"
+             :class="{ 'is-block': props.isBlock }"
         >
             <div class="key">
                 <span>{{ props.i18nLabels?.KEY_LABEL || '' }}</span>
@@ -163,6 +166,7 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
             <div v-for="(item, idx) in state.items"
                  :key="idx"
                  class="pair-group"
+                 :class="{ 'is-block': props.isBlock }"
             >
                 <p-field-group :invalid-text="state.keyValidations[idx].message"
                                :invalid="props.showValidation && !state.keyValidations[idx].isValid"
@@ -173,6 +177,7 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
                                       :invalid="invalid"
                                       :placeholder="props.pairConfig.keyLabel"
                                       :disabled="props.disabled"
+                                      :block="props.isBlock"
                                       @update:value="handleInputKeySection(idx, ...arguments)"
                         />
                     </template>
@@ -187,6 +192,7 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
                                       :invalid="invalid"
                                       :placeholder="props.pairConfig.valueLabel"
                                       :disabled="props.disabled"
+                                      :block="props.isBlock"
                                       @update:value="handleInputValueSection(idx, ...arguments)"
                         />
                     </template>
@@ -215,6 +221,14 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
             @apply inline-block font-bold pl-2;
             width: 20rem;
         }
+        &.is-block {
+            .key {
+                width: 49%;
+            }
+            .value {
+                width: 51%;
+            }
+        }
     }
     .pair-group {
         display: flex;
@@ -229,11 +243,20 @@ const stopPairInit = watch(() => props.pairs, (pairs) => {
             &.value {
                 width: 20rem;
             }
-
             .p-text-input {
                 width: 100%;
                 &.invalid {
                     @apply border border-alert;
+                }
+            }
+        }
+        &.is-block {
+            .input-box {
+                &.key {
+                    width: 100%;
+                }
+                &.value {
+                    width: 100%;
                 }
             }
         }
