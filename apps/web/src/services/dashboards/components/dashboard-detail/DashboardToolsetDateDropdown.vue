@@ -18,7 +18,8 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateCustomModal.vue';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
@@ -32,15 +33,19 @@ const props = withDefaults(defineProps<Props>(), {
 const { i18nDayjs } = useI18nDayjs();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
 /* Query */
 const {
+    dashboard,
+    fetcher,
     keys,
-    functions,
     queryClient,
-} = useDashboardQuery();
-
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
@@ -107,11 +112,11 @@ const handleSelectMonthMenuItem = (selected: string) => {
         updateDashboardDateRange(state.selectedDateRange);
     }
 
-    if (!dashboardDetailGetters.disableManageButtons && !props.widgetMode) {
+    if (isManageable.value && !props.widgetMode) {
         mutate({
             dashboard_id: dashboardDetailState.dashboardId,
             options: {
-                ...dashboardDetailGetters.dashboardInfo?.options || {},
+                ...(dashboard.value?.options || {}),
                 date_range: state.selectedDateRange,
             },
         });
@@ -154,11 +159,11 @@ const setInitialDateRange = () => {
 
 const { mutate } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
     },
 );

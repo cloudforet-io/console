@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -16,6 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -37,9 +39,15 @@ const {
     publicDashboardItems,
     privateDashboardItems,
     keys,
-    functions,
     queryClient,
 } = useDashboardQuery();
+const {
+    fetcher,
+    keys: dashboardDetailKeys,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const route = useRoute();
 
 const appContextStore = useAppContextStore();
 const {
@@ -81,15 +89,20 @@ const state = reactive({
         if (props.dashboardId.startsWith('private')) return state.privateDashboardItems.map((d) => d.name);
         return state.publicDashboardItems.map((d) => d.name);
     }),
+    isDetailPage: computed(() => route.params.dashboardId !== undefined),
 });
 
 const { mutate, isPending: loading } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: DashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: DashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
             const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
             queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+            if (state.isDetailPage) {
+                const dashboardQueryKey = isPrivate ? dashboardDetailKeys.privateDashboardQueryKey : dashboardDetailKeys.publicDashboardQueryKey;
+                queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            }
         },
         onError: (e) => {
             ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));

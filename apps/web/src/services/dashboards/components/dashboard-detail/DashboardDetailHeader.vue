@@ -19,6 +19,8 @@ import { gray } from '@/styles/colors';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -32,7 +34,6 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
@@ -44,6 +45,13 @@ const {
     publicFolderItems,
     privateFolderItems,
 } = useDashboardQuery();
+
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => props.dashboardId),
+});
 
 const queryState = reactive({
     publicDashboardItems: computed(() => {
@@ -70,16 +78,17 @@ const { getControlMenuItems } = useDashboardControlMenuItems({
     isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
 });
 const state = reactive({
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared),
-    sharedScope: computed<DashboardScope|undefined>(() => dashboardDetailGetters.dashboardInfo?.scope),
+    isPrivate: computed<boolean>(() => !!dashboard.value?.dashboard_id.startsWith('private')),
+    isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared),
+    sharedScope: computed<DashboardScope|undefined>(() => dashboard.value?.scope),
     selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
-        if (dashboardDetailGetters.dashboardInfo?.user_id) return true;
+        if (dashboard.value?.user_id) return true;
         return state.isSharedDashboard;
     }),
     badgeType: computed<BadgeType>(() => 'subtle'),
     badgeStyleType: computed<BadgeStyleType>(() => {
-        if (dashboardDetailGetters.isPrivate) return 'gray150';
+        if (state.isPrivate) return 'gray150';
         if (state.sharedScope === 'PROJECT') return 'primary3';
         return 'indigo100';
     }),
@@ -87,7 +96,7 @@ const state = reactive({
         if (dashboardDetailState.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
-                if (dashboardDetailGetters.dashboardInfo?.scope === 'PROJECT') {
+                if (dashboard.value?.scope === 'PROJECT') {
                     return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
                 }
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
@@ -129,8 +138,8 @@ const handleSelectItem = (item: MenuItem) => {
         </div>
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading :title="dashboardDetailGetters.dashboardName">
-                    <p-skeleton v-if="!dashboardDetailGetters.dashboardName"
+                <p-heading :title="dashboard?.name">
+                    <p-skeleton v-if="!dashboard?.name"
                                 width="20rem"
                                 height="1.5rem"
                     />
@@ -140,7 +149,7 @@ const handleSelectItem = (item: MenuItem) => {
                                  :style-type="state.badgeStyleType"
                                  class="mr-2"
                         >
-                            <p-i v-if="dashboardDetailGetters.isPrivate"
+                            <p-i v-if="state.isPrivate"
                                  name="ic_lock-filled"
                                  width="0.75rem"
                                  height="0.75rem"
@@ -165,12 +174,12 @@ const handleSelectItem = (item: MenuItem) => {
                     </template>
                 </p-heading>
             </template>
-            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
+            <template v-if="dashboard?.version !== '1.0'"
                       #extra
             >
-                <dashboard-control-buttons v-if="!dashboardDetailGetters.disableManageButtons"
+                <dashboard-control-buttons v-if="isManageable"
                                            :dashboard-id="props.dashboardId"
-                                           :name="dashboardDetailGetters.dashboardName"
+                                           :name="dashboard?.name"
                 />
             </template>
         </p-heading-layout>

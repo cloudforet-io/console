@@ -52,7 +52,7 @@ const {
     privateFolderItems,
     keys,
     api,
-    functions,
+    fetcher,
     queryClient,
 } = useDashboardQuery();
 
@@ -160,7 +160,7 @@ const { mutate: createFolder } = useMutation(
 );
 const { mutate: updateFolder } = useMutation(
     {
-        mutationFn: functions.updateFolderFn,
+        mutationFn: fetcher.updateFolderFn,
         onSuccess: (folder: PublicFolderModel|PrivateFolderModel) => {
             showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
             state.proxyVisible = false;

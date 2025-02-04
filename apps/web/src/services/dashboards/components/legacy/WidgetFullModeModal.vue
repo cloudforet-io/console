@@ -22,6 +22,8 @@ import { gray } from '@/styles/colors';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { getDashboardWidgetInfoList } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -55,6 +57,11 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormGetters = widgetFormStore.getters;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
     loadingWidget: true,
@@ -66,7 +73,8 @@ const state = reactive({
     hasNonInheritedWidgetOptions: false,
     originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
         if (!props.widgetKey) return undefined;
-        return dashboardDetailGetters.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
+        const widgetInfoList = getDashboardWidgetInfoList((dashboard.value?.layouts?.[0].widgets as DashboardLayoutWidgetInfo[]) || []);
+        return widgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
     }),
     hideDateDropdown: computed<boolean>(() => widgetFormGetters.widgetConfig?.options?.data_criteria === 'realtime'),
 });

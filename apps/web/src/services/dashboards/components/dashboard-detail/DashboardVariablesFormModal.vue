@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable, ManualVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariableSchemaProperties } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
@@ -25,7 +26,7 @@ import DashboardVariablesFormDynamic
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormDynamic.vue';
 import DashboardVariablesFormManual
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormManual.vue';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 type ManualVariableData = Omit<ManualVariable, 'management'|'key'|'name'|'method'>;
@@ -50,14 +51,16 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const userStore = useUserStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
 /* Query */
 const {
+    dashboard,
+    fetcher,
     keys,
-    functions,
     queryClient,
-} = useDashboardQuery();
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -70,17 +73,18 @@ const state = reactive({
         if (state.selectedMethod === METHOD_TYPE.MANUAL_ENTRY) return state.isManualFormValid;
         return state.isDynamicFormValid;
     }),
+    dashboardVarsSchemaProperties: computed<DashboardGlobalVariableSchemaProperties>(() => dashboard.value?.vars_schema?.properties || {}),
     targetVariable: computed<DashboardGlobalVariable|undefined>(() => {
         if (props.modalType === 'CREATE' || !props.variableKey || !props.visible) return undefined;
-        return cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey]);
+        return cloneDeep(state.dashboardVarsSchemaProperties[props.variableKey]);
     }),
     existingVariableNameList: computed<string[]>(() => {
-        const _nameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
+        const _nameList: string[] = Object.values(state.dashboardVarsSchemaProperties).map((d) => d.name);
         if (props.modalType === 'CREATE' || !state.targetVariable) return _nameList;
         return _nameList.filter((d) => d !== state.targetVariable?.name);
     }),
     existingVariableKeyList: computed<string[]>(() => {
-        const _keyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.key);
+        const _keyList: string[] = Object.values(state.dashboardVarsSchemaProperties).map((d) => d.key);
         if (props.modalType === 'CREATE' || !state.targetVariable) return _keyList;
         return _keyList.filter((d) => d !== state.targetVariable?.key);
     }),
@@ -89,7 +93,7 @@ const state = reactive({
     isDynamicFormValid: false,
     showUpdateWarning: computed<boolean>(() => {
         if (props.modalType === 'CREATE') return false;
-        const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
+        const _varsKeys = Object.keys(dashboard.value?.vars || {});
         return _varsKeys.includes(props.variableKey || '');
     }),
     //
@@ -176,7 +180,7 @@ const createDashboardVarsSchema = (dashboardId: string) => {
         dashboard_id: dashboardId,
         vars_schema: {
             properties: {
-                ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                ...state.dashboardVarsSchemaProperties,
                 [state.dashboardGlobalVariable.key]: {
                     ...state.dashboardGlobalVariable,
                     use: true,
@@ -189,14 +193,14 @@ const createDashboardVarsSchema = (dashboardId: string) => {
 const updateDashboardVarsSchema = (dashboardId: string) => {
     const _originalKey = state.targetVariable?.key;
     if (!_originalKey) return;
-    const _newVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+    const _newVarsSchemaProperties = cloneDeep(state.dashboardVarsSchemaProperties);
     delete _newVarsSchemaProperties[_originalKey];
     _newVarsSchemaProperties[state.dashboardGlobalVariable.key] = {
         ...state.dashboardGlobalVariable,
         use: state.targetVariable?.use || false,
         created_by: state.targetVariable?.created_by,
     };
-    const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+    const _vars = cloneDeep(dashboard.value?.vars || {});
     const _tempVars = cloneDeep(dashboardDetailState.vars);
     delete _vars[_originalKey];
     delete _tempVars[_originalKey];
@@ -212,11 +216,11 @@ const updateDashboardVarsSchema = (dashboardId: string) => {
 
 const { mutate, isPending: loading } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             showSuccessMessage(state.variableFormSuccessMessage, '');
         },
         onError: (e) => {
@@ -248,7 +252,7 @@ const handleChangeMethod = (method: MethodType) => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
         if (props.modalType === 'UPDATE' && props.variableKey) {
-            const _targetProperty = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[props.variableKey]);
+            const _targetProperty = cloneDeep(state.dashboardVarsSchemaProperties[props.variableKey]);
             if (isEmpty(_targetProperty)) return;
             initSelectedVariable(_targetProperty);
         }

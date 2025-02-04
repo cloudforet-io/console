@@ -2,6 +2,7 @@
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
+    computed,
     reactive, watch,
 } from 'vue';
 
@@ -13,6 +14,7 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -40,7 +42,11 @@ const {
 });
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
+
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const state = reactive({
     labelList: [] as string[],
@@ -67,7 +73,8 @@ const handleDelete = (index: number) => {
     emit('update-labels', state.labelList);
 };
 
-watch(() => dashboardDetailGetters.dashboardLabels, (val) => {
+watch(() => dashboard.value?.labels, (val) => {
+    if (!val) return;
     state.labelList = val;
 }, { immediate: true });
 </script>

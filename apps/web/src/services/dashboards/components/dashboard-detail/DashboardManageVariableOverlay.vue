@@ -12,7 +12,10 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 import { getClonedName } from '@cloudforet/utils';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type {
+    DashboardGlobalVariableSchemaProperties,
+    DashboardModel,
+} from '@/api-clients/dashboard/_types/dashboard-type';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -28,7 +31,7 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
@@ -52,15 +55,17 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const userStore = useUserStore();
 
 /* Query */
 const {
+    dashboard,
     keys,
-    functions,
+    fetcher,
     queryClient,
-} = useDashboardQuery();
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
@@ -73,8 +78,9 @@ const state = reactive({
     thisPage: 1,
     pageSize: 15,
     searchText: '',
+    dashboardVarsSchemaProperties: computed<DashboardGlobalVariableSchemaProperties>(() => dashboard.value?.vars_schema?.properties ?? {}),
     globalVariablesTableItems: computed<GlobalVariableTableItem[]>(() => {
-        const _properties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _properties: DashboardGlobalVariable[] = Object.values(state.dashboardVarsSchemaProperties);
         const _orderedProperties = getOrderedGlobalVariables(_properties);
         return _orderedProperties.map((d) => ({
             ...d,
@@ -96,7 +102,7 @@ const state = reactive({
         { name: 'buttons', label: ' ', width: '144px' },
     ] as DataTableField[],
     showDeleteWarning: computed<boolean>(() => {
-        const _varsKeys = Object.keys(dashboardDetailGetters.dashboardInfo?.vars || {});
+        const _varsKeys = Object.keys(dashboard.value?.vars || {});
         return _varsKeys.includes(state.selectedVariableKey);
     }),
     actionType: 'DELETE' as 'DELETE'|'CLONE'|'UPDATE',
@@ -125,9 +131,9 @@ const isPresetVarsSchemaProperty = (key: string): boolean => {
 
 /* Api */
 const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
-    const _varsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+    const _varsSchemaProperties = cloneDeep(state.dashboardVarsSchemaProperties);
     delete _varsSchemaProperties[variableKey];
-    const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+    const _vars = cloneDeep(dashboard.value?.vars || {});
     const _tempVars = cloneDeep(dashboardDetailState.vars);
     delete _vars[variableKey];
     delete _tempVars[variableKey];
@@ -141,16 +147,16 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
     });
 };
 const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
-    const _clonedProperty = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey]);
-    const _varsNameList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.name);
-    const _varsKeyList: string[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties).map((d) => d.key);
+    const _clonedProperty = cloneDeep(state.dashboardVarsSchemaProperties[variableKey]);
+    const _varsNameList: string[] = Object.values(state.dashboardVarsSchemaProperties).map((d) => d.name);
+    const _varsKeyList: string[] = Object.values(state.dashboardVarsSchemaProperties).map((d) => d.key);
     _clonedProperty.key = getClonedName(_varsKeyList, _clonedProperty.key, 'clone_');
     _clonedProperty.name = getClonedName(_varsNameList, _clonedProperty.name);
     mutate({
         dashboard_id: dashboardId,
         vars_schema: {
             properties: {
-                ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                ...state.dashboardVarsSchemaProperties,
                 [_clonedProperty.key]: {
                     ..._clonedProperty,
                     use: false,
@@ -161,7 +167,7 @@ const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string
     });
 };
 const updateUseDashboardVarsSchema = (dashboardId: string, variableKey: string, use: boolean) => {
-    const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+    const _vars = cloneDeep(dashboard.value?.vars || {});
     const _tempVars = cloneDeep(dashboardDetailState.vars);
     delete _vars[variableKey];
     delete _tempVars[variableKey];
@@ -170,9 +176,9 @@ const updateUseDashboardVarsSchema = (dashboardId: string, variableKey: string, 
         dashboard_id: dashboardId,
         vars_schema: {
             properties: {
-                ...dashboardDetailGetters.dashboardVarsSchemaProperties,
+                ...state.dashboardVarsSchemaProperties,
                 [variableKey]: {
-                    ...dashboardDetailGetters.dashboardVarsSchemaProperties[variableKey],
+                    ...state.dashboardVarsSchemaProperties[variableKey],
                     use,
                 },
             },
@@ -183,11 +189,11 @@ const updateUseDashboardVarsSchema = (dashboardId: string, variableKey: string, 
 
 const { mutate } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: DashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: DashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             showSuccessMessage(state.successMessage, '');
         },
         onError: (e) => {

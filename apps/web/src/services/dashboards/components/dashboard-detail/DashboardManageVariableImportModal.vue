@@ -24,6 +24,7 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -36,21 +37,24 @@ interface Props {
 const appContextStore = useAppContextStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
-
 /* Query */
 const {
     publicDashboardItems,
     privateDashboardItems,
     publicFolderItems,
     privateFolderItems,
-    keys,
-    functions,
-    queryClient,
 } = useDashboardQuery();
+const {
+    dashboard,
+    fetcher,
+    keys,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -59,7 +63,7 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     currentDashboardId: computed<string>(() => dashboardDetailState.dashboardId || ''),
-    currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties)),
+    currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboard.value?.vars_schema?.properties ?? {})),
     keyword: '',
     selectedDashboardId: '' as string|undefined,
     publicDashboardItems: computed<PublicDashboardModel[]>(() => {
@@ -93,11 +97,11 @@ const state = reactive({
 /* Api */
 const { mutate } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
         },
         onError: (e) => {
@@ -120,7 +124,7 @@ const handleClickClearAll = () => {
     state.selectedVariableKeys = [];
 };
 const handleConfirmImportVariables = () => {
-    const _dashboardVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+    const _dashboardVarsSchemaProperties = cloneDeep(dashboard.value?.vars_schema?.properties ?? {});
     state.selectedDashboardVariables
         .filter((variable) => state.selectedVariableKeys.includes(variable.key))
         .forEach((variable) => {

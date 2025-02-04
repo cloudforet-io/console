@@ -8,14 +8,18 @@ import { debounce } from 'lodash';
 
 import { PDataLoader } from '@cloudforet/mirinae';
 
+import type { DashboardLayoutWidgetInfo } from '@/api-clients/dashboard/_types/dashboard-type';
+
 import WidgetFullModeModal from '@/services/dashboards/components/legacy/WidgetFullModeModal.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import type { ReformedWidgetInfo } from '@/services/dashboards/composables/use-reformed-widget-info-list';
 import {
     useReformedWidgetInfoList,
 } from '@/services/dashboards/composables/use-reformed-widget-info-list';
+import { getDashboardWidgetInfoList } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -29,6 +33,9 @@ type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
@@ -46,7 +53,7 @@ const { containerWidth } = useDashboardContainerWidth({ containerRef, observeRes
 
 /* reform widget info list */
 const { reformedWidgetInfoList } = useReformedWidgetInfoList({
-    dashboardWidgetInfoList: computed(() => dashboardDetailGetters.dashboardWidgetInfoList),
+    dashboardWidgetInfoList: computed(() => getDashboardWidgetInfoList((dashboard.value?.layouts?.[0].widgets as DashboardLayoutWidgetInfo[]) || [])),
     containerWidth,
 });
 
