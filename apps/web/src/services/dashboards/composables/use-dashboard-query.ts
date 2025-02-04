@@ -6,14 +6,11 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
-import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/update';
 import { usePrivateFolderApi } from '@/api-clients/dashboard/private-folder/composables/use-private-folder-api';
 import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
-import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 
@@ -25,8 +22,8 @@ import { useUserStore } from '@/store/user/user-store';
 
 
 export const useDashboardQuery = () => {
-    const { publicDashboardAPI, publicDashboardListQueryKey } = usePublicDashboardApi();
-    const { privateDashboardAPI, privateDashboardListQueryKey } = usePrivateDashboardApi();
+    const { publicDashboardAPI, publicDashboardListQueryKey, publicDashboardQueryKey } = usePublicDashboardApi();
+    const { privateDashboardAPI, privateDashboardListQueryKey, privateDashboardQueryKey } = usePrivateDashboardApi();
     const { publicFolderAPI, publicFolderListQueryKey } = usePublicFolderApi();
     const { privateFolderAPI, privateFolderListQueryKey } = usePrivateFolderApi();
     const queryClient = useQueryClient();
@@ -129,14 +126,7 @@ export const useDashboardQuery = () => {
         enabled: computed(() => !_state.isAdminMode),
     });
 
-    /* Functions */
-    const updateDashboardFn = (params: DashboardUpdateParams): Promise<DashboardModel> => {
-        const _isPrivate = params.dashboard_id.startsWith('private');
-        if (_isPrivate) {
-            return privateDashboardAPI.update(params as PrivateDashboardUpdateParameters);
-        }
-        return publicDashboardAPI.update(params as PublicDashboardUpdateParameters);
-    };
+    /* Fetchers */
     const updateFolderFn = (params: FolderUpdateParams): Promise<FolderModel> => {
         const _isPrivate = params.folder_id.startsWith('private');
         if (_isPrivate) {
@@ -171,9 +161,10 @@ export const useDashboardQuery = () => {
             privateDashboardListQueryKey: _privateDashboardListQueryKey,
             publicFolderListQueryKey: _publicFolderListQueryKey,
             privateFolderListQueryKey: _privateFolderListQueryKey,
+            publicDashboardQueryKey,
+            privateDashboardQueryKey,
         },
-        functions: {
-            updateDashboardFn,
+        fetcher: {
             updateFolderFn,
         },
         api: {
