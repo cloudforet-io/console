@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -12,8 +12,8 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 
 
 
@@ -22,19 +22,24 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const labelPopoverRef = ref<HTMLElement|null>(null);
 
 /* Query */
 const {
+    dashboard,
+    fetcher,
     keys,
-    functions,
     queryClient,
-} = useDashboardQuery();
-
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => props.dashboardId),
+});
 const state = reactive({
     visible: false,
+    dashboardLabels: computed<string[]>(() => dashboard.value?.labels || []),
+    isDeprecatedDashboard: computed(() => dashboard.value?.version === '1.0'),
 });
 
 const handleUpdateLabels = async (labels: string[]) => {
@@ -46,11 +51,11 @@ const handleUpdateLabels = async (labels: string[]) => {
 
 const { mutate } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
         onError: (e) => {
             ErrorHandler.handleError(e);
@@ -75,17 +80,17 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
             >
                 <div class="button-contents-wrapper">
                     <span class="button-text">{{ $t('Label') }}</span>
-                    <p-badge v-if="dashboardDetailGetters.dashboardLabels.length > 0"
+                    <p-badge v-if="state.dashboardLabels.length > 0"
                              style-type="gray200"
                              badge-type="subtle"
                     >
-                        +{{ dashboardDetailGetters.dashboardLabels.length }}
+                        +{{ state.dashboardLabels.length }}
                     </p-badge>
                 </div>
             </p-button>
             <template #content>
                 <div class="content-wrapper">
-                    <dashboard-labels :editable="!dashboardDetailGetters.isDeprecatedDashboard && !dashboardDetailGetters.disableManageButtons"
+                    <dashboard-labels :editable="!state.isDeprecatedDashboard && isManageable"
                                       @update-labels="handleUpdateLabels"
                     />
                 </div>

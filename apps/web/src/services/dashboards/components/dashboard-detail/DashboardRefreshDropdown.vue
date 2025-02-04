@@ -16,7 +16,8 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -37,14 +38,16 @@ const emit = defineEmits<{(e: 'refresh'): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
 /* Query */
 const {
-    keys,
-    functions,
-    queryClient,
-} = useDashboardQuery();
+    dashboard, keys, fetcher, queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => props.dashboardId),
+});
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -100,11 +103,11 @@ const handleSelectRefreshIntervalOption = (option) => {
     clearRefreshInterval();
     executeRefreshInterval();
 
-    if (!dashboardDetailGetters.disableManageButtons) {
+    if (isManageable.value) {
         mutate({
             dashboard_id: dashboardDetailState.dashboardId,
             options: {
-                ...dashboardDetailGetters.dashboardInfo?.options || {},
+                ...(dashboard.value?.options || {}),
                 refresh_interval_option: option,
             },
         });
@@ -113,11 +116,11 @@ const handleSelectRefreshIntervalOption = (option) => {
 
 const { mutate } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
     },
 );

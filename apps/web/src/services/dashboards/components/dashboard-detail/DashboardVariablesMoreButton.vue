@@ -15,7 +15,7 @@ import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mir
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { DashboardGlobalVariableSchemaProperties, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,7 +23,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -42,25 +42,26 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 /* Query */
 const {
+    dashboard,
+    fetcher,
     keys,
-    functions,
     queryClient,
-} = useDashboardQuery();
-
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any | null,
     searchText: '',
-    varsSchemaProperties: computed(() => ({})),
+    dashboardVarsSchemaProperties: computed<DashboardGlobalVariableSchemaProperties>(() => dashboard.value?.vars_schema?.properties || {}),
     variableList: computed<VariableMenuItem[]>(() => {
-        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(state.dashboardVarsSchemaProperties);
         const _orderedVariables = getOrderedGlobalVariables(_refinedProperties);
         return _orderedVariables.map((property) => ({
             name: property.key,
@@ -69,6 +70,7 @@ const state = reactive({
         }));
     }),
     selected: computed<VariableMenuItem[]>(() => state.variableList.filter((item) => item.use)),
+    isDeprecatedDashboard: computed(() => dashboard.value?.version === '1.0'),
 });
 
 const {
@@ -95,9 +97,9 @@ onClickOutside(containerRef, hideContextMenu);
 
 /* Api */
 const toggleUseDashboardVarsSchema = debounce((dashboardId: string, variableKey: string) => {
-    const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
+    const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(state.dashboardVarsSchemaProperties);
     const _use = !_dashboardVarsSchemaProperties[variableKey].use;
-    const _vars = cloneDeep(dashboardDetailGetters.dashboardInfo?.vars || {});
+    const _vars = cloneDeep(dashboard.value?.vars || {});
     const _tempVars = cloneDeep(dashboardDetailState.vars);
     if (!_use) {
         delete _vars[variableKey];
@@ -121,11 +123,11 @@ const toggleUseDashboardVarsSchema = debounce((dashboardId: string, variableKey:
 
 const { mutate, isPending: loading } = useMutation(
     {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: DashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: DashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
         },
         onError: (e) => {
@@ -198,7 +200,7 @@ const {
                         @select="handleSelectVariable"
                         @update:search-text="handleUpdateSearchText"
         >
-            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard && !props.widgetMode"
+            <template v-if="!state.isDeprecatedDashboard && !props.widgetMode"
                       #bottom
             >
                 <p-button class="manage-variable-button"

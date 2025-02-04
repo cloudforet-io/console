@@ -28,7 +28,6 @@ import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/publi
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -52,7 +51,8 @@ import DashboardReorderSidebar from '@/services/dashboards/components/dashboard-
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -70,7 +70,6 @@ type RefinedWidgetInfo = WidgetModel & {
     component: AsyncComponent|null;
 };
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
@@ -86,11 +85,19 @@ const widgetRef = ref<Array<WidgetComponent|null>>([]);
 
 /* Query */
 const {
+    dashboard,
+    widgetList,
     keys,
-    functions,
+    api,
+    isLoading,
+    fetcher,
     queryClient,
-} = useDashboardQuery();
-
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
@@ -118,7 +125,7 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
         return [];
     }
     let _refinedWidgets: RefinedWidgetInfo[] = [];
-    dashboardDetailGetters.dashboardLayouts.forEach((d) => {
+    dashboard.value?.layouts?.forEach((d) => {
         const _widgetIdList = d.widgets;
         _widgetIdList?.forEach((widgetId) => {
             const _widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
@@ -142,7 +149,6 @@ const getRefinedWidgetInfoList = (dashboardWidgets: Array<PublicWidgetModel|Priv
     return _refinedWidgets;
 };
 const getWidgetLoading = (widgetId: string) => {
-    // if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     if (!state.intersectedWidgetMap[widgetId]) return true;
     return false;
@@ -177,26 +183,55 @@ const getResizedWidgetInfoList = (widgetInfoList: RefinedWidgetInfo[], _containe
 
 
 /* Api */
-const deleteWidget = async (widgetId: string) => {
+const { mutateAsync: updateDashboard } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+        },
+    },
+);
+const deleteWidgetFn = (params: PrivateWidgetDeleteParameters|PublicWidgetDeleteParameters) => {
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
-        : SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>;
-    try {
-        await fetcher({
-            widget_id: widgetId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+    const _fetcher = isPrivate
+        ? api.privateWidgetAPI.delete
+        : api.publicWidgetAPI.delete;
+    return _fetcher(params);
 };
+const { mutateAsync: deleteWidget } = useMutation(
+    {
+        mutationFn: deleteWidgetFn,
+        onSuccess: (_, variables) => {
+            // delete wisdget from mounted map
+            delete state.mountedWidgetMap[variables.widget_id];
+            state.mountedWidgetMap = { ...state.mountedWidgetMap };
+
+            const isPrivate = variables.widget_id?.startsWith('private');
+            const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+            queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleError(e);
+        },
+        onSettled: (data) => {
+            if (data?.state !== 'CREATING') {
+                // close modal
+                widgetDeleteState.visibleModal = false;
+                widgetDeleteState.targetWidget = null;
+            }
+        },
+    },
+);
+
 const updateWidget = async (widgetId: string, size: WidgetSize) => {
     const isPrivate = widgetId.startsWith('private');
-    const fetcher = isPrivate
+    const _fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
         : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
     try {
-        await fetcher({
+        await _fetcher({
             widget_id: widgetId,
             size,
         });
@@ -207,11 +242,11 @@ const updateWidget = async (widgetId: string, size: WidgetSize) => {
 
 const listWidgetDataTables = async (widgetId: string) => {
     const isPrivate = widgetId.startsWith('private');
-    const fetcher = isPrivate
+    const _fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
         : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
     try {
-        const { results } = await fetcher({ widget_id: widgetId });
+        const { results } = await _fetcher({ widget_id: widgetId });
         if (!results) return [];
         const _refinedResults = cloneDeep(results);
         results.forEach((r, idx) => {
@@ -310,8 +345,26 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             widget_id: createdWidget.widget_id,
             state: 'ACTIVE',
         });
-        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId, createdWidget.widget_id);
-        dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets, completedWidget]);
+        const _layouts = cloneDeep(dashboard.value?.layouts || []);
+        if (_layouts.length) {
+            const _targetLayout = _layouts[0];
+            if (_targetLayout.widgets) {
+                _targetLayout.widgets.push(createdWidget.widget_id);
+            } else {
+                _targetLayout.widgets = [createdWidget.widget_id];
+            }
+            _layouts[0] = _targetLayout;
+        } else {
+            _layouts.push({
+                widgets: [createdWidget.widget_id],
+            });
+        }
+        await updateDashboard({
+            dashboard_id: dashboardDetailState.dashboardId || '',
+            layouts: _layouts,
+        });
+
+        dashboardDetailStore.setDashboardWidgets([...widgetList.value, completedWidget]);
         showSuccessMessage(i18n.t('COMMON.WIDGETS.CLONE_SUCCESS_MSG'), '');
     } catch (e: any) {
         showErrorMessage(e.message, e);
@@ -319,10 +372,13 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
     }
 };
 const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSize) => {
-    const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widget.widget_id);
+    const _widget = widgetList.value.find((w) => w.widget_id === widget.widget_id);
     if (!_widget) return;
     await updateWidget(widget.widget_id, size);
-    await dashboardDetailStore.listDashboardWidgets();
+    // TODO: remove this after applying mutation
+    const isPrivate = widget.widget_id.startsWith('private');
+    const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+    await queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
 };
 const handleWidgetMounted = (widgetId: string) => {
     state.mountedWidgetMap = {
@@ -333,55 +389,48 @@ const handleWidgetMounted = (widgetId: string) => {
 const handleDeleteModalConfirm = async () => {
     const _targetWidgetId = widgetDeleteState.targetWidget?.widget_id as string;
     // 1. remove from dashboard layouts
-    const changedLayouts = await dashboardDetailStore.deleteDashboardWidget(_targetWidgetId);
+    const _dashboardLayouts = cloneDeep(dashboard.value?.layouts ?? []);
+    const firstLayout = _dashboardLayouts[0];
+    const deletedWidgetIndex = firstLayout?.widgets?.indexOf(_targetWidgetId) ?? -1;
+    const changedLayouts = deletedWidgetIndex !== -1
+        ? (_dashboardLayouts[0]?.widgets?.splice(deletedWidgetIndex, 1), _dashboardLayouts)
+        : undefined;
+
     await updateDashboard({
         dashboard_id: dashboardDetailState.dashboardId || '',
         layouts: changedLayouts,
     });
     // 2. delete widget
-    await deleteWidget(_targetWidgetId);
-    // 3. delete widget from mounted map
-    delete state.mountedWidgetMap[_targetWidgetId];
-    state.mountedWidgetMap = { ...state.mountedWidgetMap };
-    // 3. close modal
-    widgetDeleteState.visibleModal = false;
-    widgetDeleteState.targetWidget = null;
-    await dashboardDetailStore.listDashboardWidgets();
+    await deleteWidget({ widget_id: _targetWidgetId });
 };
 const handleClickAddWidget = () => {
     widgetGenerateStore.setOverlayType('ADD');
     widgetGenerateStore.setShowOverlay(true);
 };
 
-const { mutateAsync: updateDashboard } = useMutation(
-    {
-        mutationFn: functions.updateDashboardFn,
-        onSuccess: (dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-        },
-    },
-);
-
 /* Watcher */
-watch(() => dashboardDetailState.dashboardWidgets, (widgets) => {
+watch([widgetList, () => dashboard.value?.layouts], ([widgets]) => {
     state.refinedWidgetInfoList = getRefinedWidgetInfoList(widgets);
 });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         state.remountWidgetId = widgetGenerateState.latestWidgetId;
-        await dashboardDetailStore.listDashboardWidgets();
+
+        // fetch widget list
+        const isPrivate = dashboard.value?.dashboard_id?.startsWith('private');
+        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        await queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
+
         state.remountWidgetId = undefined;
         await loadAWidget(widgetGenerateState.latestWidgetId);
     }
 });
-watch(() => dashboardDetailState.dashboardWidgets, (dashboardWidgets) => {
+watch(widgetList, (dashboardWidgets) => {
     // delete creating widgets
     if (!widgetGenerateState.showOverlay) {
         dashboardWidgets.forEach((widget) => {
             if (widget.state === 'CREATING') {
-                deleteWidget(widget.widget_id);
+                deleteWidget({ widget_id: widget.widget_id });
             }
         });
     }
@@ -452,7 +501,7 @@ onBeforeUnmount(() => {
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <p-data-loader :loading="dashboardDetailState.loadingDashboard || dashboardDetailState.loadingWidgets"
+        <p-data-loader :loading="isLoading"
                        :data="state.refinedWidgetInfoList"
                        loader-backdrop-color="gray.100"
                        disable-empty-case
@@ -475,7 +524,7 @@ onBeforeUnmount(() => {
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
-                               :disable-manage-buttons="dashboardDetailGetters.disableManageButtons"
+                               :disable-manage-buttons="!isManageable"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
@@ -487,13 +536,13 @@ onBeforeUnmount(() => {
                 </template>
             </div>
         </p-data-loader>
-        <div v-if="!(dashboardDetailState.loadingDashboard || dashboardDetailState.loadingWidgets) && !state.refinedWidgetInfoList?.length"
+        <div v-if="!isLoading && !state.refinedWidgetInfoList?.length"
              class="no-data-wrapper"
         >
             <p-empty show-image
                      image-size="sm"
                      class="empty-wrapper"
-                     :show-button="!dashboardDetailGetters.disableManageButtons"
+                     :show-button="isManageable"
             >
                 {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                 <template #button>
