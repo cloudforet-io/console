@@ -42,6 +42,7 @@ import { gray, white } from '@/styles/colors';
 import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -61,8 +62,10 @@ const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
-
+const dashboardDetailState = dashboardDetailStore.state;
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const storeState = reactive({
     selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
     selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
@@ -268,7 +271,7 @@ const queryKey = computed(() => [
         sortBy: state.sortBy,
         thisPage: state.thisPage,
         pageSize: state.pageSize,
-        vars: normalizeAndSerializeVars(dashboardDetailGetters.dashboardInfo?.vars ?? {}),
+        vars: normalizeAndSerializeVars(dashboard.value?.vars ?? {}),
     },
 ]);
 
@@ -279,7 +282,7 @@ const queryResult = useQuery({
         granularity: state.selectedGranularity,
         sort: state.sortBy,
         page: state.page,
-        vars: dashboardDetailGetters.dashboardInfo?.vars,
+        vars: dashboard.value?.vars,
     }),
     enabled: computed(() => storeState.selectedDataTableId !== undefined && storeState.selectedDataTable !== undefined),
     staleTime: WIDGET_LOAD_STALE_TIME,

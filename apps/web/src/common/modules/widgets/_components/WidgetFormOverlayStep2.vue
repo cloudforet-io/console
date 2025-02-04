@@ -3,6 +3,7 @@ import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, isEqual } from 'lodash';
 
 import {
@@ -12,10 +13,11 @@ import {
 import type {
     DashboardOptions, DashboardVars,
 } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
@@ -29,6 +31,7 @@ import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -36,8 +39,8 @@ import {
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
+
 const overlayWidgetRef = ref<HTMLElement|null>(null);
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -53,6 +56,15 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
+/* Query */
+const {
+    dashboard,
+    keys,
+    fetcher,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 let fieldManager: WidgetFieldValueManager;
 
 const state = reactive({
@@ -101,7 +113,7 @@ const state = reactive({
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared && !storeState.isAdminMode),
+    isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared && !storeState.isAdminMode),
 });
 
 const {
@@ -127,10 +139,37 @@ const updateWidget = async () => {
         state.fieldManager.updateOriginData(cloneDeep(widget.options));
     }
     if (_isCreating) {
-        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId || '', widgetGenerateState.widgetId);
+        const _layouts = cloneDeep(dashboard.value?.layouts || []);
+        if (_layouts.length) {
+            const _targetLayout = _layouts[0];
+            if (_targetLayout.widgets) {
+                _targetLayout.widgets.push(widgetGenerateState.widgetId);
+            } else {
+                _targetLayout.widgets = [widgetGenerateState.widgetId];
+            }
+            _layouts[0] = _targetLayout;
+        } else {
+            _layouts.push({
+                widgets: [widgetGenerateState.widgetId],
+            });
+        }
+        updateDashboard({
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts: _layouts,
+        });
     }
 };
 
+const { mutate: updateDashboard } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+        },
+    },
+);
 
 /* Util */
 const initSnapshot = () => {

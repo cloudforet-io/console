@@ -39,6 +39,7 @@ import type {
     DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -48,6 +49,11 @@ const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
+const {
+    dashboard,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -254,6 +260,7 @@ const handleConfirmDataSource = async () => {
 
         const result = await widgetGenerateStore.createAddDataTable({
             ...addParameters,
+            vars: dashboard.value?.vars || {},
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
