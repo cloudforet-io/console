@@ -1,0 +1,19 @@
+name: "[Dispatch] Master to develop"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'enter version(x.y.z)'
+        required: true
+        default: '2.0.0'
+
+env:
+  VERSION: ${{ github.event.inputs.version }}
+
+jobs:
+  merge_to_develop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test
+        run: echo "test"
