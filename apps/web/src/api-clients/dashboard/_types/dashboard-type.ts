@@ -9,12 +9,14 @@ import type {
 import type { PrivateDashboardChangeFolderParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/change-folder';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
 import type { PrivateDashboardDeleteParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/delete';
+import type { PrivateDashboardGetParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/get';
 import type { PrivateDashboardListParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/list';
 import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/update';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardChangeFolderParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/change-folder';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import type { PublicDashboardDeleteParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/delete';
+import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
 import type { PublicDashboardListParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/list';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
@@ -33,6 +35,7 @@ export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters 
 export type DashboardListParams = PublicDashboardListParameters | PrivateDashboardListParameters;
 export type DashboardUpdateParams = PublicDashboardUpdateParameters | PrivateDashboardUpdateParameters;
 export type DashboardDeleteParams = PublicDashboardDeleteParameters | PrivateDashboardDeleteParameters;
+export type DashboardGetParams = PublicDashboardGetParameters | PrivateDashboardGetParameters;
 
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';
@@ -67,8 +70,9 @@ export interface DashboardVariablesSchema {
 }
 
 export interface DashboardGlobalVariablesSchema {
-    properties: Record<string, DashboardGlobalVariable>;
+    properties: DashboardGlobalVariableSchemaProperties;
 }
+export type DashboardGlobalVariableSchemaProperties = Record<string, DashboardGlobalVariable>;
 
 // dashboard variables types
 export type DashboardVariables = SingleSelectDashboardVariables | MultiSelectDashboardVariables;
