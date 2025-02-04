@@ -1,4 +1,4 @@
-name: "[Pull Request] Check Revert Candidate Commits"
+name: [Pull Request] Check Revert Candidate Commits
 
 on:
   pull_request:
