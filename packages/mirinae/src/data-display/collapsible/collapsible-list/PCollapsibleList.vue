@@ -39,6 +39,7 @@
             <p-collapsible-panel v-show="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents || proxyUnfoldedIndices.includes(idx)"
                                  :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
                                  :line-clamp="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents ? lineClamp : -1"
+                                 :enable-deep-clamp="item.enableDeepClamp"
                                  @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
             >
                 <slot v-bind="{

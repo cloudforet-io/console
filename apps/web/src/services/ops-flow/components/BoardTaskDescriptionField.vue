@@ -25,6 +25,7 @@ const { editorContents } = useEditorContentTransformer({
     <p-collapsible-panel v-if="props.description"
                          class="task-desc-field"
                          :line-clamp="1"
+                         :enable-deep-clamp="true"
     >
         <text-editor-viewer :contents="editorContents"
                             contents-type="markdown"
