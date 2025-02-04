@@ -39,8 +39,6 @@ import type {
     DataTableTransformOptions, ConcatOptions, JoinOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel|PrivateWidgetModel;
@@ -51,8 +49,6 @@ interface DataTableReference {
     children: string[];
 }
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
-    const dashboardDetailStore = useDashboardDetailInfoStore();
-    const dashboardDetailGetters = dashboardDetailStore.getters;
     const state = reactive({
         // display
         showOverlay: false,
@@ -233,7 +229,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         createAddDataTable: async (addParams: Partial<DataTableAddParameters>):Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
-                vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                 ...addParams,
             } as DataTableAddParameters;
             const isPrivate = state.widgetId.startsWith('private');
@@ -254,7 +249,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>, unsavedId: string): Promise<DataTableModel|undefined> => {
             const parameters = {
                 widget_id: state.widgetId,
-                vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                 ...transformParams,
             } as DataTableTransformParameters;
             const isPrivate = state.widgetId.startsWith('private');
@@ -312,7 +306,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 } else {
                     result = await fetcher({
                         ...updateParams,
-                        vars: dashboardDetailGetters.dashboardInfo?.vars || {},
                     });
                     if (state.widget?.state === 'ACTIVE') {
                         await actions.updateWidget({

@@ -48,6 +48,9 @@ import type {
     JoinOptions, ValueMappingOptions, ConcatOptions, AggregateOptions, AggregateFunction,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 interface Props {
@@ -60,6 +63,13 @@ const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+const {
+    dashboard,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
@@ -229,6 +239,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         const createParams = {
             name: state.dataTableName,
             operator: state.operator,
+            vars: dashboard.value?.vars || {},
             options: { [state.operator]: options() },
         };
         const dataTable = await widgetGenerateStore.createTransformDataTable(createParams, state.dataTableId);
