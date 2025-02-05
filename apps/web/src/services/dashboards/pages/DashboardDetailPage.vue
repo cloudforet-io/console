@@ -57,7 +57,7 @@ const {
     dashboard,
     widgetList,
     isError,
-    isLoading: widgetLoading,
+    isLoading,
     keys,
     fetcher,
     queryClient,
@@ -96,7 +96,7 @@ const handleUpdateDashboardVariables = (params) => {
 };
 
 
-const { mutate: updateDashboard, isPending: dashboardLoading } = useMutation(
+const { mutate: updateDashboard, isPending: dashboardUpdateLoading } = useMutation(
     {
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
@@ -182,23 +182,23 @@ onUnmounted(() => {
                 </div>
                 <div class="right-part">
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="dashboardLoading||widgetLoading"
+                                                :loading="isLoading || dashboardUpdateLoading"
                                                 @refresh="handleRefresh"
                     />
                 </div>
             </div>
-            <div v-if="!dashboardLoading"
+            <div v-if="!dashboardUpdateLoading"
                  class="dashboard-selectors"
             >
                 <dashboard-variables v-if="state.isDeprecatedDashboard"
                                      class="variable-selector-wrapper"
-                                     :loading="dashboardLoading"
+                                     :loading="dashboardUpdateLoading"
                                      @update="handleUpdateDashboardVariables"
                 />
                 <dashboard-variables-v2 v-else
                                         class="variable-selector-wrapper"
                                         :disable-save-button="!isManageable"
-                                        :loading="dashboardLoading"
+                                        :loading="dashboardUpdateLoading"
                                         @update="handleUpdateDashboardVariables"
                 />
             </div>

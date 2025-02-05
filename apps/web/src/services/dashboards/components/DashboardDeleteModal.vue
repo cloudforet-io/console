@@ -39,7 +39,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
-
+/* Query */
 const {
     api,
     keys,
@@ -59,12 +59,13 @@ const handleDeleteDashboardConfirm = async () => {
     if (!props.dashboardId) {
         throw new Error('Dashboard ID is not provided');
     }
-    mutate({
+    deleteDashboard({
         dashboard_id: props.dashboardId,
     });
 };
 
-const deleteDashboard = (params: PublicDashboardDeleteParameters|PrivateDashboardDeleteParameters): Promise<void> => {
+/* Api */
+const deleteDashboardFn = (params: PublicDashboardDeleteParameters|PrivateDashboardDeleteParameters): Promise<void> => {
     const _isPrivate = params.dashboard_id.startsWith('private');
     if (_isPrivate) {
         return api.privateDashboardAPI.delete(params as PrivateDashboardDeleteParameters);
@@ -72,9 +73,9 @@ const deleteDashboard = (params: PublicDashboardDeleteParameters|PrivateDashboar
     return api.publicDashboardAPI.delete(params as PublicDashboardDeleteParameters);
 };
 
-const { mutate, isPending: loading } = useMutation(
+const { mutate: deleteDashboard, isPending: loading } = useMutation(
     {
-        mutationFn: deleteDashboard,
+        mutationFn: deleteDashboardFn,
         onSuccess: async (_, params) => {
             const _isPrivate = params.dashboard_id.startsWith('private');
             const dashboardListQueryKey = _isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;

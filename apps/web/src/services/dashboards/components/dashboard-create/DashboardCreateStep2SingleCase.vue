@@ -126,16 +126,16 @@ const {
 });
 
 /* Api */
-const createDashboard = (params: DashboardCreateParams): Promise<DashboardModel> => {
+const createDashboardFn = (params: DashboardCreateParams): Promise<DashboardModel> => {
     if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
         return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
     }
     return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
 };
 
-const { mutate } = useMutation(
+const { mutate: createDashboard } = useMutation(
     {
-        mutationFn: createDashboard,
+        mutationFn: createDashboardFn,
         onSuccess: (dashboard: DashboardModel) => {
             dashboardCreatePageStore.setDashboardCreated(true);
             const isPrivate = dashboard.dashboard_id.startsWith('private');
@@ -171,7 +171,7 @@ const handleConfirm = async () => {
     } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
         (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
     }
-    mutate(_dashboardParams as DashboardCreateParams);
+    createDashboard(_dashboardParams as DashboardCreateParams);
 };
 
 /* Watcher */
