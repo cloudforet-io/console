@@ -11,6 +11,7 @@ export interface AlertModel {
     alert_id: string;
     title: string;
     status: AlertStatusType;
+    labels?: string[];
     description: string;
     urgency: AlertUrgencyType;
     severity: AlertSeverityType;

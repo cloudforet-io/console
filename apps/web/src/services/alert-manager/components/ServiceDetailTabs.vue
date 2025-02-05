@@ -18,6 +18,7 @@ import ServiceDetailTabsNotifications from '@/services/alert-manager/components/
 import ServiceDetailTabsNotificationsDetail
     from '@/services/alert-manager/components/ServiceDetailTabsNotificationsDetail.vue';
 import ServiceDetailTabsOverview from '@/services/alert-manager/components/ServiceDetailTabsOverview.vue';
+import ServiceDetailTabsOverviewInfo from '@/services/alert-manager/components/ServiceDetailTabsOverviewInfo.vue';
 import ServiceDetailTabsSettingsContainer from '@/services/alert-manager/components/ServiceDetailTabsSettingsContainer.vue';
 import ServiceDetailTabsWebhook from '@/services/alert-manager/components/ServiceDetailTabsWebhook.vue';
 import ServiceDetailTabsWebhookDetail
@@ -116,6 +117,7 @@ watch(() => tabState.activeTab, (activeTab) => {
                 <service-detail-tabs-settings-container />
             </template>
         </p-tab>
+        <service-detail-tabs-overview-info v-if="tabState.activeTab === SERVICE_DETAIL_TABS.OVERVIEW" />
     </div>
 </template>
 
