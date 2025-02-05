@@ -49,7 +49,15 @@
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
         "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
-      "cache": false
+      "cache": true
+    },
+    "unified-storybook#build": {
+      "outputs": ["./.storybook-static/**"],
+      "inputs": [
+        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+      ],
+      "cache": true
     },
     "transpile": {
       "dependsOn": ["^transpile"],
