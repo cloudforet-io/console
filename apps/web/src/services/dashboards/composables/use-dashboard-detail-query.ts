@@ -48,19 +48,19 @@ export const useDashboardDetailQuery = ({
 
     const _publicDashboardQueryKey = computed(() => [
         ...publicDashboardQueryKey.value,
-        dashboardId,
+        dashboardId.value,
     ]);
     const _privateDashboardQueryKey = computed(() => [
         ...privateDashboardQueryKey.value,
-        dashboardId,
+        dashboardId.value,
     ]);
     const _publicWidgetListQueryKey = computed(() => [
         ...publicWidgetListQueryKey.value,
-        dashboardId,
+        dashboardId.value,
     ]);
     const _privateWidgetListQueryKey = computed(() => [
         ...privateWidgetListQueryKey.value,
-        dashboardId,
+        dashboardId.value,
     ]);
 
     /* Querys */
@@ -108,8 +108,8 @@ export const useDashboardDetailQuery = ({
 
     /* State */
     const isLoading = computed(() => (_state.isPrivate
-        ? (privateDashboardQuery.isFetching.value || privateWidgetListQuery.isFetching.value)
-        : (publicWidgetListQuery.isFetching.value || publicDashboardQuery.isFetching.value)));
+        ? (privateDashboardQuery.isLoading.value || privateWidgetListQuery.isLoading.value)
+        : (publicWidgetListQuery.isLoading.value || publicDashboardQuery.isLoading.value)));
     const isError = computed(() => (_state.isPrivate
         ? (privateDashboardQuery.isError.value || privateWidgetListQuery.isError.value)
         : (publicDashboardQuery.isError.value || publicWidgetListQuery.isError.value)));

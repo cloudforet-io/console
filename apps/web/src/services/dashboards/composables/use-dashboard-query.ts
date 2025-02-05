@@ -22,8 +22,8 @@ import { useUserStore } from '@/store/user/user-store';
 
 
 export const useDashboardQuery = () => {
-    const { publicDashboardAPI, publicDashboardListQueryKey, publicDashboardQueryKey } = usePublicDashboardApi();
-    const { privateDashboardAPI, privateDashboardListQueryKey, privateDashboardQueryKey } = usePrivateDashboardApi();
+    const { publicDashboardAPI, publicDashboardListQueryKey } = usePublicDashboardApi();
+    const { privateDashboardAPI, privateDashboardListQueryKey } = usePrivateDashboardApi();
     const { publicFolderAPI, publicFolderListQueryKey } = usePublicFolderApi();
     const { privateFolderAPI, privateFolderListQueryKey } = usePrivateFolderApi();
     const queryClient = useQueryClient();
@@ -161,8 +161,6 @@ export const useDashboardQuery = () => {
             privateDashboardListQueryKey: _privateDashboardListQueryKey,
             publicFolderListQueryKey: _publicFolderListQueryKey,
             privateFolderListQueryKey: _privateFolderListQueryKey,
-            publicDashboardQueryKey,
-            privateDashboardQueryKey,
         },
         fetcher: {
             updateFolderFn,
