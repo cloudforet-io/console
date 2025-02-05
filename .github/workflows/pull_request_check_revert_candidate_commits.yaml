@@ -1,0 +1,52 @@
+name: "[Pull Request] Check Revert Candidate Commits"
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find feat(backend) commits
+        id: check-commits
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMITS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits \
+            --jq '.[] | select(.commit.message | test("^feat\\(backend")) | .sha + " " + .commit.message')
+
+          if [ -z "$COMMITS" ]; then
+            echo "No matching commits found"
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found matching commits"
+            echo "found=true" >> $GITHUB_OUTPUT
+            COMMITS="${COMMITS//$'\n'/'%0A'}"
+            echo "commits=$COMMITS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment feat(backend) commits
+        if: steps.check-commits.outputs.found == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const commits = `${{ steps.check-commits.outputs.commits }}`.replace(/%0A/g, '\n');
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: prNumber,
+              body: `⚠️ The following commits require review:\n\n${commits}`
+            });
+
+      - name: Comment no feat(backend) commits
+        if: steps.check-commits.outputs.found == 'false'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `✅ There are no commits in this PR that require review.`
+            });
+

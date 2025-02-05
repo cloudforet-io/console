@@ -23,11 +23,11 @@ const config: StorybookConfig = {
     return {
       mirinae: {
         title: 'Mirinae Component',
-        url: 'https://your-production-react-storybook-url',
+        url: 'https://storybook.developer.spaceone.dev',
       },
       web: {
         title: 'Web Component',
-        url: 'https://your-production-angular-storybook-url',
+        url: 'https://spaceone-web-storybook.vercel.app',
       },
     };
   },
