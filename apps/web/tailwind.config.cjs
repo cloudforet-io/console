@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const spaceoneTailwindConfig = require('@cloudforet/mirinae/tailwind.config.cjs');
+const spaceoneTailwindConfig = require('postcss-config-custom/tailwind.config.cjs');
 
 module.exports = {
     content: [

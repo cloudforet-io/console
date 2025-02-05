@@ -1,0 +1,17 @@
+{
+    "extends": "tsconfig/base.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "allowImportingTsExtensions": true,
+        "noEmit": true
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.js",
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        ".out"
+    ]
+}

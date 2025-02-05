@@ -5,13 +5,12 @@
                  class="text fake"
                  :style="{'-webkit-line-clamp': lineClamp}"
             >
-                <slot />
+                <slot v-if="!enableDeepClamp" />
             </div>
-            <div class="text"
-                 :class="{collapsed: proxyIsCollapsed}"
-                 :style="{'-webkit-line-clamp': lineClamp}"
+            <div ref="contentRef"
+                 class="text"
             >
-                <slot v-if="lineClamp !== 0 || !proxyIsCollapsed" />
+                <slot v-if="enableDeepClamp || (lineClamp !== 0 || !proxyIsCollapsed)" />
             </div>
         </div>
         <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow"
@@ -22,17 +21,19 @@
 
 <script lang="ts">
 import {
-    defineComponent, onMounted, onUnmounted, onUpdated, reactive, toRefs,
+    computed,
+    defineComponent, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
-import { debounce } from 'lodash';
-
+import {
+    useDeepTextClamper,
+    useSimpleTextClamper,
+} from '@/data-display/collapsible/collapsible-panel/composables/use-text-clamper';
 import type { CollapsiblePanelProps } from '@/data-display/collapsible/collapsible-panel/type';
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
 const PAD = 2;
-
 export default defineComponent<CollapsiblePanelProps>({
     name: 'PCollapsiblePanel',
     components: { PCollapsibleToggle },
@@ -41,7 +42,7 @@ export default defineComponent<CollapsiblePanelProps>({
         event: 'update:isCollapsed',
     },
     props: {
-        /* collapsible props */
+    /* collapsible props */
         isCollapsed: {
             type: Boolean,
             default: true,
@@ -51,35 +52,53 @@ export default defineComponent<CollapsiblePanelProps>({
             type: Number,
             default: 2,
         },
+        enableDeepClamp: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
             fakeTextRef: null as null|HTMLElement,
-            isOverflow: false,
+            contentRef: null as null|HTMLElement,
         });
 
-        /* util */
-        const checkTextOverflow = debounce(() => {
-            if (!state.fakeTextRef) return;
-            state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight + PAD;
-        }, 150);
+        const simpleTextClamper = useSimpleTextClamper(PAD, props.lineClamp || 2);
+        const deepTextClamper = useDeepTextClamper(props.lineClamp || 2);
 
-        onUpdated(() => {
-            checkTextOverflow();
-        });
+        const updateClamping = () => {
+            nextTick(() => {
+                if (props.enableDeepClamp) {
+                    deepTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef);
+                } else {
+                    simpleTextClamper.runTextClamper(state.proxyIsCollapsed, state.contentRef, state.fakeTextRef);
+                }
+            });
+        };
 
         onMounted(() => {
-            window.addEventListener('resize', checkTextOverflow);
-            checkTextOverflow();
+            window.addEventListener('resize', updateClamping);
+            updateClamping();
         });
 
         onUnmounted(() => {
-            window.removeEventListener('resize', checkTextOverflow);
+            window.removeEventListener('resize', updateClamping);
+        });
+
+        watch(() => state.proxyIsCollapsed, () => {
+            updateClamping();
+        });
+
+        watch(() => state.contentRef, () => {
+            updateClamping();
         });
 
         return {
             ...toRefs(state),
+            isOverflow: computed(() => (props.enableDeepClamp
+                ? deepTextClamper.state.isOverflow
+                : simpleTextClamper.state.isOverflow)),
         };
     },
 });
@@ -97,13 +116,11 @@ export default defineComponent<CollapsiblePanelProps>({
         position: relative;
         word-break: break-word;
         .text {
-            &.collapsed, &.fake {
+            &.fake {
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
-            }
-            &.fake {
                 position: absolute;
                 visibility: hidden;
                 top: 0;

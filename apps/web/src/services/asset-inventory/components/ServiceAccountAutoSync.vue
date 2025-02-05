@@ -16,7 +16,7 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
+import AutoSyncState from '@/common/components/badge/auto-sync-state/AutoSyncState.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ServiceAccountAutoSyncDetail from '@/services/asset-inventory/components/ServiceAccountAutoSyncDetail.vue';
