@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useQueryKey } from '@/api-clients/_common/composables/use-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PrivateDashboardChangeFolderParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/change-folder';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
@@ -11,8 +11,8 @@ import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/p
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 
 export const usePrivateDashboardApi = () => {
-    const privateDashboardQueryKey = useQueryKey('private-dashboard/get');
-    const privateDashboardListQueryKey = useQueryKey('private-dashboard/list');
+    const privateDashboardQueryKey = useAPIQueryKey('private-dashboard/get');
+    const privateDashboardListQueryKey = useAPIQueryKey('private-dashboard/list');
 
     const actions = {
         async create(params: PrivateDashboardCreateParameters) {

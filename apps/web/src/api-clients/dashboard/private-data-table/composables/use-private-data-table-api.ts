@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useQueryKey } from '@/api-clients/_common/composables/use-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DataTableLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
@@ -13,8 +13,8 @@ import type { DataTableTransformParameters } from '@/api-clients/dashboard/publi
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 
 export const usePrivateDataTableApi = () => {
-    const privateDataTableQueryKey = useQueryKey('private-data-table/get');
-    const privateDataTableListQueryKey = useQueryKey('private-data-table/list');
+    const privateDataTableQueryKey = useAPIQueryKey('private-data-table/get');
+    const privateDataTableListQueryKey = useAPIQueryKey('private-data-table/list');
 
     const action = {
         async add(params: DataTableAddParameters) {

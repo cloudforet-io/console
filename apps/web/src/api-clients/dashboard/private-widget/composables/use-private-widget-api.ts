@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useQueryKey } from '@/api-clients/_common/composables/use-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
@@ -13,8 +13,8 @@ import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/priv
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 
 export const usePrivateWidgetApi = () => {
-    const privateWidgetQueryKey = useQueryKey('private-widget/get');
-    const privateWidgetListQueryKey = useQueryKey('private-widget/list');
+    const privateWidgetQueryKey = useAPIQueryKey('private-widget/get');
+    const privateWidgetListQueryKey = useAPIQueryKey('private-widget/list');
 
     const action = {
         async create(params: PrivateWidgetCreateParameters) {

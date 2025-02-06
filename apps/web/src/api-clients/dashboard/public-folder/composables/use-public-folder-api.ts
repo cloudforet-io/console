@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useQueryKey } from '@/api-clients/_common/composables/use-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
 import type { PublicFolderDeleteParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/delete';
@@ -13,8 +13,8 @@ import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/sc
 
 
 export const usePublicFolderApi = () => {
-    const publicFolderQueryKey = useQueryKey('public-folder/get');
-    const publicFolderListQueryKey = useQueryKey('public-folder/list');
+    const publicFolderQueryKey = useAPIQueryKey('public-folder/get');
+    const publicFolderListQueryKey = useAPIQueryKey('public-folder/list');
 
     const action = {
         async create(params: PublicFolderCreateParameters) {
