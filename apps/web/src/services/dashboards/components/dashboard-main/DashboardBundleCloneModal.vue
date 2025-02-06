@@ -92,10 +92,10 @@ const allReferenceStore = useAllReferenceStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
-    publicFolderItems,
-    privateFolderItems,
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
     api,
     keys,
     queryClient,
@@ -110,17 +110,17 @@ const storeState = reactive({
 
 const queryState = reactive({
     publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
         if (storeState.isAdminMode) return _v2DashboardItems;
         return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
 });
 
@@ -233,9 +233,9 @@ const {
 /* Util */
 const getDashboardNameList = (dashboardType: DashboardType) => {
     if (dashboardType === 'PRIVATE') {
-        return (privateDashboardItems.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
+        return (privateDashboardList.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
     }
-    return publicDashboardItems.value.filter((i) => i.version !== '1.0').map((item) => item.name);
+    return publicDashboardList.value.filter((i) => i.version !== '1.0').map((item) => item.name);
 };
 const getChangedFolderModalTableItems = (folderItems: FolderModel[], targetDashboardItems: DashboardModel[]): DashboardDataTableItem[] => {
     // 2.1. Create New Folder
@@ -312,7 +312,7 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
 };
 const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string) => {
     const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
-    const _allDashboardItems = [...privateDashboardItems.value, ...publicDashboardItems.value];
+    const _allDashboardItems = [...privateDashboardList.value, ...publicDashboardList.value];
     const _dashboard = _allDashboardItems.find((item) => item.dashboard_id === dashboardId);
     if (!_dashboard) throw new Error('Dashboard not found');
 
@@ -350,7 +350,7 @@ const folderCreateFetcher = (params: FolderCreateParams, isPrivate?: boolean) =>
     return api.publicDashboardAPI.create(params as PublicFolderCreateParameters);
 };
 const createFolder = async (name: string, isPrivate: boolean) => {
-    const _existingFolderNameList = isPrivate ? privateFolderItems.value.map((d) => d.name) : publicFolderItems.value.map((d) => d.name);
+    const _existingFolderNameList = isPrivate ? privateFolderList.value.map((d) => d.name) : publicFolderList.value.map((d) => d.name);
     const params: FolderCreateParams = {
         name: getClonedName(_existingFolderNameList, name),
         tags: { created_by: storeState.userId },

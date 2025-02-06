@@ -68,11 +68,11 @@ const queryTagsHelper = useQueryTags({
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
-    publicFolderItems,
-    privateFolderItems,
-    loading,
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
+    isLoading,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -85,23 +85,23 @@ const storeState = reactive({
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
         if (storeState.isAdminMode) return _v2DashboardItems;
         return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     deprecatedDashboardItems: computed(() => {
-        const _public = publicDashboardItems.value.filter((d) => d.version === '1.0');
-        const _private = privateDashboardItems.value.filter((d) => d.version === '1.0');
+        const _public = publicDashboardList.value.filter((d) => d.version === '1.0');
+        const _private = privateDashboardList.value.filter((d) => d.version === '1.0');
         return [..._public, ..._private];
     }),
-    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(publicFolderItems.value, publicDashboardItems.value, dashboardPageControlState.newIdList)),
-    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(privateFolderItems.value, privateDashboardItems.value, dashboardPageControlState.newIdList)),
+    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(publicFolderList.value, publicDashboardList.value, dashboardPageControlState.newIdList)),
+    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(privateFolderList.value, privateDashboardList.value, dashboardPageControlState.newIdList)),
     publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
         if (storeState.isAdminMode) {
             const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
@@ -354,7 +354,7 @@ onUnmounted(() => {
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="loading"
+        <p-data-loader :loading="isLoading"
                        :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >

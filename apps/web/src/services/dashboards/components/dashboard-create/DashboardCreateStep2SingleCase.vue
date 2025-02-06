@@ -53,10 +53,10 @@ const userStore = useUserStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
-    publicFolderItems,
-    privateFolderItems,
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
     keys,
     api,
     queryClient,
@@ -64,9 +64,9 @@ const {
 
 const getDashboardNameList = (dashboardType: DashboardType) => {
     if (dashboardType === 'PRIVATE') {
-        return (privateDashboardItems.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
+        return (privateDashboardList.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
     }
-    return publicDashboardItems.value.filter((i) => i.version !== '1.0').map((item) => item.name);
+    return publicDashboardList.value.filter((i) => i.version !== '1.0').map((item) => item.name);
 };
 
 const storeState = reactive({
@@ -75,10 +75,10 @@ const storeState = reactive({
 const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     dashboardNameList: computed<string[]>(() => getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
     folderMenuItems: computed<SelectDropdownMenuItem[]>(() => {

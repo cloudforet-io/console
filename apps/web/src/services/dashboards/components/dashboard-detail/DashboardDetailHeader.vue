@@ -40,10 +40,10 @@ const userStore = useUserStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
-    publicFolderItems,
-    privateFolderItems,
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
 } = useDashboardQuery();
 
 const { dashboard } = useDashboardDetailQuery({
@@ -55,17 +55,17 @@ const { isManageable } = useDashboardManageable({
 
 const queryState = reactive({
     publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
         if (storeState.isAdminMode) return _v2DashboardItems;
         return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
 });
 

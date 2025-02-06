@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue';
-import { reactive, computed } from 'vue';
+import { computed } from 'vue';
 
-import type { QueryClient } from '@tanstack/vue-query';
+import type { QueryClient, QueryKey } from '@tanstack/vue-query';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
@@ -16,6 +16,9 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
+const DEFAULT_LIST_DATA = { results: [] };
+const STALE_TIME = 1000 * 60 * 5;
+
 interface UseDashboardDetailQueryOptions {
     dashboardId: ComputedRef<string|undefined>;
 }
@@ -25,8 +28,18 @@ interface UseDashboardDetailQueryReturn {
     widgetList: ComputedRef<(PublicWidgetModel|PrivateWidgetModel)[]>;
     isLoading: ComputedRef<boolean>;
     isError: ComputedRef<boolean>;
-    keys: Record<string, ComputedRef<unknown[]>>;
-    api: Record<string, Record<string, (args: any) => Promise<any>>>;
+    keys: {
+        publicDashboardQueryKey: ComputedRef<QueryKey>;
+        privateDashboardQueryKey: ComputedRef<QueryKey>;
+        publicWidgetListQueryKey: ComputedRef<QueryKey>;
+        privateWidgetListQueryKey: ComputedRef<QueryKey>;
+    };
+    api: {
+        publicDashboardAPI: ReturnType<typeof usePublicDashboardApi>['publicDashboardAPI'];
+        privateDashboardAPI: ReturnType<typeof usePrivateDashboardApi>['privateDashboardAPI'];
+        publicWidgetAPI: ReturnType<typeof usePublicWidgetApi>['publicWidgetAPI'];
+        privateWidgetAPI: ReturnType<typeof usePrivateWidgetApi>['privateWidgetAPI'];
+    };
     fetcher: {
         updateDashboardFn: (args: DashboardUpdateParams) => Promise<DashboardModel>
     };
@@ -42,10 +55,9 @@ export const useDashboardDetailQuery = ({
     const { privateWidgetAPI, privateWidgetListQueryKey } = usePrivateWidgetApi();
     const queryClient = useQueryClient();
 
-    const _state = reactive({
-        isPrivate: computed(() => !!dashboardId.value?.startsWith('private')),
-    });
+    const isPrivate = computed(() => !!dashboardId.value?.startsWith('private'));
 
+    /* Query Keys */
     const _publicDashboardQueryKey = computed(() => [
         ...publicDashboardQueryKey.value,
         dashboardId.value,
@@ -69,32 +81,38 @@ export const useDashboardDetailQuery = ({
         queryFn: () => publicDashboardAPI.get({
             dashboard_id: dashboardId.value as string,
         }),
-        enabled: computed(() => !!dashboardId.value && !_state.isPrivate),
-        staleTime: 1000 * 60 * 5,
+        enabled: computed(() => !!dashboardId.value && !isPrivate.value),
+        staleTime: STALE_TIME,
     });
     const privateDashboardQuery = useQuery({
         queryKey: _privateDashboardQueryKey,
         queryFn: () => privateDashboardAPI.get({
             dashboard_id: dashboardId.value as string,
         }),
-        enabled: computed(() => !!dashboardId.value && _state.isPrivate),
-        staleTime: 1000 * 60 * 5,
+        enabled: computed(() => !!dashboardId.value && isPrivate.value),
+        staleTime: STALE_TIME,
     });
     const publicWidgetListQuery = useQuery({
         queryKey: _publicWidgetListQueryKey,
         queryFn: () => publicWidgetAPI.list({
             dashboard_id: dashboardId.value as string,
         }),
-        enabled: computed(() => !!dashboardId.value && publicDashboardQuery.isSuccess && !_state.isPrivate),
-        staleTime: 1000 * 60 * 5,
+        select: (data) => data?.results || [],
+        enabled: computed(() => !!dashboardId.value && publicDashboardQuery.isSuccess && !isPrivate.value),
+        initialData: DEFAULT_LIST_DATA,
+        initialDataUpdatedAt: 0,
+        staleTime: STALE_TIME,
     });
     const privateWidgetListQuery = useQuery({
         queryKey: _privateWidgetListQueryKey,
         queryFn: () => privateWidgetAPI.list({
             dashboard_id: dashboardId.value as string,
         }),
-        enabled: computed(() => !!dashboardId.value && privateDashboardQuery.isSuccess && _state.isPrivate),
-        staleTime: 1000 * 60 * 5,
+        select: (data) => data?.results || [],
+        enabled: computed(() => !!dashboardId.value && privateDashboardQuery.isSuccess && isPrivate.value),
+        initialData: DEFAULT_LIST_DATA,
+        initialDataUpdatedAt: 0,
+        staleTime: STALE_TIME,
     });
 
     /* Functions */
@@ -107,16 +125,16 @@ export const useDashboardDetailQuery = ({
     };
 
     /* State */
-    const isLoading = computed(() => (_state.isPrivate
-        ? (privateDashboardQuery.isLoading.value || privateWidgetListQuery.isLoading.value)
-        : (publicWidgetListQuery.isLoading.value || publicDashboardQuery.isLoading.value)));
-    const isError = computed(() => (_state.isPrivate
+    const isLoading = computed<boolean>(() => (isPrivate.value
+        ? (privateDashboardQuery.isFetching.value || privateWidgetListQuery.isFetching.value)
+        : (publicWidgetListQuery.isFetching.value || publicDashboardQuery.isFetching.value)));
+    const isError = computed<boolean>(() => (isPrivate.value
         ? (privateDashboardQuery.isError.value || privateWidgetListQuery.isError.value)
         : (publicDashboardQuery.isError.value || publicWidgetListQuery.isError.value)));
 
     return {
-        dashboard: computed(() => (_state.isPrivate ? privateDashboardQuery.data?.value : publicDashboardQuery.data?.value)),
-        widgetList: computed(() => (_state.isPrivate ? privateWidgetListQuery.data?.value?.results : publicWidgetListQuery.data?.value?.results) || []),
+        dashboard: computed(() => (isPrivate.value ? privateDashboardQuery.data?.value : publicDashboardQuery.data?.value)),
+        widgetList: computed(() => (isPrivate.value ? privateWidgetListQuery.data?.value : publicWidgetListQuery.data?.value)),
         isLoading,
         isError,
         api: {

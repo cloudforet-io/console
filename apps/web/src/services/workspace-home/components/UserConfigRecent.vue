@@ -48,8 +48,8 @@ const displayStore = useDisplayStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
+    publicDashboardList,
+    privateDashboardList,
 } = useDashboardQuery();
 
 const storeState = reactive({
@@ -76,7 +76,7 @@ const state = reactive({
 const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([recentConfig], [...publicDashboardItems.value, ...privateDashboardItems.value])[0];
+        return convertDashboardConfigToReferenceData([recentConfig], [...publicDashboardList.value, ...privateDashboardList.value])[0];
     }
     if (itemType === RECENT_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([recentConfig], storeState.projects)[0];

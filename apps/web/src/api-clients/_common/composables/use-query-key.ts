@@ -1,6 +1,9 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -11,8 +14,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
  * @param additionalGlobalParams - Optional additional global parameters to include in the api query key.
  * @returns A computed reference to the query key array.
  */
-
-type QueryKey = Array<unknown>;
 
 interface GlobalQueryParams {
     workspaceId?: string;

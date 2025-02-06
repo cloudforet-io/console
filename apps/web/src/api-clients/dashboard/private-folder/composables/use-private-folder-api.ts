@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -9,7 +13,19 @@ import type { PrivateFolderListParameters } from '@/api-clients/dashboard/privat
 import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 
-export const usePrivateFolderApi = () => {
+interface UsePrivateFolderApiReturn {
+    privateFolderQueryKey: ComputedRef<QueryKey>;
+    privateFolderListQueryKey: ComputedRef<QueryKey>;
+    privateFolderAPI: {
+        create: (params: PrivateFolderCreateParameters) => Promise<PrivateFolderModel>;
+        update: (params: PrivateFolderUpdateParameters) => Promise<PrivateFolderModel>;
+        delete: (params: PrivateFolderDeleteParameters) => Promise<void>;
+        get: (params: PrivateFolderGetParameters) => Promise<PrivateFolderModel>;
+        list: (params: PrivateFolderListParameters) => Promise<ListResponse<PrivateFolderModel>>;
+    };
+}
+
+export const usePrivateFolderApi = (): UsePrivateFolderApiReturn => {
     const privateFolderQueryKey = useAPIQueryKey('private-folder/get');
     const privateFolderListQueryKey = useAPIQueryKey('private-folder/list');
 

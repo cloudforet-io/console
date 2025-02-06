@@ -51,8 +51,8 @@ const userStore = useUserStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
+    publicDashboardList,
+    privateDashboardList,
     keys,
     api,
     queryClient,
@@ -65,11 +65,11 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
         if (storeState.isAdminMode) return _v2DashboardItems;
         return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     bundleCaseType: computed(() => {
         if (!isEmpty(dashboardCreatePageState.selectedOotbIdMap)) return 'TEMPLATE';
         return 'EXISTING';
