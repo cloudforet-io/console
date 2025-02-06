@@ -15,16 +15,12 @@ import {
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
-import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
 import type { PublicWidgetDeleteParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/delete';
-import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { i18n } from '@/translations';
 
@@ -215,30 +211,36 @@ const { mutateAsync: deleteWidget } = useMutation(
         onError: (e) => {
             ErrorHandler.handleError(e);
         },
-        onSettled: (data) => {
-            if (data?.state !== 'CREATING') {
-                // close modal
-                widgetDeleteState.visibleModal = false;
-                widgetDeleteState.targetWidget = null;
-            }
+        onSettled: () => {
+            // close modal
+            widgetDeleteState.visibleModal = false;
+            widgetDeleteState.targetWidget = null;
         },
     },
 );
 
-const updateWidget = async (widgetId: string, size: WidgetSize) => {
-    const isPrivate = widgetId.startsWith('private');
-    const _fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
-    try {
-        await _fetcher({
-            widget_id: widgetId,
-            size,
+const { mutate: updateWidgetSize } = useMutation({
+    mutationFn: fetcher.updateWidgetFn,
+    onSuccess: (_, variables) => {
+        const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
+            const _updatedWidgetList = (oldData.results ?? []).map((widget) => {
+                if (widget.widget_id === variables.widget_id) {
+                    return { ...widget, size: variables.size };
+                }
+                return widget;
+            });
+            return {
+                ...oldData,
+                results: _updatedWidgetList,
+            };
         });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
 
 const listWidgetDataTables = async (widgetId: string) => {
     const isPrivate = widgetId.startsWith('private');
@@ -317,11 +319,11 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
     if (!dashboardDetailState.dashboardId) return;
     const isPrivate = widget.widget_id.startsWith('private');
     const widgetCreateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
+        ? api.privateWidgetAPI.create
+        : api.publicWidgetAPI.create;
     const widgetUpdateFetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>;
+        ? api.privateWidgetAPI.update
+        : api.publicWidgetAPI.update;
 
     const dataTableList = await listWidgetDataTables(widget.widget_id);
     const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
@@ -374,11 +376,10 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
 const handleToggleWidgetSize = async (widget: RefinedWidgetInfo, size: WidgetSize) => {
     const _widget = widgetList.value.find((w) => w.widget_id === widget.widget_id);
     if (!_widget) return;
-    await updateWidget(widget.widget_id, size);
-    // TODO: remove this after applying mutation
-    const isPrivate = widget.widget_id.startsWith('private');
-    const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
-    await queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
+    await updateWidgetSize({
+        widget_id: widget.widget_id,
+        size,
+    });
 };
 const handleWidgetMounted = (widgetId: string) => {
     state.mountedWidgetMap = {
