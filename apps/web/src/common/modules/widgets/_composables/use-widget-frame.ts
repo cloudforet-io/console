@@ -20,6 +20,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
+import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetEmit, WidgetProps, WidgetSize,
@@ -90,7 +91,7 @@ const getRecursiveDataTableIds = (prevValue: string[] = [], dataTable: DataTable
     return prevValue.concat(dataTable.data_table_id);
 };
 const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>, dateRange?: DateRange, dashboardVars?: DashboardVars): Location|undefined => {
-    const _granularity = (widgetOptions?.granularity as string) || 'MONTHLY';
+    const _granularity = (widgetOptions?.granularity as GranularityValue).granularity || 'MONTHLY';
     const _groupBy: string[] = dataTable?.options?.group_by?.map((d) => d.key);
     const _costFilters = [
         ...(dataTable?.options?.filter ?? []),
