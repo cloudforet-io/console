@@ -201,10 +201,7 @@ const updateDashboardVarsSchema = (dashboardId: string) => {
         created_by: state.targetVariable?.created_by,
     };
     const _vars = cloneDeep(dashboard.value?.vars || {});
-    const _tempVars = cloneDeep(dashboardDetailState.vars);
     delete _vars[_originalKey];
-    delete _tempVars[_originalKey];
-    dashboardDetailStore.setVars(_tempVars);
     mutate({
         dashboard_id: dashboardId,
         vars_schema: {
@@ -220,7 +217,14 @@ const { mutate, isPending: loading } = useMutation(
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
             const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
+                if (!oldDashboard) return oldDashboard;
+                return {
+                    ...oldDashboard,
+                    vars_schema: _dashboard.vars_schema,
+                    vars: _dashboard.vars,
+                };
+            });
             showSuccessMessage(state.variableFormSuccessMessage, '');
         },
         onError: (e) => {

@@ -63,6 +63,7 @@ const {
     keys,
     fetcher,
     queryClient,
+    isLoading,
 } = useDashboardDetailQuery({
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
@@ -134,10 +135,7 @@ const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: strin
     const _varsSchemaProperties = cloneDeep(state.dashboardVarsSchemaProperties);
     delete _varsSchemaProperties[variableKey];
     const _vars = cloneDeep(dashboard.value?.vars || {});
-    const _tempVars = cloneDeep(dashboardDetailState.vars);
     delete _vars[variableKey];
-    delete _tempVars[variableKey];
-    dashboardDetailStore.setVars(_tempVars);
     mutate({
         dashboard_id: dashboardId,
         vars_schema: {
@@ -168,10 +166,7 @@ const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string
 };
 const updateUseDashboardVarsSchema = (dashboardId: string, variableKey: string, use: boolean) => {
     const _vars = cloneDeep(dashboard.value?.vars || {});
-    const _tempVars = cloneDeep(dashboardDetailState.vars);
     delete _vars[variableKey];
-    delete _tempVars[variableKey];
-    dashboardDetailStore.setVars(_tempVars);
     mutate({
         dashboard_id: dashboardId,
         vars_schema: {
@@ -193,7 +188,14 @@ const { mutate } = useMutation(
         onSuccess: (_dashboard: DashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
             const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
+                if (!oldDashboard) return oldDashboard;
+                return {
+                    ...oldDashboard,
+                    vars_schema: _dashboard.vars_schema,
+                    vars: _dashboard.vars,
+                };
+            });
             showSuccessMessage(state.successMessage, '');
         },
         onError: (e) => {
@@ -254,7 +256,7 @@ const handleConfirmDelete = () => {
                       @close="handleCloseOverlay"
     >
         <p-toolbox-table :fields="state.variableFields"
-                         :loading="dashboardDetailState.loadingDashboard"
+                         :loading="isLoading"
                          :items="getSlicedVariableItems(state.searchedGlobalVariablesTableItems, state.thisPage, state.pageSize)"
                          :page-size-options="[15, 30, 45]"
                          :page-size.sync="state.pageSize"

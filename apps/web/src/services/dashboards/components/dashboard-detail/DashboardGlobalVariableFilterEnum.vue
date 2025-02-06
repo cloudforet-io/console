@@ -3,7 +3,9 @@
 
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep, flattenDeep, isEqual } from 'lodash';
+import {
+    cloneDeep, flattenDeep, isEqual, xor,
+} from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
@@ -14,20 +16,28 @@ import type {
     NumberEnumVariable,
     TextEnumVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
     variable: DashboardGlobalVariable;
+    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const state = reactive({
     variable: computed(() => props.variable as TextEnumVariable | NumberEnumVariable),
@@ -35,6 +45,7 @@ const state = reactive({
     menuItems: computed<SelectDropdownMenuItem[]>(() => state.variable.values.map((value) => ({ label: value.label, name: value.key }))),
     selected: [] as SelectDropdownMenuItem[],
     isNumber: computed<boolean>(() => state.variable.type === 'number'),
+    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 
@@ -44,30 +55,22 @@ const handleSelectOption = () => {
 
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars);
+    const vars = cloneDeep(props.vars ?? {});
     const selectedValues: string[] = changedSelected.map((d) => d.name) as string[];
     if (selectedValues.length === 0) {
         delete vars[_key];
     } else {
         const _refinedValues: string[]|number[] = state.isNumber ? selectedValues.map((d) => parseFloat(d)) : selectedValues;
         const _vars = state.multiSelectable ? _refinedValues : _refinedValues[0];
-        if (isEqual(dashboardDetailState.vars[_key], _vars)) {
+        if (isEqual(vars[_key], _vars)) {
             return;
         }
         vars[_key] = _vars;
     }
-    dashboardDetailStore.setVars(vars);
+    state.proxyVars = vars;
 };
 
-const initVariableAndSelected = async () => {
-    const found = state.menuItems[0];
-    if (found) {
-        state.selected = [found];
-        changeVariables([found]);
-    }
-};
-
-const initSelected = async (value: any) => {
+const initSelected = (value: any) => {
     // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
     const selectedValues = flattenDeep([value ?? []]);
     const refinedValues = selectedValues.map((d) => d.toString());
@@ -75,22 +78,37 @@ const initSelected = async (value: any) => {
     if (selectedItems.length) {
         state.selected = selectedItems;
     } else {
-        await initVariableAndSelected();
+        const found = state.menuItems[0];
+        if (found) {
+            state.selected = [found];
+            changeVariables([found]);
+        }
     }
 };
 
-watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, async (varsSchema, prevVarsSchema) => {
+watch(() => dashboard.value?.vars_schema?.properties, async (varsSchema, prevVarsSchema) => {
+    if (!varsSchema) return;
     const _variable = props.variable as TextEnumVariable|NumberEnumVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    const value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key];
+    const value = dashboard.value?.vars?.[_variable.key];
     if (value) {
-        await initSelected(value);
+        initSelected(value);
     } else {
         state.selected = [];
     }
 }, { immediate: true });
 
+// for reset
+watch(() => props.vars, (_vars) => {
+    const selectedValues = state.selected.map((d) => d.name);
+    const _variable = props.variable as TextEnumVariable|NumberEnumVariable;
+    const tempVarsValue = flattenDeep([(_vars?.[_variable.key] as string|string[]|undefined) ?? []]);
+    const isNotSame = xor(selectedValues, tempVarsValue).length > 0;
+    if (isNotSame) {
+        initSelected(_vars?.[state.variable.key]);
+    }
+});
 
 
 </script>

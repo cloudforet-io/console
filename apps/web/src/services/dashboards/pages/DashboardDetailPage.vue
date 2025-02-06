@@ -102,7 +102,13 @@ const { mutate: updateDashboard, isPending: dashboardUpdateLoading } = useMutati
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
             const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
+                if (!oldDashboard) return _dashboard;
+                return {
+                    ...oldDashboard,
+                    vars: { ..._dashboard.vars },
+                };
+            });
         },
         onError: (e) => {
             ErrorHandler.handleError(e);
