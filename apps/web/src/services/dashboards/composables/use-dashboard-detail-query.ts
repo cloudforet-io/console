@@ -5,15 +5,18 @@ import type { QueryClient, QueryKey } from '@tanstack/vue-query';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { WidgetModel, WidgetUpdateParams } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/update';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
+import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
+import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
 const DEFAULT_LIST_DATA = { results: [] };
@@ -42,6 +45,7 @@ interface UseDashboardDetailQueryReturn {
     };
     fetcher: {
         updateDashboardFn: (args: DashboardUpdateParams) => Promise<DashboardModel>
+        updateWidgetFn: (args: WidgetUpdateParams) => Promise<WidgetModel>
     };
     queryClient: QueryClient;
 }
@@ -123,6 +127,13 @@ export const useDashboardDetailQuery = ({
         }
         return publicDashboardAPI.update(params as PublicDashboardUpdateParameters);
     };
+    const updateWidgetFn = (params: WidgetUpdateParams): Promise<WidgetModel> => {
+        const _isPrivate = params.widget_id.startsWith('private');
+        if (_isPrivate) {
+            return privateWidgetAPI.update(params as PrivateWidgetUpdateParameters);
+        }
+        return publicWidgetAPI.update(params as PublicWidgetUpdateParameters);
+    };
 
     /* State */
     const isLoading = computed<boolean>(() => (isPrivate.value
@@ -151,6 +162,7 @@ export const useDashboardDetailQuery = ({
         },
         fetcher: {
             updateDashboardFn,
+            updateWidgetFn,
         },
         queryClient,
     };

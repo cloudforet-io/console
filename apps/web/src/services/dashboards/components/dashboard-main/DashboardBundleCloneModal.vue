@@ -4,7 +4,6 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataTable, PI, PToggleButton, PButtonModal, PTextInput, PFieldGroup, PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
 } from '@cloudforet/mirinae';
@@ -12,7 +11,6 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type {
     DashboardCreateParams,
@@ -23,10 +21,10 @@ import type { FolderCreateParams, FolderModel } from '@/api-clients/dashboard/_t
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
 import type { PrivateFolderCreateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/create';
-import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
-import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
+import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
@@ -48,8 +46,6 @@ import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboa
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
-
-
 
 
 
@@ -89,6 +85,8 @@ const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
 const allReferenceStore = useAllReferenceStore();
+const { privateWidgetAPI } = usePrivateWidgetApi();
+const { publicWidgetAPI } = usePublicWidgetApi();
 
 /* Query */
 const {
@@ -299,9 +297,9 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
     try {
         const isPrivate = dashboardId.startsWith('private');
         const fetcher = isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.list
-            : SpaceConnector.clientV2.dashboard.publicWidget.list;
-        const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
+            ? privateWidgetAPI.list
+            : publicWidgetAPI.list;
+        const res = await fetcher({
             dashboard_id: dashboardId,
         });
         return res.results || [];

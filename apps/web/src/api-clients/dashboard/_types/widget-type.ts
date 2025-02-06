@@ -8,9 +8,15 @@ import type {
     GRANULARITY,
     WIDGET_SIZE,
 } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
+import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
 import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
+import type { PublicWidgetDeleteParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/delete';
 import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
+import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
 import type { VariableModelType } from '@/lib/variable-models';
@@ -22,6 +28,9 @@ import type { DataInfo, LabelsInfo } from '@/common/modules/widgets/types/widget
 
 export type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 export type WidgetListParams = PublicWidgetListParameters|PrivateWidgetListParameters;
+export type WidgetCreateParams = PublicWidgetCreateParameters| PrivateWidgetCreateParameters;
+export type WidgetUpdateParams = PublicWidgetUpdateParameters| PrivateWidgetUpdateParameters;
+export type WidgetDeleteParams = PublicWidgetDeleteParameters| PrivateWidgetDeleteParameters;
 
 interface WidgetItemOptions {
     type: VariableModelType;

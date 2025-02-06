@@ -3,20 +3,18 @@ import { computed, reactive, watch } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@cloudforet/mirinae';
 import { getClonedName } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
-import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
-import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
+import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
@@ -49,9 +47,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
+const { privateWidgetAPI } = usePrivateWidgetApi();
+const { publicWidgetAPI } = usePublicWidgetApi();
 
-
-
+/* Query */
 const {
     publicDashboardList,
     privateDashboardList,
@@ -117,9 +116,9 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
     try {
         const isPrivate = dashboardId.startsWith('private');
         const fetcher = isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.list
-            : SpaceConnector.clientV2.dashboard.publicWidget.list;
-        const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
+            ? privateWidgetAPI.list
+            : publicWidgetAPI.list;
+        const res = await fetcher({
             dashboard_id: dashboardId,
         });
         return res.results || [];

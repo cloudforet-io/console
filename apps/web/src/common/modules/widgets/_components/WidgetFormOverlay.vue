@@ -4,15 +4,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, POverlayLayout, PTextButton,
 } from '@cloudforet/mirinae';
 
 
-import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
+import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
-import type { PublicWidgetDeleteParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/delete';
+import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
@@ -29,6 +28,9 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
+const { privateWidgetAPI } = usePrivateWidgetApi();
+const { publicWidgetAPI } = usePublicWidgetApi();
+
 const state = reactive({
     sidebarTitle: computed(() => {
         if (widgetGenerateState.overlayType === 'EXPAND') return undefined;
@@ -77,8 +79,8 @@ const deleteWidget = async (widgetId: string) => {
     if (!widgetId) return;
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
     const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>
-        : SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>;
+        ? privateWidgetAPI.delete
+        : publicWidgetAPI.delete;
     try {
         await fetcher({
             widget_id: widgetId,

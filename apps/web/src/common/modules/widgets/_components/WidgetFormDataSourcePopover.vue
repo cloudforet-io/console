@@ -4,17 +4,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
 
-import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
-import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { i18n } from '@/translations';
 
@@ -51,6 +48,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 const {
     dashboard,
+    api,
 } = useDashboardDetailQuery({
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
@@ -172,8 +170,8 @@ const state = reactive({
 const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null> => {
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
     const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
+        ? api.privateWidgetAPI.create
+        : api.publicWidgetAPI.create;
     try {
         return await fetcher({
             dashboard_id: dashboardDetailState.dashboardId as string,
