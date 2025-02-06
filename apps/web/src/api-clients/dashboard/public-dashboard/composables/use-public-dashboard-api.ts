@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -12,7 +16,22 @@ import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/p
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 
-export const usePublicDashboardApi = () => {
+interface UsePublicDashboardApiReturn {
+    publicDashboardQueryKey: ComputedRef<QueryKey>;
+    publicDashboardListQueryKey: ComputedRef<QueryKey>;
+    publicDashboardAPI: {
+        create: (params: PublicDashboardCreateParameters) => Promise<PublicDashboardModel>;
+        update: (params: PublicDashboardUpdateParameters) => Promise<PublicDashboardModel>;
+        changeFolder: (params: PublicDashboardChangeFolderParameters) => Promise<PublicDashboardModel>;
+        share: (params: PublicDashboardShareParameters) => Promise<PublicDashboardModel>;
+        unshare: (params: PublicDashboardUnshareParameters) => Promise<PublicDashboardModel>;
+        delete: (params: PublicDashboardDeleteParameters) => Promise<void>;
+        get: (params: PublicDashboardGetParameters) => Promise<PublicDashboardModel>;
+        list: (params: PublicDashboardListParameters) => Promise<ListResponse<PublicDashboardModel>>;
+    }
+}
+
+export const usePublicDashboardApi = (): UsePublicDashboardApiReturn => {
     const publicDashboardQueryKey = useAPIQueryKey('public-dashboard/get');
     const publicDashboardListQueryKey = useAPIQueryKey('public-dashboard/list');
 

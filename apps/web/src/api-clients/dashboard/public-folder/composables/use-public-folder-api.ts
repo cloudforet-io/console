@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -11,8 +15,21 @@ import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/publ
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
+interface UsePublicFolderApiReturn {
+    publicFolderQueryKey: ComputedRef<QueryKey>;
+    publicFolderListQueryKey: ComputedRef<QueryKey>;
+    publicFolderAPI: {
+        create: (params: PublicFolderCreateParameters) => Promise<PublicFolderModel>;
+        update: (params: PublicFolderUpdateParameters) => Promise<PublicFolderModel>;
+        share: (params: PublicFolderShareParameters) => Promise<PublicFolderModel>;
+        unshare: (params: PublicFolderUnshareParameters) => Promise<PublicFolderModel>;
+        delete: (params: PublicFolderDeleteParameters) => Promise<void>;
+        get: (params: PublicFolderGetParameters) => Promise<PublicFolderModel>;
+        list: (params: PublicFolderListParameters) => Promise<ListResponse<PublicFolderModel>>;
+    }
+}
 
-export const usePublicFolderApi = () => {
+export const usePublicFolderApi = (): UsePublicFolderApiReturn => {
     const publicFolderQueryKey = useAPIQueryKey('public-folder/get');
     const publicFolderListQueryKey = useAPIQueryKey('public-folder/list');
 

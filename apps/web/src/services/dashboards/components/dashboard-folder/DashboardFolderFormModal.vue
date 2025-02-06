@@ -48,8 +48,8 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 
 /* Query */
 const {
-    publicFolderItems,
-    privateFolderItems,
+    publicFolderList,
+    privateFolderList,
     keys,
     api,
     fetcher,
@@ -64,10 +64,10 @@ const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     isPrivate: false,
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     selectedFolder: computed<FolderModel|undefined>(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             if (props.folderId?.startsWith('private')) {

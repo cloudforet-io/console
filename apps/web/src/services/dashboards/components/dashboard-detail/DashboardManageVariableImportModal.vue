@@ -42,10 +42,10 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
-    publicFolderItems,
-    privateFolderItems,
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
 } = useDashboardQuery();
 const {
     dashboard,
@@ -67,16 +67,16 @@ const state = reactive({
     keyword: '',
     selectedDashboardId: '' as string|undefined,
     publicDashboardItems: computed<PublicDashboardModel[]>(() => {
-        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId);
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId);
         if (storeState.isAdminMode) return _v2DashboardItems;
         return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateDashboardItems: computed<PrivateDashboardModel[]>(() => privateDashboardItems.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId)),
+    privateDashboardItems: computed<PrivateDashboardModel[]>(() => privateDashboardList.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId)),
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     allDashboardItems: computed<PrivateDashboardModel[]>(() => [...state.publicDashboardItems, ...state.privateDashboardItems]),
     selectedDashboardVariables: computed<DashboardGlobalVariable[]>(() => {
         const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);

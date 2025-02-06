@@ -82,8 +82,8 @@ const displayStore = useDisplayStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
+    publicDashboardList,
+    privateDashboardList,
 } = useDashboardQuery();
 
 const router = useRouter();
@@ -203,7 +203,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...publicDashboardItems.value, ...privateDashboardItems.value],
+            [...publicDashboardList.value, ...privateDashboardList.value],
         );
     }),
     favoriteMetricItems: computed<ReferenceData[]>(() => {

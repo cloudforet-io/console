@@ -70,8 +70,8 @@ const displayStore = useDisplayStore();
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
+    publicDashboardList,
+    privateDashboardList,
 } = useDashboardQuery();
 
 const emit = defineEmits<{(e: 'click-favorite'): void;
@@ -125,7 +125,7 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
 const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): ReferenceData|undefined => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([favoriteConfig], [...publicDashboardItems.value, ...privateDashboardItems.value])[0];
+        return convertDashboardConfigToReferenceData([favoriteConfig], [...publicDashboardList.value, ...privateDashboardList.value])[0];
     }
     if (itemType === FAVORITE_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([favoriteConfig], storeState.projects)[0];

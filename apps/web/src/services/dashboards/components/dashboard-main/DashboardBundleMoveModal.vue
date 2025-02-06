@@ -39,8 +39,8 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 
 /* Query */
 const {
-    publicFolderItems,
-    privateFolderItems,
+    publicFolderList,
+    privateFolderList,
     api,
     keys,
     queryClient,
@@ -52,10 +52,10 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderItems.value;
-        return publicFolderItems.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateFolderItems: computed(() => privateFolderItems.value),
+    privateFolderItems: computed(() => privateFolderList.value),
     selectedIdMap: computed<Record<string, boolean>>(() => {
         if (dashboardPageControlState.folderModalType === 'PUBLIC') {
             return dashboardPageControlState.selectedPublicIdMap;

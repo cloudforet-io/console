@@ -1,16 +1,20 @@
+import type { Ref } from 'vue';
 import {
-    computed, reactive, watch,
+    computed, type ComputedRef, reactive, watch,
 } from 'vue';
 
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import type { QueryKey } from '@tanstack/vue-query';
+import { type QueryClient, useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import { usePrivateFolderApi } from '@/api-clients/dashboard/private-folder/composables/use-private-folder-api';
 import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 
@@ -20,12 +24,39 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+const DEFAULT_LIST_DATA = { results: [] };
+const STALE_TIME = 1000 * 60 * 5;
 
-export const useDashboardQuery = () => {
+interface UseDashboardQueryReturn {
+    publicDashboardList: Ref<PublicDashboardModel[]>;
+    privateDashboardList: Ref<PrivateDashboardModel[]>;
+    publicFolderList: Ref<FolderModel[]>;
+    privateFolderList: Ref<FolderModel[]>;
+    isLoading: ComputedRef<boolean>;
+    keys: {
+        publicDashboardListQueryKey: ComputedRef<QueryKey>;
+        privateDashboardListQueryKey: ComputedRef<QueryKey>;
+        publicFolderListQueryKey: ComputedRef<QueryKey>;
+        privateFolderListQueryKey: ComputedRef<QueryKey>;
+    };
+    fetcher: {
+        updateFolderFn: (args: FolderUpdateParams) => Promise<FolderModel>
+    };
+    api: {
+        publicDashboardAPI: ReturnType<typeof usePublicDashboardApi>['publicDashboardAPI'];
+        privateDashboardAPI: ReturnType<typeof usePrivateDashboardApi>['privateDashboardAPI'];
+        publicFolderAPI: ReturnType<typeof usePublicFolderApi>['publicFolderAPI'];
+        privateFolderAPI: ReturnType<typeof usePrivateFolderApi>['privateFolderAPI'];
+    };
+    queryClient: QueryClient;
+}
+
+export const useDashboardQuery = (): UseDashboardQueryReturn => {
     const { publicDashboardAPI, publicDashboardListQueryKey } = usePublicDashboardApi();
     const { privateDashboardAPI, privateDashboardListQueryKey } = usePrivateDashboardApi();
     const { publicFolderAPI, publicFolderListQueryKey } = usePublicFolderApi();
     const { privateFolderAPI, privateFolderListQueryKey } = usePrivateFolderApi();
+
     const queryClient = useQueryClient();
 
     const appContextStore = useAppContextStore();
@@ -37,50 +68,36 @@ export const useDashboardQuery = () => {
 
     const _state = reactive({
         // Store State
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
-        currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+        isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+        currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
         costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
         userId: computed<string|undefined>(() => userStore.state.userId),
         // state
         publicDashboardListApiQuery: publicDashboardListApiQueryHelper.data,
         publicFolderListApiQuery: publicFolderListApiQueryHelper.data,
-    });
-
-    /* Keys */
-    const _publicDashboardListQueryKey = computed(() => [
-        ...publicDashboardListQueryKey.value,
-        {
+        defaultListQuery: {
             query: {
-                ..._state.publicDashboardListApiQuery,
                 sort: [{ key: 'created_at', desc: true }],
             },
         },
+    });
+
+    /* Query Keys */
+    const _publicDashboardListQueryKey = computed(() => [
+        ...publicDashboardListQueryKey.value,
+        _state.defaultListQuery,
     ]);
     const _privateDashboardListQueryKey = computed(() => [
         ...privateDashboardListQueryKey.value,
-        {
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        },
+        _state.defaultListQuery,
     ]);
     const _publicFolderListQueryKey = computed(() => [
         ...publicFolderListQueryKey.value,
-        {
-            query: {
-                ..._state.publicFolderListApiQuery,
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        },
+        _state.defaultListQuery,
     ]);
     const _privateFolderListQueryKey = computed(() => [
         ...privateFolderListQueryKey.value,
-        {
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        },
+        _state.defaultListQuery,
     ]);
 
 
@@ -93,7 +110,10 @@ export const useDashboardQuery = () => {
                 sort: [{ key: 'created_at', desc: true }],
             },
         }),
-        staleTime: 1000 * 60 * 5,
+        select: (data) => data?.results || [],
+        initialData: DEFAULT_LIST_DATA,
+        initialDataUpdatedAt: 0,
+        staleTime: STALE_TIME,
     });
     const privateDashboardListQuery = useQuery({
         queryKey: _privateDashboardListQueryKey,
@@ -102,7 +122,10 @@ export const useDashboardQuery = () => {
                 sort: [{ key: 'created_at', desc: true }],
             },
         }),
-        staleTime: 1000 * 60 * 5,
+        select: (data) => data?.results || [],
+        initialData: DEFAULT_LIST_DATA,
+        initialDataUpdatedAt: 0,
+        staleTime: STALE_TIME,
         enabled: computed(() => !_state.isAdminMode),
     });
     const publicFolderListQuery = useQuery({
@@ -113,7 +136,10 @@ export const useDashboardQuery = () => {
                 sort: [{ key: 'created_at', desc: true }],
             },
         }),
-        staleTime: 1000 * 60 * 5,
+        select: (data) => data?.results || [],
+        initialData: DEFAULT_LIST_DATA,
+        initialDataUpdatedAt: 0,
+        staleTime: STALE_TIME,
     });
     const privateFolderListQuery = useQuery({
         queryKey: _privateFolderListQueryKey,
@@ -122,7 +148,10 @@ export const useDashboardQuery = () => {
                 sort: [{ key: 'created_at', desc: true }],
             },
         }),
-        staleTime: 1000 * 60 * 5,
+        select: (data) => data?.results || [],
+        initialData: DEFAULT_LIST_DATA,
+        initialDataUpdatedAt: 0,
+        staleTime: STALE_TIME,
         enabled: computed(() => !_state.isAdminMode),
     });
 
@@ -149,13 +178,15 @@ export const useDashboardQuery = () => {
         _state.publicFolderListApiQuery = publicFolderListApiQueryHelper.data;
     }, { immediate: true });
 
+    const isLoading = computed<boolean>(() => publicDashboardListQuery.isFetching.value || privateDashboardListQuery.isFetching.value
+        || publicFolderListQuery.isFetching.value || privateFolderListQuery.isFetching.value);
+
     return {
-        publicDashboardItems: computed(() => publicDashboardListQuery.data.value?.results || []),
-        privateDashboardItems: computed(() => privateDashboardListQuery.data.value?.results || []),
-        publicFolderItems: computed(() => publicFolderListQuery.data.value?.results || []),
-        privateFolderItems: computed(() => privateFolderListQuery.data.value?.results || []),
-        loading: computed<boolean>(() => publicDashboardListQuery.isFetching.value || privateDashboardListQuery.isFetching.value
-            || publicFolderListQuery.isFetching.value || privateFolderListQuery.isFetching.value),
+        publicDashboardList: publicDashboardListQuery.data,
+        privateDashboardList: privateDashboardListQuery.data,
+        publicFolderList: publicFolderListQuery.data,
+        privateFolderList: privateFolderListQuery.data,
+        isLoading,
         keys: {
             publicDashboardListQueryKey: _publicDashboardListQueryKey,
             privateDashboardListQueryKey: _privateDashboardListQueryKey,

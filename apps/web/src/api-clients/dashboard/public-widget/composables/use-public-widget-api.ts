@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -12,7 +16,21 @@ import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/publ
 import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
-export const usePublicWidgetApi = () => {
+interface UsePublicWidgetApiReturn {
+    publicWidgetQueryKey: ComputedRef<QueryKey>;
+    publicWidgetListQueryKey: ComputedRef<QueryKey>;
+    publicWidgetAPI: {
+        create: (params: PublicWidgetCreateParameters) => Promise<PublicWidgetModel>;
+        update: (params: PublicWidgetUpdateParameters) => Promise<PublicWidgetModel>;
+        delete: (params: PublicWidgetDeleteParameters) => Promise<void>;
+        load: (params: PublicWidgetLoadParameters) => Promise<WidgetLoadResponse>;
+        loadSum: (params: PublicWidgetLoadSumParameters) => Promise<WidgetLoadResponse>;
+        get: (params: PublicWidgetGetParameters) => Promise<PublicWidgetModel>;
+        list: (params: PublicWidgetListParameters) => Promise<ListResponse<PublicWidgetModel>>;
+    }
+}
+
+export const usePublicWidgetApi = (): UsePublicWidgetApiReturn => {
     const publicWidgetQueryKey = useAPIQueryKey('public-widget/get');
     const publicWidgetListQueryKey = useAPIQueryKey('public-widget/list');
 

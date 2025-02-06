@@ -36,8 +36,8 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 
 /* Query */
 const {
-    publicDashboardItems,
-    privateDashboardItems,
+    publicDashboardList,
+    privateDashboardList,
     keys,
     queryClient,
 } = useDashboardQuery();
@@ -76,11 +76,11 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardItems.value.filter((d) => d.version !== '1.0');
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
         if (storeState.isAdminMode) return _v2DashboardItems;
         return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
     }),
-    privateDashboardItems: computed(() => privateDashboardItems.value.filter((d) => d.version !== '1.0')),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     originName: computed<string>(() => {
         const _dashboard = [...state.publicDashboardItems, ...state.privateDashboardItems].find((item: DashboardModel) => item.dashboard_id === props.dashboardId);
         return _dashboard?.name || '';

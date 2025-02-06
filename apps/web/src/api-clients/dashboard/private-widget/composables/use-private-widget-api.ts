@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -12,7 +16,21 @@ import type { PrivateWidgetLoadSumParameters } from '@/api-clients/dashboard/pri
 import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 
-export const usePrivateWidgetApi = () => {
+interface UsePrivateWidgetApiReturn {
+    privateWidgetQueryKey: ComputedRef<QueryKey>;
+    privateWidgetListQueryKey: ComputedRef<QueryKey>;
+    privateWidgetAPI: {
+        create: (params: PrivateWidgetCreateParameters) => Promise<PrivateWidgetModel>;
+        update: (params: PrivateWidgetUpdateParameters) => Promise<PrivateWidgetModel>;
+        delete: (params: PrivateWidgetDeleteParameters) => Promise<void>;
+        load: (params: PrivateWidgetLoadParameters) => Promise<WidgetLoadResponse>;
+        loadSum: (params: PrivateWidgetLoadSumParameters) => Promise<WidgetLoadResponse>;
+        get: (params: PrivateWidgetGetParameters) => Promise<PrivateWidgetModel>;
+        list: (params: PrivateWidgetListParameters) => Promise<ListResponse<PrivateWidgetModel>>;
+    }
+}
+
+export const usePrivateWidgetApi = (): UsePrivateWidgetApiReturn => {
     const privateWidgetQueryKey = useAPIQueryKey('private-widget/get');
     const privateWidgetListQueryKey = useAPIQueryKey('private-widget/list');
 
