@@ -13,19 +13,26 @@ import type {
     DashboardGlobalVariable,
     TextAnyVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     variable: DashboardGlobalVariable;
+    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
-
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const state = reactive({
     variable: computed(() => {
         const anyTextVariable = props.variable as TextAnyVariable;
@@ -34,6 +41,7 @@ const state = reactive({
     value: undefined as string|undefined,
     editMode: false,
     keyword: '',
+    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 const handleDeleteTextValue = () => {
@@ -58,22 +66,32 @@ const handleClickDoneButton = () => {
 
 const changeVariables = (changedSelected?: string) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars);
+    const vars = cloneDeep(props.vars ?? {});
     if (changedSelected) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
     }
-    dashboardDetailStore.setVars(vars);
+    state.proxyVars = vars;
 };
 
 // set default value
-watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
+watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchema) => {
+    if (!varsSchema) return;
     const _variable = props.variable as TextAnyVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[_variable.key])) return;
-    state.value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] || _variable.options?.defaultValue;
+    state.value = dashboard.value?.vars?.[_variable.key] || _variable.options?.defaultValue;
     changeVariables(state.value);
 }, { immediate: true });
+
+// for reset
+watch(() => props.vars, (_vars) => {
+    const _variable = props.variable as TextAnyVariable;
+    const tempVarsValue = _vars?.[_variable.key] as string|undefined;
+    if (state.value !== tempVarsValue) {
+        state.value = tempVarsValue;
+    }
+});
 
 </script>
 

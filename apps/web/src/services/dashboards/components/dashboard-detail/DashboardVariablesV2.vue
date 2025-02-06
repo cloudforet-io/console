@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { isEqual } from 'lodash';
@@ -53,6 +53,7 @@ const state = reactive({
     showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     dashboardVarsSchemaProperties: computed<DashboardGlobalVariableSchemaProperties>(() => dashboard.value?.vars_schema?.properties ?? {}),
     dashboardVars: computed<DashboardVars>(() => dashboard.value?.vars ?? {}),
+    tempVars: undefined as DashboardVars|undefined,
     globalVariables: computed<DashboardGlobalVariable[]>(() => {
         const properties = state.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
         const _usedProperties: DashboardGlobalVariable[] = Object.values(properties).filter((d) => d.use);
@@ -62,7 +63,7 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
         state.globalVariables.forEach((_var) => {
-            if (!isEqual(state.dashboardVars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
+            if (!isEqual(state.dashboardVars?.[_var.key], state.tempVars?.[_var.key])) {
                 results.push(_var.key);
             }
         });
@@ -74,13 +75,16 @@ const state = reactive({
 });
 
 const handleClickSaveButton = () => {
-    emit('update', { vars: dashboardDetailState.vars });
-    // dashboardDetailStore.setVars(dashboardDetailState.vars);
+    emit('update', { vars: state.tempVars });
 };
 const handleResetVariables = () => {
-    const _originVars = props.originVars ?? state.dashboardVars;
-    dashboardDetailStore.setVars(_originVars);
+    const _originVars = state.dashboardVars;
+    state.tempVars = { ..._originVars };
 };
+
+watch(() => dashboard.value?.vars, (_vars) => {
+    state.tempVars = { ..._vars };
+}, { immediate: true });
 </script>
 
 <template>
@@ -89,7 +93,9 @@ const handleResetVariables = () => {
     >
         <template v-for="(property, idx) in state.globalVariables">
             <div :key="`${property.name}-${idx}`">
-                <dashboard-global-variable-filter :variable="property" />
+                <dashboard-global-variable-filter :variable="property"
+                                                  :vars.sync="state.tempVars"
+                />
                 <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(property.key)" />
             </div>
         </template>

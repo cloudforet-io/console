@@ -173,7 +173,7 @@ const { mutate: updateDashboard } = useMutation(
 
 /* Util */
 const initSnapshot = () => {
-    state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
+    state.varsSnapshot = cloneDeep(dashboard.value?.vars || {});
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
 };
 const reset = () => {
@@ -222,10 +222,6 @@ watch(() => state.mounted, async (mounted) => {
         state.mounted = false;
     }
 });
-// watch(() => dashboardDetailState.vars, async () => {
-//     await nextTick();
-//     loadOverlayWidget();
-// });
 
 onBeforeMount(() => {
     initSnapshot();
@@ -252,10 +248,10 @@ onUnmounted(() => {
                         />
                         <dashboard-variables-v2 disable-save-button
                                                 widget-mode
-                                                :is-project-dashboard="!!dashboardDetailState.projectId"
+                                                :is-project-dashboard="!!dashboard?.project_id"
                         />
                     </div>
-                    <p-button v-if="!state.isSharedDashboard && !dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
+                    <p-button v-if="!state.isSharedDashboard && !dashboard?.project_id && widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"
                               class="edit-button"

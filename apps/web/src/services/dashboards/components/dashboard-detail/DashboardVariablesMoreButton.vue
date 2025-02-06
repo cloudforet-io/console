@@ -15,7 +15,10 @@ import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mir
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardGlobalVariableSchemaProperties, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type {
+    DashboardGlobalVariableSchemaProperties,
+    DashboardModel,
+} from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -39,7 +42,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -100,11 +102,8 @@ const toggleUseDashboardVarsSchema = debounce((dashboardId: string, variableKey:
     const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(state.dashboardVarsSchemaProperties);
     const _use = !_dashboardVarsSchemaProperties[variableKey].use;
     const _vars = cloneDeep(dashboard.value?.vars || {});
-    const _tempVars = cloneDeep(dashboardDetailState.vars);
     if (!_use) {
         delete _vars[variableKey];
-        delete _tempVars[variableKey];
-        dashboardDetailStore.setVars(_tempVars);
     }
     mutate({
         dashboard_id: dashboardId,
@@ -127,7 +126,14 @@ const { mutate, isPending: loading } = useMutation(
         onSuccess: (_dashboard: DashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
             const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
+                if (!oldDashboard) return oldDashboard;
+                return {
+                    ...oldDashboard,
+                    vars_schema: _dashboard.vars_schema,
+                    vars: _dashboard.vars,
+                };
+            });
             showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
         },
         onError: (e) => {
