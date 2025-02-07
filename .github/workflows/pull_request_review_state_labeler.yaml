@@ -18,7 +18,7 @@ jobs:
         id: check_self_approved
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.CONSOLE_PR_PAT_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
             const owner = context.repo.owner;
@@ -36,7 +36,7 @@ jobs:
         if: github.event_name == 'pull_request_target' && steps.check_self_approved.outputs.isSelfApprovedPR == 'false'
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.CONSOLE_PR_PAT_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
             const owner = context.repo.owner;
@@ -56,7 +56,7 @@ jobs:
         if: github.event_name == 'pull_request_review' && steps.check_self_approved.outputs.isSelfApprovedPR == 'false'
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.CONSOLE_PR_PAT_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
             const owner = context.repo.owner;
