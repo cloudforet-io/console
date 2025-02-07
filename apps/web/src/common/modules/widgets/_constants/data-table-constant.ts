@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import type {
     AddLabelsOptions,
     ConcatOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions, ValueMappingOptions,
@@ -136,4 +138,15 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
             },
         ],
     } as ValueMappingOptions,
+};
+
+export const TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS = {
+    JOIN: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.JOIN),
+    CONCAT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.CONCAT),
+    QUERY: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.QUERY),
+    EVAL: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.EVAL),
+    AGGREGATE: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.AGGREGATE),
+    PIVOT: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.PIVOT),
+    ADD_LABELS: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.ADD_LABELS),
+    VALUE_MAPPING: cloneDeep(DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP.VALUE_MAPPING),
 };
