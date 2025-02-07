@@ -67,7 +67,7 @@ export const getFormattedNumber = (val: number, numberFormatInfo?: NumberFormatI
     }
 };
 
-export const sanitizeWidgetOptions = (options: Record<string, any>, widgetType: WidgetType) => {
+export const sanitizeWidgetOptions = (options: Record<string, any> = {}, widgetType: WidgetType = 'table') => {
     const currentOptionKeys = Object.keys(options ?? {});
     const widgetConfig = getWidgetConfig(widgetType);
     const validOptionKeys = [
