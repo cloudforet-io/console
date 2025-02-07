@@ -12,9 +12,6 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-
 import getRandomId from '@/lib/random-id-generator';
 
 import type {
@@ -27,9 +24,12 @@ import type {
     CustomColumnWidthItem,
     CustomTableColumnWidthValue,
 } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 interface CustomWidthFieldItem extends CustomColumnWidthItem {
     key: string;
@@ -38,25 +38,29 @@ const FIELD_KEY = 'customTableColumnWidth';
 
 const props = defineProps<WidgetFieldComponentProps<undefined>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
-const storeState = reactive({
-    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
 const state = reactive({
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
+    isPivotDataTable: computed<boolean>(() => state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<CustomTableColumnWidthValue>(() => props.fieldManager.data[FIELD_KEY].value),
     customWidthItems: [] as CustomWidthFieldItem[],
     allFieldList: computed<MenuItem[]>(() => {
-        if (!widgetGenerateGetters.selectedDataTable) return [];
+        if (!state.selectedDataTable) return [];
 
-        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+        const columnFieldForPivot = state.selectedDataTable?.options.PIVOT?.fields?.column;
 
         const fieldList = sortWidgetTableFields(
             [
-                ...Object.keys(widgetGenerateGetters.selectedDataTable?.labels_info ?? {}),
-                ...((state.isPivotDataTable && columnFieldForPivot) ? [columnFieldForPivot, SUB_TOTAL_NAME] : Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {})),
+                ...Object.keys(state.selectedDataTable?.labels_info ?? {}),
+                ...((state.isPivotDataTable && columnFieldForPivot) ? [columnFieldForPivot, SUB_TOTAL_NAME] : Object.keys(state.selectedDataTable?.data_info ?? {})),
             ],
         ) ?? [];
         return fieldList.map((d) => ({

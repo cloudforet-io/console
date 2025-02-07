@@ -12,20 +12,31 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type {
     CategoryByOptions,
 } from '@/common/modules/widgets/_widget-fields/category-by/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
+
 const FIELD_KEY = 'categoryBy';
 const props = defineProps<WidgetFieldComponentProps<CategoryByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
-        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        if (!state.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,
