@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -12,7 +16,21 @@ import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-dat
 import type { DataTableTransformParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 
-export const usePrivateDataTableApi = () => {
+interface UsePrivateDataTableApiReturn {
+    privateDataTableQueryKey: ComputedRef<QueryKey>;
+    privateDataTableListQueryKey: ComputedRef<QueryKey>;
+    privateDataTableAPI: {
+        add: (params: DataTableAddParameters) => Promise<PrivateDataTableModel>;
+        transform: (params: DataTableTransformParameters) => Promise<PrivateDataTableModel>;
+        update: (params: DataTableUpdateParameters) => Promise<PrivateDataTableModel>;
+        delete: (params: DataTableDeleteParameters) => Promise<void>;
+        load: (params: DataTableLoadParameters) => Promise<DataTableLoadResponse>;
+        get: (params: DataTableGetParameters) => Promise<PrivateDataTableModel>;
+        list: (params: DataTableListParameters) => Promise<ListResponse<PrivateDataTableModel>>;
+    }
+}
+
+export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
     const privateDataTableQueryKey = useAPIQueryKey('private-data-table/get');
     const privateDataTableListQueryKey = useAPIQueryKey('private-data-table/list');
 
