@@ -1,8 +1,11 @@
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+
 import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
-
+export type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 
 type Handler = (item:any) => string;
 
@@ -38,4 +41,10 @@ export interface TransformDataTableProps<OperatorOptions> {
     operatorOptions: OperatorOptions;
     originData: OperatorOptions;
     invalid?: boolean;
+}
+
+export interface DataTableReference {
+    data_table_id: string;
+    parents: string[];
+    children: string[];
 }

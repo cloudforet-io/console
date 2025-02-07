@@ -1,3 +1,7 @@
+import type { ComputedRef } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
@@ -12,7 +16,22 @@ import type { DataTableTransformParameters } from '@/api-clients/dashboard/publi
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
-export const usePublicDataTableApi = () => {
+
+interface UsePublicDataTableApiReturn {
+    publicDataTableQueryKey: ComputedRef<QueryKey>;
+    publicDataTableListQueryKey: ComputedRef<QueryKey>;
+    publicDataTableAPI: {
+        add: (params: DataTableAddParameters) => Promise<PublicDataTableModel>;
+        transform: (params: DataTableTransformParameters) => Promise<PublicDataTableModel>;
+        update: (params: DataTableUpdateParameters) => Promise<PublicDataTableModel>;
+        delete: (params: DataTableDeleteParameters) => Promise<void>;
+        load: (params: DataTableLoadParameters) => Promise<DataTableLoadResponse>;
+        get: (params: DataTableGetParameters) => Promise<PublicDataTableModel>;
+        list: (params: DataTableListParameters) => Promise<ListResponse<PublicDataTableModel>>;
+    }
+}
+
+export const usePublicDataTableApi = (): UsePublicDataTableApiReturn => {
     const publicDataTableQueryKey = useAPIQueryKey('public-data-table/get');
     const publicDataTableListQueryKey = useAPIQueryKey('public-data-table/list');
 
