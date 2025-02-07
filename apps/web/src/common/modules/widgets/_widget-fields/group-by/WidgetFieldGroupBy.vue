@@ -19,26 +19,37 @@ import type {
     GroupByOptions,
     GroupByValue,
 } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 const DEFAULT_COUNT = 5;
 const FIELD_KEY = 'groupBy';
 
 const props = defineProps<WidgetFieldComponentProps<GroupByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     isInitiated: false,
     fieldValue: computed<GroupByValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
-        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        if (!state.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,

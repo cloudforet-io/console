@@ -9,17 +9,18 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { customNumberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { NumberFormat, NumberFormatValue, NumberFormatOptions } from '@/common/modules/widgets/_widget-fields/number-format/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 
@@ -36,22 +37,26 @@ const FIELD_KEY = 'numberFormat';
 
 const props = defineProps<WidgetFieldComponentProps<NumberFormatOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
-const storeState = reactive({
-    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
 const state = reactive({
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
+    isPivotDataTable: computed<boolean>(() => state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isInitiated: false,
     fieldValue: computed<NumberFormatValue>(() => props.fieldManager.data[FIELD_KEY].value),
     dataFieldList: computed<string[]>(() => {
-        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+        const columnFieldForPivot = state.selectedDataTable?.options.PIVOT?.fields?.column;
         if (state.isPivotDataTable && columnFieldForPivot) {
             return [columnFieldForPivot];
         }
-        return Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+        return Object.keys(state.selectedDataTable?.data_info ?? {}) ?? [];
     }),
     menuItems: computed<SelectDropdownMenuItem[]>(() => [
         {

@@ -6,37 +6,41 @@ import {
 import { PSelectDropdown, PFieldGroup } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import { widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { DataFieldOptions, DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 const FIELD_KEY = 'dataField';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
-const storeState = reactive({
-    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
 const state = reactive({
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
+    isPivotDataTable: computed<boolean>(() => state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<DataFieldValue>(() => props.fieldManager.data[FIELD_KEY]?.value),
     multiselectable: computed(() => props.widgetFieldSchema?.options?.multiSelectable),
     menuItems: computed<MenuItem[]>(() => {
-        const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+        const dataInfoList = Object.keys(state.selectedDataTable?.data_info ?? {}) ?? [];
         return dataInfoList.filter((field) => field !== SUB_TOTAL_NAME)
             .map((d) => ({
                 name: d,
@@ -46,7 +50,7 @@ const state = reactive({
     invalid: computed<boolean>(() => !validator(state.fieldValue, props.widgetConfig)),
     selectedItem: computed<MenuItem[]|string|undefined>(() => {
         if (state.isPivotDataTable) {
-            const dataName = storeState.selectedDataTable?.options.PIVOT?.fields?.column || '';
+            const dataName = state.selectedDataTable?.options.PIVOT?.fields?.column || '';
             return convertToMenuItem([dataName]);
         }
         if (!state.menuItems.length) return undefined;

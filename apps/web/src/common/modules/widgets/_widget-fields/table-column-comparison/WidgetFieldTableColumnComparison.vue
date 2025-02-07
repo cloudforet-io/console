@@ -10,8 +10,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/inputs/dropdown/select-dropdown/type';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 
@@ -26,22 +24,29 @@ import type {
     TableColumnComparisonOptions,
     TableColumnComparisonValue,
 } from '@/common/modules/widgets/_widget-fields/table-column-comparison/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 const FIELD_KEY = 'tableColumnComparison';
 
 const props = defineProps<WidgetFieldComponentProps<TableColumnComparisonOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
-const storeState = reactive({
-    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
 const state = reactive({
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
+    isPivotDataTable: computed<boolean>(() => state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     fieldValue: computed<TableColumnComparisonValue>(() => props.fieldManager.data[FIELD_KEY].value),
     infoText: computed<TranslateResult>(() => {
         if (props.widgetConfig.widgetName !== 'table') return i18n.t('COMMON.WIDGETS.COMPARISON.INFO_TOOLTIP_TABLE');
@@ -54,7 +59,7 @@ const state = reactive({
         { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
     ]),
     fieldMenuItems: computed<SelectDropdownMenuItem[]>(() => {
-        const dataInfoList = Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+        const dataInfoList = Object.keys(state.selectedDataTable?.data_info ?? {}) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,

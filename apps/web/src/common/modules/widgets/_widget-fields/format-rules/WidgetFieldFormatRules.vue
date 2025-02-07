@@ -21,20 +21,31 @@ import type {
     FormatRulesValue, FormatRulesOptions, ThresholdValue, FormatRulesType,
 
 } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 const FIELD_KEY = 'formatRules';
 
 const props = defineProps<WidgetFieldComponentProps<FormatRulesOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
     type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
     invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
@@ -59,8 +70,8 @@ const state = reactive({
     }),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
-        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        if (!state.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,
