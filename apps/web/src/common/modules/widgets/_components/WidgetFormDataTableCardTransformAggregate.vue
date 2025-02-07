@@ -25,6 +25,8 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AggregateOptions } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
+
 
 
 const props = defineProps<TransformDataTableProps<AggregateOptions>>();
@@ -34,17 +36,23 @@ const emit = defineEmits<{(e: 'update:operator-options', value: AggregateOptions
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
 });
 const groupByInfo = ref<AggregateOptions['group_by']>(cloneDeep(props.originData.group_by));
 const functionInfo = ref<AggregateOptions['function']>(cloneDeep(props.originData.function));
-const storeState = reactive({
-    dataTables: computed(() => widgetGenerateState.dataTables),
-});
+
 const state = reactive({
     proxyOperatorOptions: useProxyValue<AggregateOptions>('operator-options', props, emit),
-    selectedDataTable: computed(() => storeState.dataTables.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
+    selectedDataTable: computed(() => dataTableList.value.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
     invalid: computed<boolean>(() => {
         if (!state.proxyOperatorOptions?.data_table_id) return true;
         if (!state.proxyOperatorOptions.group_by?.length) return true;

@@ -7,18 +7,20 @@ import {
 import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataLoader, PEmpty, PButton,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import {
+    usePrivateDataTableApi,
+} from '@/api-clients/dashboard/private-data-table/composables/use-private-data-table-api';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
+import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import type { PublicWidgetDeleteParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/delete';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
@@ -74,10 +76,8 @@ const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const allReferenceStore = useAllReferenceStore();
 const displayStore = useDisplayStore();
-
-/* State */
-const containerRef = ref<HTMLElement|null>(null);
-const widgetRef = ref<Array<WidgetComponent|null>>([]);
+const { publicDataTableAPI } = usePublicDataTableApi();
+const { privateDataTableAPI } = usePrivateDataTableApi();
 
 /* Query */
 const {
@@ -95,6 +95,9 @@ const { isManageable } = useDashboardManageable({
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
 
+/* State */
+const containerRef = ref<HTMLElement|null>(null);
+const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
@@ -245,8 +248,8 @@ const { mutate: updateWidgetSize } = useMutation({
 const listWidgetDataTables = async (widgetId: string) => {
     const isPrivate = widgetId.startsWith('private');
     const _fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
+        ? privateDataTableAPI.list
+        : publicDataTableAPI.list;
     try {
         const { results } = await _fetcher({ widget_id: widgetId });
         if (!results) return [];
@@ -308,10 +311,9 @@ const handleClickDeleteWidget = (widget: RefinedWidgetInfo) => {
     widgetDeleteState.targetWidget = widget;
     widgetDeleteState.visibleModal = true;
 };
-const handleOpenWidgetOverlay = async (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
+const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetOverlayType) => {
     widgetGenerateStore.setOverlayType(overlayType);
-    widgetGenerateStore.setWidgetForm(widget);
-    await widgetGenerateStore.listDataTable();
+    widgetGenerateStore.setWidgetFormInfo(widget);
     widgetGenerateStore.setOverlayStep(2);
     widgetGenerateStore.setShowOverlay(true);
 };

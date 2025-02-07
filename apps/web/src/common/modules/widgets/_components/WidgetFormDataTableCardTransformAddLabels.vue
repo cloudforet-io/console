@@ -24,6 +24,8 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { TransformDataTableProps, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AddLabelsOptions } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
+
 
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
@@ -41,9 +43,15 @@ const emit = defineEmits<{(e: 'update:operator-options', value: AddLabelsOptions
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const storeState = reactive({
-    dataTables: computed<Partial<DataTableModel>[]>(() => widgetGenerateState.dataTables),
-    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => storeState.dataTables.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
+    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => dataTableList.value.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
 });
 
 const dataTableInfo = ref<TransformDataTableInfo>({

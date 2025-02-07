@@ -10,9 +10,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
@@ -22,6 +19,8 @@ import {
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { JoinOptions, JoinType } from '@/common/modules/widgets/types/widget-model';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 
@@ -44,9 +43,14 @@ const rightKeyInfo = ref<JoinOptions['right_keys']>(props.originData.right_keys)
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const storeState = reactive({
-    dataTables: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => widgetGenerateState.dataTables),
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
 });
+
 const state = reactive({
     proxyOperatorOptions: useProxyValue<JoinOptions>('operator-options', props, emit),
     joinTypeItems: computed<SelectDropdownMenuItem[]>(() => [
@@ -65,7 +69,7 @@ const state = reactive({
     leftKeyMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.proxyOperatorOptions.data_tables.length < 1) return [];
         const _targetDataTableId = state.proxyOperatorOptions.data_tables[0];
-        const _targetDataTable = storeState.dataTables.find((d) => d.data_table_id === _targetDataTableId);
+        const _targetDataTable = dataTableList.value.find((d) => d.data_table_id === _targetDataTableId);
         return Object.keys(_targetDataTable?.labels_info ?? {})?.map((d) => ({
             name: d,
             label: d,
@@ -74,7 +78,7 @@ const state = reactive({
     rightKeyMenuItems: computed(() => {
         if (state.proxyOperatorOptions.data_tables.length < 2) return [];
         const _targetDataTableId = state.proxyOperatorOptions.data_tables[1];
-        const _targetDataTable = storeState.dataTables.find((d) => d.data_table_id === _targetDataTableId);
+        const _targetDataTable = dataTableList.value.find((d) => d.data_table_id === _targetDataTableId);
         return Object.keys(_targetDataTable?.labels_info ?? {})?.map((d) => ({
             name: d,
             label: d,

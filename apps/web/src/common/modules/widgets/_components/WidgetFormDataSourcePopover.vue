@@ -4,15 +4,16 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
 
-import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { WidgetCreateParams, WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
-import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,6 +22,10 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import getRandomId from '@/lib/random-id-generator';
+import type { ListResponse } from '@/lib/variable-models/_base/types';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
@@ -28,15 +33,17 @@ import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
-    DATA_TABLE_TYPE,
+    DATA_TABLE_TYPE, TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions,
+    DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions, DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -46,22 +53,31 @@ const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
+
+/* Query */
+const {
+    dataTableList,
+    api,
+    keys: widgetQueryKeys,
+    queryClient,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 const {
     dashboard,
-    api,
+    keys,
 } = useDashboardDetailQuery({
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
+
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-    dataTables: computed(() => widgetGenerateStore.state.dataTables),
 });
 
 const state = reactive({
-    loading: false,
     showPopover: false,
     selectedPopperCondition: undefined as undefined|DataTableDataType,
     dataSourceDomainItems: computed(() => ([
@@ -167,22 +183,53 @@ const state = reactive({
 });
 
 /* Api */
-const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null> => {
-    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
-    const fetcher = isPrivate
-        ? api.privateWidgetAPI.create
-        : api.publicWidgetAPI.create;
-    try {
-        return await fetcher({
-            dashboard_id: dashboardDetailState.dashboardId as string,
-            tags: { created_by: userStore.state.userId },
-            widget_type: 'table',
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return null;
+const widgetCreateFn = (params: WidgetCreateParams): Promise<WidgetModel> => {
+    if (dashboardDetailState.dashboardId?.startsWith('private')) {
+        return api.privateWidgetAPI.create(params);
     }
+    return api.publicWidgetAPI.create(params);
 };
+const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutation({
+    mutationFn: widgetCreateFn,
+    onSuccess: (data) => {
+        const _isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+        const widgetListQueryKey = _isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => (oldData.results.length ? {
+            ...oldData, results: [...oldData.results, data],
+        } : {
+            ...oldData, results: [data],
+        }));
+        widgetGenerateStore.setWidgetFormInfo(data);
+        state.showPopover = false;
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e);
+    },
+});
+const dataTableAddFn = (params: DataTableAddParameters): Promise<DataTableModel> => {
+    if (dashboardDetailState.dashboardId?.startsWith('private')) {
+        return api.privateDataTableAPI.add(params);
+    }
+    return api.publicDataTableAPI.add(params);
+};
+const { mutate: addDataTable, isPending: dataTableAddLoading } = useMutation({
+    mutationFn: dataTableAddFn,
+    onSuccess: (data) => {
+        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+        const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
+        queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results.length ? {
+            ...oldData, results: [...oldData.results, data],
+        } : {
+            ...oldData, results: [data],
+        }));
+
+        widgetGenerateStore.setSelectedDataTableId(data?.data_table_id);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 
 /* Util */
 const resetSelectedDataSource = () => {
@@ -201,21 +248,39 @@ const handleClickDataSourceDomain = (domainName: DataTableSourceType) => {
     resetSelectedDataSource();
 };
 const handleClickOperator = (operator: DataTableOperator) => {
-    widgetGenerateStore.createUnsavedTransformDataTable(operator);
+    const unsavedTransformData = {
+        data_table_id: `UNSAVED-${getRandomId()}`,
+        name: getDuplicatedDataTableName(`${operator} Data`, dataTableList.value),
+        data_type: DATA_TABLE_TYPE.TRANSFORMED,
+        operator,
+        options: {
+            [operator]: TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS[operator],
+        } as DataTableTransformOptions,
+        state: 'AVAILABLE',
+    } as Partial<DataTableModel>;
+
+    const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+    const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
+    queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results.length ? {
+        ...oldData, results: [...oldData.results, unsavedTransformData],
+    } : {
+        ...oldData, results: [unsavedTransformData],
+    }));
+
     state.showPopover = false;
 };
+
 const handleSelectPopperCondition = (condition: DataTableDataType) => {
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
-    state.loading = true;
     // create widget
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
-        const createdWidget = await createWidget();
-        if (createdWidget) {
-            widgetGenerateStore.setWidgetForm(createdWidget);
-        }
-        state.showPopover = false;
+        await createWidget({
+            dashboard_id: dashboardDetailState.dashboardId as string,
+            tags: { created_by: userStore.state.userId },
+            widget_type: 'table',
+        });
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
@@ -224,7 +289,7 @@ const handleConfirmDataSource = async () => {
             : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
         const addParameters = {
             source_type: state.selectedDataSourceDomain,
-            name: getDuplicatedDataTableName(dataTableBaseName, widgetGenerateState.dataTables),
+            name: getDuplicatedDataTableName(dataTableBaseName, dataTableList.value),
         } as DataTableAddParameters;
         const dataKey = state.selectedCostDataType?.replace('data.', '');
         const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
@@ -256,20 +321,18 @@ const handleConfirmDataSource = async () => {
         state.showPopover = false;
         widgetGenerateStore.setDataTableCreateLoading(true);
 
-        const result = await widgetGenerateStore.createAddDataTable({
+        addDataTable({
             ...addParameters,
             vars: dashboard.value?.vars || {},
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
-        if (!widgetGenerateState.selectedDataTableId && result) {
-            widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
-        }
     }
-    state.loading = false;
     widgetGenerateStore.setDataTableCreateLoading(false);
 };
+
+
 
 watch(() => state.showPopover, (val) => {
     if (!val) {
@@ -389,7 +452,7 @@ watch(() => state.showPopover, (val) => {
                 <div class="popover-footer">
                     <p-button style-type="substitutive"
                               :disabled="state.disableConfirmButton"
-                              :loading="state.loading"
+                              :loading="widgetCreateLoading || dataTableAddLoading"
                               @click="handleConfirmDataSource"
                     >
                         {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
