@@ -122,6 +122,20 @@ export const getOverlayLayoutArgTypes = (): ArgTypes => ({
         },
         control: 'text',
     },
+    headerSlot: {
+        name: 'header',
+        description: 'Slot for header contents.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: 'text',
+    },
     titleRightExtraSlot: {
         name: 'title-right-extra',
         description: 'Slot for extra contents on the right side of the title.',
@@ -178,6 +192,7 @@ export const getOverlayLayoutArgTypes = (): ArgTypes => ({
         },
     },
     // default
+    header: { table: { disable: true } },
     'title-right-extra': { table: { disable: true } },
     default: { table: { disable: true } },
     footer: { table: { disable: true } },
