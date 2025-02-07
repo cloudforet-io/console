@@ -117,6 +117,14 @@ export const MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
         ],
     },
     {
+        id: MENU_ID.OPS_FLOW,
+        needPermissionByRole: true,
+        subMenuList: [
+            { id: MENU_ID.OPS_FLOW_LANDING },
+            { id: MENU_ID.TASK_BOARD },
+        ],
+    },
+    {
         id: MENU_ID.IAM,
         needPermissionByRole: true,
         subMenuList: [
@@ -222,6 +230,12 @@ export const ADMIN_MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
             { id: MENU_ID.COST_REPORT },
             { id: MENU_ID.DATA_SOURCES },
             { id: MENU_ID.COST_ADVANCED_SETTINGS },
+        ],
+    },
+    {
+        id: MENU_ID.OPS_FLOW,
+        subMenuList: [
+            { id: MENU_ID.TASK_MANAGEMENT },
         ],
     },
     {
