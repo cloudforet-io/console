@@ -3,12 +3,16 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { isArray, isEqual, uniq } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { DataTableDeleteParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/delete';
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
@@ -20,6 +24,7 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
 import WidgetFormDataTableCardAlertModal
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
@@ -33,6 +38,7 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE, GROUP_BY_INFO_ITEMS_FOR_TAGS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
@@ -41,6 +47,11 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+
+import {
+    useDashboardDataTableCascadeUpdate,
+} from '@/services/dashboards/composables/use-dashboard-data-table-cascade-update';
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 interface Props {
     selected: boolean;
@@ -55,12 +66,25 @@ const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
 
+/* Query */
+const {
+    widget,
+    dataTableList,
+    keys,
+    api,
+    fetcher,
+    queryClient,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const { cascadeUpdateDataTable } = useDashboardDataTableCascadeUpdate({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const storeState = reactive({
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
-    selectedDataTable: computed(() => widgetGenerateStore.getters.selectedDataTable),
-    dataTables: computed(() => widgetGenerateState.dataTables),
     allDataTableInvalidMap: computed(() => widgetGenerateState.allDataTableInvalidMap),
 });
 
@@ -194,22 +218,51 @@ const modalState = reactive({
     referenceDataTableName: '',
 });
 
-const setFailStatus = (status: boolean) => {
-    state.failStatus = status;
-};
-const getTimeDiffValue = (): TimeDiff|undefined => {
-    if (advancedOptionsState.selectedTimeDiff === 'none' || !Number(advancedOptionsState.selectedTimeDiffDate)) return undefined;
-    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label || '';
-    const timeDiffOptions = {
-        none: '',
-        months: 'month',
-        years: 'year',
-    };
-    return {
-        [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate),
-        data_name: advancedOptionsState.timeDiffDataName || `${defaultFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
-    };
-};
+/* APIs */
+const { mutateAsync: updateDataTableAndCascadeUpdate } = useMutation({
+    mutationFn: fetcher.updateDataTableFn,
+    onSuccess: async (data) => {
+        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+        const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+        await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
+            if (oldData.results) {
+                return {
+                    ...oldData,
+                    results: oldData.results.map((dataTable) => {
+                        if (dataTable.data_table_id === data.data_table_id) {
+                            return data;
+                        }
+                        return dataTable;
+                    }),
+                };
+            }
+            return oldData;
+        });
+        await cascadeUpdateDataTable(data.data_table_id);
+
+        setInitialDataTableForm();
+        state.filterFormKey = getRandomId();
+        setFailStatus(false);
+    },
+    onError: (error) => {
+        setFailStatus(true);
+        showErrorMessage(error.message, error);
+        ErrorHandler.handleError(error);
+    },
+});
+const { mutateAsync: updateWidget } = useMutation({
+    mutationFn: fetcher.updateWidgetFn,
+    onSuccess: (data) => {
+        const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
+            ? keys.privateWidgetQueryKey
+            : keys.publicWidgetQueryKey;
+        queryClient.setQueryData(widgetQueryKey.value, () => data);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     if (!state.dataFieldName.length) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
@@ -272,16 +325,56 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         },
     };
 
-    const result = await widgetGenerateStore.updateDataTable(updateParams);
-
-    if (result) {
-        setInitialDataTableForm();
-        state.filterFormKey = getRandomId();
-        setFailStatus(false);
-    } else setFailStatus(true);
-
+    const result = await updateDataTableAndCascadeUpdate(updateParams);
+    if (widget.value?.state === 'ACTIVE') {
+        const sanitizedOptions = sanitizeWidgetOptions({
+            widgetHeader: {
+                ...widget.value?.options?.widgetHeader,
+            },
+        });
+        await updateWidget({
+            widget_id: widgetGenerateState.widgetId,
+            state: 'INACTIVE',
+            options: sanitizedOptions,
+        });
+    }
     return result;
 };
+const deleteDataTableFn = (params: DataTableDeleteParameters): Promise<void> => {
+    if (params.data_table_id.startsWith('private')) {
+        return api.privateDataTableAPI.delete(params);
+    } return api.publicDataTableAPI.delete(params);
+};
+const { mutateAsync: deleteDataTable } = useMutation({
+    mutationFn: deleteDataTableFn,
+    onSuccess: async (_, variables) => {
+        const _allDataTableInvalidMap = {
+            ...storeState.allDataTableInvalidMap,
+        };
+        delete _allDataTableInvalidMap[variables.data_table_id];
+        widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
+
+        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+        const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+        await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
+            if (oldData.results) {
+                return {
+                    ...oldData,
+                    results: oldData.results.filter((dataTable) => dataTable.data_table_id !== variables.data_table_id),
+                };
+            }
+            return oldData;
+        });
+
+        if (storeState.selectedDataTableId === variables.data_table_id) {
+            const dataTableId = dataTableList.value.length ? dataTableList.value[0]?.data_table_id : undefined;
+            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
+        }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
 
 /* Events */
 const handleSelectSourceItem = (selectedItem: string) => {
@@ -290,7 +383,7 @@ const handleSelectSourceItem = (selectedItem: string) => {
 };
 
 const handleClickDeleteDataTable = async () => {
-    const isExistingDataTableInTransformed = storeState.dataTables.find((dataTable) => {
+    const isExistingDataTableInTransformed = dataTableList.value.find((dataTable) => {
         const isTransformedData = dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED;
         if (!isTransformedData) return undefined;
         const isDualDataTableOperator = dataTable.operator === DATA_TABLE_OPERATOR.CONCAT || dataTable.operator === DATA_TABLE_OPERATOR.JOIN;
@@ -312,15 +405,10 @@ const handleClickResetDataTable = () => {
 };
 const handleConfirmModal = async () => {
     if (modalState.mode === 'DELETE') {
-        const beforeSelectedDataTableId = storeState.selectedDataTableId;
         const deleteParams = {
             data_table_id: state.dataTableId,
         };
-        await widgetGenerateStore.deleteDataTable(deleteParams);
-        if (beforeSelectedDataTableId === state.dataTableId) {
-            const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
-            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
-        }
+        await deleteDataTable(deleteParams);
     }
     if (modalState.mode === 'RESET') {
         setInitialDataTableForm();
@@ -358,6 +446,23 @@ const setInitialDataTableForm = () => {
     advancedOptionsState.selectedTimeDiffDate = originDataState.timeDiffDate;
     advancedOptionsState.timeDiffDataName = originDataState.timeDiffDataName;
 };
+const setFailStatus = (status: boolean) => {
+    state.failStatus = status;
+};
+const getTimeDiffValue = (): TimeDiff|undefined => {
+    if (advancedOptionsState.selectedTimeDiff === 'none' || !Number(advancedOptionsState.selectedTimeDiffDate)) return undefined;
+    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label || '';
+    const timeDiffOptions = {
+        none: '',
+        months: 'month',
+        years: 'year',
+    };
+    return {
+        [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate),
+        data_name: advancedOptionsState.timeDiffDataName || `${defaultFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
+    };
+};
+
 
 onMounted(() => {
     // Initial Form Setting

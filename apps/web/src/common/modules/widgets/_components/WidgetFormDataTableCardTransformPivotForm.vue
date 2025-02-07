@@ -28,6 +28,8 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
+
 const props = defineProps<TransformDataTableProps<PivotOptions>>();
 
 const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): void;
@@ -35,6 +37,13 @@ const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): v
 }>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
@@ -45,13 +54,10 @@ const limitInfo = ref<PivotOptions['limit']>(props.originData.limit);
 const functionInfo = ref<PivotOptions['function']>(props.originData.function);
 const orderByInfo = ref<PivotOptions['order_by']>(props.originData.order_by);
 
-const storeState = reactive({
-    dataTables: computed(() => widgetGenerateState.dataTables),
-});
 const state = reactive({
     isInitiated: true,
     proxyOperatorOptions: useProxyValue<PivotOptions>('operatorOptions', props, emit),
-    selectedDataTable: computed(() => storeState.dataTables.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
+    selectedDataTable: computed(() => dataTableList.value.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
     labelFieldItems: computed<MenuItem[]>(() => {
         if (!state.selectedDataTable) return [];
         const labelsInfo = state.selectedDataTable.labels_info;

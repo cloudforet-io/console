@@ -4,22 +4,26 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButton, PButtonModal, POverlayLayout, PTextButton,
 } from '@cloudforet/mirinae';
 
 
-import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
-import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import { i18n } from '@/translations';
+
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -28,8 +32,17 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
-const { privateWidgetAPI } = usePrivateWidgetApi();
-const { publicWidgetAPI } = usePublicWidgetApi();
+
+/* Query */
+const {
+    widget,
+    api,
+    keys,
+    fetcher,
+    queryClient,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const state = reactive({
     sidebarTitle: computed(() => {
@@ -57,13 +70,13 @@ const state = reactive({
     }),
     warningModalVisible: false,
     warningModalTitle: computed(() => {
-        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
-        if (widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
+        if (widget.value?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_TITLE');
+        if (widget.value?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_TITLE');
         return '';
     }),
     warningModalDescription: computed(() => {
-        if (widgetGenerateState.widget?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
-        if (widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
+        if (widget.value?.state === 'CREATING') return i18n.t('COMMON.WIDGETS.FORM.CREATING_WIDGET_WARNING_MODAL_DESC');
+        if (widget.value?.state === 'INACTIVE' || state.isWidgetOptionsChanged) return i18n.t('COMMON.WIDGETS.FORM.INACTIVE_WIDGET_WARNING_MODAL_DESC');
         return '';
     }),
     isWidgetOptionsChanged: false,
@@ -78,47 +91,64 @@ const state = reactive({
 const deleteWidget = async (widgetId: string) => {
     if (!widgetId) return;
     const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
-    const fetcher = isPrivate
-        ? privateWidgetAPI.delete
-        : publicWidgetAPI.delete;
+    const _fetcher = isPrivate
+        ? api.privateWidgetAPI.delete
+        : api.publicWidgetAPI.delete;
     try {
-        await fetcher({
+        await _fetcher({
             widget_id: widgetId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
+const { mutateAsync: updateWidget } = useMutation({
+    mutationFn: fetcher.updateWidgetFn,
+    onSuccess: (data) => {
+        const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
+            ? keys.privateWidgetQueryKey
+            : keys.publicWidgetQueryKey;
+        queryClient.setQueryData(widgetQueryKey.value, () => data);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 
 /* Event */
 const handleClickContinue = async () => {
     if (widgetGenerateState.overlayStep === 1) {
-        if (widgetGenerateState.widget?.data_table_id !== widgetGenerateState.selectedDataTableId) {
+        if (widget.value?.data_table_id !== widgetGenerateState.selectedDataTableId) {
             const _updateParams: PublicWidgetUpdateParameters|PrivateWidgetUpdateParameters = {
                 widget_id: widgetGenerateState.widgetId,
                 data_table_id: widgetGenerateState.selectedDataTableId,
             };
-            if (widgetGenerateState.widget?.state === 'ACTIVE') {
+            if (widget.value?.state === 'ACTIVE') {
                 _updateParams.state = 'INACTIVE';
             }
-            if (widgetGenerateState.widget?.options?.widgetHeader) {
+            if (widget.value?.options?.widgetHeader) {
                 _updateParams.options = {
-                    widgetHeader: widgetGenerateState.widget?.options?.widgetHeader,
+                    widgetHeader: widget.value?.options?.widgetHeader,
                 };
             }
-            await widgetGenerateStore.updateWidget(_updateParams);
+            const sanitizedOptions = sanitizeWidgetOptions(_updateParams.options ?? {}, _updateParams.widget_type ?? 'table');
+            await updateWidget({
+                ..._updateParams,
+                options: sanitizedOptions,
+            });
         }
         widgetGenerateStore.setOverlayStep(2);
         return;
     }
-    if (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged) {
+    if (widget.value?.state === 'CREATING' || widget.value?.state === 'INACTIVE' || state.isWidgetOptionsChanged) {
         state.warningModalVisible = true;
         return;
     }
     widgetGenerateStore.setShowOverlay(false);
 };
 const handleCloseOverlay = (value: boolean) => {
-    if (!value && (widgetGenerateState.widget?.state === 'CREATING' || widgetGenerateState.widget?.state === 'INACTIVE' || state.isWidgetOptionsChanged)) {
+    if (!value && (widget.value?.state === 'CREATING' || widget.value?.state === 'INACTIVE' || state.isWidgetOptionsChanged)) {
         state.warningModalVisible = true;
         return;
     }
@@ -129,7 +159,7 @@ const handleCloseWarningModal = () => {
 };
 const handleConfirmWarningModal = async () => {
     state.warningModalVisible = false;
-    if (widgetGenerateState.widget?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
+    if (widget.value?.state === 'CREATING') await deleteWidget(widgetGenerateState.widgetId);
     widgetGenerateStore.reset();
     widgetGenerateStore.setShowOverlay(false);
 };
@@ -146,11 +176,9 @@ const handleClickGuideLink = () => { window.open(state.guideLink, '_blank'); };
 
 /* Watcher */
 watch(() => widgetGenerateState.showOverlay, async (val) => {
-    if (!val && widgetGenerateState.widget?.state !== 'CREATING') {
+    if (!val && widget.value?.state !== 'CREATING') {
         widgetGenerateStore.setLatestWidgetId(widgetGenerateState.widgetId);
         widgetGenerateStore.reset();
-    } else if (val && widgetGenerateState.overlayType !== 'ADD') {
-        await widgetGenerateStore.listDataTable();
     }
 });
 

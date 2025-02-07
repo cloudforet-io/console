@@ -43,6 +43,7 @@ import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analys
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -59,16 +60,22 @@ type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const widgetGenerateGetters = widgetGenerateStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 const { dashboard } = useDashboardDetailQuery({
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
+
 const storeState = reactive({
     selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
-    selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
     dataTableLoadFailed: computed(() => widgetGenerateState.dataTableLoadFailed),
     // reference
     project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -78,13 +85,14 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === storeState.selectedDataTableId)),
     data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
-    labelFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
-    dataFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
-    dataInfo: computed<DataInfo|undefined>(() => storeState.selectedDataTable?.data_info),
-    isPivot: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
-    pivotColumn: computed<string|undefined>(() => storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.fields?.column),
-    isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!storeState.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
+    labelFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(state.selectedDataTable?.labels_info ?? {})))),
+    dataFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(state.selectedDataTable?.data_info ?? {})))),
+    dataInfo: computed<DataInfo|undefined>(() => state.selectedDataTable?.data_info),
+    isPivot: computed<boolean>(() => state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    pivotColumn: computed<string|undefined>(() => state.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.fields?.column),
+    isAutoTypeColumnPivot: computed<boolean>(() => state.isPivot && !!state.selectedDataTable?.options?.[DATA_TABLE_OPERATOR.PIVOT]?.limit),
     // pivotSortKeys: computed<string[]>(() => (state.isPivot ? storeState.selectedDataTable?.sort_keys ?? [] : [])),
     fields: computed<PreviewTableField[]>(() => {
         if (!storeState.selectedDataTableId || !state.data?.results?.length) {
@@ -136,7 +144,7 @@ const state = reactive({
             ...dataFields,
         ];
     }),
-    isSeparatedDataTable: computed(() => !Object.keys(storeState.selectedDataTable?.labels_info ?? {}).includes('Date')),
+    isSeparatedDataTable: computed(() => !Object.keys(state.selectedDataTable?.labels_info ?? {}).includes('Date')),
     sortBy: [] as { key: string; desc: boolean }[],
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -171,7 +179,7 @@ const state = reactive({
 });
 
 const emptyState = reactive({
-    isUnavailableDataTable: computed(() => storeState.selectedDataTable?.state === 'UNAVAILABLE'),
+    isUnavailableDataTable: computed(() => state.selectedDataTable?.state === 'UNAVAILABLE'),
     title: computed(() => {
         if (!storeState.selectedDataTableId) return i18n.t('COMMON.WIDGETS.PREVIEW_TABLE_EMPTY_TITLE');
         // if (storeState.dataTableLoadFailed && emptyState.isUnavailableDataTable) return i18n.t('DASHBOARDS.WIDGET.DATA_TABLE_LOAD_INVALID_GLOBAL_VARIALBE_TITLE');
@@ -266,8 +274,8 @@ const queryKey = computed(() => [
     storeState.selectedDataTableId,
     {
         granularity: state.selectedGranularity,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(storeState.selectedDataTable?.options),
-        dataTables: normalizeAndSerializeDataTableOptions((widgetGenerateState.dataTables || []).map((d) => d?.options || {})),
+        dataTableOptions: normalizeAndSerializeDataTableOptions(state.selectedDataTable?.options),
+        dataTables: normalizeAndSerializeDataTableOptions((dataTableList.value || []).map((d) => d?.options || {})),
         sortBy: state.sortBy,
         thisPage: state.thisPage,
         pageSize: state.pageSize,
@@ -284,7 +292,7 @@ const queryResult = useQuery({
         page: state.page,
         vars: dashboard.value?.vars,
     }),
-    enabled: computed(() => storeState.selectedDataTableId !== undefined && storeState.selectedDataTable !== undefined),
+    enabled: computed(() => storeState.selectedDataTableId !== undefined && state.selectedDataTable !== undefined),
     staleTime: WIDGET_LOAD_STALE_TIME,
     retry: 2,
 });
@@ -294,7 +302,7 @@ const isError = computed<boolean>(() => queryResult.isError.value);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);
 
 
-watch([() => storeState.selectedDataTableId, () => storeState.selectedDataTable], async ([dataTableId]) => {
+watch([() => storeState.selectedDataTableId, () => state.selectedDataTable], async ([dataTableId]) => {
     if (!dataTableId) return;
     state.thisPage = 1;
     state.sortBy = [];
@@ -330,7 +338,7 @@ onUnmounted(() => {
                                  width="1rem"
                                  height="1rem"
                             />
-                            <span>{{ storeState.selectedDataTable?.name }}</span>
+                            <span>{{ state.selectedDataTable?.name }}</span>
                         </div>
                         <p-select-dropdown class="granularity-dropdown"
                                            :menu="state.granularityItems"

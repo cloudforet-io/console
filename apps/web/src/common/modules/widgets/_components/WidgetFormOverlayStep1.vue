@@ -23,21 +23,28 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 
 import { violet } from '@/styles/colors';
 
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
+
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
-const dataTableCardRef = ref<WidgetFormDataTableCard[]>([]);
+const dataTableCardRef = ref<typeof WidgetFormDataTableCard[]>([]);
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const storeState = reactive({
-    dataTables: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => widgetGenerateState.dataTables),
-    selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
     allDataTableInvalid: computed(() => widgetGenerateGetters.allDataTableInvalid),
 });
 
 const displayState = reactive({
-    dataTablesSortedByCreatedAt: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => orderBy(storeState.dataTables ?? [], ['created_at'], ['asc'])),
+    dataTablesSortedByCreatedAt: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => orderBy(dataTableList.value, ['created_at'], ['asc'])),
     dataTableAreaOpen: true,
     tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 4.5,
     minHeight: 32,
@@ -149,7 +156,7 @@ onMounted(async () => {
                                                      loading-card
                         />
                         <widget-form-data-source-popover />
-                        <div v-if="!storeState.dataTables.length"
+                        <div v-if="!dataTableList.length"
                              class="empty-data-table-guide"
                         >
                             <p class="title">

@@ -2,22 +2,31 @@
 
 import { computed, reactive } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PIconButton, PI, PTextInput, PTooltip,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, violet } from '@/styles/colors';
+
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
+
 
 
 interface Props {
@@ -33,9 +42,18 @@ const emit = defineEmits<{(e: 'update:dataTableName', value: string): void;}>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
+/* Query */
+const {
+    dataTableList,
+    fetcher,
+    keys,
+    queryClient,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const storeState = reactive({
-    dataTables: computed(() => widgetGenerateState.dataTables),
-    currentDataTable: computed(() => storeState.dataTables.find((dataTable) => dataTable.data_table_id === props.dataTableId)),
+    currentDataTable: computed(() => dataTableList.value.find((dataTable) => dataTable.data_table_id === props.dataTableId)),
 });
 
 const state = reactive({
@@ -65,22 +83,62 @@ const handleClickNameEdit = () => {
 };
 const handleClickNameConfirm = async () => {
     const editedDataTableName = dataTableNameState.proxyDataTableName.trim();
-    if (storeState.currentDataTable.name === editedDataTableName) {
+    if (storeState.currentDataTable?.name === editedDataTableName) {
         dataTableNameState.editMode = false;
         return;
     }
-    const dataTableNames = storeState.dataTables.map((dataTable) => dataTable.name);
+    const dataTableNames = dataTableList.value.map((dataTable) => dataTable.name);
     if (dataTableNames.includes(editedDataTableName)) {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_WARNING'), '');
         return;
     }
-    await widgetGenerateStore.updateDataTable({
-        data_table_id: props.dataTableId,
-        name: editedDataTableName,
-    }, { unsaved: state.isUnsavedTransformed, preventReferenceUpdating: true });
-    showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
-    dataTableNameState.editMode = false;
+
+    if (state.isUnsavedTransformed) {
+        const unsavedDataTable = {
+            ...storeState.currentDataTable,
+            name: editedDataTableName,
+        } as DataTableModel;
+        await syncDataTableList(unsavedDataTable);
+    } else {
+        updateDataTable({
+            data_table_id: props.dataTableId,
+            name: editedDataTableName,
+        });
+    }
 };
+
+/* Api */
+const { mutate: updateDataTable } = useMutation({
+    mutationFn: fetcher.updateDataTableFn,
+    onSuccess: async (data) => {
+        await syncDataTableList(data);
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
+        dataTableNameState.editMode = false;
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
+const syncDataTableList = async (data: DataTableModel) => {
+    const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+    const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+    await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
+        if (oldData.results) {
+            return {
+                ...oldData,
+                results: oldData.results.map((dataTable) => {
+                    if (dataTable.data_table_id === data.data_table_id) {
+                        return data;
+                    }
+                    return dataTable;
+                }),
+            };
+        }
+        return oldData;
+    });
+};
+
 </script>
 
 <template>
