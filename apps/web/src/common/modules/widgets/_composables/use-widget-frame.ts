@@ -9,6 +9,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
@@ -143,7 +144,7 @@ export const useWidgetFrame = (
     overrides: OverridableWidgetFrameState = {},
 ) => {
     const _state = reactive({
-        widgetConfig: computed(() => getWidgetConfig(props.widgetName)),
+        widgetConfig: computed<WidgetConfig|undefined>(() => getWidgetConfig(props.widgetName)),
         showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.value?.toggleValue || false),
         title: computed(() => {
             if (_state.showWidgetHeader) return props.widgetOptions?.widgetHeader?.value?.title;
@@ -154,8 +155,8 @@ export const useWidgetFrame = (
             return undefined;
         }),
         size: computed<WidgetSize>(() => {
-            if (props.size && _state.widgetConfig.meta.sizes.includes(props.size)) return props.size;
-            return _state.widgetConfig.meta.sizes[0];
+            if (props.size && _state.widgetConfig?.meta.sizes.includes(props.size)) return props.size;
+            return _state.widgetConfig?.meta.sizes[0];
         }),
         periodText: computed<string>(() => {
             if (!overrides.dateRange) return '';
@@ -204,7 +205,7 @@ export const useWidgetFrame = (
     const widgetFrameProps = computed<WidgetFrameProps>(() => ({
         widgetId: props.widgetId,
         widgetOptions: props.widgetOptions,
-        widgetSizes: _state.widgetConfig.meta.sizes,
+        widgetSizes: _state.widgetConfig?.meta.sizes,
         dataTableId: props.dataTableId,
         //
         mode: props.mode ?? 'view',
