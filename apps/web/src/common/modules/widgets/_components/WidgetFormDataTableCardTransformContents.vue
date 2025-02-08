@@ -321,6 +321,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     if (firstUpdating) {
         const createParams = {
             name: state.dataTableName,
+            widget_id: widgetGenerateState.widgetId,
             operator: state.operator,
             vars: dashboard.value?.vars || {},
             options: { [state.operator]: options() },

@@ -50,6 +50,7 @@ import type { DataTableSourceType, DataTableQueryFilter } from '@/common/modules
 
 import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 interface VariableOption {
@@ -82,13 +83,21 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;}>();
 const allReferenceStore = useAllReferenceStore();
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const appContextStore = useAppContextStore();
+
+/* Query */
+const {
+    dataTableList,
+} = useDashboardWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    dataTable: computed(() => widgetGenerateStore.state.dataTables.find((d) => d.data_table_id === props.dataTableId)),
+    dataTable: computed(() => dataTableList.value.find((d) => d.data_table_id === props.dataTableId)),
 });
 
 const state = reactive({
