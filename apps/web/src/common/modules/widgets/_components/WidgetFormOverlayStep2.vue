@@ -76,6 +76,7 @@ const {
     dataTableList,
     keys: widgetKeys,
     fetcher: wigetFetcher,
+    widgetLoading,
 } = useDashboardWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
@@ -97,7 +98,7 @@ const state = reactive({
     }),
     value: computed(() => state.fieldManager?.data?.granularity),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
-    selectedWidgetType: widget.value?.widget_type as WidgetType,
+    selectedWidgetType: computed<WidgetType|undefined>(() => widget.value?.widget_type),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: i18n.t('COMMON.WIDGETS.FULL'), name: 'FULL' },
@@ -304,7 +305,8 @@ onUnmounted(() => {
                     </p-select-button>
                 </div>
             </div>
-            <div class="widget-wrapper"
+            <div v-if="!widgetLoading"
+                 class="widget-wrapper"
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
                 <component :is="getWidgetComponent(state.selectedWidgetType)"
@@ -327,7 +329,7 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!state.fieldManager"
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!state.fieldManager && !widgetLoading"
                                                :widget-validation-invalid="widgetOptionsInvalid"
                                                :widget-validation-invalid-text="widgetOptionsInvalidText"
                                                :field-manager="state.fieldManager"

@@ -200,7 +200,6 @@ const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutatio
             ...oldData, results: [data],
         }));
         widgetGenerateStore.setWidgetFormInfo(data);
-        state.showPopover = false;
     },
     onError: (e) => {
         ErrorHandler.handleError(e);
@@ -212,12 +211,12 @@ const dataTableAddFn = (params: DataTableAddParameters): Promise<DataTableModel>
     }
     return api.publicDataTableAPI.add(params);
 };
-const { mutate: addDataTable, isPending: dataTableAddLoading } = useMutation({
+const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useMutation({
     mutationFn: dataTableAddFn,
     onSuccess: (data) => {
         const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
         const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
-        queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results.length ? {
+        queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
             ...oldData, results: [...oldData.results, data],
         } : {
             ...oldData, results: [data],
@@ -228,6 +227,9 @@ const { mutate: addDataTable, isPending: dataTableAddLoading } = useMutation({
     onError: (e) => {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
+    },
+    onSettled: () => {
+        state.showPopover = false;
     },
 });
 
@@ -288,6 +290,7 @@ const handleConfirmDataSource = async () => {
             ? `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`
             : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
         const addParameters = {
+            widget_id: widgetGenerateState.widgetId as string,
             source_type: state.selectedDataSourceDomain,
             name: getDuplicatedDataTableName(dataTableBaseName, dataTableList.value),
         } as DataTableAddParameters;
@@ -318,10 +321,9 @@ const handleConfirmDataSource = async () => {
         };
 
         // NOTE: For DataTable-Create loading
-        state.showPopover = false;
         widgetGenerateStore.setDataTableCreateLoading(true);
 
-        addDataTable({
+        await addDataTable({
             ...addParameters,
             vars: dashboard.value?.vars || {},
             options: {
