@@ -26,6 +26,7 @@ interface UseDashboardWidgetFormQueryReturn {
     widget: ComputedRef<WidgetModel|undefined>;
     dataTableList: ComputedRef<(PublicDataTableModel|PrivateDataTableModel)[]>;
     dataTableListLoading: ComputedRef<boolean>;
+    widgetLoading: ComputedRef<boolean>;
     keys: {
         publicWidgetQueryKey: ComputedRef<QueryKey>;
         privateWidgetQueryKey: ComputedRef<QueryKey>;
@@ -132,11 +133,15 @@ export const useDashboardWidgetFormQuery = ({
     const dataTableListLoading = computed<boolean>(() => (isPrivate.value
         ? privateDataTableListQuery.isFetching.value
         : publicDataTableListQuery.isFetching.value));
+    const widgetLoading = computed<boolean>(() => (isPrivate.value
+        ? privateWidgetQuery.isFetching.value
+        : publicWidgetQuery.isFetching.value));
 
     return {
         widget: computed(() => (isPrivate.value ? privateWidgetQuery.data.value : publicWidgetQuery.data.value)),
         dataTableList: computed(() => (isPrivate.value ? privateDataTableListQuery.data.value : publicDataTableListQuery.data.value)),
         dataTableListLoading,
+        widgetLoading,
         api: {
             publicWidgetAPI,
             privateWidgetAPI,
