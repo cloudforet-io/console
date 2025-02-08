@@ -228,9 +228,6 @@ const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useMutatio
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
     },
-    onSettled: () => {
-        state.showPopover = false;
-    },
 });
 
 /* Util */
@@ -249,7 +246,7 @@ const handleClickDataSourceDomain = (domainName: DataTableSourceType) => {
     state.selectedDataSourceDomain = domainName;
     resetSelectedDataSource();
 };
-const handleClickOperator = (operator: DataTableOperator) => {
+const handleCreateUnsavedTransform = (operator: DataTableOperator) => {
     const unsavedTransformData = {
         data_table_id: `UNSAVED-${getRandomId()}`,
         name: getDuplicatedDataTableName(`${operator} Data`, dataTableList.value),
@@ -273,6 +270,7 @@ const handleClickOperator = (operator: DataTableOperator) => {
 };
 
 const handleSelectPopperCondition = (condition: DataTableDataType) => {
+    if (condition === DATA_TABLE_TYPE.TRANSFORMED && !dataTableList.value.length) return;
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
@@ -322,6 +320,7 @@ const handleConfirmDataSource = async () => {
 
         // NOTE: For DataTable-Create loading
         widgetGenerateStore.setDataTableCreateLoading(true);
+        state.showPopover = false;
 
         await addDataTable({
             ...addParameters,
@@ -369,10 +368,13 @@ watch(() => state.showPopover, (val) => {
                 <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.ADD')"
                                icon="ic_service_data-sources"
                                block
+                               :show-select-marker="false"
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADDED)"
                 />
                 <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.TRANSFORM')"
                                icon="ic_transform-data"
+                               :disabled="!dataTableList.length"
+                               :show-select-marker="false"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"
                 />
@@ -480,7 +482,7 @@ watch(() => state.showPopover, (val) => {
                                            value="operatorKey"
                                            label="a"
                                            block
-                                           @click="handleClickOperator(operatorInfo.key)"
+                                           @click="handleCreateUnsavedTransform(operatorInfo.key)"
                             >
                                 <div class="operator-card-contents">
                                     <p-i :name="operatorInfo.icon"
@@ -508,7 +510,7 @@ watch(() => state.showPopover, (val) => {
                                            value="operatorKey"
                                            label="a"
                                            block
-                                           @click="handleClickOperator(operatorInfo.key)"
+                                           @click="handleCreateUnsavedTransform(operatorInfo.key)"
                             >
                                 <div class="operator-card-contents">
                                     <p-i :name="operatorInfo.icon"
