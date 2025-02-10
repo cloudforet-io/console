@@ -12,6 +12,6 @@ export const REFERENCE_FIELD_MAP = {
     'Service Account': 'serviceAccount',
 } as const;
 
-export const WIDGET_LOAD_STALE_TIME = 1000 * 60 * 10;
+export const WIDGET_LOAD_STALE_TIME = 1000 * 60 * 5;
 
 export const UNSUPPORTED_CHARTS_IN_PIVOT = ['gauge', 'geoMap', 'treemap', 'pieChart', 'colorCodedHeatmap', 'sankeyChart'];

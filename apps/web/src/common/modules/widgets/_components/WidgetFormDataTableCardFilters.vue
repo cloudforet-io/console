@@ -40,6 +40,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFiltersItem
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_QUERY_OPERATOR,
@@ -50,7 +51,6 @@ import type { DataTableSourceType, DataTableQueryFilter } from '@/common/modules
 
 import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 interface VariableOption {
@@ -89,7 +89,7 @@ const appContextStore = useAppContextStore();
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

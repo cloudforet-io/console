@@ -9,6 +9,7 @@ import { PI, PContextMenu, PFieldTitle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -16,7 +17,6 @@ import type { DataTableOperator } from '@/common/modules/widgets/types/widget-mo
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 interface Props {
     dataTableId: string;
@@ -34,7 +34,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
