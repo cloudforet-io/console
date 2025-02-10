@@ -34,6 +34,7 @@ export interface WidgetProps {
     loading?: boolean;
     dashboardOptions?: DashboardOptions;
     dashboardVars?: DashboardVars;
+    dashboardId?: string;
     disableRefreshOnVariableChange?: boolean;
     disableRefreshOnLoading?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;

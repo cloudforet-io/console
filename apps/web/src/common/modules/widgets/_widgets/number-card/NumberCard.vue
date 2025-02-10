@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useQueries } from '@tanstack/vue-query';
 import { debounce, throttle } from 'lodash';
@@ -21,7 +20,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
@@ -53,7 +51,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const topPartRef = ref<null | HTMLElement>(null);
 const valueTextRef = ref<null | HTMLElement>(null);
-const route = useRoute();
 
 const { keys, api } = useWidgetFormQuery({
     widgetId: computed(() => props.widgetId),
@@ -169,7 +166,7 @@ const fetchWidgetData = async (params: WidgetLoadSumParams): Promise<WidgetLoadR
 
 const baseQueryKey = computed(() => [
     ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
-    route.params.dashboardId,
+    props.dashboardId,
     props.widgetId,
     props.widgetName,
     {
@@ -185,7 +182,7 @@ const baseQueryKey = computed(() => [
 
 const comparisonQueryKey = computed(() => [
     ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
-    route.params.dashboardId,
+    props.dashboardId,
     props.widgetId,
     props.widgetName,
     {
@@ -235,11 +232,6 @@ const errorMessage = computed<string>(() => {
     return queryResults.value?.[0].error?.message;
 });
 
-const refetchWidget = () => {
-    queryResults.value?.[0].refetch();
-    queryResults.value?.[1].refetch();
-};
-
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
@@ -250,7 +242,6 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 useResizeObserver(valueTextRef, throttle(() => {
     setValueTextFontSize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
 
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
@@ -264,7 +255,13 @@ watch(() => props.dataTableId, async (newDataTableId) => {
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget: refetchWidget,
+    loadWidget: () => {
+        queryResults.value?.[0].refetch();
+        queryResults.value?.[1].refetch();
+    },
+});
+onMounted(() => {
+    emit('mounted', props.widgetName);
 });
 </script>
 

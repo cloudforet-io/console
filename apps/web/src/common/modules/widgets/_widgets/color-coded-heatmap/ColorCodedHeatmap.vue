@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, reactive, watch,
+    computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useQuery } from '@tanstack/vue-query';
 import { orderBy } from 'lodash';
@@ -21,7 +20,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     normalizeAndSerializeVars,
@@ -46,7 +44,6 @@ const BOX_MIN_WIDTH = 112;
 const MAX_COUNT = 80;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-const route = useRoute();
 
 const { keys, api } = useWidgetFormQuery({
     widgetId: computed(() => props.widgetId),
@@ -88,7 +85,7 @@ const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResp
 
 const queryKey = computed(() => [
     ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-    route.params.dashboardId,
+    props.dashboardId,
     props.widgetId,
     props.widgetName,
     {
@@ -160,9 +157,6 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 });
 
 /* Util */
-const refetchWidget = () => {
-    queryResult.refetch();
-};
 const getColor = (val: string, field: string): string => {
     const _label = getReferenceLabel(props.allReferenceTypeInfo, field, val);
     return (widgetOptionsState.formatRulesInfo?.rules ?? []).find((d) => d.text === _label || _label.includes(d.text) || val.includes(d.text))?.color
@@ -178,7 +172,6 @@ watch(() => widgetOptionsState.formatRulesInfo, async () => {
     }));
 }, { immediate: true });
 
-useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
 
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
@@ -192,7 +185,12 @@ watch(() => props.dataTableId, async (newDataTableId) => {
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget: refetchWidget,
+    loadWidget: () => {
+        queryResult.refetch();
+    },
+});
+onMounted(() => {
+    emit('mounted', props.widgetName);
 });
 </script>
 

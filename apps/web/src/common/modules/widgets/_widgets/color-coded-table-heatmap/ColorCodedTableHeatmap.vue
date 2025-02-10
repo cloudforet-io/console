@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useQuery } from '@tanstack/vue-query';
 import { cloneDeep, throttle } from 'lodash';
@@ -20,7 +19,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
@@ -59,7 +57,6 @@ const Y_AXIS_FIELD_WIDTH = 120;
 const BOX_MIN_WIDTH = 64;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-const route = useRoute();
 
 const { keys, api } = useWidgetFormQuery({
     widgetId: computed(() => props.widgetId),
@@ -128,7 +125,7 @@ const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResp
 };
 const queryKey = computed(() => [
     ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-    route.params.dashboardId,
+    props.dashboardId,
     props.widgetId,
     props.widgetName,
     {
@@ -165,9 +162,6 @@ const errorMessage = computed<string|undefined>(() => {
 });
 
 /* Util */
-const refetchWidget = () => {
-    queryResult.refetch();
-};
 const targetValue = (xField?: string, yField?: string, format?: 'table'|'tooltip'): number|string => {
     if (!state.data?.results?.length || !xField || !yField) return '--';
 
@@ -244,7 +238,6 @@ watch(() => widgetOptionsState, () => {
 }, { deep: true });
 
 /* Lifecycle */
-useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
 
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
@@ -258,7 +251,12 @@ watch(() => props.dataTableId, async (newDataTableId) => {
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget: refetchWidget,
+    loadWidget: () => {
+        queryResult.refetch();
+    },
+});
+onMounted(() => {
+    emit('mounted', props.widgetName);
 });
 useResizeObserver(colorCodedTableRef, throttle(() => {
     resizeWidget();

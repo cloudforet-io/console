@@ -532,6 +532,7 @@ onBeforeUnmount(() => {
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
+                               :dashboard-id="dashboardDetailState.dashboardId"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
                                :disable-manage-buttons="!isManageable"
                                :all-reference-type-info="state.allReferenceTypeInfo"
