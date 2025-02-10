@@ -8,7 +8,6 @@ import { useQuery } from '@tanstack/vue-query';
 import bytes from 'bytes';
 import { sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
 } from '@cloudforet/mirinae';
@@ -16,6 +15,7 @@ import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/typ
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/api-clients/_common/schema/type';
+import type { DataTableLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
@@ -24,17 +24,14 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     normalizeAndSerializeVars,
 } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import {
-    normalizeAndSerializeDataTableOptions,
-} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
@@ -43,7 +40,6 @@ import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analys
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -67,7 +63,9 @@ const dashboardDetailState = dashboardDetailStore.state;
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+    api,
+    keys,
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const { dashboard } = useDashboardDetailQuery({
@@ -85,8 +83,9 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    isPrivate: computed(() => storeState.selectedDataTableId?.startsWith('private')),
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === storeState.selectedDataTableId)),
-    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
+    data: computed<DataTableLoadResponse | null>(() => queryResult?.data?.value || null),
     labelFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(state.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(state.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed<DataInfo|undefined>(() => state.selectedDataTable?.data_info),
@@ -261,21 +260,21 @@ const getSortIcon = (field: PreviewTableField) => {
 //     return `( ${value} ${key} )`;
 // };
 
-const fetchWidgetData = async (params: DataTableLoadParameters): Promise<WidgetLoadResponse> => {
-    const defaultFetcher = storeState.selectedDataTableId?.startsWith('private')
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, WidgetLoadResponse>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, WidgetLoadResponse>;
+const fetchWidgetData = async (params: DataTableLoadParameters): Promise<DataTableLoadResponse> => {
+    const defaultFetcher = state.isPrivate
+        ? api.privateDataTableAPI.load
+        : api.publicDataTableAPI.load;
     const res = await defaultFetcher(params);
     return res;
 };
 
 const queryKey = computed(() => [
-    'data-table-load',
+    ...(state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
     storeState.selectedDataTableId,
     {
         granularity: state.selectedGranularity,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.selectedDataTable?.options),
-        dataTables: normalizeAndSerializeDataTableOptions((dataTableList.value || []).map((d) => d?.options || {})),
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.selectedDataTable?.options),
+        // dataTables: normalizeAndSerializeDataTableOptions((dataTableList.value || []).map((d) => d?.options || {})),
         sortBy: state.sortBy,
         thisPage: state.thisPage,
         pageSize: state.pageSize,

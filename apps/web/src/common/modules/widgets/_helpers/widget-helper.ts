@@ -1,13 +1,7 @@
 import bytes from 'bytes';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { byteFormatter, customNumberFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { DataTableGetParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/get';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -16,20 +10,6 @@ import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 
-
-export const getWidgetDataTable = async (dataTableId: string): Promise<PrivateDataTableModel|PublicDataTableModel|undefined> => {
-    const isPrivate = dataTableId.startsWith('private-');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.get<DataTableGetParameters, PrivateDataTableModel>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.get<DataTableGetParameters, PublicDataTableModel>;
-    try {
-        const result = await fetcher({ data_table_id: dataTableId });
-        return result;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    }
-};
 
 export const sortWidgetTableFields = (fields: string[]): string[] => {
     const priorityFields = Object.values(DATE_FIELD) as string[];
