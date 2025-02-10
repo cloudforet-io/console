@@ -55,7 +55,7 @@ const tableState = reactive({
             sortable: false,
         },
         {
-            name: 'state',
+            name: 'schedule.state',
             label: 'State',
             type: 'item',
             sortable: false,
