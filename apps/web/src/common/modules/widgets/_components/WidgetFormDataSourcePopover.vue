@@ -30,6 +30,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
@@ -43,7 +44,6 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -60,7 +60,7 @@ const {
     api,
     keys: widgetQueryKeys,
     queryClient,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const {

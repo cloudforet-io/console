@@ -11,6 +11,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     FORMAT_RULE_TYPE,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
@@ -26,7 +27,6 @@ import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 const FIELD_KEY = 'formatRules';
@@ -40,7 +40,7 @@ const validator = widgetValidatorRegistry[FIELD_KEY];
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

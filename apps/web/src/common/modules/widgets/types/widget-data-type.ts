@@ -17,5 +17,5 @@ export type TableDataItem = Record<string, any>;
 export type WidgetLoadResponse = ListResponse<Record<string, string|number>> & {
     labels_info: LabelsInfo;
     data_info: DataInfo;
-    order: string[];
+    order?: string[];
 };

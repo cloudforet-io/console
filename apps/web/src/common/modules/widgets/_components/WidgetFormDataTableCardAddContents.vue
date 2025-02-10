@@ -34,6 +34,10 @@ import WidgetFormDataTableCardHeaderTitle
 import WidgetFormDataTableCardSourceForm
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceForm.vue';
 import {
+    useDataTableCascadeUpdate,
+} from '@/common/modules/widgets/_composables/use-data-table-cascade-update';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE, GROUP_BY_INFO_ITEMS_FOR_TAGS,
@@ -53,6 +57,8 @@ import {
 } from '@/services/dashboards/composables/use-dashboard-data-table-cascade-update';
 import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 interface Props {
     selected: boolean;
     item: PublicDataTableModel|PrivateDataTableModel;
@@ -65,6 +71,8 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 
 /* Query */
 const {
@@ -74,10 +82,10 @@ const {
     api,
     fetcher,
     queryClient,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const { cascadeUpdateDataTable } = useDashboardDataTableCascadeUpdate({
+const { cascadeUpdateDataTable } = useDataTableCascadeUpdate({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
@@ -89,6 +97,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    isPrivate: computed(() => widgetGenerateState.widgetId?.startsWith('private')),
     loading: false,
     dataTableId: computed(() => props.item.data_table_id),
     sourceType: computed(() => props.item.source_type),
@@ -219,11 +228,32 @@ const modalState = reactive({
 });
 
 /* APIs */
+const invalidateLoadQueries = async (data: DataTableModel) => {
+    await queryClient.invalidateQueries({
+        queryKey: [
+            ...(state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
+            data.data_table_id,
+        ],
+    });
+    await queryClient.invalidateQueries({
+        queryKey: [
+            ...(state.isPrivate ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
+            dashboardDetailState.dashboardId,
+            widgetGenerateState.widgetId,
+        ],
+    });
+    await queryClient.invalidateQueries({
+        queryKey: [
+            ...(state.isPrivate ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
+            dashboardDetailState.dashboardId,
+            widgetGenerateState.widgetId,
+        ],
+    });
+};
 const { mutateAsync: updateDataTableAndCascadeUpdate } = useMutation({
     mutationFn: fetcher.updateDataTableFn,
     onSuccess: async (data) => {
-        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
-        const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+        const dataTableListQueryKey = state.isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
         await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
             if (oldData.results) {
                 return {
@@ -238,6 +268,7 @@ const { mutateAsync: updateDataTableAndCascadeUpdate } = useMutation({
             }
             return oldData;
         });
+        await invalidateLoadQueries(data);
         await cascadeUpdateDataTable(data.data_table_id);
 
         setInitialDataTableForm();

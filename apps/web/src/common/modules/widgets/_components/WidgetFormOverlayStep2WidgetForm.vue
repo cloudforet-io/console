@@ -19,6 +19,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
@@ -34,7 +35,6 @@ import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/Wi
 
 import { gray, red } from '@/styles/colors';
 
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 
@@ -64,7 +64,7 @@ const {
     fetcher,
     keys,
     queryClient,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

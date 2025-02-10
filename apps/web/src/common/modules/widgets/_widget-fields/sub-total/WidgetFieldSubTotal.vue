@@ -5,6 +5,7 @@ import {
     PFieldTitle, PToggleButton, PI, PTooltip, PCheckbox,
 } from '@cloudforet/mirinae';
 
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { SubTotalOptions, SubTotalValue } from '@/common/modules/widgets/_widget-fields/sub-total/type';
@@ -13,7 +14,6 @@ import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 const FIELD_KEY = 'subTotal';
@@ -25,7 +25,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

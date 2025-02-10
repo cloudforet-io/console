@@ -5,15 +5,12 @@ import {
 
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
-import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
 import { i18n } from '@/translations';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +18,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -28,7 +26,6 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 const props = defineProps<TransformDataTableProps<PivotOptions>>();
 
@@ -41,7 +38,8 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+    api,
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
@@ -183,8 +181,8 @@ const fetchAndExtractDynamicField = async () => {
     if (!dataTableInfo.value?.dataTableId || !fieldsInfo.value?.column) return;
     const _isPrivate = dataTableInfo.value?.dataTableId.startsWith('private');
     const _fetcher = _isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>;
+        ? api.privateDataTableAPI.load
+        : api.publicDataTableAPI.load;
     try {
         state.dynamicFieldLoading = true;
         const res = await _fetcher({

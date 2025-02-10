@@ -18,6 +18,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_TABLE_OPERATOR,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -25,7 +26,6 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AggregateOptions } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 
 
 
@@ -40,7 +40,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     dataTableList,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
