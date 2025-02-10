@@ -1,6 +1,6 @@
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
+import type { CostJobStatus } from '@/api-clients/cost-analysis/job/schema/type';
 
-import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
 
 interface SyncedAccount {
     account_id: string;

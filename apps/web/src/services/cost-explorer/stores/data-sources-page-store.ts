@@ -9,21 +9,18 @@ import { durationFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { DataSourceAccountAnalyzeParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/analyze';
-import type { CostDataSourceAccountListParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/list';
-import type { CostDataSourceAccountResetParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/reset';
-import type { CostDataSourceAccountUpdateParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/update';
-import type {
-    CostDataSourceAccountModel,
-    CostDataSourceAnalyzeModel,
-} from '@/schema/cost-analysis/data-source-account/model';
-import type { CostDataSourceGetParameters } from '@/schema/cost-analysis/data-source/api-verbs/get';
-import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
-import type { CostDataSourceSyncParameters } from '@/schema/cost-analysis/data-source/api-verbs/sync';
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
-import type { CostJobCancelParameters } from '@/schema/cost-analysis/job/api-verbs/cancel';
-import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
-import type { CostJobModel } from '@/schema/cost-analysis/job/model';
+import type { DataSourceAccountAnalyzeParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/analyze';
+import type { CostDataSourceAccountListParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/list';
+import type { CostDataSourceAccountResetParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/reset';
+import type { CostDataSourceAccountUpdateParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/update';
+import type { CostDataSourceAccountModel, CostDataSourceAnalyzeModel } from '@/api-clients/cost-analysis/data-source-account/schema/model';
+import type { CostDataSourceGetParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/get';
+import type { CostDataSourceListParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/list';
+import type { CostDataSourceSyncParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/sync';
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
+import type { CostJobCancelParameters } from '@/api-clients/cost-analysis/job/schema/api-verbs/cancel';
+import type { CostJobListParameters } from '@/api-clients/cost-analysis/job/schema/api-verbs/list';
+import type { CostJobModel } from '@/api-clients/cost-analysis/job/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -37,6 +34,7 @@ import type {
     CostLinkedAccountModalType,
     DataSourceItem,
 } from '@/services/cost-explorer/types/data-sources-type';
+
 
 export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceStore = useAllReferenceStore();

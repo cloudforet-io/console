@@ -8,8 +8,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import type { CostDataSourceListParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/list';
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {

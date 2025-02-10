@@ -13,6 +13,7 @@ import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/ana
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
@@ -43,7 +44,6 @@ import type {
     BookmarkType,
 } from '@/services/workspace-home/types/workspace-home-type';
 
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 
 interface WorkspaceHomeState {
     // info

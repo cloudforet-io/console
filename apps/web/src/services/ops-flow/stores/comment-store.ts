@@ -6,10 +6,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CommentCreateParameters } from '@/schema/opsflow/comment/api-verbs/create';
-import type { CommentDeleteParameters } from '@/schema/opsflow/comment/api-verbs/delete';
-import type { CommentListParameters } from '@/schema/opsflow/comment/api-verbs/list';
-import type { CommentModel } from '@/schema/opsflow/comment/model';
+import type { CommentCreateParameters } from '@/api-clients/opsflow/comment/schema/api-verbs/create';
+import type { CommentDeleteParameters } from '@/api-clients/opsflow/comment/schema/api-verbs/delete';
+import type { CommentListParameters } from '@/api-clients/opsflow/comment/schema/api-verbs/list';
+import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
 
 export const useCommentStore = defineStore('comment', () => {
     const comments = ref<CommentModel[]|undefined>();
