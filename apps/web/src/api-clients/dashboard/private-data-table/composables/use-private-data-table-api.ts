@@ -19,6 +19,7 @@ import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-d
 interface UsePrivateDataTableApiReturn {
     privateDataTableQueryKey: ComputedRef<QueryKey>;
     privateDataTableListQueryKey: ComputedRef<QueryKey>;
+    privateDataTableLoadQueryKey: ComputedRef<QueryKey>;
     privateDataTableAPI: {
         add: (params: DataTableAddParameters) => Promise<PrivateDataTableModel>;
         transform: (params: DataTableTransformParameters) => Promise<PrivateDataTableModel>;
@@ -33,6 +34,7 @@ interface UsePrivateDataTableApiReturn {
 export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
     const privateDataTableQueryKey = useAPIQueryKey('private-data-table/get');
     const privateDataTableListQueryKey = useAPIQueryKey('private-data-table/list');
+    const privateDataTableLoadQueryKey = useAPIQueryKey('private-data-table/load');
 
     const action = {
         async add(params: DataTableAddParameters) {
@@ -61,6 +63,7 @@ export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
     return {
         privateDataTableQueryKey,
         privateDataTableListQueryKey,
+        privateDataTableLoadQueryKey,
         privateDataTableAPI: action,
     };
 };

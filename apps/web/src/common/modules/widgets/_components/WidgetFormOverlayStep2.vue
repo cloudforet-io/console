@@ -13,8 +13,6 @@ import {
 import type {
     DashboardOptions, DashboardVars,
 } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -24,6 +22,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -37,7 +36,6 @@ import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -70,20 +68,20 @@ const {
 } = useDashboardDetailQuery({
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
-/* Query */
 const {
     widget,
     dataTableList,
     keys: widgetKeys,
     fetcher: wigetFetcher,
     widgetLoading,
-} = useDashboardWidgetFormQuery({
+} = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
 let fieldManager: WidgetFieldValueManager;
 
 const state = reactive({
+    isPrivate: computed<boolean>(() => !!widgetGenerateState.widgetId?.startsWith('private')),
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     mounted: false,
     fieldManager: computed<WidgetFieldValueManager>(() => {
@@ -145,7 +143,7 @@ const {
 const { mutateAsync: updateWidgetMutate } = useMutation({
     mutationFn: wigetFetcher.updateWidgetFn,
     onSuccess: (data) => {
-        const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
+        const widgetQueryKey = state.isPrivate
             ? widgetKeys.privateWidgetQueryKey
             : widgetKeys.publicWidgetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
@@ -156,6 +154,7 @@ const { mutateAsync: updateWidgetMutate } = useMutation({
     },
 });
 const updateWidget = async () => {
+    if (!widgetGenerateState.widgetId) return;
     const _isCreating = widget.value?.state === 'CREATING';
     const sanitizedOptions = sanitizeWidgetOptions(state.fieldManager.data, widgetGenerateState.selectedWidgetName);
     const result = await updateWidgetMutate({
@@ -194,9 +193,8 @@ const updateWidget = async () => {
 const { mutate: updateDashboard } = useMutation(
     {
         mutationFn: fetcher.updateDashboardFn,
-        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+        onSuccess: () => {
+            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
             queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
     },
@@ -211,9 +209,22 @@ const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
-const loadOverlayWidget = () => {
-    overlayWidgetRef?.value?.loadWidget();
-};
+// const loadOverlayWidget = async () => {
+//     await queryClient.invalidateQueries({
+//         queryKey: [
+//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadQueryKey.value : widgetKeys.publicWidgetLoadQueryKey.value),
+//             dashboardDetailState.dashboardId,
+//             widgetGenerateState.widgetId,
+//         ],
+//     });
+//     await queryClient.invalidateQueries({
+//         queryKey: [
+//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadSumQueryKey.value : widgetKeys.publicWidgetLoadSumQueryKey.value),
+//             dashboardDetailState.dashboardId,
+//             widgetGenerateState.widgetId,
+//         ],
+//     });
+// };
 
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
@@ -222,7 +233,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdateWidgetOptions = async () => {
     if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
         await updateWidget();
-        loadOverlayWidget();
+        // await loadOverlayWidget();
     } else {
         state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
         await updateWidget();
@@ -249,7 +260,7 @@ watch(() => state.mounted, async (mounted) => {
         if (widget.value?.state === 'CREATING') {
             await updateWidget();
         }
-        loadOverlayWidget();
+        // await loadOverlayWidget();
         state.mounted = false;
     }
 });

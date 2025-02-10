@@ -19,6 +19,8 @@ import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/sc
 interface UsePublicWidgetApiReturn {
     publicWidgetQueryKey: ComputedRef<QueryKey>;
     publicWidgetListQueryKey: ComputedRef<QueryKey>;
+    publicWidgetLoadQueryKey: ComputedRef<QueryKey>;
+    publicWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
     publicWidgetAPI: {
         create: (params: PublicWidgetCreateParameters) => Promise<PublicWidgetModel>;
         update: (params: PublicWidgetUpdateParameters) => Promise<PublicWidgetModel>;
@@ -33,6 +35,8 @@ interface UsePublicWidgetApiReturn {
 export const usePublicWidgetApi = (): UsePublicWidgetApiReturn => {
     const publicWidgetQueryKey = useAPIQueryKey('public-widget/get');
     const publicWidgetListQueryKey = useAPIQueryKey('public-widget/list');
+    const publicWidgetLoadQueryKey = useAPIQueryKey('public-widget/load');
+    const publicWidgetLoadSumQueryKey = useAPIQueryKey('public-widget/load-sum');
 
     const action = {
         async create(params: PublicWidgetCreateParameters) {
@@ -61,6 +65,8 @@ export const usePublicWidgetApi = (): UsePublicWidgetApiReturn => {
     return {
         publicWidgetQueryKey,
         publicWidgetListQueryKey,
+        publicWidgetLoadQueryKey,
+        publicWidgetLoadSumQueryKey,
         publicWidgetAPI: action,
     };
 };

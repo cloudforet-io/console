@@ -11,11 +11,15 @@ import type {
 import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
 import type { PrivateWidgetDeleteParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/delete';
 import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import type { PrivateWidgetLoadParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load';
+import type { PrivateWidgetLoadSumParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load-sum';
 import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
 import type { PublicWidgetDeleteParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/delete';
 import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
+import type { PublicWidgetLoadParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load';
+import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load-sum';
 import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
@@ -31,6 +35,8 @@ export type WidgetListParams = PublicWidgetListParameters|PrivateWidgetListParam
 export type WidgetCreateParams = PublicWidgetCreateParameters| PrivateWidgetCreateParameters;
 export type WidgetUpdateParams = PublicWidgetUpdateParameters| PrivateWidgetUpdateParameters;
 export type WidgetDeleteParams = PublicWidgetDeleteParameters| PrivateWidgetDeleteParameters;
+export type WidgetLoadParams = PublicWidgetLoadParameters| PrivateWidgetLoadParameters;
+export type WidgetLoadSumParams = PublicWidgetLoadSumParameters| PrivateWidgetLoadSumParameters;
 
 interface WidgetItemOptions {
     type: VariableModelType;
@@ -149,9 +155,13 @@ export type InheritOptions = Partial<Record<WidgetOptionKey, {
 export type WidgetLoadResponse = ListResponse<Record<string, string|number>> & {
     labels_info: LabelsInfo;
     data_info: DataInfo;
-    order: string[];
+    order?: string[];
 };
 
-export type DataTableLoadResponse = ListResponse<Record<string, string|number>>;
+export type DataTableLoadResponse = ListResponse<Record<string, string|number>> & {
+    labels_info: LabelsInfo;
+    data_info: DataInfo;
+    order?: string[];
+};
 
 

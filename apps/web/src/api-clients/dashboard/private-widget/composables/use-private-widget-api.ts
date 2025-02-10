@@ -19,6 +19,8 @@ import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/
 interface UsePrivateWidgetApiReturn {
     privateWidgetQueryKey: ComputedRef<QueryKey>;
     privateWidgetListQueryKey: ComputedRef<QueryKey>;
+    privateWidgetLoadQueryKey: ComputedRef<QueryKey>;
+    privateWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
     privateWidgetAPI: {
         create: (params: PrivateWidgetCreateParameters) => Promise<PrivateWidgetModel>;
         update: (params: PrivateWidgetUpdateParameters) => Promise<PrivateWidgetModel>;
@@ -33,6 +35,8 @@ interface UsePrivateWidgetApiReturn {
 export const usePrivateWidgetApi = (): UsePrivateWidgetApiReturn => {
     const privateWidgetQueryKey = useAPIQueryKey('private-widget/get');
     const privateWidgetListQueryKey = useAPIQueryKey('private-widget/list');
+    const privateWidgetLoadQueryKey = useAPIQueryKey('private-widget/load');
+    const privateWidgetLoadSumQueryKey = useAPIQueryKey('private-widget/load-sum');
 
     const action = {
         async create(params: PrivateWidgetCreateParameters) {
@@ -61,6 +65,8 @@ export const usePrivateWidgetApi = (): UsePrivateWidgetApiReturn => {
     return {
         privateWidgetQueryKey,
         privateWidgetListQueryKey,
+        privateWidgetLoadQueryKey,
+        privateWidgetLoadSumQueryKey,
         privateWidgetAPI: action,
     };
 };
