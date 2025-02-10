@@ -3,6 +3,7 @@ import { useResizeObserver } from '@vueuse/core/index';
 import {
     computed, defineExpose, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
@@ -15,17 +16,15 @@ import {
     isEmpty, orderBy, throttle,
 } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PrivateWidgetLoadParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-import type { PublicWidgetLoadParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load';
+import type { WidgetLoadParams, WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
@@ -34,13 +33,10 @@ import {
     normalizeAndSerializeVars,
 } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import {
-    normalizeAndSerializeDataTableOptions,
-} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
-import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import { isDateField } from '@/common/modules/widgets/_helpers/widget-field-helper';
-import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import { getWidgetLoadApiQueryDateRange } from '@/common/modules/widgets/_helpers/widget-load-helper';
 import type { CategoryByValue } from '@/common/modules/widgets/_widget-fields/category-by/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
@@ -50,12 +46,13 @@ import type { DisplaySeriesLabelValue } from '@/common/modules/widgets/_widget-f
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { TooltipNumberFormatValue } from '@/common/modules/widgets/_widget-fields/tooltip-number-format/type';
-import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 
 
 
@@ -65,6 +62,13 @@ interface ChartData {
 }
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+const route = useRoute();
+
+const { keys, api } = useWidgetFormQuery({
+    widgetId: computed(() => props.widgetId),
+    preventLoad: true,
+});
+
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
@@ -72,9 +76,8 @@ const { dateRange } = useWidgetDateRange({
 });
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
-    runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
-    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    dataTable: undefined as DataTableModel|undefined,
 
     data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
     chart: null as EChartsType | null,
@@ -90,7 +93,7 @@ const state = reactive({
                 if (state.unit) _name = `${_name} (${state.unit})`;
                 let _value = numberFormatter(params.value) || '';
                 if (widgetOptionsState.tooltipNumberFormatInfo?.toggleValue) {
-                    _value = getFormattedNumber(params.value, widgetOptionsState.dataFieldInfo?.data as string, widgetOptionsState.numberFormatInfo, state.unit);
+                    _value = getFormattedNumber(params.value, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit);
                 }
                 return `${params.marker} ${_name}: <b>${_value}</b>`;
             },
@@ -138,25 +141,27 @@ const widgetOptionsState = reactive({
     displaySeriesLabelInfo: computed<DisplaySeriesLabelValue>(() => props.widgetOptions?.displaySeriesLabel?.value as DisplaySeriesLabelValue),
 });
 
-/* Util */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
+/* Api */
+const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
+        ? api.privateWidgetAPI.load
+        : api.publicWidgetAPI.load;
     const res = await defaultFetcher(params);
     return res;
 };
 
 const queryKey = computed(() => [
-    'widget-load-treemap',
+    ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
+    route.params.dashboardId,
     props.widgetId,
+    props.widgetName,
     {
         start: dateRange.value.start,
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        dataTableId: props.dataTableId,
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         groupBy: widgetOptionsState.categoryByInfo?.data,
         count: widgetOptionsState.categoryByInfo?.count,
         vars: normalizeAndSerializeVars(props.dashboardVars),
@@ -174,7 +179,7 @@ const queryResult = useQuery({
         vars: props.dashboardVars,
         ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
@@ -218,9 +223,8 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     }) || [];
 };
 
-const loadWidget = (forceLoad?: boolean) => {
-    state.runQueries = true;
-    if (forceLoad) queryResult.refetch();
+const refetchWidget = () => {
+    queryResult.refetch();
 };
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -244,13 +248,21 @@ watch([() => state.data, () => props.widgetOptions], ([newData]) => {
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, loadWidget });
+useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
+
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
-    state.dataTable = await getWidgetDataTable(newDataTableId);
+    const fetcher = state.isPrivateWidget
+        ? api.privateDataTableAPI.get
+        : api.publicDataTableAPI.get;
+    try {
+        state.dataTable = await fetcher({ data_table_id: newDataTableId });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget,
+    loadWidget: refetchWidget,
 });
 </script>
 
