@@ -20,6 +20,7 @@ import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-t
 interface UsePublicDataTableApiReturn {
     publicDataTableQueryKey: ComputedRef<QueryKey>;
     publicDataTableListQueryKey: ComputedRef<QueryKey>;
+    publicDataTableLoadQueryKey: ComputedRef<QueryKey>;
     publicDataTableAPI: {
         add: (params: DataTableAddParameters) => Promise<PublicDataTableModel>;
         transform: (params: DataTableTransformParameters) => Promise<PublicDataTableModel>;
@@ -34,6 +35,7 @@ interface UsePublicDataTableApiReturn {
 export const usePublicDataTableApi = (): UsePublicDataTableApiReturn => {
     const publicDataTableQueryKey = useAPIQueryKey('public-data-table/get');
     const publicDataTableListQueryKey = useAPIQueryKey('public-data-table/list');
+    const publicDataTableLoadQueryKey = useAPIQueryKey('public-data-table/load');
 
     const action = {
         async add(params: DataTableAddParameters) {
@@ -62,6 +64,7 @@ export const usePublicDataTableApi = (): UsePublicDataTableApiReturn => {
     return {
         publicDataTableQueryKey,
         publicDataTableListQueryKey,
+        publicDataTableLoadQueryKey,
         publicDataTableAPI: action,
     };
 };

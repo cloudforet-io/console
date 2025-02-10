@@ -29,11 +29,7 @@ export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOp
     const isManageable = computed(() => {
         if (storeState.isAdminMode) return true;
         if (dashboard.value?.dashboard_id.startsWith('private')) return true;
-        if (storeState.isWorkspaceOwner) {
-            if (dashboard.value?.project_id) return false;
-            return true;
-        }
-        if (dashboard.value?.project_id) return false;
+        if (storeState.isWorkspaceOwner) return true;
         return false;
     });
 

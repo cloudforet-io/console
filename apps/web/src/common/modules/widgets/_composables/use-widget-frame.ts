@@ -1,23 +1,20 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { DisplayAnnotationValue } from '@/common/modules/widgets/_widget-fields/display-annotation/type';
@@ -44,22 +41,6 @@ interface OverridableWidgetFrameState {
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const listDataTables = async (widgetId?: string): Promise<DataTableModel[]> => {
-    if (!widgetId) return [];
-    const _isPrivate = widgetId.startsWith('private');
-    const _fetcher = _isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
-    try {
-        const { results } = await _fetcher({
-            widget_id: widgetId,
-        });
-        return results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 const convertDashboardVarsToConsoleFilters = (dashboardVars?: DashboardVars): ConsoleFilter[] => {
     if (!dashboardVars) return [];
     return Object.entries(dashboardVars).map(([k, v]) => ({
@@ -143,6 +124,14 @@ export const useWidgetFrame = (
     emit: WidgetEmit,
     overrides: OverridableWidgetFrameState = {},
 ) => {
+    /* Query */
+    const {
+        dataTableList,
+    } = useWidgetFormQuery({
+        widgetId: computed(() => props.widgetId),
+    });
+
+
     const _state = reactive({
         widgetConfig: computed<WidgetConfig|undefined>(() => getWidgetConfig(props.widgetName)),
         showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.value?.toggleValue || false),
@@ -164,11 +153,10 @@ export const useWidgetFrame = (
             if (_dateRange?.start && (_dateRange.start !== _dateRange.end)) return `${_dateRange.start} ~ ${_dateRange.end}`;
             return _dateRange.end;
         }),
-        dataTable: computed<DataTableModel|undefined>(() => _state.dataTables?.find((d) => d.data_table_id === props.dataTableId)),
-        dataTables: [] as DataTableModel[],
+        dataTable: computed<DataTableModel|undefined>(() => dataTableList.value?.find((d) => d.data_table_id === props.dataTableId)),
         unitMap: computed<Record<string, string>>(() => {
             const _result: Record<string, string> = {};
-            _state.dataTables.forEach((d) => {
+            dataTableList.value.forEach((d) => {
                 Object.entries(d.data_info).forEach(([k, v]) => {
                     if (v?.unit) _result[k] = v.unit;
                 });
@@ -177,9 +165,9 @@ export const useWidgetFrame = (
         }),
         fullDataLinkList: computed<FullDataLink[]>(() => {
             if (!_state.dataTable) return [];
-            let _dataTableIds = getRecursiveDataTableIds([], _state.dataTable, _state.dataTables);
+            let _dataTableIds = getRecursiveDataTableIds([], _state.dataTable, dataTableList.value);
             _dataTableIds = Array.from(new Set(_dataTableIds));
-            const _dataTables = _state.dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));
+            const _dataTables = dataTableList.value.filter((d) => _dataTableIds.includes(d.data_table_id));
             const _result: FullDataLink[] = [];
             _dataTables.forEach((d) => {
                 const _location = getFullDataLocation(d, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars);
@@ -242,10 +230,6 @@ export const useWidgetFrame = (
             emit('toggle-size', size);
         },
     };
-
-    onMounted(async () => {
-        _state.dataTables = await listDataTables(props.widgetId);
-    });
 
     return { widgetFrameProps, widgetFrameEventHandlers };
 };
