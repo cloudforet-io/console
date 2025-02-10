@@ -80,6 +80,12 @@ const handleClickSaveButton = () => {
 const handleResetVariables = () => {
     const _originVars = state.dashboardVars;
     state.tempVars = { ..._originVars };
+    dashboardDetailStore.setVars(_originVars);
+};
+
+const handleUpdateVars = (val: DashboardVars) => {
+    state.tempVars = val;
+    dashboardDetailStore.setVars(val);
 };
 
 watch(() => dashboard.value?.vars, (_vars) => {
@@ -94,7 +100,8 @@ watch(() => dashboard.value?.vars, (_vars) => {
         <template v-for="(property, idx) in state.globalVariables">
             <div :key="`${property.name}-${idx}`">
                 <dashboard-global-variable-filter :variable="property"
-                                                  :vars.sync="state.tempVars"
+                                                  :vars="state.tempVars"
+                                                  @update:vars="handleUpdateVars"
                 />
                 <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(property.key)" />
             </div>

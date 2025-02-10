@@ -128,7 +128,7 @@ const state = reactive({
         if (state.selectedCostDataType === 'usage_quantity') {
             return 'Usage';
         }
-        return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
+        return targetCostDataSource?.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
     operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string|TranslateResult; icon: string;}[]>(() => [
         {
@@ -194,7 +194,7 @@ const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutatio
     onSuccess: (data) => {
         const _isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
         const widgetListQueryKey = _isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
-        queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => (oldData.results.length ? {
+        queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => (oldData.results?.length ? {
             ...oldData, results: [...oldData.results, data],
         } : {
             ...oldData, results: [data],
@@ -260,7 +260,7 @@ const handleCreateUnsavedTransform = (operator: DataTableOperator) => {
 
     const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
     const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
-    queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results.length ? {
+    queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
         ...oldData, results: [...oldData.results, unsavedTransformData],
     } : {
         ...oldData, results: [unsavedTransformData],
@@ -270,7 +270,7 @@ const handleCreateUnsavedTransform = (operator: DataTableOperator) => {
 };
 
 const handleSelectPopperCondition = (condition: DataTableDataType) => {
-    if (condition === DATA_TABLE_TYPE.TRANSFORMED && !dataTableList.value.length) return;
+    if (condition === DATA_TABLE_TYPE.TRANSFORMED && !dataTableList.value?.length) return;
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
@@ -373,7 +373,7 @@ watch(() => state.showPopover, (val) => {
                 />
                 <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.TRANSFORM')"
                                icon="ic_transform-data"
-                               :disabled="!dataTableList.length"
+                               :disabled="!dataTableList?.length"
                                :show-select-marker="false"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"

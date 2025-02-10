@@ -185,10 +185,10 @@ const getResizedWidgetInfoList = (widgetInfoList: RefinedWidgetInfo[], _containe
 const { mutateAsync: updateDashboard } = useMutation(
     {
         mutationFn: fetcher.updateDashboardFn,
-        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+        onSuccess: async (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
             const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            await queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
     },
 );
@@ -349,6 +349,12 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             widget_id: createdWidget.widget_id,
             state: 'ACTIVE',
         });
+        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        await queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => ({
+            ...oldData,
+            results: [...(oldData.results || []), completedWidget],
+        }));
+
         const _layouts = cloneDeep(dashboard.value?.layouts || []);
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
