@@ -3,24 +3,23 @@ import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
     computed, defineExpose, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useQueries } from '@tanstack/vue-query';
 import { debounce, throttle } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI,
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { PrivateWidgetLoadSumParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/load-sum';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load-sum';
+import type { WidgetLoadResponse, WidgetLoadSumParams } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -30,12 +29,9 @@ import {
     normalizeAndSerializeVars,
 } from '@/common/modules/widgets/_helpers/global-variable-helper';
 import {
-    normalizeAndSerializeDataTableOptions,
-} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
-import {
     getPreviousDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
-import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { ComparisonValue } from '@/common/modules/widgets/_widget-fields/comparison/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
@@ -43,7 +39,8 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
-import type { DateRange, WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
@@ -51,10 +48,17 @@ import type {
 import { gray } from '@/styles/colors';
 
 
+
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const topPartRef = ref<null | HTMLElement>(null);
 const valueTextRef = ref<null | HTMLElement>(null);
+const route = useRoute();
+
+const { keys, api } = useWidgetFormQuery({
+    widgetId: computed(() => props.widgetId),
+    preventLoad: true,
+});
 
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
@@ -62,9 +66,8 @@ const { dateRange } = useWidgetDateRange({
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const state = reactive({
-    runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
-    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    dataTable: undefined as DataTableModel|undefined,
     previousLoading: false,
     isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
@@ -156,38 +159,42 @@ const setValueTextFontSize = debounce(() => {
 }, 300);
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<WidgetLoadResponse> => {
+const fetchWidgetData = async (params: WidgetLoadSumParams): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, WidgetLoadResponse>
-        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, WidgetLoadResponse>;
+        ? api.privateWidgetAPI.loadSum
+        : api.publicWidgetAPI.loadSum;
     const res = await defaultFetcher(params);
     return res;
 };
 
 const baseQueryKey = computed(() => [
-    'widget-load-number-card',
+    ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
+    route.params.dashboardId,
     props.widgetId,
+    props.widgetName,
     {
         start: dateRange.value.start,
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        dataTableId: props.dataTableId,
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
 const comparisonQueryKey = computed(() => [
-    'widget-load-number-card-comparison',
+    ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
+    route.params.dashboardId,
     props.widgetId,
+    props.widgetName,
     {
         start: state.comparisonDateRange.start,
         end: state.comparisonDateRange.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        dataTableId: props.dataTableId,
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
@@ -203,7 +210,7 @@ const queryResults = useQueries({
                 end: dateRange.value.end,
                 vars: props.dashboardVars,
             }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
         {
@@ -215,7 +222,7 @@ const queryResults = useQueries({
                 end: state.comparisonDateRange.end,
                 vars: props.dashboardVars,
             }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries && widgetOptionsState.comparisonInfo?.toggleValue),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && widgetOptionsState.comparisonInfo?.toggleValue),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
     ],
@@ -228,12 +235,9 @@ const errorMessage = computed<string>(() => {
     return queryResults.value?.[0].error?.message;
 });
 
-const loadWidget = (forceLoad?: boolean) => {
-    state.runQueries = true;
-    if (forceLoad) {
-        queryResults.value?.[0].refetch();
-        queryResults.value?.[1].refetch();
-    }
+const refetchWidget = () => {
+    queryResults.value?.[0].refetch();
+    queryResults.value?.[1].refetch();
 };
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -246,13 +250,21 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 useResizeObserver(valueTextRef, throttle(() => {
     setValueTextFontSize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, loadWidget });
+useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
+
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
-    state.dataTable = await getWidgetDataTable(newDataTableId);
+    const fetcher = state.isPrivateWidget
+        ? api.privateDataTableAPI.get
+        : api.publicDataTableAPI.get;
+    try {
+        state.dataTable = await fetcher({ data_table_id: newDataTableId });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget,
+    loadWidget: refetchWidget,
 });
 </script>
 
