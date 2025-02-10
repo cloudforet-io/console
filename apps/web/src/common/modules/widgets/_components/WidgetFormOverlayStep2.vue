@@ -333,6 +333,7 @@ onUnmounted(() => {
                            :data-tables="dataTableList"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
+                           :dashboard-id="dashboardDetailState.dashboardId"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
@@ -26,7 +25,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
@@ -62,7 +60,6 @@ interface ChartData {
 }
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-const route = useRoute();
 
 const { keys, api } = useWidgetFormQuery({
     widgetId: computed(() => props.widgetId),
@@ -152,7 +149,7 @@ const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResp
 
 const queryKey = computed(() => [
     ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-    route.params.dashboardId,
+    props.dashboardId,
     props.widgetId,
     props.widgetName,
     {
@@ -223,10 +220,6 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     }) || [];
 };
 
-const refetchWidget = () => {
-    queryResult.refetch();
-};
-
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
@@ -243,12 +236,11 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
 });
 watch([() => state.data, () => props.widgetOptions], ([newData]) => {
     drawChart(newData);
-});
+}, { immediate: true });
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
 
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
@@ -262,7 +254,12 @@ watch(() => props.dataTableId, async (newDataTableId) => {
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget: refetchWidget,
+    loadWidget: () => {
+        queryResult.refetch();
+    },
+});
+onMounted(() => {
+    emit('mounted', props.widgetName);
 });
 </script>
 

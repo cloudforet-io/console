@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose,
+    computed, defineExpose, onMounted,
     reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
+import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
@@ -28,7 +28,6 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
@@ -68,7 +67,6 @@ interface ChartData {
 }
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-const route = useRoute();
 
 const { keys, api } = useWidgetFormQuery({
     widgetId: computed(() => props.widgetId),
@@ -85,7 +83,7 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     dataTable: undefined as DataTableModel|undefined,
 
-    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetLoadResponse | null>(() => queryResult.data?.value || null),
     chart: null as EChartsType | null,
     chartData: [] as ChartData[],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
@@ -208,9 +206,9 @@ const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResp
     return res;
 };
 
-const queryKey = computed(() => [
+const queryKey = computed<QueryKey>(() => [
     ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-    route.params.dashboardId,
+    props.dashboardId,
     props.widgetId,
     props.widgetName,
     {
@@ -272,10 +270,6 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     state.chartData = _refinedData;
 };
 
-const refetchWidget = () => {
-    queryResult.refetch();
-};
-
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
     errorMessage,
@@ -293,12 +287,10 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
 });
 watch([() => state.data, () => props.widgetOptions], ([newData]) => {
     drawChart(newData);
-});
+}, { immediate: true });
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 500));
-useWidgetInitAndRefresh({ props, emit, loadWidget: refetchWidget });
-
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
     const fetcher = state.isPrivateWidget
@@ -311,7 +303,12 @@ watch(() => props.dataTableId, async (newDataTableId) => {
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget: refetchWidget,
+    loadWidget: async () => {
+        queryResult.refetch();
+    },
+});
+onMounted(() => {
+    emit('mounted', props.widgetName);
 });
 </script>
 
