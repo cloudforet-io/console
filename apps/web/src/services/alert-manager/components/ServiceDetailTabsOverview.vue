@@ -1,39 +1,11 @@
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
-
-import { PDivider, screens } from '@cloudforet/mirinae';
-
-import ServiceDetailTabsOverviewEscalationPolicy
-    from '@/services/alert-manager/components/ServiceDetailTabsOverviewEscalationPolicy.vue';
-import ServiceDetailTabsOverviewNotification
-    from '@/services/alert-manager/components/ServiceDetailTabsOverviewNotification.vue';
 import ServiceDetailTabsOverviewStatusTable
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewStatusTable.vue';
-import ServiceDetailTabsOverviewWebhook
-    from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhook.vue';
-
-const { width } = useWindowSize();
-
-const state = reactive({
-    isTabletSize: computed(() => width.value < screens.tablet.max),
-});
 </script>
 
 <template>
     <div class="service-detail-tabs-overview">
         <service-detail-tabs-overview-status-table />
-        <p-divider class="divider" />
-        <service-detail-tabs-overview-webhook />
-        <p-divider class="divider" />
-        <div class="section-wrapper">
-            <service-detail-tabs-overview-notification class="section" />
-            <p-divider class="divider"
-                       :vertical="!state.isTabletSize"
-            />
-            <service-detail-tabs-overview-escalation-policy class="section" />
-        </div>
-        <p-divider class="divider" />
     </div>
 </template>
 
