@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { PDataTable, PLink, PSkeleton } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n } from '@/translations';
 
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+    computed,
     onUnmounted,
     reactive, ref, watch,
 } from 'vue';
@@ -18,6 +19,8 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2
     from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -30,10 +33,14 @@ const props = defineProps<Props>();
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
-
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => props.dashboardId),
+});
 
 const state = reactive({
     hasAlertConfig: false,
@@ -84,7 +91,7 @@ onUnmounted(() => {
     <div class="project-dashboard-page">
         <div class="dashboard-wrapper">
             <div class="title-wrapper">
-                <p-skeleton v-if="!dashboardDetailGetters.dashboardName"
+                <p-skeleton v-if="!dashboard?.name"
                             width="20rem"
                             height="1.5rem"
                 />
@@ -92,7 +99,7 @@ onUnmounted(() => {
                      class="dashboard-title"
                 >
                     <p class="title">
-                        {{ dashboardDetailGetters.dashboardName }}
+                        {{ dashboard?.name }}
                     </p>
                     <span class="beta-mark">beta</span>
                 </div>
@@ -114,7 +121,7 @@ onUnmounted(() => {
                 >
                     <dashboard-variables-v2 class="variable-selector-wrapper"
                                             is-project-dashboard
-                                            :disable-save-button="dashboardDetailGetters.disableManageButtons"
+                                            :disable-save-button="!isManageable"
                                             :loading="state.dashboardVariablesLoading"
                                             @update="handleUpdateDashboardVariables"
                     />

@@ -5,8 +5,8 @@ import {
 
 import { isEmpty } from 'lodash';
 
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

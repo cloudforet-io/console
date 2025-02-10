@@ -5,7 +5,7 @@ import {
 
 import { PDataLoader, PButton } from '@cloudforet/mirinae';
 
-import type { EventModel } from '@/schema/opsflow/event/model';
+import type { EventModel } from '@/api-clients/opsflow/event/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

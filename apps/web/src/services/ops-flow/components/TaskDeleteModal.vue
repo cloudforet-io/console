@@ -3,8 +3,8 @@ import { ref } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { TaskDeleteParameters } from '@/schema/opsflow/task/api-verbs/delete';
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskDeleteParameters } from '@/api-clients/opsflow/task/schema/api-verbs/delete';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { getParticle, i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

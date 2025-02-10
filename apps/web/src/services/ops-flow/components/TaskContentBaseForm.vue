@@ -8,10 +8,10 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
-import type { TaskModel } from '@/schema/opsflow/task/model';
-import type { TaskStatusType } from '@/schema/opsflow/task/type';
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';

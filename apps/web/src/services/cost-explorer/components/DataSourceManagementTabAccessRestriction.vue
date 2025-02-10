@@ -8,7 +8,7 @@ import { PHeading, PToggleButton, PButtonModal } from '@cloudforet/mirinae';
 
 import type {
     CostDataSourceUpdatePermissionsParameters,
-} from '@/schema/cost-analysis/data-source/api-verbs/update-permissions';
+} from '@/api-clients/cost-analysis/data-source/schema/api-verbs/update-permissions';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

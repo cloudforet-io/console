@@ -5,10 +5,10 @@ import { defineStore } from 'pinia';
 
 import { APIError } from '@cloudforet/core-lib/space-connector/error';
 
-import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
-import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

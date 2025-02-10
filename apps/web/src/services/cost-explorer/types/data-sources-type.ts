@@ -1,7 +1,8 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
-import type { CostJobModel } from '@/schema/cost-analysis/job/model';
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
+import type { CostJobModel } from '@/api-clients/cost-analysis/job/schema/model';
+
 
 export interface DataSourceItem extends CostDataSourceModel {
     icon?: string;

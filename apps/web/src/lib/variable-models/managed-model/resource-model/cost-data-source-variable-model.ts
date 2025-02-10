@@ -1,4 +1,5 @@
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

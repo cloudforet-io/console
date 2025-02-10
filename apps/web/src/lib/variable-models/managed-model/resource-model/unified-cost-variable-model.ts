@@ -1,4 +1,5 @@
-import type { UnifiedCostModel } from '@/schema/cost-analysis/unified-cost/model';
+
+import type { UnifiedCostModel } from '@/api-clients/cost-analysis/unified-cost/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

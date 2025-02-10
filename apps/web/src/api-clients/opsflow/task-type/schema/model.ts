@@ -1,6 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
-import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 
 export interface TaskTypeModel {
     task_type_id: string;
