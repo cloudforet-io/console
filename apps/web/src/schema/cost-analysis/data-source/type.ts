@@ -5,3 +5,8 @@ export type CostDataSourceState = typeof COST_DATA_SOURCE_STATE[keyof typeof COS
 export type CostDataSourceType = typeof COST_DATA_SOURCE_TYPE[keyof typeof COST_DATA_SOURCE_TYPE];
 
 export type CostDataSourceSecretType = typeof COST_DATA_SOURCE_SECRET_TYPE[keyof typeof COST_DATA_SOURCE_SECRET_TYPE];
+
+export interface CostDataSourceSchedule {
+    state: CostDataSourceState;
+    hour: number;
+}
