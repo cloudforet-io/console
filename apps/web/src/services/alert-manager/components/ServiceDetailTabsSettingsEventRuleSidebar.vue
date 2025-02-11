@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 import draggable from 'vuedraggable';
 
@@ -24,7 +26,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
@@ -34,13 +35,13 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/stores/servi
 import type { TreeNode } from '@/services/project/tree/type';
 
 interface Props {
-  hideSidebar: boolean;
   items: EventRuleModel[];
+  headerHeight: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    hideSidebar: false,
     items: undefined,
+    headerHeight: 0,
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -55,8 +56,6 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const route = useRoute();
 const router = useRouter();
 
-const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
-
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
@@ -69,7 +68,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-    proxyHideSidebar: useProxyValue('hideSidebar', props, emit),
+    hideSidebar: false,
     searchValue: '',
     filteredItems: computed<EventRuleModel[]>(() => {
         const filtered = state.searchValue
@@ -81,6 +80,7 @@ const state = reactive({
     treeListOpenState: {} as Record<string, boolean>,
     selectedTreeId: undefined as string | undefined,
     isEditMode: false,
+    headerHeight: computed<number>(() => props.headerHeight + 48),
 });
 
 const setTreeList = (): TreeNode[] => {
@@ -98,7 +98,6 @@ const setTreeList = (): TreeNode[] => {
                         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                         query: {
                             tab: SERVICE_DETAIL_TABS.SETTINGS,
-                            mode: 'eventRule',
                             webhookId,
                         },
                     },
@@ -119,7 +118,6 @@ const setTreeList = (): TreeNode[] => {
                     name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                     query: {
                         tab: SERVICE_DETAIL_TABS.SETTINGS,
-                        mode: 'eventRule',
                         webhookId,
                         eventRuleId: item.event_rule_id,
                     },
@@ -144,7 +142,7 @@ const getWebhookIcon = (id: string): string | undefined => {
     return webhook ? storeState.plugins[webhook.plugin_info.plugin_id]?.icon : undefined;
 };
 const clickResizer = () => {
-    state.proxyHideSidebar = !state.proxyHideSidebar;
+    state.hideSidebar = !state.hideSidebar;
 };
 
 const handleSearchInput = (value: string) => {
@@ -212,26 +210,17 @@ watch([() => props.items.length, () => storeState.showEventRuleFormCard], async 
     if (!showFormCard && !route.query?.eventRuleId) await initSidebar();
 }, { immediate: true });
 watch(() => state.isMobileSize, (isMobileSize) => {
-    if (!isMobileSize) state.proxyHideSidebar = false;
+    if (!isMobileSize) state.hideSidebar = false;
 }, { immediate: true });
 </script>
 
 <template>
     <div class="service-detail-tabs-settings-event-rule-side-bar"
-         :class="{ 'hidden': state.proxyHideSidebar && state.isMobileSize, 'mobile-opened': !state.proxyHideSidebar && state.isMobileSize }"
+         :class="{ 'mobile': state.isMobileSize, 'hidden': state.hideSidebar }"
+         :style="{ top: `${state.headerHeight}px`, height: state.isMobileSize ? `calc(100% - ${state.headerHeight}px)` : 'auto' }"
     >
         <p-pane-layout class="sidebar p-4">
-            <div v-if="state.isMobileSize"
-                 class="resizer"
-                 @click="clickResizer"
-            >
-                <p-i width="1.5rem"
-                     height="1.5rem"
-                     :name="state.proxyHideSidebar ? 'ic_chevron-right' : 'ic_chevron-left'"
-                     color="inherit"
-                />
-            </div>
-            <div v-if="!state.proxyHideSidebar"
+            <div v-if="!state.hideSidebar"
                  class="sidebar-inner flex flex-col text-label-md gap-4"
             >
                 <div class="flex items-center justify-between">
@@ -262,7 +251,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                 <div v-if="state.treeList.length > 0">
                     <div v-for="(title, idx) in state.treeList"
                          :key="`title-${idx}`"
-                         class="cursor-pointer"
+                         class="cursor-pointer w-full"
                          @click="handleClickItem(title, idx)"
                     >
                         <div class="tree-item">
@@ -278,6 +267,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                  height="1rem"
                                  width="1rem"
                                  color="inherit"
+                                 class="block"
                             />
                             <p-lazy-img v-else
                                         :src="getWebhookIcon(title?.id)"
@@ -285,13 +275,14 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                         width="1rem"
                                         height="1rem"
                             />
-                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
+                            <span class="ml-0.5">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
                         </div>
                         <draggable v-if="title.isOpen"
                                    v-model="title.children"
                                    ghost-class="ghost"
                                    handle=".handle"
                                    draggable=".children-item"
+                                   class="flex flex-col"
                         >
                             <div v-for="(item, itemIdx) in title.children || []"
                                  :key="`children-${itemIdx}`"
@@ -305,12 +296,12 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                     >
                                         {{ itemIdx + 1 }}
                                     </p-badge>
-                                    <span class="truncate max-w-36">{{ item.data.name }}</span>
+                                    <span class="truncate flex-1">{{ item.data.name }}</span>
                                     <p-i v-if="state.isEditMode"
                                          name="ic_drag-handle"
                                          width="1rem"
                                          height="1rem"
-                                         class="handle"
+                                         class="handle ml-auto"
                                          :color="gray[500]"
                                     />
                                 </div>
@@ -325,26 +316,37 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                 </span>
             </div>
         </p-pane-layout>
+        <div v-if="state.isMobileSize"
+             class="resizer"
+             @click="clickResizer"
+        >
+            <p-i width="1.5rem"
+                 height="1.5rem"
+                 :name="state.hideSidebar ? 'ic_chevron-right' : 'ic_chevron-left'"
+                 color="inherit"
+            />
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule-side-bar {
-    @apply flex;
-    min-height: 23.125rem;
+    @apply flex h-full;
     .sidebar {
+        @apply overflow-y-auto border-t-0 border-b-0 border-l-0 rounded-none;
         width: 15rem;
-        min-height: 23.125rem;
         padding: 0;
         z-index: 2;
         transition: width 0.3s ease;
         .sidebar-inner {
+            @apply overflow-y-auto;
             width: 15rem;
             padding: 1rem;
             transition: width 0.3s ease;
             .tree-item {
-                @apply flex items-center pt-1.5 pr-0.5 pb-1.5;
+                @apply inline-flex items-center overflow-hidden whitespace-nowrap pt-1.5 pr-0.5 pb-1.5;
                 .arrow-button {
+                    @apply block;
                     &.is-collapsed {
                         transform: rotate(-90deg);
                     }
@@ -355,39 +357,34 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                 }
             }
         }
-        .resizer {
-            @apply flex items-center justify-center bg-white border border-gray-300 cursor-pointer;
-            margin-left: -0.25rem;
-            margin-top: 0.75rem;
-            width: 1.5rem;
-            height: 1.5rem;
-            border-top-right-radius: 50%;
-            border-bottom-right-radius: 50%;
-            border-left: none;
-            z-index: 1;
-            &:hover {
-                @apply bg-blue-200;
-            }
+    }
+    .resizer {
+        @apply flex items-center justify-center bg-white border border-gray-300 cursor-pointer;
+        margin-left: -0.25rem;
+        margin-top: 0.75rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-top-right-radius: 50%;
+        border-bottom-right-radius: 50%;
+        border-left: none;
+        z-index: 1;
+        &:hover {
+            @apply bg-blue-200;
         }
     }
     &.hidden {
-        position: absolute;
-        top: 23.5px;
-        left: -1.5rem;
-        z-index: 1000;
         .sidebar {
             @apply border-r-0;
             width: 0;
+            .sidebar-inner {
+                width: 0;
+            }
         }
     }
-    &.mobile-opened {
-        position: absolute;
-        top: 23.5px;
-        left: -1.5rem;
-        z-index: 1000;
-        .resizer {
-            margin-left: 14.9rem;
-        }
+    &.mobile {
+        @apply absolute border-t;
+        top: 0;
+        left: 0;
     }
 }
 </style>

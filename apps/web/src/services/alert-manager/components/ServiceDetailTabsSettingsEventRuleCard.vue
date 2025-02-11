@@ -98,7 +98,7 @@ const state = reactive({
                             result[type].push({
                                 label: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE'),
                                 name: 'asset_types',
-                                value: matchAssetValue.asset_types.map((i) => storeState.cloudServiceType[i].label).join(', '),
+                                value: matchAssetValue.asset_types.map((i) => storeState.cloudServiceType[i]?.label || storeState.cloudServiceType[i]?.name).join(', ') || '-',
                             });
                         }
                         if (matchAssetValue.key) {
