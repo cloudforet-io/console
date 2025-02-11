@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import ServiceDetailTabsOverviewWebhookChartDaily
-    from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookChartDaily.vue';
+import ServiceDetailTabsOverviewWebhookBarChartDaily
+    from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookBarChartDaily.vue';
 import ServiceDetailTabsOverviewWebhookChartMonthly
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookChartMonthly.vue';
 
@@ -16,6 +16,6 @@ const props = withDefaults(defineProps<Props>(), {
 <template>
     <div>
         <service-detail-tabs-overview-webhook-chart-monthly v-if="props.dateOption === 'monthly'" />
-        <service-detail-tabs-overview-webhook-chart-daily v-else />
+        <service-detail-tabs-overview-webhook-bar-chart-daily v-else />
     </div>
 </template>

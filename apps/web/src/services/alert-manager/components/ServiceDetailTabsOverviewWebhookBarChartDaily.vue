@@ -129,10 +129,7 @@ watch(
         const today = dayjs.utc();
         const fourteenDaysAgo = today.subtract(13, 'day');
 
-        const allDates: string[] = [];
-        for (let i = 0; i < 14; i++) {
-            allDates.push(fourteenDaysAgo.add(i, 'day').format('YYYY-MM-DD'));
-        }
+        const allDates: string[] = Array.from({ length: 14 }, (_, i) => fourteenDaysAgo.add(i, 'day').format('YYYY-MM-DD'));
 
         state.refinedItems = reduce(allDates, (acc, date) => {
             acc[date] = {};
