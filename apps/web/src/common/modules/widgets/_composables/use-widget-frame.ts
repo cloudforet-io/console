@@ -25,8 +25,6 @@ import type { DateRange } from '@/common/modules/widgets/types/widget-data-type'
 import type {
     WidgetEmit, WidgetProps, WidgetSize,
 } from '@/common/modules/widgets/types/widget-display-type';
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
-import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
@@ -86,12 +84,16 @@ const getRecursiveDataTableIds = (prevValue: string[] = [], dataTable: DataTable
             _results = _results.concat(..._dataTables.map((d) => getRecursiveDataTableIds(prevValue, d, dataTables)));
             return _results;
         }
-        return prevValue.concat(dataTable.data_table_id);
+
+        const _dataTableId = dataTable?.options?.[dataTable.operator]?.data_table_id;
+        const _dataTable = dataTables.find((d) => d.data_table_id === _dataTableId);
+        _results = _results.concat(...getRecursiveDataTableIds(prevValue, _dataTable, dataTables));
+        return _results;
     }
     return prevValue.concat(dataTable.data_table_id);
 };
-const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>, dateRange?: DateRange, dashboardVars?: DashboardVars): Location|undefined => {
-    const _granularity = (widgetOptions?.granularity as GranularityValue).granularity || 'MONTHLY';
+const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: WidgetProps['widgetOptions'], dateRange?: DateRange, dashboardVars?: DashboardVars): Location|undefined => {
+    const _granularity = (widgetOptions?.granularity?.value as GranularityValue)?.granularity || 'MONTHLY';
     const _groupBy: string[] = dataTable?.options?.group_by?.map((d) => d.key);
     const _costFilters = [
         ...(dataTable?.options?.filter ?? []),
