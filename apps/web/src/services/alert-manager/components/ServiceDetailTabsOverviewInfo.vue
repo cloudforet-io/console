@@ -1,8 +1,27 @@
 <script lang="ts" setup>
-import { PPaneLayout } from '@cloudforet/mirinae';
+import { reactive } from 'vue';
+
+import { PPaneLayout, PSelectButton } from '@cloudforet/mirinae';
+
+import { i18n } from '@/translations';
 
 import ServiceDetailTabsOverviewInfoAlertChart
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewInfoAlertChart.vue';
+import ServiceDetailTabsOverviewWebhook from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhook.vue';
+import ServiceDetailTabsOverviewWebhookChart
+    from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookChart.vue';
+
+const state = reactive({
+    dateOptions: [
+        { label: i18n.t('ALERT_MANAGER.SERVICE.WEBHOOK_MONTHLY'), name: 'monthly' },
+        { label: i18n.t('ALERT_MANAGER.SERVICE.WEBHOOK_DAILY'), name: 'daily' },
+    ],
+    selectedDateOption: 'monthly',
+});
+
+const handleChangeDateOption = (dateOption: string) => {
+    state.selectedDateOption = dateOption;
+};
 </script>
 
 <template>
@@ -19,9 +38,25 @@ import ServiceDetailTabsOverviewInfoAlertChart
             <service-detail-tabs-overview-info-alert-chart />
         </p-pane-layout>
         <p-pane-layout class="info col-span-2">
-            <p class="title-label">
-                {{ $t('ALERT_MANAGER.WEBHOOK.TITLE') }}
-            </p>
+            <div class="flex justify-between">
+                <p class="title-label">
+                    {{ $t('ALERT_MANAGER.WEBHOOK.TITLE') }}
+                </p>
+                <div>
+                    <p-select-button v-for="(date, i) in state.dateOptions"
+                                     :key="i"
+                                     class="mr-2"
+                                     :value="date.name"
+                                     style-type="gray"
+                                     :selected="state.selectedDateOption"
+                                     @change="handleChangeDateOption"
+                    >
+                        {{ date.label }}
+                    </p-select-button>
+                </div>
+            </div>
+            <service-detail-tabs-overview-webhook-chart :date-option="state.selectedDateOption" />
+            <service-detail-tabs-overview-webhook />
         </p-pane-layout>
     </div>
 </template>
