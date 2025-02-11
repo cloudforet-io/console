@@ -255,7 +255,7 @@
 			"CREATE_SERVICE_TITLE": "新しいサービスを作成",
 			"CREATE_WEBHOOK_TITLE": "ウェブフックの作成",
 			"DEFAULT_ESCALATION_POLICY": "デフォルトエスカレーションポリシー",
-			"DETAILS": "詳細情報",
+			"DETAILS": "",
 			"EMPTY_MEMBER": "サービスメンバーがいません",
 			"GO_BACK": "戻る",
 			"HEALTHY_SERVICE": "ヘルシーサービス ",
@@ -301,7 +301,9 @@
 			"VALIDATION_KEY_UNIQUE": "同じ名前のキーがすでに存在します。",
 			"VALIDATION_NAME_UNIQUE": "同じ名前のサービスはすでに存在します。",
 			"VIEW_ALL": "すべて表示",
-			"WEBHOOK": "ウェプフク ({cnt})"
+			"WEBHOOK": "ウェプフク ({cnt})",
+			"WEBHOOK_DAILY": "",
+			"WEBHOOK_MONTHLY": ""
 		},
 		"SET_UP": "設定",
 		"SHOW_MORE": "もっと見る",

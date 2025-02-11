@@ -255,7 +255,7 @@
 			"CREATE_SERVICE_TITLE": "새로운 서비스 생성",
 			"CREATE_WEBHOOK_TITLE": "웹훅 생성",
 			"DEFAULT_ESCALATION_POLICY": "기본 에스컬레이션 정책",
-			"DETAILS": "상세 정보",
+			"DETAILS": "",
 			"EMPTY_MEMBER": "서비스 멤버가 없습니다.",
 			"GO_BACK": "뒤로가기",
 			"HEALTHY_SERVICE": "정상 서비스",
@@ -301,7 +301,9 @@
 			"VALIDATION_KEY_UNIQUE": "동일한 이름의 키가 이미 존재합니다. ",
 			"VALIDATION_NAME_UNIQUE": "동일한 이름의 서비스가 이미 존재합니다.",
 			"VIEW_ALL": "전체보기",
-			"WEBHOOK": "웹훅 ({cnt})"
+			"WEBHOOK": "웹훅 ({cnt})",
+			"WEBHOOK_DAILY": "",
+			"WEBHOOK_MONTHLY": ""
 		},
 		"SET_UP": "설정",
 		"SHOW_MORE": "더보기",
