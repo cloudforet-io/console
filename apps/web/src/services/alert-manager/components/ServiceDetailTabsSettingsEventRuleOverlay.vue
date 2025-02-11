@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core';
+import { useElementSize, useWindowSize } from '@vueuse/core';
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -37,6 +37,8 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
+const headerEl = ref<HTMLElement|null>(null);
+
 const emit = defineEmits<{(e: 'update:visible', value: string): void }>();
 
 const storeState = reactive({
@@ -55,6 +57,7 @@ const state = reactive({
     selectedScope: EVENT_RULE_SCOPE.WEBHOOK,
     selectedWebhook: '',
     hideSidebar: false,
+    headerHeight: computed(() => useElementSize(headerEl).height), // 58 is the padding of the header
 });
 
 const handleClickAddRule = () => {
@@ -85,7 +88,7 @@ onUnmounted(() => {
                       @close="state.proxyVisible = false"
     >
         <template #header>
-            <p-heading-layout>
+            <p-heading-layout ref="headerEl">
                 <template #heading>
                     <p-heading haeding-type="sub">
                         <template #title>
@@ -93,7 +96,9 @@ onUnmounted(() => {
                                 {{ $t('ALERT_MANAGER.EVENT_RULE.TITLE') }}
                             </p>
                         </template>
-                        <template #title-right-extra>
+                        <template v-if="!state.isMobileSize"
+                                  #title-right-extra
+                        >
                             <div class="inline-flex items-center gap-1 text-gray-700 text-label-sm">
                                 <p-i name="ic_info-circle"
                                      class="title-tooltip"
@@ -120,8 +125,8 @@ onUnmounted(() => {
         </template>
         <div class="loader">
             <service-detail-tabs-settings-event-rule-sidebar v-if="!state.loading && storeState.items.length > 0"
-                                                             :hide-sidebar.sync="state.hideSidebar"
                                                              :items="storeState.items"
+                                                             :header-height="state.headerHeight.value"
             />
             <p-data-loader :loading="state.loading"
                            :data="!storeState.showEventRuleFormCard ? storeState.items : true"
@@ -155,10 +160,6 @@ onUnmounted(() => {
                 </template>
             </p-data-loader>
         </div>
-        <service-detail-tabs-settings-event-rule-sidebar v-if="state.isMobileSize"
-                                                         :hide-sidebar.sync="state.hideSidebar"
-                                                         :items="storeState.items"
-        />
         <service-detail-tabs-settings-event-rule-scope-modal v-if="hasReadWriteAccess && storeState.modalVisible"
                                                              :visible="hasReadWriteAccess && storeState.modalVisible"
                                                              :scope.sync="state.selectedScope"
