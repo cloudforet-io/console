@@ -19,7 +19,7 @@ import ServiceDetailTabsNotificationsDetail
     from '@/services/alert-manager/components/ServiceDetailTabsNotificationsDetail.vue';
 import ServiceDetailTabsOverview from '@/services/alert-manager/components/ServiceDetailTabsOverview.vue';
 import ServiceDetailTabsOverviewInfo from '@/services/alert-manager/components/ServiceDetailTabsOverviewInfo.vue';
-import ServiceDetailTabsSettingsContainer from '@/services/alert-manager/components/ServiceDetailTabsSettingsContainer.vue';
+import ServiceDetailTabsSettings from '@/services/alert-manager/components/ServiceDetailTabsSettings.vue';
 import ServiceDetailTabsWebhook from '@/services/alert-manager/components/ServiceDetailTabsWebhook.vue';
 import ServiceDetailTabsWebhookDetail
     from '@/services/alert-manager/components/ServiceDetailTabsWebhookDetail.vue';
@@ -47,9 +47,6 @@ const storeState = reactive({
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
     selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
 });
-const state = reactive({
-    isSettingMode: computed<boolean>(() => route.query?.mode !== 'eventRule'),
-});
 
 watch(() => route.query.tab, (tab) => {
     if (tab) {
@@ -67,7 +64,6 @@ watch(() => tabState.activeTab, (activeTab) => {
         tab: activeTab,
         urgency: activeTab !== SERVICE_DETAIL_TABS.ALERTS ? undefined : route.query?.urgency,
         status: activeTab !== SERVICE_DETAIL_TABS.ALERTS ? undefined : route.query?.status,
-        mode: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.mode,
         webhookId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.webhookId,
         eventRuleId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.eventRuleId,
         escalationPolicyId: activeTab !== SERVICE_DETAIL_TABS.SETTINGS ? undefined : route.query?.escalationPolicyId,
@@ -105,7 +101,6 @@ watch(() => tabState.activeTab, (activeTab) => {
                :tabs="tabState.tabs"
                :active-tab.sync="tabState.activeTab"
                class="tab"
-               :class="{'event-rule': !state.isSettingMode}"
         >
             <template #overview>
                 <service-detail-tabs-overview />
@@ -114,7 +109,7 @@ watch(() => tabState.activeTab, (activeTab) => {
                 <service-detail-tabs-alert />
             </template>
             <template #settings>
-                <service-detail-tabs-settings-container />
+                <service-detail-tabs-settings />
             </template>
         </p-tab>
         <service-detail-tabs-overview-info v-if="tabState.activeTab === SERVICE_DETAIL_TABS.OVERVIEW" />
@@ -126,11 +121,6 @@ watch(() => tabState.activeTab, (activeTab) => {
     .horizontal-tab {
         .tab {
             min-height: 32.625rem;
-        }
-    }
-    .tab {
-        &.event-rule {
-            @apply bg-transparent border-none;
         }
     }
 }

@@ -163,8 +163,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.showEventRuleFormCard = false;
             state.isEventRuleEditMode = false;
         },
-        initEscalationPolicyState() {
-            state.eventRuleList = [];
+        initEventRuleState() {
             state.eventRuleInfo = {} as EventRuleModel;
             state.eventRuleScopeModalVisible = false;
             state.showEventRuleFormCard = false;

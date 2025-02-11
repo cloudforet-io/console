@@ -13,14 +13,14 @@ import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/serv
 import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
-import { replaceUrlQuery } from '@/lib/router-query-string';
-
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import { red } from '@/styles/colors';
 
 import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
+import ServiceDetailTabsSettingsEventRuleOverlay
+    from '@/services/alert-manager/components/ServiceDetailTabsSettingsEventRuleOverlay.vue';
 import ServiceDetailTabsSettingsModal from '@/services/alert-manager/components/ServiceDetailTabsSettingsUpdateModal.vue';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
@@ -48,6 +48,7 @@ const storeState = reactive({
 });
 const state = reactive({
     selectModalVisible: false,
+    eventRuleOverlayVisible: false,
     modalType: undefined as ServiceDetailSettingCardType|undefined,
     settingCardItems: computed<CardItemType[]>(() => [
         {
@@ -103,10 +104,7 @@ const getAutoRecovery = (): CardValueInfoType|undefined => {
 };
 const handleClickEditButton = (type: ServiceDetailSettingCardType) => {
     if (type === SERVICE_SETTING_CARD.EVENT_RULE) {
-        replaceUrlQuery({
-            mode: 'eventRule',
-            escalationPolicyId: undefined,
-        });
+        state.eventRuleOverlayVisible = true;
         return;
     }
     state.selectModalVisible = true;
@@ -137,7 +135,7 @@ onMounted(() => {
                         class="flex-1"
                 >
                     <div class="py-3 px-0.5">
-                        <div class="flex items-center justify-between mb-6">
+                        <div class="h-8 flex items-center justify-between mb-6">
                             <span class="text-label-xl">{{ item.title }}</span>
                             <p-icon-button v-if="hasReadWriteAccess || (!hasReadWriteAccess && item.type === SERVICE_SETTING_CARD.EVENT_RULE)"
                                            name="ic_edit"
@@ -164,6 +162,9 @@ onMounted(() => {
             </div>
             <service-detail-tabs-settings-escalation-policy />
         </div>
+        <service-detail-tabs-settings-event-rule-overlay v-if="state.eventRuleOverlayVisible"
+                                                         :visible.sync="state.eventRuleOverlayVisible"
+        />
         <service-detail-tabs-settings-modal v-if="state.selectModalVisible"
                                             :visible.sync="state.selectModalVisible"
                                             :type="state.modalType"

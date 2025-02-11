@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip, PButton,
+    PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
-
-import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -25,24 +22,20 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/types/alert-manager-type';
 
-type ModalType = 'edit' | 'delete' | 'member' | 'alert';
+type ModalType = 'edit' | 'delete' | 'member';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
-const route = useRoute();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
-    isSettingMode: computed<boolean>(() => route.query?.mode !== 'eventRule'),
     menuItems: computed<MenuItem[]>(() => [
         {
             icon: 'ic_settings',
@@ -56,33 +49,18 @@ const state = reactive({
             label: i18n.t('ALERT_MANAGER.DELETE'),
         },
     ]),
-    headingTitle: computed(() => {
-        if (state.isSettingMode) {
-            return storeState.serviceInfo.name || '';
-        }
-        return i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE');
-    }),
 });
 const modalState = reactive({
     modalVisible: false,
     type: '' as ModalType,
 });
 
-const handleClickAddRule = () => {
-    serviceDetailPageStore.setEventRuleScopeModalVisible(true);
-};
 const handleActionModal = (type: ModalType) => {
     modalState.modalVisible = true;
     modalState.type = type;
 };
 const handleGoBackButton = () => {
-    if (state.isSettingMode) {
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
-        return;
-    }
-    replaceUrlQuery({
-        mode: 'settings',
-    });
+    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
 };
 </script>
 
@@ -91,12 +69,12 @@ const handleGoBackButton = () => {
         <div class="flex flex-col pb-6 gap-1">
             <p-heading-layout>
                 <template #heading>
-                    <p-heading :title="state.headingTitle"
+                    <p-heading :title="storeState.serviceInfo.name || ''"
                                show-back-button
                                @click-back-button="handleGoBackButton"
                     >
                         <template #title-right-extra>
-                            <p-select-dropdown v-if="hasReadWriteAccess && state.isSettingMode"
+                            <p-select-dropdown v-if="hasReadWriteAccess"
                                                :menu="state.menuItems"
                                                style-type="icon-button"
                                                button-icon="ic_ellipsis-horizontal"
@@ -106,33 +84,11 @@ const handleGoBackButton = () => {
                                                size="sm"
                                                @select="handleActionModal"
                             />
-                            <div v-else
-                                 class="inline-flex items-center gap-1 text-gray-700 text-label-sm"
-                            >
-                                <p-i name="ic_info-circle"
-                                     class="title-tooltip"
-                                     height="0.875rem"
-                                     width="0.875rem"
-                                />
-                                <span>{{ $t('ALERT_MANAGER.EVENT_RULE.DESC') }}</span>
-                            </div>
                         </template>
                     </p-heading>
                 </template>
-                <template v-if="hasReadWriteAccess && !state.isSettingMode && storeState.eventRuleList.length > 0"
-                          #extra
-                >
-                    <p-button icon-left="ic_plus_bold"
-                              class="self-start mx-auto"
-                              @click="handleClickAddRule"
-                    >
-                        {{ $t('ALERT_MANAGER.EVENT_RULE.NO_DATA_ADD_RULE') }}
-                    </p-button>
-                </template>
             </p-heading-layout>
-            <div v-if="state.isSettingMode"
-                 class="flex items-center pl-10 text-label-sm gap-2"
-            >
+            <div class="flex items-center pl-10 text-label-sm gap-2">
                 <div class="service-member flex items-center text-gray-700 gap-0.5"
                      @click="handleActionModal('member')"
                 >

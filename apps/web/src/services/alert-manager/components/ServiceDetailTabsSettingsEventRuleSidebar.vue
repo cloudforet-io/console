@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 import draggable from 'vuedraggable';
 
@@ -98,7 +100,6 @@ const setTreeList = (): TreeNode[] => {
                         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                         query: {
                             tab: SERVICE_DETAIL_TABS.SETTINGS,
-                            mode: 'eventRule',
                             webhookId,
                         },
                     },
@@ -119,7 +120,6 @@ const setTreeList = (): TreeNode[] => {
                     name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                     query: {
                         tab: SERVICE_DETAIL_TABS.SETTINGS,
-                        mode: 'eventRule',
                         webhookId,
                         eventRuleId: item.event_rule_id,
                     },
@@ -262,7 +262,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                 <div v-if="state.treeList.length > 0">
                     <div v-for="(title, idx) in state.treeList"
                          :key="`title-${idx}`"
-                         class="cursor-pointer"
+                         class="cursor-pointer w-full"
                          @click="handleClickItem(title, idx)"
                     >
                         <div class="tree-item">
@@ -278,6 +278,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                  height="1rem"
                                  width="1rem"
                                  color="inherit"
+                                 class="block"
                             />
                             <p-lazy-img v-else
                                         :src="getWebhookIcon(title?.id)"
@@ -285,13 +286,14 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                         width="1rem"
                                         height="1rem"
                             />
-                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
+                            <span class="ml-0.5">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
                         </div>
                         <draggable v-if="title.isOpen"
                                    v-model="title.children"
                                    ghost-class="ghost"
                                    handle=".handle"
                                    draggable=".children-item"
+                                   class="flex flex-col"
                         >
                             <div v-for="(item, itemIdx) in title.children || []"
                                  :key="`children-${itemIdx}`"
@@ -305,12 +307,12 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                     >
                                         {{ itemIdx + 1 }}
                                     </p-badge>
-                                    <span class="truncate max-w-36">{{ item.data.name }}</span>
+                                    <span class="truncate flex-1">{{ item.data.name }}</span>
                                     <p-i v-if="state.isEditMode"
                                          name="ic_drag-handle"
                                          width="1rem"
                                          height="1rem"
-                                         class="handle"
+                                         class="handle ml-auto"
                                          :color="gray[500]"
                                     />
                                 </div>
@@ -331,10 +333,9 @@ watch(() => state.isMobileSize, (isMobileSize) => {
 <style scoped lang="postcss">
 .service-detail-tabs-settings-event-rule-side-bar {
     @apply flex;
-    min-height: 23.125rem;
     .sidebar {
+        @apply overflow-y-auto border-t-0 border-b-0 border-l-0 rounded-none;
         width: 15rem;
-        min-height: 23.125rem;
         padding: 0;
         z-index: 2;
         transition: width 0.3s ease;
@@ -343,8 +344,9 @@ watch(() => state.isMobileSize, (isMobileSize) => {
             padding: 1rem;
             transition: width 0.3s ease;
             .tree-item {
-                @apply flex items-center pt-1.5 pr-0.5 pb-1.5;
+                @apply inline-flex items-center overflow-hidden whitespace-nowrap pt-1.5 pr-0.5 pb-1.5;
                 .arrow-button {
+                    @apply block;
                     &.is-collapsed {
                         transform: rotate(-90deg);
                     }
