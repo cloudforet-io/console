@@ -255,7 +255,7 @@
 			"CREATE_SERVICE_TITLE": "Create New Service",
 			"CREATE_WEBHOOK_TITLE": "Create Webhook",
 			"DEFAULT_ESCALATION_POLICY": "Default Escalation Policy",
-			"DETAILS": "View Details",
+			"DETAILS": "View Webhook Details",
 			"EMPTY_MEMBER": "No Service Member",
 			"GO_BACK": "Go back",
 			"HEALTHY_SERVICE": "Healthy Services",
@@ -301,7 +301,9 @@
 			"VALIDATION_KEY_UNIQUE": "A service with this key name already exists.",
 			"VALIDATION_NAME_UNIQUE": "A service with this name already exists.",
 			"VIEW_ALL": "View all",
-			"WEBHOOK": "Webhook ({cnt})"
+			"WEBHOOK": "Webhook ({cnt})",
+			"WEBHOOK_DAILY": "Daily",
+			"WEBHOOK_MONTHLY": "Monthly"
 		},
 		"SET_UP": "Set Up",
 		"SHOW_MORE": "show more",
