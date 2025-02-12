@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 import {
@@ -43,7 +44,9 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -61,6 +64,7 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
 type CostAnalyzeRawData = {
@@ -78,6 +82,9 @@ const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
+
 
 const getValueSumKey = (dataType: string) => {
     switch (dataType) {
@@ -392,6 +399,28 @@ const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
 };
 
 /* event */
+const handleClickRowData = (fieldName: string, value: string) => {
+    if (!fieldName || !value) return;
+
+    let _routeName: string;
+    let _params = {};
+
+    if (fieldName === GROUP_BY.PROJECT) {
+        _routeName = PROJECT_ROUTE.DETAIL._NAME;
+        _params = { id: value };
+    }
+    if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
+        _routeName = ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME;
+        _params = { serviceAccountId: value };
+    }
+
+    if (!_routeName) return;
+
+    window.open(router.resolve(getProperRouteLocation({
+        name: _routeName,
+        params: _params,
+    })).href, '_blank');
+};
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, {
         queryTags: true,
@@ -533,7 +562,10 @@ watch(
                             : value
                     }}
                 </span>
-                <span v-else-if="field.name === GROUP_BY.PROJECT">
+                <span v-else-if="field.name === GROUP_BY.PROJECT"
+                      class="cursor-pointer"
+                      @click="handleClickRowData(field.name, value)"
+                >
                     {{
                         storeState.projects[value]
                             ? storeState.projects[value].label
@@ -552,7 +584,10 @@ watch(
                         storeState.regions[value] ? storeState.regions[value].name : value
                     }}
                 </span>
-                <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
+                <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT"
+                      class="cursor-pointer"
+                      @click="handleClickRowData(field.name, value)"
+                >
                     {{
                         storeState.serviceAccounts[value]
                             ? storeState.serviceAccounts[value].name
