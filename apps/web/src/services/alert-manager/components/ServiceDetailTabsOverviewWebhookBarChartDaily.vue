@@ -33,11 +33,11 @@ const serviceId = ref<string>(serviceDetailPageGetters.serviceInfo.service_id);
 interface StackedData {
   data: (number | string)[];
   type: 'bar';
-  stack: 'webhook';
+  stack: 'webhook_daily';
   label: {
-    show: true,
-    position: 'inside'
-  },
+    show: true;
+    position: 'inside';
+  };
   name: string;
 }
 
@@ -81,11 +81,14 @@ const state = reactive<OverviewWebhookState>({
         yAxis: {
             type: 'value',
             axisLabel: {
-                formatter: (value) => {
-                    if (value >= 1000) {
-                        return `${value / 1000}K`;
+                formatter: (params) => {
+                    const value = params.value;
+                    if (value >= 1000000) {
+                        return `${(value / 1000000).toFixed(1)}M`;
+                    } if (value >= 1000) {
+                        return `${(value / 1000).toFixed(1)}K`;
                     }
-                    return value;
+                    return value.toFixed(0);
                 },
             },
         },
@@ -105,19 +108,26 @@ const initChart = () => {
         }
     });
 
-    const sortedDates = Object.keys(state.refinedItems);
-
     pluginIds.forEach((pluginId: string) => {
-        const data = sortedDates.map((date) => state.refinedItems[date][pluginId] || '-');
+        const data = Object.keys(state.refinedItems).map((date) => state.refinedItems[date][pluginId] || '-');
 
         state.chartData.push({
             data,
             type: 'bar',
-            stack: 'webhook',
+            stack: 'webhook_daily',
             name: pluginId,
             label: {
                 show: true,
                 position: 'inside',
+                formatter: (params) => {
+                    const value = params.value;
+                    if (value >= 1000000) {
+                        return `${(value / 1000000).toFixed(1)}M`;
+                    } if (value >= 1000) {
+                        return `${(value / 1000).toFixed(1)}K`;
+                    }
+                    return value.toFixed(0);
+                },
             },
         });
     });
