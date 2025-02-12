@@ -12,6 +12,13 @@ export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SO
 export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TABLE_OPERATOR];
 export type DataTableDataType = keyof typeof DATA_TABLE_TYPE;
 export type AdditionalLabels = Record<string, string>;
+export interface DataTableGroupByInfo {
+    key:string;
+    name: string;
+    reference?: object;
+    search_key?: string;
+    tags?: string[]; // [tag_key_1, tag_key_2, ...]
+}
 export interface TimeDiff {
     years?: number;
     months?: number;
@@ -26,7 +33,7 @@ export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
     'COST'?: CostOptions;
-    group_by?: {key:string; name: string; reference?: object; search_key?: string }[];
+    group_by?: DataTableGroupByInfo[];
     data_name: string;
     data_unit?: string;
     timediff?: TimeDiff;
