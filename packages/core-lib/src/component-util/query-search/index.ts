@@ -123,7 +123,7 @@ export function makeDistinctValueHandler(
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
 
-            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count);
+            if (keyItem?.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count);
 
             return {
                 results: res.results.reduce((results, d) => {

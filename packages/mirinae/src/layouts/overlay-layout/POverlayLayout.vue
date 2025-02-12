@@ -52,14 +52,16 @@ const handleClose = () => {
                      'fixed-size': props.isFixedSize,
                  }"
             >
-                <div v-if="!props.hideHeader"
-                     class="header"
-                >
-                    <div class="title-wrapper">
-                        <h2 class="title-text">
-                            {{ props.title }}
-                        </h2> <slot name="title-right-extra" />
-                    </div>
+                <div class="header">
+                    <slot v-if="!props.hideHeader"
+                          name="header"
+                    >
+                        <div class="title-wrapper">
+                            <h2 class="title-text">
+                                {{ props.title }}
+                            </h2> <slot name="title-right-extra" />
+                        </div>
+                    </slot>
                 </div>
                 <p-icon-button class="close-button"
                                name="ic_close"

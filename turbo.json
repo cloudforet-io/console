@@ -33,7 +33,7 @@
       "cache": true
     },
     "mirinae-storybook#build": {
-      "outputs": ["./.storybook-static/**"],
+      "outputs": ["./storybook-static/**"],
       "inputs": [
         "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
@@ -43,13 +43,21 @@
     },
     "web-storybook#build": {
       "dependsOn": ["@cloudforet/mirinae#build", "@cloudforet/mirinae#transpile", "@cloudforet/utils#build", "@cloudforet/core-lib#build"],
-      "outputs": ["./.storybook-static/**"],
+      "outputs": ["./storybook-static/**"],
       "inputs": [
         "../web/src/common/**", "../web/postcss.config.js", "../web/tailwind.config.js",  "../web/package.json",
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
         "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
-      "cache": false
+      "cache": true
+    },
+    "unified-storybook#build": {
+      "outputs": ["./storybook-static/**"],
+      "inputs": [
+        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+      ],
+      "cache": true
     },
     "transpile": {
       "dependsOn": ["^transpile"],
