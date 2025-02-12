@@ -244,7 +244,7 @@ onUnmounted(() => {
                            :total-count="storeState.totalCount"
                 />
             </template>
-            <template v-if="storeState.selectedDataSourceItem.state === 'ENABLED'"
+            <template v-if="storeState.selectedDataSourceItem.schedule.state === 'ENABLED'"
                       #extra
             >
                 <p-button style-type="tertiary"
@@ -300,7 +300,7 @@ onUnmounted(() => {
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND') }}
                     </p-button>
-                    <p-button v-if="storeState.selectedDataSourceItem.state === 'ENABLED' && value === 'IN_PROGRESS'"
+                    <p-button v-if="storeState.selectedDataSourceItem.schedule.state === 'ENABLED' && value === 'IN_PROGRESS'"
                               size="sm"
                               style-type="tertiary"
                               class="ml-2"
