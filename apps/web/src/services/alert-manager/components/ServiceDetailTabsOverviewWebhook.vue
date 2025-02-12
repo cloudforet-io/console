@@ -6,7 +6,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
+    PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -89,11 +89,6 @@ watch(() => storeState.serviceId, (serviceId) => {
 
 <template>
     <div class="service-detail-tabs-overview-webhook">
-        <p-field-title class="field-title"
-                       :label="$t('ALERT_MANAGER.WEBHOOK.TITLE')"
-                       size="lg"
-                       font-weight="regular"
-        />
         <div ref="rowItemsWrapperRef"
              class="row-items-wrapper"
              :class="{'empty': !state.items.length}"
