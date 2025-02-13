@@ -139,10 +139,10 @@ export const DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP = {
 };
 
 export const GROUP_BY_INFO_ITEMS_FOR_TAGS = [
-    {
-        key: GROUP_BY.PROJECT,
-        name: 'project',
-    },
+    // {
+    //     key: GROUP_BY.PROJECT,
+    //     name: 'project',
+    // },
     {
         key: GROUP_BY.SERVICE_ACCOUNT,
         name: 'service_account',
