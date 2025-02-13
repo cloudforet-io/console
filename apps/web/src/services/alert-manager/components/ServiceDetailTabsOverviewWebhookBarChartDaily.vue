@@ -12,6 +12,7 @@ import { init } from 'echarts/core';
 import { reduce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { byteFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
@@ -30,10 +31,12 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const chartContext = ref<HTMLElement | null>(null);
 const serviceId = ref<string>(serviceDetailPageGetters.serviceInfo.service_id);
 
+const WEBHOOK_DAILY = 'webhook_daily';
+
 interface StackedData {
   data: (number | string)[];
   type: 'bar';
-  stack: 'webhook_daily';
+  stack: typeof WEBHOOK_DAILY;
   label: {
     show: true;
     position: 'inside';
@@ -81,15 +84,7 @@ const state = reactive<OverviewWebhookState>({
         yAxis: {
             type: 'value',
             axisLabel: {
-                formatter: (params) => {
-                    const value = params.value;
-                    if (value >= 1000000) {
-                        return `${(value / 1000000).toFixed(1)}M`;
-                    } if (value >= 1000) {
-                        return `${(value / 1000).toFixed(1)}K`;
-                    }
-                    return value.toFixed(0);
-                },
+                formatter: (val) => byteFormatter(val),
             },
         },
         animation: false,
@@ -114,20 +109,12 @@ const initChart = () => {
         state.chartData.push({
             data,
             type: 'bar',
-            stack: 'webhook_daily',
+            stack: WEBHOOK_DAILY,
             name: pluginId,
             label: {
                 show: true,
                 position: 'inside',
-                formatter: (params) => {
-                    const value = params.value;
-                    if (value >= 1000000) {
-                        return `${(value / 1000000).toFixed(1)}M`;
-                    } if (value >= 1000) {
-                        return `${(value / 1000).toFixed(1)}K`;
-                    }
-                    return value.toFixed(0);
-                },
+                formatter: (params) => byteFormatter(params.value),
             },
         });
     });

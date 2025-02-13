@@ -12,6 +12,7 @@ import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { byteFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
@@ -30,10 +31,12 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const chartContext = ref<HTMLElement | null>(null);
 const serviceId = ref<string>(serviceDetailPageGetters.serviceInfo.service_id);
 
+const WEBHOOK_MONTHLY = 'webhook_monthly';
+
 interface StackedData {
   data: (number | string)[];
   type: 'bar';
-  stack: 'webhook_monthly';
+  stack: string;
   label: {
     show: true;
     position: 'inside';
@@ -81,12 +84,7 @@ const state = reactive<OverviewMonthlyWebhookState>({
         yAxis: {
             type: 'value',
             axisLabel: {
-                formatter: (value) => {
-                    if (value >= 1000) {
-                        return `${value / 1000}K`;
-                    }
-                    return value;
-                },
+                formatter: (value) => byteFormatter(value),
             },
         },
         animation: false,
@@ -112,20 +110,12 @@ const initChart = () => {
             state.chartData.push({
                 data,
                 type: 'bar',
-                stack: 'webhook_monthly',
+                stack: WEBHOOK_MONTHLY,
                 name: pluginId,
                 label: {
                     show: true,
                     position: 'inside',
-                    formatter: (params) => {
-                        const value = params.value;
-                        if (value >= 1000000) {
-                            return `${(value / 1000000).toFixed(1)}M`;
-                        } if (value >= 1000) {
-                            return `${(value / 1000).toFixed(1)}K`;
-                        }
-                        return value.toFixed(0);
-                    },
+                    formatter: (params) => byteFormatter(params.value),
                 },
             });
         });
