@@ -7,10 +7,14 @@ import type { TranslateResult } from 'vue-i18n';
 import { cloneDeep, range } from 'lodash';
 
 import {
+    makeDistinctValueHandler,
+} from '@cloudforet/core-lib/component-util/query-search';
+import {
     PFieldGroup, PSelectDropdown, PTextInput,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -20,15 +24,23 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import {
+    MANAGED_VARIABLE_MODELS, type ManagedVariableModelKey,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
-import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+import {
+    DATA_SOURCE_DOMAIN,
+    GROUP_BY_INFO_ITEMS_FOR_TAGS,
+} from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
 import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 
+const TAGS_DATA_KEY = 'tags';
 
 
 interface Props {
@@ -39,6 +51,7 @@ interface Props {
     sourceKey: string;
     sourceItems: SelectDropdownMenuItem[];
     selectedGroupByItems: any[];
+    selectedGroupByTagsMap: Record<string, string[]>;
     filter: Record<string, DataTableQueryFilter>;
     dataFieldName: string;
     dataUnit: string;
@@ -55,6 +68,7 @@ const MAX_GROUP_BY_COUNT = 5;
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
+    (e: 'update:selected-group-by-tags-map', value: Record<string, string[]>): void;
     (e: 'update:data-field-name', value: string): void;
     (e: 'update:data-unit', value: string): void;
     (e: 'update:selected-time-diff', value: string): void;
@@ -78,6 +92,7 @@ const { allItems: costDataSourceMenuItems } = useCostDataSourceFilterMenuItems({
 
 const state = reactive({
     proxySelectedGroupByItems: useProxyValue('selectedGroupByItems', props, emit),
+    proxySelectedGroupByTagsMap: useProxyValue('selectedGroupByTagsMap', props, emit),
     proxyDataFieldName: useProxyValue('dataFieldName', props, emit),
     proxyDataUnit: useProxyValue('dataUnit', props, emit),
     proxyFilter: useProxyValue<Record<string, DataTableQueryFilter>>('filter', props, emit),
@@ -144,6 +159,32 @@ const groupByState = reactive({
     }),
 });
 
+const groupByTagsState = reactive({
+    tagsAreaVisible: computed(() => state.proxySelectedGroupByItems.some((d) => GROUP_BY_INFO_ITEMS_FOR_TAGS.some((item) => item.key === d.name))),
+    tagsAreaItems: computed(() => state.proxySelectedGroupByItems.filter((d) => GROUP_BY_INFO_ITEMS_FOR_TAGS.some((item) => item.key === d.name))),
+    loading: false,
+    valueHandlerMap: computed(() => {
+        const handlerMaps = {};
+        state.proxySelectedGroupByItems.forEach(({ name }) => {
+            const groupByItemInfo = GROUP_BY_INFO_ITEMS_FOR_TAGS.find((d) => d.key === name);
+            if (groupByItemInfo) {
+                handlerMaps[groupByItemInfo.key] = getValueHandlerMap(groupByItemInfo.name);
+            }
+        });
+        return handlerMaps;
+    }),
+    selectedMap: computed(() => {
+        const selectedMap = {};
+        state.proxySelectedGroupByItems.forEach((item) => {
+            const groupByItemInfo = GROUP_BY_INFO_ITEMS_FOR_TAGS.find((d) => d.key === item.name);
+            if (groupByItemInfo) {
+                selectedMap[item.name] = item.tags || [];
+            }
+        });
+        return selectedMap;
+    }),
+});
+
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metrics[props.sourceId ?? '']?.data?.labels_info;
@@ -197,6 +238,23 @@ const resetAllFilter = () => {
     state.proxyFilter = {};
 };
 
+const getValueHandlerMap = (name: ManagedVariableModelKey): AutocompleteHandler => {
+    const resourceKey = MANAGED_VARIABLE_MODELS[name]?.meta?.resourceType;
+    const handler = makeDistinctValueHandler(resourceKey, TAGS_DATA_KEY);
+    return async (...args) => {
+        try {
+            groupByTagsState.loading = true;
+            const results = await handler(...args);
+            return results;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            return { results: [] };
+        } finally {
+            groupByTagsState.loading = false;
+        }
+    };
+};
+
 watch([() => props.sourceId, () => props.sourceKey], async () => {
     resetAllFilter();
 });
@@ -225,6 +283,26 @@ watch([
                                block
                                @select="handleUpdateSelectedGroupBy"
             />
+            <div v-if="groupByTagsState.tagsAreaVisible"
+                 class="groupb-by-tags-area flex flex-col gap-2"
+            >
+                <div v-for="(item) in groupByTagsState.tagsAreaItems"
+                     :key="`tags-dropdown-${item.name}`"
+                     class="tags-dropdown-wrapper"
+                >
+                    <div class="header-name flex items-center">
+                        {{ item.label }} tags
+                    </div>
+                    <p-select-dropdown block
+                                       :selected.sync="state.proxySelectedGroupByTagsMap[item.name]"
+                                       :handler="groupByTagsState.valueHandlerMap[item.name]"
+                                       is-filterable
+                                       multi-selectable
+                                       show-select-marker
+                                       appearance-type="stack"
+                    />
+                </div>
+            </div>
         </p-field-group>
         <widget-form-data-table-card-filters :key="props.filterFormKey"
                                              :data-table-id="props.dataTableId"
@@ -278,6 +356,23 @@ watch([
 <style lang="postcss" scoped>
 .widget-form-data-table-card-add-form {
     padding: 0.75rem;
+
+    .groupb-by-tags-area {
+        @apply bg-gray-100 rounded-lg;
+        padding: 0.75rem 0.5rem;
+        margin-top: 0.25rem;
+
+        .tags-dropdown-wrapper {
+            @apply bg-white border border-gray-150 rounded-lg;
+            width: 100%;
+            padding: 0.125rem 0.5rem 0.5rem;
+            .header-name {
+                @apply text-label-md font-bold text-gray-800;
+                height: 2rem;
+            }
+        }
+    }
+
     .data-text-input {
         @apply w-full;
     }

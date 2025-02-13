@@ -31,7 +31,7 @@ import WidgetFormDataTableCardSourceForm
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
-    DATA_TABLE_TYPE,
+    DATA_TABLE_TYPE, GROUP_BY_INFO_ITEMS_FOR_TAGS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -39,6 +39,8 @@ import type {
     DataTableAddOptions,
     DataTableQueryFilter, TimeDiff,
 } from '@/common/modules/widgets/types/widget-model';
+
+import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 interface Props {
     selected: boolean;
@@ -73,7 +75,11 @@ const state = reactive({
     selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
-    selectedGroupByItems: [] as { name: string; label: string; }[],
+    selectedGroupByItems: [] as { name: string; label: string; tags?: [] }[],
+    selectedGroupByTagsMap: {
+        [GROUP_BY.PROJECT]: [],
+        [GROUP_BY.REGION]: [],
+    } as Record<string, string[]>,
     filter: {} as Record<string, DataTableQueryFilter>,
     dataFieldName: '',
     dataUnit: '',
@@ -107,13 +113,15 @@ const state = reactive({
     optionsChanged: computed(() => {
         const sourceKeyChanged = state.selectedSourceEndItem !== originDataState.sourceKey;
         const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
+        const groupByTagsChanged = !isEqual(state.selectedGroupByTagsMap, originDataState.groupByTagsMap);
         const filterChanged = !isEqual(state.filter, originDataState.filter);
         const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
         const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
         const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
         const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
 
-        return sourceKeyChanged || groupByChanged || filterChanged || dataTableNameChanged || dataUnitChanged
+        return sourceKeyChanged || groupByChanged || groupByTagsChanged || filterChanged
+            || dataTableNameChanged || dataUnitChanged
             || timeDiffChanged || timeDiffDateChanged;
     }),
     failStatus: false,
@@ -139,7 +147,22 @@ const originDataState = reactive({
     groupBy: computed(() => ((props.item.options as DataTableAddOptions).group_by ?? []).map((group) => ({
         name: group.key,
         label: group.name,
+        tags: group.tags,
     }))),
+    groupByTagsMap: computed(() => {
+        const _groupByTagsMap = {
+            [GROUP_BY.PROJECT]: [],
+            [GROUP_BY.REGION]: [],
+        } as Record<string, string[]>;
+        ((props.item.options as DataTableAddOptions).group_by ?? []).forEach((group) => {
+            const isGroupByTags = GROUP_BY_INFO_ITEMS_FOR_TAGS.some((tag) => tag.key === group.key);
+            if (isGroupByTags) {
+                const tagsMenu = group.tags?.map((tag) => ({ name: tag, label: tag }));
+                _groupByTagsMap[group.key as string] = tagsMenu || [];
+            }
+        });
+        return _groupByTagsMap;
+    }),
     filter: computed<Record<string, DataTableQueryFilter>>(() => {
         const _filter = {} as Record<string, DataTableQueryFilter>;
         ((props.item.options as DataTableAddOptions).filter ?? []).forEach((filter) => {
@@ -201,10 +224,24 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     const costGroupBy = state.selectedGroupByItems.map((group) => ({
         key: group.name,
         name: group.label,
+        tags: group.tags,
     }));
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
     const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
+
+    GROUP_BY_INFO_ITEMS_FOR_TAGS.forEach((tag) => {
+        const groupByTags = groupBy.find((group) => group.key === tag.key);
+        if (groupByTags) {
+            groupBy.map((group) => {
+                if (tag.key === group.key) {
+                    group.tags = state.selectedGroupByTagsMap[tag.key]?.map((item) => item.name) || [];
+                }
+                return group;
+            });
+        }
+    });
+
     const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>)
         .filter((filter) => {
             if (isArray(filter.v)) return filter?.v?.length;
@@ -311,6 +348,7 @@ const setInitialDataTableForm = () => {
     // Initial Form Setting
     // Basic Options
     state.selectedGroupByItems = [...originDataState.groupBy];
+    state.selectedGroupByTagsMap = { ...originDataState.groupByTagsMap };
     state.filter = originDataState.filter;
     state.dataFieldName = originDataState.dataName;
     state.dataUnit = originDataState.dataUnit;
@@ -379,6 +417,7 @@ defineExpose({
                                               :source-type="state.sourceType"
                                               :source-items="state.selectableSourceItems"
                                               :selected-group-by-items.sync="state.selectedGroupByItems"
+                                              :selected-group-by-tags-map.sync="state.selectedGroupByTagsMap"
                                               :filter.sync="state.filter"
                                               :data-field-name.sync="state.dataFieldName"
                                               :data-unit.sync="state.dataUnit"
