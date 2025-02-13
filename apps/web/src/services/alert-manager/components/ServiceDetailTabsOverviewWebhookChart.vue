@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import ServiceDetailTabsOverviewWebhookBarChartDaily
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookBarChartDaily.vue';
-import ServiceDetailTabsOverviewWebhookChartMonthly
-    from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookChartMonthly.vue';
+import ServiceDetailTabsOverviewWebhookBarChartMonthly
+    from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookBarChartMonthly.vue';
 
 interface Props {
   dateOption: string;
@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
     <div>
-        <service-detail-tabs-overview-webhook-chart-monthly v-if="props.dateOption === 'monthly'" />
+        <service-detail-tabs-overview-webhook-bar-chart-monthly v-if="props.dateOption === 'monthly'" />
         <service-detail-tabs-overview-webhook-bar-chart-daily v-else />
     </div>
 </template>

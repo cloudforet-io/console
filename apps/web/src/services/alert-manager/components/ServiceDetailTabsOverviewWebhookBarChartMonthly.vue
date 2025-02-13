@@ -1,15 +1,15 @@
 <script lang="ts" setup>
+
 import type { ComputedRef } from 'vue';
 import {
-    computed, onMounted, reactive, ref, watch,
-
+    computed,
+    onMounted, reactive, ref, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import { reduce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { byteFormatter } from '@cloudforet/utils';
@@ -31,28 +31,28 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const chartContext = ref<HTMLElement | null>(null);
 const serviceId = ref<string>(serviceDetailPageGetters.serviceInfo.service_id);
 
-const WEBHOOK_DAILY = 'webhook_daily';
+const WEBHOOK_MONTHLY = 'webhook_monthly';
 
 interface StackedData {
   data: (number | string)[];
   type: 'bar';
-  stack: typeof WEBHOOK_DAILY;
+  stack: string;
   label: {
     show: true;
     position: 'inside';
-  };
+  }
   name: string;
 }
 
-interface OverviewWebhookState {
+interface OverviewMonthlyWebhookState {
   webhookList: WebhookModel[];
   refinedItems: Record<string, any>;
   chart: EChartsType | null;
   chartOptions: ComputedRef<BarSeriesOption>;
-  chartData: StackedData[];
+  chartData: StackedData[]
 }
 
-const state = reactive<OverviewWebhookState>({
+const state = reactive<OverviewMonthlyWebhookState>({
     webhookList: [],
     refinedItems: {},
     chart: null,
@@ -78,13 +78,13 @@ const state = reactive<OverviewWebhookState>({
             type: 'category',
             data: Object.keys(state.refinedItems),
             axisLabel: {
-                formatter: (val) => val,
+                formatter: (value) => dayjs.utc(value).format('MMM YY'),
             },
         },
         yAxis: {
             type: 'value',
             axisLabel: {
-                formatter: (val) => byteFormatter(val),
+                formatter: (value) => byteFormatter(value),
             },
         },
         animation: false,
@@ -96,53 +96,56 @@ const state = reactive<OverviewWebhookState>({
 
 const initChart = () => {
     const pluginIds: Set<string> = new Set();
-    Object.values(state.refinedItems).forEach((dateData) => {
-        if (dateData instanceof Object) {
-            Object.keys(dateData)
-                .forEach((pluginId) => pluginIds.add(pluginId));
-        }
-    });
 
-    pluginIds.forEach((pluginId: string) => {
-        const data = Object.keys(state.refinedItems).map((date) => state.refinedItems[date][pluginId] || '-');
-
-        state.chartData.push({
-            data,
-            type: 'bar',
-            stack: WEBHOOK_DAILY,
-            name: pluginId,
-            label: {
-                show: true,
-                position: 'inside',
-                formatter: (params) => byteFormatter(params.value),
-            },
+    if (Object.values(state.refinedItems).length > 0) {
+        Object.values(state.refinedItems).forEach((dateData) => {
+            if (dateData instanceof Object) {
+                Object.keys(dateData).forEach((pluginId) => pluginIds.add(pluginId));
+            }
         });
-    });
+
+        pluginIds.forEach((pluginId: string) => {
+            const data = Object.keys(state.refinedItems).map((date) => state.refinedItems[date][pluginId] || '-');
+
+            state.chartData.push({
+                data,
+                type: 'bar',
+                stack: WEBHOOK_MONTHLY,
+                name: pluginId,
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: (params) => byteFormatter(params.value),
+                },
+            });
+        });
+    }
 };
+
+watch(() => state.refinedItems, () => {
+    initChart();
+}, { immediate: true, deep: true });
+
+watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+    if (chartCtx) {
+        state.chart = init(chartCtx);
+        state.chart.setOption(state.chartOptions, true);
+    }
+}, { immediate: true, deep: true });
 
 watch(
     () => state.webhookList,
     () => {
         const today = dayjs.utc();
-        const fourteenDaysAgo = today.subtract(13, 'day');
+        const twelveMonthsAgo = today.subtract(11, 'month').startOf('month');
 
-        const allDates: string[] = Array.from({ length: 14 }, (_, i) => fourteenDaysAgo.add(i, 'day').format('YYYY-MM-DD'));
+        const monthlyData = state.webhookList.reduce((acc, cur) => {
+            const createdAt = dayjs.utc(cur.created_at);
+            const monthKey = createdAt.format('YYYY-MM');
 
-        state.refinedItems = reduce(allDates, (acc, date) => {
-            acc[date] = {};
-            return acc;
-        }, {});
-
-        state.refinedItems = reduce(state.webhookList, (acc, cur) => {
-            const key = dayjs.utc(cur.created_at).format('YYYY-MM-DD');
-            const curDate = dayjs(key);
-
-            if (
-                curDate.isAfter(fourteenDaysAgo.subtract(1, 'day'))
-            && (curDate.isBefore(today) || curDate.isSame(today))
-            ) {
-                if (!acc[key]) {
-                    acc[key] = {};
+            if (createdAt.isAfter(twelveMonthsAgo) && createdAt.isBefore(today) || createdAt.isSame(today, 'month')) {
+                if (!acc[monthKey]) {
+                    acc[monthKey] = {};
                 }
 
                 const pluginId = cur.plugin_info?.plugin_id;
@@ -151,41 +154,31 @@ watch(
                     : 0;
 
                 if (pluginId) {
-                    if (!acc[key][pluginId]) {
-                        acc[key][pluginId] = 0;
+                    if (!acc[monthKey][pluginId]) {
+                        acc[monthKey][pluginId] = 0;
                     }
-                    acc[key][pluginId] += totalRequests;
+                    acc[monthKey][pluginId] += totalRequests;
                 }
             }
 
             return acc;
-        }, state.refinedItems);
+        }, {});
 
-        Object.keys(state.refinedItems).forEach((date) => {
-            const plugins: Set<string> = new Set(
-                state.webhookList.map((item) => item.plugin_info?.plugin_id),
-            );
+        const allMonths = Array.from({ length: 12 }, (_, i) => twelveMonthsAgo.add(i, 'month').format('YYYY-MM'));
 
-            plugins.forEach((pluginId: string) => {
-                if (!state.refinedItems[date][pluginId]) {
-                    state.refinedItems[date][pluginId] = 0;
-                }
-            });
-        });
+        const initializedMonthlyData = allMonths.reduce((acc, month) => {
+            if (!monthlyData[month]) {
+                acc[month] = {};
+            } else {
+                acc[month] = monthlyData[month];
+            }
+            return acc;
+        }, {});
+
+        state.refinedItems = initializedMonthlyData;
     },
     { immediate: true, deep: true },
 );
-
-watch(() => state.refinedItems, () => {
-    initChart();
-});
-
-watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
-    if (chartCtx) {
-        state.chart = init(chartContext.value);
-        state.chart.setOption(state.chartOptions, true);
-    }
-}, { immediate: true, deep: true });
 
 /* API */
 const fetchWebhookList = async () => {
@@ -209,7 +202,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="service-detail-tabs-overview-webhook-chart-daily">
+    <div class="service-detail-tabs-overview-webhook-bar-chart-monthly">
         <div ref="chartContext"
              class="chart"
         />
@@ -217,7 +210,7 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="postcss">
-.service-detail-tabs-overview-webhook-chart-daily {
+.service-detail-tabs-overview-webhook-bar-chart-monthly {
     height: 100%;
     .chart {
         width: 100%;
