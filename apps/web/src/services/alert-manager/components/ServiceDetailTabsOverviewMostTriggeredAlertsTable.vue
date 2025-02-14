@@ -160,15 +160,15 @@ watch(() => tableState.refinedItems, () => {
             <template #th-triggered_cnt>
                 <span />
             </template>
-            <template #no-data>
-                <p-empty
-                    :show-image="false"
-                    :show-button="false"
-                >
-                    {{ $t('ALERT_MANAGER.SERVICE.MOST_FREQUENTLY_OCCURRED_ALERTS_NO_DATA') }}
-                </p-empty>
-            </template>
         </p-data-table>
+        <p-empty
+            v-else
+            :show-image="false"
+            :show-button="false"
+            class="mt-36"
+        >
+            {{ $t('ALERT_MANAGER.SERVICE.MOST_FREQUENTLY_OCCURRED_ALERTS_NO_DATA') }}
+        </p-empty>
     </div>
 </template>
 
