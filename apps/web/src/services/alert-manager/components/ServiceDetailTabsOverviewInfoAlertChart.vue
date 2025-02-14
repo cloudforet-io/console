@@ -194,6 +194,8 @@ watch(() => state.labelInfoList, (labelInfoList) => {
 <style scoped lang="postcss">
 .alert-chart {
     @apply flex;
+    height: 500px;
+    overflow-y: auto;
     .chart {
         width: 50%;
         height: 16.5rem;
