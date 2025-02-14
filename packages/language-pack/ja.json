@@ -278,6 +278,15 @@
 			"MODAL_EDIT_TITLE": "サービス名を編集",
 			"MODAL_MEMBER_PLACEHOLDER": "メンバーを選択してください",
 			"MOST_FREQUENTLY_OCCURRED_ALERTS": "",
+			"MOST_FREQUENTLY_OCCURRED_ALERTS_NO_DATA": "データがありません",
+			"MOST_TRIGGERED_ALERTS": {
+				"CUSTOM": "",
+				"LAST_MONTH": "",
+				"LAST_SIX_MONTHS": "",
+				"LAST_THREE_MONTHS": "",
+				"LAST_TWELVE_MONTHS": "",
+				"THIS_MONTH": ""
+			},
 			"NO_DATA": "新しいサービスを作成",
 			"NO_DATA_DESC": "各サービスのアラートを設定し、発生するすべての問題を迅速に把握しましょう。",
 			"OPEN_ALERTS": "全てのオープンされたアラート",
