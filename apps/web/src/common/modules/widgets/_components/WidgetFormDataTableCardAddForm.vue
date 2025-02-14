@@ -240,7 +240,7 @@ const resetAllFilter = () => {
 
 const getValueHandlerMap = (name: ManagedVariableModelKey): AutocompleteHandler => {
     const resourceKey = MANAGED_VARIABLE_MODELS[name]?.meta?.resourceType;
-    const handler = makeDistinctValueHandler(resourceKey, TAGS_DATA_KEY);
+    const handler = makeDistinctValueHandler(resourceKey, TAGS_DATA_KEY, undefined, undefined, 1000);
     return async (...args) => {
         try {
             groupByTagsState.loading = true;
