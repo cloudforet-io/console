@@ -37,6 +37,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
+import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
@@ -54,7 +55,7 @@ import ProjectMainDeleteModal from '@/services/project-v1/components/ProjectMain
 import ProjectMainProjectGroupMoveModal from '@/services/project-v1/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMemberInviteModal from '@/services/project-v1/components/ProjectMemberInviteModal.vue';
 import ProjectTagsModal from '@/services/project-v1/components/ProjectTagsModal.vue';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project-v1/stores/project-detail-page-store';
 import { useProjectTreeStore } from '@/services/project-v1/stores/project-tree-store';
 
@@ -86,6 +87,8 @@ const projectTreeStore = useProjectTreeStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
+
+const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
 const queryHelper = new QueryHelper();
 const storeState = reactive({
@@ -197,10 +200,10 @@ const handleSelectItem = (selected: MenuItem) => {
 const handleClickWebhook = () => {
     if (!props.id) return;
     if (!webhooksState.alertActivated) {
-        router.push(getProperRouteLocation({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }));
+        router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }));
         return;
     }
-    router.push(getProperRouteLocation({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }));
+    router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }));
 };
 const handleOpenMemberModal = () => {
     memberState.memberModalVisible = true;
@@ -252,12 +255,12 @@ const handleHeaderIconHover = (isHovered: boolean) => {
 const handleClickBackButton = () => {
     if (state.parentGroupId) {
         router.push({
-            name: PROJECT_ROUTE_V1._NAME,
+            name: PROJECT_ROUTE._NAME,
             params: { projectGroupId: state.parentGroupId },
         });
         return;
     }
-    router.push({ name: PROJECT_ROUTE_V1._NAME });
+    router.push({ name: PROJECT_ROUTE._NAME });
 };
 
 const handleRemoveProjectUser = async (userId: string) => {
@@ -340,11 +343,13 @@ const getProjectAlertActivated = async () => {
 
 /* Watchers */
 watch(() => projectDetailPageGetters.projectType, async () => {
-    await Promise.allSettled([
-        getProjectAlertActivated(),
-        listWebhooks(),
-        fetchUserList(),
-    ]);
+    if (!isAlertManagerV2Enabled) {
+        await Promise.allSettled([
+            getProjectAlertActivated(),
+            listWebhooks(),
+        ]);
+    }
+    await fetchUserList();
 });
 
 watch(() => projectDetailPageState.projectId, async (projectId) => {
@@ -457,7 +462,8 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  :color="gray[400]"
                             />
                         </template>
-                        <div class="info-item"
+                        <div v-if="!isAlertManagerV2Enabled"
+                             class="info-item"
                              @click="handleClickWebhook"
                         >
                             <p-i class="info-icon"

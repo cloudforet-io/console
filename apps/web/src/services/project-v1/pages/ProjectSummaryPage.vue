@@ -10,6 +10,8 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 
+import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
@@ -33,6 +35,7 @@ const state = reactive({
     hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });
+const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
 const handleClickNotiClose = () => {
     state.deprecatedNotiVisible = false;
@@ -51,7 +54,7 @@ const getProjectAlertConfig = async () => {
 };
 
 watch(() => props.id, () => {
-    getProjectAlertConfig();
+    if (!isAlertManagerV2Enabled) getProjectAlertConfig();
 }, { immediate: true });
 </script>
 
@@ -89,11 +92,10 @@ watch(() => props.id, () => {
             :project-id="props.id"
         />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-summary-alert-widget
-                v-if="state.hasAlertConfig"
-                :key="`project-summary-alert-widget-${props.id}`"
-                class="col-span-12"
-                :project-id="props.id"
+            <project-summary-alert-widget v-if="!isAlertManagerV2Enabled && state.hasAlertConfig"
+                                          :key="`project-summary-alert-widget-${props.id}`"
+                                          class="col-span-12"
+                                          :project-id="props.id"
             />
             <!--            <project-v1-summary-billing-widget-->
             <!--                class="col-span-12"-->
