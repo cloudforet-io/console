@@ -9,13 +9,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
+import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
-import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
@@ -43,6 +43,7 @@ import type {
     ProviderReferenceDataMap, ProviderResourceDataItem, DailyUpdatesListItem,
     BookmarkType,
 } from '@/services/workspace-home/types/workspace-home-type';
+
 
 interface WorkspaceHomeState {
     // info

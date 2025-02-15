@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { MetricListParameters } from '@/schema/inventory/metric/api-verbs/list';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 

@@ -6,15 +6,16 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CommentModel } from '@/schema/opsflow/comment/model';
-import type { EventListParameters } from '@/schema/opsflow/event/api-verbs/list';
-import type { EventModel } from '@/schema/opsflow/event/model';
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
+import type { EventListParameters } from '@/api-clients/opsflow/event/schema/api-verbs/list';
+import type { EventModel } from '@/api-clients/opsflow/event/schema/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
+
 
 const EVENT_PAGE_SIZE = 10;
 interface UseTaskDetailPageStoreState {

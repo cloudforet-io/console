@@ -11,18 +11,20 @@ import {
     PIconButton, PFieldGroup, PTextInput, PButton, PFieldTitle,
 } from '@cloudforet/mirinae';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { isFieldNameValid } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableProps, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { AddLabelsOptions } from '@/common/modules/widgets/types/widget-model';
+
 
 
 
@@ -41,9 +43,15 @@ const emit = defineEmits<{(e: 'update:operator-options', value: AddLabelsOptions
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const storeState = reactive({
-    dataTables: computed<Partial<DataTableModel>[]>(() => widgetGenerateState.dataTables),
-    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => storeState.dataTables.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
+    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => dataTableList.value.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
 });
 
 const dataTableInfo = ref<TransformDataTableInfo>({

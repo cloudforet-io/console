@@ -6,10 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type {
-    DashboardLayout,
     DashboardLayoutWidgetInfo,
     DashboardModel,
     DashboardOptions,
@@ -18,19 +16,18 @@ import type {
     DashboardVariablesSchema,
     DashboardVars,
     DashboardGlobalVariablesSchema,
-} from '@/schema/dashboard/_types/dashboard-type';
-import type { PrivateDashboardGetParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicDashboardGetParameters } from '@/schema/dashboard/public-dashboard/api-verbs/get';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardGetParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/get';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -39,8 +36,6 @@ import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
-
-
 
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 type GetDashboardParameters = PublicDashboardGetParameters | PrivateDashboardGetParameters;
@@ -86,8 +81,6 @@ const refineProjectDashboardVariables = (variables: DashboardVariables, projectI
 };
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
-    const dashboardStore = useDashboardStore();
-    const dashboardState = dashboardStore.state;
     const appContextStore = useAppContextStore();
     const userStore = useUserStore();
     const storeState = reactive({
@@ -119,29 +112,26 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     });
 
     const getters = reactive({
-        dashboardInfo: computed<PublicDashboardModel|PrivateDashboardModel|undefined>(() => {
-            const _allDashboardItems = [...dashboardState.privateDashboardItems, ...dashboardState.publicDashboardItems];
-            return _allDashboardItems.find((d) => d.dashboard_id === state.dashboardId) || state.dashboard;
-        }),
-        dashboardName: computed<string>(() => getters.dashboardInfo?.name || ''),
-        dashboardLabels: computed<string[]>(() => getters.dashboardInfo?.labels || []),
-        dashboardLayouts: computed<DashboardLayout[]>(() => getters.dashboardInfo?.layouts || []),
-        dashboardVarsSchema: computed<DashboardVariablesSchema>(() => getters.dashboardInfo?.vars_schema || {}),
-        dashboardVarsSchemaProperties: computed<Record<string, DashboardGlobalVariable>>(() => getters.dashboardInfo?.vars_schema?.properties || {}),
-        isPrivate: computed<boolean>(() => !!state.dashboardId?.startsWith('private')),
-        //
-        isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
-        isDeprecatedDashboard: computed<boolean>(() => getters.dashboardInfo?.version === '1.0'),
-        disableManageButtons: computed<boolean>(() => {
-            if (state.projectId) return true;
-            if (state.dashboardId?.startsWith('private')) return false;
-            if (storeState.isAdminMode) return false;
-            if (storeState.isWorkspaceOwner) {
-                if (getters.dashboardInfo?.workspace_id === '*') return true;
-                return false;
+        refinedVars: computed<DashboardVars>(() => {
+            const isProjectSharedDashboard = !!state.projectId;
+            const _vars: DashboardVars = cloneDeep(state.vars);
+            if (isProjectSharedDashboard && !!state.projectId) {
+                _vars.project = [state.projectId];
             }
-            return true;
+            if (storeState.isAdminMode) {
+                if (state.selectedWorkspaceId && state.selectedWorkspaceId !== 'all') {
+                    _vars[WorkspaceVariableModel.meta.idKey] = [state.selectedWorkspaceId];
+                } else {
+                    delete _vars[WorkspaceVariableModel.meta.idKey];
+                }
+            } else {
+                delete _vars[WorkspaceVariableModel.meta.idKey];
+            }
+            return _vars;
         }),
+
+        // only for 1.0 legacy dashboard
+        isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
             const _refinedVariablesSchema: DashboardVariablesSchema = {
@@ -167,26 +157,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             });
             return _refinedVariablesSchema;
         }),
-        refinedVars: computed<DashboardVars>(() => {
-            const isProjectSharedDashboard = !!state.projectId;
-            const _vars: DashboardVars = cloneDeep(state.vars);
-            if (isProjectSharedDashboard && !!state.projectId) {
-                _vars.project = [state.projectId];
-            }
-            if (storeState.isAdminMode) {
-                if (state.selectedWorkspaceId && state.selectedWorkspaceId !== 'all') {
-                    _vars[WorkspaceVariableModel.meta.idKey] = [state.selectedWorkspaceId];
-                } else {
-                    delete _vars[WorkspaceVariableModel.meta.idKey];
-                }
-            } else {
-                delete _vars[WorkspaceVariableModel.meta.idKey];
-            }
-            return _vars;
-        }),
-        // only for 1.0 legacy dashboard
         dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => {
-            const _dashboardWidget: DashboardLayoutWidgetInfo[] = getters.dashboardInfo?.layouts?.[0].widgets || [];
+            const _dashboardWidget: DashboardLayoutWidgetInfo[] = state.dashboard?.layouts?.[0].widgets || [];
             return _dashboardWidget.map((info) => ({
                 ...info,
                 widget_key: info.widget_key ?? getRandomId(),
@@ -220,10 +192,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.showDateRangeNotification = true;
         state.selectedWorkspaceId = undefined;
     };
-    const _setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
+    const setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
+        }
+        if (!!dashboardInfo.project_id && dashboardInfo.project_id !== '*') {
+            state.projectId = dashboardInfo.project_id;
         }
         state.vars = dashboardInfo.vars ?? {};
         state.dashboard = dashboardInfo;
@@ -237,7 +212,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
     };
-    const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
+    const setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
@@ -253,8 +228,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        if (!['*', '-'].includes(_dashboardInfo.project_id)) {
-            state.projectId = _dashboardInfo.project_id;
+        if (!['*', '-'].includes(_dashboardInfo?.project_id)) {
+            state.projectId = _dashboardInfo?.project_id;
         }
 
         // variables, variables schema
@@ -288,9 +263,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const { status, response } = await fetcher<GetDashboardParameters, DashboardModel>(params);
             if (status === 'succeed') {
                 if (response.version === '1.0') {
-                    _setDashboardInfoStoreState(response);
+                    setDashboardInfoStoreState(response);
                 } else {
-                    _setDashboardInfoStoreStateV2(response);
+                    setDashboardInfoStoreStateV2(response);
                 }
                 if (fetchWidgets) {
                     await listDashboardWidgets();
@@ -303,21 +278,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             state.loadingDashboard = false;
         }
     };
-    const deleteDashboardWidget = async (widgetId?: string) => {
-        if (!widgetId) return;
-        const _dashboardLayouts = cloneDeep(getters.dashboardLayouts ?? []);
-        const deletedWidgetIndex = _dashboardLayouts[0]?.widgets?.findIndex((d) => d === widgetId);
-        if (!deletedWidgetIndex || deletedWidgetIndex === -1) return;
-        _dashboardLayouts[0]?.widgets?.splice(deletedWidgetIndex, 1);
-        await dashboardStore.updateDashboard(state.dashboardId as string, {
-            dashboard_id: state.dashboardId || '',
-            layouts: _dashboardLayouts,
-        });
-    };
     // HACK: only for 1.0 dashboard
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {
-        const _originVariables: DashboardVariables = originVariables ?? getters.dashboardInfo?.variables ?? {};
-        const _originVariablesSchema: DashboardVariablesSchema = originVariablesSchema ?? getters.dashboardInfo?.variables_schema ?? { properties: {}, order: [] };
+        const _originVariables: DashboardVariables = originVariables ?? state.variables ?? {};
+        const _originVariablesSchema: DashboardVariablesSchema = originVariablesSchema ?? state.variablesSchema ?? { properties: {}, order: [] };
 
         // reset variables schema
         let _variableSchema = cloneDeep(state.variablesSchema);
@@ -346,10 +310,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariables(_variables);
         setVariablesInitMap(_variablesInitMap);
     };
-    //
-    const deleteDashboard = async (dashboardId: string) => {
-        await dashboardStore.deleteDashboard(dashboardId);
-    };
+    // HACK: only for Project Dashboard
     const listDashboardWidgets = async () => {
         if (!state.dashboardId) return;
         try {
@@ -360,7 +321,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
                 dashboard_id: state.dashboardId,
             });
-            // state.dashboardWidgets = migrateLegacyWidgetOptions(res.results || []);
             state.dashboardWidgets = res.results || [];
             return;
         } catch (e) {
@@ -383,10 +343,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const actions = {
         reset,
         getDashboardInfo,
-        deleteDashboardWidget,
         resetVariables,
-        deleteDashboard,
         listDashboardWidgets,
+        setDashboardInfoStoreStateV2,
+        setDashboardInfoStoreState,
     };
 
     return {

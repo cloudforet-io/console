@@ -12,9 +12,9 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import { GRANULARITY, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
-import type { Granularity, WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import { GRANULARITY, WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { Granularity, WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';

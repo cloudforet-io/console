@@ -16,8 +16,8 @@ import {
 import type { DynamicField } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import { QueryType } from '@/schema/_common/api-verbs/export';
-import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';
+import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
+import type { ExportOption, ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

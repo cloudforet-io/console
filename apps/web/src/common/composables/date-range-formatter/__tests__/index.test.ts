@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { describe, expect, it } from 'vitest';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { useDateRangeFormatter } from '@/common/composables/date-range-formatter';
 

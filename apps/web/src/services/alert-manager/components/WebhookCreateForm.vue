@@ -6,7 +6,7 @@ import {
     PFieldGroup, PTextInput, PSelectDropdown, PDataLoader, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';

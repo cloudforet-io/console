@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 import type {

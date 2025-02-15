@@ -8,7 +8,7 @@ import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ContentsType } from '@/schema/_common/type';
+import type { ContentsType } from '@/api-clients/_common/schema/type';
 
 import { getFileDownloadUrl } from '@/lib/file-manager';
 import type { FileManagerResourceGroupType } from '@/lib/file-manager/type';

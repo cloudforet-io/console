@@ -5,18 +5,19 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { TaskTypeCreateParameters } from '@/schema/opsflow/task-type/api-verbs/create';
-import type { TaskTypeDeleteParameters } from '@/schema/opsflow/task-type/api-verbs/delete';
-import type { TaskTypeGetParameters } from '@/schema/opsflow/task-type/api-verbs/get';
-import type { TaskTypeListParameters } from '@/schema/opsflow/task-type/api-verbs/list';
-import type { TaskTypeUpdateParameters } from '@/schema/opsflow/task-type/api-verbs/update';
-import type { TaskTypeUpdateFieldsParameters } from '@/schema/opsflow/task-type/api-verbs/update-fields';
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { TaskTypeCreateParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/create';
+import type { TaskTypeDeleteParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/delete';
+import type { TaskTypeGetParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/get';
+import type { TaskTypeListParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/list';
+import type { TaskTypeUpdateParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/update';
+import type { TaskTypeUpdateFieldsParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/update-fields';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface UseTaskTypeStoreState {
     loading: boolean;

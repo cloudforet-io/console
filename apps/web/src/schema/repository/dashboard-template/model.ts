@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { DashboardTemplateState, DashboardTemplateType } from '@/schema/repository/dashboard-template/type';
 
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';

@@ -1,5 +1,5 @@
-import type { Tags } from '@/schema/_common/model';
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { Tags } from '@/api-clients/_common/schema/model';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 
 export interface TrustedSecretCreateParameters {
     name: string;

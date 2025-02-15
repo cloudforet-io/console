@@ -16,7 +16,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';

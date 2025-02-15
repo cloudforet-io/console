@@ -2,8 +2,9 @@
 import { asyncComputed } from '@vueuse/core';
 import { computed } from 'vue';
 
-import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
-import type { EventAdditionalInfo, EventType } from '@/schema/opsflow/event/type';
+
+import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { EventAdditionalInfo, EventType } from '@/api-clients/opsflow/event/schema/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';

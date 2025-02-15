@@ -3,23 +3,22 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@cloudforet/mirinae';
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { PrivateFolderCreateParameters } from '@/schema/dashboard/private-folder/api-verbs/create';
-import type { PrivateFolderUpdateParameters } from '@/schema/dashboard/private-folder/api-verbs/update';
-import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
-import type { PublicFolderCreateParameters } from '@/schema/dashboard/public-folder/api-verbs/create';
-import type { PublicFolderUpdateParameters } from '@/schema/dashboard/public-folder/api-verbs/update';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { FolderCreateParams, FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
+import type { PrivateFolderCreateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/create';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
+import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -28,13 +27,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
-
-
-type FolderModel = PublicFolderModel | PrivateFolderModel;
-type FolderCreateParams = PublicFolderCreateParameters | PrivateFolderCreateParameters;
-type FolderUpdateParams = PublicFolderUpdateParameters | PrivateFolderUpdateParameters;
 interface Props {
     visible: boolean;
     folderId?: string;
@@ -48,10 +43,19 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicFolderList,
+    privateFolderList,
+    keys,
+    api,
+    fetcher,
+    queryClient,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
@@ -59,17 +63,22 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     isPrivate: false,
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
     selectedFolder: computed<FolderModel|undefined>(() => {
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             if (props.folderId?.startsWith('private')) {
-                return dashboardPageControlGetters.privateFolderItems.find((d) => d.folder_id === props.folderId);
+                return state.privateFolderItems.find((d) => d.folder_id === props.folderId);
             }
-            return dashboardPageControlGetters.publicFolderItems.find((d) => d.folder_id === props.folderId);
+            return state.publicFolderItems.find((d) => d.folder_id === props.folderId);
         }
         return undefined;
     }),
     existingNameList: computed<string[]>(() => {
-        const _targetFolderItems = state.isPrivate ? dashboardPageControlGetters.privateFolderItems : dashboardPageControlGetters.publicFolderItems;
+        const _targetFolderItems = state.isPrivate ? state.privateFolderItems : state.publicFolderItems;
         if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
             return _targetFolderItems.filter((d) => d.folder_id !== state.selectedFolder?.folder_id).map((d) => d.name);
         }
@@ -97,12 +106,17 @@ const {
     },
 });
 
-/* Api */
-const createFolder = async () => {
-    try {
+/* Event */
+const handleFormConfirm = async () => {
+    if (!isAllValid) return;
+    if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
+        const params: FolderUpdateParams = {
+            folder_id: state.selectedFolder?.folder_id as string,
+            name: name.value as string,
+        };
+        updateFolder(params);
+    } else {
         const _isPrivate = storeState.isWorkspaceMember ? true : state.isPrivate;
-
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.create : SpaceConnector.clientV2.dashboard.publicFolder.create;
         const params: FolderCreateParams = {
             name: name.value as string,
             tags: { created_by: userStore.state.userId },
@@ -110,46 +124,56 @@ const createFolder = async () => {
         if (!_isPrivate) {
             (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
         }
-        const createdFolder = await fetcher(params);
-        dashboardPageControlStore.setNewIdList([
-            ...dashboardPageControlState.newIdList,
-            createdFolder.folder_id,
-        ]);
-        showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
-        state.proxyVisible = false;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_CREATE_FOLDER'));
+        createFolder(params);
     }
-};
-const updateFolderName = async () => {
-    try {
-        const _isPrivate = props.folderId?.startsWith('private');
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateFolder.update : SpaceConnector.clientV2.dashboard.publicFolder.update;
-        const params: FolderUpdateParams = {
-            folder_id: state.selectedFolder?.folder_id as string,
-            name: name.value as string,
-        };
-        await fetcher(params);
-        state.proxyVisible = false;
-        showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_UPDATE_FOLDER'));
-    }
-};
-
-/* Event */
-const handleFormConfirm = async () => {
-    if (!isAllValid) return;
-    if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
-        await updateFolderName();
-    } else {
-        await createFolder();
-    }
-    await dashboardStore.load();
 };
 const handleUpdatePrivate = (value: boolean) => {
     state.isPrivate = value;
 };
+
+const createFolderFn = (params: PrivateFolderCreateParameters | PublicFolderCreateParameters): Promise<FolderModel> => {
+    const _isPrivate = storeState.isWorkspaceMember ? true : state.isPrivate;
+    if (_isPrivate) {
+        return api.privateFolderAPI.create(params as PrivateFolderCreateParameters);
+    }
+    return api.publicFolderAPI.create(params as PublicFolderCreateParameters);
+};
+const { mutate: createFolder } = useMutation(
+    {
+        mutationFn: createFolderFn,
+        onSuccess: (folder: PublicFolderModel|PrivateFolderModel) => {
+            dashboardPageControlStore.setNewIdList([
+                ...dashboardPageControlState.newIdList,
+                folder.folder_id,
+            ]);
+            showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
+            state.proxyVisible = false;
+
+            const isPrivate = folder.folder_id.startsWith('private');
+            const folderListQueryKey = isPrivate ? keys.privateFolderListQueryKey : keys.publicFolderListQueryKey;
+            queryClient.invalidateQueries({ queryKey: folderListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_CREATE_FOLDER'));
+        },
+    },
+);
+const { mutate: updateFolder } = useMutation(
+    {
+        mutationFn: fetcher.updateFolderFn,
+        onSuccess: (folder: PublicFolderModel|PrivateFolderModel) => {
+            showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
+            state.proxyVisible = false;
+
+            const isPrivate = folder.folder_id.startsWith('private');
+            const folderListQueryKey = isPrivate ? keys.privateFolderListQueryKey : keys.publicFolderListQueryKey;
+            queryClient.invalidateQueries({ queryKey: folderListQueryKey.value });
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_UPDATE_FOLDER'));
+        },
+    },
+);
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {

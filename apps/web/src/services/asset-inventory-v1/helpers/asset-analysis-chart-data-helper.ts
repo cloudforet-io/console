@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
 import type { ReferenceMap } from '@/store/reference/type';
 

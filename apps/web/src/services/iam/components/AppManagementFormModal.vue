@@ -13,10 +13,10 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { Tags } from '@/schema/_common/model';
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { Tags } from '@/api-clients/_common/schema/model';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -32,7 +32,7 @@ import { useRoleFormatter } from '@/services/iam/composables/refined-table-data'
 import { getInputItemsFromTagKeys } from '@/services/iam/composables/tag-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+import type { ProjectTreeNodeData } from '@/services/project-v1/types/project-tree-type';
 
 
 interface AppDropdownMenuItem extends SelectDropdownMenuItem {

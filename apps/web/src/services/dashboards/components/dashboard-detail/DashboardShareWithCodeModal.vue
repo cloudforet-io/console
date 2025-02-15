@@ -1,29 +1,25 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PCodeEditor, PButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetModel } from '@/schema/dashboard/_types/widget-type';
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetListParameters } from '@/schema/dashboard/private-widget/api-verbs/list';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetListParameters } from '@/schema/dashboard/public-widget/api-verbs/list';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 
@@ -41,37 +37,42 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string): void;
 }>();
 
+const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+} = useDashboardQuery();
+const {
+    widgetList,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+});
+
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    targetDashboard: computed<DashboardModel>(() => dashboardPageControlGetters.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId)),
+    targetDashboard: computed<DashboardModel>(() => queryState.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId)),
     loading: false,
     isCopied: false,
     sharedDashboard: {} as SharedDashboardInfo,
     widgetDataTablesMap: {} as Record<string, DataTableModel[]>,
 });
-
-/* Api */
-const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
-    try {
-        const isPrivate = dashboardId.startsWith('private');
-        const fetcher = isPrivate
-            ? SpaceConnector.clientV2.dashboard.privateWidget.list
-            : SpaceConnector.clientV2.dashboard.publicWidget.list;
-        const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
-            dashboard_id: dashboardId,
-        });
-        return res.results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 
 /* Event */
 const handleUpdateVisible = (visible: boolean) => {
@@ -93,8 +94,7 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         state.loading = true;
 
-        const _dashboardWidgets = await listDashboardWidgets(props.dashboardId);
-        const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, _dashboardWidgets, storeState.costDataSource);
+        const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, widgetList.value, storeState.costDataSource);
         state.sharedDashboard = {
             name: state.targetDashboard.name || '',
             layouts: _sharedLayouts,

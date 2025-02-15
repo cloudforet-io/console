@@ -40,6 +40,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFiltersItem
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_QUERY_OPERATOR,
@@ -82,13 +83,21 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;}>();
 const allReferenceStore = useAllReferenceStore();
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const appContextStore = useAppContextStore();
+
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    dataTable: computed(() => widgetGenerateStore.state.dataTables.find((d) => d.data_table_id === props.dataTableId)),
+    dataTable: computed(() => dataTableList.value.find((d) => d.data_table_id === props.dataTableId)),
 });
 
 const state = reactive({

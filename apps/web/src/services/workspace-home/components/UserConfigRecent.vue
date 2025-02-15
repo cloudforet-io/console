@@ -4,11 +4,10 @@ import { useRoute } from 'vue-router/composables';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
@@ -31,6 +30,7 @@ import {
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
@@ -42,11 +42,15 @@ const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const dashboardStore = useDashboardStore();
-const dashboardState = dashboardStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const displayStore = useDisplayStore();
+
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+} = useDashboardQuery();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
@@ -72,7 +76,7 @@ const state = reactive({
 const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([recentConfig], [...dashboardState.publicDashboardItems, ...dashboardState.privateDashboardItems])[0];
+        return convertDashboardConfigToReferenceData([recentConfig], [...publicDashboardList.value, ...privateDashboardList.value])[0];
     }
     if (itemType === RECENT_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([recentConfig], storeState.projects)[0];

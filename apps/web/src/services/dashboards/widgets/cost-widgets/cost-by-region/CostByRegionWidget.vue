@@ -15,7 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { COST_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

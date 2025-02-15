@@ -11,7 +11,7 @@ import { isEmpty, orderBy, throttle } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';

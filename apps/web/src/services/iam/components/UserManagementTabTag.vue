@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { Tags, TimeStamp } from '@/api-clients/_common/schema/model';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
 import type { UserModel } from '@/schema/identity/user/model';
 import { i18n } from '@/translations';

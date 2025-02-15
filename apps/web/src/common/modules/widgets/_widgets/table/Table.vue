@@ -1,37 +1,28 @@
 <script setup lang="ts">
 import {
-    defineExpose, reactive, computed, watch,
+    defineExpose, reactive, computed, watch, onMounted,
 } from 'vue';
 
 import { useQueries } from '@tanstack/vue-query';
 import { sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
-import type { PrivateWidgetLoadSumParameters } from '@/schema/dashboard/private-widget/api-verbs/load-sum';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
-import type { PublicWidgetLoadSumParameters } from '@/schema/dashboard/public-widget/api-verbs/load-sum';
+import type { WidgetLoadParams, WidgetLoadResponse, WidgetLoadSumParams } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     normalizeAndSerializeVars,
 } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import {
-    normalizeAndSerializeDataTableOptions,
-} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
-import { getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
@@ -47,19 +38,25 @@ import type { TableColumnWidthValue } from '@/common/modules/widgets/_widget-fie
 import type { TextWrapValue } from '@/common/modules/widgets/_widget-fields/text-wrap/type';
 import type { TotalValue } from '@/common/modules/widgets/_widget-fields/total/type';
 import WidgetDataTable from '@/common/modules/widgets/_widgets/table/_component/WidgetDataTable.vue';
-import type { TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DataTableModel, TableWidgetField } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    TableDataItem, WidgetLoadResponse,
+    TableDataItem,
 } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
+
 const REFERENCE_FIELDS = ['Project', 'Workspace', 'Region', 'Service Account'];
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
+
+const { keys, api } = useWidgetFormQuery({
+    widgetId: computed(() => props.widgetId),
+    preventLoad: true,
+});
 
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
@@ -67,14 +64,12 @@ const { dateRange } = useWidgetDateRange({
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 
-
 const state = reactive({
-    runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     pageSize: computed<number>(() => (props.size === 'full' ? 30 : 10)),
     thisPage: 1 as number,
     sortBy: [] as Sort[],
-    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    dataTable: undefined as DataTableModel|undefined,
     dataInfo: computed<DataInfo|undefined>(() => state.dataTable?.data_info),
     tableFields: computed<TableWidgetField[]>(() => {
         const labelFields: TableWidgetField[] = (widgetOptionsState.groupByInfo?.data as string[] ?? []).map(
@@ -146,25 +141,27 @@ const getTableDefaultSortBy = (_sortBy: Sort[]) => {
     const defaultSortBy = [{ key: (widgetOptionsState.dataFieldInfo?.data as string[])?.[0], desc: true }];
     return defaultSortBy;
 };
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
+const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
+        ? api.privateWidgetAPI.load
+        : api.publicWidgetAPI.load;
     const res = await defaultFetcher(params);
     return res;
 };
 
-const fetchWidgetSumData = async (params: PrivateWidgetLoadSumParameters|PublicWidgetLoadSumParameters): Promise<WidgetLoadResponse> => {
+const fetchWidgetSumData = async (params: WidgetLoadSumParams): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, WidgetLoadResponse>
-        : SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, WidgetLoadResponse>;
+        ? api.privateWidgetAPI.loadSum
+        : api.publicWidgetAPI.loadSum;
     const res = await defaultFetcher(params);
     return res;
 };
 
 const baseQueryKey = computed(() => [
-    'widget-load-table',
+    ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
+    props.dashboardId,
     props.widgetId,
+    props.widgetName,
     {
         start: dateRange.value.start,
         end: dateRange.value.end,
@@ -173,23 +170,25 @@ const baseQueryKey = computed(() => [
         pageSize: state.pageSize,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         groupBy: widgetOptionsState.groupByInfo?.data,
-        dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        dataTableId: props.dataTableId,
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
 
 const fullDataQueryKey = computed(() => [
-    'widget-load-table-sum',
+    ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
+    props.dashboardId,
     props.widgetId,
+    props.widgetName,
     {
         start: dateRange.value.start,
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        dataTableId: props.dataTableId,
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
         vars: normalizeAndSerializeVars(props.dashboardVars),
     },
@@ -213,10 +212,9 @@ const queryResults = useQueries({
                 granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
             enabled: computed<boolean>(() => {
-                const loadEnabled = state.runQueries;
                 const widgetActive = props.widgetState !== 'INACTIVE';
                 const dataTableReady = !!state.dataTable;
-                return loadEnabled && widgetActive && dataTableReady;
+                return widgetActive && dataTableReady;
             }),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
@@ -230,11 +228,10 @@ const queryResults = useQueries({
                 granularity: widgetOptionsState.granularityInfo?.granularity,
             }),
             enabled: computed<boolean>(() => {
-                const loadEnabled = state.runQueries;
                 const widgetActive = props.widgetState !== 'INACTIVE';
                 const dataTableReady = !!state.dataTable;
                 const totalEnabled = !!widgetOptionsState.totalInfo?.toggleValue;
-                return loadEnabled && widgetActive && dataTableReady && totalEnabled;
+                return widgetActive && dataTableReady && totalEnabled;
             }),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
@@ -287,24 +284,26 @@ const handleUpdateThisPage = async (newPage: number) => {
     state.thisPage = newPage;
 };
 
-const loadWidget = async (forceLoad?: boolean) => {
-    state.runQueries = true;
-    if (forceLoad) {
-        queryResults.value?.[0].refetch();
-        queryResults.value?.[1].refetch();
-    }
-};
-
-useWidgetInitAndRefresh({ props, emit, loadWidget });
-
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
-    state.dataTable = await getWidgetDataTable(newDataTableId);
+    const fetcher = state.isPrivateWidget
+        ? api.privateDataTableAPI.get
+        : api.publicDataTableAPI.get;
+    try {
+        state.dataTable = await fetcher({ data_table_id: newDataTableId });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget,
+    loadWidget: () => {
+        queryResults.value?.[0].refetch();
+        queryResults.value?.[1].refetch();
+    },
 });
-
+onMounted(() => {
+    emit('mounted', props.widgetName);
+});
 </script>
 
 <template>

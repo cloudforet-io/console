@@ -3,8 +3,8 @@ import {
     computed, reactive, ref,
 } from 'vue';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import WidgetFormDataTableCardAddContents
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddContents.vue';

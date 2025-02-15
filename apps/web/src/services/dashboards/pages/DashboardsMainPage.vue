@@ -21,9 +21,9 @@ import type {
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { DashboardListParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { DashboardListParams, DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -39,6 +39,11 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import {
+    getDashboardTreeData,
+    isPublicControlButtonDisabled,
+} from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -46,7 +51,6 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -62,43 +66,94 @@ const queryTagsHelper = useQueryTags({
     }],
 });
 
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
+    isLoading,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
+
+
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
+    deprecatedDashboardItems: computed(() => {
+        const _public = publicDashboardList.value.filter((d) => d.version === '1.0');
+        const _private = privateDashboardList.value.filter((d) => d.version === '1.0');
+        return [..._public, ..._private];
+    }),
+    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(publicFolderList.value, publicDashboardList.value, dashboardPageControlState.newIdList)),
+    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(privateFolderList.value, privateDashboardList.value, dashboardPageControlState.newIdList)),
+    publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
+        if (storeState.isAdminMode) {
+            const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+            return {
+                clone: _selectedPublicIdList.length === 0,
+                move: _selectedPublicIdList.length === 0,
+                delete: _selectedPublicIdList.length === 0,
+            };
+        }
+        const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+        return {
+            clone: _selectedPublicIdList.length === 0,
+            move: isPublicControlButtonDisabled(state.publicDashboardItems, dashboardPageControlState.selectedPublicIdMap),
+            delete: isPublicControlButtonDisabled(state.publicDashboardItems, dashboardPageControlState.selectedPublicIdMap),
+        };
+    }),
+    privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
+        const _selectedPrivateIdList: string[] = Object.entries(dashboardPageControlState.selectedPrivateIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+        return {
+            clone: _selectedPrivateIdList.length === 0,
+            move: _selectedPrivateIdList.length === 0,
+            delete: _selectedPrivateIdList.length === 0,
+        };
+    }),
+
     refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (state.isSearching.PUBLIC) return [];
-        if (!state.searchFilters.length) return dashboardPageControlGetters.publicDashboardTreeData;
-        return getSearchedTreeData(dashboardPageControlGetters.publicDashboardTreeData, state.searchedDashboardIdList);
+        if (!state.searchFilters.length) return state.publicDashboardTreeData;
+        return getSearchedTreeData(state.publicDashboardTreeData, state.searchedDashboardIdList);
     }),
     refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         if (state.isSearching.PRIVATE) return [];
-        if (!state.searchFilters.length) return dashboardPageControlGetters.privateDashboardTreeData;
-        return getSearchedTreeData(dashboardPageControlGetters.privateDashboardTreeData, state.searchedDashboardIdList);
+        if (!state.searchFilters.length) return state.privateDashboardTreeData;
+        return getSearchedTreeData(state.privateDashboardTreeData, state.searchedDashboardIdList);
     }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
-            return !!dashboardPageControlGetters.publicDashboardItems.length || !!dashboardPageControlGetters.publicFolderItems.length;
+            return !!state.publicDashboardItems.length || !!state.publicFolderItems.length;
         }
         return !!(
-            dashboardPageControlGetters.publicDashboardItems.length
-            || dashboardPageControlGetters.privateDashboardItems.length
-            || dashboardPageControlGetters.deprecatedDashboardItems.length
-            || dashboardPageControlGetters.publicFolderItems.length
-            || dashboardPageControlGetters.privateFolderItems.length
+            state.publicDashboardItems.length
+            || state.privateDashboardItems.length
+            || state.deprecatedDashboardItems.length
+            || state.publicFolderItems.length
+            || state.privateFolderItems.length
         );
     }),
     treeCollapseMap: {
         public: false,
         private: false,
     } as Record<string, boolean>,
-    publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
-        if (storeState.isAdminMode) return dashboardPageControlGetters.adminTreeControlButtonDisableMap;
-        return dashboardPageControlGetters.publicTreeControlButtonDisableMap;
-    }),
+
     // search
     isSearching: {
         PUBLIC: false,
@@ -299,7 +354,7 @@ onUnmounted(() => {
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="dashboardPageControlGetters.loading"
+        <p-data-loader :loading="isLoading"
                        :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >
@@ -352,7 +407,7 @@ onUnmounted(() => {
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
                                        :selected-id-map="dashboardPageControlState.selectedPrivateIdMap"
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
-                                       :button-disable-map="dashboardPageControlGetters.privateTreeControlButtonDisableMap"
+                                       :button-disable-map="state.privateTreeControlButtonDisableMap"
                                        show-control-buttons
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
                                        @click-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
@@ -360,10 +415,10 @@ onUnmounted(() => {
                                        @click-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
                 />
             </div>
-            <dashboard-main-board-list v-if="dashboardPageControlGetters.deprecatedDashboardItems.length"
+            <dashboard-main-board-list v-if="state.deprecatedDashboardItems.length"
                                        class="dashboard-list"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.DEPRECATED')"
-                                       :dashboard-list="dashboardPageControlGetters.deprecatedDashboardItems"
+                                       :dashboard-list="state.deprecatedDashboardItems"
                                        is-collapsed
             />
         </p-data-loader>

@@ -15,21 +15,28 @@ import type { InputItem } from '@cloudforet/mirinae/src/controls/input/text-inpu
 import type {
     DashboardGlobalVariable,
     NumberAnyVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     variable: DashboardGlobalVariable;
+    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const state = reactive({
     variable: computed(() => {
@@ -44,6 +51,7 @@ const state = reactive({
     value: undefined as number|undefined,
     editMode: false,
     keyword: undefined as number|undefined,
+    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 const handleUpdateKeyword = (value: string) => {
@@ -136,25 +144,34 @@ const isValidNumberInfo = (value: string, min: number, max: number, step?: strin
 
 const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars) as DashboardVars;
+    const vars = cloneDeep(props.vars ?? {}) as DashboardVars;
     if (changedSelected !== undefined) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
     }
-    dashboardDetailStore.setVars(vars);
+    state.proxyVars = vars;
 };
 
-watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, (varsSchema, prevVarsSchema) => {
+watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchema) => {
+    if (!varsSchema) return;
     const _variable = props.variable as NumberAnyVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    state.value = (dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] as number) || _variable.options.min;
+    state.value = (dashboard.value?.vars?.[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);
 
-    state.keyword = (dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key] as number) || _variable.options.min;
+    state.keyword = (dashboard.value?.vars?.[_variable.key] as number) || _variable.options.min;
 }, { immediate: true });
 
+// for reset
+watch(() => props.vars, (_vars) => {
+    const _variable = props.variable as NumberAnyVariable;
+    const tempVarsValue = _vars?.[_variable.key] as number|undefined;
+    if (state.value !== parseFloat(tempVarsValue)) {
+        state.value = parseFloat(tempVarsValue);
+    }
+});
 
 
 </script>

@@ -9,7 +9,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SharedConfigListParameters } from '@/schema/config/shared-config/api-verbs/list';
 import type { SharedConfigModel } from '@/schema/config/shared-config/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';

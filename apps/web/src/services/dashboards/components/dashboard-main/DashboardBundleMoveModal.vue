@@ -4,24 +4,23 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { DashboardChangeFolderParams } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
+import type { DashboardChangeFolderParams } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
@@ -35,15 +34,28 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicFolderList,
+    privateFolderList,
+    api,
+    keys,
+    queryClient,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
     selectedIdMap: computed<Record<string, boolean>>(() => {
         if (dashboardPageControlState.folderModalType === 'PUBLIC') {
             return dashboardPageControlState.selectedPublicIdMap;
@@ -55,9 +67,9 @@ const state = reactive({
         .filter(([key]) => key.includes('dash'))
         .map(([key]) => key)),
     availableFolderItems: computed<FolderModel[]>(() => {
-        if (dashboardPageControlState.folderModalType === 'PRIVATE') return dashboardPageControlGetters.privateFolderItems;
-        if (storeState.isAdminMode) return dashboardPageControlGetters.publicFolderItems;
-        return dashboardPageControlGetters.publicFolderItems.filter((d) => !(d.shared && d.scope === 'WORKSPACE'));
+        if (dashboardPageControlState.folderModalType === 'PRIVATE') return state.privateFolderItems;
+        if (storeState.isAdminMode) return state.publicFolderItems;
+        return state.publicFolderItems.filter((d) => !(d.shared && d.scope === 'WORKSPACE'));
     }),
     headerTitle: computed<TranslateResult>(() => i18n.t('DASHBOARDS.ALL_DASHBOARDS.MOVE_DASHBOARDS', { count: state.targetDashboardIdList.length })),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -89,7 +101,9 @@ const state = reactive({
 const updateDashboard = async (dashboardId: string): Promise<boolean> => {
     try {
         const _isPrivate = dashboardId.startsWith('private');
-        const fetcher = _isPrivate ? SpaceConnector.clientV2.dashboard.privateDashboard.changeFolder : SpaceConnector.clientV2.dashboard.publicDashboard.changeFolder;
+        const fetcher = _isPrivate
+            ? api.privateDashboardAPI.changeFolder
+            : api.publicDashboardAPI.changeFolder;
         const params: DashboardChangeFolderParams = {
             dashboard_id: dashboardId,
         };
@@ -113,7 +127,8 @@ const handleFormConfirm = async () => {
     } if (failCount > 0) {
         ErrorHandler.handleRequestError(new Error(''), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_MOVE_DASHBOARD', { count: failCount }));
     }
-    await dashboardStore.load();
+    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
     dashboardPageControlStore.reset();
     state.proxyVisible = false;
 };

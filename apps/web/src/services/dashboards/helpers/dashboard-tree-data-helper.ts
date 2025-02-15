@@ -1,7 +1,7 @@
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 
 import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -119,4 +119,28 @@ export const getSelectedDataTableItems = (folderItems: FolderModel[], dashboardI
     });
 
     return _results;
+};
+
+export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
+    const _selectedIdList: string[] = Object.entries(selectedIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+    if (_selectedIdList.length === 0) return true;
+    let result = false;
+    _selectedIdList.forEach((id) => {
+        if (result) return;
+        const _isFolder = id.includes('folder');
+        if (_isFolder) {
+            const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
+            _childrenDashboards?.forEach((child) => {
+                if (child?.shared && child?.scope === 'WORKSPACE') {
+                    result = true;
+                }
+            });
+        } else {
+            const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
+            if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
+                result = true;
+            }
+        }
+    });
+    return result;
 };

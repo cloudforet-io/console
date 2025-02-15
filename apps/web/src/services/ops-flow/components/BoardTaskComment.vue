@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
-import type { CommentModel } from '@/schema/opsflow/comment/model';
+import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';

@@ -1,26 +1,30 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PI } from '@cloudforet/mirinae';
 
-import type { PrivateFolderDeleteParameters } from '@/schema/dashboard/private-folder/api-verbs/delete';
-import type { PublicFolderDeleteParameters } from '@/schema/dashboard/public-folder/api-verbs/delete';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+
+
+
 
 
 
@@ -32,7 +36,7 @@ const DELETE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
 ];
-type FolderDeleteParams = PublicFolderDeleteParameters | PrivateFolderDeleteParameters;
+
 interface Props {
     visible?: boolean;
     folderId?: string;
@@ -43,10 +47,45 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
-const dashboardStore = useDashboardStore();
+const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
+
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
+    api,
+    keys,
+    queryClient,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
+    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+});
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
+
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -54,7 +93,7 @@ const state = reactive({
         let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
         // single case
         if (props.folderId) {
-            const _childrenIdList = dashboardPageControlGetters.allDashboardItems.filter((d) => d.folder_id === props.folderId);
+            const _childrenIdList = queryState.allDashboardItems.filter((d) => d.folder_id === props.folderId);
             _selectedIdMap = {
                 [props.folderId]: true,
                 ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
@@ -62,25 +101,36 @@ const state = reactive({
         } else if (dashboardPageControlState.folderModalType === 'PRIVATE') { // bundle case
             _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
         }
-        return getSelectedDataTableItems(dashboardPageControlGetters.allFolderItems, dashboardPageControlGetters.allDashboardItems, _selectedIdMap);
+        return getSelectedDataTableItems(queryState.allFolderItems, queryState.allDashboardItems, _selectedIdMap);
     }),
 });
 
 /* Api */
 const deleteFolder = async (folderId: string): Promise<boolean> => {
     const fetcher = folderId.startsWith('private')
-        ? SpaceConnector.clientV2.dashboard.privateFolder.delete
-        : SpaceConnector.clientV2.dashboard.publicFolder.delete;
+        ? api.privateFolderAPI.delete
+        : api.publicFolderAPI.delete;
     try {
-        await fetcher<FolderDeleteParams>({ folder_id: folderId });
+        await fetcher({ folder_id: folderId });
         return true;
     } catch (e) {
         return false;
     }
 };
 const deleteDashboard = async (dashboardId: string): Promise<boolean> => {
+    const fetcher = dashboardId.startsWith('private')
+        ? api.privateDashboardAPI.delete
+        : api.publicDashboardAPI.delete;
     try {
-        await dashboardStore.deleteDashboard(dashboardId);
+        await fetcher({ dashboard_id: dashboardId });
+        const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === dashboardId);
+        if (isFavoriteItem) {
+            await favoriteStore.deleteFavorite({
+                itemType: FAVORITE_TYPE.DASHBOARD,
+                workspaceId: storeState.currentWorkspaceId || '',
+                itemId: dashboardId,
+            });
+        }
         return true;
     } catch (e) {
         return false;
@@ -105,7 +155,10 @@ const handleDeleteConfirm = async () => {
     } else {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
-    await dashboardStore.load();
+    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.publicFolderListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.privateFolderListQueryKey.value });
     dashboardPageControlStore.reset();
     state.loading = false;
     state.proxyVisible = false;

@@ -4,18 +4,16 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
 
-import type { PrivateWidgetCreateParameters } from '@/schema/dashboard/private-widget/api-verbs/create';
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
-import type { PublicWidgetCreateParameters } from '@/schema/dashboard/public-widget/api-verbs/create';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { WidgetCreateParams, WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
+import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -24,21 +22,28 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import getRandomId from '@/lib/random-id-generator';
+import type { ListResponse } from '@/lib/variable-models/_base/types';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
-    DATA_TABLE_TYPE,
+    DATA_TABLE_TYPE, TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions,
+    DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions, DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
@@ -49,15 +54,30 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 
+/* Query */
+const {
+    dataTableList,
+    api,
+    keys: widgetQueryKeys,
+    queryClient,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const {
+    dashboard,
+    keys,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+
+
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-    dataTables: computed(() => widgetGenerateStore.state.dataTables),
 });
 
 const state = reactive({
-    loading: false,
     showPopover: false,
     selectedPopperCondition: undefined as undefined|DataTableDataType,
     dataSourceDomainItems: computed(() => ([
@@ -108,7 +128,7 @@ const state = reactive({
         if (state.selectedCostDataType === 'usage_quantity') {
             return 'Usage';
         }
-        return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
+        return targetCostDataSource?.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
     operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string|TranslateResult; icon: string;}[]>(() => [
         {
@@ -163,22 +183,52 @@ const state = reactive({
 });
 
 /* Api */
-const createWidget = async (): Promise<PublicWidgetModel|PrivateWidgetModel|null> => {
-    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
-    const fetcher = isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>
-        : SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>;
-    try {
-        return await fetcher({
-            dashboard_id: dashboardDetailState.dashboardId as string,
-            tags: { created_by: userStore.state.userId },
-            widget_type: 'table',
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return null;
+const widgetCreateFn = (params: WidgetCreateParams): Promise<WidgetModel> => {
+    if (dashboardDetailState.dashboardId?.startsWith('private')) {
+        return api.privateWidgetAPI.create(params);
     }
+    return api.publicWidgetAPI.create(params);
 };
+const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutation({
+    mutationFn: widgetCreateFn,
+    onSuccess: (data) => {
+        const _isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+        const widgetListQueryKey = _isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => (oldData.results?.length ? {
+            ...oldData, results: [...oldData.results, data],
+        } : {
+            ...oldData, results: [data],
+        }));
+        widgetGenerateStore.setWidgetFormInfo(data);
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e);
+    },
+});
+const dataTableAddFn = (params: DataTableAddParameters): Promise<DataTableModel> => {
+    if (dashboardDetailState.dashboardId?.startsWith('private')) {
+        return api.privateDataTableAPI.add(params);
+    }
+    return api.publicDataTableAPI.add(params);
+};
+const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useMutation({
+    mutationFn: dataTableAddFn,
+    onSuccess: (data) => {
+        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+        const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
+        queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
+            ...oldData, results: [...oldData.results, data],
+        } : {
+            ...oldData, results: [data],
+        }));
+
+        widgetGenerateStore.setSelectedDataTableId(data?.data_table_id);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 
 /* Util */
 const resetSelectedDataSource = () => {
@@ -196,22 +246,41 @@ const handleClickDataSourceDomain = (domainName: DataTableSourceType) => {
     state.selectedDataSourceDomain = domainName;
     resetSelectedDataSource();
 };
-const handleClickOperator = (operator: DataTableOperator) => {
-    widgetGenerateStore.createUnsavedTransformDataTable(operator);
+const handleCreateUnsavedTransform = (operator: DataTableOperator) => {
+    const unsavedTransformData = {
+        data_table_id: `UNSAVED-${getRandomId()}`,
+        name: getDuplicatedDataTableName(`${operator} Data`, dataTableList.value),
+        data_type: DATA_TABLE_TYPE.TRANSFORMED,
+        operator,
+        options: {
+            [operator]: TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS[operator],
+        } as DataTableTransformOptions,
+        state: 'AVAILABLE',
+    } as Partial<DataTableModel>;
+
+    const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
+    const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
+    queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
+        ...oldData, results: [...oldData.results, unsavedTransformData],
+    } : {
+        ...oldData, results: [unsavedTransformData],
+    }));
+
     state.showPopover = false;
 };
+
 const handleSelectPopperCondition = (condition: DataTableDataType) => {
+    if (condition === DATA_TABLE_TYPE.TRANSFORMED && !dataTableList.value?.length) return;
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
-    state.loading = true;
     // create widget
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
-        const createdWidget = await createWidget();
-        if (createdWidget) {
-            widgetGenerateStore.setWidgetForm(createdWidget);
-        }
-        state.showPopover = false;
+        await createWidget({
+            dashboard_id: dashboardDetailState.dashboardId as string,
+            tags: { created_by: userStore.state.userId },
+            widget_type: 'table',
+        });
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
@@ -219,8 +288,9 @@ const handleConfirmDataSource = async () => {
             ? `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`
             : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
         const addParameters = {
+            widget_id: widgetGenerateState.widgetId as string,
             source_type: state.selectedDataSourceDomain,
-            name: getDuplicatedDataTableName(dataTableBaseName, widgetGenerateState.dataTables),
+            name: getDuplicatedDataTableName(dataTableBaseName, dataTableList.value),
         } as DataTableAddParameters;
         const dataKey = state.selectedCostDataType?.replace('data.', '');
         const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
@@ -249,22 +319,21 @@ const handleConfirmDataSource = async () => {
         };
 
         // NOTE: For DataTable-Create loading
-        state.showPopover = false;
         widgetGenerateStore.setDataTableCreateLoading(true);
+        state.showPopover = false;
 
-        const result = await widgetGenerateStore.createAddDataTable({
+        await addDataTable({
             ...addParameters,
+            vars: dashboard.value?.vars || {},
             options: {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
-        if (!widgetGenerateState.selectedDataTableId && result) {
-            widgetGenerateStore.setSelectedDataTableId(result?.data_table_id);
-        }
     }
-    state.loading = false;
     widgetGenerateStore.setDataTableCreateLoading(false);
 };
+
+
 
 watch(() => state.showPopover, (val) => {
     if (!val) {
@@ -299,10 +368,13 @@ watch(() => state.showPopover, (val) => {
                 <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.ADD')"
                                icon="ic_service_data-sources"
                                block
+                               :show-select-marker="false"
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADDED)"
                 />
                 <p-select-card :label="i18n.t('COMMON.WIDGETS.DATA_TABLE.TRANSFORM')"
                                icon="ic_transform-data"
+                               :disabled="!dataTableList?.length"
+                               :show-select-marker="false"
                                block
                                @click="handleSelectPopperCondition(DATA_TABLE_TYPE.TRANSFORMED)"
                 />
@@ -384,7 +456,7 @@ watch(() => state.showPopover, (val) => {
                 <div class="popover-footer">
                     <p-button style-type="substitutive"
                               :disabled="state.disableConfirmButton"
-                              :loading="state.loading"
+                              :loading="widgetCreateLoading || dataTableAddLoading"
                               @click="handleConfirmDataSource"
                     >
                         {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
@@ -410,7 +482,7 @@ watch(() => state.showPopover, (val) => {
                                            value="operatorKey"
                                            label="a"
                                            block
-                                           @click="handleClickOperator(operatorInfo.key)"
+                                           @click="handleCreateUnsavedTransform(operatorInfo.key)"
                             >
                                 <div class="operator-card-contents">
                                     <p-i :name="operatorInfo.icon"
@@ -438,7 +510,7 @@ watch(() => state.showPopover, (val) => {
                                            value="operatorKey"
                                            label="a"
                                            block
-                                           @click="handleClickOperator(operatorInfo.key)"
+                                           @click="handleCreateUnsavedTransform(operatorInfo.key)"
                             >
                                 <div class="operator-card-contents">
                                     <p-i :name="operatorInfo.icon"

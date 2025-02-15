@@ -113,8 +113,8 @@ import {
 import type { KeyItem, ValueHandler } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ChangeHistoryListParameters } from '@/schema/inventory/change-history/api-verbs/list';
 import type { ChangeHistoryModel } from '@/schema/inventory/change-history/model';
 import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
