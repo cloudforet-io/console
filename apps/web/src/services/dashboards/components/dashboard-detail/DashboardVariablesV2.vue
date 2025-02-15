@@ -57,6 +57,10 @@ const state = reactive({
     globalVariables: computed<DashboardGlobalVariable[]>(() => {
         const properties = state.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
         const _usedProperties: DashboardGlobalVariable[] = Object.values(properties).filter((d) => d.use);
+        if (props.isProjectDashboard) {
+            const _usedPropertiesWithoutProject = getOrderedGlobalVariables(_usedProperties).filter((d) => d.key !== 'project_id');
+            return getOrderedGlobalVariables(_usedPropertiesWithoutProject);
+        }
         return getOrderedGlobalVariables(_usedProperties);
     }),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),

@@ -197,6 +197,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
         }
+        if (!!dashboardInfo.project_id && dashboardInfo.project_id !== '*') {
+            state.projectId = dashboardInfo.project_id;
+        }
         state.vars = dashboardInfo.vars ?? {};
         state.dashboard = dashboardInfo;
         const _dashboardInfo = cloneDeep(dashboardInfo);

@@ -13,10 +13,12 @@ import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboar
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import { usePrivateFolderApi } from '@/api-clients/dashboard/private-folder/composables/use-private-folder-api';
 import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -30,8 +32,8 @@ const STALE_TIME = 1000 * 60 * 5;
 interface UseDashboardQueryReturn {
     publicDashboardList: Ref<PublicDashboardModel[]>;
     privateDashboardList: Ref<PrivateDashboardModel[]>;
-    publicFolderList: Ref<FolderModel[]>;
-    privateFolderList: Ref<FolderModel[]>;
+    publicFolderList: Ref<PublicFolderModel[]>;
+    privateFolderList: Ref<PrivateFolderModel[]>;
     isLoading: ComputedRef<boolean>;
     keys: {
         publicDashboardListQueryKey: ComputedRef<QueryKey>;
