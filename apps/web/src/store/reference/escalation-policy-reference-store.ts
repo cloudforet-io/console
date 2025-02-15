@@ -11,13 +11,13 @@ import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-po
 import type { EscalationPolicyListParameters as EscalationPolicyListParametersV1 } from '@/schema/monitoring/escalation-policy/api-verbs/list';
 import type { EscalationPolicyModel as EscalationPolicyModelV1 } from '@/schema/monitoring/escalation-policy/model';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
-import config from '@/lib/config';
+
+import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -30,10 +30,10 @@ let lastLoadedTime = 0;
 
 export const useEscalationPolicyReferenceStore = defineStore('reference-escalation-policy', () => {
     const userStore = useUserStore();
-    const domainStore = useDomainStore();
     const state = reactive({
         items: null as EscalationPolicyReferenceMap | null,
     });
+    const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
     const getters = reactive({
         escalationPolicyItems: asyncComputed<EscalationPolicyReferenceMap>(async () => {
@@ -60,8 +60,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
 
         const referenceMap: EscalationPolicyReferenceMap = {};
         try {
-            const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
-            const fetcher = isAlertManagerVersionV2
+            const fetcher = isAlertManagerV2Enabled
                 ? SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
                     query: {
                         only: ['escalation_policy_id', 'name', 'service_id'],

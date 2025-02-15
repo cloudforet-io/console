@@ -11,13 +11,12 @@ import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { WebhookListParameters as WebhookListParametersV1 } from '@/schema/monitoring/webhook/api-verbs/list';
 import type { WebhookModel as WebhookModelV1 } from '@/schema/monitoring/webhook/model';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
-import config from '@/lib/config';
+import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -30,10 +29,11 @@ let lastLoadedTime = 0;
 
 export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
     const userStore = useUserStore();
-    const domainStore = useDomainStore();
     const state = reactive({
         items: null as WebhookReferenceMap | null,
     });
+
+    const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
     const getters = reactive({
         webhookItems: asyncComputed<WebhookReferenceMap>(async () => {
@@ -60,8 +60,7 @@ export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
 
         const referenceMap: WebhookReferenceMap = {};
         try {
-            const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
-            const fetcher = isAlertManagerVersionV2
+            const fetcher = isAlertManagerV2Enabled
                 ? SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>
                 : SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParametersV1, ListResponse<WebhookModelV1>>;
 
