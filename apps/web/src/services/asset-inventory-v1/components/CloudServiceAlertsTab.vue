@@ -13,7 +13,7 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';

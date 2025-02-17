@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import {
+    computed,
     onUnmounted,
-    reactive, ref, watch,
+    ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PSkeleton } from '@cloudforet/mirinae';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { SpaceRouter } from '@/router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
@@ -18,7 +21,9 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2
     from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 
 
@@ -27,53 +32,51 @@ interface Props {
     dashboardId: string;
 }
 const props = defineProps<Props>();
+const { getProperRouteLocation } = useProperRouteLocation();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+const route = useRoute();
 
-
-const state = reactive({
-    hasAlertConfig: false,
-    dashboardVariablesLoading: false,
+/* Query */
+const {
+    dashboard,
+    widgetList,
+    isError,
+    isLoading,
+    keys,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => route.params.dashboardId),
 });
 
-
-const handleUpdateDashboardVariables = async (params) => {
-    if (!props.dashboardId) return;
-    state.dashboardVariablesLoading = true;
-    try {
-        await dashboardStore.updateDashboard(props.dashboardId, params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.dashboardVariablesLoading = false;
-    }
-};
 const handleRefresh = async () => {
-    await dashboardDetailStore.listDashboardWidgets();
+    await queryClient.invalidateQueries({ queryKey: keys.publicWidgetListQueryKey.value });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
-/* api */
-const getDashboardDataAndListWidget = async (dashboardId: string) => {
-    try {
-        await dashboardDetailStore.getDashboardInfo({ dashboardId, fetchWidgets: true });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
-    if (!dashboardId || !props.id) return;
-    /* NOTE: The dashboard data is reset in first entering case */
-    if (dashboardId && !prevDashboardId) { // this includes all three cases
+watch([dashboard, () => route.params], ([_dashboard]) => {
+    if (_dashboard) {
         dashboardDetailStore.reset();
+        dashboardDetailStore.setDashboardInfoStoreStateV2({
+            ..._dashboard,
+            project_id: route.params.id,
+        });
     }
-    dashboardDetailStore.setProjectId(props.id);
-    await getDashboardDataAndListWidget(dashboardId);
 }, { immediate: true });
+watch(widgetList, (_widgetList) => {
+    if (_widgetList.length) {
+        dashboardDetailStore.setDashboardWidgets(_widgetList);
+    }
+});
+watch(isError, (error) => {
+    if (error) {
+        ErrorHandler.handleError(error);
+        SpaceRouter.router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL._NAME }));
+    }
+});
 
 onUnmounted(() => {
     dashboardDetailStore.reset();
@@ -84,7 +87,7 @@ onUnmounted(() => {
     <div class="project-dashboard-page">
         <div class="dashboard-wrapper">
             <div class="title-wrapper">
-                <p-skeleton v-if="!dashboardDetailGetters.dashboardName"
+                <p-skeleton v-if="!dashboard?.name"
                             width="20rem"
                             height="1.5rem"
                 />
@@ -92,7 +95,7 @@ onUnmounted(() => {
                      class="dashboard-title"
                 >
                     <p class="title">
-                        {{ dashboardDetailGetters.dashboardName }}
+                        {{ dashboard?.name }}
                     </p>
                     <span class="beta-mark">beta</span>
                 </div>
@@ -104,19 +107,18 @@ onUnmounted(() => {
                 <div class="toolset">
                     <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="dashboardDetailState.loadingWidgets"
+                                                :loading="isLoading"
                                                 disable-interval
                                                 @refresh="handleRefresh"
                     />
                 </div>
-                <div v-if="!dashboardDetailState.loadingDashboard"
+                <div v-if="!isLoading"
                      class="selectors"
                 >
                     <dashboard-variables-v2 class="variable-selector-wrapper"
                                             is-project-dashboard
-                                            :disable-save-button="dashboardDetailGetters.disableManageButtons"
-                                            :loading="state.dashboardVariablesLoading"
-                                            @update="handleUpdateDashboardVariables"
+                                            disable-save-button
+                                            :loading="isLoading"
                     />
                 </div>
                 <dashboard-widget-container-v2 ref="widgetContainerRef" />

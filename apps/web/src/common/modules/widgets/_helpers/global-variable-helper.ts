@@ -1,6 +1,6 @@
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DashboardVars } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 
 export const isGlobalVariableFormat = (value: string | MenuItem[]): boolean => {
     if (Array.isArray(value)) return false;

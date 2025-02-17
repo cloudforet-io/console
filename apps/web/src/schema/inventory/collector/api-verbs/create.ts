@@ -1,5 +1,5 @@
-import type { Tags } from '@/schema/_common/model';
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { Tags } from '@/api-clients/_common/schema/model';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type { CollectorPluginInfo } from '@/schema/inventory/collector/model';
 import type { Schedule, SecretFilter } from '@/schema/inventory/collector/type';
 

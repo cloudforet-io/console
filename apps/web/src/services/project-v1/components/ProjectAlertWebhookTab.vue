@@ -24,7 +24,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';
 import type { WebhookDisableParameters } from '@/schema/monitoring/webhook/api-verbs/disable';
 import type { WebhookEnableParameters } from '@/schema/monitoring/webhook/api-verbs/enable';
@@ -46,7 +46,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import ProjectAlertWebhookUpdateModal from '@/services/project-v1/components/ProjectAlertWebhookUpdateModal.vue';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project-v1/stores/project-detail-page-store';
 
 
@@ -209,7 +209,7 @@ const deleteWebhookConfirm = async () => {
 
 /* event */
 const onClickAdd = () => {
-    router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME });
+    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME });
 };
 const checkModalConfirm = async () => {
     if (checkModalState.mode === WEBHOOK_STATE.ENABLED) await enableWebhook();

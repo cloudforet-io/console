@@ -2,22 +2,22 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PDataTable, PI, PButtonModal, PRadioGroup, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PublicDashboardShareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/share';
-import type { PublicDashboardUnshareParameters } from '@/schema/dashboard/public-dashboard/api-verbs/unshare';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicFolderShareParameters } from '@/schema/dashboard/public-folder/api-verbs/share';
-import type { PublicFolderUnshareParameters } from '@/schema/dashboard/public-folder/api-verbs/unshare';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
+import type { PublicDashboardShareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/share';
+import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/unshare';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderShareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/share';
+import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/unshare';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -26,6 +26,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -48,18 +49,43 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
+    api,
+    keys,
+    queryClient,
+} = useDashboardQuery();
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
+    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
+    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+});
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     targetFolderId: computed<string|undefined>(() => props.folderId || state.targetDashboardItem?.folder_id),
-    targetFolderItem: computed<PublicFolderModel|undefined>(() => dashboardPageControlGetters.allFolderItems.find((f) => f.folder_id === state.targetFolderId)),
-    targetDashboardItem: computed<PublicDashboardModel|undefined>(() => dashboardPageControlGetters.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)),
+    targetFolderItem: computed<PublicFolderModel|undefined>(() => queryState.allFolderItems.find((f) => f.folder_id === state.targetFolderId)),
+    targetDashboardItem: computed<PublicDashboardModel|undefined>(() => queryState.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)),
     isShared: computed<boolean>(() => {
         if (props.folderId) return !!state.targetFolderItem?.shared;
         return !!state.targetDashboardItem?.shared;
@@ -81,7 +107,7 @@ const state = reactive({
             name: _folderName,
             type: 'FOLDER',
         }];
-        const _dashboardItems: DashboardDataTableItem[] = dashboardPageControlGetters.allDashboardItems
+        const _dashboardItems: DashboardDataTableItem[] = queryState.allDashboardItems
             .filter((d) => d.folder_id === state.targetFolderId)
             .map((d) => ({
                 id: d.dashboard_id,
@@ -134,78 +160,85 @@ const state = reactive({
 });
 
 /* Api */
-const shareFolder = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.dashboard.publicFolder.share<PublicFolderShareParameters>({
-            folder_id: state.targetFolderId || '',
-            scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
-    } catch (e: any) {
-        showErrorMessage(e.message, e);
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
+const shareFolder = () => {
+    folderShareMutate({
+        folder_id: state.targetFolderId || '',
+        scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
+    });
 };
-const unshareFolder = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.dashboard.publicFolder.unshare<PublicFolderUnshareParameters>({
-            folder_id: state.targetFolderId || '',
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
-    } catch (e: any) {
-        showErrorMessage(e.message, e);
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
+const unshareFolder = () => {
+    folderShareMutate({
+        folder_id: state.targetFolderId || '',
+    });
 };
-const shareDashboard = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.dashboard.publicDashboard.share<PublicDashboardShareParameters>({
-            dashboard_id: props.dashboardId || '',
-            scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
-    } catch (e: any) {
-        showErrorMessage(e.message, e);
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
+const shareDashboard = () => {
+    dashboardShareMutate({
+        dashboard_id: props.dashboardId || '',
+        scope: storeState.isAdminMode ? state.selectedTarget : 'PROJECT',
+    });
 };
-const unshareDashboard = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.dashboard.publicDashboard.unshare<PublicDashboardUnshareParameters>({
-            dashboard_id: props.dashboardId || '',
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
-    } catch (e: any) {
-        showErrorMessage(e.message, e);
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
+const unshareDashboard = () => {
+    dashboardShareMutate({
+        dashboard_id: props.dashboardId || '',
+    });
+};
+const folderSharefetcher = (params: PublicFolderShareParameters|PublicFolderUnshareParameters) => {
+    if (!state.isShared) {
+        return api.publicFolderAPI.share(params as PublicFolderShareParameters);
     }
+    return api.publicFolderAPI.unshare(params as PublicFolderUnshareParameters);
+};
+const dashboardShareFetcher = (params: PublicDashboardShareParameters|PublicDashboardUnshareParameters) => {
+    if (!state.isShared) {
+        return api.publicDashboardAPI.share(params as PublicDashboardShareParameters);
+    }
+    return api.publicDashboardAPI.unshare(params as PublicDashboardUnshareParameters);
 };
 
+const { mutate: folderShareMutate, isPending: folderLoading } = useMutation({
+    mutationFn: folderSharefetcher,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: keys.publicFolderListQueryKey.value });
+        if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
+        else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+    onSettled: () => {
+        dashboardPageControlStore.reset();
+        state.proxyVisible = false;
+    },
+});
+
+const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useMutation({
+    mutationFn: dashboardShareFetcher,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+        if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
+        else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+    onSettled: () => {
+        dashboardPageControlStore.reset();
+        state.proxyVisible = false;
+    },
+});
+
 /* Event */
-const handleConfirm = async () => {
+const handleConfirm = () => {
     if (!state.isShared) {
-        if (state.targetFolderId) await shareFolder();
-        else await shareDashboard();
+        if (state.targetFolderId) shareFolder();
+        else shareDashboard();
     } else if (state.targetFolderId) {
-        await unshareFolder();
+        unshareFolder();
     } else {
-        await unshareDashboard();
+        unshareDashboard();
     }
-    await dashboardStore.load();
-    dashboardPageControlStore.reset();
-    state.proxyVisible = false;
 };
 const handleChangeTarget = (value: 'WORKSPACE' | 'PROJECT') => {
     state.selectedTarget = value;
@@ -223,8 +256,8 @@ watch(() => state.proxyVisible, (visible) => {
     <p-button-modal :visible.sync="state.proxyVisible"
                     size="md"
                     :header-title="state.headerTitle"
-                    :loading="state.loading"
-                    :disabled="state.loading"
+                    :loading="folderLoading || dashboardLoading"
+                    :disabled="folderLoading || dashboardLoading"
                     :enable-scroll="true"
                     class="dashboard-folder-share-modal"
                     @confirm="handleConfirm"
@@ -255,7 +288,7 @@ watch(() => state.proxyVisible, (visible) => {
             </p-field-group>
             <p-data-table :items="state.modalTableItems"
                           :fields="TABLE_FIELDS"
-                          :loading="state.loading"
+                          :loading="folderLoading || dashboardLoading"
             >
                 <template #col-name-format="{item}">
                     <div class="table-column">

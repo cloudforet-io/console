@@ -7,7 +7,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

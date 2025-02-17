@@ -11,7 +11,7 @@ import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';

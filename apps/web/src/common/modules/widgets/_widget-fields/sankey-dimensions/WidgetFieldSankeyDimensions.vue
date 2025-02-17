@@ -14,15 +14,18 @@ import { i18n } from '@/translations';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import {
     widgetValidatorRegistry,
 } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { SankeyDimensionsOptions, SankeyDimensionsValue } from '@/common/modules/widgets/_widget-fields/sankey-dimensions/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
 
 
 
@@ -33,14 +36,22 @@ const props = defineProps<WidgetFieldComponentProps<SankeyDimensionsOptions>>();
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
+
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     fieldValue: computed<SankeyDimensionsValue>(() => props.fieldManager.data[FIELD_KEY].value),
     max: computed<number|undefined>(() => props.widgetFieldSchema?.options?.max),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (!widgetGenerateGetters.selectedDataTable) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.labels_info ?? {})) ?? [];
+        if (!state.selectedDataTable) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.labels_info ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,

@@ -1,27 +1,55 @@
 import type { ComputedRef } from 'vue';
-import { computed } from 'vue';
+import { reactive, computed } from 'vue';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
 
 interface UseDashboardControlMenuItems {
     isAdminMode: ComputedRef<boolean>;
     isWorkspaceOwner: ComputedRef<boolean>;
-    dashboardList?: ComputedRef<DashboardModel[]>;
-    folderList?: ComputedRef<FolderModel[]>;
 }
 interface UseDashboardControlMenuItemsReturn {
     getControlMenuItems: (id: string) => ComputedRef<MenuItem[]>|MenuItem[];
 }
 
 export const useDashboardControlMenuItems = ({
-    isAdminMode, isWorkspaceOwner, dashboardList, folderList,
+    isAdminMode, isWorkspaceOwner,
 }: UseDashboardControlMenuItems): UseDashboardControlMenuItemsReturn => {
+    const appContextStore = useAppContextStore();
+
+    /* Query */
+    const {
+        publicDashboardList,
+        privateDashboardList,
+        publicFolderList,
+        privateFolderList,
+    } = useDashboardQuery();
+
+    const queryState = reactive({
+        publicDashboardItems: computed(() => {
+            const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+            if (appContextStore.getters.isAdminMode) return _v2DashboardItems;
+            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        }),
+        privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
+        dashboardList: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
+        publicFolderItems: computed(() => {
+            if (appContextStore.getters.isAdminMode) return publicFolderList.value;
+            return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+        }),
+        privateFolderItems: computed(() => privateFolderList.value),
+        folderList: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+    });
+
     const _getDashboardManageable = (dashboard: DashboardModel): boolean => {
         if (dashboard.dashboard_id.startsWith('private')) return true;
         if (isAdminMode.value) return true;
@@ -40,7 +68,7 @@ export const useDashboardControlMenuItems = ({
     };
     const _getDashboardControlMenuItems = (dashboardId: string): ComputedRef<MenuItem[]>|MenuItem[] => {
         const _isPrivate = dashboardId.startsWith('private');
-        const _dashboard = dashboardList?.value.find((item) => item.dashboard_id === dashboardId);
+        const _dashboard = queryState.dashboardList.find((item) => item.dashboard_id === dashboardId);
         if (!_dashboard) return [];
 
         const _isDeprecated = _dashboard.version === '1.0';
@@ -94,7 +122,7 @@ export const useDashboardControlMenuItems = ({
     };
     const _getFolderControlMenuItems = (folderId: string): ComputedRef<MenuItem[]>|MenuItem[] => {
         const _isPrivate = folderId.startsWith('private');
-        const _folder = folderList?.value.find((item) => item.folder_id === folderId);
+        const _folder = queryState.folderList.find((item) => item.folder_id === folderId);
         if (!_folder) return [];
 
         const _isFolderManageable = _getFolderManageable(_folder);

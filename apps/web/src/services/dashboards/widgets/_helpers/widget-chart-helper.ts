@@ -2,9 +2,9 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { IDateAxisSettings } from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 
-import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
-import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { Granularity } from '@/api-clients/dashboard/_types/widget-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type {

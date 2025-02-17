@@ -21,7 +21,7 @@ import type {
 import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';

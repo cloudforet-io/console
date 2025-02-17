@@ -18,7 +18,7 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { NotificationDeleteParameters } from '@/schema/notification/notification/api-verbs/delete';
 import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
 import type { NotificationSetReadParameters } from '@/schema/notification/notification/api-verbs/set-read';

@@ -5,17 +5,18 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { TaskCategoryCreateParameters } from '@/schema/opsflow/task-category/api-verbs/create';
-import type { TaskCategoryDeleteParameters } from '@/schema/opsflow/task-category/api-verbs/delete';
-import type { TaskCategoryGetParameters } from '@/schema/opsflow/task-category/api-verbs/get';
-import type { TaskCategoryListParameters } from '@/schema/opsflow/task-category/api-verbs/list';
-import type { TaskCategoryUpdateParameters } from '@/schema/opsflow/task-category/api-verbs/update';
-import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { TaskCategoryCreateParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/create';
+import type { TaskCategoryDeleteParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/delete';
+import type { TaskCategoryGetParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/get';
+import type { TaskCategoryListParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/list';
+import type { TaskCategoryUpdateParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/update';
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 
 interface UseTaskCategoryStoreState {

@@ -1,4 +1,4 @@
-import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 
 import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 

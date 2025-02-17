@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -27,17 +25,11 @@ import { useDashboardSettingsStore } from '@/services/dashboards/stores/dashboar
 
 
 
-const dashboardStore = useDashboardStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardSettings = useDashboardSettingsStore();
 const userStore = useUserStore();
 dashboardSettings.initState(userStore.state.userId);
-const loadDashboard = async () => {
-    await dashboardStore.load();
-};
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], loadDashboard);
-callApiWithGrantGuard();
 
 </script>
 

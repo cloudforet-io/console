@@ -15,7 +15,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
 
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 import { useProjectPageStore } from '@/services/project-v1/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project-v1/types/project-type';
 
@@ -64,7 +64,7 @@ const state = reactive({
 
 const handleSelectProjectGroup = () => {
     router.push(getProperRouteLocation({
-        name: PROJECT_ROUTE_V1._NAME,
+        name: PROJECT_ROUTE._NAME,
         params: {
             projectGroupId: props.item.id as string,
         },

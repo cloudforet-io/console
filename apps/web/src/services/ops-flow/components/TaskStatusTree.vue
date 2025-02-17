@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import type { TaskStatusOption, TaskStatusType } from '@/schema/opsflow/task/type';
+import type { TaskStatusOption, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

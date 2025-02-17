@@ -28,7 +28,7 @@ import EscalationPolicyFormRulesInput from '@/services/alert-manager-v1/componen
 import { ACTION } from '@/services/alert-manager-v1/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
 import type { ActionMode } from '@/services/alert-manager-v1/types/alert-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 import type { ProjectTreeNodeData } from '@/services/project-v1/types/project-tree-type';
 
 const props = withDefaults(defineProps<{
@@ -185,7 +185,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         size="sm"
-                        :to="getProperRouteLocation({ name: PROJECT_ROUTE_V1._NAME })"
+                        :to="getProperRouteLocation({ name: PROJECT_ROUTE._NAME })"
                         :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
                         highlight
                 />

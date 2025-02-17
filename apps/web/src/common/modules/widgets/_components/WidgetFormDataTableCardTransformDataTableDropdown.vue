@@ -9,12 +9,14 @@ import { PI, PContextMenu, PFieldTitle } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableOperator } from '@/common/modules/widgets/types/widget-model';
 
 import { gray } from '@/styles/colors';
+
 
 interface Props {
     dataTableId: string;
@@ -29,8 +31,14 @@ const emit = defineEmits<{(e: 'update:data-table-info', value: TransformDataTabl
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const storeState = reactive({
-    dataTables: computed(() => widgetGenerateState.dataTables),
     isJoinRestricted: computed<boolean|undefined>(() => widgetGenerateState.joinRestrictedMap[props.dataTableId]),
 });
 
@@ -40,7 +48,7 @@ const state = reactive({
     proxyDataTableInfo: useProxyValue('dataTableInfo', props, emit),
     visibleMenu: false,
     secondaryVisibleMenu: false,
-    baseMenuItems: computed(() => storeState.dataTables
+    baseMenuItems: computed(() => dataTableList.value
         .filter((dataTable) => !dataTable.data_table_id.startsWith('UNSAVED-') && dataTable.data_table_id !== props.dataTableId)
         .map((dataTable) => ({
             label: dataTable.name,
@@ -168,7 +176,7 @@ watch(() => props.dataTableInfo, (newVal) => {
                      :class="{'select-button': true,
                               selected: !!state.selected,
                               disabled: props.isLegacyDataTable,
-                              error: state.selected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.selected?.[0]?.name)
+                              error: state.selected && !dataTableList.some((dataTable) => dataTable.data_table_id === state.selected?.[0]?.name)
                      }"
                      @click="handleClickSelectButton(false)"
                 >
@@ -210,7 +218,7 @@ watch(() => props.dataTableInfo, (newVal) => {
                 <div ref="targetRef"
                      :class="{'select-button': true,
                               selected: !!state.secondarySelected,
-                              error: (state.secondarySelected && !storeState.dataTables.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name))
+                              error: (state.secondarySelected && !dataTableList.some((dataTable) => dataTable.data_table_id === state.secondarySelected?.[0]?.name))
                                   || storeState.isJoinRestricted,
                               [props.operator]: true
                      }"

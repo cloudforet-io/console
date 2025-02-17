@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { NoteCreateParameters } from '@/schema/alert-manager/note/api-verbs/create';
 import type { NoteDeleteParameters } from '@/schema/alert-manager/note/api-verbs/delete';

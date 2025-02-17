@@ -3,8 +3,8 @@ import { computed, reactive, toRef } from 'vue';
 
 import { flattenDeep } from 'lodash';
 
-import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetConfig, WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import type { DashboardLayoutWidgetInfo } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { WidgetConfig, WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 
 import {
     widgetThemeAssigner,

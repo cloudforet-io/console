@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
-    computed, defineExpose, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
@@ -12,26 +12,20 @@ import type {
 import { init } from 'echarts/core';
 import { isEmpty, orderBy, throttle } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PrivateWidgetLoadParameters } from '@/schema/dashboard/private-widget/api-verbs/load';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
-import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+import type { WidgetLoadParams, WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetInitAndRefresh } from '@/common/modules/widgets/_composables/use-widget-init-and-refresh';
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     normalizeAndSerializeVars,
 } from '@/common/modules/widgets/_helpers/global-variable-helper';
-import {
-    normalizeAndSerializeDataTableOptions,
-} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
-import { getFormattedNumber, getWidgetDataTable } from '@/common/modules/widgets/_helpers/widget-helper';
+import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
 import type { FormatRulesValue, ThresholdValue } from '@/common/modules/widgets/_widget-fields/format-rules/type';
@@ -39,7 +33,7 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { WidgetLoadResponse } from '@/common/modules/widgets/types/widget-data-type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
@@ -47,19 +41,25 @@ import type {
 
 import { gray } from '@/styles/colors';
 
+
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
+
+const { keys, api } = useWidgetFormQuery({
+    widgetId: computed(() => props.widgetId),
+    preventLoad: true,
+});
+
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
     baseOnDate: computed(() => props.dashboardOptions?.date_range?.end),
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const state = reactive({
-    runQueries: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
-    dataTable: undefined as PublicDataTableModel|PrivateDataTableModel|undefined,
+    dataTable: undefined as DataTableModel|undefined,
 
     unit: computed<string|undefined>(() => {
         if (!widgetOptionsState.dataFieldInfo?.data) return undefined;
@@ -129,6 +129,7 @@ const state = reactive({
         });
         return _color;
     }),
+    dataTableLoading: false,
 });
 
 const widgetOptionsState = reactive({
@@ -142,24 +143,26 @@ const widgetOptionsState = reactive({
 
 
 /* Api */
-const fetchWidgetData = async (params: PrivateWidgetLoadParameters|PublicWidgetLoadParameters): Promise<WidgetLoadResponse> => {
+const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResponse> => {
     const defaultFetcher = state.isPrivateWidget
-        ? SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>
-        : SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>;
+        ? api.privateWidgetAPI.load
+        : api.publicWidgetAPI.load;
     const res = await defaultFetcher(params);
     return res;
 };
 
 const queryKey = computed(() => [
-    'widget-load-gauge',
+    ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
+    props.dashboardId,
     props.widgetId,
+    props.widgetName,
     {
         start: dateRange.value.start,
         end: dateRange.value.end,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: state.dataTable?.data_table_id,
-        dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
+        dataTableId: props.dataTableId,
+        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
+        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
         vars: normalizeAndSerializeVars(props.dashboardVars),
     },
 ]);
@@ -173,11 +176,11 @@ const queryResult = useQuery({
         end: dateRange.value.end,
         vars: props.dashboardVars,
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && state.runQueries),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isFetching.value);
+const widgetLoading = computed<boolean>(() => queryResult.isFetching.value || state.dataTableLoading);
 const errorMessage = computed<string|undefined>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResult.error?.value?.message;
@@ -188,11 +191,6 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
     if (isEmpty(rawData)) return;
     state.chartData = rawData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] || 0;
 };
-const loadWidget = (forceLoad?: boolean) => {
-    state.runQueries = true;
-    if (forceLoad) queryResult.refetch();
-};
-
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
@@ -209,15 +207,28 @@ watch([() => state.chartData, () => chartContext.value, () => props.widgetOption
 });
 watch([() => state.data, () => props.widgetOptions], ([newData]) => {
     drawChart(newData);
-});
-
-useWidgetInitAndRefresh({ props, emit, loadWidget });
+}, { immediate: true });
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
-    state.dataTable = await getWidgetDataTable(newDataTableId);
+    state.dataTableLoading = true;
+    const fetcher = state.isPrivateWidget
+        ? api.privateDataTableAPI.get
+        : api.publicDataTableAPI.get;
+    try {
+        state.dataTable = await fetcher({ data_table_id: newDataTableId });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.dataTableLoading = false;
+    }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
-    loadWidget,
+    loadWidget: () => {
+        queryResult.refetch();
+    },
+});
+onMounted(() => {
+    emit('mounted', props.widgetName);
 });
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();

@@ -10,15 +10,14 @@ import {
 } from '@cloudforet/mirinae';
 import { getClonedName } from '@cloudforet/utils';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { SpaceRouter } from '@/router';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
-import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,6 +26,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
@@ -43,19 +43,33 @@ const TABLE_FIELDS = [
 ];
 const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
-const dashboardStore = useDashboardStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
+
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    keys,
+    api,
+    queryClient,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     bundleCaseType: computed(() => {
         if (!isEmpty(dashboardCreatePageState.selectedOotbIdMap)) return 'TEMPLATE';
         return 'EXISTING';
@@ -75,8 +89,8 @@ const state = reactive({
             type: 'DASHBOARD',
         }));
     }),
-    existingPublicDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.publicDashboardItems.map((d) => d.name)),
-    existingPrivateDashboardNameList: computed<string[]>(() => dashboardPageControlGetters.privateDashboardItems.map((d) => d.name)),
+    existingPublicDashboardNameList: computed<string[]>(() => state.publicDashboardItems.map((d) => d.name)),
+    existingPrivateDashboardNameList: computed<string[]>(() => state.privateDashboardItems.map((d) => d.name)),
 });
 
 /* Util */
@@ -112,7 +126,10 @@ const createBundleOotb = async () => {
         if (storeState.isWorkspaceMember) {
             _createType = 'PRIVATE';
         }
-        _promises.push(dashboardStore.createDashboard(_createType, _dashboardParams));
+        const fetcher = _createType === 'PRIVATE'
+            ? api.privateDashboardAPI.create
+            : api.publicDashboardAPI.create;
+        _promises.push(fetcher(_dashboardParams));
     }));
     const _results = await Promise.allSettled(_promises);
     const _fulfilledResults = _results.filter((r) => r.status === 'fulfilled');
@@ -135,7 +152,8 @@ const handleChangePrivate = (id: string, value: boolean) => {
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
     await createBundleOotb();
-    await dashboardStore.load();
+    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
     await SpaceRouter.router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE._NAME,
     }));

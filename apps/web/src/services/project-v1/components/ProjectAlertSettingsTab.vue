@@ -11,8 +11,8 @@ import {
     PI, PIconButton, PPaneLayout, PButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
@@ -39,7 +39,7 @@ import ProjectAlertSettingsEscalationPolicyChangeModal
     from '@/services/project-v1/components/ProjectAlertSettingsEscalationPolicyChangeModal.vue';
 import ProjectAlertSettingsNotificationPolicyUpdateModal
     from '@/services/project-v1/components/ProjectAlertSettingsNotificationPolicyUpdateModal.vue';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface NotificationUrgencyOption {
     name: ProjectAlertConfigNotiUrgency;
@@ -130,7 +130,7 @@ const onClickChangeEscalationPolicy = () => {
 };
 const onClickEditEventRule = () => {
     router.push({
-        name: PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME,
+        name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
         params: { projectId: props.id ?? '' },
     }).catch(() => {});
 };

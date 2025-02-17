@@ -1,62 +1,10 @@
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
 import type { QueryTag } from '@cloudforet/mirinae/src/controls/search/query-search-tags/type';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
-
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
-import type { FolderModel } from '@/schema/dashboard/_types/folder-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PrivateFolderModel } from '@/schema/dashboard/private-folder/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
-import type { PublicFolderModel } from '@/schema/dashboard/public-folder/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useUserStore } from '@/store/user/user-store';
-
-import {
-    getDashboardTreeData,
-} from '@/services/dashboards/helpers/dashboard-tree-data-helper';
-import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
-
-
-
-const _isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
-    const _selectedIdList: string[] = Object.entries(selectedIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
-    if (_selectedIdList.length === 0) return true;
-    let result = false;
-    _selectedIdList.forEach((id) => {
-        if (result) return;
-        const _isFolder = id.includes('folder');
-        if (_isFolder) {
-            const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
-            _childrenDashboards?.forEach((child) => {
-                if (child?.shared && child?.scope === 'WORKSPACE') {
-                    result = true;
-                }
-            });
-        } else {
-            const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
-            if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
-                result = true;
-            }
-        }
-    });
-    return result;
-};
 
 export const useDashboardPageControlStore = defineStore('page-dashboard-control', () => {
-    const appContextStore = useAppContextStore();
-    const dashboardStore = useDashboardStore();
-    const dashboardState = dashboardStore.state;
-    const userStore = useUserStore();
-    const storeState = reactive({
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    });
     const state = reactive({
         // folder
         folderFormModalVisible: false,
@@ -80,58 +28,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         selectedPrivateIdMap: {} as Record<string, boolean>,
         newIdList: [] as string[],
         searchQueryTags: [] as QueryTag[],
-    });
-    const getters = reactive({
-        // admin
-        adminTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
-            const _selectedPublicIdList: string[] = Object.entries(state.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
-            return {
-                clone: _selectedPublicIdList.length === 0,
-                move: _selectedPublicIdList.length === 0,
-                delete: _selectedPublicIdList.length === 0,
-            };
-        }),
-        // public (only for dashboard page, so project dashboards are excluded)
-        publicDashboardItems: computed<PublicDashboardModel[]>(() => {
-            const _v2DashboardItems = dashboardState.publicDashboardItems.filter((d) => d.version !== '1.0');
-            if (storeState.isAdminMode) return _v2DashboardItems;
-            return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-        }),
-        publicFolderItems: computed<PublicFolderModel[]>(() => {
-            if (storeState.isAdminMode) return dashboardState.publicFolderItems;
-            return dashboardState.publicFolderItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-        }),
-        publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.publicFolderItems, getters.publicDashboardItems, state.newIdList)),
-        publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
-            const _selectedPublicIdList: string[] = Object.entries(state.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
-            return {
-                clone: _selectedPublicIdList.length === 0,
-                move: _isPublicControlButtonDisabled(getters.publicDashboardItems, state.selectedPublicIdMap),
-                delete: _isPublicControlButtonDisabled(getters.publicDashboardItems, state.selectedPublicIdMap),
-            };
-        }),
-        // private
-        privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardState.privateDashboardItems.filter((d) => d.version !== '1.0')),
-        privateFolderItems: computed<PrivateFolderModel[]>(() => dashboardState.privateFolderItems),
-        privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(getters.privateFolderItems, getters.privateDashboardItems, state.newIdList)),
-        privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
-            const _selectedPrivateIdList: string[] = Object.entries(state.selectedPrivateIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
-            return {
-                clone: _selectedPrivateIdList.length === 0,
-                move: _selectedPrivateIdList.length === 0,
-                delete: _selectedPrivateIdList.length === 0,
-            };
-        }),
-        // deprecated (version 1.0)
-        deprecatedDashboardItems: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => {
-            const _publicDeprecated = dashboardState.publicDashboardItems.filter((d) => d.version === '1.0');
-            const _privateDeprecated = dashboardState.privateDashboardItems.filter((d) => d.version === '1.0');
-            return [..._publicDeprecated, ..._privateDeprecated];
-        }),
-        // etc
-        allDashboardItems: computed<DashboardModel[]>(() => [...getters.publicDashboardItems, ...getters.privateDashboardItems]),
-        allFolderItems: computed<FolderModel[]>(() => [...getters.publicFolderItems, ...getters.privateFolderItems]),
-        loading: computed<boolean>(() => dashboardState.loading),
     });
 
     /* Mutations */
@@ -304,7 +200,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
 
     return {
         state,
-        getters,
         ...mutations,
         ...actions,
     };

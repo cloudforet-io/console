@@ -27,7 +27,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import { numberFormatter } from '@cloudforet/utils';
 
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -64,7 +64,7 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 
 type CostAnalyzeRawData = {
@@ -640,13 +640,13 @@ watch(
                 #tf-col-format="{field, colIndex, values}"
             >
                 <span v-if="colIndex === 0">Total</span>
-                <span v-else-if="tableState.showFormattedData
+                <span v-else-if="tableState.showFormattedData && field.name !== 'usage_unit'
                     && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
                         && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
                 >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
                 </span>
-                <span v-else-if="!tableState.showFormattedData
+                <span v-else-if="!tableState.showFormattedData && field.name !== 'usage_unit'
                     && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
                         && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
                 >

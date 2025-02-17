@@ -11,6 +11,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     FORMAT_RULE_TYPE,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
@@ -21,20 +22,30 @@ import type {
     FormatRulesValue, FormatRulesOptions, ThresholdValue, FormatRulesType,
 
 } from '@/common/modules/widgets/_widget-fields/format-rules/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
 
 
 const FIELD_KEY = 'formatRules';
 
 const props = defineProps<WidgetFieldComponentProps<FormatRulesOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
     type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
     invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
@@ -59,8 +70,8 @@ const state = reactive({
     }),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
-        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        if (!state.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,

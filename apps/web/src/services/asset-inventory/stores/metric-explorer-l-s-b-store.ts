@@ -5,8 +5,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { NamespaceGroupListParameters } from '@/schema/inventory-v2/namespace-group/api-verbs/list';
 import type { NamespaceGroupModel } from '@/schema/inventory-v2/namespace-group/model';
 import type { NamespaceGetParameters } from '@/schema/inventory-v2/namespace/api-verbs/get';

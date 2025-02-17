@@ -261,7 +261,7 @@ export default defineComponent<Props>({
     top: $top-bar-height;
     left: 0;
     flex-direction: column;
-    z-index: 1030;
+    z-index: 1020;
 
     /* transition: opacity 0.3s ease; */
     max-height: 100%;

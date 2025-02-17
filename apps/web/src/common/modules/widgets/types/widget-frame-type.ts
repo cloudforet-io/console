@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
 
 import type { WidgetFieldValue } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';

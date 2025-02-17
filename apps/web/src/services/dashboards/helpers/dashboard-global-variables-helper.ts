@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import { DASHBOARD_VARS_SCHEMA_PRESET } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 

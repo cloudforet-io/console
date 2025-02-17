@@ -14,7 +14,7 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
 import { i18n } from '@/translations';

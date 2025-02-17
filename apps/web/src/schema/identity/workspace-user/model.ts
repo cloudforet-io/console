@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { UserGroupPerUserModel } from '@/schema/identity/user/model';

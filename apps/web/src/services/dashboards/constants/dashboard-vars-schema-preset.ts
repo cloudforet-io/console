@@ -1,4 +1,4 @@
-import type { DashboardGlobalVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardGlobalVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 
 
 

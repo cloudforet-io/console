@@ -2,19 +2,24 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { useMutation } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+
 
 
 interface Props {
@@ -29,9 +34,22 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string): void;
 }>();
 
-const dashboardStore = useDashboardStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    keys,
+    queryClient,
+} = useDashboardQuery();
+const {
+    fetcher,
+    keys: dashboardDetailKeys,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const route = useRoute();
+
+const appContextStore = useAppContextStore();
 const {
     forms: {
         _name,
@@ -44,7 +62,7 @@ const {
     _name: '',
 }, {
     _name(value: string) {
-        if (state.loading) return '';
+        if (loading.value) return '';
         if (value === state.originName) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
@@ -52,38 +70,57 @@ const {
         return '';
     },
 });
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
     originName: computed<string>(() => {
-        const _dashboard = dashboardPageControlGetters.allDashboardItems.find((item: DashboardModel) => item.dashboard_id === props.dashboardId);
+        const _dashboard = [...state.publicDashboardItems, ...state.privateDashboardItems].find((item: DashboardModel) => item.dashboard_id === props.dashboardId);
         return _dashboard?.name || '';
     }),
     dashboardNameList: computed<string[]>(() => {
-        if (props.dashboardId.startsWith('private')) return dashboardPageControlGetters.privateDashboardItems.map((d) => d.name);
-        return dashboardPageControlGetters.publicDashboardItems.map((d) => d.name);
+        if (props.dashboardId.startsWith('private')) return state.privateDashboardItems.map((d) => d.name);
+        return state.publicDashboardItems.map((d) => d.name);
     }),
+    isDetailPage: computed(() => route.params.dashboardId !== undefined),
 });
 
-const updateDashboard = async () => {
-    try {
-        await dashboardStore.updateDashboard(props.dashboardId, {
-            dashboard_id: props.dashboardId,
-            name: _name.value,
-        });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
-    }
-};
+const { mutate, isPending: loading } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: DashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+            if (state.isDetailPage) {
+                const dashboardQueryKey = isPrivate ? dashboardDetailKeys.privateDashboardQueryKey : dashboardDetailKeys.publicDashboardQueryKey;
+                queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            }
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
+        },
+        onSettled() {
+            state.proxyVisible = false;
+        },
+    },
+);
 
 const handleConfirm = async () => {
-    state.loading = true;
-    await updateDashboard();
-    state.proxyVisible = false;
-    state.loading = false;
+    mutate({
+        dashboard_id: props.dashboardId,
+        name: _name.value,
+    });
 };
 
-const handleUpdateVisible = (visible) => {
+const handleUpdateVisible = (visible: boolean) => {
     state.proxyVisible = visible;
 };
 
@@ -103,8 +140,8 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
-                           :invalid="!state.loading && invalidState._name"
-                           :invalid-text="state.loading ? '' : invalidTexts._name"
+                           :invalid="!loading && invalidState._name"
+                           :invalid-text="loading ? '' : invalidTexts._name"
                            required
             >
                 <template #default="{invalid}">

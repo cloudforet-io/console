@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
@@ -18,7 +18,7 @@ import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 export interface AlertCount {
     state: AlertState;
@@ -76,7 +76,7 @@ export const useProjectDetailPageStore = defineStore('page-project-v1-detail', (
             });
         } catch (e) {
             state.currentProject = undefined;
-            ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE_V1._NAME }));
+            ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
         } finally {
             state.loading = false;
         }

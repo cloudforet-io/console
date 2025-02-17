@@ -9,7 +9,7 @@ import {
     PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 

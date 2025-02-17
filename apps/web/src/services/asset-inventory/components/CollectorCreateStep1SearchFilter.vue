@@ -122,7 +122,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 

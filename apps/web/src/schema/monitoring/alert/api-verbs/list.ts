@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import type {
     AlertSeverity, AlertState, AlertUrgency,

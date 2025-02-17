@@ -13,7 +13,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';
 import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';

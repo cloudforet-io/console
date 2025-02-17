@@ -3,7 +3,7 @@ import type { RouteConfig } from 'vue-router';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 const ProjectContainer = () => import('@/services/project-v1/ProjectContainer.vue');
 
@@ -27,7 +27,7 @@ export default {
     children: [
         {
             path: ':projectGroupId?',
-            name: PROJECT_ROUTE_V1._NAME,
+            name: PROJECT_ROUTE._NAME,
             meta: {
                 menuId: MENU_ID.PROJECT,
                 lsbVisible: true,
@@ -37,35 +37,35 @@ export default {
         },
         {
             path: 'detail/:id',
-            name: PROJECT_ROUTE_V1.DETAIL._NAME,
-            redirect: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+            name: PROJECT_ROUTE.DETAIL._NAME,
+            redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: ProjectDetailPage,
             children: [
                 {
                     path: '/',
-                    name: PROJECT_ROUTE_V1.DETAIL.TAB._NAME,
-                    redirect: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+                    name: PROJECT_ROUTE.DETAIL.TAB._NAME,
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailTabPage,
                     children: [
                         {
                             path: 'summary',
-                            name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+                            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             meta: { lsbVisible: true },
                             props: true,
                             component: ProjectSummaryPage,
                         },
                         {
                             path: 'alert',
-                            name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
+                            name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                             meta: { lsbVisible: true },
                             props: true,
                             component: ProjectAlertPage,
                         },
                         {
                             path: 'notification',
-                            name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME,
+                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                             meta: { lsbVisible: true },
                             props: true,
                             component: ProjectNotificationsPage,
@@ -76,7 +76,7 @@ export default {
                         },
                         {
                             path: 'dashboard/:dashboardId',
-                            name: PROJECT_ROUTE_V1.DETAIL.TAB.DASHBOARD._NAME,
+                            name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
                             meta: { lsbVisible: true },
                             props: true,
                             component: ProjectDashboardPage,
@@ -85,21 +85,21 @@ export default {
                 },
                 {
                     path: 'event-rule',
-                    name: PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME,
+                    name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
                     props: (route) => ({ projectId: route.params.id }),
                     meta: { lsbVisible: true },
                     component: ProjectAlertEventRulePage,
                 },
                 {
                     path: 'notification/:protocolId',
-                    name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+                    name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
                     meta: { lsbVisible: true },
                     component: ProjectNotificationAddPage,
                     props: true,
                 },
                 {
                     path: 'webhook/create',
-                    name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
+                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
                     meta: { centeredLayout: true },
                     component: ProjectAlertWebhookCreatePage,
                 },

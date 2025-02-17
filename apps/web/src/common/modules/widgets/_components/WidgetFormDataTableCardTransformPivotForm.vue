@@ -5,15 +5,12 @@ import {
 
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PRadioGroup, PRadio, PI,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
-import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
+import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
 import { i18n } from '@/translations';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,12 +18,14 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { PivotOptions } from '@/common/modules/widgets/types/widget-model';
+
 
 const props = defineProps<TransformDataTableProps<PivotOptions>>();
 
@@ -35,6 +34,14 @@ const emit = defineEmits<{(e: 'update:operator-options', value: PivotOptions): v
 }>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+
+/* Query */
+const {
+    dataTableList,
+    api,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const dataTableInfo = ref<TransformDataTableInfo>({
     dataTableId: props.originData?.data_table_id,
@@ -45,13 +52,10 @@ const limitInfo = ref<PivotOptions['limit']>(props.originData.limit);
 const functionInfo = ref<PivotOptions['function']>(props.originData.function);
 const orderByInfo = ref<PivotOptions['order_by']>(props.originData.order_by);
 
-const storeState = reactive({
-    dataTables: computed(() => widgetGenerateState.dataTables),
-});
 const state = reactive({
     isInitiated: true,
     proxyOperatorOptions: useProxyValue<PivotOptions>('operatorOptions', props, emit),
-    selectedDataTable: computed(() => storeState.dataTables.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
+    selectedDataTable: computed(() => dataTableList.value.find((dataTable) => dataTable.data_table_id === dataTableInfo.value.dataTableId)),
     labelFieldItems: computed<MenuItem[]>(() => {
         if (!state.selectedDataTable) return [];
         const labelsInfo = state.selectedDataTable.labels_info;
@@ -177,8 +181,8 @@ const fetchAndExtractDynamicField = async () => {
     if (!dataTableInfo.value?.dataTableId || !fieldsInfo.value?.column) return;
     const _isPrivate = dataTableInfo.value?.dataTableId.startsWith('private');
     const _fetcher = _isPrivate
-        ? SpaceConnector.clientV2.dashboard.privateDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>
-        : SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, string>>>;
+        ? api.privateDataTableAPI.load
+        : api.publicDataTableAPI.load;
     try {
         state.dynamicFieldLoading = true;
         const res = await _fetcher({

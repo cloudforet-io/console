@@ -24,9 +24,9 @@ import type {
     DynamicLayoutOptions,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import { QueryType } from '@/schema/_common/api-verbs/export';
-import type { ExportParameter } from '@/schema/_common/api-verbs/export';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
+import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
@@ -65,7 +65,7 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory/types/type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 
 interface Props {

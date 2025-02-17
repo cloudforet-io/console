@@ -1,4 +1,4 @@
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_FILTER_ITEM_MAP,

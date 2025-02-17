@@ -6,7 +6,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PDefinitionTable, PLink } from '@cloudforet/mirinae';
 
-import type { CostReportSendParameters } from '@/schema/cost-analysis/cost-report/api-verbs/send';
+import type { CostReportSendParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/send';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';

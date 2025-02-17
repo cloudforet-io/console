@@ -13,9 +13,9 @@ import {
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';

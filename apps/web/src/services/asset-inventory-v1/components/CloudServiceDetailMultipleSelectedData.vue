@@ -20,9 +20,9 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 
-import { QueryType } from '@/schema/_common/api-verbs/export';
-import type { ExportParameter } from '@/schema/_common/api-verbs/export';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
+import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
@@ -44,7 +44,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BASE_INFORMATION } from '@/services/asset-inventory-v1/constants/cloud-service-detail-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface Props {
     cloudServiceIdList: string[];

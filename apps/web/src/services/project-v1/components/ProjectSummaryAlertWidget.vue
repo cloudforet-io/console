@@ -15,7 +15,7 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
@@ -32,7 +32,7 @@ import { alert, secondary } from '@/styles/colors';
 import AlertListItem from '@/services/alert-manager-v1/components/AlertListItem.vue';
 import { ALERT_ASSIGNED_FILTER } from '@/services/alert-manager-v1/constants/alert-constant';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager-v1/types/alert-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface AlertState {
     name: string;
@@ -94,7 +94,7 @@ const state = reactive({
 
 /* util */
 const alertLinkFormatter = (alertState): Location => ({
-    name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
+    name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
     query: {
         state: alertState,
     } as AlertListPageUrlQuery,

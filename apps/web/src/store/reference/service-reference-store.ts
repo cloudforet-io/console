@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
@@ -17,6 +17,7 @@ import type {
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
+import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -30,6 +31,7 @@ let lastLoadedTime = 0;
 export const useServiceReferenceStore = defineStore('reference-service', () => {
     const userStore = useUserStore();
     const domainStore = useDomainStore();
+    const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
     const state = reactive({
         items: null as ServiceReferenceMap | null,
@@ -67,6 +69,7 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
             },
         };
 
+        if (!isAlertManagerV2Enabled) return;
         try {
             const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>(params);
 

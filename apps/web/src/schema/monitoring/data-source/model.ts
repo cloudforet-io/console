@@ -1,6 +1,6 @@
 import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { MonitoringType } from '@/schema/monitoring/data-source/type';
 
 

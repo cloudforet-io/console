@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/_common/model';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { CloudServiceState } from '@/schema/inventory/cloud-service/type';
 
 export interface CloudServiceModel {

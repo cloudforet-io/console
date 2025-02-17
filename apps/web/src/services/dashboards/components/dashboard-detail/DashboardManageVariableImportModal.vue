@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
     PButton, PButtonModal, PCheckbox, PSearch, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
-import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard/model';
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,33 +24,59 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
 
 interface Props {
     visible: boolean;
 }
-const dashboardStore = useDashboardStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
+const appContextStore = useAppContextStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
+} = useDashboardQuery();
+const {
+    dashboard,
+    fetcher,
+    keys,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     currentDashboardId: computed<string>(() => dashboardDetailState.dashboardId || ''),
-    currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties)),
+    currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboard.value?.vars_schema?.properties ?? {})),
     keyword: '',
     selectedDashboardId: '' as string|undefined,
-    publicDashboardItems: computed<PublicDashboardModel[]>(() => dashboardPageControlGetters.publicDashboardItems.filter((item) => item.dashboard_id !== state.currentDashboardId)),
-    privateDashboardItems: computed<PrivateDashboardModel[]>(() => dashboardPageControlGetters.privateDashboardItems.filter((item) => item.dashboard_id !== state.currentDashboardId)),
+    publicDashboardItems: computed<PublicDashboardModel[]>(() => {
+        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId);
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed<PrivateDashboardModel[]>(() => privateDashboardList.value.filter((d) => d.version !== '1.0' && d.dashboard_id !== state.currentDashboardId)),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
     allDashboardItems: computed<PrivateDashboardModel[]>(() => [...state.publicDashboardItems, ...state.privateDashboardItems]),
     selectedDashboardVariables: computed<DashboardGlobalVariable[]>(() => {
         const selectedDashboard = state.allDashboardItems.find((item) => item.dashboard_id === state.selectedDashboardId);
@@ -68,30 +95,23 @@ const state = reactive({
 
 
 /* Api */
-const updateUseDashboardVarsSchema = async (dashboardId: string) => {
-    try {
-        const _dashboardVarsSchemaProperties = cloneDeep(dashboardDetailGetters.dashboardVarsSchemaProperties);
-        state.selectedDashboardVariables
-            .filter((variable) => state.selectedVariableKeys.includes(variable.key))
-            .forEach((variable) => {
-                _dashboardVarsSchemaProperties[variable.key] = {
-                    ...variable,
-                    use: false,
-                    created_by: userStore.state.userId,
-                };
-            });
-        await dashboardStore.updateDashboard(dashboardId, {
-            dashboard_id: dashboardId,
-            vars_schema: {
-                properties: _dashboardVarsSchemaProperties,
-            },
-        });
-        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
-    }
-};
-
+const { mutate } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_S_UPDATE_DASHBOARD_VARS_SCHEMA'), '');
+        },
+        onError: (e) => {
+            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.DETAIL.VARIABLES.ALT_E_UPDATE_DASHBOARD_VARS_SCHEMA'));
+        },
+        onSettled() {
+            state.proxyVisible = false;
+        },
+    },
+);
 
 /* Event */
 const handleChangeSelectedVariableKeys = (selected: string[]) => {
@@ -103,11 +123,24 @@ const handleChangeAllSelectedVariables = (selected: boolean) => {
 const handleClickClearAll = () => {
     state.selectedVariableKeys = [];
 };
-const handleConfirmImportVariables = async () => {
-    await updateUseDashboardVarsSchema(state.currentDashboardId);
-    state.proxyVisible = false;
+const handleConfirmImportVariables = () => {
+    const _dashboardVarsSchemaProperties = cloneDeep(dashboard.value?.vars_schema?.properties ?? {});
+    state.selectedDashboardVariables
+        .filter((variable) => state.selectedVariableKeys.includes(variable.key))
+        .forEach((variable) => {
+            _dashboardVarsSchemaProperties[variable.key] = {
+                ...variable,
+                use: false,
+                created_by: userStore.state.userId,
+            };
+        });
+    mutate({
+        dashboard_id: state.currentDashboardId,
+        vars_schema: {
+            properties: _dashboardVarsSchemaProperties,
+        },
+    });
 };
-
 
 const isDuplicatedVariableName = (variable: DashboardGlobalVariable): boolean => state.currentDashboardVariables.some((currentVariable) => currentVariable.name === variable.name
     || currentVariable.key === variable.key);
@@ -135,7 +168,7 @@ watch(() => state.selectedDashboardId, () => {
         <template #body>
             <div class="import-contents">
                 <div class="left-dashboard-variable-tree-contents">
-                    <l-s-b-collapsible-menu-item v-if="state.publicDashboardItems.length || dashboardPageControlGetters.publicFolderItems.length"
+                    <l-s-b-collapsible-menu-item v-if="state.publicDashboardItems.length || publicFolderItems.length"
                                                  class="category-menu-item mt-1"
                                                  :item="{
                                                      type: 'collapsible',
@@ -148,11 +181,12 @@ watch(() => state.selectedDashboardId, () => {
                         <template #collapsible-contents>
                             <dashboard-manage-variable-import-modal-tree type="PUBLIC"
                                                                          :dashboards="state.publicDashboardItems"
+                                                                         :folders="state.publicFolderItems"
                                                                          :selected.sync="state.selectedDashboardId"
                             />
                         </template>
                     </l-s-b-collapsible-menu-item>
-                    <l-s-b-collapsible-menu-item v-if="state.privateDashboardItems.length || dashboardPageControlGetters.privateFolderItems.length"
+                    <l-s-b-collapsible-menu-item v-if="state.privateDashboardItems.length || privateFolderItems.length"
                                                  class="category-menu-item mt-1"
                                                  :item="{
                                                      type: 'collapsible',
@@ -165,6 +199,7 @@ watch(() => state.selectedDashboardId, () => {
                         <template #collapsible-contents>
                             <dashboard-manage-variable-import-modal-tree type="PRIVATE"
                                                                          :dashboards="state.privateDashboardItems"
+                                                                         :folders="state.privateFolderItems"
                                                                          :selected.sync="state.selectedDashboardId"
                             />
                         </template>

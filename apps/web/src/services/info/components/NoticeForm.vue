@@ -15,9 +15,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { ContentsType, ResourceGroupType } from '@/api-clients/_common/schema/type';
 import { SpaceRouter } from '@/router';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { ContentsType, ResourceGroupType } from '@/schema/_common/type';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
