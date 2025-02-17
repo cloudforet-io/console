@@ -116,6 +116,7 @@ const state = reactive({
         return basicFields;
     }),
     isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    dataTableLoading: false,
 });
 
 const widgetOptionsState = reactive({
@@ -238,7 +239,7 @@ const queryResults = useQueries({
     ],
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || state.dataTableLoading);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResults.value?.[0].error?.message as string;
@@ -286,6 +287,7 @@ const handleUpdateThisPage = async (newPage: number) => {
 
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
+    state.dataTableLoading = true;
     const fetcher = state.isPrivateWidget
         ? api.privateDataTableAPI.get
         : api.publicDataTableAPI.get;
@@ -293,6 +295,8 @@ watch(() => props.dataTableId, async (newDataTableId) => {
         state.dataTable = await fetcher({ data_table_id: newDataTableId });
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.dataTableLoading = false;
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({
