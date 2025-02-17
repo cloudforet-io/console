@@ -3,10 +3,6 @@ import { computed, reactive } from 'vue';
 import { cloneDeep, isEmpty, isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type {
     DashboardLayoutWidgetInfo,
     DashboardModel,
@@ -17,13 +13,9 @@ import type {
     DashboardVars,
     DashboardGlobalVariablesSchema,
 } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { PrivateDashboardGetParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/get';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
-import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
-import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
@@ -33,12 +25,8 @@ import { useUserStore } from '@/store/user/user-store';
 import getRandomId from '@/lib/random-id-generator';
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 
-type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
-type GetDashboardParameters = PublicDashboardGetParameters | PrivateDashboardGetParameters;
 const DEFAULT_REFRESH_INTERVAL = '5m';
 export const DASHBOARD_DEFAULT = Object.freeze<{ options: DashboardOptions }>({
     options: {
@@ -247,37 +235,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variables = _variables;
         state.variablesInitMap = _variablesInitMap;
     };
-    const privateDashboardGetFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.privateDashboard.get);
-    const publicDashboardGetFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.publicDashboard.get);
-    const getDashboardInfo = async ({ dashboardId, fetchWidgets = false }: { dashboardId: undefined|string, fetchWidgets?: boolean}) => {
-        if (dashboardId === state.dashboardId || dashboardId === undefined) return;
-
-        const isPrivate = dashboardId?.startsWith('private');
-        const fetcher = isPrivate ? privateDashboardGetFetcher : publicDashboardGetFetcher;
-        // WARN:: from under this line, beware using originState. originState could reference irrelevant dashboard data
-        state.dashboardId = dashboardId;
-        state.loadingDashboard = true;
-        if (fetchWidgets) setDashboardWidgets([]);
-        try {
-            const params: GetDashboardParameters = { dashboard_id: dashboardId as string };
-            const { status, response } = await fetcher<GetDashboardParameters, DashboardModel>(params);
-            if (status === 'succeed') {
-                if (response.version === '1.0') {
-                    setDashboardInfoStoreState(response);
-                } else {
-                    setDashboardInfoStoreStateV2(response);
-                }
-                if (fetchWidgets) {
-                    await listDashboardWidgets();
-                }
-            }
-        } catch (e) {
-            reset();
-            throw e;
-        } finally {
-            state.loadingDashboard = false;
-        }
-    };
     // HACK: only for 1.0 dashboard
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {
         const _originVariables: DashboardVariables = originVariables ?? state.variables ?? {};
@@ -310,23 +267,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariables(_variables);
         setVariablesInitMap(_variablesInitMap);
     };
-    // HACK: only for Project Dashboard
-    const listDashboardWidgets = async () => {
-        if (!state.dashboardId) return;
-        try {
-            const isPrivate = state.dashboardId.startsWith('private');
-            const fetcher = isPrivate
-                ? SpaceConnector.clientV2.dashboard.privateWidget.list
-                : SpaceConnector.clientV2.dashboard.publicWidget.list;
-            const res = await fetcher<PublicWidgetListParameters|PrivateWidgetListParameters, ListResponse<WidgetModel>>({
-                dashboard_id: state.dashboardId,
-            });
-            state.dashboardWidgets = res.results || [];
-            return;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    };
 
     const mutations = {
         setOptions,
@@ -342,9 +282,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
     const actions = {
         reset,
-        getDashboardInfo,
         resetVariables,
-        listDashboardWidgets,
         setDashboardInfoStoreStateV2,
         setDashboardInfoStoreState,
     };
