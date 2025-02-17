@@ -103,6 +103,7 @@ const state = reactive({
         }
         return { start: _start, end: _end };
     }),
+    dataTableLoading: false,
 });
 
 const widgetOptionsState = reactive({
@@ -155,7 +156,7 @@ const queryResult = useQuery({
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isFetching.value);
+const widgetLoading = computed<boolean>(() => queryResult.isFetching.value || state.dataTableLoading);
 const errorMessage = computed<string|undefined>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
     return queryResult.error?.value?.message;
@@ -241,6 +242,7 @@ watch(() => widgetOptionsState, () => {
 
 watch(() => props.dataTableId, async (newDataTableId) => {
     if (!newDataTableId) return;
+    state.dataTableLoading = true;
     const fetcher = state.isPrivateWidget
         ? api.privateDataTableAPI.get
         : api.publicDataTableAPI.get;
@@ -248,6 +250,8 @@ watch(() => props.dataTableId, async (newDataTableId) => {
         state.dataTable = await fetcher({ data_table_id: newDataTableId });
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.dataTableLoading = false;
     }
 }, { immediate: true });
 defineExpose<WidgetExpose>({

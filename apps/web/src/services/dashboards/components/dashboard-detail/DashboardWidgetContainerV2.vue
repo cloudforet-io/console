@@ -106,7 +106,7 @@ const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: [] as RefinedWidgetInfo[],
+    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList(widgetList.value, containerWidth.value)),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -418,9 +418,9 @@ const handleClickAddWidget = () => {
 };
 
 /* Watcher */
-watch([widgetList, () => dashboard.value?.layouts], ([widgets]) => {
-    state.refinedWidgetInfoList = getRefinedWidgetInfoList(widgets);
-});
+// watch([widgetList, () => dashboard.value?.layouts], ([widgets]) => {
+//     state.refinedWidgetInfoList = getRefinedWidgetInfoList(widgets);
+// });
 watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
     if (!showOverlay && widgetGenerateState.overlayType !== 'EXPAND') {
         state.remountWidgetId = widgetGenerateState.latestWidgetId;
@@ -444,10 +444,10 @@ watch(widgetList, (dashboardWidgets) => {
         });
     }
 }, { immediate: true });
-watch(() => containerWidth.value, (_containerWidth) => {
-    if (!state.refinedWidgetInfoList?.length) return;
-    state.refinedWidgetInfoList = getResizedWidgetInfoList(state.refinedWidgetInfoList, _containerWidth);
-});
+// watch(() => containerWidth.value, (_containerWidth) => {
+//     if (!state.refinedWidgetInfoList?.length) return;
+//     state.refinedWidgetInfoList = getResizedWidgetInfoList(state.refinedWidgetInfoList, _containerWidth);
+// });
 defineExpose({
     refreshAllWidget,
 });
