@@ -4,10 +4,12 @@ import {
 } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
-import { type QueryClient, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { type QueryClient, useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
@@ -104,7 +106,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
 
 
     /* Querys */
-    const publicDashboardListQuery = useQuery({
+    const publicDashboardListQuery = useScopedQuery<ListResponse<PublicDashboardModel>, unknown, PublicDashboardModel[]>({
         queryKey: _publicDashboardListQueryKey,
         queryFn: () => publicDashboardAPI.list({
             query: {
@@ -112,12 +114,12 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
                 sort: [{ key: 'created_at', desc: true }],
             },
         }),
-        select: (data) => data?.results || [],
+        select: (data) => data?.results ?? [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-    });
-    const privateDashboardListQuery = useQuery({
+    }, ['DOMAIN', 'WORKSPACE']);
+    const privateDashboardListQuery = useScopedQuery<ListResponse<PrivateDashboardModel>, unknown, PrivateDashboardModel[]>({
         queryKey: _privateDashboardListQueryKey,
         queryFn: () => privateDashboardAPI.list({
             query: {
@@ -129,8 +131,8 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
         enabled: computed(() => !_state.isAdminMode),
-    });
-    const publicFolderListQuery = useQuery({
+    }, ['WORKSPACE']);
+    const publicFolderListQuery = useScopedQuery<ListResponse<PublicFolderModel>, unknown, PublicFolderModel[]>({
         queryKey: _publicFolderListQueryKey,
         queryFn: () => publicFolderAPI.list({
             query: {
@@ -142,8 +144,8 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-    });
-    const privateFolderListQuery = useQuery({
+    }, ['DOMAIN', 'WORKSPACE']);
+    const privateFolderListQuery = useScopedQuery<ListResponse<PrivateFolderModel>, unknown, PrivateFolderModel[]>({
         queryKey: _privateFolderListQueryKey,
         queryFn: () => privateFolderAPI.list({
             query: {
@@ -155,7 +157,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
         enabled: computed(() => !_state.isAdminMode),
-    });
+    }, ['WORKSPACE']);
 
     /* Fetchers */
     const updateFolderFn = (params: FolderUpdateParams): Promise<FolderModel> => {
@@ -184,10 +186,10 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         || publicFolderListQuery.isFetching.value || privateFolderListQuery.isFetching.value);
 
     return {
-        publicDashboardList: publicDashboardListQuery.data,
-        privateDashboardList: privateDashboardListQuery.data,
-        publicFolderList: publicFolderListQuery.data,
-        privateFolderList: privateFolderListQuery.data,
+        publicDashboardList: computed<PublicDashboardModel[]>(() => publicDashboardListQuery.data.value ?? []),
+        privateDashboardList: computed<PrivateDashboardModel[]>(() => privateDashboardListQuery.data.value ?? []),
+        publicFolderList: computed<PublicFolderModel[]>(() => publicFolderListQuery.data.value ?? []),
+        privateFolderList: computed<PrivateFolderModel[]>(() => privateFolderListQuery.data.value ?? []),
         isLoading,
         keys: {
             publicDashboardListQueryKey: _publicDashboardListQueryKey,

@@ -2,8 +2,9 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import type { QueryClient, QueryKey } from '@tanstack/vue-query';
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
+import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetModel, WidgetUpdateParams } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
@@ -80,23 +81,23 @@ export const useDashboardDetailQuery = ({
     ]);
 
     /* Querys */
-    const publicDashboardQuery = useQuery({
+    const publicDashboardQuery = useScopedQuery({
         queryKey: _publicDashboardQueryKey,
         queryFn: () => publicDashboardAPI.get({
             dashboard_id: dashboardId.value as string,
         }),
         enabled: computed(() => !!dashboardId.value && !isPrivate.value),
         staleTime: STALE_TIME,
-    });
-    const privateDashboardQuery = useQuery({
+    }, ['DOMAIN', 'WORKSPACE']);
+    const privateDashboardQuery = useScopedQuery({
         queryKey: _privateDashboardQueryKey,
         queryFn: () => privateDashboardAPI.get({
             dashboard_id: dashboardId.value as string,
         }),
         enabled: computed(() => !!dashboardId.value && isPrivate.value),
         staleTime: STALE_TIME,
-    });
-    const publicWidgetListQuery = useQuery({
+    }, ['WORKSPACE']);
+    const publicWidgetListQuery = useScopedQuery({
         queryKey: _publicWidgetListQueryKey,
         queryFn: () => publicWidgetAPI.list({
             dashboard_id: dashboardId.value as string,
@@ -106,8 +107,8 @@ export const useDashboardDetailQuery = ({
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-    });
-    const privateWidgetListQuery = useQuery({
+    }, ['DOMAIN', 'WORKSPACE']);
+    const privateWidgetListQuery = useScopedQuery({
         queryKey: _privateWidgetListQueryKey,
         queryFn: () => privateWidgetAPI.list({
             dashboard_id: dashboardId.value as string,
@@ -117,7 +118,7 @@ export const useDashboardDetailQuery = ({
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-    });
+    }, ['WORKSPACE']);
 
     /* Functions */
     const updateDashboardFn = (params: DashboardUpdateParams): Promise<DashboardModel> => {
@@ -145,7 +146,7 @@ export const useDashboardDetailQuery = ({
 
     return {
         dashboard: computed(() => (isPrivate.value ? privateDashboardQuery.data?.value : publicDashboardQuery.data?.value)),
-        widgetList: computed(() => (isPrivate.value ? privateWidgetListQuery.data?.value : publicWidgetListQuery.data?.value)),
+        widgetList: computed(() => (isPrivate.value ? privateWidgetListQuery.data?.value : publicWidgetListQuery.data?.value) ?? []),
         isLoading,
         isError,
         api: {

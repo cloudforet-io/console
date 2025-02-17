@@ -2,8 +2,9 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import type { QueryClient, QueryKey } from '@tanstack/vue-query';
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
+import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import type { WidgetModel, WidgetUpdateParams } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateDataTableApi } from '@/api-clients/dashboard/private-data-table/composables/use-private-data-table-api';
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
@@ -101,23 +102,23 @@ export const useWidgetFormQuery = ({
     ]);
 
     /* Querys */
-    const publicWidgetQuery = useQuery({
+    const publicWidgetQuery = useScopedQuery({
         queryKey: _publicWidgetQueryKey,
         queryFn: () => publicWidgetAPI.get({
             widget_id: widgetId?.value as string,
         }),
         enabled: computed(() => !!widgetId?.value && !isPrivate.value && !preventLoad),
         staleTime: STALE_TIME,
-    });
-    const privateWidgetQuery = useQuery({
+    }, ['DOMAIN', 'WORKSPACE']);
+    const privateWidgetQuery = useScopedQuery({
         queryKey: _privateWidgetQueryKey,
         queryFn: () => privateWidgetAPI.get({
             widget_id: widgetId?.value as string,
         }),
         enabled: computed(() => !!widgetId?.value && isPrivate.value && !preventLoad),
         staleTime: STALE_TIME,
-    });
-    const publicDataTableListQuery = useQuery({
+    }, ['WORKSPACE']);
+    const publicDataTableListQuery = useScopedQuery({
         queryKey: _publicDataTableListQueryKey,
         queryFn: () => publicDataTableAPI.list({
             widget_id: widgetId?.value as string,
@@ -127,8 +128,8 @@ export const useWidgetFormQuery = ({
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-    });
-    const privateDataTableListQuery = useQuery({
+    }, ['DOMAIN', 'WORKSPACE']);
+    const privateDataTableListQuery = useScopedQuery({
         queryKey: _privateDataTableListQueryKey,
         queryFn: () => privateDataTableAPI.list({
             widget_id: widgetId?.value as string,
@@ -138,7 +139,7 @@ export const useWidgetFormQuery = ({
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-    });
+    }, ['WORKSPACE']);
 
     /* Fetchers */
     const updateDataTableFn = (params: DataTableUpdateParameters): Promise<DataTableModel> => {
@@ -164,7 +165,7 @@ export const useWidgetFormQuery = ({
 
     return {
         widget: computed(() => (isPrivate.value ? privateWidgetQuery.data.value : publicWidgetQuery.data.value)),
-        dataTableList: computed(() => (isPrivate.value ? privateDataTableListQuery.data.value : publicDataTableListQuery.data.value)),
+        dataTableList: computed(() => (isPrivate.value ? privateDataTableListQuery.data.value : publicDataTableListQuery.data.value) ?? []),
         dataTableListLoading,
         widgetLoading,
         api: {
