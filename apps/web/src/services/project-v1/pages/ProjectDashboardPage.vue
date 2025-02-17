@@ -4,6 +4,7 @@ import {
     onUnmounted,
     ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PSkeleton } from '@cloudforet/mirinae';
 
@@ -36,29 +37,35 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+const route = useRoute();
+
 /* Query */
 const {
     dashboard,
     widgetList,
     isError,
     isLoading,
+    keys,
+    queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => props.dashboardId),
+    dashboardId: computed(() => route.params.dashboardId),
 });
 
 const handleRefresh = async () => {
-    await dashboardDetailStore.listDashboardWidgets();
+    await queryClient.invalidateQueries({ queryKey: keys.publicWidgetListQueryKey.value });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
-watch(dashboard, (_dashboard) => {
+watch([dashboard, () => route.params], ([_dashboard]) => {
     if (_dashboard) {
         dashboardDetailStore.reset();
         dashboardDetailStore.setDashboardInfoStoreStateV2({
             ..._dashboard,
-            project_id: props.id,
+            project_id: route.params.id,
         });
     }
-});
+}, { immediate: true });
 watch(widgetList, (_widgetList) => {
     if (_widgetList.length) {
         dashboardDetailStore.setDashboardWidgets(_widgetList);

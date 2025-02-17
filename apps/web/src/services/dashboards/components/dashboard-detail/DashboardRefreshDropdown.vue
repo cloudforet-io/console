@@ -43,10 +43,10 @@ const dashboardDetailState = dashboardDetailStore.state;
 const {
     dashboard, keys, fetcher, queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => props.dashboardId),
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
 const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => props.dashboardId),
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
 
 const state = reactive({
