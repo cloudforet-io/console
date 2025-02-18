@@ -69,7 +69,7 @@ const state = reactive({
     namespaceMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedCategory) return [];
         return Object.values(storeState.namespaces)
-            .filter((d) => d.data.category === props.dataSourceDomain)
+            // .filter((d) => d.data.category === props.dataSourceDomain)
             .filter((d) => d.data.group === state.selectedCategory)
             .filter((d) => d.label.toLowerCase().includes(state.namespaceSearchText.toLowerCase()))
             .map((namespace) => ({
