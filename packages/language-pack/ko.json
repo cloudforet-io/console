@@ -265,6 +265,7 @@
 			"INVITE": "초대",
 			"INVITE_MEMBER": "멤버 초대",
 			"INVITE_MEMBER_DESC": "이 서비스에 접근 가능한 멤버",
+			"LABELS_WITH_ALERTS_NO_DATA": "데이터가 없습니다.",
 			"LABELS_WITH_THE_MOST_ALERTS": "",
 			"LABEL_KEY": "키",
 			"LABEL_KEY_DESC": "입력한 키는 각 서비스를 식별하는 데 사용되며, \n한 번 설정하면 변경할 수 없습니다.",

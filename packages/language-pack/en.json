@@ -265,6 +265,7 @@
 			"INVITE": "Invite",
 			"INVITE_MEMBER": "Invite Member",
 			"INVITE_MEMBER_DESC": "Members with access to this service",
+			"LABELS_WITH_ALERTS_NO_DATA": "No Data",
 			"LABELS_WITH_THE_MOST_ALERTS": "Labels with the Most Alerts",
 			"LABEL_KEY": "Key",
 			"LABEL_KEY_DESC": "The entered key is used to identify each \nservice and cannot be changed once set.",

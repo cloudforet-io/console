@@ -11,7 +11,7 @@ import { init } from 'echarts/core';
 import { reduce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PProgressBar } from '@cloudforet/mirinae';
+import { PProgressBar, PEmpty } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -160,32 +160,43 @@ watch(() => state.labelInfoList, (labelInfoList) => {
 </script>
 
 <template>
-    <div class="alert-chart">
+    <div>
+        <div v-if="state.chartData.length === 0"
+             class="mt-40"
+        >
+            <p-empty>
+                <span>{{ $t('ALERT_MANAGER.SERVICE.LABELS_WITH_ALERTS_NO_DATA') }}</span>
+            </p-empty>
+        </div>
         <div
-            ref="chartContext"
-            class="chart"
-        />
-        <div class="label-info">
-            <div v-for="(labelInfo, idx) in state.labelInfoList"
-                 :key="`label-${idx}`"
-                 class="mb-5"
-            >
-                <p-progress-bar class="progress-bar"
-                                :percentage="(labelInfo.count / state.totalCount) * 100"
-                                :color="MASSIVE_CHART_COLORS[idx]"
+            class="alert-chart"
+        >
+            <div
+                ref="chartContext"
+                class="chart"
+            />
+            <div class="label-info">
+                <div v-for="(labelInfo, idx) in state.labelInfoList"
+                     :key="`label-${idx}`"
+                     class="mb-5"
                 >
-                    <template #label>
-                        <div class="progress-bar-info">
-                            <p class="progress-bar-label mb-1.5">
-                                {{ labelInfo.label }}
-                            </p>
-                            <p class="progress-bar-per">
-                                <span class="font-medium">{{ (labelInfo.count / state.totalCount) * 100 }}% </span>
-                                <span class="text-gray-700">({{ labelInfo.count }})</span>
-                            </p>
-                        </div>
-                    </template>
-                </p-progress-bar>
+                    <p-progress-bar class="progress-bar"
+                                    :percentage="(labelInfo.count / state.totalCount) * 100"
+                                    :color="MASSIVE_CHART_COLORS[idx]"
+                    >
+                        <template #label>
+                            <div class="progress-bar-info">
+                                <p class="progress-bar-label mb-1.5">
+                                    {{ labelInfo.label }}
+                                </p>
+                                <p class="progress-bar-per">
+                                    <span class="font-medium">{{ (labelInfo.count / state.totalCount) * 100 }}% </span>
+                                    <span class="text-gray-700">({{ labelInfo.count }})</span>
+                                </p>
+                            </div>
+                        </template>
+                    </p-progress-bar>
+                </div>
             </div>
         </div>
     </div>
