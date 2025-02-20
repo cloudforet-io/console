@@ -370,11 +370,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     };
     const result = await updateDataTableAndCascadeUpdate(updateParams);
     if (widget.value?.state === 'ACTIVE') {
-        const sanitizedOptions = sanitizeWidgetOptions({
-            widgetHeader: {
-                ...widget.value?.options?.widgetHeader,
-            },
-        });
+        const _widgetOptions = cloneDeep(widget.value.options);
+        const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value.widget_type, result);
         await updateWidget({
             widget_id: widgetGenerateState.widgetId,
             state: 'INACTIVE',

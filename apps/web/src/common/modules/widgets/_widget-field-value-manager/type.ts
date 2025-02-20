@@ -34,8 +34,9 @@ import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/
 import type { XAxisValue } from '@/common/modules/widgets/_widget-fields/x-axis/type';
 import type { YAxisValue } from '@/common/modules/widgets/_widget-fields/y-axis/type';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
-export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig, allValueMap?: WidgetFieldValueMap) => boolean;
+export type FieldValueValidator<T extends WidgetFieldValue> = (fieldValue: T, widgetConfig: WidgetConfig, dataTable?: DataTableModel, allValueMap?: WidgetFieldValueMap) => boolean;
 export type FieldDefaultValueConvertor<T extends keyof WidgetFieldTypeMap> = (widgetConfig: WidgetConfig, dataTable: PublicDataTableModel|PrivateDataTableModel) => WidgetFieldTypeMap[T]['value'];
 
 export interface WidgetFieldValueMap {

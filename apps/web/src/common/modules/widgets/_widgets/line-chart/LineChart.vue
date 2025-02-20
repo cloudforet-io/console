@@ -93,7 +93,7 @@ const state = reactive({
     }),
     chartData: [],
     isAreaChart: computed<boolean>(() => props.widgetName === 'stackedAreaChart'),
-    unitMap: computed<Record<string, string>>(() => widgetFrameProps.value.unitMap || {}),
+    unitMap: computed<Record<string, string>>(() => widgetFrameProps?.value?.unitMap || {}),
     chartOptions: computed<LineSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         grid: {
@@ -272,8 +272,16 @@ const drawChart = (rawData: WidgetLoadResponse|null) => {
             },
         });
     });
+
     state.chartData = _seriesData;
 };
+
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
+    dateRange,
+    errorMessage,
+    widgetLoading,
+    noData: computed(() => (state.data ? !state.data.results?.length : false)),
+});
 
 /* Watcher */
 watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
@@ -282,16 +290,11 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
         state.chart.setOption(state.chartOptions, true);
     }
 });
-watch([() => state.data, () => props.widgetOptions], ([newData]) => {
+watch([() => state.data, () => props.widgetOptions, () => state.dataTable], ([newData,, _dataTable]) => {
+    if (!_dataTable) return;
     drawChart(newData);
 }, { immediate: true });
 
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
-    dateRange,
-    errorMessage,
-    widgetLoading,
-    noData: computed(() => (state.data ? !state.data.results?.length : false)),
-});
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();

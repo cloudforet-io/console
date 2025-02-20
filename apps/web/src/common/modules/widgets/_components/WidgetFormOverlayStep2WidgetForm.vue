@@ -32,6 +32,7 @@ import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
+import tableConfig from '@/common/modules/widgets/_widgets/table/widget-config';
 
 import { gray, red } from '@/styles/colors';
 
@@ -126,26 +127,36 @@ const { mutateAsync: updateWidget } = useMutation({
 const handleSelectDataTable = async (dataTableId: string) => {
     const selectedDataTable = dataTableList.value.find((d) => d.data_table_id === dataTableId);
     if (!selectedDataTable) return;
+
+    const isPivotDataTable = selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT;
+    let widgetType = widgetGenerateState.selectedWidgetName;
+
+    if (isPivotDataTable && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetType)) {
+        widgetType = 'table';
+        widgetGenerateStore.setSelectedWidgetName('table');
+        widgetGenerateStore.setSize(tableConfig.meta.sizes[0]);
+    }
+
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    const sanitizedOptions = sanitizeWidgetOptions();
+    const sanitizedOptions = sanitizeWidgetOptions(props.fieldManager.data, widgetType, selectedDataTable);
     await updateWidget({
         widget_id: widgetGenerateState.widgetId,
         data_table_id: dataTableId,
+        widget_type: widgetType,
         state: 'INACTIVE',
         options: sanitizedOptions,
     });
 
-    props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
-
-    // check if selected chart type is supported in pivot
-    if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
-        changeWidgetType('table');
-    }
+    const _config = getWidgetConfig(widgetType);
+    if (!_config) return;
+    props.fieldManager.updateWidgetConfig(_config);
+    props.fieldManager.updateDataTableAndOriginData(selectedDataTable, sanitizedOptions);
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
     changeWidgetType(widgetName);
 };
+
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
     state.widgetDefaultValidationModalVisible = false;
@@ -182,10 +193,12 @@ const checkDefaultValidation = () => {
 const changeWidgetType = (widgetName: string) => {
     const _config = getWidgetConfig(widgetName);
     if (widgetName === widgetGenerateState.selectedWidgetName || !_config) return;
+
+    const sanitizedOptions = sanitizeWidgetOptions(props.fieldManager.data, widgetName, state.selectedDataTable);
+    props.fieldManager.updateWidgetConfig(_config);
+    props.fieldManager.updateModifiedData(sanitizedOptions);
     widgetGenerateStore.setSelectedWidgetName(widgetName);
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
-
-    props.fieldManager.updateWidgetType(_config);
     checkDefaultValidation();
 };
 

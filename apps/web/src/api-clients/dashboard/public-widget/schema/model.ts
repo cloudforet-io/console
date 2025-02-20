@@ -16,7 +16,7 @@ export interface PublicWidgetModel {
     size: WidgetSize;
     data_table_id: string;
     widget_type: WidgetType;
-    options: Record<WidgetFieldName, WidgetFieldValue<WidgetFieldValues>>;
+    options: Record<Partial<WidgetFieldName>, WidgetFieldValue<WidgetFieldValues>>;
     tags: Tags;
     workspace_id?: string;
     domain_id?: string;
