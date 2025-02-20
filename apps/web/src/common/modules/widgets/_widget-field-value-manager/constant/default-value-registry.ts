@@ -149,19 +149,19 @@ export const widgetFieldDefaultValueSetterRegistry: WidgetFieldDefaultValueSette
     dataField: (widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dataFieldOptions = (_fieldsSchema.dataField?.options ?? {}) as DataFieldOptions;
-
+        const multiSelectable = dataFieldOptions.multiSelectable;
         const result = cloneDeep(widgetFieldDefaultValueMap.dataField);
 
         const isPivotDataTable = dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
         if (isPivotDataTable) { // if pivot dataTable, always multiSelectable
             return {
-                data: [dataTable?.options.PIVOT?.fields?.column],
+                data: multiSelectable ? [dataTable?.options.PIVOT?.fields?.column] : dataTable?.options.PIVOT?.fields?.column,
             };
         }
 
         const fieldKeys = sortWidgetTableFields(Object.keys(dataTable?.data_info ?? {}));
 
-        if (dataFieldOptions.multiSelectable) {
+        if (multiSelectable) {
             result.data = dataFieldOptions.allSelected ? fieldKeys : [fieldKeys?.[0]];
         } else {
             result.data = fieldKeys?.[0];
