@@ -68,10 +68,7 @@ export const useScopedQuery = <TQueryFnData = unknown, TError = unknown, TData =
 
     const queryEnabled = computed<boolean>(() => {
         const _inheritedEnabled = options?.enabled as MaybeRef<boolean> | undefined;
-
-        if (_inheritedEnabled !== undefined && !toValue(_inheritedEnabled)) {
-            return false;
-        }
+        if (_inheritedEnabled !== undefined && !toValue(_inheritedEnabled)) return false;
         return _state.isValidScope && !_state.isLoading;
     });
 

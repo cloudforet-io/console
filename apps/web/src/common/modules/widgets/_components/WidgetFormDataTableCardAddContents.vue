@@ -4,7 +4,9 @@ import {
 } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
-import { isArray, isEqual, uniq } from 'lodash';
+import {
+    cloneDeep, isArray, isEqual, uniq,
+} from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
@@ -51,12 +53,6 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
-
-import {
-    useDashboardDataTableCascadeUpdate,
-} from '@/services/dashboards/composables/use-dashboard-data-table-cascade-update';
-import { useDashboardWidgetFormQuery } from '@/services/dashboards/composables/use-dashboard-widget-form-query';
-
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
@@ -358,11 +354,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
 
     const result = await updateDataTableAndCascadeUpdate(updateParams);
     if (widget.value?.state === 'ACTIVE') {
-        const sanitizedOptions = sanitizeWidgetOptions({
-            widgetHeader: {
-                ...widget.value?.options?.widgetHeader,
-            },
-        });
+        const _widgetOptions = cloneDeep(widget.value.options);
+        const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value.widget_type, result);
         await updateWidget({
             widget_id: widgetGenerateState.widgetId,
             state: 'INACTIVE',

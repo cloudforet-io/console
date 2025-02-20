@@ -48,7 +48,7 @@ const state = reactive({
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     fieldValue: computed<FormatRulesValue>(() => props.fieldManager.data[FIELD_KEY].value),
     type: computed<FormatRulesType>(() => props.widgetFieldSchema?.options?.formatRulesType as FormatRulesType),
-    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed(() => !validator(state.fieldValue, props.widgetConfig, state.selectedDataTable)),
     fieldInvalid: computed(() => {
         if (!props.widgetFieldSchema?.options?.useField) return false;
         if (state.fieldValue.field === undefined) return true;

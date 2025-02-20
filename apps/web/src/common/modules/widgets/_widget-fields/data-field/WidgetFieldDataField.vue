@@ -47,7 +47,7 @@ const state = reactive({
                 label: d,
             }));
     }),
-    invalid: computed<boolean>(() => !validator(state.fieldValue, props.widgetConfig)),
+    invalid: computed<boolean>(() => !validator(state.fieldValue, props.widgetConfig, state.selectedDataTable)),
     selectedItem: computed<MenuItem[]|string|undefined>(() => {
         if (state.isPivotDataTable) {
             const dataName = state.selectedDataTable?.options.PIVOT?.fields?.column || '';

@@ -74,7 +74,7 @@ export default class WidgetFieldValueManager {
 
         const validator = widgetValidatorRegistry[key];
         if (validator) {
-            const isValid = validator(this.modifiedData.value[key].value, this.widgetConfig, this.modifiedData.value);
+            const isValid = validator(this.modifiedData.value[key].value, this.widgetConfig, this.dataTable, this.modifiedData.value);
             if (!isValid) {
                 this.validationErrors[key as string] = `Invalid value for field "${key}"`;
                 return false;
@@ -91,7 +91,7 @@ export default class WidgetFieldValueManager {
 
         Object.entries(this.modifiedData.value ?? {}).forEach(([key, field]) => {
             const validator = widgetValidatorRegistry[key];
-            if (validator && !validator(field.value, this.widgetConfig, this.modifiedData.value)) {
+            if (validator && !validator(field.value, this.widgetConfig, this.dataTable, this.modifiedData.value)) {
                 this.validationErrors[key] = `Invalid value for field "${key}"`;
                 isValid = false;
             }
@@ -110,17 +110,8 @@ export default class WidgetFieldValueManager {
         this.widgetConfig = widgetConfig;
     }
 
-    private updateModifiedData(data: WidgetFieldValueMap): void {
+    updateModifiedData(data: WidgetFieldValueMap): void {
         this.modifiedData.value = { ...data };
-    }
-
-    updateWidgetType(newWidgetConfig: WidgetConfig): void {
-        this.updateWidgetConfig(newWidgetConfig);
-        const originDataWithExistingHeaderValue = {
-            widgetHeader: this.originData.value.widgetHeader,
-        };
-        this.updateModifiedData(WidgetFieldValueManager.applyDefaultValue(originDataWithExistingHeaderValue, newWidgetConfig, this.dataTable));
-        this.validationErrors = {};
     }
 
     updateDataTableAndOriginData(dataTable: PublicDataTableModel|PrivateDataTableModel, data: WidgetFieldValueMap): void {

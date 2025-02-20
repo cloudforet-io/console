@@ -50,8 +50,9 @@ const state = reactive({
     fieldValue: computed<SankeyDimensionsValue>(() => props.fieldManager.data[FIELD_KEY].value),
     max: computed<number|undefined>(() => props.widgetFieldSchema?.options?.max),
     menuItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (!state.selectedDataTable) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.labels_info ?? {})) ?? [];
+        const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
+        if (!state.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,
@@ -61,7 +62,7 @@ const state = reactive({
         if (!state.menuItems.length) return [];
         return state.menuItems.filter((d) => state.fieldValue.data?.includes(d.name));
     }),
-    isValid: computed<boolean>(() => validator(state.fieldValue, props.widgetConfig)),
+    isValid: computed<boolean>(() => validator(state.fieldValue, props.widgetConfig, state.selectedDataTable)),
     isMaxValid: computed<boolean>(() => state.fieldValue?.count <= state.max),
     tooltipDesc: computed<TranslateResult>(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {
         fieldName: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DIMENSIONS'),

@@ -5,6 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import { useMutation } from '@tanstack/vue-query';
+import { cloneDeep } from 'lodash';
 
 import {
     PButton, PButtonModal, POverlayLayout, PTextButton,
@@ -21,8 +22,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { UNSUPPORTED_CHARTS_IN_PIVOT } from '@/common/modules/widgets/_constants/widget-constant';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -36,6 +39,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     widget,
+    dataTableList,
     api,
     keys,
     fetcher,
@@ -45,6 +49,7 @@ const {
 });
 
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value?.find((item) => item.data_table_id === widgetGenerateState.selectedDataTableId)),
     sidebarTitle: computed(() => {
         if (widgetGenerateState.overlayType === 'EXPAND') return undefined;
         let _title = i18n.t('COMMON.WIDGETS.ADD_WIDGET');
@@ -127,12 +132,13 @@ const handleClickContinue = async () => {
             if (widget.value?.state === 'ACTIVE') {
                 _updateParams.state = 'INACTIVE';
             }
-            if (widget.value?.options?.widgetHeader) {
-                _updateParams.options = {
-                    widgetHeader: widget.value?.options?.widgetHeader,
-                };
+            let widgetType = widget.value?.widget_type ?? 'table';
+            if (UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetType)) {
+                widgetType = 'table';
+                _updateParams.widget_type = widgetType;
             }
-            const sanitizedOptions = sanitizeWidgetOptions(_updateParams.options ?? {}, _updateParams.widget_type ?? 'table');
+            const _widgetOptions = cloneDeep(widget.value?.options ?? {});
+            const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widgetType, state.selectedDataTable);
             await updateWidget({
                 ..._updateParams,
                 options: sanitizedOptions,

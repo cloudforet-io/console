@@ -1,3 +1,6 @@
+import { every } from 'lodash';
+
+import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
 import type { FieldValueValidator } from '@/common/modules/widgets/_widget-field-value-manager/type';
@@ -30,8 +33,26 @@ export interface WidgetValidatorRegistry {
     [fieldKey: string]: FieldValueValidator<any>;
 }
 
+const isValidSelectionList = (baseList: string[], selectedList?: string[]): boolean => {
+    if (!selectedList) return false;
+    return every(selectedList, (item) => baseList.includes(item));
+};
+
+export const WIDGET_OPTIONS_AFFECTED_BY_DATA_TABLE = [
+    'dataField',
+    'formatRules',
+    'groupBy',
+    'stackBy',
+    'xAxis',
+    'yAxis',
+    'categoryBy',
+    'sankeyDimensions',
+    'customTableColumnWidth',
+    'tableColumnComparison',
+];
+
 export const widgetValidatorRegistry: WidgetValidatorRegistry = {
-    dateRange: (fieldValue: DateRangeValue, widgetConfig, allValueMap) => {
+    dateRange: (fieldValue: DateRangeValue, widgetConfig, dataTable, allValueMap) => {
         const _dateRangeType = fieldValue.options?.value;
         const _granularity = allValueMap?.granularity?.value?.granularity;
         if (!_dateRangeType || !_granularity) return false;
@@ -42,20 +63,38 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
 
         return true;
     },
-    dataField: (fieldValue: DataFieldValue, widgetConfig) => {
+    dataField: (fieldValue: DataFieldValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const dataFieldOptions = (_fieldsSchema.dataField?.options ?? {}) as DataFieldOptions;
-        if (dataFieldOptions.multiSelectable) {
-            return Array.isArray(fieldValue.data) && !!fieldValue.data.length;
+        const isPivotDataTable = dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
+        const multiSelectable = dataFieldOptions.multiSelectable;
+        const availableFieldKeys = Object.keys(dataTable?.data_info ?? {});
+
+        if (isPivotDataTable) {
+            const pivotColumnsField = dataTable?.options.PIVOT?.fields?.column;
+            if (!pivotColumnsField) return false;
+            if (multiSelectable) {
+                return Array.isArray(fieldValue.data) && !!fieldValue.data.length && isValidSelectionList([pivotColumnsField], fieldValue.data);
+            }
+            return fieldValue.data === pivotColumnsField;
         }
-        return !!fieldValue.data;
+
+        if (dataFieldOptions.multiSelectable) {
+            const value = fieldValue.data as string[]|undefined;
+            return Array.isArray(value) && !!value.length && isValidSelectionList(availableFieldKeys, value);
+        }
+
+        const value = fieldValue.data as string|undefined;
+        return !!value && availableFieldKeys.includes(value);
     },
-    formatRules: (fieldValue: FormatRulesValue, widgetConfig, allValueMap) => {
+    formatRules: (fieldValue: FormatRulesValue, widgetConfig, dataTable, allValueMap) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const formatRulesOptions = (_fieldsSchema.formatRules?.options ?? {}) as FormatRulesOptions;
+        const availableFieldKeys = Object.keys(dataTable?.[formatRulesOptions?.dataTarget ?? 'labels_info'] ?? {});
         const type = formatRulesOptions.formatRulesType;
 
         if (formatRulesOptions.useField) {
+            if (fieldValue.field && !availableFieldKeys.includes(fieldValue.field)) return false;
             if (formatRulesOptions.dependentField) {
                 const dependentValue: string|string[]|undefined = allValueMap?.[formatRulesOptions.dependentField]?.value?.data;
                 if (!dependentValue) return !!fieldValue.field;
@@ -77,28 +116,40 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return true;
     },
-    categoryBy: (fieldValue: CategoryByValue, widgetConfig) => {
+    categoryBy: (fieldValue: CategoryByValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const categoryByOptions = (_fieldsSchema.categoryBy?.options ?? {}) as CategoryByOptions;
-        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > categoryByOptions.max) return false;
+        const availableFieldKeys = Object.keys(dataTable?.[categoryByOptions?.dataTarget ?? 'labels_info'] ?? {});
+
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0
+            || fieldValue.count > categoryByOptions.max || !availableFieldKeys.includes(fieldValue.data)) return false;
         return true;
     },
-    stackBy: (fieldValue: StackByValue, widgetConfig) => {
+    stackBy: (fieldValue: StackByValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const stackByOptions = (_fieldsSchema.stackBy?.options ?? {}) as StackByOptions;
-        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > stackByOptions.max) return false;
+        const availableFieldKeys = Object.keys(dataTable?.[stackByOptions?.dataTarget ?? 'labels_info'] ?? {});
+
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0
+            || fieldValue.count > stackByOptions.max || !availableFieldKeys.includes(fieldValue.data)) return false;
         return true;
     },
-    xAxis: (fieldValue: XAxisValue, widgetConfig) => {
+    xAxis: (fieldValue: XAxisValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const xAxisOptions = (_fieldsSchema.xAxis?.options ?? {}) as XAxisOptions;
-        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > xAxisOptions.max) return false;
+        const availableFieldKeys = Object.keys(dataTable?.[xAxisOptions?.dataTarget ?? 'labels_info'] ?? {});
+
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0
+            || fieldValue.count > xAxisOptions.max || !availableFieldKeys.includes(fieldValue.data)) return false;
         return true;
     },
-    yAxis: (fieldValue: YAxisValue, widgetConfig) => {
+    yAxis: (fieldValue: YAxisValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const yAxisOptions = (_fieldsSchema.yAxis?.options ?? {}) as YAxisOptions;
-        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0 || fieldValue.count > yAxisOptions.max) return false;
+        const availableFieldKeys = Object.keys(dataTable?.[yAxisOptions?.dataTarget ?? 'labels_info'] ?? {});
+
+        if (!fieldValue.data || !fieldValue.count || fieldValue.count < 0
+            || fieldValue.count > yAxisOptions.max || !availableFieldKeys.includes(fieldValue.data)) return false;
         return true;
     },
     colorSchema: (fieldValue: ColorSchemaValue) => {
@@ -111,16 +162,24 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         }
         return true;
     },
-    tableColumnComparison: (fieldValue: TableColumnComparisonValue) => {
+    tableColumnComparison: (fieldValue: TableColumnComparisonValue, widgetConfig, dataTable) => {
+        const availableFieldKeys = Object.keys(dataTable?.data_info ?? {});
+
         if (fieldValue.toggleValue) {
-            return !!fieldValue.decreaseColor && !!fieldValue.increaseColor && !!fieldValue.format && !!fieldValue.fields?.length;
+            return !!fieldValue.decreaseColor && !!fieldValue.increaseColor && !!fieldValue.format
+                && !!fieldValue.fields?.length && isValidSelectionList(availableFieldKeys, fieldValue.fields);
         }
         return true;
     },
-    customTableColumnWidth: (fieldValue: CustomTableColumnWidthValue) => {
+    customTableColumnWidth: (fieldValue: CustomTableColumnWidthValue, widgetConfig, dataTable) => {
+        const availableFieldKeys = [...Object.keys(dataTable?.labels_info ?? {}), ...Object.keys(dataTable?.data_info ?? {})];
+
+
+
         if (fieldValue.widthInfos?.length) {
             return fieldValue.widthInfos.every((d) => !!d.fieldKey && d.width >= 0)
-                || fieldValue.widthInfos.map((d) => d.fieldKey).length === new Set(fieldValue.widthInfos.map((d) => d.fieldKey)).size;
+                && fieldValue.widthInfos.map((d) => d.fieldKey).length === new Set(fieldValue.widthInfos.map((d) => d.fieldKey)).size
+                && isValidSelectionList(availableFieldKeys, fieldValue.widthInfos.map((d) => d.fieldKey));
         }
         return true;
     },
@@ -139,21 +198,32 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
         if (!fieldValue.granularity) return false;
         return true;
     },
-    groupBy: (fieldValue: GroupByValue, widgetConfig) => {
+    groupBy: (fieldValue: GroupByValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const groupByOptions = (_fieldsSchema.groupBy?.options ?? {}) as GroupByOptions;
-        if (groupByOptions.fixedValue && fieldValue.data !== groupByOptions.fixedValue) return false;
+        const availableFieldKeys = Object.keys(dataTable?.[groupByOptions?.dataTarget ?? 'labels_info'] ?? {});
+
         if (groupByOptions.hideCount && !!fieldValue.count) return false;
         if (!groupByOptions.hideCount && groupByOptions.max && groupByOptions.defaultMaxCount && (!fieldValue.count || fieldValue.count > groupByOptions.max)) return false;
-        if (groupByOptions.multiSelectable && !Array.isArray(fieldValue.data)) return false;
+        if (groupByOptions.multiSelectable) {
+            if (!Array.isArray(fieldValue.data)) return false;
+            if (!isValidSelectionList(availableFieldKeys, fieldValue.data as string[]|undefined)) return false;
+            if (groupByOptions.excludeDateField && fieldValue.data.includes('Date')) return false;
+            if (groupByOptions.fixedValue && !fieldValue.data.includes(groupByOptions.fixedValue)) return false;
+            return !!fieldValue.data;
+        }
         if (groupByOptions.excludeDateField && fieldValue.data === 'Date') return false;
-        // return !!fieldValue.data;
-        return true;
+        if (groupByOptions.fixedValue && fieldValue.data !== groupByOptions.fixedValue) return false;
+        return !!fieldValue.data && availableFieldKeys.includes(fieldValue.data as string);
     },
-    sankeyDimensions: (fieldValue: SankeyDimensionsValue, widgetConfig) => {
+    sankeyDimensions: (fieldValue: SankeyDimensionsValue, widgetConfig, dataTable) => {
         const _fieldsSchema = integrateFieldsSchema(widgetConfig.requiredFieldsSchema, widgetConfig.optionalFieldsSchema);
         const sankeyDimensionsOptions = (_fieldsSchema.sankeyDimensions?.options ?? {}) as SankeyDimensionsOptions;
-        if (!fieldValue.data || fieldValue.data.length !== 2 || !fieldValue.count || fieldValue.count > sankeyDimensionsOptions.max) return false;
+        const availableFieldKeys = Object.keys(dataTable?.labels_info ?? {});
+
+
+        if (!fieldValue.data || fieldValue.data.length !== 2 || !fieldValue.count
+            || fieldValue.count > sankeyDimensionsOptions.max || isValidSelectionList(availableFieldKeys, fieldValue.data)) return false;
         return true;
     },
     widgetHeader: (fieldValue: WidgetHeaderValue) => {

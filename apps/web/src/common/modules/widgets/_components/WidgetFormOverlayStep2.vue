@@ -156,7 +156,7 @@ const { mutateAsync: updateWidgetMutate } = useMutation({
 const updateWidget = async () => {
     if (!widgetGenerateState.widgetId) return;
     const _isCreating = widget.value?.state === 'CREATING';
-    const sanitizedOptions = sanitizeWidgetOptions(state.fieldManager.data, widgetGenerateState.selectedWidgetName);
+    const sanitizedOptions = sanitizeWidgetOptions(state.fieldManager.data, widgetGenerateState.selectedWidgetName, state.selectedDataTable);
     const result = await updateWidgetMutate({
         widget_id: widgetGenerateState.widgetId,
         size: widgetGenerateState.size,
