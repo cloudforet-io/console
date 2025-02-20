@@ -72,7 +72,7 @@ const state = reactive({
         }
         return state.fieldValue.data;
     }),
-    isValid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    isValid: computed(() => validator(state.fieldValue, props.widgetConfig, state.selectedDataTable)),
     max: computed(() => props.widgetFieldSchema?.options?.max),
     isMaxValid: computed<boolean>(() => (state.max ? ((state.fieldValue?.count ?? DEFAULT_COUNT) <= state.max) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {

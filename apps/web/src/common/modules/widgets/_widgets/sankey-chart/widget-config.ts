@@ -16,6 +16,7 @@ const sankeyChart: WidgetConfig = {
         dataField: {},
         sankeyDimensions: {
             options: {
+                dataTarget: 'labels_info',
                 defaultMaxCount: 10,
                 max: 31,
             },
