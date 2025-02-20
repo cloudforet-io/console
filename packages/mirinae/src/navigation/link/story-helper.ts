@@ -15,6 +15,7 @@ export const getLinkArgs = (): Args => ({
     href: 'https://cloudforet.io',
     to: undefined,
     useAnchorScroll: false,
+    lineHeight: undefined,
     defaultSlot: null,
 
 });
@@ -179,6 +180,21 @@ export const getLinkArgTypes = (): ArgTypes => ({
                 summary: false,
             },
         },
+    },
+    lineHeight: {
+        name: 'lineHeight',
+        type: { name: 'string' },
+        description: 'Line height of link text.',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: 'text',
     },
     defaultSlot: {
         name: 'default',

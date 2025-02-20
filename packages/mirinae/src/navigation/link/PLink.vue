@@ -21,7 +21,9 @@
                          color="inherit"
                          class="icon"
                     />
-                    <span class="text">
+                    <span class="text"
+                          :style="{lineHeight: props.lineHeight}"
+                    >
                         <slot v-bind="{...$props}">
                             {{ props.text }}
                         </slot>
@@ -60,6 +62,7 @@ interface LinkProps {
     href?: string;
     to?: Location;
     useAnchorScroll?: boolean;
+    lineHeight?: string;
 }
 
 const props = withDefaults(defineProps<LinkProps>(), {
@@ -70,6 +73,7 @@ const props = withDefaults(defineProps<LinkProps>(), {
     href: undefined,
     to: undefined,
     useAnchorScroll: false,
+    lineHeight: undefined,
 });
 
 const linkRef = ref<HTMLElement|null>(null);
