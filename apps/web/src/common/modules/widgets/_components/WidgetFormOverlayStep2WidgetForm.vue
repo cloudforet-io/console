@@ -142,10 +142,14 @@ const handleSelectDataTable = async (dataTableId: string) => {
     await updateWidget({
         widget_id: widgetGenerateState.widgetId,
         data_table_id: dataTableId,
+        widget_type: widgetType,
         state: 'INACTIVE',
         options: sanitizedOptions,
     });
 
+    const _config = getWidgetConfig(widgetType);
+    if (!_config) return;
+    props.fieldManager.updateWidgetConfig(_config);
     props.fieldManager.updateDataTableAndOriginData(selectedDataTable, sanitizedOptions);
 };
 
@@ -189,11 +193,12 @@ const checkDefaultValidation = () => {
 const changeWidgetType = (widgetName: string) => {
     const _config = getWidgetConfig(widgetName);
     if (widgetName === widgetGenerateState.selectedWidgetName || !_config) return;
-    widgetGenerateStore.setSelectedWidgetName(widgetName);
-    widgetGenerateStore.setSize(_config.meta.sizes[0]);
 
     const sanitizedOptions = sanitizeWidgetOptions(props.fieldManager.data, widgetName, state.selectedDataTable);
+    props.fieldManager.updateWidgetConfig(_config);
     props.fieldManager.updateModifiedData(sanitizedOptions);
+    widgetGenerateStore.setSelectedWidgetName(widgetName);
+    widgetGenerateStore.setSize(_config.meta.sizes[0]);
     checkDefaultValidation();
 };
 

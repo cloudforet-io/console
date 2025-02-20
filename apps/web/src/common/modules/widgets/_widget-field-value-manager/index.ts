@@ -106,7 +106,7 @@ export default class WidgetFieldValueManager {
         this.validationErrors = {};
     }
 
-    private updateWidgetConfig(widgetConfig: WidgetConfig): void {
+    updateWidgetConfig(widgetConfig: WidgetConfig): void {
         this.widgetConfig = widgetConfig;
     }
 
