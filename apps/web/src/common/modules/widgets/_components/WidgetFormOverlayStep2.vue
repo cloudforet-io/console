@@ -3,6 +3,7 @@ import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, isEqual } from 'lodash';
 
 import {
@@ -11,24 +12,30 @@ import {
 
 import type {
     DashboardOptions, DashboardVars,
-} from '@/schema/dashboard/_types/dashboard-type';
+} from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -36,13 +43,12 @@ import {
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
+
 const overlayWidgetRef = ref<HTMLElement|null>(null);
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
@@ -53,23 +59,44 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
+/* Query */
+const {
+    dashboard,
+    keys,
+    fetcher,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+const {
+    widget,
+    dataTableList,
+    keys: widgetKeys,
+    fetcher: wigetFetcher,
+    widgetLoading,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 let fieldManager: WidgetFieldValueManager;
 
 const state = reactive({
+    isPrivate: computed<boolean>(() => !!widgetGenerateState.widgetId?.startsWith('private')),
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     mounted: false,
     fieldManager: computed<WidgetFieldValueManager>(() => {
         if (!fieldManager) {
             fieldManager = new WidgetFieldValueManager(
                 getWidgetConfig(widgetGenerateState.selectedWidgetName),
-                widgetGenerateGetters.selectedDataTable,
-                cloneDeep(widgetGenerateState.widget?.options) || {},
+                state.selectedDataTable,
+                cloneDeep(widget.value?.options) || {},
             );
         }
         return fieldManager;
     }),
     value: computed(() => state.fieldManager?.data?.granularity),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
-    selectedWidgetType: widgetGenerateState.widget?.widget_type as WidgetType,
+    selectedWidgetType: computed<WidgetType|undefined>(() => widget.value?.widget_type),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetSizeOptions: [
         { label: i18n.t('COMMON.WIDGETS.FULL'), name: 'FULL' },
@@ -79,7 +106,7 @@ const state = reactive({
     widgetSize: computed(() => {
         if (widgetGenerateState.overlayType === 'EXPAND') return 'full';
         if (state.selectedWidgetSize === 'FULL') return 'full';
-        return widgetGenerateState.widget?.size;
+        return widget.value?.size;
     }),
     widgetWidth: computed(() => {
         if (state.widgetSize === 'full' || state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND') {
@@ -88,62 +115,116 @@ const state = reactive({
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetFieldChanged: computed<boolean>(() => {
-        const _isOptionsChanged = !isEqual(cloneDeep(state.fieldManager.data), widgetGenerateState.widget?.options);
-        const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widgetGenerateState.widget?.widget_type;
+        const _isOptionsChanged = !isEqual(cloneDeep(state.fieldManager.data), widget.value?.options);
+        const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widget.value?.widget_type;
         emit('watch-options-changed', _isOptionsChanged || _isTypeChanged);
         return _isOptionsChanged || _isTypeChanged;
     }),
     disableApplyButton: computed<boolean>(() => {
         if (!state.fieldManager?.validateAll()) return true;
-        const _isWidgetInactive = widgetGenerateState.widget?.state === 'INACTIVE';
+        const _isWidgetInactive = widget.value?.state === 'INACTIVE';
         return (!_isWidgetInactive && !state.isWidgetFieldChanged) || widgetOptionsInvalid.value;
     }),
     //
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
-    isSharedDashboard: computed<boolean>(() => !!dashboardDetailGetters.dashboardInfo?.shared && !storeState.isAdminMode),
+    isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared && !storeState.isAdminMode),
 });
 
 const {
     invalid: widgetOptionsInvalid,
     invalidText: widgetOptionsInvalidText,
 } = useWidgetOptionsComplexValidation({
-    optionValueMap: computed(() => widgetGenerateState.widgetFormValueMap),
+    optionValueMap: computed(() => widget.value?.options ?? {}),
     widgetConfig: computed(() => state.widgetConfig),
 });
 
 /* Api */
+const { mutateAsync: updateWidgetMutate } = useMutation({
+    mutationFn: wigetFetcher.updateWidgetFn,
+    onSuccess: (data) => {
+        const widgetQueryKey = state.isPrivate
+            ? widgetKeys.privateWidgetQueryKey
+            : widgetKeys.publicWidgetQueryKey;
+        queryClient.setQueryData(widgetQueryKey.value, () => data);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 const updateWidget = async () => {
-    const _isCreating = widgetGenerateState.widget?.state === 'CREATING';
-    const widget = await widgetGenerateStore.updateWidget({
+    if (!widgetGenerateState.widgetId) return;
+    const _isCreating = widget.value?.state === 'CREATING';
+    const sanitizedOptions = sanitizeWidgetOptions(state.fieldManager.data, widgetGenerateState.selectedWidgetName, state.selectedDataTable);
+    const result = await updateWidgetMutate({
         widget_id: widgetGenerateState.widgetId,
         size: widgetGenerateState.size,
         widget_type: widgetGenerateState.selectedWidgetName,
         data_table_id: widgetGenerateState.selectedDataTableId,
-        options: state.fieldManager.data,
+        options: sanitizedOptions,
         state: 'ACTIVE',
     });
-    if (widget) {
-        state.fieldManager.updateOriginData(cloneDeep(widget.options));
+    if (result) {
+        state.fieldManager.updateOriginData(cloneDeep(result.options));
     }
     if (_isCreating) {
-        await dashboardStore.addWidgetToDashboard(dashboardDetailState.dashboardId || '', widgetGenerateState.widgetId);
+        const _layouts = cloneDeep(dashboard.value?.layouts || []);
+        if (_layouts.length) {
+            const _targetLayout = _layouts[0];
+            if (_targetLayout.widgets) {
+                _targetLayout.widgets.push(widgetGenerateState.widgetId);
+            } else {
+                _targetLayout.widgets = [widgetGenerateState.widgetId];
+            }
+            _layouts[0] = _targetLayout;
+        } else {
+            _layouts.push({
+                widgets: [widgetGenerateState.widgetId],
+            });
+        }
+        updateDashboard({
+            dashboard_id: dashboardDetailState.dashboardId,
+            layouts: _layouts,
+        });
     }
 };
 
+const { mutate: updateDashboard } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: () => {
+            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+        },
+    },
+);
 
 /* Util */
 const initSnapshot = () => {
-    state.varsSnapshot = cloneDeep(dashboardDetailState.vars);
+    state.varsSnapshot = cloneDeep(dashboard.value?.vars || {});
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
 };
 const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
-const loadOverlayWidget = () => {
-    overlayWidgetRef?.value?.loadWidget();
-};
+// const loadOverlayWidget = async () => {
+//     await queryClient.invalidateQueries({
+//         queryKey: [
+//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadQueryKey.value : widgetKeys.publicWidgetLoadQueryKey.value),
+//             dashboardDetailState.dashboardId,
+//             widgetGenerateState.widgetId,
+//         ],
+//     });
+//     await queryClient.invalidateQueries({
+//         queryKey: [
+//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadSumQueryKey.value : widgetKeys.publicWidgetLoadSumQueryKey.value),
+//             dashboardDetailState.dashboardId,
+//             widgetGenerateState.widgetId,
+//         ],
+//     });
+// };
 
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
@@ -152,7 +233,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
 const handleUpdateWidgetOptions = async () => {
     if (state.selectedWidgetType === widgetGenerateState.selectedWidgetName) {
         await updateWidget();
-        loadOverlayWidget();
+        // await loadOverlayWidget();
     } else {
         state.selectedWidgetType = widgetGenerateState.selectedWidgetName;
         await updateWidget();
@@ -167,7 +248,7 @@ const handleEditWidget = () => {
 };
 
 /* Watcher */
-watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
+watch(() => widget.value?.size, (widgetSize) => {
     if (widgetSize === 'sm') {
         state.selectedWidgetSize = 'ACTUAL';
     } else {
@@ -176,17 +257,13 @@ watch(() => widgetGenerateState.widget?.size, (widgetSize) => {
 }, { immediate: true });
 watch(() => state.mounted, async (mounted) => {
     if (mounted) {
-        if (widgetGenerateState.widget?.state === 'CREATING') {
+        if (widget.value?.state === 'CREATING') {
             await updateWidget();
         }
-        loadOverlayWidget();
+        // await loadOverlayWidget();
         state.mounted = false;
     }
 });
-// watch(() => dashboardDetailState.vars, async () => {
-//     await nextTick();
-//     loadOverlayWidget();
-// });
 
 onBeforeMount(() => {
     initSnapshot();
@@ -213,10 +290,10 @@ onUnmounted(() => {
                         />
                         <dashboard-variables-v2 disable-save-button
                                                 widget-mode
-                                                :is-project-dashboard="!!dashboardDetailState.projectId"
+                                                :is-project-dashboard="!!dashboard?.project_id"
                         />
                     </div>
-                    <p-button v-if="!state.isSharedDashboard && !dashboardDetailState.projectId && widgetGenerateState.overlayType === 'EXPAND'"
+                    <p-button v-if="!state.isSharedDashboard && !dashboard?.project_id && widgetGenerateState.overlayType === 'EXPAND'"
                               style-type="tertiary"
                               icon-left="ic_edit"
                               class="edit-button"
@@ -239,22 +316,24 @@ onUnmounted(() => {
                     </p-select-button>
                 </div>
             </div>
-            <div class="widget-wrapper"
+            <div v-if="!widgetLoading"
+                 class="widget-wrapper"
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' || widgetGenerateState.overlayType === 'EXPAND' }"
             >
                 <component :is="getWidgetComponent(state.selectedWidgetType)"
                            :key="widgetGenerateState.selectedDataTableId"
                            ref="overlayWidgetRef"
-                           :widget-name="widgetGenerateState.widget.widget_type"
-                           :widget-id="widgetGenerateState.widget.widget_id"
-                           :widget-state="widgetGenerateState.widget.state"
+                           :widget-name="widget?.widget_type"
+                           :widget-id="widget?.widget_id"
+                           :widget-state="widget?.state"
                            :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
-                           :widget-options="widgetGenerateState.widget.options"
-                           :data-tables="widgetGenerateState.dataTables"
+                           :widget-options="widget?.options"
+                           :data-tables="dataTableList"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
+                           :dashboard-id="dashboardDetailState.dashboardId"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"
@@ -262,7 +341,7 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!state.fieldManager"
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!state.fieldManager && !widgetLoading"
                                                :widget-validation-invalid="widgetOptionsInvalid"
                                                :widget-validation-invalid-text="widgetOptionsInvalidText"
                                                :field-manager="state.fieldManager"

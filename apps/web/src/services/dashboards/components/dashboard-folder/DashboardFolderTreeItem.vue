@@ -45,15 +45,13 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
 
 const { getControlMenuItems } = useDashboardControlMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
     isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
-    dashboardList: computed(() => dashboardPageControlGetters.allDashboardItems),
-    folderList: computed(() => dashboardPageControlGetters.allFolderItems),
 });
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),

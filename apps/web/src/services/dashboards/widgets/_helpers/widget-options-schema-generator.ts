@@ -1,4 +1,4 @@
-import type { WidgetOptionKey, WidgetOptionsSchema, WidgetOptionsSchemaProperty } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetOptionKey, WidgetOptionsSchema, WidgetOptionsSchemaProperty } from '@/api-clients/dashboard/_types/widget-type';
 
 import {
     MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES,

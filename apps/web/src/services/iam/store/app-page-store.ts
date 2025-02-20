@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AppCreateParameters } from '@/schema/identity/app/api-verbs/create';
 import type { AppDeleteParameters } from '@/schema/identity/app/api-verbs/delete';
 import type { AppDisableParameters } from '@/schema/identity/app/api-verbs/disable';

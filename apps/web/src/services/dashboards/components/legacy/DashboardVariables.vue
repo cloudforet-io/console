@@ -5,11 +5,12 @@ import { isEqual, xor } from 'lodash';
 
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 
 import DashboardVariableDropdown from '@/services/dashboards/components/legacy/DashboardVariableDropdown.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -28,7 +29,9 @@ const emit = defineEmits<{(e: 'update', val: { variables?: DashboardVariables, v
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
-
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const state = reactive({
@@ -38,11 +41,11 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
-        const prevUsedProperties = Object.entries(dashboardDetailGetters.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
+        const prevUsedProperties = Object.entries(dashboard.value?.variables_schema?.properties ?? {}).filter(([, v]) => v.use);
         const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
         // check variables changed
         currUsedProperties.forEach(([k]) => {
-            if (!isEqual(dashboardDetailGetters.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
+            if (!isEqual(dashboard.value?.variables?.[k], dashboardDetailState.variables?.[k])) {
                 results.push(k);
             }
         });
@@ -60,8 +63,8 @@ const handleClickSaveButton = () => {
     });
 };
 const handleResetVariables = () => {
-    const _originVariables = props.originVariables ?? dashboardDetailGetters.dashboardInfo?.variables;
-    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailGetters.dashboardInfo?.variables_schema;
+    const _originVariables = props.originVariables ?? dashboard.value?.variables;
+    const _originVariablesSchema = props.originVariablesSchema ?? dashboard.value?.variables_schema;
     dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
 };
 

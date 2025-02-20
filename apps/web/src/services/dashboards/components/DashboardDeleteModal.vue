@@ -1,18 +1,26 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
+import type { PrivateDashboardDeleteParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/delete';
+import type { PublicDashboardDeleteParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/delete';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 const recentStore = useRecentStore();
 
@@ -28,36 +36,77 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void,
 }>();
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const dashboardDetailStore = useDashboardDetailInfoStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
+/* Query */
+const {
+    api,
+    keys,
+    queryClient,
+} = useDashboardQuery();
+
+const storeState = reactive({
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
 });
 
 const handleDeleteDashboardConfirm = async () => {
-    try {
-        state.loading = true;
-        if (!props.dashboardId) {
-            throw new Error('Dashboard ID is not provided');
-        }
-        await dashboardDetailStore.deleteDashboard(props.dashboardId);
-        await recentStore.deleteRecent({
-            type: RECENT_TYPE.DASHBOARD,
-            itemId: props.dashboardId,
-        });
-        state.loading = false;
-        state.proxyVisible = false;
-        await SpaceRouter.router.replace(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
+    if (!props.dashboardId) {
+        throw new Error('Dashboard ID is not provided');
     }
+    deleteDashboard({
+        dashboard_id: props.dashboardId,
+    });
 };
+
+/* Api */
+const deleteDashboardFn = (params: PublicDashboardDeleteParameters|PrivateDashboardDeleteParameters): Promise<void> => {
+    const _isPrivate = params.dashboard_id.startsWith('private');
+    if (_isPrivate) {
+        return api.privateDashboardAPI.delete(params as PrivateDashboardDeleteParameters);
+    }
+    return api.publicDashboardAPI.delete(params as PublicDashboardDeleteParameters);
+};
+
+const { mutate: deleteDashboard, isPending: loading } = useMutation(
+    {
+        mutationFn: deleteDashboardFn,
+        onSuccess: async (_, params) => {
+            const _isPrivate = params.dashboard_id.startsWith('private');
+            const dashboardListQueryKey = _isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            await queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+            await recentStore.deleteRecent({
+                type: RECENT_TYPE.DASHBOARD,
+                itemId: props.dashboardId,
+            });
+            const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === params.dashboard_id);
+            if (isFavoriteItem) {
+                await favoriteStore.deleteFavorite({
+                    itemType: FAVORITE_TYPE.DASHBOARD,
+                    workspaceId: storeState.currentWorkspaceId || '',
+                    itemId: params.dashboard_id,
+                });
+            }
+            state.proxyVisible = false;
+            await SpaceRouter.router.replace(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
+        },
+        onError(error) {
+            ErrorHandler.handleRequestError(error, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
+        },
+    },
+);
+
 </script>
 
 <template>
     <delete-modal :header-title="$t('DASHBOARDS.FORM.DELETE_TITLE')"
                   :visible.sync="state.proxyVisible"
-                  :loading="state.loading"
+                  :loading="loading"
                   @confirm="handleDeleteDashboardConfirm"
     />
 </template>

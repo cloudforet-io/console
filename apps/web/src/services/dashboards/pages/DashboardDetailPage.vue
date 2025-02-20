@@ -4,14 +4,17 @@ import {
     onUnmounted, reactive, ref, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PDivider, PI,
 } from '@cloudforet/mirinae';
 
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -29,10 +32,10 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
-
 
 interface Props {
     dashboardId: string;
@@ -40,9 +43,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const gnbStore = useGnbStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const { breadcrumbs } = useBreadcrumbs();
@@ -51,51 +52,99 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
+/* Query */
+const {
+    dashboard,
+    widgetList,
+    isError,
+    isLoading,
+    keys,
+    fetcher,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => props.dashboardId),
+});
+
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.DASHBOARD,
         id: props.dashboardId,
     })),
-    dashboardVariablesLoading: false,
+    isDeprecatedDashboard: computed(() => dashboard.value?.version === '1.0'),
 });
-
-const getDashboardDataAndListWidget = async (dashboardId: string) => {
-    try {
-        await dashboardDetailStore.getDashboardInfo({ dashboardId, fetchWidgets: true });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
-    }
-};
 
 /* Event */
 const handleRefresh = async () => {
-    if (dashboardDetailGetters.dashboardInfo?.version !== '1.0') await dashboardDetailStore.listDashboardWidgets();
+    if (dashboard.value?.version !== '1.0') {
+        const isPrivate = props.dashboardId.startsWith('private');
+        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        await queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
-const handleUpdateDashboardVariables = async (params) => {
-    state.dashboardVariablesLoading = true;
-    try {
-        await dashboardStore.updateDashboard(props.dashboardId, params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.dashboardVariablesLoading = false;
-    }
+const handleUpdateDashboardVariables = (params) => {
+    updateDashboard({
+        dashboard_id: props.dashboardId,
+        ...params,
+    });
 };
 
-watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
-    /* NOTE: The dashboard data is reset in first entering case */
-    if (dashboardId && !prevDashboardId) { // this includes all three cases
-        dashboardDetailStore.reset();
-    }
-    await getDashboardDataAndListWidget(dashboardId);
+
+const { mutate: updateDashboard, isPending: dashboardUpdateLoading } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
+                if (!oldDashboard) return _dashboard;
+                return {
+                    ...oldDashboard,
+                    vars: { ..._dashboard.vars },
+                };
+            });
+        },
+        onError: (e) => {
+            ErrorHandler.handleError(e);
+        },
+    },
+);
+
+
+watch(() => props.dashboardId, async (dashboardId) => {
     // Set Dashboard Detail Custom breadcrumbs
-    gnbStore.setBreadcrumbs(breadcrumbs.value);
+    if (dashboardId) { // this includes all three cases
+        gnbStore.setBreadcrumbs(breadcrumbs.value);
+    }
 }, { immediate: true });
+
+watch(dashboard, (_dashboard) => {
+    if (_dashboard) {
+        dashboardDetailStore.reset();
+        if (state.isDeprecatedDashboard) {
+            dashboardDetailStore.setDashboardInfoStoreState(_dashboard);
+        } else {
+            dashboardDetailStore.setDashboardInfoStoreStateV2(_dashboard);
+        }
+    }
+});
+watch(widgetList, (_widgetList) => {
+    if (_widgetList.length) {
+        dashboardDetailStore.setDashboardWidgets(_widgetList);
+    }
+});
+watch(isError, (error) => {
+    if (error) {
+        ErrorHandler.handleError(error);
+        SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
+    }
+});
 
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
@@ -112,7 +161,7 @@ onUnmounted(() => {
 <template>
     <div class="dashboard-detail-page">
         <portal-target name="dashboard-detail-page" />
-        <div v-if="dashboardDetailGetters.isDeprecatedDashboard"
+        <div v-if="state.isDeprecatedDashboard"
              class="deprecated-banner"
         >
             <p-i name="ic_limit-filled"
@@ -139,23 +188,23 @@ onUnmounted(() => {
                 </div>
                 <div class="right-part">
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="dashboardDetailState.loadingWidgets"
+                                                :loading="isLoading || dashboardUpdateLoading"
                                                 @refresh="handleRefresh"
                     />
                 </div>
             </div>
-            <div v-if="!dashboardDetailState.loadingDashboard"
+            <div v-if="!dashboardUpdateLoading"
                  class="dashboard-selectors"
             >
-                <dashboard-variables v-if="dashboardDetailGetters.isDeprecatedDashboard"
+                <dashboard-variables v-if="state.isDeprecatedDashboard"
                                      class="variable-selector-wrapper"
-                                     :loading="state.dashboardVariablesLoading"
+                                     :loading="dashboardUpdateLoading"
                                      @update="handleUpdateDashboardVariables"
                 />
                 <dashboard-variables-v2 v-else
                                         class="variable-selector-wrapper"
-                                        :disable-save-button="dashboardDetailGetters.disableManageButtons"
-                                        :loading="state.dashboardVariablesLoading"
+                                        :disable-save-button="!isManageable"
+                                        :loading="dashboardUpdateLoading"
                                         @update="handleUpdateDashboardVariables"
                 />
             </div>
@@ -163,7 +212,7 @@ onUnmounted(() => {
         <div />
 
         <div class="widget-container-body">
-            <dashboard-widget-container v-if="dashboardDetailGetters.isDeprecatedDashboard"
+            <dashboard-widget-container v-if="state.isDeprecatedDashboard"
                                         ref="widgetContainerRef"
             />
             <dashboard-widget-container-v2 v-else

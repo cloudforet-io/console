@@ -15,7 +15,7 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project-v1/stores/project-detail-page-store';
 
 interface Props {
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
     id: undefined,
     item: undefined,
     tabs: () => [],
-    activeTab: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
 });
 
 const route = useRoute();
@@ -52,7 +52,7 @@ const onChangeTab = (activeTab: string) => {
     if (activeTab === route.name) return;
     const isDashboardTab = activeTab.startsWith('public-dash-');
     const dashboardTabRoute = {
-        name: PROJECT_ROUTE_V1.DETAIL.TAB.DASHBOARD._NAME,
+        name: PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME,
         params: {
             id: props.id as string,
             dashboardId: activeTab,

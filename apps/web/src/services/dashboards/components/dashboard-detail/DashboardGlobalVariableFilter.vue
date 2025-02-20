@@ -3,7 +3,10 @@ import {
     computed, reactive,
 } from 'vue';
 
-import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardGlobalVariableFilterEnum
     from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterEnum.vue';
@@ -19,11 +22,12 @@ import DashboardGlobalVariableFilterTextInput
 
 interface Props {
     variable: DashboardGlobalVariable;
+    vars?: DashboardVars;
 }
 
 const props = defineProps<Props>();
-
-
+const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void;
+}>();
 
 const state = reactive({
     variableMethod: computed<DashboardGlobalVariable['method']>(() => props.variable.method),
@@ -35,6 +39,7 @@ const state = reactive({
         if (props.variable.options.inputType === 'input') return 'NUMBER_INPUT'; // input - number
         return 'NUMBER_SLIDER'; // slider - number
     }),
+    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 </script>
@@ -43,18 +48,23 @@ const state = reactive({
     <div class="dashboard-global-variable-filter">
         <dashboard-global-variable-filter-enum v-if="state.variableFilterType === 'ENUM'"
                                                :variable="props.variable"
+                                               :vars.sync="state.proxyVars"
         />
         <dashboard-global-variable-filter-reference v-else-if="state.variableFilterType === 'REFERENCE'"
                                                     :variable="props.variable"
+                                                    :vars.sync="state.proxyVars"
         />
         <dashboard-global-variable-filter-text-input v-else-if="state.variableFilterType === 'TEXT_INPUT'"
                                                      :variable="props.variable"
+                                                     :vars.sync="state.proxyVars"
         />
         <dashboard-global-variable-filter-number-input v-else-if="state.variableFilterType === 'NUMBER_INPUT'"
                                                        :variable="props.variable"
+                                                       :vars.sync="state.proxyVars"
         />
         <dashboard-global-variable-filter-number-slider v-else-if="state.variableFilterType === 'NUMBER_SLIDER'"
                                                         :variable="props.variable"
+                                                        :vars.sync="state.proxyVars"
         />
     </div>
 </template>

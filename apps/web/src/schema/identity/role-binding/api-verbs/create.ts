@@ -1,4 +1,4 @@
-import type { ResourceGroupType } from '@/schema/_common/type';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 
 export interface RoleCreateParameters {
     user_id: string;

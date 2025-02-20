@@ -7,20 +7,21 @@ import { PI, PTreeView } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 
 
 interface Props {
     dashboards: DashboardModel[];
+    folders: FolderModel[];
     type: 'PRIVATE' | 'PUBLIC';
     selected: string|undefined;
 }
@@ -31,19 +32,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{e: 'update:selected', value: string|undefined}>();
 
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 
 const state = reactive({
     currentParentPathIds: [] as string[],
     currentFolderId: undefined as string|undefined,
     treeDisplayMap: {} as TreeDisplayMap,
-    dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (props.type === 'PRIVATE') {
-            return getDashboardTreeData(dashboardPageControlGetters.privateFolderItems, props.dashboards);
-        }
-        return getDashboardTreeData(dashboardPageControlGetters.publicFolderItems, props.dashboards);
-    }),
+    dashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(props.folders, props.dashboards)),
     proxySelected: useProxyValue<string|undefined>('selected', props, emit),
 });
 

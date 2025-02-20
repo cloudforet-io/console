@@ -12,8 +12,8 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,10 +23,12 @@ import WidgetFormDataTableCardTransformFormWrapper
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
 import WidgetFormDataTableGlobalVariableViewButton
     from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_FIELD_TYPE, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { EvalOptions } from '@/common/modules/widgets/types/widget-model';
+
 
 
 
@@ -47,9 +49,17 @@ const FORMULA_PLACEHOLDER = '{{ Product }}';
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
+
 const storeState = reactive({
-    dataTables: computed<Partial<DataTableModel>[]>(() => widgetGenerateState.dataTables),
-    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => storeState.dataTables.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
+    currentDataTable: computed<Partial<DataTableModel>|undefined>(() => dataTableList.value.find((d) => d.data_table_id === dataTableInfo.value.dataTableId)),
 });
 const state = reactive({
     proxyOperatorOptions: useProxyValue<EvalOptions>('operator-options', props, emit),

@@ -4,6 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, sortBy } from 'lodash';
 
 import {
@@ -11,10 +12,14 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_OPERATOR, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
@@ -23,11 +28,15 @@ import {
     getWidgetFieldComponent,
 } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';
+import tableConfig from '@/common/modules/widgets/_widgets/table/widget-config';
 
 import { gray, red } from '@/styles/colors';
+
+
 
 
 const FORM_TITLE_MAP = {
@@ -49,14 +58,25 @@ const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const widgetGenerateGetters = widgetGenerateStore.getters;
+
+/* Query */
+const {
+    dataTableList,
+    fetcher,
+    keys,
+    queryClient,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
         icon: WIDGET_COMPONENT_ICON_MAP[d.widgetName ?? ''],
-        iconColor: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT ? gray[300] : undefined,
-        disabled: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT,
+        iconColor: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT ? gray[300] : undefined,
+        disabled: UNSUPPORTED_CHARTS_IN_PIVOT.includes(d.widgetName) && state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT,
     }))),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetConfigDependencies: computed<{[key:string]: string[]}>(() => state.widgetConfig.dependencies || {}),
@@ -80,38 +100,63 @@ const state = reactive({
         [FORM_TITLE_MAP.REQUIRED_FIELDS]: false,
         [FORM_TITLE_MAP.OPTIONAL_FIELDS]: false,
     },
-    selectableDataTableItems: computed(() => widgetGenerateState.dataTables.map((d) => ({
+    selectableDataTableItems: computed(() => dataTableList.value.map((d) => ({
         name: d.data_table_id,
         label: d.name,
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
     selectedDataTableId: computed<string>(() => widgetGenerateState.selectedDataTableId),
-    selectedDataTable: computed<DataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
     errorModalCurrentType: undefined as 'default'|'geoMap'|undefined,
 });
 
-
+/* Api */
+const { mutateAsync: updateWidget } = useMutation({
+    mutationFn: fetcher.updateWidgetFn,
+    onSuccess: (data) => {
+        const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
+            ? keys.privateWidgetQueryKey
+            : keys.publicWidgetQueryKey;
+        queryClient.setQueryData(widgetQueryKey.value, () => data);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 /* Event */
 const handleSelectDataTable = async (dataTableId: string) => {
-    const selectedDataTable = widgetGenerateState.dataTables.find((d) => d.data_table_id === dataTableId);
+    const selectedDataTable = dataTableList.value.find((d) => d.data_table_id === dataTableId);
     if (!selectedDataTable) return;
+
+    const isPivotDataTable = selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT;
+    let widgetType = widgetGenerateState.selectedWidgetName;
+
+    if (isPivotDataTable && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetType)) {
+        widgetType = 'table';
+        widgetGenerateStore.setSelectedWidgetName('table');
+        widgetGenerateStore.setSize(tableConfig.meta.sizes[0]);
+    }
+
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    await widgetGenerateStore.updateWidget({
+    const sanitizedOptions = sanitizeWidgetOptions(props.fieldManager.data, widgetType, selectedDataTable);
+    await updateWidget({
+        widget_id: widgetGenerateState.widgetId,
         data_table_id: dataTableId,
+        widget_type: widgetType,
         state: 'INACTIVE',
+        options: sanitizedOptions,
     });
 
-    props.fieldManager.updateDataTableAndOriginData(selectedDataTable, {});
-
-    // check if selected chart type is supported in pivot
-    if (selectedDataTable.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
-        changeWidgetType('table');
-    }
+    const _config = getWidgetConfig(widgetType);
+    if (!_config) return;
+    props.fieldManager.updateWidgetConfig(_config);
+    props.fieldManager.updateDataTableAndOriginData(selectedDataTable, sanitizedOptions);
 };
 
 const handleSelectWidgetName = (widgetName: string) => {
     changeWidgetType(widgetName);
 };
+
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
     state.widgetDefaultValidationModalVisible = false;
@@ -123,7 +168,7 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
 /* Utils */
 const checkDefaultValidation = () => {
     const selectedChartType = widgetGenerateState.selectedWidgetName;
-    const selectedDataTable = widgetGenerateGetters.selectedDataTable ?? {};
+    const selectedDataTable = state.selectedDataTable ?? {};
     if (!selectedDataTable?.options) return;
     switch (selectedChartType) {
     case 'geoMap': {
@@ -148,15 +193,17 @@ const checkDefaultValidation = () => {
 const changeWidgetType = (widgetName: string) => {
     const _config = getWidgetConfig(widgetName);
     if (widgetName === widgetGenerateState.selectedWidgetName || !_config) return;
+
+    const sanitizedOptions = sanitizeWidgetOptions(props.fieldManager.data, widgetName, state.selectedDataTable);
+    props.fieldManager.updateWidgetConfig(_config);
+    props.fieldManager.updateModifiedData(sanitizedOptions);
     widgetGenerateStore.setSelectedWidgetName(widgetName);
     widgetGenerateStore.setSize(_config.meta.sizes[0]);
-
-    props.fieldManager.updateWidgetType(_config);
     checkDefaultValidation();
 };
 
 onMounted(() => {
-    if (widgetGenerateGetters.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
+    if (state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT && UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetGenerateState.selectedWidgetName)) {
         changeWidgetType('table');
     } else checkDefaultValidation();
 });

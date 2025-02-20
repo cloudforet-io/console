@@ -88,7 +88,7 @@ import type { DynamicLayoutEventListener } from '@cloudforet/mirinae/types/data-
 import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DataSourceListParameters } from '@/schema/monitoring/data-source/api-verbs/list';
 import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import type { MonitoringLogListParameters } from '@/schema/monitoring/log/api-verbs/list';

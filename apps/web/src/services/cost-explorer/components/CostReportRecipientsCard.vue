@@ -8,11 +8,11 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
-import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import type {
     CostReportConfigUpdateRecipientsParameters,
-} from '@/schema/cost-analysis/cost-report-config/api-verbs/update-recipients';
-import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
+} from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/update-recipients';
+import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';

@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';
@@ -20,7 +20,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface TableItem {
     project_id?: string;

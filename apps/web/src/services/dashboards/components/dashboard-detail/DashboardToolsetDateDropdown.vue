@@ -3,22 +3,24 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DateRange, DashboardOptions } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange, DashboardOptions } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
-
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateCustomModal.vue';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
 
 interface Props {
     dateRange?: DateRange;
@@ -29,10 +31,21 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { i18nDayjs } = useI18nDayjs();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
+
+/* Query */
+const {
+    dashboard,
+    fetcher,
+    keys,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
@@ -99,10 +112,11 @@ const handleSelectMonthMenuItem = (selected: string) => {
         updateDashboardDateRange(state.selectedDateRange);
     }
 
-    if (!dashboardDetailGetters.disableManageButtons && !props.widgetMode) {
-        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+    if (isManageable.value && !props.widgetMode) {
+        mutate({
+            dashboard_id: dashboardDetailState.dashboardId,
             options: {
-                ...dashboardDetailGetters.dashboardInfo?.options || {},
+                ...(dashboard.value?.options || {}),
                 date_range: state.selectedDateRange,
             },
         });
@@ -142,6 +156,17 @@ const setInitialDateRange = () => {
     // The Last index is 'Custom' menu index.
     return state.monthMenuItems.length - 1;
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+        },
+    },
+);
 
 watch(() => props.dateRange, () => {
     state.selectedMonthMenuItem = state.monthMenuItems[setInitialDateRange()];

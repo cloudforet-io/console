@@ -10,8 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { CostReportConfigUpdateParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/update';
-import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
+import type { CostReportConfigUpdateParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/update';
+import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';

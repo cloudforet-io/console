@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { EventRuleGetParameters } from '@/schema/alert-manager/event-rule/api-verbs/get';
 import type { EventRuleListParameters } from '@/schema/alert-manager/event-rule/api-verbs/list';
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';

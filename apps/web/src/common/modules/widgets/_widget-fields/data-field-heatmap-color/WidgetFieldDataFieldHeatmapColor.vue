@@ -9,10 +9,9 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
 import { i18n } from '@/translations';
 
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { DATA_FIELD_HEATMAP_COLOR } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -21,31 +20,37 @@ import type {
     DataFieldHeatmapColorOptions,
     DataFieldHeatmapColorValue,
 } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
 
 
 const FIELD_KEY = 'dataFieldHeatmapColor';
 
 const props = defineProps<WidgetFieldComponentProps<DataFieldHeatmapColorOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
-const storeState = reactive({
-    selectedDataTable: computed<PrivateDataTableModel|PublicDataTableModel|undefined>(() => widgetGenerateGetters.selectedDataTable),
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
 const state = reactive({
-    isPivotDataTable: computed<boolean>(() => storeState.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
+    isPivotDataTable: computed<boolean>(() => state.selectedDataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
     isInitiated: false,
     fieldValue: computed<DataFieldHeatmapColorValue>(() => props.fieldManager.data[FIELD_KEY].value),
     dataFieldList: computed<string[]>(() => {
-        const columnFieldForPivot = storeState.selectedDataTable?.options.PIVOT?.fields?.column;
+        const columnFieldForPivot = state.selectedDataTable?.options.PIVOT?.fields?.column;
         if (state.isPivotDataTable && columnFieldForPivot) {
             return [columnFieldForPivot];
         }
-        return Object.keys(widgetGenerateGetters.selectedDataTable?.data_info ?? {}) ?? [];
+        return Object.keys(state.selectedDataTable?.data_info ?? {}) ?? [];
     }),
     menuItems: computed<SelectDropdownMenuItem[]>(() => Object.entries(DATA_FIELD_HEATMAP_COLOR).map(([key, value]) => {
         if (key === DATA_FIELD_HEATMAP_COLOR.NONE.key) {

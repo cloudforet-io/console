@@ -121,6 +121,7 @@ onUnmounted(() => {
                                     :bookmark-folder-list="storeState.bookmarkFolderList"
                                     :bookmark-list="storeState.bookmarkList"
                                     :filter-by-folder="storeState.filterByFolder"
+                                    :selected-bookmark="storeState.selectedBookmark"
                                     @confirm="handleCreateFolder"
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"

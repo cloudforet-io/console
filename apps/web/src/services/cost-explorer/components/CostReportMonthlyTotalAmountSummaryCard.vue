@@ -21,11 +21,11 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/ta
 import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/buttons/select-button-group/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
-import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
-import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CostReportDataAnalyzeParameters } from '@/api-clients/cost-analysis/cost-report-data/schema/api-verbs/analyze';
+import type { CostReportListParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/list';
+import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -52,7 +52,6 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
-
 
 
 type CostReportDataAnalyzeResult = {

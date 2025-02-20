@@ -10,6 +10,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import {
@@ -19,26 +20,36 @@ import type {
     GroupByOptions,
     GroupByValue,
 } from '@/common/modules/widgets/_widget-fields/group-by/type';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
+
 
 const DEFAULT_COUNT = 5;
 const FIELD_KEY = 'groupBy';
 
 const props = defineProps<WidgetFieldComponentProps<GroupByOptions>>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 
 const validator = widgetValidatorRegistry[FIELD_KEY];
 
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 const state = reactive({
+    selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     isInitiated: false,
     fieldValue: computed<GroupByValue>(() => props.fieldManager.data[FIELD_KEY].value),
     menuItems: computed<MenuItem[]>(() => {
         const dataTarget = props.widgetFieldSchema?.options?.dataTarget;
-        if (!widgetGenerateGetters.selectedDataTable || !dataTarget) return [];
-        const dataInfoList = sortWidgetTableFields(Object.keys(widgetGenerateGetters.selectedDataTable?.[dataTarget] ?? {})) ?? [];
+        if (!state.selectedDataTable || !dataTarget) return [];
+        const dataInfoList = sortWidgetTableFields(Object.keys(state.selectedDataTable?.[dataTarget] ?? {})) ?? [];
         return dataInfoList.map((d) => ({
             name: d,
             label: d,
@@ -61,7 +72,7 @@ const state = reactive({
         }
         return state.fieldValue.data;
     }),
-    isValid: computed(() => validator(state.fieldValue, props.widgetConfig)),
+    isValid: computed(() => validator(state.fieldValue, props.widgetConfig, state.selectedDataTable)),
     max: computed(() => props.widgetFieldSchema?.options?.max),
     isMaxValid: computed<boolean>(() => (state.max ? ((state.fieldValue?.count ?? DEFAULT_COUNT) <= state.max) : true)),
     tooltipDesc: computed(() => i18n.t('COMMON.WIDGETS.MAX_ITEMS_DESC', {

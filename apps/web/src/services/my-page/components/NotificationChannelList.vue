@@ -13,8 +13,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { Tags } from '@/schema/_common/model';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { Tags } from '@/api-clients/_common/schema/model';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserChannelListParameters } from '@/schema/alert-manager/user-channel/api-verbs/list';
@@ -40,7 +40,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface EnrichedProtocolItem extends ProtocolModel {
     label: TranslateResult;
@@ -86,7 +86,7 @@ const createProtocolItem = (d) => {
     return {
         label: d.protocol_type === 'INTERNAL' ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
         link: {
-            name: props.projectId ? PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
+            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
             params: { protocolId: d.protocol_id },
             query,
         },

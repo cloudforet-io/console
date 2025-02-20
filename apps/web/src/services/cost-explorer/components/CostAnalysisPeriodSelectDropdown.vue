@@ -11,7 +11,7 @@ import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import { i18n } from '@/translations';
 
 import { queryStringToObject, queryStringToString } from '@/lib/router-query-string';

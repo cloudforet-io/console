@@ -12,13 +12,13 @@ import {
     PDataLoader,
 } from '@cloudforet/mirinae';
 
-import { SpaceRouter } from '@/router';
-import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type {
     BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,
-} from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
+} from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
+import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

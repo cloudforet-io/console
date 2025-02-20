@@ -9,8 +9,8 @@ import {
     isEqual,
 } from 'lodash';
 
-import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
-import type { InheritOptions } from '@/schema/dashboard/_types/widget-type';
+import type { DashboardVariables } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { InheritOptions } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/display/type';

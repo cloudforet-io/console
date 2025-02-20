@@ -5,35 +5,48 @@ import {
 } from 'vue';
 import draggable from 'vuedraggable';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PI, PButton,
 } from '@cloudforet/mirinae';
 
-import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
-import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useDisplayStore } from '@/store/display/display-store';
 
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 const displayStore = useDisplayStore();
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
+
+/* Query */
+const {
+    dashboard,
+    widgetList,
+    keys,
+    fetcher,
+    queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const state = reactive({
     widgetList: computed<WidgetModel[]>(() => {
         const results: WidgetModel[] = [];
-        dashboardDetailGetters.dashboardLayouts.forEach((d) => {
+        dashboard.value?.layouts?.forEach((d) => {
             const _widgetIdList = d.widgets;
             _widgetIdList?.forEach((widgetId) => {
-                const _widget = dashboardDetailState.dashboardWidgets.find((w) => w.widget_id === widgetId);
+                const _widget = widgetList.value.find((w) => w.widget_id === widgetId);
                 const _config = getWidgetConfig(_widget?.widget_type);
                 if (!_widget || !_config) return;
                 results.push(_widget);
@@ -44,19 +57,32 @@ const state = reactive({
 });
 
 /* Event */
-const handleChangeWidgetOrder = async () => {
+const handleChangeWidgetOrder = () => {
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
     const _updatedLayouts = [{ widgets: _widgetIdList }];
-    await dashboardStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+    updateDashboard({
         dashboard_id: dashboardDetailState.dashboardId || '',
         layouts: _updatedLayouts,
     });
-    dashboardDetailStore.setDashboardWidgets([...dashboardDetailState.dashboardWidgets]);
 };
 const getWidgetDefaultName = (widgetType: string): string => {
     const _config = getWidgetConfig(widgetType);
     return _config?.meta?.title || widgetType;
 };
+
+const { mutate: updateDashboard } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+        },
+        onSettled: () => {
+            // dashboardDetailStore.setDashboardWidgets([...widgetList.value]);
+        },
+    },
+);
 
 watch(() => dashboardDetailState.dashboardId, (after, before) => {
     if (after !== before) {

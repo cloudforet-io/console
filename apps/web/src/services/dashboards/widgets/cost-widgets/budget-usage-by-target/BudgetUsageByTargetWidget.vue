@@ -12,7 +12,7 @@ import {
     PProgressBar,
 } from '@cloudforet/mirinae';
 
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { COST_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

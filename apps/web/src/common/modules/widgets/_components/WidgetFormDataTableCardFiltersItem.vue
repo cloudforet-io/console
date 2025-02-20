@@ -13,7 +13,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { DashboardGlobalVariable } from '@/schema/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import {
@@ -25,6 +25,7 @@ import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/t
 
 import { blue, gray } from '@/styles/colors';
 
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -45,8 +46,10 @@ const emit = defineEmits<{(e: 'delete'): void;
 const operatorButtonRef = ref<HTMLElement | null>(null);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
-
+const dashboardDetailState = dashboardDetailStore.state;
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 const state = reactive({
     visibleMenu: false,
     operatorMenu: computed<MenuItem[]>(() => {
@@ -100,7 +103,7 @@ const state = reactive({
     selectedOperator: [] as MenuItem[],
     proxySelectedFilter: useProxyValue<DataTableQueryFilterForDropdown>('selectedFilter', props, emit),
     globalVariableItems: computed<MenuItem[]>(() => {
-        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboardDetailGetters.dashboardVarsSchemaProperties);
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboard.value?.vars_schema?.properties ?? {});
         const _orderedVariables = getOrderedGlobalVariables(_refinedProperties);
         return _orderedVariables.map((variable) => ({
             name: `{{ global.${variable.key} }}`,

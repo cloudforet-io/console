@@ -8,8 +8,9 @@ import {
     PButton, PHeading, PSelectCard, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
-import type { TaskModel } from '@/schema/opsflow/task/model';
+
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

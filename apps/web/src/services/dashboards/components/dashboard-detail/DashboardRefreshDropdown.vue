@@ -5,16 +5,21 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { PIconButton, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';
+import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/api-clients/dashboard/_constants/dashboard-constant';
+import type { RefreshIntervalOption } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);
 
@@ -31,10 +36,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh'): void;
 }>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
+
+/* Query */
+const {
+    dashboard, keys, fetcher, queryClient,
+} = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
+const { isManageable } = useDashboardManageable({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -90,15 +103,27 @@ const handleSelectRefreshIntervalOption = (option) => {
     clearRefreshInterval();
     executeRefreshInterval();
 
-    if (!dashboardDetailGetters.disableManageButtons) {
-        dashboardStore.updateDashboard(dashboardDetailState.dashboardId, {
+    if (isManageable.value) {
+        mutate({
+            dashboard_id: dashboardDetailState.dashboardId,
             options: {
-                ...dashboardDetailGetters.dashboardInfo?.options || {},
+                ...(dashboard.value?.options || {}),
                 refresh_interval_option: option,
             },
         });
     }
 };
+
+const { mutate } = useMutation(
+    {
+        mutationFn: fetcher.updateDashboardFn,
+        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
+            const isPrivate = _dashboard.dashboard_id.startsWith('private');
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+        },
+    },
+);
 
 watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {
     if (!dashboardId) {

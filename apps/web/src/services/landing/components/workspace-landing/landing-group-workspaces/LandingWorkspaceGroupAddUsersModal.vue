@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { RoleListBasicRoleParameters } from '@/schema/identity/role/api-verbs/list-basic-role';
 import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';

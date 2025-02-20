@@ -29,7 +29,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
@@ -51,7 +51,7 @@ import { getAccountFields, stateFormatter } from '@/services/asset-inventory-v1/
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 const props = withDefaults(defineProps<{
     serviceAccountId: string;

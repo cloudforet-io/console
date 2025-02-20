@@ -11,7 +11,7 @@ import {
     PBadge, PCollapsibleList, PPaneLayout, PHeading, PEmpty, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';

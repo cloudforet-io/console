@@ -10,12 +10,14 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { TASK_STATUS_COLOR_NAMES } from '@/schema/opsflow/task/constant';
+
+import { TASK_STATUS_COLOR_NAMES } from '@/api-clients/opsflow/task/schema/constant';
 import type {
     TaskStatusColorName,
-    TaskStatusOption, TaskStatusOptions,
+    TaskStatusOption,
+    TaskStatusOptions,
     TaskStatusType,
-} from '@/schema/opsflow/task/type';
+} from '@/api-clients/opsflow/task/schema/type';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

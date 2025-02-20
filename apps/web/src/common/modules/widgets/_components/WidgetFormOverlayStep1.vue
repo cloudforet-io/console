@@ -9,8 +9,8 @@ import {
     PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 
-import type { PrivateDataTableModel } from '@/schema/dashboard/private-data-table/model';
-import type { PublicDataTableModel } from '@/schema/dashboard/public-data-table/model';
+import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
+import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -19,25 +19,32 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
+import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { violet } from '@/styles/colors';
+
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
-const dataTableCardRef = ref<WidgetFormDataTableCard[]>([]);
+const dataTableCardRef = ref<typeof WidgetFormDataTableCard[]>([]);
+
+/* Query */
+const {
+    dataTableList,
+} = useWidgetFormQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
 const storeState = reactive({
-    dataTables: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => widgetGenerateState.dataTables),
-    selectedDataTable: computed(() => widgetGenerateGetters.selectedDataTable),
     allDataTableInvalid: computed(() => widgetGenerateGetters.allDataTableInvalid),
 });
 
 const displayState = reactive({
-    dataTablesSortedByCreatedAt: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => orderBy(storeState.dataTables ?? [], ['created_at'], ['asc'])),
+    dataTablesSortedByCreatedAt: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => orderBy(dataTableList.value, ['created_at'], ['asc'])),
     dataTableAreaOpen: true,
     tableAreaHeight: (dataTableContentsRef.value?.clientHeight || 1000) / 4.5,
     minHeight: 32,
@@ -149,7 +156,7 @@ onMounted(async () => {
                                                      loading-card
                         />
                         <widget-form-data-source-popover />
-                        <div v-if="!storeState.dataTables.length"
+                        <div v-if="!dataTableList.length"
                              class="empty-data-table-guide"
                         >
                             <p class="title">

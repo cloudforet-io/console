@@ -3,7 +3,9 @@
 
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep, flattenDeep, isEqual } from 'lodash';
+import {
+    cloneDeep, flattenDeep, isEqual, xor,
+} from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
@@ -12,7 +14,8 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dro
 import type {
     DashboardGlobalVariable,
     ReferenceVariable,
-} from '@/schema/dashboard/_types/dashboard-global-variable-type';
+} from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -29,22 +32,28 @@ import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
+import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     variable: DashboardGlobalVariable;
+    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
+const { dashboard } = useDashboardDetailQuery({
+    dashboardId: computed(() => dashboardDetailState.dashboardId),
+});
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -82,6 +91,7 @@ const state = reactive({
         return getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
     }),
     selected: [] as MenuItem[],
+    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 // event
@@ -92,7 +102,7 @@ const handleSelectOption = () => {
 // helper
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars);
+    const vars = cloneDeep(props.vars ?? {});
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete vars[_key];
@@ -101,7 +111,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         vars[_key] = reconvertedSelected[0];
     }
-    dashboardDetailStore.setVars(vars);
+    state.proxyVars = vars;
 };
 
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
@@ -116,8 +126,7 @@ const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> =
     foundItems = foundItems.concat(results);
     return foundItems;
 };
-const initVariableAndSelected = async () => {
-    const items = await loadOptionItems();
+const initVariableAndSelected = (items: MenuItem[]) => {
     const found = items[0];
     if (found) {
         state.selected = [found];
@@ -133,21 +142,34 @@ const initSelected = async (value: any) => {
     if (selectedItems.length) {
         state.selected = selectedItems;
     } else {
-        await initVariableAndSelected();
+        initVariableAndSelected(items);
     }
 };
 
-watch(() => dashboardDetailGetters.dashboardVarsSchemaProperties, async (varsSchema, prevVarsSchema) => {
+watch(() => dashboard.value?.vars_schema?.properties, async (varsSchema, prevVarsSchema) => {
+    if (!varsSchema) return;
     const _variable = props.variable as ReferenceVariable;
     if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
-    const value = dashboardDetailGetters.dashboardInfo?.vars?.[_variable.key];
+    const value = dashboard.value?.vars?.[_variable.key];
     if (value) {
         await initSelected(value);
     } else {
         state.selected = [];
     }
 }, { immediate: true });
+
+
+// for reset
+watch(() => props.vars, (_vars) => {
+    const selectedValues = state.selected.map((d) => d.name);
+    const _variable = props.variable as ReferenceVariable;
+    const tempVarsValue = flattenDeep([(_vars?.[_variable.key] as string|string[]|undefined) ?? []]);
+    const isNotSame = xor(selectedValues, tempVarsValue).length > 0;
+    if (isNotSame) {
+        initSelected(_vars?.[state.variable.key]);
+    }
+});
 
 
 </script>

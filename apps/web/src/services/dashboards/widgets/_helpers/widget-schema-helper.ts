@@ -1,9 +1,9 @@
 import { chain, get, union } from 'lodash';
 
-import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {
     InheritOptions, WidgetConfig, WidgetFilterOptionKey, WidgetOptions, WidgetOptionsSchema,
-} from '@/schema/dashboard/_types/widget-type';
+} from '@/api-clients/dashboard/_types/widget-type';
 
 import { MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES, MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES } from '@/services/dashboards/widgets/_constants/managed-widget-options-schema';
 

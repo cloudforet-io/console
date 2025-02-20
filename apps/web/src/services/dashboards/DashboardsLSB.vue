@@ -8,17 +8,16 @@ import {
     PIconButton,
 } from '@cloudforet/mirinae';
 
-import type { DashboardModel } from '@/schema/dashboard/_types/dashboard-type';
+import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -34,15 +33,12 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { gray } from '@/styles/colors';
 
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-const dashboardStore = useDashboardStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlGetters = dashboardPageControlStore.getters;
 const userStore = useUserStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -51,15 +47,38 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const router = useRouter();
 const route = useRoute();
 
+/* Query */
+const {
+    publicDashboardList,
+    privateDashboardList,
+    publicFolderList,
+    privateFolderList,
+} = useDashboardQuery();
+
 const storeState = reactive({
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
+
+const queryState = reactive({
+    publicDashboardItems: computed(() => {
+        const _v2DashboardItems = publicDashboardList.value?.filter((d) => d.version !== '1.0') || [];
+        if (storeState.isAdminMode) return _v2DashboardItems;
+        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
+    }),
+    privateDashboardItems: computed(() => privateDashboardList.value?.filter((d) => d.version !== '1.0') || []),
+    publicFolderItems: computed(() => {
+        if (storeState.isAdminMode) return publicFolderList.value;
+        return publicFolderList.value?.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT')) || [];
+    }),
+    privateFolderItems: computed(() => privateFolderList.value),
+});
+
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.publicDashboardItems)),
-    privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(dashboardPageControlGetters.privateDashboardItems)),
+    publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(queryState.publicDashboardItems)),
+    privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(queryState.privateDashboardItems)),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -71,7 +90,12 @@ const state = reactive({
         ...(storeState.isWorkspaceOwner ? filterStarredItems(state.publicV2DashboardMenuSet) : []),
         ...filterStarredItems(state.privateV2DashboardMenuSet),
     ]),
-    deprecatedMenuSet: computed<LSBItem[]>(() => dashboardPageControlGetters.deprecatedDashboardItems.map((d) => ({
+    deprecatedDashboardItems: computed(() => {
+        const _public = publicDashboardList.value?.filter((d) => d.version === '1.0') || [];
+        const _private = privateDashboardList.value?.filter((d) => d.version === '1.0') || [];
+        return [..._public, ..._private];
+    }),
+    deprecatedMenuSet: computed<LSBItem[]>(() => state.deprecatedDashboardItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.dashboard_id,
         label: d.name,
@@ -155,8 +179,12 @@ const state = reactive({
     }),
 });
 
+
+
+
+
 /* Util */
-const getDashboardMenuSet = (dashboardList: DashboardModel[]) => dashboardList?.map((d) => ({
+const getDashboardMenuSet = (dashboardList: (PublicDashboardModel|PrivateDashboardModel)[]) => dashboardList?.map((d) => ({
     type: MENU_ITEM_TYPE.ITEM,
     id: d.dashboard_id,
     label: d.name,
@@ -184,17 +212,17 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     }));
     return _starredItem;
 };
-const loadDashboard = async () => {
-    await dashboardStore.load();
-};
+// const loadDashboard = async () => {
+//     await dashboardStore.load();
+// };
 
 /* Event */
 const handleClickAddButton = () => {
     router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }));
 };
 
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], loadDashboard);
-callApiWithGrantGuard();
+// const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], loadDashboard);
+// callApiWithGrantGuard();
 </script>
 
 <template>
@@ -222,13 +250,14 @@ callApiWithGrantGuard();
                   #slot-admin
         >
             <dashboard-l-s-b-tree type="PUBLIC"
-                                  :dashboards="dashboardPageControlGetters.publicDashboardItems"
+                                  :dashboards="queryState.publicDashboardItems"
+                                  :folders="queryState.publicFolderItems"
             />
         </template>
         <template v-if="!storeState.isAdminMode"
                   #slot-shared
         >
-            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.publicFolderItems.length || dashboardPageControlGetters.publicDashboardItems.length"
+            <l-s-b-collapsible-menu-item v-if="queryState.publicFolderItems.length || queryState.publicDashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -239,13 +268,14 @@ callApiWithGrantGuard();
             >
                 <template #collapsible-contents>
                     <dashboard-l-s-b-tree type="PUBLIC"
-                                          :dashboards="dashboardPageControlGetters.publicDashboardItems"
+                                          :dashboards="queryState.publicDashboardItems"
+                                          :folders="queryState.publicFolderItems"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>
         </template>
         <template #slot-private>
-            <l-s-b-collapsible-menu-item v-if="dashboardPageControlGetters.privateFolderItems.length || dashboardPageControlGetters.privateDashboardItems.length"
+            <l-s-b-collapsible-menu-item v-if="queryState.privateFolderItems.length || queryState.privateDashboardItems.length"
                                          class="category-menu-item mt-1"
                                          :item="{
                                              type: 'collapsible',
@@ -256,7 +286,8 @@ callApiWithGrantGuard();
             >
                 <template #collapsible-contents>
                     <dashboard-l-s-b-tree type="PRIVATE"
-                                          :dashboards="dashboardPageControlGetters.privateDashboardItems"
+                                          :dashboards="queryState.privateDashboardItems"
+                                          :folders="queryState.privateFolderItems"
                     />
                 </template>
             </l-s-b-collapsible-menu-item>

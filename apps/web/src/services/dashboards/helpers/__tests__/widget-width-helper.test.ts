@@ -1,6 +1,6 @@
 import { describe, expect } from 'vitest';
 
-import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import type { WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 
 import {
     WIDGET_CONTAINER_MAX_WIDTH,

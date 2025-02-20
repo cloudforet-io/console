@@ -14,7 +14,7 @@ import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/table
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
+import type { CostJobStatus } from '@/api-clients/cost-analysis/job/schema/type';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';

@@ -12,8 +12,8 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
@@ -24,7 +24,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import ProjectChannelList from '@/services/alert-manager-v1/components/ProjectChannelList.vue';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
-import { PROJECT_ROUTE_V1 } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 
 const NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_level']; label: string}[] = [
@@ -170,7 +170,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
                     :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
-                    :to="getProperRouteLocation({ name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } })"
+                    :to="getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } })"
                     highlight
             />
         </div>

@@ -14,7 +14,7 @@ import type {
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
