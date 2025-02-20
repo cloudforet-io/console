@@ -205,7 +205,8 @@ watch([() => state.chartData, () => chartContext.value, () => props.widgetOption
         state.chart.setOption(state.chartOptions, true);
     }
 });
-watch([() => state.data, () => props.widgetOptions], ([newData]) => {
+watch([() => state.data, () => props.widgetOptions, () => state.dataTable], ([newData,, _dataTable]) => {
+    if (!_dataTable) return;
     drawChart(newData);
 }, { immediate: true });
 watch(() => props.dataTableId, async (newDataTableId) => {

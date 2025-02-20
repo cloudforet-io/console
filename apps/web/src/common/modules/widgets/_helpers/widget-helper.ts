@@ -1,5 +1,5 @@
 import bytes from 'bytes';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isArray } from 'lodash';
 
 import { byteFormatter, customNumberFormatter, numberFormatter } from '@cloudforet/utils';
 
@@ -10,6 +10,8 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
+// eslint-disable-next-line import/no-cycle
+import { widgetFieldDefaultValueSetterRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/default-value-registry';
 import { WIDGET_OPTIONS_AFFECTED_BY_DATA_TABLE, widgetValidatorRegistry } from '@/common/modules/widgets/_widget-field-value-manager/constant/validator-registry';
 import type { NumberFormatInfo } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -67,51 +69,54 @@ export const sanitizeWidgetOptions = (options: WidgetModel['options'] = {}, widg
 
     // Remove keys that are not in the validOptionKeys list
     currentOptionKeys.forEach((key) => {
+        const fieldValue = cloneDeep(options[key]).value;
         if (!validOptionKeys.includes(key)) {
             delete options[key];
         }
 
-        const fieldValue = cloneDeep(options[key]).value;
         const validator = widgetValidatorRegistry[key];
         const isFieldAffectedByDataTable = WIDGET_OPTIONS_AFFECTED_BY_DATA_TABLE.includes(key);
 
-        if (!dataTable || !fieldValue || !validator || !isFieldAffectedByDataTable) return;
+        if (!validOptionKeys.includes(key) || !dataTable || !fieldValue || !validator || !isFieldAffectedByDataTable) return;
 
         const fieldOptions = _fieldsSchema[key]?.options ?? {};
         if (!validator(fieldValue, widgetConfig, dataTable, options)) {
             const availableFieldKeys = Object.keys(dataTable?.[fieldOptions?.dataTarget || 'data_info'] ?? {});
-            console.debug('key', key, dataTable, fieldValue, availableFieldKeys, fieldOptions, validator(fieldValue, widgetConfig, dataTable, options));
-            console.debug('availableFieldKeys', key, fieldOptions, availableFieldKeys, fieldValue.data);
             if (key === 'dataField') {
                 const isMultiSelectable = fieldOptions?.multiSelectable;
+                const originalData = fieldValue.data;
+                const filteredData = isArray(originalData) ? originalData.filter((val) => availableFieldKeys.includes(val)) : [];
+                const getSingleValue = (data) => (availableFieldKeys.includes(data) ? data : availableFieldKeys[0]);
 
                 const isPivotDataTable = dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT;
                 if (isPivotDataTable) {
-                    const pivotColumnsField = dataTable?.options.PIVOT?.fields?.column;
-                    options[key] = { value: { ...fieldValue, data: isMultiSelectable ? [pivotColumnsField] : pivotColumnsField } };
-                } else if (isMultiSelectable) {
+                    const pivotColumnsField = dataTable?.options.PIVOT?.fields?.column; // string;
                     options[key] = {
                         value: {
                             ...fieldValue,
-                            data: fieldValue.data?.filter((val) => availableFieldKeys.includes(val)) || [],
+                            data: isMultiSelectable ? [pivotColumnsField] : pivotColumnsField,
                         },
                     };
-                } else if (!availableFieldKeys.includes(fieldValue.data)) {
-                    options[key] = { value: { ...fieldValue, data: availableFieldKeys[0] } };
+                } else {
+                    options[key] = {
+                        ...fieldValue,
+                        value: { data: isMultiSelectable ? filteredData : getSingleValue(originalData) },
+                    };
                 }
             }
             if (key === 'groupBy') {
                 const isMultiSelectable = fieldOptions?.multiSelectable;
-                if (isMultiSelectable) {
-                    options[key] = {
-                        value: {
-                            ...fieldValue,
-                            data: fieldValue.data?.filter((val) => availableFieldKeys.includes(val)) || [],
-                        },
-                    };
-                } else if (!availableFieldKeys.includes(fieldValue.data)) {
-                    options[key] = { value: { ...fieldValue, data: availableFieldKeys[0] } };
-                }
+                const originalData = fieldValue.data;
+                const filteredData = isArray(originalData) ? originalData.filter((val) => availableFieldKeys.includes(val)) : [];
+                const hideCount = fieldOptions?.hideCount;
+                const getSingleValue = (data) => (availableFieldKeys.includes(data) ? data : availableFieldKeys[0]);
+
+                options[key] = {
+                    value: {
+                        count: !hideCount ? (fieldValue.count ?? fieldOptions.defaultMaxCount ?? 5) : undefined,
+                        data: isMultiSelectable ? filteredData : getSingleValue(originalData),
+                    },
+                };
             }
             if (key === 'categoryBy' || key === 'stackBy' || key === 'xAxis' || key === 'yAxis') {
                 if (!availableFieldKeys.includes(fieldValue.data)) {
@@ -155,6 +160,15 @@ export const sanitizeWidgetOptions = (options: WidgetModel['options'] = {}, widg
         }
     });
 
-    console.debug('options', options);
+    validOptionKeys.forEach((key) => {
+        const fieldValue = cloneDeep(options[key])?.value;
+        if (!fieldValue) {
+            const defaultValueSetter = widgetFieldDefaultValueSetterRegistry[key];
+            if (defaultValueSetter) {
+                options[key] = { value: defaultValueSetter(widgetConfig, dataTable) };
+            }
+        }
+    });
+
     return options;
 };
