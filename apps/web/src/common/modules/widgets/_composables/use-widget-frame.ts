@@ -157,7 +157,7 @@ export const useWidgetFrame = (
         unitMap: computed<Record<string, string>>(() => {
             const _result: Record<string, string> = {};
             dataTableList.value.forEach((d) => {
-                Object.entries(d.data_info).forEach(([k, v]) => {
+                Object.entries(d?.data_info ?? {}).forEach(([k, v]) => {
                     if (v?.unit) _result[k] = v.unit;
                 });
             });
