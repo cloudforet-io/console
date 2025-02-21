@@ -32,6 +32,8 @@ export interface AlertModel {
     resolved_at: string;
     acknowledged_by: string,
     resolved_by: string,
+    acknowledged_duration: string;
+    resolved_duration: string;
 }
 
 export interface AlertHistoryModel {
