@@ -144,7 +144,7 @@ const fetchAlerts = async () => {
 };
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
-        return storeState.webhook[id].label || id;
+        return storeState.webhook[id]?.label || id;
     }
     return id;
 };
