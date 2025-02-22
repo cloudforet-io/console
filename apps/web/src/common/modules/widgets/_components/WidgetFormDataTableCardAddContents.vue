@@ -82,7 +82,9 @@ const {
 } = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const { cascadeUpdateDataTable } = useDataTableCascadeUpdate({
+const {
+    cascadeUpdateDataTable,
+} = useDataTableCascadeUpdate({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
