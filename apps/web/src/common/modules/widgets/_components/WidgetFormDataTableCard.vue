@@ -20,14 +20,15 @@ const LOADING_STATE = 'LOADING';
 interface Props {
     item?: PublicDataTableModel|PrivateDataTableModel;
     loadingCard?: boolean;
+    loading?: boolean;
 }
 
 const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
-const addContents = ref<WidgetFormDataTableCardAddContents|null>(null);
-const transformContents = ref<WidgetFormDataTableCardTransformContents|null>(null);
+const addContents = ref<typeof WidgetFormDataTableCardAddContents|null>(null);
+const transformContents = ref<typeof WidgetFormDataTableCardTransformContents|null>(null);
 
 const state = reactive({
     dataTableId: computed<string|undefined>(() => props.item?.data_table_id),
@@ -56,11 +57,13 @@ defineExpose({
                                                   ref="addContents"
                                                   :item="props.item"
                                                   :selected="state.selected"
+                                                  :loading="props.loading"
         />
         <widget-form-data-table-card-transform-contents v-else-if="state.dataType === DATA_TABLE_TYPE.TRANSFORMED"
                                                         ref="transformContents"
                                                         :item="props.item"
                                                         :selected="state.selected"
+                                                        :loading="props.loading"
         />
     </div>
 </template>

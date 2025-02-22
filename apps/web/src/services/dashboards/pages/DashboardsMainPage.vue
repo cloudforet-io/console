@@ -100,8 +100,8 @@ const state = reactive({
         const _private = privateDashboardList.value.filter((d) => d.version === '1.0');
         return [..._public, ..._private];
     }),
-    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(publicFolderList.value, publicDashboardList.value, dashboardPageControlState.newIdList)),
-    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(privateFolderList.value, privateDashboardList.value, dashboardPageControlState.newIdList)),
+    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.publicFolderItems, state.publicDashboardItems, dashboardPageControlState.newIdList)),
+    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.privateFolderItems, state.privateDashboardItems, dashboardPageControlState.newIdList)),
     publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
         if (storeState.isAdminMode) {
             const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
