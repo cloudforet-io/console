@@ -70,7 +70,7 @@
     "commander": "^10.0.1",
     "core-js": "^3.29.1",
     "dayjs": "^1.10.7",
-    "dompurify": "^3.2.3",
+    "dompurify": "^3.2.4",
     "dragselect": "^1.15.1",
     "ejs": "^3.1.10",
     "filepond": "^4.30.3",
