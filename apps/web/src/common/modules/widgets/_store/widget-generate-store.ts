@@ -30,6 +30,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         joinRestrictedMap: {} as JoinRestrictedMap, // Flag for handling Join type EXCEPTION RESTRICTION cases. (duplicated data field). Example - { '{dataTalbeId}': true, }
         allDataTableInvalidMap: {} as Record<string, boolean>, // Flag for handling all data table invalid cases. Example - { '{dataTalbeId}': true, }
         dataTableLoadFailed: false,
+        dataTableCasCadeUpdateLoadingMap: {} as Record<string, boolean>,
     });
 
     const getters = reactive({
@@ -80,6 +81,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setDataTableLoadFailed = (status: boolean) => {
         state.dataTableLoadFailed = status;
     };
+    const setDataTableCasCadeUpdateLoadingMap = (value: Record<string, boolean>) => {
+        state.dataTableCasCadeUpdateLoadingMap = value;
+    };
 
     const mutations = {
         setWidgetId,
@@ -95,6 +99,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setAllDataTableInvalidMap,
         setDataTableCreateLoading,
         setDataTableLoadFailed,
+        setDataTableCasCadeUpdateLoadingMap,
     };
     const actions = {
         /* Step 2 */
