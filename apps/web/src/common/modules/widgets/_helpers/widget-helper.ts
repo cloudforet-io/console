@@ -99,8 +99,10 @@ export const sanitizeWidgetOptions = (options: WidgetModel['options'] = {}, widg
                     };
                 } else {
                     options[key] = {
-                        ...fieldValue,
-                        value: { data: isMultiSelectable ? filteredData : getSingleValue(originalData) },
+                        value: {
+                            ...fieldValue,
+                            data: isMultiSelectable ? filteredData : getSingleValue(originalData),
+                        },
                     };
                 }
             }
