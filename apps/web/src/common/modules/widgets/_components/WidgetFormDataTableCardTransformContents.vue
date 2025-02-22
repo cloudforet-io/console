@@ -96,7 +96,9 @@ const {
 } = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const { cascadeUpdateDataTable } = useDataTableCascadeUpdate({
+const {
+    cascadeUpdateDataTable,
+} = useDataTableCascadeUpdate({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
@@ -559,7 +561,7 @@ defineExpose({
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"
-                                            :loading="state.loading || props.loading"
+                                            :loading="state.loading || props.loading || !!widgetGenerateState.dataTableCasCadeUpdateLoadingMap?.[props.item.data_table_id]"
                                             @delete="handleClickDeleteDataTable"
                                             @reset="handleClickResetDataTable"
                                             @update="handleUpdateDataTable"
