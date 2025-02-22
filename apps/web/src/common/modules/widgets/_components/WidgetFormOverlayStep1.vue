@@ -35,6 +35,7 @@ const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
 const dataTableCardRef = ref<typeof WidgetFormDataTableCard[]>([]);
+const scrollContainerRef = ref<HTMLElement|null>(null);
 
 /* Query */
 const {
@@ -98,6 +99,11 @@ const handleClickAllApply = async () => {
         displayState.loading = false;
     }
 };
+const handleScrollDataTableContainer = () => {
+    if (!scrollContainerRef.value) return;
+    const { scrollWidth } = scrollContainerRef.value;
+    scrollContainerRef.value.scrollTo({ left: scrollWidth, behavior: 'smooth' });
+};
 
 /* Hide Toggle */
 const offTransition = () => { displayState.transition = false; };
@@ -160,7 +166,9 @@ onMounted(async () => {
              class="data-table-contents"
         >
             <div class="data-table-area">
-                <div class="data-table-scroll-wrapper">
+                <div ref="scrollContainerRef"
+                     class="data-table-scroll-wrapper"
+                >
                     <div class="data-table-contents-wrapper">
                         <widget-form-data-table-card v-for="(dataTable, index) in displayState.dataTablesSortedByCreatedAt"
                                                      :ref="el => dataTableCardRef[index] = el"
@@ -171,7 +179,7 @@ onMounted(async () => {
                         <widget-form-data-table-card v-if="widgetGenerateState.dataTableCreateLoading"
                                                      loading-card
                         />
-                        <widget-form-data-source-popover />
+                        <widget-form-data-source-popover @scroll="handleScrollDataTableContainer" />
                         <div v-if="!dataTableList.length"
                              class="empty-data-table-guide"
                         >

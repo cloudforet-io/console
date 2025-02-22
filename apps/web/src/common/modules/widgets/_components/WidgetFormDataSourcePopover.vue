@@ -54,6 +54,8 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 
+const emit = defineEmits<{(e: 'scroll'): void;}>();
+
 /* Query */
 const {
     dataTableList,
@@ -246,7 +248,7 @@ const handleClickDataSourceDomain = (domainName: DataTableSourceType) => {
     state.selectedDataSourceDomain = domainName;
     resetSelectedDataSource();
 };
-const handleCreateUnsavedTransform = (operator: DataTableOperator) => {
+const handleCreateUnsavedTransform = async (operator: DataTableOperator) => {
     const unsavedTransformData = {
         data_table_id: `UNSAVED-${getRandomId()}`,
         name: getDuplicatedDataTableName(`${operator} Data`, dataTableList.value),
@@ -260,13 +262,14 @@ const handleCreateUnsavedTransform = (operator: DataTableOperator) => {
 
     const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
     const dataTableListQueryKey = _isPrivate ? widgetQueryKeys.privateDataTableListQueryKey : widgetQueryKeys.publicDataTableListQueryKey;
-    queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
+    await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
         ...oldData, results: [...oldData.results, unsavedTransformData],
     } : {
         ...oldData, results: [unsavedTransformData],
     }));
 
     state.showPopover = false;
+    emit('scroll');
 };
 
 const handleSelectPopperCondition = (condition: DataTableDataType) => {
@@ -329,6 +332,7 @@ const handleConfirmDataSource = async () => {
                 ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
             },
         });
+        emit('scroll');
     }
     widgetGenerateStore.setDataTableCreateLoading(false);
 };
