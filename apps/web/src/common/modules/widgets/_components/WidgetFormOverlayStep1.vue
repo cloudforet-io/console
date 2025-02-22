@@ -20,6 +20,10 @@ import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/Wi
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import {
+    createDataTableReferenceMap,
+    getDataTableReferenceMapExecutionOrder,
+} from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import { violet } from '@/styles/colors';
@@ -64,23 +68,34 @@ const displayState = reactive({
     resizing: false,
     clientY: null,
     transition: false,
+    loading: false,
 });
 
-
 /* Event */
-
 const handleClickAllApply = async () => {
+    displayState.loading = true;
     try {
-        dataTableCardRef.value.forEach((_ref) => {
-            if (_ref) {
-                if (typeof _ref?.updateDataTable === 'function') {
-                    _ref?.updateDataTable();
-                }
-            }
-        });
+        const dataTableReferenceMap = createDataTableReferenceMap(dataTableList.value);
+        const executionOrderList = getDataTableReferenceMapExecutionOrder(dataTableReferenceMap);
+
+        const dataTableRefs = Object.fromEntries(
+            dataTableCardRef.value
+                .filter((_ref) => _ref)
+                .map((_ref) => [_ref.item?.data_table_id, _ref]),
+        );
+
+        await Promise.allSettled(
+            executionOrderList.map(async (dataTableId) => {
+                const dataTableRef = dataTableRefs[dataTableId];
+                if (dataTableRef) await dataTableRef.updateDataTable();
+            }),
+        );
+
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.APPLY_ALL_SUCCESS'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        displayState.loading = false;
     }
 };
 
@@ -151,6 +166,7 @@ onMounted(async () => {
                                                      :ref="el => dataTableCardRef[index] = el"
                                                      :key="`data-table-${dataTable.data_table_id}`"
                                                      :item="dataTable"
+                                                     :loading="displayState.loading"
                         />
                         <widget-form-data-table-card v-if="widgetGenerateState.dataTableCreateLoading"
                                                      loading-card
