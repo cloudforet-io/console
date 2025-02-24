@@ -54,7 +54,7 @@ const getProjectAlertConfig = async () => {
 };
 
 watch(() => props.id, () => {
-    if (!isAlertManagerV2Enabled) getProjectAlertConfig();
+    if (!isAlertManagerV2Enabled.value) getProjectAlertConfig();
 }, { immediate: true });
 </script>
 

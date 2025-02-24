@@ -9,14 +9,12 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap,
     ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
-import config from '@/lib/config';
 import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
@@ -30,7 +28,6 @@ let lastLoadedTime = 0;
 
 export const useServiceReferenceStore = defineStore('reference-service', () => {
     const userStore = useUserStore();
-    const domainStore = useDomainStore();
     const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
     const state = reactive({
@@ -52,9 +49,6 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
     });
 
     const load = async (options?: ReferenceLoadOptions) => {
-        const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
-        if (!isAlertManagerVersionV2) return;
-
         const currentTime = new Date().getTime();
 
         if (
@@ -69,7 +63,7 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
             },
         };
 
-        if (!isAlertManagerV2Enabled) return;
+        if (!isAlertManagerV2Enabled.value) return;
         try {
             const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>(params);
 

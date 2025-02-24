@@ -107,7 +107,7 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        ...(isAlertManagerV2Enabled ? [] : [
+        ...(isAlertManagerV2Enabled.value ? [] : [
             {
                 name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                 label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
