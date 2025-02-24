@@ -62,6 +62,7 @@ const storeState = reactive({
 /* Query */
 const {
     dashboard,
+    widgetList,
     keys,
     fetcher,
     queryClient,
@@ -129,6 +130,10 @@ const state = reactive({
     varsSnapshot: {} as DashboardVars,
     dashboardOptionsSnapshot: {} as DashboardOptions,
     isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared && !storeState.isAdminMode),
+    isDashboardLayoutChanged: computed(() => {
+        const _layouts = dashboard.value?.layouts || [];
+        return !isEqual(_layouts?.[0]?.widgets, widgetList.value.map((w) => w.widget_id));
+    }),
 });
 
 const {
@@ -168,7 +173,8 @@ const updateWidget = async () => {
     if (result) {
         state.fieldManager.updateOriginData(cloneDeep(result.options));
     }
-    if (_isCreating) {
+
+    if (_isCreating || state.isDashboardLayoutChanged) {
         const _layouts = cloneDeep(dashboard.value?.layouts || []);
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
@@ -193,9 +199,10 @@ const updateWidget = async () => {
 const { mutate: updateDashboard } = useMutation(
     {
         mutationFn: fetcher.updateDashboardFn,
-        onSuccess: () => {
+        onSuccess: (data) => {
             const dashboardQueryKey = state.isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            // queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            queryClient.setQueryData(dashboardQueryKey.value, () => data);
         },
     },
 );
@@ -257,7 +264,7 @@ watch(() => widget.value?.size, (widgetSize) => {
 }, { immediate: true });
 watch(() => state.mounted, async (mounted) => {
     if (mounted) {
-        if (widget.value?.state === 'CREATING') {
+        if (widget.value?.state === 'CREATING' || state.isDashboardLayoutChanged) {
             await updateWidget();
         }
         // await loadOverlayWidget();
