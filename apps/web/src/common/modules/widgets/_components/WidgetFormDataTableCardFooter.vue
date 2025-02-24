@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PButton, PSpinner } from '@cloudforet/mirinae';
+import { PButton } from '@cloudforet/mirinae';
 
 interface Props {
    disabled: boolean;
@@ -44,13 +44,11 @@ const handleUpdateDataTable = () => {
             </p-button>
             <p-button style-type="secondary"
                       class="apply-button"
+                      :loading="props.loading"
                       :disabled="props.disabled || props.isLegacyDataTable"
                       @click="handleUpdateDataTable"
             >
                 <div class="button-contents-wrapper">
-                    <p-spinner v-if="props.loading"
-                               size="sm"
-                    />
                     {{ $t('COMMON.WIDGETS.APPLY') }}
                 </div>
                 <div v-if="props.changed"

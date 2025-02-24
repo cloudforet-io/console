@@ -58,7 +58,7 @@ const state = reactive({
 
 const getEscalationPolicyLabel = (id: string): string => storeState.escalationPolicy[id]?.label || '';
 const getWebhookIcon = (id: string): string|undefined => {
-    const webhook = storeState.webhook[id].data;
+    const webhook = storeState.webhook[id]?.data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };

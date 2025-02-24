@@ -58,6 +58,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 interface Props {
     selected: boolean;
     item: PublicDataTableModel|PrivateDataTableModel;
+    loading?: boolean;
 }
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
@@ -81,7 +82,9 @@ const {
 } = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const { cascadeUpdateDataTable } = useDataTableCascadeUpdate({
+const {
+    cascadeUpdateDataTable,
+} = useDataTableCascadeUpdate({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
@@ -246,7 +249,7 @@ const invalidateLoadQueries = async (data: DataTableModel) => {
         ],
     });
 };
-const { mutateAsync: updateDataTableAndCascadeUpdate } = useMutation({
+const { mutateAsync: updateDataTableMutation } = useMutation({
     mutationFn: fetcher.updateDataTableFn,
     onSuccess: async (data) => {
         const dataTableListQueryKey = state.isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
@@ -265,7 +268,6 @@ const { mutateAsync: updateDataTableAndCascadeUpdate } = useMutation({
             return oldData;
         });
         await invalidateLoadQueries(data);
-        await cascadeUpdateDataTable(data.data_table_id);
 
         setInitialDataTableForm();
         state.filterFormKey = getRandomId();
@@ -284,6 +286,9 @@ const { mutateAsync: updateWidget } = useMutation({
             ? keys.privateWidgetQueryKey
             : keys.publicWidgetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
+
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
+        widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
     },
     onError: (e) => {
         showErrorMessage(e.message, e);
@@ -351,18 +356,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             timediff: getTimeDiffValue(),
         },
     };
-
-    const result = await updateDataTableAndCascadeUpdate(updateParams);
-    if (widget.value?.state === 'ACTIVE') {
-        const _widgetOptions = cloneDeep(widget.value.options);
-        const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value.widget_type, result);
-        await updateWidget({
-            widget_id: widgetGenerateState.widgetId,
-            state: 'INACTIVE',
-            options: sanitizedOptions,
-        });
-    }
-    return result;
+    return updateDataTableMutation(updateParams);
 };
 const deleteDataTableFn = (params: DataTableDeleteParameters): Promise<void> => {
     if (params.data_table_id.startsWith('private')) {
@@ -447,8 +441,14 @@ const handleUpdateDataTable = async () => {
     state.loading = true;
     const result = await updateDataTable();
     if (result) {
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
-        widgetGenerateStore.setSelectedDataTableId(state.dataTableId);
+        const _widgetOptions = cloneDeep(widget.value?.options);
+        const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value?.widget_type, result);
+        await updateWidget({
+            widget_id: widgetGenerateState.widgetId,
+            state: 'INACTIVE',
+            options: sanitizedOptions,
+        });
+        await cascadeUpdateDataTable(result.data_table_id);
     }
     setTimeout(() => {
         state.loading = false;
@@ -557,7 +557,7 @@ defineExpose({
         />
         <widget-form-data-table-card-footer :disabled="validationState.dataTableApplyInvalid"
                                             :changed="state.optionsChanged"
-                                            :loading="state.loading"
+                                            :loading="state.loading || props.loading"
                                             @delete="handleClickDeleteDataTable"
                                             @reset="handleClickResetDataTable"
                                             @update="handleUpdateDataTable"

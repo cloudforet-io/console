@@ -70,6 +70,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 interface Props {
     selected: boolean;
     item: PublicDataTableModel|PrivateDataTableModel;
+    loading?: boolean;
 }
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
@@ -95,7 +96,9 @@ const {
 } = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const { cascadeUpdateDataTable } = useDataTableCascadeUpdate({
+const {
+    cascadeUpdateDataTable,
+} = useDataTableCascadeUpdate({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
@@ -228,11 +231,10 @@ const invalidateLoadQueries = async (data: DataTableModel) => {
         ],
     });
 };
-const { mutateAsync: updateDataTableAndCascadeUpdate } = useMutation({
+const { mutateAsync: updateDataTableMutation } = useMutation({
     mutationFn: fetcher.updateDataTableFn,
     onSuccess: async (data) => {
         await syncDataTableList(data);
-        await cascadeUpdateDataTable(data.data_table_id);
         await invalidateLoadQueries(data);
 
         setFailStatus(false);
@@ -250,6 +252,7 @@ const { mutateAsync: updateWidget } = useMutation({
             ? keys.privateWidgetQueryKey
             : keys.publicWidgetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     },
     onError: (e) => {
         showErrorMessage(e.message, e);
@@ -368,17 +371,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         name: state.dataTableName,
         options: { [state.operator]: options() },
     };
-    const result = await updateDataTableAndCascadeUpdate(updateParams);
-    if (widget.value?.state === 'ACTIVE') {
-        const _widgetOptions = cloneDeep(widget.value.options);
-        const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value.widget_type, result);
-        await updateWidget({
-            widget_id: widgetGenerateState.widgetId,
-            state: 'INACTIVE',
-            options: sanitizedOptions,
-        });
-    }
-    return result;
+
+    return updateDataTableMutation(updateParams);
 };
 const deleteDataTableFn = (params: DataTableDeleteParameters): Promise<void> => {
     if (params.data_table_id.startsWith('private')) {
@@ -431,8 +425,15 @@ const handleUpdateDataTable = async () => {
     state.loading = true;
     const result = await updateDataTable();
     if (result) {
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
+        const _widgetOptions = cloneDeep(widget.value?.options);
+        const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value?.widget_type, result);
+        await updateWidget({
+            widget_id: widgetGenerateState.widgetId,
+            state: 'INACTIVE',
+            options: sanitizedOptions,
+        });
         widgetGenerateStore.setSelectedDataTableId(result.data_table_id);
+        await cascadeUpdateDataTable(result.data_table_id);
     }
     setTimeout(() => {
         state.loading = false;
@@ -560,7 +561,7 @@ defineExpose({
         />
         <widget-form-data-table-card-footer :disabled="state.applyDisabled"
                                             :changed="state.optionsChanged"
-                                            :loading="state.loading"
+                                            :loading="state.loading || props.loading || !!widgetGenerateState.dataTableCasCadeUpdateLoadingMap?.[props.item.data_table_id]"
                                             @delete="handleClickDeleteDataTable"
                                             @reset="handleClickResetDataTable"
                                             @update="handleUpdateDataTable"

@@ -133,6 +133,9 @@ const handleClickContinue = async () => {
                 _updateParams.state = 'INACTIVE';
             }
             let widgetType = widget.value?.widget_type ?? 'table';
+            if (widgetGenerateState.selectedWidgetName) {
+                widgetType = widgetGenerateState.selectedWidgetName;
+            }
             if (UNSUPPORTED_CHARTS_IN_PIVOT.includes(widgetType)) {
                 widgetType = 'table';
                 _updateParams.widget_type = widgetType;

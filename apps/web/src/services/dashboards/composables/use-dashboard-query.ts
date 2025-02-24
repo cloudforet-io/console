@@ -90,6 +90,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
     const _publicDashboardListQueryKey = computed(() => [
         ...publicDashboardListQueryKey.value,
         _state.defaultListQuery,
+        _state.publicDashboardListApiQuery.filter,
     ]);
     const _privateDashboardListQueryKey = computed(() => [
         ...privateDashboardListQueryKey.value,
@@ -98,6 +99,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
     const _publicFolderListQueryKey = computed(() => [
         ...publicFolderListQueryKey.value,
         _state.defaultListQuery,
+        _state.publicFolderListApiQuery.filter,
     ]);
     const _privateFolderListQueryKey = computed(() => [
         ...privateFolderListQueryKey.value,
@@ -111,13 +113,17 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         queryFn: () => publicDashboardAPI.list({
             query: {
                 ..._state.publicDashboardListApiQuery,
-                sort: [{ key: 'created_at', desc: true }],
+                sort: [{
+                    key: 'created_at',
+                    desc: true,
+                }],
             },
         }),
         select: (data) => data?.results ?? [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
+        enabled: computed(() => !!_state.publicDashboardListApiQuery?.filter),
     }, ['DOMAIN', 'WORKSPACE']);
     const privateDashboardListQuery = useScopedQuery<ListResponse<PrivateDashboardModel>, unknown, PrivateDashboardModel[]>({
         queryKey: _privateDashboardListQueryKey,
@@ -144,6 +150,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
+        enabled: computed(() => !!_state.publicFolderListApiQuery?.filter),
     }, ['DOMAIN', 'WORKSPACE']);
     const privateFolderListQuery = useScopedQuery<ListResponse<PrivateFolderModel>, unknown, PrivateFolderModel[]>({
         queryKey: _privateFolderListQueryKey,
