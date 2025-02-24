@@ -27,7 +27,8 @@ import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 
-const DEFAULT_REFRESH_INTERVAL = '5m';
+// const DEFAULT_REFRESH_INTERVAL = '5m';
+const DEFAULT_REFRESH_INTERVAL = 'off';
 export const DASHBOARD_DEFAULT = Object.freeze<{ options: DashboardOptions }>({
     options: {
         date_range: {
