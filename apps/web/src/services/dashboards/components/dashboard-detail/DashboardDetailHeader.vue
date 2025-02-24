@@ -162,7 +162,7 @@ const handleSelectItem = (item: MenuItem) => {
                                            style-type="tertiary-icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            size="sm"
-                                           :menu="getControlMenuItems(props.dashboardId).value"
+                                           :menu="getControlMenuItems(props.dashboardId)"
                                            :selected="[]"
                                            use-fixed-menu-style
                                            reset-selection-on-menu-close

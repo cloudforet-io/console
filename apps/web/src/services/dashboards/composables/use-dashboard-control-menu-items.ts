@@ -1,3 +1,4 @@
+import { toValue } from '@vueuse/core';
 import type { ComputedRef } from 'vue';
 import { reactive, computed } from 'vue';
 
@@ -73,6 +74,7 @@ export const useDashboardControlMenuItems = ({
 
         const _isDeprecated = _dashboard.version === '1.0';
         const _isDashboardManageable = _getDashboardManageable(_dashboard);
+
         if (!_isDashboardManageable) {
             if (_isDeprecated) return [];
             return computed(() => ([
@@ -159,8 +161,8 @@ export const useDashboardControlMenuItems = ({
         ]));
     };
     const getControlMenuItems = (id: string): ComputedRef<MenuItem[]>|MenuItem[] => {
-        if (id.includes('folder')) return _getFolderControlMenuItems(id);
-        return _getDashboardControlMenuItems(id);
+        if (id.includes('folder')) return toValue(_getFolderControlMenuItems(id));
+        return toValue(_getDashboardControlMenuItems(id));
     };
 
     return {
