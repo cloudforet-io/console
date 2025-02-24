@@ -60,7 +60,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
 
         const referenceMap: EscalationPolicyReferenceMap = {};
         try {
-            const fetcher = isAlertManagerV2Enabled
+            const fetcher = isAlertManagerV2Enabled.value
                 ? SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
                     query: {
                         only: ['escalation_policy_id', 'name', 'service_id'],
