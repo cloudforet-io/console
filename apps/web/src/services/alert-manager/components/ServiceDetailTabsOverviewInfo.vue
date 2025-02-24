@@ -7,6 +7,8 @@ import { i18n } from '@/translations';
 
 import ServiceDetailTabsOverviewInfoAlertChart
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewInfoAlertChart.vue';
+import ServiceDetailTabsOverviewMostTriggeredAlertsTable
+    from '@/services/alert-manager/components/ServiceDetailTabsOverviewMostTriggeredAlertsTable.vue';
 import ServiceDetailTabsOverviewWebhook from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhook.vue';
 import ServiceDetailTabsOverviewWebhookChart
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhookChart.vue';
@@ -26,10 +28,8 @@ const handleChangeDateOption = (dateOption: string) => {
 
 <template>
     <div class="service-detail-tabs-overview-info">
-        <p-pane-layout class="info col-span-1">
-            <p class="title-label">
-                {{ $t('ALERT_MANAGER.SERVICE.MOST_FREQUENTLY_OCCURRED_ALERTS') }}
-            </p>
+        <p-pane-layout class="info left col-span-1">
+            <service-detail-tabs-overview-most-triggered-alerts-table />
         </p-pane-layout>
         <p-pane-layout class="info col-span-1">
             <p class="title-label">
@@ -66,6 +66,8 @@ const handleChangeDateOption = (dateOption: string) => {
     @apply mt-4 grid grid-flow-row-dense grid-cols-2 grid-rows-2 gap-4;
     .info {
         @apply px-4 py-5;
+        max-height: 425px;
+        overflow: hidden;
         .title-label {
             @apply text-[1rem] font-bold mb-5;
         }
