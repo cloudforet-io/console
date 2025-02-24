@@ -60,7 +60,7 @@ export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
 
         const referenceMap: WebhookReferenceMap = {};
         try {
-            const fetcher = isAlertManagerV2Enabled
+            const fetcher = isAlertManagerV2Enabled.value
                 ? SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>
                 : SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParametersV1, ListResponse<WebhookModelV1>>;
 
