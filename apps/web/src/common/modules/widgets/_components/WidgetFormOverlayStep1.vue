@@ -200,6 +200,7 @@ onMounted(async () => {
                     />
                     <p-button icon-left="ic_refresh"
                               style-type="secondary"
+                              :loading="displayState.loading"
                               :disabled="storeState.allDataTableInvalid"
                               @click="handleClickAllApply"
                     >

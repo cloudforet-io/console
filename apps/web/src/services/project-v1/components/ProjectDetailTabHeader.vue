@@ -343,7 +343,7 @@ const getProjectAlertActivated = async () => {
 
 /* Watchers */
 watch(() => projectDetailPageGetters.projectType, async () => {
-    if (!isAlertManagerV2Enabled) {
+    if (!isAlertManagerV2Enabled.value) {
         await Promise.allSettled([
             getProjectAlertActivated(),
             listWebhooks(),
