@@ -179,10 +179,12 @@ const updateWidget = async () => {
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
             if (_targetLayout.widgets) {
-                _targetLayout.widgets.push(widgetGenerateState.widgetId);
+                const newLayoutWidgets = [..._targetLayout.widgets as string[], widgetGenerateState.widgetId];
+                _targetLayout.widgets = sanitizeAndSortWidgets(newLayoutWidgets, widgetList.value.map((w) => w.widget_id));
             } else {
                 _targetLayout.widgets = [widgetGenerateState.widgetId];
             }
+
             _layouts[0] = _targetLayout;
         } else {
             _layouts.push({
@@ -208,6 +210,28 @@ const { mutate: updateDashboard } = useMutation(
 );
 
 /* Util */
+const sanitizeAndSortWidgets = (_layoutWidgets: string[] = [], _widgetList: string[] = []): string[] => {
+    const uniqueWidgets = [...new Set(_layoutWidgets)];
+
+    if (uniqueWidgets.length === _widgetList.length && uniqueWidgets.every((item) => _widgetList.includes(item))) {
+        return [...uniqueWidgets];
+    }
+
+    const widgetsSet = new Set(uniqueWidgets);
+    const widgetListSet = new Set(_widgetList);
+
+    const missingInWidgets = [...widgetListSet].filter((item) => !widgetsSet.has(item));
+
+    const sanitizedWidgets = uniqueWidgets.filter((item) => widgetListSet.has(item)).concat(missingInWidgets);
+
+    const indexMap = new Map(_widgetList.map((item, index) => [item, index]));
+    sanitizedWidgets.sort((a, b) => (indexMap.get(a) ?? Infinity) - (indexMap.get(b) ?? Infinity));
+
+
+    return sanitizedWidgets;
+};
+
+
 const initSnapshot = () => {
     state.varsSnapshot = cloneDeep(dashboard.value?.vars || {});
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);

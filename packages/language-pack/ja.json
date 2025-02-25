@@ -2536,7 +2536,8 @@
 					"NAMESPACE": "Namespace",
 					"SECURITY": "セキュリティ",
 					"SELECT_A_DATA_SOURCE": "データソースを選択",
-					"SELECT_DATA_SOURCE_TYPE": "データソースの種類を選択"
+					"SELECT_DATA_SOURCE_TYPE": "データソースの種類を選択",
+					"UNIFIED_COST": ""
 				},
 				"STEP_2": {
 					"ADD_RULE": "ルールを追加",

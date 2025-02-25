@@ -33,6 +33,7 @@ export type WidgetState = 'CREATING' | 'INACTIVE' | 'ACTIVE';
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
     'COST'?: CostOptions;
+    'UNIFIED_COST'?: UnifiedCostOptions;
     group_by?: DataTableGroupByInfo[];
     data_name: string;
     data_unit?: string;
@@ -49,6 +50,10 @@ export interface AssetOptions {
 export interface CostOptions {
     data_source_id: string;
     plugin_id?: string;
+    data_key: string;
+}
+
+export interface UnifiedCostOptions {
     data_key: string;
 }
 

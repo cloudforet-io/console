@@ -2536,7 +2536,8 @@
 					"NAMESPACE": "네임스페이스",
 					"SECURITY": "보안",
 					"SELECT_A_DATA_SOURCE": "데이터 소스 선택",
-					"SELECT_DATA_SOURCE_TYPE": "데이터 소스 타입 선택"
+					"SELECT_DATA_SOURCE_TYPE": "데이터 소스 타입 선택",
+					"UNIFIED_COST": ""
 				},
 				"STEP_2": {
 					"ADD_RULE": "규칙 추가",
