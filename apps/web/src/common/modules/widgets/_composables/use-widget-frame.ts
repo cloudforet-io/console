@@ -27,6 +27,7 @@ import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/ty
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import type { MetricFilter } from '@/services/asset-inventory-v1/types/asset-analysis-type';
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -85,7 +86,7 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: WidgetPr
         ...convertConsoleFiltersToMetricFilter(dataTable?.options?.filter ?? []),
         ...dashboardVars,
     };
-    const _filter = dataTable?.source_type === DATA_SOURCE_DOMAIN.COST ? _costFilters : _assetFilters;
+    const _filter = (dataTable?.source_type === DATA_SOURCE_DOMAIN.COST || dataTable?.source_type === DATA_SOURCE_DOMAIN.UNIFIED_COST) ? _costFilters : _assetFilters;
 
     const _dateRange: DateRange = cloneDeep(dateRange);
     if (!_dateRange?.start) _dateRange.start = dateRange?.end;
@@ -105,7 +106,18 @@ const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: WidgetPr
             },
             query: _query,
         });
-    } if (dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
+    }
+    if (dataTable?.source_type === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+        return getProperRouteLocation({
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: UNIFIED_COST_KEY,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: _query,
+        });
+    }
+    if (dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
         const _metricId = dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
         if (_metricId) {
             return getProperRouteLocation({

@@ -3,6 +3,7 @@
 import { computed, reactive } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
+import { cloneDeep } from 'lodash';
 
 import {
     PIconButton, PI, PTextInput, PTooltip,
@@ -20,6 +21,7 @@ import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-wi
 import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
@@ -44,6 +46,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 
 /* Query */
 const {
+    widget,
     dataTableList,
     fetcher,
     keys,
@@ -71,6 +74,15 @@ const handleSelectDataTable = async (dataTableId: string) => {
         showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.SELECT_DATA_TABLE_WARNING'), '');
         return;
     }
+    if (widgetGenerateState.selectedDataTableId === dataTableId) return;
+
+    const _widgetOptions = cloneDeep(widget.value?.options);
+    const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value?.widget_type, storeState.currentDataTable);
+    await updateWidget({
+        widget_id: widgetGenerateState.widgetId,
+        state: 'INACTIVE',
+        options: sanitizedOptions,
+    });
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
 };
 const handleUpdateDataTableName = (value: string) => {
@@ -108,6 +120,19 @@ const handleClickNameConfirm = async () => {
 };
 
 /* Api */
+const { mutateAsync: updateWidget } = useMutation({
+    mutationFn: fetcher.updateWidgetFn,
+    onSuccess: (data) => {
+        const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
+            ? keys.privateWidgetQueryKey
+            : keys.publicWidgetQueryKey;
+        queryClient.setQueryData(widgetQueryKey.value, () => data);
+    },
+    onError: (e) => {
+        showErrorMessage(e.message, e);
+        ErrorHandler.handleError(e);
+    },
+});
 const { mutate: updateDataTable } = useMutation({
     mutationFn: fetcher.updateDataTableFn,
     onSuccess: async (data) => {
