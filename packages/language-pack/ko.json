@@ -252,6 +252,7 @@
 			"ALT_S_INVITE_MEMBER": "멤버 초대 완료",
 			"ALT_S_UPDATE_SERVICE": "서비스 수정 완료",
 			"AVERAGE_ACKNOWLEDGED_RESOLVED_TIME_BY_URGENCY": "",
+			"AVERAGE_ACKNOWLEDGED_RESOLVED_TIME_BY_URGENCY_NO_DATA": "데이터가 없습니다.",
 			"CREATE_SERVICE_DESC": "모니터링, 장애 대응 관리, 수동으로 얼럿을 생성할 수 있도록 기술 스택의 특정 구성 요소를 명확히 식별할 수 있는 서비스 이름을 설정하세요.",
 			"CREATE_SERVICE_TITLE": "새로운 서비스 생성",
 			"CREATE_WEBHOOK_TITLE": "웹훅 생성",
@@ -278,14 +279,13 @@
 			"MODAL_DELETE_TITLE": "이 서비스를 삭제하시겠습니까?",
 			"MODAL_EDIT_TITLE": "서비스 이름 수정",
 			"MODAL_MEMBER_PLACEHOLDER": "멤버 선택",
-			"MOST_FREQUENTLY_OCCURRED_ALERTS": "",
-			"MOST_FREQUENTLY_OCCURRED_ALERTS_NO_DATA": "데이터가 없습니다.",
 			"MOST_TRIGGERED_ALERTS": {
 				"CUSTOM": "",
 				"LAST_MONTH": "",
 				"LAST_SIX_MONTHS": "",
 				"LAST_THREE_MONTHS": "",
 				"LAST_TWELVE_MONTHS": "",
+				"NO_DATA": "데이터가 없습니다.",
 				"THIS_MONTH": ""
 			},
 			"NO_DATA": "새로운 서비스 생성",
