@@ -252,7 +252,6 @@ const { mutateAsync: updateWidget } = useMutation({
             ? keys.privateWidgetQueryKey
             : keys.publicWidgetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
-        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
     },
     onError: (e) => {
         showErrorMessage(e.message, e);
@@ -432,6 +431,7 @@ const handleUpdateDataTable = async () => {
             state: 'INACTIVE',
             options: sanitizedOptions,
         });
+        showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_SUCCESS'), '');
         widgetGenerateStore.setSelectedDataTableId(result.data_table_id);
         await cascadeUpdateDataTable(result.data_table_id);
     }

@@ -186,7 +186,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
         }
-        if (!!dashboardInfo.project_id && dashboardInfo.project_id !== '*') {
+        if (!!dashboardInfo.project_id && dashboardInfo.project_id !== '*' && dashboardInfo.project_id !== '-') {
             state.projectId = dashboardInfo.project_id;
         }
         state.vars = dashboardInfo.vars ?? {};
