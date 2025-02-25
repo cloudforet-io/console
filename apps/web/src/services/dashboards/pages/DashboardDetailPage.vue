@@ -133,7 +133,7 @@ watch(dashboard, (_dashboard) => {
             dashboardDetailStore.setDashboardInfoStoreStateV2(_dashboard);
         }
     }
-});
+}, { immediate: true });
 watch(widgetList, (_widgetList) => {
     if (_widgetList.length) {
         dashboardDetailStore.setDashboardWidgets(_widgetList);
