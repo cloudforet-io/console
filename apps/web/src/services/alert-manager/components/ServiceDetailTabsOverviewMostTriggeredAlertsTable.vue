@@ -189,7 +189,7 @@ watch(() => tableState.refinedItems, () => {
         >
             <p-empty>
                 <template #default>
-                    <span>No Data</span>
+                    <span>{{ $t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.NO_DATA') }}</span>
                 </template>
             </p-empty>
         </div>
