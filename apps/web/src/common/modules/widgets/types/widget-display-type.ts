@@ -39,6 +39,8 @@ export interface WidgetProps {
     disableRefreshOnLoading?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     disableManageButtons?: boolean;
+
+    loadDisabled?: boolean;
 }
 
 export interface WidgetEmit {
