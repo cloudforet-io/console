@@ -115,7 +115,7 @@ const queryResult = useQuery({
             limit: MAX_COUNT,
         },
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 

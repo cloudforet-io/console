@@ -176,7 +176,7 @@ const queryResult = useQuery({
         end: dateRange.value.end,
         vars: props.dashboardVars,
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
