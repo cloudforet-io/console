@@ -152,7 +152,7 @@ const queryResult = useQuery({
         ...(!isDateField(widgetOptionsState.xAxisInfo.data) && { page: { start: 1, limit: widgetOptionsState.xAxisInfo?.count } }),
         vars: props.dashboardVars,
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 

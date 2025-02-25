@@ -153,7 +153,7 @@ const queryResult = useQuery({
         start: dateRange.value.start,
         end: dateRange.value.end,
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 

@@ -215,7 +215,8 @@ const queryResults = useQueries({
             enabled: computed<boolean>(() => {
                 const widgetActive = props.widgetState !== 'INACTIVE';
                 const dataTableReady = !!state.dataTable;
-                return widgetActive && dataTableReady;
+                const loadDisabled = props.loadDisabled;
+                return widgetActive && dataTableReady && !loadDisabled;
             }),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
@@ -232,7 +233,9 @@ const queryResults = useQueries({
                 const widgetActive = props.widgetState !== 'INACTIVE';
                 const dataTableReady = !!state.dataTable;
                 const totalEnabled = !!widgetOptionsState.totalInfo?.toggleValue;
-                return widgetActive && dataTableReady && totalEnabled;
+                const loadDisabled = props.loadDisabled;
+
+                return widgetActive && dataTableReady && totalEnabled && !loadDisabled;
             }),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
