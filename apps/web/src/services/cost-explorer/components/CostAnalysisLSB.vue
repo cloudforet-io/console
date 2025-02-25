@@ -183,7 +183,8 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
 };
 
 (() => {
-    costQuerySetStore.setUnifiedCostOn(storeState.isAdminMode);
+    const isUnifiedCostRoute = route.params.dataSourceId === UNIFIED_COST_KEY;
+    costQuerySetStore.setUnifiedCostOn(isUnifiedCostRoute || storeState.isAdminMode);
 })();
 
 </script>
