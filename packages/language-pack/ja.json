@@ -279,6 +279,7 @@
 			"MODAL_DELETE_TITLE": "このサービスを削除してもよろしいですか？",
 			"MODAL_EDIT_TITLE": "サービス名を編集",
 			"MODAL_MEMBER_PLACEHOLDER": "メンバーを選択してください",
+			"MOST_FREQUENTLY_OCCURRED_ALERTS": "",
 			"MOST_TRIGGERED_ALERTS": {
 				"CUSTOM": "",
 				"LAST_MONTH": "",
