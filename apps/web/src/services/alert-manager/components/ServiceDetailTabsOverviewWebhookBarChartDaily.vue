@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ComputedRef } from 'vue';
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 
 } from 'vue';
 
@@ -14,7 +14,6 @@ import { reduce } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { byteFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 
@@ -24,12 +23,14 @@ import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const chartContext = ref<HTMLElement | null>(null);
-const serviceId = ref<string>(serviceDetailPageGetters.serviceInfo.service_id);
+const serviceId = computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id);
 
 const WEBHOOK_DAILY = 'webhook_daily';
 
@@ -191,9 +192,9 @@ watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
 const fetchWebhookList = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
-            service_id: serviceId.value,
             query: {
                 sort: [{ key: 'created_at', desc: false }],
+                filter: [{ k: 'service_id', v: serviceId.value, o: 'eq' }],
             },
         });
 
@@ -203,9 +204,9 @@ const fetchWebhookList = async () => {
     }
 };
 
-onMounted(async () => {
+watch(() => serviceId, async () => {
     await fetchWebhookList();
-});
+}, { immediate: true, deep: true });
 </script>
 
 <template>
