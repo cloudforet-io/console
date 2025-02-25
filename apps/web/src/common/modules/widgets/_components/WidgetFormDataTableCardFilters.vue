@@ -105,9 +105,12 @@ const state = reactive({
     proxyFilter: useProxyValue<Record<string, DataTableQueryFilter>>('filter', props, emit),
     filterItems: computed(() => props.filterItems),
     selectedItems: [] as any[],
+    primaryCostOptions: computed<Record<string, any>>(() => ({
+        ...((props.sourceType === DATA_SOURCE_DOMAIN.COST && props.sourceId) ? { data_source_id: props.sourceId } : {}),
+    })),
     handlerMap: computed(() => {
         const handlerMaps = {};
-        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
+        if (props.sourceType === DATA_SOURCE_DOMAIN.COST || props.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
             state.selectedItems.forEach(({ name, presetKeys }) => {
                 handlerMaps[name] = getCostMenuHandler(name, { presetKeys });
             });
@@ -118,9 +121,6 @@ const state = reactive({
         }
         return handlerMaps;
     }),
-    primaryCostOptions: computed<Record<string, any>>(() => ({
-        data_source_id: props.sourceId,
-    })),
     primaryMetricStatOptions: computed<Record<string, any>>(() => ({
         metric_id: props.sourceId,
     })),

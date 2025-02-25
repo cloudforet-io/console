@@ -143,7 +143,7 @@ const state = reactive({
     }),
     filterFormKey: getRandomId(),
     optionsChanged: computed(() => {
-        const sourceKeyChanged = state.selectedSourceEndItem !== originDataState.sourceKey;
+        const sourceKeyChanged = state.sourceType !== DATA_SOURCE_DOMAIN.UNIFIED_COST && state.selectedSourceEndItem !== originDataState.sourceKey;
         const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
         const groupByTagsChanged = !isEqual(state.selectedGroupByTagsMap, originDataState.groupByTagsMap);
         const filterChanged = !isEqual(state.filter, originDataState.filter);
@@ -175,7 +175,11 @@ const validationState = reactive({
 });
 
 const originDataState = reactive({
-    sourceKey: computed(() => (state.sourceType === DATA_SOURCE_DOMAIN.COST ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id)),
+    sourceKey: computed(() => {
+        if (state.sourceType === DATA_SOURCE_DOMAIN.COST) return props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key;
+        if (state.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) return 'cost';
+        return props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
+    }),
     groupBy: computed(() => ((props.item.options as DataTableAddOptions).group_by ?? []).map((group) => ({
         name: group.key,
         label: group.name,
@@ -302,9 +306,10 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         return undefined;
     }
 
-    const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
-        ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
-        : { metric_id: state.selectedSourceEndItem };
+    let domainOptions;
+    if (state.sourceType === DATA_SOURCE_DOMAIN.COST) domainOptions = { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem };
+    if (state.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) domainOptions = { data_key: 'cost' };
+    if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) domainOptions = { metric_id: state.selectedSourceEndItem };
 
     const costGroupBy = state.selectedGroupByItems.map((group) => ({
         key: group.name,
@@ -313,7 +318,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     }));
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
-    const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
+
+    const groupBy = (state.sourceType === DATA_SOURCE_DOMAIN.COST || state.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) ? costGroupBy : assetGroupBy;
 
     GROUP_BY_INFO_ITEMS_FOR_TAGS.forEach((tag) => {
         const groupByTags = groupBy.find((group) => group.key === tag.key);
@@ -532,7 +538,8 @@ defineExpose({
                                                       :selected="props.selected"
                                                       :data-table-name.sync="dataTableNameState.dataTableName"
             />
-            <widget-form-data-table-card-source-form :source-type="state.sourceType"
+            <widget-form-data-table-card-source-form v-if="state.sourceType !== DATA_SOURCE_DOMAIN.UNIFIED_COST"
+                                                     :source-type="state.sourceType"
                                                      :parent-source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.namespaceId"
                                                      :menu="state.selectableSourceItems"
                                                      :selected="state.selectedSourceEndItem"

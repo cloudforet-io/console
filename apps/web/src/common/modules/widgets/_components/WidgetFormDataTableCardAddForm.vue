@@ -39,6 +39,7 @@ import {
 import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
 import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 const TAGS_DATA_KEY = 'tags';
 
@@ -47,8 +48,8 @@ interface Props {
     filterFormKey: string;
     dataTableId: string;
     sourceType?: string;
-    sourceId: string;
-    sourceKey: string;
+    sourceId?: string;
+    sourceKey?: string;
     sourceItems: SelectDropdownMenuItem[];
     selectedGroupByItems: any[];
     selectedGroupByTagsMap: Record<string, string[]>;
@@ -87,7 +88,7 @@ const storeState = reactive({
 });
 const { allItems: costDataSourceMenuItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
-    costDataSource: computed(() => storeState.costDataSources[props.sourceId]),
+    costDataSource: computed(() => storeState.costDataSources[props.sourceId ?? '']),
 });
 
 const state = reactive({
@@ -149,11 +150,19 @@ const groupByState = reactive({
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return costDataSourceMenuItems.value.filter((d) => d.name !== 'project_group_id');
         }
+        if (props.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+            const groupByItemValueList = Object.values(GROUP_BY_ITEM_MAP);
+            if (!storeState.isAdminMode) return groupByItemValueList.filter((d) => d.name !== 'workspace_id').map((d) => ({ name: d.name, label: d.label }));
+            return groupByItemValueList.map((d) => ({ name: d.name, label: d.label }));
+        }
         return [...assetFilterState.metricItems];
     }),
-    filterItems: computed(() => {
+    filterItems: computed<MenuItem[]>(() => {
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return costDataSourceMenuItems.value;
+        }
+        if (props.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+            return groupByState.items;
         }
         return [...assetFilterState.metricFilterItems];
     }),
