@@ -16,6 +16,7 @@ export const DATA_TABLE_TYPE = {
 
 export const DATA_SOURCE_DOMAIN = {
     COST: 'COST',
+    UNIFIED_COST: 'UNIFIED_COST',
     ASSET: 'ASSET',
     SECURITY: 'SECURITY',
 };

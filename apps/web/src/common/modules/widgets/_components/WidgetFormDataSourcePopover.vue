@@ -30,6 +30,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
+import WidgetFormUnifiedCostDataSourcePopper
+    from '@/common/modules/widgets/_components/WidgetFormUnifiedCostDataSourcePopper.vue';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_SOURCE_DOMAIN,
@@ -104,6 +106,9 @@ const state = reactive({
         if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
             return !state.selectedCostDataSourceId || !state.selectedCostDataType;
         }
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+            return !state.selectedUnifiedCostDataType;
+        }
         if ([DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)) {
             return !state.selectedMetricId;
         }
@@ -112,6 +117,7 @@ const state = reactive({
     // cost
     selectedCostDataSourceId: undefined as undefined|string,
     selectedCostDataType: undefined as undefined|string,
+    selectedUnifiedCostDataType: undefined as undefined|string,
     // asset & security
     selectedMetricId: undefined as undefined|string,
     selectedNamespace: computed(() => {
@@ -236,6 +242,7 @@ const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useMutatio
 const resetSelectedDataSource = () => {
     state.selectedCostDataSourceId = undefined;
     state.selectedCostDataType = undefined;
+    state.selectedUnifiedCostDataType = undefined;
     state.selectedMetricId = undefined;
 };
 
@@ -287,9 +294,11 @@ const handleConfirmDataSource = async () => {
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
-        const dataTableBaseName = state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST
-            ? `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`
-            : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
+        let dataTableBaseName: string;
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) dataTableBaseName = `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`;
+        else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) dataTableBaseName = 'Unified Cost';
+        else dataTableBaseName = `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
+
         const addParameters = {
             widget_id: widgetGenerateState.widgetId as string,
             source_type: state.selectedDataSourceDomain,
@@ -313,7 +322,13 @@ const handleConfirmDataSource = async () => {
                 data_key: state.selectedCostDataType,
             },
         };
-        const assetOptions = {
+        const unifiedCostOptions: DataTableAddOptions = {
+            data_name: dataTableBaseName,
+            UNIFIED_COST: {
+                data_key: state.selectedUnifiedCostDataType,
+            },
+        };
+        const assetOptions: DataTableAddOptions = {
             data_name: storeState.metrics[state.selectedMetricId]?.label,
             data_unit: storeState.metrics[state.selectedMetricId]?.data.unit,
             ASSET: {
@@ -325,13 +340,19 @@ const handleConfirmDataSource = async () => {
         widgetGenerateStore.setDataTableCreateLoading(true);
         state.showPopover = false;
 
-        await addDataTable({
+        const mergedParams = {
             ...addParameters,
             vars: dashboard.value?.vars || {},
-            options: {
-                ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
-            },
-        });
+        };
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
+            mergedParams.options = costOptions;
+        } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+            mergedParams.options = unifiedCostOptions;
+        } else {
+            mergedParams.options = assetOptions;
+        }
+
+        await addDataTable(mergedParams);
         emit('scroll');
     }
     widgetGenerateStore.setDataTableCreateLoading(false);
@@ -413,6 +434,29 @@ watch(() => state.showPopover, (val) => {
                                 </p>
                             </div>
                         </p-select-card>
+                        <p-select-card :class="{'custom-select-card': true, 'selected': state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST }"
+                                       :value="DATA_SOURCE_DOMAIN.UNIFIED_COST"
+                                       @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.UNIFIED_COST)"
+                        >
+                            <div class="domain-contents">
+                                <p-i v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST"
+                                     class="selected-marker"
+                                     name="ic_checkbox-circle-selected"
+                                     width="1.25rem"
+                                     height="1.25rem"
+                                />
+                                <div class="icon-wrapper">
+                                    <p-i name="ic_data-domain-cost"
+                                         width="1.25rem"
+                                         height="1.25rem"
+                                    />
+                                </div>
+                                <p class="name">
+                                    {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.UNIFIED_COST') }}
+                                </p>
+                            </div>
+                        </p-select-card>
+
                         <p class="data-source-domain-title mt-2">
                             {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.INVENTORY') }}
                         </p>
@@ -444,6 +488,9 @@ watch(() => state.showPopover, (val) => {
                             v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
                             :selected-cost-data-source-id.sync="state.selectedCostDataSourceId"
                             :selected-cost-data-type.sync="state.selectedCostDataType"
+                        />
+                        <widget-form-unified-cost-data-source-popper v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST"
+                                                                     :selected-cost-data-type.sync="state.selectedUnifiedCostDataType"
                         />
                         <widget-form-asset-security-data-source-popper
                             v-if="[DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)"
@@ -647,7 +694,7 @@ watch(() => state.showPopover, (val) => {
     .data-source-popover-content {
         display: flex;
         flex-direction: column;
-        min-width: 43.5rem;
+        min-width: 44rem;
         height: 26rem;
         .top-part {
             display: flex;
@@ -657,7 +704,7 @@ watch(() => state.showPopover, (val) => {
                 @apply border-r border-gray-200;
                 display: flex;
                 flex-direction: column;
-                min-width: 11.5rem;
+                min-width: 12rem;
                 height: 100%;
                 padding: 1rem 0.75rem;
 
