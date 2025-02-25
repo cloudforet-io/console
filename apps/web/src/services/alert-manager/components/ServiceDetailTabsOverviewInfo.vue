@@ -5,8 +5,8 @@ import { PPaneLayout, PSelectButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import ServiceDetailTabsOverviewInfoAlertChart
-    from '@/services/alert-manager/components/ServiceDetailTabsOverviewInfoAlertChart.vue';
+import ServiceDetailTabsOverviewInfoAlertAverageTimeByUrgencyBarChart
+    from '@/services/alert-manager/components/ServiceDetailTabsOverviewInfoAlertAverageTimeByUrgencyBarChart.vue';
 import ServiceDetailTabsOverviewMostTriggeredAlertsTable
     from '@/services/alert-manager/components/ServiceDetailTabsOverviewMostTriggeredAlertsTable.vue';
 import ServiceDetailTabsOverviewWebhook from '@/services/alert-manager/components/ServiceDetailTabsOverviewWebhook.vue';
@@ -32,10 +32,10 @@ const handleChangeDateOption = (dateOption: string) => {
             <service-detail-tabs-overview-most-triggered-alerts-table />
         </p-pane-layout>
         <p-pane-layout class="info col-span-1">
-            <p class="title-label">
-                {{ $t('ALERT_MANAGER.SERVICE.LABELS_WITH_THE_MOST_ALERTS') }}
+            <p class="text-[1rem] font-bold">
+                {{ $t('ALERT_MANAGER.SERVICE.AVERAGE_ACKNOWLEDGED_RESOLVED_TIME_BY_URGENCY') }}
             </p>
-            <service-detail-tabs-overview-info-alert-chart />
+            <service-detail-tabs-overview-info-alert-average-time-by-urgency-bar-chart />
         </p-pane-layout>
         <p-pane-layout class="info col-span-2">
             <div class="flex justify-between">
