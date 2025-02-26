@@ -252,6 +252,7 @@
 			"ALT_S_INVITE_MEMBER": "メンバーが正常に招待されました",
 			"ALT_S_UPDATE_SERVICE": "サービスが正常に更新されました",
 			"AVERAGE_ACKNOWLEDGED_RESOLVED_TIME_BY_URGENCY": "",
+			"AVERAGE_ACKNOWLEDGED_RESOLVED_TIME_BY_URGENCY_NO_DATA": "データがありません",
 			"CREATE_SERVICE_DESC": "モニタリング、障害対応の管理、手動でアラートを作成できるように、技術スタックの特定のコンポーネントを明確に識別できるサービス名を設定してください。",
 			"CREATE_SERVICE_TITLE": "新しいサービスを作成",
 			"CREATE_WEBHOOK_TITLE": "ウェブフックの作成",
@@ -279,13 +280,13 @@
 			"MODAL_EDIT_TITLE": "サービス名を編集",
 			"MODAL_MEMBER_PLACEHOLDER": "メンバーを選択してください",
 			"MOST_FREQUENTLY_OCCURRED_ALERTS": "",
-			"MOST_FREQUENTLY_OCCURRED_ALERTS_NO_DATA": "データがありません",
 			"MOST_TRIGGERED_ALERTS": {
 				"CUSTOM": "",
 				"LAST_MONTH": "",
 				"LAST_SIX_MONTHS": "",
 				"LAST_THREE_MONTHS": "",
 				"LAST_TWELVE_MONTHS": "",
+				"NO_DATA": "データがありません",
 				"THIS_MONTH": ""
 			},
 			"NO_DATA": "新しいサービスを作成",

@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PDataTable, PSelectDropdown, PLazyImg,
+    PDataTable, PSelectDropdown, PLazyImg, PEmpty,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -184,6 +184,15 @@ watch(() => tableState.refinedItems, () => {
                 </div>
             </template>
         </p-data-table>
+        <div v-else
+             class="mt-36"
+        >
+            <p-empty>
+                <template #default>
+                    <span>{{ $t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.NO_DATA') }}</span>
+                </template>
+            </p-empty>
+        </div>
     </div>
 </template>
 

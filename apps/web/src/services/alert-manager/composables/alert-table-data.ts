@@ -67,3 +67,26 @@ export const calculateTime = (time: string, timezone: string): string => {
 
     return result.trim();
 };
+
+export const formatDurationWithTimezone = (
+    duration: number,
+    timezone: string,
+): string => {
+    const today = dayjs().tz(timezone);
+    const targetTime = today.subtract(duration, 'seconds');
+
+    const diffInSeconds = today.diff(targetTime, 'seconds');
+    const days = Math.floor(diffInSeconds / 86400);
+    const hours = Math.floor((diffInSeconds % 86400) / 3600);
+    const minutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = Math.floor((diffInSeconds % 60) % 60);
+
+    let result = '';
+    if (days > 0) result += `${days}d `;
+    if (hours > 0) result += `${hours}hr `;
+    if (minutes > 0 || result === '') result += `${minutes}m `;
+    if (seconds > 0 || result === '') result += `${seconds}s`;
+
+    return result.trim();
+};
+
