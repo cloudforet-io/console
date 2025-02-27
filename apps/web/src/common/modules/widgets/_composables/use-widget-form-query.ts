@@ -29,8 +29,8 @@ interface UseWidgetFormQueryReturn {
     dataTableListLoading: ComputedRef<boolean>;
     widgetLoading: ComputedRef<boolean>;
     keys: {
-        publicWidgetQueryKey: ComputedRef<QueryKey>;
-        privateWidgetQueryKey: ComputedRef<QueryKey>;
+        publicWidgetGetQueryKey: ComputedRef<QueryKey>;
+        privateWidgetGetQueryKey: ComputedRef<QueryKey>;
         publicWidgetLoadQueryKey: ComputedRef<QueryKey>;
         privateWidgetLoadQueryKey: ComputedRef<QueryKey>;
         publicWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
@@ -59,13 +59,13 @@ export const useWidgetFormQuery = ({
 }: UseWidgetFormQueryOptions): UseWidgetFormQueryReturn => {
     const {
         publicWidgetAPI,
-        publicWidgetQueryKey,
+        publicWidgetGetQueryKey,
         publicWidgetLoadQueryKey,
         publicWidgetLoadSumQueryKey,
     } = usePublicWidgetApi();
     const {
         privateWidgetAPI,
-        privateWidgetQueryKey,
+        privateWidgetGetQueryKey,
         privateWidgetLoadQueryKey,
         privateWidgetLoadSumQueryKey,
     } = usePrivateWidgetApi();
@@ -84,12 +84,12 @@ export const useWidgetFormQuery = ({
     const isPrivate = computed(() => !!widgetId?.value?.startsWith('private'));
 
     /* Query Keys */
-    const _publicWidgetQueryKey = computed(() => [
-        ...publicWidgetQueryKey.value,
+    const _publicWidgetGetQueryKey = computed(() => [
+        ...publicWidgetGetQueryKey.value,
         widgetId?.value,
     ]);
-    const _privateWidgetQueryKey = computed(() => [
-        ...privateWidgetQueryKey.value,
+    const _privateWidgetGetQueryKey = computed(() => [
+        ...privateWidgetGetQueryKey.value,
         widgetId?.value,
     ]);
     const _publicDataTableListQueryKey = computed(() => [
@@ -103,7 +103,7 @@ export const useWidgetFormQuery = ({
 
     /* Querys */
     const publicWidgetQuery = useScopedQuery({
-        queryKey: _publicWidgetQueryKey,
+        queryKey: _publicWidgetGetQueryKey,
         queryFn: () => publicWidgetAPI.get({
             widget_id: widgetId?.value as string,
         }),
@@ -111,7 +111,7 @@ export const useWidgetFormQuery = ({
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateWidgetQuery = useScopedQuery({
-        queryKey: _privateWidgetQueryKey,
+        queryKey: _privateWidgetGetQueryKey,
         queryFn: () => privateWidgetAPI.get({
             widget_id: widgetId?.value as string,
         }),
@@ -175,8 +175,8 @@ export const useWidgetFormQuery = ({
             privateDataTableAPI,
         },
         keys: {
-            publicWidgetQueryKey: _publicWidgetQueryKey,
-            privateWidgetQueryKey: _privateWidgetQueryKey,
+            publicWidgetGetQueryKey: _publicWidgetGetQueryKey,
+            privateWidgetGetQueryKey: _privateWidgetGetQueryKey,
             publicDataTableListQueryKey: _publicDataTableListQueryKey,
             privateDataTableListQueryKey: _privateDataTableListQueryKey,
             publicWidgetLoadQueryKey: computed(() => publicWidgetLoadQueryKey.value),

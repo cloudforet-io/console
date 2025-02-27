@@ -100,7 +100,7 @@ const { mutate, isPending: loading } = useMutation(
             const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
             queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
             if (state.isDetailPage) {
-                const dashboardQueryKey = isPrivate ? dashboardDetailKeys.privateDashboardQueryKey : dashboardDetailKeys.publicDashboardQueryKey;
+                const dashboardQueryKey = isPrivate ? dashboardDetailKeys.privateDashboardGetQueryKey : dashboardDetailKeys.publicDashboardGetQueryKey;
                 queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             }
         },

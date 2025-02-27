@@ -33,8 +33,8 @@ interface UseDashboardDetailQueryReturn {
     isLoading: ComputedRef<boolean>;
     isError: ComputedRef<boolean>;
     keys: {
-        publicDashboardQueryKey: ComputedRef<QueryKey>;
-        privateDashboardQueryKey: ComputedRef<QueryKey>;
+        publicDashboardGetQueryKey: ComputedRef<QueryKey>;
+        privateDashboardGetQueryKey: ComputedRef<QueryKey>;
         publicWidgetListQueryKey: ComputedRef<QueryKey>;
         privateWidgetListQueryKey: ComputedRef<QueryKey>;
     };
@@ -54,8 +54,8 @@ interface UseDashboardDetailQueryReturn {
 export const useDashboardDetailQuery = ({
     dashboardId,
 }: UseDashboardDetailQueryOptions): UseDashboardDetailQueryReturn => {
-    const { publicDashboardAPI, publicDashboardQueryKey } = usePublicDashboardApi();
-    const { privateDashboardAPI, privateDashboardQueryKey } = usePrivateDashboardApi();
+    const { publicDashboardAPI, publicDashboardGetQueryKey } = usePublicDashboardApi();
+    const { privateDashboardAPI, privateDashboardGetQueryKey } = usePrivateDashboardApi();
     const { publicWidgetAPI, publicWidgetListQueryKey } = usePublicWidgetApi();
     const { privateWidgetAPI, privateWidgetListQueryKey } = usePrivateWidgetApi();
     const queryClient = useQueryClient();
@@ -63,12 +63,12 @@ export const useDashboardDetailQuery = ({
     const isPrivate = computed(() => !!dashboardId.value?.startsWith('private'));
 
     /* Query Keys */
-    const _publicDashboardQueryKey = computed(() => [
-        ...publicDashboardQueryKey.value,
+    const _publicDashboardGetQueryKey = computed(() => [
+        ...publicDashboardGetQueryKey.value,
         dashboardId.value,
     ]);
-    const _privateDashboardQueryKey = computed(() => [
-        ...privateDashboardQueryKey.value,
+    const _privateDashboardGetQueryKey = computed(() => [
+        ...privateDashboardGetQueryKey.value,
         dashboardId.value,
     ]);
     const _publicWidgetListQueryKey = computed(() => [
@@ -82,7 +82,7 @@ export const useDashboardDetailQuery = ({
 
     /* Querys */
     const publicDashboardQuery = useScopedQuery({
-        queryKey: _publicDashboardQueryKey,
+        queryKey: _publicDashboardGetQueryKey,
         queryFn: () => publicDashboardAPI.get({
             dashboard_id: dashboardId.value as string,
         }),
@@ -90,7 +90,7 @@ export const useDashboardDetailQuery = ({
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateDashboardQuery = useScopedQuery({
-        queryKey: _privateDashboardQueryKey,
+        queryKey: _privateDashboardGetQueryKey,
         queryFn: () => privateDashboardAPI.get({
             dashboard_id: dashboardId.value as string,
         }),
@@ -156,8 +156,8 @@ export const useDashboardDetailQuery = ({
             privateWidgetAPI,
         },
         keys: {
-            publicDashboardQueryKey: _publicDashboardQueryKey,
-            privateDashboardQueryKey: _privateDashboardQueryKey,
+            publicDashboardGetQueryKey: _publicDashboardGetQueryKey,
+            privateDashboardGetQueryKey: _privateDashboardGetQueryKey,
             publicWidgetListQueryKey: _publicWidgetListQueryKey,
             privateWidgetListQueryKey: _privateWidgetListQueryKey,
         },
