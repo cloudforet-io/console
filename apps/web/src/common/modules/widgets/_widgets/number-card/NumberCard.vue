@@ -208,7 +208,7 @@ const queryResults = useQueries({
                 end: dateRange.value.end,
                 vars: props.dashboardVars,
             }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
         {
@@ -220,7 +220,7 @@ const queryResults = useQueries({
                 end: state.comparisonDateRange.end,
                 vars: props.dashboardVars,
             }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && widgetOptionsState.comparisonInfo?.toggleValue),
+            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && widgetOptionsState.comparisonInfo?.toggleValue && !props.loadDisabled),
             staleTime: WIDGET_LOAD_STALE_TIME,
         },
     ],

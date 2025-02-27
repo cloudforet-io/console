@@ -211,7 +211,7 @@ const queryResult = useQuery({
         vars: props.dashboardVars,
         ...getWidgetLoadApiQueryDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value),
     }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
     staleTime: WIDGET_LOAD_STALE_TIME,
 });
 

@@ -536,6 +536,7 @@ onBeforeUnmount(() => {
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
                                :disable-manage-buttons="!isManageable"
                                :all-reference-type-info="state.allReferenceTypeInfo"
+                               :load-disabled="widgetGenerateState.showOverlay"
                                @mounted="handleWidgetMounted(widget.widget_id)"
                                @click-edit="handleOpenWidgetOverlay(widget, 'EDIT')"
                                @click-clone="handleCloneWidget(widget)"

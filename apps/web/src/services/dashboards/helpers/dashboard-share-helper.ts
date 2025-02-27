@@ -86,7 +86,7 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
                         data_tables: _dataTableIndices,
                     },
                 };
-            } else if (dt.operator === 'EVAL' || dt.operator === 'QUERY' || dt.operator === 'PIVOT' || dt.operator === 'VALUE_MAPPING' || dt.operator === 'ADD_LABELS') {
+            } else {
                 const _dataTableId = dt.options[dt.operator]?.data_table_id;
                 const _dataTableIdx = _dataTables.findIndex((d) => d.data_table_id === _dataTableId);
                 _sharedDataTable.options = {
