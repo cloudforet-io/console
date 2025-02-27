@@ -121,6 +121,7 @@ onMounted(() => {
         <p-tree-view :tree-data="state.dashboardTreeData"
                      :tree-display-map="state.treeDisplayMap"
                      :selected-id="state.selectedTreeId"
+                     use-default-indent
         >
             <template #content="{ node }">
                 <div class="dashboard-menu-item-content"
