@@ -200,6 +200,7 @@ watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
         <p-tree-view :tree-data="state.projectTreeData"
                      :tree-display-map="storeState.treeDisplayMap"
                      :selected-id="state.selectedTreeId"
+                     use-default-indent
                      @update:tree-display-map="handleUpdateTreeDisplayMap"
         >
             <template #content="{ node }">
