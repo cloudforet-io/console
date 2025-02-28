@@ -316,7 +316,7 @@ onMounted(async () => {
             >
                 <div class="toolbox-wrapper">
                     <div class="toolbox">
-                        <p-button style-type="tertiary"
+                        <p-button style-type="secondary"
                                   icon-left="ic_plus"
                                   @click="handleUpdateModal('create')"
                         >

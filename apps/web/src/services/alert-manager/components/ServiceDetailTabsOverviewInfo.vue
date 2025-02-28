@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
-import { PPaneLayout, PSelectButton } from '@cloudforet/mirinae';
+import { PPaneLayout, PSelectButton, PDivider } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -37,7 +37,7 @@ const handleChangeDateOption = (dateOption: string) => {
             </p>
             <service-detail-tabs-overview-info-alert-average-time-by-urgency-bar-chart />
         </p-pane-layout>
-        <p-pane-layout class="info col-span-2">
+        <p-pane-layout class="px-4 py-5 col-span-2 h-full">
             <div class="flex justify-between">
                 <p class="title-label">
                     {{ $t('ALERT_MANAGER.WEBHOOK.TITLE') }}
@@ -56,6 +56,7 @@ const handleChangeDateOption = (dateOption: string) => {
                 </div>
             </div>
             <service-detail-tabs-overview-webhook-chart :date-option="state.selectedDateOption" />
+            <p-divider />
             <service-detail-tabs-overview-webhook />
         </p-pane-layout>
     </div>
@@ -63,10 +64,11 @@ const handleChangeDateOption = (dateOption: string) => {
 
 <style scoped lang="postcss">
 .service-detail-tabs-overview-info {
-    @apply mt-4 grid grid-flow-row-dense grid-cols-2 grid-rows-2 gap-4;
+    @apply mt-4 grid grid-flow-row-dense grid-cols-2 gap-4;
     .info {
         @apply px-4 py-5;
-        max-height: 425px;
+        min-height: 500px;
+        max-height: 500px;
         overflow: hidden;
         .title-label {
             @apply text-[1rem] font-bold mb-5;
