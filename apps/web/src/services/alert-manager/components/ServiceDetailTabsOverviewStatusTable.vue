@@ -27,7 +27,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { gray, red } from '@/styles/colors';
 
 import {
-    alertStatusBadgeStyleTypeFormatter,
+    alertStatusBadgeStyleTypeFormatter, formatDurationWithTimezone,
     getAlertStateI18n, getAlertUrgencyI18n,
 } from '@/services/alert-manager/composables/alert-table-data';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
@@ -42,6 +42,7 @@ type AlertStatusInfoType = {
     total: number,
     high?: number,
     low?: number,
+    avgDuration?: number,
     name: AlertStatusType
 };
 
@@ -77,9 +78,11 @@ const state = reactive({
             total: storeState.serviceInfo.alerts.RESOLVED.HIGH + storeState.serviceInfo.alerts.RESOLVED.LOW,
             high: storeState.serviceInfo.alerts.RESOLVED.HIGH,
             low: storeState.serviceInfo.alerts.RESOLVED.LOW,
+            avgDuration: formatDurationWithTimezone(state.resolvedAvgDuration, storeState.timezone),
             name: SERVICE_ALERTS_TYPE.RESOLVED,
         },
     ]),
+    resolvedAvgDuration: 0,
     selectedStatus: SERVICE_ALERTS_TYPE.TRIGGERED as AlertStatusType,
     urgencyField: computed<ValueItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL') as string, name: 'ALL' },
@@ -153,9 +156,35 @@ const fetchAlertsList = async () => {
     }
 };
 
+const fetchAnalyzerAvgDurationResolved = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.alert.analyze({
+            query: {
+                filter: [
+                    {
+                        k: 'service_id',
+                        v: storeState.serviceInfo.service_id,
+                        o: 'eq',
+                    },
+                ],
+                fields: {
+                    avg_resolved_duration: {
+                        key: 'resolved_duration',
+                        operator: 'average',
+                    },
+                },
+            },
+        });
+        state.resolvedAvgDuration = results[0].avg_resolved_duration;
+    } catch (error) {
+        ErrorHandler.handleError(error);
+    }
+};
+
 watch(() => storeState.serviceInfo.service_id, (service_id) => {
     if (!service_id) return;
     fetchAlertsList();
+    fetchAnalyzerAvgDurationResolved();
 }, { immediate: true });
 </script>
 
@@ -191,7 +220,9 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                     <p class="total text-display-xl">
                         {{ item.total }}
                     </p>
-                    <div class="flex gap-3 mt-0.5">
+                    <div v-if="item.status !== i18n.t('ALERT_MANAGER.ALERTS.RESOLVED')"
+                         class="flex gap-3 mt-0.5"
+                    >
                         <div class="high cnt-wrapper">
                             <p-i name="ic_error-filled"
                                  width="0.75rem"
@@ -210,6 +241,18 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                             <p class="flex gap-1 text-gray-700">
                                 <span>{{ $t('ALERT_MANAGER.ALERTS.LOW') }}:</span>
                                 <span>{{ item.low }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div class="cnt-wrapper">
+                            <p-i name="ic_time"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <p class="flex gap-1 text-gray-700">
+                                <span>{{ $t('ALERT_MANAGER.ALERTS.AVG_DURATION') }}:</span>
+                                <span>{{ item.avgDuration }}</span>
                             </p>
                         </div>
                     </div>
