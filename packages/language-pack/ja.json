@@ -14,6 +14,7 @@
 			"ALT_S_UPDATE_STATE": "ステータス変更に成功",
 			"AUTO_RECOVERY": "自動復旧",
 			"AUTO_RESOLVE_ALERTS": "アラートを自動的に完了にする",
+			"AVG_DURATION": "",
 			"COMPARE_WITH_PRE_MONTH": "前月より{cnt}少ない",
 			"CREATED": "作成",
 			"CREATED_BY": "作成者: {user}",
@@ -286,7 +287,10 @@
 				"LAST_SIX_MONTHS": "",
 				"LAST_THREE_MONTHS": "",
 				"LAST_TWELVE_MONTHS": "",
+				"MONTH": "",
 				"NO_DATA": "データがありません",
+				"SELECT": "選択する",
+				"SELECT_MONTH": "",
 				"THIS_MONTH": ""
 			},
 			"NO_DATA": "新しいサービスを作成",

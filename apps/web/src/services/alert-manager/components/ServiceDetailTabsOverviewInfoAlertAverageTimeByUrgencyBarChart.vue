@@ -86,12 +86,12 @@ const state = reactive<AverageTimeByUrgencyState>({
         barGap: 0.2,
         legend: {
             show: true,
-            type: 'scroll',
             icon: 'circle',
             itemWidth: 5,
             itemHeight: 10,
             left: '3%',
-            bottom: '2%',
+            bottom: '-1%',
+            width: '374px',
         },
         label: {
             show: true,
@@ -241,7 +241,7 @@ watch(() => state.avgDurationGroupByUrgencyList, () => {
     height: 100%;
     .chart {
         width: 100%;
-        height: 350px;
+        height: 420px;
     }
 }
 </style>
