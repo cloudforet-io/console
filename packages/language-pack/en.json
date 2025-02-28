@@ -14,6 +14,7 @@
 			"ALT_S_UPDATE_STATE": "State successfully updated  ",
 			"AUTO_RECOVERY": "Auto Recovery",
 			"AUTO_RESOLVE_ALERTS": "Automatically Resolve Alerts",
+			"AVG_DURATION": "Avg. duration",
 			"COMPARE_WITH_PRE_MONTH": "{cnt} less than previous month",
 			"CREATED": "Created",
 			"CREATED_BY": "created by: {user}",
@@ -286,7 +287,10 @@
 				"LAST_SIX_MONTHS": "Last 6 Months",
 				"LAST_THREE_MONTHS": "Last 3 Months",
 				"LAST_TWELVE_MONTHS": "Last 12 Months",
+				"MONTH": "Month",
 				"NO_DATA": "No Data",
+				"SELECT": "Select",
+				"SELECT_MONTH": "Select Month",
 				"THIS_MONTH": "This Month"
 			},
 			"NO_DATA": "Create a new service.",
