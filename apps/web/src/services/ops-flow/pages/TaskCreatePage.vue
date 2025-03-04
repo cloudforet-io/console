@@ -29,7 +29,7 @@ import {
     PHeadingLayout, PHeading, PButton, PPaneLayout, PSkeleton,
 } from '@cloudforet/mirinae';
 
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
@@ -48,6 +48,7 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
+
 
 
 
@@ -123,7 +124,7 @@ defineExpose({ setPathFrom });
 
 <template>
     <div class="mr-auto max-w-tablet">
-        <p-heading-layout class="mb-6">
+        <p-heading-layout class="mb-2">
             <template #heading>
                 <p-heading show-back-button
                            @click-back-button="handleClickBack"
@@ -138,6 +139,9 @@ defineExpose({ setPathFrom });
                 </p-heading>
             </template>
         </p-heading-layout>
+        <p class="mb-6 text-label-md text-gray-600">
+            test
+        </p>
         <p-pane-layout class="pt-8 px-4 pb-10 mr-auto flex flex-wrap w-full gap-4">
             <p-heading class="mb-6"
                        :title="$t('OPSFLOW.TASK_BOARD.TYPE_INFO', {type: taskManagementTemplateStore.templates.TaskType})"

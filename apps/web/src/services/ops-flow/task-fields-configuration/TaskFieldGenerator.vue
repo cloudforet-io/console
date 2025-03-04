@@ -13,7 +13,7 @@ import type {
     TaskField,
     TaskFieldOptions,
     TaskFieldType,
-} from '@/schema/opsflow/_types/task-field-type';
+} from '@/api-clients/opsflow/_types/task-field-type';
 import { getParticle, i18n } from '@/translations';
 
 import InfoTooltip from '@/common/components/guidance/InfoTooltip.vue';

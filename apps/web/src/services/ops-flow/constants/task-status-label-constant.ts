@@ -1,4 +1,4 @@
-import type { TaskStatusType } from '@/schema/opsflow/task/type';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
 export const TASK_STATUS_LABELS: Record<TaskStatusType, string> = {
     TODO: 'To Do',

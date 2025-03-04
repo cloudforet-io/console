@@ -9,7 +9,6 @@ import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,6 +26,8 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
+import type { TaskTypeModel } from '@/api-clients/opsflow/task/schema-type/model';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;

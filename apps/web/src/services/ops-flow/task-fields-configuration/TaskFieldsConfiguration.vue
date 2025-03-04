@@ -4,8 +4,8 @@ import draggable from 'vuedraggable';
 
 import { PI } from '@cloudforet/mirinae';
 
-import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+
+import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -15,6 +15,8 @@ import { useTaskFieldMetadataStore } from '@/services/ops-flow/task-fields-confi
 import TaskFieldGenerator from '@/services/ops-flow/task-fields-configuration/TaskFieldGenerator.vue';
 import type { MutableTaskField } from '@/services/ops-flow/task-fields-configuration/types/mutable-task-field-type';
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+
+import type { TaskTypeModel } from '@/api-clients/opsflow/task/schema-type/model';
 
 const props = defineProps<{
     scope: TaskTypeModel['scope'];
