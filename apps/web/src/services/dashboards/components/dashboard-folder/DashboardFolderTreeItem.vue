@@ -133,7 +133,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                  @click="handleClickTreeItem"
             >
                 <div class="contents-wrapper">
-                    <div class="left-part">
+                    <div :class="{'left-part': true, 'is-dashboard-item': !Array.isArray(node.children) && node.depth === 0 }">
                         <p-i class="dashboard-icon"
                              :name="Array.isArray(node.children) ? 'ic_folder' : 'ic_service_dashboard'"
                              :color="gray[600]"
@@ -230,6 +230,9 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                 display: flex;
                 align-items: center;
                 gap: 0.25rem;
+                &.is-dashboard-item {
+                    padding-left: 1rem;
+                }
                 .dashboard-icon {
                     min-width: 0.875rem;
                 }

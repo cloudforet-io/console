@@ -149,8 +149,8 @@ const { mutateAsync: updateWidgetMutate } = useMutation({
     mutationFn: wigetFetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = state.isPrivate
-            ? widgetKeys.privateWidgetQueryKey
-            : widgetKeys.publicWidgetQueryKey;
+            ? widgetKeys.privateWidgetGetQueryKey
+            : widgetKeys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
@@ -202,7 +202,7 @@ const { mutate: updateDashboard } = useMutation(
     {
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (data) => {
-            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
             // queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             queryClient.setQueryData(dashboardQueryKey.value, () => data);
         },
