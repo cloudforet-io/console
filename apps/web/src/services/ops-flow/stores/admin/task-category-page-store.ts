@@ -6,6 +6,8 @@ import {
 
 import { defineStore } from 'pinia';
 
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
@@ -15,8 +17,6 @@ import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task/schema-category/model';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task/schema-type/model';
 
 interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;

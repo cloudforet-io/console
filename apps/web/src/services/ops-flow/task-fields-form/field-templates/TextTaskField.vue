@@ -27,7 +27,7 @@ const {
     >
         <p-text-input class="my-1"
                       :value="fieldValue"
-                      :placeholder="props.field.options?.example"
+                      :placeholder="props.field.options?.description"
                       :invalid="isInvalid"
                       :readonly="props.readonly"
                       block

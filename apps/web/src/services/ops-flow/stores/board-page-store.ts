@@ -5,9 +5,10 @@ import {
 
 import { defineStore } from 'pinia';
 
+import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task/schema-category/model';
 
 
 interface UseBoardPageStoreGetters {

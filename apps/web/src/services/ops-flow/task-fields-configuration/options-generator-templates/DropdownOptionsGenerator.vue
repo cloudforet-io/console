@@ -130,7 +130,7 @@ watch(() => props.options, (op) => {
 </script>
 
 <template>
-    <div>
+    <div v-if="props.editable">
         <p-field-title :label="$t('OPSFLOW.FIELD_GENERATOR.VALUE')" />
         <draggable v-model="enums"
                    draggable=".draggable-item"
