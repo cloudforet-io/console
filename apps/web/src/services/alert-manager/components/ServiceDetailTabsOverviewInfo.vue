@@ -67,8 +67,8 @@ const handleChangeDateOption = (dateOption: string) => {
     @apply mt-4 grid grid-flow-row-dense grid-cols-2 gap-4;
     .info {
         @apply px-4 py-5;
-        min-height: 500px;
-        max-height: 500px;
+        min-height: 31.25rem;
+        max-height: 31.25rem;
         overflow: hidden;
         .title-label {
             @apply text-[1rem] font-bold mb-5;
