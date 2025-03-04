@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip,
+    PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
@@ -12,8 +12,6 @@ import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-
-import { gray } from '@/styles/colors';
 
 import ServiceDetailDeleteModal from '@/services/alert-manager/components/ServiceDetailDeleteModal.vue';
 import ServiceDetailEditModal from '@/services/alert-manager/components/ServiceDetailEditModal.vue';
@@ -71,15 +69,32 @@ const handleGoBackButton = () => {
                 <template #heading>
                     <p-heading :title="storeState.serviceInfo.name || ''"
                                show-back-button
+                               class="flex items-center gap-2"
                                @click-back-button="handleGoBackButton"
                     >
                         <template #title-right-extra>
+                            <p-button style-type="tertiary"
+                                      size="sm"
+                                      class="flex gap-0.5"
+                                      @click="handleActionModal('member')"
+                            >
+                                <p-i class="select-marker"
+                                     name="ic_member"
+                                     width="0.75rem"
+                                     height="0.75rem"
+                                />
+                                <span>{{ $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}</span>
+                                <span>({{ storeState.serviceInfo.members[MEMBERS_TYPE.USER_GROUP]?.length }}) </span>
+                                <span> / </span>
+                                <span> {{ $t('ALERT_MANAGER.SERVICE.MEMBERS') }}</span>
+                                <span>({{ storeState.serviceInfo.members[MEMBERS_TYPE.USER]?.length }})</span>
+                            </p-button>
                             <p-select-dropdown v-if="hasReadWriteAccess"
                                                :menu="state.menuItems"
                                                style-type="icon-button"
                                                button-icon="ic_ellipsis-horizontal"
                                                use-fixed-menu-style
-                                               class="bg-white rounded-full border border-gray-300"
+                                               class="bg-white rounded-md border border-gray-300"
                                                reset-selected-on-unmounted
                                                size="sm"
                                                @select="handleActionModal"
@@ -89,27 +104,6 @@ const handleGoBackButton = () => {
                 </template>
             </p-heading-layout>
             <div class="flex items-center pl-10 text-label-sm gap-2">
-                <div class="service-member flex items-center text-gray-700 gap-0.5"
-                     @click="handleActionModal('member')"
-                >
-                    <p-i class="select-marker"
-                         name="ic_member"
-                         width="0.75rem"
-                         height="0.75rem"
-                    />
-                    <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER_GROUP]?.length }}</span>
-                    <span>{{ $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}</span>
-                    <span> / </span>
-                    <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER]?.length }}</span>
-                    <span>{{ $t('ALERT_MANAGER.SERVICE.MEMBERS') }}</span>
-                </div>
-                <p-i v-if="storeState.serviceInfo?.description"
-                     name="ic_dot"
-                     width="0.125rem"
-                     height="0.125rem"
-                     :color="gray[500]"
-                     class="dot"
-                />
                 <p class="flex-1 truncate">
                     <p-tooltip position="bottom"
                                tag="p"

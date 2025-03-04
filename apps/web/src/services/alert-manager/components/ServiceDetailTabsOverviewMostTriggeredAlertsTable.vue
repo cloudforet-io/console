@@ -18,6 +18,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import CustomMonthRangeModal from '@/services/alert-manager/components/CustomMonthRangeModal.vue';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -46,10 +47,13 @@ const state = reactive({
         { name: 'last_three_months', label: i18n.t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.LAST_THREE_MONTHS') },
         { name: 'last_six_months', label: i18n.t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.LAST_SIX_MONTHS') },
         { name: 'last_twelve_months', label: i18n.t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.LAST_TWELVE_MONTHS') },
+        { type: 'divider' },
+        { name: 'custom', label: i18n.t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.CUSTOM') },
     ],
     selectedDateRange: 'this_month',
     startDate: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
     endDate: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
+    isCustomDate: false,
 });
 
 const tableState = reactive<TableState>({
@@ -70,38 +74,6 @@ const tableState = reactive<TableState>({
     }),
     loading: false,
 });
-
-watch(() => state.selectedDateRange, () => {
-    const lastMonth = dayjs.utc().subtract(1, 'month');
-    const threeMonthsAgo = dayjs.utc().subtract(3, 'month');
-    const sixMonthsAgo = dayjs.utc().subtract(6, 'month');
-    const twelveMonthsAgo = dayjs.utc().subtract(12, 'month');
-
-    switch (state.selectedDateRange) {
-    case 'this_month':
-        state.startDate = dayjs.utc().startOf('month').format('YYYY-MM-DD');
-        state.endDate = dayjs.utc().endOf('month').format('YYYY-MM-DD');
-        break;
-    case 'last_month':
-        state.startDate = lastMonth.startOf('month').format('YYYY-MM-DD');
-        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
-        break;
-    case 'last_three_months':
-        state.startDate = threeMonthsAgo.startOf('month').format('YYYY-MM-DD');
-        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
-        break;
-    case 'last_six_months':
-        state.startDate = sixMonthsAgo.startOf('month').format('YYYY-MM-DD');
-        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
-        break;
-    case 'last_twelve_months':
-        state.startDate = twelveMonthsAgo.startOf('month').format('YYYY-MM-DD');
-        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
-        break;
-    default:
-        break;
-    }
-}, { immediate: true, deep: true });
 
 /* API */
 const fetchAlertsAnalyze = async () => {
@@ -141,6 +113,56 @@ const fetchAlertsAnalyze = async () => {
     }
 };
 
+const handleMonthRange = (monthRange: [string, string]) => {
+    state.startDate = monthRange[0];
+    state.endDate = monthRange[1];
+};
+
+const handleVisible = (visible: boolean) => {
+    state.isCustomDate = visible;
+};
+
+const handleSelectMenu = (menu: string) => {
+    const lastMonth = dayjs.utc().subtract(1, 'month');
+    const threeMonthsAgo = dayjs.utc().subtract(3, 'month');
+    const sixMonthsAgo = dayjs.utc().subtract(6, 'month');
+    const twelveMonthsAgo = dayjs.utc().subtract(12, 'month');
+
+    switch (menu) {
+    case 'this_month':
+        state.isCustomDate = false;
+        state.startDate = dayjs.utc().startOf('month').format('YYYY-MM-DD');
+        state.endDate = dayjs.utc().endOf('month').format('YYYY-MM-DD');
+        break;
+    case 'last_month':
+        state.isCustomDate = false;
+        state.startDate = lastMonth.startOf('month').format('YYYY-MM-DD');
+        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
+        break;
+    case 'last_three_months':
+        state.isCustomDate = false;
+        state.startDate = threeMonthsAgo.startOf('month').format('YYYY-MM-DD');
+        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
+        break;
+    case 'last_six_months':
+        state.isCustomDate = false;
+        state.startDate = sixMonthsAgo.startOf('month').format('YYYY-MM-DD');
+        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
+        break;
+    case 'last_twelve_months':
+        state.isCustomDate = false;
+        state.startDate = twelveMonthsAgo.startOf('month').format('YYYY-MM-DD');
+        state.endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
+        break;
+    case 'custom':
+        state.isCustomDate = true;
+        break;
+    default:
+        state.isCustomDate = false;
+        break;
+    }
+};
+
 watch([() => storeState.serviceId, () => state.startDate, () => state.endDate], async () => {
     await fetchAlertsAnalyze();
 }, { immediate: true, deep: true });
@@ -151,48 +173,55 @@ watch(() => tableState.refinedItems, () => {
 </script>
 
 <template>
-    <div class="service-detail-tabs-overview-most-triggered-alerts-table">
-        <div class="flex justify-between items-center mb-5">
-            <p class="text-[1rem] font-bold">
-                {{ $t('ALERT_MANAGER.SERVICE.MOST_FREQUENTLY_OCCURRED_ALERTS') }}
-            </p>
-            <p-select-dropdown :menu="state.dateRangeList"
-                               :selected.sync="state.selectedDateRange"
-            />
-        </div>
-        <p-data-table v-if="tableState.items.length > 0"
-                      :fields="tableState.fields"
-                      :items="tableState.refinedItems"
-                      :loading="tableState.loading"
-                      striped
-                      :bordered="false"
-                      class="alert-table"
-        >
-            <template #th-triggered_cnt>
-                <span />
-            </template>
-            <template #col-title-format="{value, rowIndex}">
-                <div class="flex gap-2">
-                    <p-lazy-img
-                        :src="storeState.webhooks[tableState.refinedItems[rowIndex].triggered_by] ?
-                            storeState.plugins[storeState.webhooks[tableState.refinedItems[rowIndex].triggered_by].data.plugin_info.plugin_id].icon : 'ic_webhook'"
-                        error-icon="ic_webhook"
-                        width="1.5rem"
-                        height="1.5rem"
-                    />
-                    {{ value }}
-                </div>
-            </template>
-        </p-data-table>
-        <div v-else
-             class="mt-36"
-        >
-            <p-empty>
-                <template #default>
-                    <span>{{ $t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.NO_DATA') }}</span>
+    <div>
+        <div class="service-detail-tabs-overview-most-triggered-alerts-table">
+            <div class="flex justify-between items-center mb-5">
+                <p class="text-[1rem] font-bold">
+                    {{ $t('ALERT_MANAGER.SERVICE.MOST_FREQUENTLY_OCCURRED_ALERTS') }}
+                </p>
+                <p-select-dropdown :menu="state.dateRangeList"
+                                   :selected.sync="state.selectedDateRange"
+                                   @update:selected="handleSelectMenu"
+                />
+            </div>
+            <p-data-table v-if="tableState.items.length > 0"
+                          :fields="tableState.fields"
+                          :items="tableState.refinedItems"
+                          :loading="tableState.loading"
+                          striped
+                          :bordered="false"
+                          class="alert-table"
+            >
+                <template #th-triggered_cnt>
+                    <span />
                 </template>
-            </p-empty>
+                <template #col-title-format="{value, rowIndex}">
+                    <div class="flex gap-2">
+                        <p-lazy-img
+                            :src="storeState.webhooks[tableState.refinedItems[rowIndex].triggered_by] ?
+                                storeState.plugins[storeState.webhooks[tableState.refinedItems[rowIndex].triggered_by].data.plugin_info.plugin_id].icon : 'ic_webhook'"
+                            error-icon="ic_service_cloud-service"
+                            width="1.5rem"
+                            height="1.5rem"
+                        />
+                        {{ value }}
+                    </div>
+                </template>
+            </p-data-table>
+            <div v-else
+                 class="mt-36"
+            >
+                <p-empty>
+                    <template #default>
+                        <span>{{ $t('ALERT_MANAGER.SERVICE.MOST_TRIGGERED_ALERTS.NO_DATA') }}</span>
+                    </template>
+                </p-empty>
+            </div>
         </div>
+        <custom-month-range-modal :visible="state.isCustomDate"
+                                  @update:month-range="handleMonthRange"
+                                  @update:visible="handleVisible"
+        />
     </div>
 </template>
 

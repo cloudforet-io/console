@@ -6,7 +6,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
+    PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader, PEmpty,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -145,7 +145,11 @@ watch(() => storeState.serviceId, (serviceId) => {
                                @click="handleClickArrowButton(1)"
                 />
                 <template #no-data>
-                    <span class="text-violet-700 font-medium">{{ $t('ALERT_MANAGER.WEBHOOK.NO_DATA') }}</span>
+                    <p-empty class="mt-12 mb-16">
+                        <template #default>
+                            <span>{{ $t('ALERT_MANAGER.WEBHOOK.NO_DATA') }}</span>
+                        </template>
+                    </p-empty>
                 </template>
             </p-data-loader>
         </div>
