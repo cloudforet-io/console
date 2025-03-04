@@ -10,6 +10,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 import { i18n } from '@/translations';
@@ -23,7 +24,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
@@ -106,7 +106,7 @@ const taskTypeDescription = computed<string>(() => {
 });
 
 /* status */
-const taskAPI = useTaskAPI();
+const { taskAPI } = useTaskApi();
 const {
     selectedStatusItems,
     taskStatusValidator,
@@ -122,7 +122,10 @@ const changeStatus = async (statusId: string) => {
         if (!taskContentFormState.originTask) {
             throw new Error('Origin task is not defined');
         }
-        await taskAPI.changeStatus(taskContentFormState.originTask.task_id, statusId);
+        await taskAPI.changeStatus({
+            task_id: taskContentFormState.originTask.task_id,
+            status_id: statusId,
+        });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
