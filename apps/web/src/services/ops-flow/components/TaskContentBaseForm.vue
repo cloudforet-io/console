@@ -71,6 +71,10 @@ const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
     }
     initRelatedFieldsByCategorySelection(category);
 };
+const taskCategoryDesciprion = computed<string>(() => {
+    if (!taskContentFormGetters.currentCategory) return '';
+    return taskContentFormGetters.currentCategory.description;
+});
 
 /* task type */
 const {
@@ -96,6 +100,10 @@ const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => 
         initRelatedFieldsByTaskTypeSelection(category, taskType);
     }
 };
+const taskTypeDescription = computed<string>(() => {
+    if (!taskContentFormState.currentTaskType) return '';
+    return taskContentFormState.currentTaskType.description;
+});
 
 /* status */
 const taskAPI = useTaskAPI();
@@ -272,50 +280,57 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
 
 <template>
     <component :is="isCreateMode ? 'div' : PPaneLayout"
-               class="flex flex-wrap gap-4"
+               class="flex flex-wrap"
                :class="isCreateMode ? '' : 'py-6 px-4'"
     >
         <div v-if="!taskContentFormState.isArchivedTask"
-             class="base-form-top-wrapper"
+             class="w-full"
         >
-            <div class="base-form-field-wrapper">
-                <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
-                               :style-type="isCreateMode ? 'primary' : 'secondary'"
-                               required
-                               :invalid="isCreateMode && invalidState.category"
-                               :invalid-text="invalidTexts.category"
-                >
-                    <template #default="{invalid}">
-                        <p-select-dropdown :selected="selectedCategoryItems"
-                                           :handler="categoryMenuItemsHandler"
-                                           :page-size="10"
-                                           :invalid="invalid"
-                                           :readonly="!isCreateMode"
-                                           block
-                                           @update:selected="handleUpdateSelectedCategory"
-                        />
-                    </template>
-                </p-field-group>
+            <div class="base-form-top-wrapper">
+                <div class="base-form-field-wrapper">
+                    <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
+                                   :style-type="isCreateMode ? 'primary' : 'secondary'"
+                                   required
+                                   :invalid="isCreateMode && invalidState.category"
+                                   :invalid-text="invalidTexts.category"
+                    >
+                        <template #default="{invalid}">
+                            <p-select-dropdown :selected="selectedCategoryItems"
+                                               :handler="categoryMenuItemsHandler"
+                                               :page-size="10"
+                                               :invalid="invalid"
+                                               :readonly="!isCreateMode"
+                                               block
+                                               @update:selected="handleUpdateSelectedCategory"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
+                <div class="base-form-field-wrapper">
+                    <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
+                                   :style-type="isCreateMode ? 'primary' : 'secondary'"
+                                   required
+                                   :invalid="!isCreateMode && invalidState.taskType"
+                                   :invalid-text="invalidTexts.taskType"
+                    >
+                        <template #default="{invalid}">
+                            <p-select-dropdown :selected="selectedTaskTypeItems"
+                                               :handler="taskTypeMenuItemsHandler"
+                                               :page-size="10"
+                                               :invalid="invalid"
+                                               :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
+                                               block
+                                               @update:selected="handleUpdateSelectedTaskType"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
             </div>
-            <div class="base-form-field-wrapper">
-                <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
-                               :style-type="isCreateMode ? 'primary' : 'secondary'"
-                               required
-                               :invalid="!isCreateMode && invalidState.taskType"
-                               :invalid-text="invalidTexts.taskType"
-                >
-                    <template #default="{invalid}">
-                        <p-select-dropdown :selected="selectedTaskTypeItems"
-                                           :handler="taskTypeMenuItemsHandler"
-                                           :page-size="10"
-                                           :invalid="invalid"
-                                           :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
-                                           block
-                                           @update:selected="handleUpdateSelectedTaskType"
-                        />
-                    </template>
-                </p-field-group>
-            </div>
+            <p class="min-h-5 text-label-md text-gray-600">
+                {{ taskCategoryDesciprion }}
+                {{ taskCategoryDesciprion && taskTypeDescription ? ' | ' : '' }}
+                {{ taskTypeDescription }}
+            </p>
         </div>
         <div v-if="!isCreateMode"
              class="base-form-top-wrapper"

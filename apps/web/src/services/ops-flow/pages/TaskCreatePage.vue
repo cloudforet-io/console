@@ -124,7 +124,7 @@ defineExpose({ setPathFrom });
 
 <template>
     <div class="mr-auto max-w-tablet">
-        <p-heading-layout class="mb-2">
+        <p-heading-layout class="mb-6">
             <template #heading>
                 <p-heading show-back-button
                            @click-back-button="handleClickBack"
@@ -139,9 +139,6 @@ defineExpose({ setPathFrom });
                 </p-heading>
             </template>
         </p-heading-layout>
-        <p class="mb-6 text-label-md text-gray-600">
-            test
-        </p>
         <p-pane-layout class="pt-8 px-4 pb-10 mr-auto flex flex-wrap w-full gap-4">
             <p-heading class="mb-6"
                        :title="$t('OPSFLOW.TASK_BOARD.TYPE_INFO', {type: taskManagementTemplateStore.templates.TaskType})"
