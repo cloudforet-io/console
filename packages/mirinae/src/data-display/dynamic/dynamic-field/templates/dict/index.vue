@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <span class="p-dynamic-field-dict">
         <p-link v-if="options.link"
                 :href="options.link"
         >
@@ -69,3 +69,8 @@ export default defineComponent<DictDynamicFieldProps>({
     },
 });
 </script>
+<style lang="postcss">
+.p-dynamic-field-dict {
+    line-height: 2;
+}
+</style>
