@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import {
-    reactive, ref, watch, toRaw, computed,
+    reactive, ref, toRaw, computed,
+    watch,
 } from 'vue';
+
+import { useQuery } from '@tanstack/vue-query';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -15,6 +19,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n } from '@/translations';
 
@@ -26,7 +31,6 @@ import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
@@ -39,14 +43,12 @@ const props = defineProps<{
     relatedAssets?: string[];
     tag?: string;
 }>();
+
 const taskTypeStore = useTaskTypeStore();
 const taskCategoryStore = useTaskCategoryStore();
 const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-const loading = ref<boolean>(false);
-const taskAPI = useTaskAPI();
-const tasks = ref<TaskModel[]|undefined>(undefined);
 const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
     const map = {} as Record<string, TaskCategoryModel>;
     taskCategoryStore.getters.taskCategoriesIncludingDeleted.forEach((category) => {
@@ -86,7 +88,7 @@ const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: str
 };
 const { getTimezoneDate, getDuration } = useTimezoneDate();
 
-/* query */
+/* api query */
 const search = ref<string>('');
 const pagination = reactive({
     page: 1,
@@ -97,38 +99,59 @@ const sort = reactive({
     key: 'created_at',
     desc: true,
 });
-const queryHelper = new ApiQueryHelper();
-const getQuery = (filters?: ConsoleFilter[]) => {
-    queryHelper.setFilters(filters ?? [])
+const taskFilters = ref<ConsoleFilter[]>([]);
+const _taskFilterHelper = new QueryHelper();
+const handleUpdateFilters = (values: TaskFilters) => {
+    _taskFilterHelper.setFilters([]);
+    if (values.taskType.length) _taskFilterHelper.addFilter({ k: 'task_type_id', v: values.taskType, o: '=' });
+    if (values.status.length) _taskFilterHelper.addFilter({ k: 'status_id', v: values.status, o: '=' });
+    if (values.project.length) _taskFilterHelper.addFilter({ k: 'project_id', v: values.project, o: '=' });
+    if (values.createdBy.length) _taskFilterHelper.addFilter({ k: 'created_by', v: values.createdBy, o: '=' });
+    if (values.assignee.length) _taskFilterHelper.addFilter({ k: 'assignee', v: values.assignee, o: '=' });
+    taskFilters.value = _taskFilterHelper.filters;
+};
+const _taskListQueryHelper = new ApiQueryHelper();
+const taskListApiQuery = computed<Query>(() => {
+    _taskListQueryHelper.setFilters(taskFilters.value)
         .setMultiSortV2([toRaw(sort)])
         .setPage(pagination.page, pagination.size);
-    if (search.value) queryHelper.addFilter({ v: search.value });
-    if (props.categoryId) queryHelper.addFilter({ k: 'category_id', v: props.categoryId, o: '=' });
-    if (props.relatedAssets) queryHelper.addFilter({ k: 'related_asset_id', v: props.relatedAssets, o: '=' });
-
-    return queryHelper.dataV2;
-};
+    if (search.value) _taskListQueryHelper.addFilter({ v: search.value });
+    if (props.categoryId) _taskListQueryHelper.addFilter({ k: 'category_id', v: props.categoryId, o: '=' });
+    if (props.relatedAssets) _taskListQueryHelper.addFilter({ k: 'related_asset_id', v: props.relatedAssets, o: '=' });
+    return _taskListQueryHelper.dataV2;
+});
 
 /* list */
-const listTask = async (query: Query) => {
-    try {
-        loading.value = true;
-        const results = await taskAPI.list({
-            query,
+const { taskListQueryKey, taskAPI } = useTaskApi();
+const hasCategoriesAndTypesLoaded = ref<boolean>(false);
+
+const {
+    data: tasks, error, refetch, isLoading,
+} = useQuery<TaskModel[], APIError>({
+    queryKey: computed(() => [
+        taskListQueryKey.value,
+        taskListApiQuery.value,
+        props.categoryId,
+    ]),
+    queryFn: async ({ queryKey }) => {
+        const { results } = await taskAPI.list({
+            query: queryKey[1] as Query,
         });
-        if (results) {
-            tasks.value = results;
-            loading.value = false;
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        loading.value = false;
-        tasks.value = undefined;
-    }
-};
-let hasCategoriesAndTypesLoaded = false;
+        return results ?? [];
+    },
+    enabled: computed(() => hasCategoriesAndTypesLoaded.value),
+    retry: false,
+    // time control
+    gcTime: 1000 * 60 * 2, // 10 seconds
+    staleTime: 1000 * 30, // 30 seconds
+});
+
+watch(error, (err) => {
+    if (err) ErrorHandler.handleError(err);
+});
+
 const listCategoriesAndTaskTypes = async () => {
-    if (hasCategoriesAndTypesLoaded) return;
+    if (hasCategoriesAndTypesLoaded.value) return;
     const results = await Promise.allSettled([
         taskCategoryStore.list(),
         taskTypeStore.list({
@@ -146,17 +169,15 @@ const listCategoriesAndTaskTypes = async () => {
         }
     });
     taskTypesById.value = { ...taskTypesById.value };
-    hasCategoriesAndTypesLoaded = true;
+    hasCategoriesAndTypesLoaded.value = true;
 };
 
 listCategoriesAndTaskTypes();
-watch(() => props.categoryId, () => {
-    listTask(getQuery());
-}, { immediate: true });
 
 /* toolbox */
 const handleRefresh = () => {
-    listTask(getQuery());
+    refetch();
+    // refetch({ throwOnError: true, cancelRefetch: false });
 };
 const handleChange = (options: ToolboxOptions) => {
     if (options.searchText !== undefined) search.value = options.searchText;
@@ -164,19 +185,6 @@ const handleChange = (options: ToolboxOptions) => {
     if (options.pageLimit !== undefined) pagination.size = options.pageLimit;
     if (options.sortBy !== undefined) sort.key = options.sortBy;
     if (options.sortDesc !== undefined) sort.desc = options.sortDesc;
-    listTask(getQuery());
-};
-
-/* filters */
-const taskFilterHelper = new QueryHelper();
-const handleUpdateFilters = (values: TaskFilters) => {
-    taskFilterHelper.setFilters([]);
-    if (values.taskType.length) taskFilterHelper.addFilter({ k: 'task_type_id', v: values.taskType, o: '=' });
-    if (values.status.length) taskFilterHelper.addFilter({ k: 'status_id', v: values.status, o: '=' });
-    if (values.project.length) taskFilterHelper.addFilter({ k: 'project_id', v: values.project, o: '=' });
-    if (values.createdBy.length) taskFilterHelper.addFilter({ k: 'created_by', v: values.createdBy, o: '=' });
-    if (values.assignee.length) taskFilterHelper.addFilter({ k: 'assignee', v: values.assignee, o: '=' });
-    listTask(getQuery(taskFilterHelper.filters));
 };
 
 /* table */
@@ -240,7 +248,7 @@ const fields = computed<DataTableField[] >(() => [
         </div>
         <p-data-table :fields="fields"
                       :items="tasks"
-                      :loading="loading"
+                      :loading="isLoading"
                       class="w-auto"
         >
             <template #col-name-format="{item}">
