@@ -216,7 +216,7 @@ const { mutate, isPending: loading } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
                 if (!oldDashboard) return oldDashboard;
                 return {

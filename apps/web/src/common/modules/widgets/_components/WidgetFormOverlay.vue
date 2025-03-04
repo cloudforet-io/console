@@ -111,8 +111,8 @@ const { mutateAsync: updateWidget } = useMutation({
     mutationFn: fetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? keys.privateWidgetQueryKey
-            : keys.publicWidgetQueryKey;
+            ? keys.privateWidgetGetQueryKey
+            : keys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
