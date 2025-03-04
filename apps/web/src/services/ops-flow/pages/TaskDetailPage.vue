@@ -4,15 +4,17 @@ import { defineComponent, type ComponentPublicInstance } from 'vue';
 
 interface IInstance extends ComponentPublicInstance {
     setPathFrom(from: any): void;
-    checkTaskExist(): Promise<boolean>;
 }
 
 export default defineComponent({
     beforeRouteEnter(to, from, next) {
         next((vm) => {
             const instance = vm as unknown as IInstance;
+            if (!instance.setPathFrom) {
+                console.error('setPathFrom is not defined');
+                return;
+            }
             instance.setPathFrom(from);
-            instance.checkTaskExist();
         });
     },
 });
@@ -27,11 +29,16 @@ import {
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
+import type { QueryKey } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
+
+import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
     PHeadingLayout, PHeading, PButton, PTab, PSkeleton,
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
+import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
@@ -49,7 +56,6 @@ import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vu
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
@@ -70,41 +76,56 @@ const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
 
-/* task */
-const taskAPI = useTaskAPI();
-const task = ref<TaskModel|undefined>();
-
-/* route and query */
+/* route */
 const router = useRouter();
 const route = useRoute();
-const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
 const { getProperRouteLocation } = useProperRouteLocation();
+const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
+const error = ref<APIError | null>(null);
 const {
+    pathFrom,
     setPathFrom,
     goBack,
 } = useGoBack(getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
 }));
-const checkTaskExist = async () => {
-    try {
-        loading.value = true;
-        const taskId = props.taskId;
-        task.value = await taskAPI.get(taskId);
-        loading.value = false;
-        return true;
-    } catch (e: unknown) {
+watch(error, (err) => {
+    if (err) {
         goBack();
-        ErrorHandler.handleRequestError(e, 'Failed to get task');
-        return false;
+        ErrorHandler.handleRequestError(err, 'Failed to get task');
     }
-};
+});
 
+/* task */
+const { taskQueryKey, taskAPI } = useTaskApi();
+const taskDetailQueryKey = computed<QueryKey>(() => [
+    taskQueryKey.value,
+    props.taskId,
+]);
+const {
+    data: task,
+    isLoading: loading,
+} = useQuery<TaskModel, APIError>({
+    queryKey: taskDetailQueryKey,
+    queryFn: async ({ queryKey }) => {
+        const taskId = queryKey[1] as string;
+        try {
+            const result = await taskAPI.get({ task_id: taskId });
+            return result;
+        } catch (e) {
+            error.value = e as APIError;
+            throw e;
+        }
+    },
+    enabled: computed(() => !!props.taskId && !!pathFrom.value),
+    retry: false,
+    gcTime: 0,
+    staleTime: 0,
+});
 
 /* header and back button */
-const loading = ref<boolean>(true);
-const headerTitle = computed<string>(() => task?.value?.name ?? '');
-
+const headerTitle = computed<string>(() => task.value?.name ?? '');
 
 /* confirm leave modal */
 const hasUpdated = ref(false);
@@ -156,13 +177,11 @@ watch(task, (t) => {
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
-    if (task.value) {
-        taskDetailPageStore.setCurrentTask(task.value);
-    }
+    taskDetailPageStore.setCurrentTask(t);
 });
 
 /* expose */
-defineExpose({ setPathFrom, checkTaskExist });
+defineExpose({ setPathFrom });
 </script>
 
 <template>
@@ -207,10 +226,10 @@ defineExpose({ setPathFrom, checkTaskExist });
                        @update:active-tab="handleUpdateActiveTab"
                 >
                     <template #content>
-                        <task-content-tab />
+                        <task-content-tab :task-id="props.taskId" />
                     </template>
                     <template #progress>
-                        <task-progress-tab />
+                        <task-progress-tab :task-id="props.taskId" />
                     </template>
                 </p-tab>
                 <div v-if="activeTab === 'content' && taskDetailPageStore.getters.isEditable"
