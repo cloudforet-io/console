@@ -1,24 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
     PButton, PHeading, PSelectCard, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
 
-
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
-
-import { useUserStore } from '@/store/user/user-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
@@ -33,7 +26,6 @@ const router = useRouter();
 const taskCategoryStore = useTaskCategoryStore();
 const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
-const userStore = useUserStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -53,14 +45,6 @@ const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator(
         return !!val;
     },
 });
-const taskAPI = useTaskAPI();
-const tasks = ref<TaskModel[]>([]);
-const userId = computed(() => userStore.state.userId ?? '');
-const taskQueryHelper = new QueryHelper();
-const taskQuery = computed<Query>(() => taskQueryHelper.setFilters([
-    { k: 'created_by', v: userId.value, o: '=' },
-    { k: 'status_type', v: 'COMPLETED', o: '!=' },
-]).apiQuery);
 const handleChangeCategory = async (value: string) => {
     setForm('category', value);
     await taskTypeStore.listByCategoryId(value);
@@ -88,7 +72,6 @@ onMounted(async () => {
     await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
     availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
     setForm('category', '');
-    tasks.value = await taskAPI.list({ query: taskQuery.value }) ?? [];
     loading.value = false;
 });
 </script>
