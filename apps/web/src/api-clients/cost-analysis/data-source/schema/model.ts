@@ -1,7 +1,7 @@
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { CostDataSourceSecretType, CostDataSourceState, CostDataSourceType } from '@/api-clients/cost-analysis/data-source/schema/type';
+import type { CostDataSourceSchedule, CostDataSourceSecretType, CostDataSourceType } from '@/api-clients/cost-analysis/data-source/schema/type';
 
 
 interface PluginInfoModel {

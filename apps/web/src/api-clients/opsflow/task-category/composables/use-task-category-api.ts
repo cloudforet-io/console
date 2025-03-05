@@ -4,7 +4,7 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TaskCategoryCreateParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/create';
 import type { TaskCategoryDeleteParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/delete';
@@ -26,8 +26,8 @@ interface UseTaskCategoryApiReturn {
 }
 
 export const useTaskCategoryApi = (): UseTaskCategoryApiReturn => {
-    const taskCategoryQueryKey = useAPIQueryKey('opsflow/task-category/get');
-    const taskCategoryListQueryKey = useAPIQueryKey('opsflow/task-category/list');
+    const taskCategoryQueryKey = useAPIQueryKey('opsflow', 'task-category', 'get');
+    const taskCategoryListQueryKey = useAPIQueryKey('opsflow', 'task-category', 'list');
 
     const actions = {
         async create(params: TaskCategoryCreateParameters) {
