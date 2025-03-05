@@ -9,7 +9,7 @@ import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,6 +27,7 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
@@ -270,10 +271,10 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                :placeholder="String($t('OPSFLOW.DESCRIBE_FIELD', {
                                     field: taskManagementTemplateStore.templates.taskType ,
                                     particle: getParticle(taskManagementTemplateStore.templates.taskType , 'object')
-                                })"
+                                }))"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
@@ -281,7 +282,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                                required
                 >
                     <task-fields-configuration class="mt-2"
-                                               :scope="scope"
+                                               :require-project="scope === 'PROJECT'"
                                                :fields="fields"
                                                :origin-fields="taskCategoryPageGetters.targetTaskType?.fields"
                                                @update:fields="setFields"

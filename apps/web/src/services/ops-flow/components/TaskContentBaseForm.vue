@@ -10,6 +10,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 import { i18n } from '@/translations';
@@ -23,7 +24,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
@@ -71,6 +71,10 @@ const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
     }
     initRelatedFieldsByCategorySelection(category);
 };
+const taskCategoryDesciprion = computed<string>(() => {
+    if (!taskContentFormGetters.currentCategory) return '';
+    return taskContentFormGetters.currentCategory.description;
+});
 
 /* task type */
 const {
@@ -96,9 +100,13 @@ const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => 
         initRelatedFieldsByTaskTypeSelection(category, taskType);
     }
 };
+const taskTypeDescription = computed<string>(() => {
+    if (!taskContentFormState.currentTaskType) return '';
+    return taskContentFormState.currentTaskType.description;
+});
 
 /* status */
-const taskAPI = useTaskAPI();
+const { taskAPI } = useTaskApi();
 const {
     selectedStatusItems,
     taskStatusValidator,
@@ -114,7 +122,10 @@ const changeStatus = async (statusId: string) => {
         if (!taskContentFormState.originTask) {
             throw new Error('Origin task is not defined');
         }
-        await taskAPI.changeStatus(taskContentFormState.originTask.task_id, statusId);
+        await taskAPI.changeStatus({
+            task_id: taskContentFormState.originTask.task_id,
+            status_id: statusId,
+        });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
@@ -272,50 +283,57 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
 
 <template>
     <component :is="isCreateMode ? 'div' : PPaneLayout"
-               class="flex flex-wrap gap-4"
+               class="flex flex-wrap"
                :class="isCreateMode ? '' : 'py-6 px-4'"
     >
         <div v-if="!taskContentFormState.isArchivedTask"
-             class="base-form-top-wrapper"
+             class="w-full"
         >
-            <div class="base-form-field-wrapper">
-                <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
-                               :style-type="isCreateMode ? 'primary' : 'secondary'"
-                               required
-                               :invalid="isCreateMode && invalidState.category"
-                               :invalid-text="invalidTexts.category"
-                >
-                    <template #default="{invalid}">
-                        <p-select-dropdown :selected="selectedCategoryItems"
-                                           :handler="categoryMenuItemsHandler"
-                                           :page-size="10"
-                                           :invalid="invalid"
-                                           :readonly="!isCreateMode"
-                                           block
-                                           @update:selected="handleUpdateSelectedCategory"
-                        />
-                    </template>
-                </p-field-group>
+            <div class="base-form-top-wrapper">
+                <div class="base-form-field-wrapper">
+                    <p-field-group :label="taskManagementTemplateStore.templates.TaskCategory"
+                                   :style-type="isCreateMode ? 'primary' : 'secondary'"
+                                   required
+                                   :invalid="isCreateMode && invalidState.category"
+                                   :invalid-text="invalidTexts.category"
+                    >
+                        <template #default="{invalid}">
+                            <p-select-dropdown :selected="selectedCategoryItems"
+                                               :handler="categoryMenuItemsHandler"
+                                               :page-size="10"
+                                               :invalid="invalid"
+                                               :readonly="!isCreateMode"
+                                               block
+                                               @update:selected="handleUpdateSelectedCategory"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
+                <div class="base-form-field-wrapper">
+                    <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
+                                   :style-type="isCreateMode ? 'primary' : 'secondary'"
+                                   required
+                                   :invalid="!isCreateMode && invalidState.taskType"
+                                   :invalid-text="invalidTexts.taskType"
+                    >
+                        <template #default="{invalid}">
+                            <p-select-dropdown :selected="selectedTaskTypeItems"
+                                               :handler="taskTypeMenuItemsHandler"
+                                               :page-size="10"
+                                               :invalid="invalid"
+                                               :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
+                                               block
+                                               @update:selected="handleUpdateSelectedTaskType"
+                            />
+                        </template>
+                    </p-field-group>
+                </div>
             </div>
-            <div class="base-form-field-wrapper">
-                <p-field-group :label="taskManagementTemplateStore.templates.TaskType"
-                               :style-type="isCreateMode ? 'primary' : 'secondary'"
-                               required
-                               :invalid="!isCreateMode && invalidState.taskType"
-                               :invalid-text="invalidTexts.taskType"
-                >
-                    <template #default="{invalid}">
-                        <p-select-dropdown :selected="selectedTaskTypeItems"
-                                           :handler="taskTypeMenuItemsHandler"
-                                           :page-size="10"
-                                           :invalid="invalid"
-                                           :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
-                                           block
-                                           @update:selected="handleUpdateSelectedTaskType"
-                        />
-                    </template>
-                </p-field-group>
-            </div>
+            <p class="min-h-5 text-label-md text-gray-600">
+                {{ taskCategoryDesciprion }}
+                {{ taskCategoryDesciprion && taskTypeDescription ? ' | ' : '' }}
+                {{ taskTypeDescription }}
+            </p>
         </div>
         <div v-if="!isCreateMode"
              class="base-form-top-wrapper"

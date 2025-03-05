@@ -10,7 +10,7 @@ import {
     PFieldTitle, PButton, PIconButton, PI,
 } from '@cloudforet/mirinae';
 
-import type { DropdownTaskFieldOptions, TaskFieldEnum } from '@/schema/opsflow/_types/task-field-type';
+import type { DropdownTaskFieldOptions, TaskFieldEnum } from '@/api-clients/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -130,7 +130,7 @@ watch(() => props.options, (op) => {
 </script>
 
 <template>
-    <div>
+    <div v-if="props.editable">
         <p-field-title :label="$t('OPSFLOW.FIELD_GENERATOR.VALUE')" />
         <draggable v-model="enums"
                    draggable=".draggable-item"
