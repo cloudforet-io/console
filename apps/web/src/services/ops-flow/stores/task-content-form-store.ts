@@ -1,6 +1,6 @@
 import { reactive, computed, onMounted } from 'vue';
 
-import { isEmpty, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { APIError } from '@cloudforet/core-lib/space-connector/error';
@@ -9,15 +9,11 @@ import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
-import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
@@ -26,9 +22,6 @@ import {
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 import type { References } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
-import {
-    useTaskManagementTemplateStore,
-} from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 interface UseTaskContentFormStoreState {
     originTask?: TaskModel;
@@ -50,7 +43,6 @@ interface UseTaskContentFormStoreState {
     // overall
     mode: 'create'|'view'|'create-minimal';
     hasUnsavedChanges: boolean;
-    createTaskLoading: boolean;
 }
 interface UseTaskContentFormStoreGetters {
     currentCategory: TaskCategoryModel|undefined;
@@ -66,7 +58,6 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
     const taskFieldMetadataStore = useTaskFieldMetadataStore();
-    const taskManagementTemplateStore = useTaskManagementTemplateStore();
     const userStore = useUserStore();
 
     const state = reactive<UseTaskContentFormStoreState>({
@@ -89,7 +80,6 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         // overall
         mode: 'create',
         hasUnsavedChanges: false,
-        createTaskLoading: false,
     });
     const getters = {
         // base form
@@ -132,7 +122,6 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         }),
     } as unknown as UseTaskContentFormStoreGetters; // HACK: to avoid type error
 
-    const taskAPI = useTaskAPI();
     const actions = {
         setCurrentCategoryId(categoryId?: string) {
             if (state.currentCategoryId === categoryId) return;
@@ -225,43 +214,8 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setMode(mode: 'create'|'view'|'create-minimal') {
             state.mode = mode;
         },
-        async createTask(): Promise<TaskModel|undefined> {
-            try {
-                if (!state.currentTaskType) throw new Error('Task type is not selected');
-                state.createTaskLoading = true;
-                state.originTask = await taskAPI.create({
-                    task_type_id: state.currentTaskType.task_type_id,
-                    name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
-                    status_id: state.statusId as string,
-                    description: state.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
-                    assignee: state.assignee || undefined,
-                    data: isEmpty(state.data) ? undefined : state.data,
-                    files: state.fileIds,
-                    project_id: state.currentTaskType.require_project ? state.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
-                });
-                showSuccessMessage(i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
-                state.createTaskLoading = false;
-                return state.originTask;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
-                state.createTaskLoading = false;
-                return undefined;
-            }
-        },
-        async updateTask() {
-            try {
-                if (!state.originTask) throw new Error('Origin task is not defined');
-                state.originTask = await taskAPI.update({
-                    task_id: state.originTask.task_id,
-                    name: state.defaultData[DEFAULT_FIELD_ID_MAP.title],
-                });
-                showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
-                state.hasUnsavedChanges = false;
-                return true;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
-                return false;
-            }
+        resetUnsavedChanges() {
+            state.hasUnsavedChanges = false;
         },
     };
 

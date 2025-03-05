@@ -2,6 +2,7 @@
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 
+
 interface IInstance extends ComponentPublicInstance {
     setPathFrom(from: any): void;
 }
@@ -30,7 +31,7 @@ import {
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
 import type { QueryKey } from '@tanstack/vue-query';
-import { useQuery } from '@tanstack/vue-query';
+import { QueryClient, useMutation, useQuery } from '@tanstack/vue-query';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
@@ -44,6 +45,7 @@ import { getParticle, i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { queryStringToString } from '@/lib/router-query-string';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
@@ -57,12 +59,15 @@ import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModa
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
+
+import { DEFAULT_FIELD_ID_MAP } from '../task-fields-configuration/constants/default-field-constant';
 
 const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
 const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
@@ -73,6 +78,7 @@ const props = defineProps<{
 }>();
 
 const taskDetailPageStore = useTaskDetailPageStore();
+const taskContentFormStore = useTaskContentFormStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
 
@@ -98,7 +104,7 @@ watch(error, (err) => {
 });
 
 /* task */
-const { taskQueryKey, taskAPI } = useTaskApi();
+const { taskListQueryKey, taskQueryKey, taskAPI } = useTaskApi();
 const taskDetailQueryKey = computed<QueryKey>(() => [
     taskQueryKey.value,
     props.taskId,
@@ -127,18 +133,6 @@ const {
 /* header and back button */
 const headerTitle = computed<string>(() => task.value?.name ?? '');
 
-/* confirm leave modal */
-const hasUpdated = ref(false);
-const {
-    isConfirmLeaveModalVisible,
-    handleBeforeRouteLeave,
-    confirmRouteLeave,
-    stopRouteLeave,
-} = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskDetailPageStore.getters.hasUnsavedChanges || hasUpdated.value),
-});
-onBeforeRouteLeave(handleBeforeRouteLeave);
-
 /* tabs */
 const tabs = computed<TabItem<object>[]>(() => [
     {
@@ -160,12 +154,48 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
     });
 };
 
+/* update task */
+const queryClient = new QueryClient();
+const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = useMutation<TaskModel, APIError>({
+    mutationFn: async () => {
+        if (!task.value) throw new Error('Origin task is not defined');
+        const res = await taskAPI.update({
+            task_id: task.value.task_id,
+            name: taskContentFormStore.state.defaultData[DEFAULT_FIELD_ID_MAP.title],
+        });
+        return res;
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({
+            queryKey: [
+                taskListQueryKey,
+                taskQueryKey,
+            ],
+        });
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
+        taskContentFormStore.resetUnsavedChanges();
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
+    },
+});
+
 /* form button handling */
 const handleSaveChanges = async () => {
     if (!taskDetailPageStore.getters.isFormValid) return;
-    hasUpdated.value = !!(await taskDetailPageStore.updateTask());
-    // if (hasUpdated.value) goBack();
+    await updateTaskMutation();
 };
+
+/* confirm leave modal */
+const {
+    isConfirmLeaveModalVisible,
+    handleBeforeRouteLeave,
+    confirmRouteLeave,
+    stopRouteLeave,
+} = useConfirmRouteLeave({
+    passConfirmation: computed(() => !taskDetailPageStore.getters.hasUnsavedChanges || isSuccess.value),
+});
+onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* lifecycle */
 onUnmounted(() => {
@@ -236,11 +266,13 @@ defineExpose({ setPathFrom });
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
+                              :disabled="isUpdating"
                               @click="goBack()"
                     >
                         {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
+                              :loading="isUpdating"
                               :disabled="!taskDetailPageStore.getters.hasUnsavedChanges || !taskDetailPageStore.getters.isFormValid"
                               @click="handleSaveChanges"
                     >
