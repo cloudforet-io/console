@@ -44,10 +44,11 @@ const handleCreateAlertModal = () => {
                       #extra
             >
                 <p-button icon-left="ic_plus_bold"
+                          style-type="secondary"
                           class="self-start mx-auto"
                           @click="handleCreateAlertModal"
                 >
-                    {{ $t('ALERT_MANAGER.CREATE') }}
+                    {{ $t('ALERT_MANAGER.CREATE_ALERT') }}
                 </p-button>
             </template>
         </p-heading-layout>
