@@ -10,7 +10,9 @@
                 {{ header }}
             </slot>
         </header>
-        <div class="body" :class="{ 'no-header': !header.length && !$scopedSlots.header }">
+        <div class="body"
+             :class="{ 'no-header': !header.length && !$scopedSlots.header }"
+        >
             <slot />
         </div>
     </div>
@@ -85,6 +87,9 @@ export default defineComponent<CardProps>({
     }
     &.gray100 {
         @mixin style-type theme('colors.gray.100'), theme('colors.gray.200'), theme('colors.gray.900');
+    }
+    &.gray200 {
+        @mixin style-type theme('colors.gray.200'), theme('colors.gray.200'), theme('colors.gray.900');
     }
     &.yellow100 {
         @mixin style-type theme('colors.yellow.100'), theme('colors.gray.200'), theme('colors.gray.500');
