@@ -211,7 +211,7 @@ onUnmounted(() => {
                         >
                             {{ $t('ALERT_MANAGER.ESCALATION_POLICY.SET_POLICY') }}
                         </p-button>
-                        <p-button style-type="primary"
+                        <p-button style-type="secondary"
                                   icon-left="ic_plus_bold"
                                   size="sm"
                                   @click="handleActionModal('CREATE')"
