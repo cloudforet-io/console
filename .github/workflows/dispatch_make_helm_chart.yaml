@@ -5,7 +5,7 @@ on:
     types: [make_helm_chart]
 
 env:
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_GITHUB_HELM_CHART_WEBHOOK_URL }}
 
 jobs:
   helm_cloudforet:
