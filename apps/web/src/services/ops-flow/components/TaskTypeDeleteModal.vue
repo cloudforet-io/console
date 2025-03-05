@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
-import { useQuery } from '@tanstack/vue-query';
-
-import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import { PButtonModal, PIconButton } from '@cloudforet/mirinae';
 
-import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +15,8 @@ import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
+import { useAssociatedTasksQuery } from '../composables/use-associated-tasks-query';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
@@ -40,28 +36,11 @@ const headerTitle = computed(() => {
 const isDeleting = ref<boolean>(false);
 
 /* load associated tasks */
-const { taskListQueryKey, taskAPI } = useTaskApi();
 const {
-    data: tasks, isLoading, isError, refetch,
-} = useQuery<TaskModel[], APIError, TaskModel[], [QueryKey, Parameters<typeof taskAPI.list>[0]]>({
-    queryKey: computed(() => [
-        taskListQueryKey.value,
-        { task_type_id: taskCategoryPageState.targetTaskTypeId },
-    ]),
-    queryFn: async ({ queryKey }) => {
-        const [, params] = queryKey;
-        const { results } = await taskAPI.list(params);
-        return results ?? [];
-    },
+    tasks, isLoading, refetch,
+} = useAssociatedTasksQuery({
+    queryKey: computed(() => ({ task_type_id: taskCategoryPageState.targetTaskTypeId })),
     enabled: computed(() => !!taskCategoryPageState.visibleTaskTypeDeleteModal && !!taskCategoryPageState.targetTaskTypeId),
-    // time control
-    gcTime: 1000 * 60 * 2, // 2 minutes
-    staleTime: 1000 * 30, // 30 seconds
-});
-watch(isError, (error) => {
-    if (error) {
-        ErrorHandler.handleError(error);
-    }
 });
 
 

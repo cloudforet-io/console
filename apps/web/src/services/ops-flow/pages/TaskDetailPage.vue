@@ -163,7 +163,7 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
 /* form button handling */
 const handleSaveChanges = async () => {
     if (!taskDetailPageStore.getters.isFormValid) return;
-    hasUpdated.value = await taskDetailPageStore.updateTask();
+    hasUpdated.value = !!(await taskDetailPageStore.updateTask());
     // if (hasUpdated.value) goBack();
 };
 

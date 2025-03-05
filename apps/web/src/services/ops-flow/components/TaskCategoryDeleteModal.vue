@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    ref, computed, watch, onBeforeUnmount,
+    ref, computed, onBeforeUnmount,
 } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae/';
@@ -18,13 +18,15 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+import { useAssociatedTasksQuery } from '../composables/use-associated-tasks-query';
+
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 
-const deletable = computed(() => !taskManagementPageStore.getters.associatedTasksToCategory.length);
+const deletable = computed(() => !tasks.value?.length);
 const headerTitle = computed(() => {
     if (taskManagementPageStore.state.loadingAssociatedTasksToCategory) {
         return ' ';
@@ -37,7 +39,7 @@ const headerTitle = computed(() => {
         : _i18n.t('OPSFLOW.DELETE_TARGET', { target: _i18n.t('OPSFLOW.CATEGORY') });
 });
 
-const loading = ref<boolean>(false);
+const isDeleting = ref<boolean>(false);
 const deleteCategory = async (categoryId: string) => {
     try {
         await taskCategoryStore.delete(categoryId);
@@ -48,7 +50,7 @@ const deleteCategory = async (categoryId: string) => {
 };
 const handleConfirm = async () => {
     try {
-        loading.value = true;
+        isDeleting.value = true;
         if (!taskManagementPageState.targetCategoryId) {
             throw new Error('[Console Error] Cannot delete category without a target category');
         }
@@ -57,7 +59,7 @@ const handleConfirm = async () => {
         ErrorHandler.handleRequestError(e, 'Failed to delete category');
     } finally {
         taskManagementPageStore.closeDeleteCategoryModal();
-        loading.value = false;
+        isDeleting.value = false;
     }
 };
 const handleCloseOrCancel = () => {
@@ -66,15 +68,17 @@ const handleCloseOrCancel = () => {
 const handleClosed = () => {
     taskManagementPageStore.resetTargetCategoryId();
 };
-watch(() => taskManagementPageState.visibleDeleteCategoryModal, (visible) => {
-    if (visible) {
-        if (!taskManagementPageState.targetCategoryId) {
-            ErrorHandler.handleError(new Error('[Console Error] Cannot delete category without a target category'));
-            return;
-        }
-        taskManagementPageStore.loadAssociatedTasksToCategory(taskManagementPageState.targetCategoryId);
-    }
+
+
+/* load associated tasks */
+const {
+    tasks, isLoading,
+} = useAssociatedTasksQuery({
+    queryKey: computed(() => ({ category_id: taskManagementPageState.targetCategoryId })),
+    enabled: computed(() => !!taskManagementPageState.visibleDeleteCategoryModal && !!taskManagementPageState.targetCategoryId),
 });
+
+// TODO: remove
 onBeforeUnmount(() => {
     taskManagementPageStore.flushAssociatedTasksToCategoryMap();
 });
@@ -85,25 +89,23 @@ onBeforeUnmount(() => {
                     theme-color="alert"
                     :header-title="headerTitle"
                     :size="deletable ? 'sm' : 'md'"
-                    :loading="loading"
-                    :loading-backdrop="taskManagementPageState.loadingAssociatedTasksToCategory"
+                    :is-loading="isDeleting"
+                    :is-loading-backdrop="isLoading"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"
                     @closed="handleClosed"
     >
         <template #body>
-            <p v-if="!deletable"
-               class="text-paragraph-lg font-bold mb-4"
-            >
-                {{ $t('OPSFLOW.TASK_MANAGEMENT.CATEGORY.DELETE_CONFIRMATION_DESC', {
-                    tasks: taskManagementTemplateStore.templates.tasks,
-                    particle: getParticle(taskManagementTemplateStore.templates.tasks, 'subject')
-                }) }}
-            </p>
-            <associated-tasks v-if="!deletable"
-                              :tasks="taskManagementPageStore.getters.associatedTasksToCategory"
-            />
+            <div v-if="!deletable">
+                <p class="text-paragraph-lg font-bold mb-4">
+                    {{ $t('OPSFLOW.TASK_MANAGEMENT.CATEGORY.DELETE_CONFIRMATION_DESC', {
+                        tasks: taskManagementTemplateStore.templates.tasks,
+                        particle: getParticle(taskManagementTemplateStore.templates.tasks, 'subject')
+                    }) }}
+                </p>
+                <associated-tasks :tasks="tasks ?? []" />
+            </div>
         </template>
     </p-button-modal>
 </template>
