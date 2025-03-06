@@ -6,8 +6,8 @@ import {
     PButtonModal, PLink, PStatus, PDataTable,
 } from '@cloudforet/mirinae';
 
+import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

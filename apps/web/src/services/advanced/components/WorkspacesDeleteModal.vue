@@ -6,8 +6,8 @@ import {
     PDoubleCheckModal, PButtonModal, PLink, PStatus,
 } from '@cloudforet/mirinae';
 
+import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/api-verbs/delete';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
-import type { WorkspaceDeleteParameters } from '@/schema/identity/workspace/api-verbs/delete';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
