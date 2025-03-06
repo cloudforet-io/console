@@ -227,7 +227,7 @@ watch(() => state.avgDurationGroupByUrgencyList, () => {
              class="chart"
         />
         <p-empty v-else
-                 class="mt-40"
+                 class="mt-52"
         >
             <template #default>
                 <span>{{ $t('ALERT_MANAGER.SERVICE.AVERAGE_ACKNOWLEDGED_RESOLVED_TIME_BY_URGENCY_NO_DATA') }}</span>

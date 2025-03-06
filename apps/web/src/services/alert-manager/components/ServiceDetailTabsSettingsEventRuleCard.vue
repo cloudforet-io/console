@@ -185,7 +185,9 @@ const handleDeleteEventRule = () => {
                    :data="storeState.eventRuleInfo"
                    :class="{ 'is-mobile': state.isMobileSize }"
     >
-        <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
+        <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')"
+                style-type="gray200"
+        >
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-bold">{{ $t('ALERT_MANAGER.EVENT_RULE.TITLE') }}</span>
@@ -513,10 +515,5 @@ const handleDeleteEventRule = () => {
             }
         }
     }
-}
-
-/* custom design-system component - p-field-group */
-:deep(.p-card > header) {
-    @apply bg-gray-200;
 }
 </style>

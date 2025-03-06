@@ -14,7 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PProgressBar } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 

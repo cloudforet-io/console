@@ -240,11 +240,11 @@ onUnmounted(() => {
                     <template v-if="hasReadWriteAccess"
                               #extra
                     >
-                        <p-button style-type="primary"
+                        <p-button style-type="secondary"
                                   icon-left="ic_plus_bold"
                                   @click="handleClickCreateButton"
                         >
-                            {{ $t('ALERT_MANAGER.CREATE') }}
+                            {{ $t('ALERT_MANAGER.CREATE_WEBHOOK') }}
                         </p-button>
                     </template>
                 </p-heading-layout>

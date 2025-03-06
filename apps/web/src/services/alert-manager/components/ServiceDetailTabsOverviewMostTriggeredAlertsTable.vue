@@ -209,7 +209,7 @@ watch(() => tableState.refinedItems, () => {
                 </template>
             </p-data-table>
             <div v-else
-                 class="mt-36"
+                 class="mt-48"
             >
                 <p-empty>
                     <template #default>
