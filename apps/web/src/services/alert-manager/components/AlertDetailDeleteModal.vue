@@ -12,7 +12,6 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -35,8 +34,6 @@ const storeState = reactive({
 const router = useRouter();
 const route = useRoute();
 
-const { getProperRouteLocation } = useProperRouteLocation();
-
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const state = reactive({
@@ -58,7 +55,7 @@ const handleConfirm = async () => {
         if (serviceId) {
             await router.go(-1);
         } else {
-            await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+            await router.push({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }).catch(() => {});
         }
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
     } catch (e) {

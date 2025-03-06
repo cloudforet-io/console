@@ -9,7 +9,6 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AlertDetailDeleteModal from '@/services/alert-manager/components/AlertDetailDeleteModal.vue';
 import AlertDetailEditModal from '@/services/alert-manager/components/AlertDetailEditModal.vue';
@@ -27,7 +26,6 @@ const alertDetailPageState = alertDetailPageStore.state;
 const router = useRouter();
 const route = useRoute();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
@@ -61,7 +59,7 @@ const handleRouteBackButton = () => {
     if (serviceId) {
         router.go(-1);
     } else {
-        router.push(getProperRouteLocation({
+        router.push({
             name: ALERT_MANAGER_ROUTE.ALERTS._NAME,
             query: {
                 serviceId: storeState.selectedServiceId,
@@ -69,7 +67,7 @@ const handleRouteBackButton = () => {
                 urgency: storeState.selectedUrgency,
                 filters: storeState.selectedSearchFilter,
             },
-        }));
+        }).catch(() => {});
     }
 };
 const handleSelectDropdownMenu = (type: ModalType) => {

@@ -14,7 +14,6 @@ import { i18n } from '@/translations';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
@@ -34,7 +33,6 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const router = useRouter();
 const route = useRoute();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
@@ -77,7 +75,7 @@ const handleActionModal = (type: ModalType) => {
 };
 const handleGoBackButton = () => {
     if (state.isSettingMode) {
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+        router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
         return;
     }
     replaceUrlQuery({

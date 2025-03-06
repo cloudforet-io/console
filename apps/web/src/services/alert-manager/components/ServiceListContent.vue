@@ -15,7 +15,6 @@ import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray, green } from '@/styles/colors';
 
@@ -37,7 +36,6 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -67,7 +65,7 @@ const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
 const handleClickServiceItem = (id: string) => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
@@ -75,13 +73,13 @@ const handleClickServiceItem = (id: string) => {
         query: {
             tab: SERVICE_DETAIL_TABS.OVERVIEW,
         },
-    }));
+    }).catch(() => {});
 };
 const handleClickWebhookItem = (id: string, webhookId?: string) => {
     if (webhookId) {
         serviceDetailPageStore.setSelectedWebhookId(webhookId);
     }
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
@@ -89,13 +87,13 @@ const handleClickWebhookItem = (id: string, webhookId?: string) => {
         query: {
             tab: SERVICE_DETAIL_TABS.WEBHOOK,
         },
-    }));
+    }).catch(() => {});
 };
 const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => {
     if (id) {
         serviceDetailPageStore.setSelectedEscalationPolicyId(escalationPolicyId);
     }
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: id,
@@ -103,7 +101,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
         query: {
             tab: SERVICE_DETAIL_TABS.SETTINGS,
         },
-    }));
+    }).catch(() => {});
 };
 </script>
 

@@ -32,7 +32,6 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import ServiceDetailTabsWebhookDeleteModal
@@ -66,7 +65,6 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const tableState = reactive({
@@ -137,9 +135,9 @@ const initSelectedWebhook = () => {
 };
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.WEBHOOK.CREATE._NAME,
-    }));
+    }).catch(() => {});
 };
 const handleSelectDropdownItem = (name: WebhookModalType) => {
     modalState.visible = true;

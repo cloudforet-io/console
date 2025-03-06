@@ -4,7 +4,6 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
@@ -26,7 +25,6 @@ const alertDetailPageStore = useAlertDetailPageStore();
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 watch(() => props.alertId, async (alertId) => {
     if (!alertId) return;
@@ -35,7 +33,7 @@ watch(() => props.alertId, async (alertId) => {
 
 onMounted(() => {
     if (!props.alertId) {
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }));
+        router.push({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }).catch(() => {});
     }
 });
 onUnmounted(() => {

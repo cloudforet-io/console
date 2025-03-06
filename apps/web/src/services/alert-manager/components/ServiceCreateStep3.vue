@@ -14,7 +14,6 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import NotificationsCreateForm from '@/services/alert-manager/components/NotificationsCreateForm.vue';
 import NotificationsCreateTypeSelector
@@ -30,7 +29,6 @@ const serviceCreateFormState = serviceCreateFormStore.state;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     currentSubStep: computed<number>(() => serviceCreateFormState.currentSubStep),
@@ -50,7 +48,7 @@ const state = reactive({
 });
 
 const routeDetailSettingPage = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: storeState.createdServiceId,
@@ -58,7 +56,7 @@ const routeDetailSettingPage = () => {
         query: {
             tab: SERVICE_DETAIL_TABS.SETTINGS,
         },
-    }));
+    }).catch(() => {});
 };
 const handleChangeForm = (form: CreatedNotificationInfoType, formValid: boolean) => {
     state.form = form;

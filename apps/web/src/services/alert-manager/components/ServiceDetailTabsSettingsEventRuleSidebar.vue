@@ -23,7 +23,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
@@ -49,7 +48,6 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { width } = useWindowSize();
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
@@ -157,7 +155,7 @@ const handleClickItem = (value: TreeNode, idx?: number) => {
         return;
     }
     if (route.query?.eventRuleId === value.data.to.query?.eventRuleId) return;
-    router.push(getProperRouteLocation(value.data.to));
+    router.push(value.data.to).catch(() => {});
     state.selectedTreeId = value.id;
 };
 const fetchAndSetEventRuleInfo = async (eventRuleId: string) => {

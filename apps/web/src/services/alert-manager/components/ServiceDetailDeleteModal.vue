@@ -9,7 +9,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -29,7 +28,6 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
@@ -53,7 +51,7 @@ const handleConfirm = async () => {
     state.loading = true;
     try {
         await serviceDetailPageStore.deleteServiceDetailData();
-        await router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+        await router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_DELETE_SERVICE'), '');
     } finally {
         state.loading = false;
