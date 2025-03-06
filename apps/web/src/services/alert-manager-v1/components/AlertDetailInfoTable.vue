@@ -8,18 +8,18 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager-v1/components/AlertDetailInfoTableDescription.vue';
 import AlertDetailInfoTableProject from '@/services/alert-manager-v1/components/AlertDetailInfoTableProject.vue';
@@ -36,10 +36,10 @@ const props = defineProps<{
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 const userStore = useUserStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 
 const state = reactive({
@@ -127,7 +127,7 @@ const getEscalationPolicy = async () => {
             <template #data-escalation_policy_id>
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="getProperRouteLocation({ name: ALERT_MANAGER_ROUTE_V1.ESCALATION_POLICY._NAME })"
+                        :to="{ name: ALERT_MANAGER_ROUTE_V1.ESCALATION_POLICY._NAME, workspaceId: userWorkspaceStore.getters.currentWorkspaceId }"
                         highlight
                 >
                     {{ state.escalationPolicyName }}

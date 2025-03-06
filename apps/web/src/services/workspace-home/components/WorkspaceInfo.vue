@@ -20,7 +20,6 @@ import { useUserStore } from '@/store/user/user-store';
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -56,7 +55,6 @@ const userStore = useUserStore();
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
@@ -99,7 +97,7 @@ const actionWorkspace = (type: string, workspaceId: string) => {
     });
 };
 const routerToCreateApp = (isOpenModal: boolean) => {
-    router.push(getProperRouteLocation({ name: IAM_ROUTE.APP._NAME }));
+    router.push({ name: IAM_ROUTE.APP._NAME }).catch(() => {});
     if (isOpenModal) {
         appPageStore.$patch((_state) => {
             _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
@@ -110,7 +108,7 @@ const routerToCreateApp = (isOpenModal: boolean) => {
     }
 };
 const routerToWorkspaceUser = (isOpenModal: boolean) => {
-    router.push(getProperRouteLocation({ name: IAM_ROUTE.USER._NAME }));
+    router.push({ name: IAM_ROUTE.USER._NAME }).catch(() => {});
     if (isOpenModal) {
         userPageStore.$patch((_state) => {
             _state.state.modal.type = USER_MODAL_TYPE.INVITE;

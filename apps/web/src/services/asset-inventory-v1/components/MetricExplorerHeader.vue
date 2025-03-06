@@ -33,13 +33,13 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory-v1/components/MetricExplorerNameFormModal.vue';
 import MetricExplorerQueryFormSidebar from '@/services/asset-inventory-v1/components/MetricExplorerQueryFormSidebar.vue';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -47,7 +47,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
@@ -175,10 +174,10 @@ const duplicateMetric = async () => {
             query_options: metricExplorerPageState.metric.query_options,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
-        await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
+        await router.replace({
+            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: duplicatedMetric.metric_id },
-        }));
+        }).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
     } finally {
@@ -194,14 +193,14 @@ const deleteCustomMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
         const otherMetricId = metricExplorerPageGetters.metrics[0]?.key;
         if (otherMetricId) {
-            await router.replace(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
+            await router.replace({
+                name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                 params: { metricId: otherMetricId },
-            }));
+            }).catch(() => {});
         } else {
-            await router.replace(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER._NAME,
-            }));
+            await router.replace({
+                name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER._NAME,
+            }).catch(() => {});
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
@@ -214,10 +213,10 @@ const deleteMetricExample = async () => {
         });
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
-        await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
+        await router.replace({
+            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: state.currentMetricId },
-        }));
+        }).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
     }

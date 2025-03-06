@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
 import LSBLoadingSpinner from '@/common/modules/navigations/new-lsb/LSBLoadingSpinner.vue';
@@ -19,7 +18,6 @@ import {
 const taskCategoryStore = useTaskCategoryStore();
 const taskCategoryGetters = taskCategoryStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId === currentRoute.query.categoryId;
 
 onMounted(() => {
@@ -31,9 +29,9 @@ onMounted(() => {
     <l-s-b-container>
         <l-s-b-router-button id="all-categories"
                              icon="ic_dots-4-square"
-                             :to="getProperRouteLocation({
+                             :to="{
                                  name: OPS_FLOW_ROUTE.BOARD._NAME
-                             })"
+                             }"
                              :predicate="predicate"
         >
             <span class="capitalize">{{ $t('OPSFLOW.ALL_TASKS', {
@@ -47,10 +45,10 @@ onMounted(() => {
                            :id="`${category.category_id}-${idx}`"
                            :key="`${category.category_id}-${idx}`"
                            :index="idx"
-                           :to="getProperRouteLocation({
+                           :to="{
                                name: OPS_FLOW_ROUTE.BOARD._NAME,
                                query: { categoryId: category.category_id }
-                           })"
+                           }"
                            :predicate="predicate"
         >
             {{ category.name }}

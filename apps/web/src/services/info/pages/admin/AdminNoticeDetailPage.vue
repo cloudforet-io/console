@@ -29,7 +29,6 @@ import {
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
@@ -49,7 +48,6 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -80,10 +78,10 @@ const handleClickEditButton = () => {
         ErrorHandler.handleError(new Error('postId is undefined'));
         return;
     }
-    router.push(getProperRouteLocation({
+    router.push({
         name: ADMIN_INFO_ROUTE.NOTICE.UPDATE._NAME,
         params: { postId: props.postId },
-    }));
+    });
 };
 
 const handleDeleteModalOpen = () => {

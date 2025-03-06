@@ -2,7 +2,7 @@
 import {
     onMounted, computed, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { clone } from 'lodash';
 
@@ -19,8 +19,8 @@ import type {
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import { SpaceRouter } from '@/router';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -33,7 +33,6 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorDataModal
     from '@/services/asset-inventory-v1/components/CollectorDataModal.vue';
@@ -41,6 +40,7 @@ import CollectorContentItem from '@/services/asset-inventory-v1/components/Colle
 import CollectorListNoData from '@/services/asset-inventory-v1/components/CollectorMainListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory-v1/components/CollectorMainScheduleModal.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory-v1/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory-v1/types/collector-main-page-type';
@@ -82,11 +82,12 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
-
+const appContextStore = useAppContextStore();
+const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
@@ -106,8 +107,8 @@ const keyItemSets: KeyItemSet[] = [{
 }];
 const collectorSearchHandler = reactive({
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id', undefined, isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
-        name: makeDistinctValueHandler('inventory.Collector', 'name', undefined, isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
+        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id', undefined, storeState.isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
+        name: makeDistinctValueHandler('inventory.Collector', 'name', undefined, storeState.isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
         'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
         'plugin_info.plugin_id': makePluginReferenceValueHandler('plugin_info.plugin_id', storeState.plugins),
         'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
@@ -176,10 +177,10 @@ const state = reactive({
                     query: {
                         filters: historyLinkQueryHelper.rawQueryStrings,
                     },
-                    name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME,
+                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME : ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME,
                 },
                 detailLink: {
-                    name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
+                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
                     params: {
                         collectorId: d.collector_id,
                     },
@@ -212,7 +213,7 @@ const collectorApiQueryHelper = new ApiQueryHelper()
 
 /* Components */
 const routeToCreatePage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME }));
+    router.push({ name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME : ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME }).catch(() => {});
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
     if (options.pageStart !== undefined) collectorApiQueryHelper.setPageStart(options.pageStart);
@@ -228,7 +229,7 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
     fetchCollectorList();
 };
 const handleClickListItem = (detailLink) => {
-    SpaceRouter.router.push(getProperRouteLocation(detailLink));
+    router.push(detailLink).catch(() => {});
 };
 const handleClickCollectDataConfirm = () => {
     fetchCollectorList();

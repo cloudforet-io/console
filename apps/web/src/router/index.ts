@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import type { RouteConfig } from 'vue-router';
+import type { NavigationGuardNext, Route, RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
 import { clone } from 'lodash';
@@ -93,6 +93,11 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
+            /* Redirection to proper route */
+            const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
+            const redirected = SpaceRouter.handleWorkspaceRouteRedirection(to, currentWorkspaceId, next);
+            if (redirected) return;
+
             const { rol: prevRole, wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
             const routeScope = getRouteScope(to);
 
@@ -168,5 +173,25 @@ export class SpaceRouter {
         });
 
         return SpaceRouter.router;
+    }
+
+
+    static handleWorkspaceRouteRedirection(to: Route, currentWorkspaceId: string|undefined, next: NavigationGuardNext): boolean {
+        const targetRouteScope = getRouteScope(to);
+        const needsWorkspaceId = targetRouteScope === ROUTE_SCOPE.WORKSPACE && !to.params.workspaceId && currentWorkspaceId;
+
+        if (to.name && needsWorkspaceId) {
+            next({
+                ...to,
+                name: to.name,
+                params: {
+                    ...to.params,
+                    workspaceId: currentWorkspaceId,
+                },
+            });
+            return true;
+        }
+
+        return false;
     }
 }

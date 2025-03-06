@@ -20,7 +20,6 @@ import type { ProjectReferenceItem } from '@/store/reference/project-reference-s
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
@@ -41,7 +40,6 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
-const { getProperRouteLocation } = useProperRouteLocation();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectPageStore = useProjectPageStore();
@@ -69,10 +67,10 @@ const state = reactive({
                 label: d.label,
                 id: d.name,
                 icon: { name: 'ic_folder-filled', color: indigo[500] },
-                to: getProperRouteLocation({
+                to: {
                     name: PROJECT_ROUTE._NAME,
                     params: { projectGroupId: d.itemId },
-                }),
+                },
                 favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.name },
             };
         }
@@ -81,10 +79,10 @@ const state = reactive({
             label: d.label,
             id: d.name,
             icon: { name: 'ic_document-filled', color: peacock[600] },
-            to: getProperRouteLocation({
+            to: {
                 name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                 params: { id: d.itemId },
-            }),
+            },
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
         };
     })),
@@ -95,7 +93,7 @@ const state = reactive({
             label: i18n.t('PROJECT.LANDING.ALL_PROJECTS'),
             id: MENU_ID.PROJECT,
             icon: 'ic_dots-4-square',
-            to: getProperRouteLocation({ name: PROJECT_ROUTE._NAME }),
+            to: { name: PROJECT_ROUTE._NAME },
             hideFavorite: true,
         },
         {
@@ -127,10 +125,10 @@ const state = reactive({
             label: project.name,
             id: project.key,
             icon: { name: 'ic_document-filled', color: peacock[600] },
-            to: getProperRouteLocation({
+            to: {
                 name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                 params: { id: project.key, workspaceId: storeState.currentWorkspaceId },
-            }),
+            },
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
         }))),
     alertCounts: computed(() => ({

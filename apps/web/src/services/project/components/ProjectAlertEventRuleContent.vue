@@ -13,11 +13,10 @@ import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
 import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
 import { i18n as _i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
 
@@ -31,12 +30,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 interface Field {
     name: keyof EventRuleOptions | keyof EventRuleActions;
     label: TranslateResult;
 }
-const { getProperRouteLocation } = useProperRouteLocation();
 const queryHelper = new QueryHelper();
 
 const state = reactive({
@@ -109,9 +108,12 @@ const state = reactive({
                             <td v-else-if="field.name === 'change_project'">
                                 <p-link action-icon="internal-link"
                                         new-tab
-                                        :to="getProperRouteLocation(referenceRouter(
+                                        :to="referenceRouter(
                                             state.items[field.name] ?? '',
-                                            { resource_type: 'identity.Project' }))"
+                                            {
+                                                resource_type: 'identity.Project',
+                                                workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
+                                            })"
                                 >
                                     {{ state.projects[state.items[field.name]] ? state.projects[state.items[field.name]].label : state.items[field.name] }}
                                 </p-link>
@@ -119,7 +121,7 @@ const state = reactive({
                             <td v-else-if="field.name === 'change_escalation_policy'">
                                 <p-link action-icon="internal-link"
                                         new-tab
-                                        :to="getProperRouteLocation(state.escalationPolicyLink)"
+                                        :to="state.escalationPolicyLink"
                                 >
                                     {{ state.escalationPolicies[state.items[field.name]].label }}
                                 </p-link>

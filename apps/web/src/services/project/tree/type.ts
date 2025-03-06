@@ -1,3 +1,5 @@
+import type { Location } from 'vue-router/types/router';
+
 export interface TreeNode<T extends TreeData = any> {
     id: string;
     depth: number;

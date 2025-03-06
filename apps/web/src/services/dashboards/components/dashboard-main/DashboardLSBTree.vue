@@ -17,7 +17,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
@@ -25,6 +24,7 @@ import { gray } from '@/styles/colors';
 
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -42,7 +42,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const route = useRoute();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
@@ -87,12 +86,15 @@ const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>) => {
         updateTreeDisplayMap(node.data.id);
         return;
     }
-    router.push(getProperRouteLocation({
-        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    const dashboardDetailRouteName = storeState.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+        : DASHBOARDS_ROUTE.DETAIL._NAME;
+    router.push({
+        name: dashboardDetailRouteName,
         params: {
             dashboardId: node.data.id || '',
         },
-    }));
+    }).catch(() => {});
 };
 const handleSelectControlButton = (id: string, item: MenuItem) => {
     if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(id);

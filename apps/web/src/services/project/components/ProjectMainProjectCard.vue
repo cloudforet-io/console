@@ -14,7 +14,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -44,7 +43,6 @@ const projectPageStore = useProjectPageStore();
 
 
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -85,12 +83,12 @@ const state = reactive({
 const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
 const handleSelectProject = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
         params: {
             id: props.item.id as string,
         },
-    }));
+    }).catch(() => {});
 };
 
 const handleSelectItem = (selected: MenuItem) => {

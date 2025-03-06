@@ -19,10 +19,11 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/cont
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertListParameters, AlertListResponse } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -37,7 +38,6 @@ import { MENU_ID } from '@/lib/menu/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
@@ -86,10 +86,11 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'update', filters: Partial<AlertListTableFilters>): void;
     (event: 'change-list'): void;
 }>();
-const { getProperRouteLocation } = useProperRouteLocation();
+
 
 /* Stores */
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone || ''),
@@ -487,7 +488,10 @@ initPage();
                     <template v-if="value">
                         <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                 new-tab
-                                :to="getProperRouteLocation(referenceRouter(value,{ resource_type: 'identity.Project' }))"
+                                :to="referenceRouter(value,{
+                                    resource_type: 'identity.Project',
+                                    workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
+                                })"
                         >
                             {{ storeState.projects[value] ? storeState.projects[value].label : value }}
                         </p-link>

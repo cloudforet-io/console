@@ -15,7 +15,6 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import WebhookCreateForm from '@/services/alert-manager/components/WebhookCreateForm.vue';
 import WebhookCreateSuccessMode from '@/services/alert-manager/components/WebhookCreateSuccessMode.vue';
@@ -37,7 +36,6 @@ const serviceCreateFormState = serviceCreateFormStore.state;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
@@ -72,7 +70,7 @@ const state = reactive({
 });
 
 const handleClickCancelButton = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: props.serviceId,
@@ -80,7 +78,7 @@ const handleClickCancelButton = () => {
         query: {
             tab: SERVICE_DETAIL_TABS.WEBHOOK,
         },
-    }));
+    }).catch(() => {});
 };
 const handlePrevNavigation = () => {
     if (state.currentStep === 1) {

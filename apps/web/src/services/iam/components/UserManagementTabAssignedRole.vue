@@ -16,6 +16,7 @@ import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
@@ -23,7 +24,6 @@ import type { ProjectReferenceItem } from '@/store/reference/project-reference-s
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 
 interface UserRoleItem {
@@ -45,9 +45,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+
 const state = reactive({
     title: computed(() => i18n.t('IAM.USER.MAIN.ASSIGNED_ROLES')),
     loading: true,
@@ -68,12 +69,18 @@ const getProjectLink = (value, isProject: boolean) => {
         const link = router.resolve(referenceRouter(value, {
             resource_type: 'identity.Project',
         }));
-        return link.resolved;
+        return {
+            ...link.resolved,
+            workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+        };
     }
     const link = router.resolve(referenceRouter(value, {
         resource_type: 'identity.ProjectGroup',
     }));
-    return link.resolved;
+    return {
+        ...link.resolved,
+        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+    };
 };
 
 const getUserDetailData = async (userId) => {
@@ -116,7 +123,7 @@ watch(() => props.userId, () => {
                 <p-link v-if="value"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="getProperRouteLocation(getProjectLink(value, false))"
+                        :to="getProjectLink(value, false)"
                 >
                     {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
                 </p-link>
@@ -128,7 +135,7 @@ watch(() => props.userId, () => {
                 <p-link v-if="value"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="getProperRouteLocation(getProjectLink(value, true))"
+                        :to="getProjectLink(value, true)"
                 >
                     {{ state.projects[value] ? state.projects[value].label : value }}
                 </p-link>

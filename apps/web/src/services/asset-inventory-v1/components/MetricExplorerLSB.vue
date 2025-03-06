@@ -21,7 +21,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -49,7 +48,6 @@ const route = useRoute();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
@@ -99,12 +97,12 @@ const state = reactive({
                 name: metric.key.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
                 color: gray[500],
             },
-            to: getProperRouteLocation({
+            to: {
                 name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     metricId: metric.key,
                 },
-            }),
+            },
             favoriteOptions: {
                 type: FAVORITE_TYPE.METRIC,
                 id: metric.key,
@@ -115,13 +113,13 @@ const state = reactive({
             id: example.example_id,
             label: example.name,
             icon: 'ic_example-filled',
-            to: getProperRouteLocation({
+            to: {
                 name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                 params: {
                     metricId: example.metric_id,
                     metricExampleId: example.example_id,
                 },
-            }),
+            },
             favoriteOptions: {
                 type: FAVORITE_TYPE.METRIC_EXAMPLE,
                 id: example.example_id,

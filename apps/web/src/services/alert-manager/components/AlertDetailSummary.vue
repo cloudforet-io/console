@@ -11,11 +11,11 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray, red } from '@/styles/colors';
 
@@ -29,9 +29,9 @@ const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
@@ -137,16 +137,17 @@ watch(() => alertDetailPageState.alertInfo, (alertInfo) => {
             <p-link :text="getEscalationInfo(storeState.alertInfo.escalation_policy_id)"
                     action-icon="internal-link"
                     new-tab
-                    :to="getProperRouteLocation({
+                    :to="{
                         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                         params: {
                             serviceId: storeState.alertInfo.service_id,
+                            workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                         },
                         query: {
                             tab: SERVICE_DETAIL_TABS.SETTINGS,
                             escalationPolicyId: storeState.alertInfo.escalation_policy_id,
                         },
-                    })"
+                    }"
                     highlight
                     size="md"
                     class="leading-8"

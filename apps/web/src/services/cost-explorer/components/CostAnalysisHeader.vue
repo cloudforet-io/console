@@ -9,7 +9,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { CostQuerySetDeleteParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/delete';
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,7 +20,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -40,7 +38,6 @@ const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/compon
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const gnbStore = useGnbStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
@@ -100,13 +97,13 @@ const handleDeleteQueryConfirm = async () => {
         await SpaceConnector.clientV2.costAnalysis.costQuerySet.delete<CostQuerySetDeleteParameters>({ cost_query_set_id: state.itemIdForDeleteQuery });
         await costAnalysisPageStore.listCostQueryList();
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
-        await SpaceRouter.router.push(getProperRouteLocation({
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        await router.push({
+            name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
                 costQuerySetId: costAnalysisPageGetters.managedCostQuerySetList[0].cost_query_set_id,
             },
-        }));
+        }).catch(() => {});
         const isFavoriteItem = favoriteGetters.costAnalysisItems.find((item) => item.itemId === state.itemIdForDeleteQuery);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({

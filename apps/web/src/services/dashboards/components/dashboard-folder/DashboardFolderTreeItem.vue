@@ -14,16 +14,17 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -41,8 +42,8 @@ const emit = defineEmits<{(e: 'toggle-folder'): void;
 }>();
 const LABELS_LIMIT = 2;
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
@@ -91,18 +92,22 @@ const handleClickTreeItem = (): void => {
         return;
     }
     if (props.disableLink) return;
-    const _location = getProperRouteLocation({
-        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    const dashboardDetailRouteName = storeState.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+        : DASHBOARDS_ROUTE.DETAIL._NAME;
+    const _location = {
+        name: dashboardDetailRouteName,
         params: {
+            workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
             dashboardId: props.treeData.data.id || '',
         },
-    });
+    };
     const _target = props.readonlyMode ? '_blank' : '_self';
     if (_target === '_blank') {
         window.open(router.resolve(_location).href, _target);
         return;
     }
-    router.push(_location);
+    router.push(_location).catch(() => {});
 };
 const handleClickLabel = (label: string) => {
     dashboardPageControlStore.setSearchQueryTags([

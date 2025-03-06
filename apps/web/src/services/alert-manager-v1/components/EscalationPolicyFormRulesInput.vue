@@ -18,9 +18,11 @@ import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 
 import ProjectChannelList from '@/services/alert-manager-v1/components/ProjectChannelList.vue';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
@@ -44,7 +46,8 @@ const MINIFIED_NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_le
     { name: 'LV5', label: '5' },
 ];
 const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
-const { getProperRouteLocation } = useProperRouteLocation();
+
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
@@ -170,7 +173,10 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
                     :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
-                    :to="getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } })"
+                    :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: {
+                        id: escalationPolicyFormState.projectId,
+                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId
+                    } }"
                     highlight
             />
         </div>

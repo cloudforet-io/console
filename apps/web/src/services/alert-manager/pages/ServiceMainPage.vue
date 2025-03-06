@@ -9,7 +9,6 @@ import {
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceList from '@/services/alert-manager/components/ServiceList.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -18,14 +17,13 @@ const router = useRouter();
 
 const allReferenceStore = useAllReferenceStore();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.CREATE._NAME,
-    }));
+    }).catch(() => {});
 };
 
 onMounted(() => {

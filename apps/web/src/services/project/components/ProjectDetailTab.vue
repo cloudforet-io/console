@@ -12,7 +12,6 @@ import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -34,7 +33,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const route = useRoute();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
@@ -58,7 +56,7 @@ const onChangeTab = (activeTab: string) => {
             dashboardId: activeTab,
         },
     };
-    router.replace(getProperRouteLocation(isDashboardTab ? dashboardTabRoute : { name: activeTab }));
+    router.replace(isDashboardTab ? dashboardTabRoute : { name: activeTab }).catch(() => {});
 };
 </script>
 

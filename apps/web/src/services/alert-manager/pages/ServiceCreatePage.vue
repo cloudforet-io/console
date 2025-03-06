@@ -6,7 +6,6 @@ import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceCreateStep1 from '@/services/alert-manager/components/ServiceCreateStep1.vue';
 import ServiceCreateStep2 from '@/services/alert-manager/components/ServiceCreateStep2.vue';
@@ -18,7 +17,6 @@ import type { createHeaderInfoByStep } from '@/services/alert-manager/types/aler
 const serviceCreateFormStore = useServiceCreateFormStore();
 const serviceCreateFormState = serviceCreateFormStore.state;
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -67,7 +65,7 @@ const state = reactive({
 });
 
 const handleClickClose = () => {
-    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+    router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
 };
 
 onUnmounted(() => {

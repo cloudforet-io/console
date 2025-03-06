@@ -8,7 +8,6 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -26,7 +25,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -63,12 +61,12 @@ const state = reactive({
 });
 
 const handleSelectProjectGroup = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: PROJECT_ROUTE._NAME,
         params: {
             projectGroupId: props.item.id as string,
         },
-    }));
+    }).catch(() => {});
 };
 
 const handleSelectItem = (selected: MenuItem) => {

@@ -38,7 +38,6 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import ServiceDetailTabsNotificationsDeleteModal
@@ -74,7 +73,6 @@ const serviceCreateFormStore = useServiceCreateFormStore();
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const tableState = reactive({
@@ -169,9 +167,9 @@ const handleCloseModal = () => {
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
     serviceCreateFormStore.setCreatedService(storeState.service);
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
-    }));
+    }).catch(() => {});
 };
 const handleSelectDropdownItem = (name: NotificationsModalType) => {
     modalState.visible = true;

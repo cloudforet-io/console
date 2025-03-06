@@ -33,6 +33,7 @@ import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -42,7 +43,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
@@ -77,13 +77,13 @@ interface Props {
 const props = defineProps<Props>();
 // const route = useRoute();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const projectTreeStore = useProjectTreeStore();
 
+const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
@@ -121,29 +121,36 @@ const state = reactive({
     viewInItems: computed<ViewInItem[]>(() => ([
         {
             label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
-            to: getProperRouteLocation({
+            to: {
                 name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+                params: {
+                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+                },
                 query: {
                     project: [props.id],
                 },
-            }),
+            },
         },
         {
             label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
-            to: getProperRouteLocation({
+            to: {
                 name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+                params: {
+                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+                },
                 query: {
                     filters: queryHelper.setFilters([
                         { k: 'project_id', v: [props.id], o: '' },
                     ]).rawQueryStrings,
                 },
-            }),
+            },
         },
         {
             label: i18n.t('PROJECT.DETAIL.COST_ANALYSIS'),
-            to: getProperRouteLocation({
+            to: {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
+                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                     dataSourceId: Object.keys(storeState.costDataSource)?.[0],
                     costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
                 },
@@ -152,7 +159,7 @@ const state = reactive({
                         { k: 'project_id', v: [props.id], o: 'in' },
                     ]),
                 },
-            }),
+            },
         },
     ])),
     currentProject: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -200,10 +207,10 @@ const handleSelectItem = (selected: MenuItem) => {
 const handleClickWebhook = () => {
     if (!props.id) return;
     if (!webhooksState.alertActivated) {
-        router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }));
+        router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }).catch(() => {});
         return;
     }
-    router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }));
+    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }).catch(() => {});
 };
 const handleOpenMemberModal = () => {
     memberState.memberModalVisible = true;

@@ -12,11 +12,11 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
     LSBItem, LSBMenu,
@@ -40,8 +40,8 @@ const PROVIDER_MENU_ID = 'provider';
 const CATEGORY_MENU_ID = 'category';
 const REGION_MENU_ID = 'region';
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
+const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
@@ -53,6 +53,7 @@ const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentGrantInfo: computed(() => userStore.state.currentGrantInfo),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
@@ -108,7 +109,7 @@ const state = reactive({
                 label: state.detailPageParams.group,
                 id: selectedItem?.group,
                 isBackLink: true,
-                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME }),
+                to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME },
                 titleIcon: get(selectedItem, ['tags', 'spaceone:icon'], ''),
             },
         ];
@@ -117,7 +118,10 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.ITEM,
                 label: d.name,
                 id: d.cloud_service_type_key,
-                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } }),
+                to: {
+                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
+                    params: { ...state.detailPageParams, name: d.name },
+                },
             });
         });
         return results;
@@ -165,15 +169,16 @@ const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) =
 };
 
 const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
-    await router.replace(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
+    await router.replace({
+        name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: params.provider,
             group: params.group,
             name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
         },
         query: route.query,
-    }));
+    }).catch(() => {
+    });
     await cloudServiceDetailPageStore.setSelectedCloudServiceType();
 };
 const handleSelectProvider = (selected: string) => {
@@ -193,7 +198,7 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
 <template>
     <l-s-b :menu-set="state.menuSet"
            class="cloud-service-l-s-b"
-           :class="{'is-admin-mode': isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
+           :class="{'is-admin-mode': storeState.isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
     >
         <template #slot-project>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"

@@ -54,7 +54,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import AutoSyncState from '@/common/components/badge/auto-sync-state/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
 import { gray } from '@/styles/colors';
@@ -67,6 +66,7 @@ import {
 import { convertAgentModeOptions } from '@/services/asset-inventory-v1/helpers/agent-mode-helper';
 import { stateFormatter } from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator/type';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
@@ -87,7 +87,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const { getProperRouteLocation } = useProperRouteLocation();
+
 
 const storeState = reactive({
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
@@ -277,11 +277,11 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 
 /** Add & Delete Service Accounts Action (Dropdown) * */
 const clickAddServiceAccount = () => {
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.ADD._NAME,
+    router.push({
+        name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.ADD._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.ADD._NAME,
         params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : serviceAccountSchemaState.selectedAccountType },
         query: { nextPath: route.fullPath },
-    }));
+    }).catch(() => {});
 };
 
 const handleClickSettings = () => {
@@ -291,10 +291,10 @@ const handleClickSettings = () => {
 const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+    router.push({
+        name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
         params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
-    }));
+    }).catch(() => {});
 };
 const handleDynamicLayoutFetch = (changed) => {
     if (tableState.schema === null) return;

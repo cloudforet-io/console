@@ -8,6 +8,7 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 
@@ -16,7 +17,6 @@ import getRandomId from '@/lib/random-id-generator';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetDetailNotificationsChannelTable
     from '@/services/cost-explorer/components/BudgetDetailNotificationsChannelTable.vue';
@@ -35,10 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
     currency: CURRENCY.USD,
 });
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     hasBudgetAlert: computed(() => {
@@ -149,12 +149,13 @@ const handleBudgetNotifications = () => {
                                         new-tab
                                         size="md"
                                         :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                                        :to="getProperRouteLocation({
+                                        :to="{
                                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                                             params: {
+                                                workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                                                 id: state.budgetTargetId
                                             }
-                                        })"
+                                        }"
                                         highlight
                                 />
                             </div>

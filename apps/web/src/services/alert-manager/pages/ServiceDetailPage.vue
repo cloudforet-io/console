@@ -5,7 +5,6 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -28,7 +27,6 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     favoriteOptions: computed<FavoriteOptions>(() => ({
@@ -48,7 +46,7 @@ watch(() => props.serviceId, async (serviceId) => {
 
 onMounted(() => {
     if (!props.serviceId) {
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+        router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
     }
 });
 

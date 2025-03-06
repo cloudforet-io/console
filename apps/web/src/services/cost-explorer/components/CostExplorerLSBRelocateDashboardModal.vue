@@ -5,11 +5,13 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { PButton, PDivider } from '@cloudforet/mirinae';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 interface Props {
@@ -20,7 +22,8 @@ const router = useRouter();
 withDefaults(defineProps<Props>(), {
     visible: false,
 });
-const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
@@ -44,12 +47,18 @@ const handleRouteToDashboard = () => {
         v: ['Cost'],
         o: '=',
     }]).rawQueryStrings;
-    const routeData = router.resolve(getProperRouteLocation({
-        name: DASHBOARDS_ROUTE._NAME,
+    const dashboardRouteName = appContextStore.getters.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE._NAME
+        : DASHBOARDS_ROUTE._NAME;
+    const routeData = router.resolve({
+        name: dashboardRouteName,
+        params: {
+            workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+        },
         query: {
             filters: dashboardQuery,
         },
-    }));
+    });
     window.open(routeData.href, '_blank');
 };
 
