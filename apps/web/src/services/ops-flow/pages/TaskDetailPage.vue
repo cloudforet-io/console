@@ -52,7 +52,6 @@ import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useConfirmRouteLeave } from '@/common/composables/confirm-route-leave';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vue';
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
@@ -85,17 +84,16 @@ const userStore = useUserStore();
 /* route */
 const router = useRouter();
 const route = useRoute();
-const { getProperRouteLocation } = useProperRouteLocation();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
 const error = ref<APIError | null>(null);
 const {
     pathFrom,
     setPathFrom,
     goBack,
-} = useGoBack(getProperRouteLocation({
+} = useGoBack({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
-}));
+});
 watch(error, (err) => {
     if (err) {
         goBack();

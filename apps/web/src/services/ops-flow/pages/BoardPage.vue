@@ -7,7 +7,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
@@ -19,14 +18,13 @@ import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-
 
 const route = useRoute();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const boardPageStore = useBoardPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const taskCreatePageLink = computed(() => getProperRouteLocation({
+const taskCreatePageLink = computed(() => ({
     name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
     query: { categoryId: route.query.categoryId } as TaskCreatePageQuery,
 }));

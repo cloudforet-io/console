@@ -44,7 +44,6 @@ import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useConfirmRouteLeave } from '@/common/composables/confirm-route-leave';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import TaskContentBaseForm from '@/services/ops-flow/components/TaskContentBaseForm.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
@@ -68,7 +67,6 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 /* route and query */
 const router = useRouter();
 const route = useRoute();
-const { getProperRouteLocation } = useProperRouteLocation();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
 const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryStringToString(route.query.taskTypeId));
 
@@ -79,10 +77,10 @@ const {
     pathFrom,
     setPathFrom,
     goBack,
-} = useGoBack(getProperRouteLocation({
+} = useGoBack({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
-}));
+});
 const handleClickBack = () => {
     if (pathFrom.value?.name === OPS_FLOW_ROUTE.LANDING._NAME) {
         router.back();
