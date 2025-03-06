@@ -32,7 +32,6 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory-v1/components/ServiceAccountAttachedGeneralAccounts.vue';
@@ -45,6 +44,7 @@ import ServiceAccountCredentials
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory-v1/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountEditModal from '@/services/asset-inventory-v1/components/ServiceAccountEditModal.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
@@ -61,7 +61,6 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const route = useRoute();
 
@@ -155,9 +154,9 @@ const handleRefresh = () => {
     if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
 const handleClickBackbutton = () => {
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
-    }));
+    router.push({
+        name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
+    }).catch(() => {});
 };
 
 onMounted(async () => {

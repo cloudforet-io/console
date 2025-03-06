@@ -11,6 +11,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
     CloudServiceTypeItem,
@@ -23,11 +24,11 @@ import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory-v1/components/MetricExplorerLSBMetricTree.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory-v1/types/asset-analysis-type';
@@ -42,13 +43,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const userStore = useUserStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const route = useRoute();
 
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
         const res: Record<string, CloudServiceTypeItem> = {};
@@ -72,7 +74,7 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     selectedId: computed<string|undefined>(() => {
-        const routeName = getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME }).name;
+        const routeName = { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME }.name;
         if (!props.isDetailPage) return undefined;
         if (route.name === routeName) return route.params.metricId;
         return route.params.metricExampleId;
@@ -91,12 +93,12 @@ const state = reactive({
                     ...metric,
                     type: 'metric',
                     is_managed: metric.data.is_managed,
-                    to: getProperRouteLocation({
-                        name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
+                    to: {
+                        name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
                             metricId: metric.key,
                         },
-                    }),
+                    },
                 },
             };
             const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
@@ -109,13 +111,13 @@ const state = reactive({
                         data: {
                             ...example,
                             type: 'example',
-                            to: getProperRouteLocation({
+                            to: {
                                 name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                                 params: {
                                     metricId: metric.key,
                                     metricExampleId: example.example_id,
                                 },
-                            }),
+                            },
                         },
                     })),
                 };

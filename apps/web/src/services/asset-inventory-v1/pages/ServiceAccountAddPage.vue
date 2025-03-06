@@ -29,7 +29,6 @@ import { useUserStore } from '@/store/user/user-store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
 import ServiceAccountAutoSyncForm from '@/services/asset-inventory-v1/components/ServiceAccountAutoSyncForm.vue';
@@ -41,6 +40,7 @@ import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory-v1/constants/service-account-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory-v1/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory-v1/stores/service-account-schema-store';
@@ -57,7 +57,6 @@ const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
 }>();
-const { getProperRouteLocation } = useProperRouteLocation();
 const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -186,11 +185,16 @@ const handleSave = async () => {
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
         if (state.isTrustedAccount && serviceAccountPageFormState.isAutoSyncEnabled) state.createModal = true;
         else if (props.provider === 'kubernetes') {
-            router.push(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            router.push({
+                name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
                 params: { serviceAccountId: accountId as string },
-            }));
-        } else router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } }));
+            }).catch(() => {});
+        } else {
+            router.push({
+                name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+                query: { provider: props.provider },
+            }).catch(() => {});
+        }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
@@ -214,14 +218,20 @@ const handleSync = async () => {
         });
         state.createModal = false;
         serviceAccountPageStore.initState();
-        router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+        router.push({
+            name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            params: { serviceAccountId: state.createdAccountId },
+        }).catch(() => {});
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
 const handleRouteToServiceAccountDetailPage = () => {
-    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+    router.push({
+        name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+        params: { serviceAccountId: state.createdAccountId },
+    }).catch(() => {});
 };
 
 /* Init */

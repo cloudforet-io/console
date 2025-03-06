@@ -52,6 +52,7 @@
 <script lang="ts" setup>
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -60,7 +61,6 @@ import {
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import { SpaceRouter } from '@/router';
 import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
 import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
@@ -73,9 +73,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorScheduleForm from '@/services/asset-inventory-v1/components/CollectorFormSchedule.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     useCollectorFormStore,
@@ -85,8 +85,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const appContextStore = useAppContextStore();
-const { getProperRouteLocation } = useProperRouteLocation();
-
+const router = useRouter();
 const emit = defineEmits([
     'update:currentStep',
 ]);
@@ -184,12 +183,12 @@ const handleConfirmCreateCollector = async () => {
 const goToCollectorDetailPage = () => {
     state.visibleCreateCompleteModal = false;
     if (state.createdCollectorId) {
-        SpaceRouter.router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
+        router.push({
+            name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME,
             params: {
                 collectorId: state.createdCollectorId,
             },
-        }));
+        }).catch(() => {});
     }
 };
 
