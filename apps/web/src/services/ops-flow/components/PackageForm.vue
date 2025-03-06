@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import {
     ref, watch, nextTick,
+    computed,
 } from 'vue';
 
+import type { QueryKey } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -10,9 +13,10 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
+import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
+import type { PackageListParameters } from '@/api-clients/identity/package/schema/api-verbs/list';
+import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -20,14 +24,14 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpdateConfirmModal.vue';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+
+import { usePackageMuatations } from '../composables/use-package-mutations';
+
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
-const packageStore = usePackageStore();
-
 
 
 /* workspace */
@@ -37,7 +41,6 @@ const {
     workspaceValidator,
     setSelectedWorkspaces,
     setInitialWorkspaces,
-    applyPackageToWorkspaces,
     addedWorkspaceItems,
     removedWorkspaceItems,
 } = useWorkspaceField();
@@ -59,10 +62,25 @@ const {
     categoryValidator,
     setSelectedCategoryItems,
     setInitialCategoriesByPackageId,
-    applyPackageToCategories,
     addedCategoryItems,
     removedCategoryItems,
 } = useCategoryField();
+
+/* packages */
+const { packageAPI, packageListQueryKey } = usePackageApi();
+const { data: packages } = useQuery({
+    queryKey: computed<[QueryKey, PackageListParameters]>(() => [
+        packageListQueryKey.value,
+        { query: { only: ['package_id', 'name'] } },
+    ]),
+    queryFn: async ({ queryKey }) => {
+        const { results } = await packageAPI.list(queryKey[1]);
+        return results as Pick<PackageModel, 'package_id'|'name'>[]|undefined;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60, // 1 minute
+});
+
 
 /* form */
 const {
@@ -93,18 +111,56 @@ const {
                 length: 50,
             });
         }
-        if (packageStore.getters.packages.some((p) => p.package_id !== taskManagementPageState.targetPackageId && p.name === value)) {
+        if (packages.value && packages.value.some((p) => p.package_id !== taskManagementPageState.targetPackageId && p.name === value)) {
             return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { field: _i18n.t('OPSFLOW.NAME') });
         }
         return true;
     },
 });
 
+/* mutations */
+const { createPackage, updatePackage, isProcessing } = usePackageMuatations();
+
 /* update confirm modal */
 const visibleUpdateConfirmModal = ref(false);
+const handleUpdateCancel = () => {
+    visibleUpdateConfirmModal.value = false;
+};
+const handleUpdateConfirm = async () => {
+    visibleUpdateConfirmModal.value = false;
+
+    if (!isAllValid.value) {
+        ErrorHandler.handleError(new Error('Invalid form'));
+    }
+    if (taskManagementPageState.targetPackageId) {
+        await updatePackage({
+            updatePackageParams: {
+                package_id: taskManagementPageState.targetPackageId,
+                name: name.value,
+                description: description.value,
+            },
+            addedCategoryIds: addedCategoryItems.value.map((item) => item.name),
+            removedCategoryIds: removedCategoryItems.value.map((item) => item.name),
+            addedWorkspaceIds: addedWorkspaceItems.value.map((item) => item.name),
+            removedWorkspaceIds: removedWorkspaceItems.value.map((item) => item.name),
+        });
+    } else {
+        await createPackage({
+            createPackageParams: {
+                name: name.value,
+                description: description.value,
+                tags: {},
+            },
+            addedCategoryIds: addedCategoryItems.value.map((item) => item.name),
+            removedCategoryIds: removedCategoryItems.value.map((item) => item.name),
+            addedWorkspaceIds: addedWorkspaceItems.value.map((item) => item.name),
+            removedWorkspaceIds: removedWorkspaceItems.value.map((item) => item.name),
+        });
+    }
+    taskManagementPageStore.closePackageForm();
+};
 
 /* form modal */
-const loading = ref(false);
 const handleCancelOrClose = () => {
     taskManagementPageStore.closePackageForm();
 };
@@ -119,70 +175,7 @@ const handleFormConfirm = () => {
         handleUpdateConfirm();
     }
 };
-const handleUpdateCancel = () => {
-    visibleUpdateConfirmModal.value = false;
-};
-const handleUpdateConfirm = async () => {
-    visibleUpdateConfirmModal.value = false;
 
-    if (!isAllValid.value) {
-        ErrorHandler.handleError(new Error('Invalid form'));
-    }
-    loading.value = true;
-    if (taskManagementPageState.targetPackageId) {
-        try {
-            const updatedPackage = await packageStore.update({
-                package_id: taskManagementPageState.targetPackageId,
-                name: name.value,
-                description: description.value,
-            });
-            // bind workspaces and categories
-            const errorMessages: string[] = [];
-            const responses = await Promise.allSettled([
-                applyPackageToWorkspaces(updatedPackage.package_id),
-                applyPackageToCategories(updatedPackage.package_id),
-            ]);
-            responses.forEach((response) => {
-                if (response.status === 'rejected') {
-                    errorMessages.push(response.reason.message);
-                }
-            });
-            if (errorMessages.length) {
-                throw new Error(errorMessages.join('\n'));
-            }
-            showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
-        } catch (e) {
-            ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }));
-        }
-    } else {
-        try {
-            const createdPackage = await packageStore.create({
-                name: name.value,
-                description: description.value,
-                tags: {},
-            });
-            // bind workspaces and categories
-            const errorMessages: string[] = [];
-            const responses = await Promise.allSettled([
-                applyPackageToWorkspaces(createdPackage.package_id),
-                applyPackageToCategories(createdPackage.package_id),
-            ]);
-            responses.forEach((response) => {
-                if (response.status === 'rejected') {
-                    errorMessages.push(response.reason.message);
-                }
-            });
-            if (errorMessages.length) {
-                throw new Error(errorMessages.join('\n'));
-            }
-            showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
-        } catch (e) {
-            ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }));
-        }
-    }
-    taskManagementPageStore.closePackageForm();
-    loading.value = false;
-};
 
 watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.targetPackage], async ([visible, targetPackage], [prevVisible]) => {
     if (!visible) {
@@ -228,7 +221,7 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                 <div class="p-6 w-full">
                     <p-field-group :label="$t('OPSFLOW.NAME')"
                                    required
-                                   :invalid="!loading && invalidState.name"
+                                   :invalid="!isProcessing && invalidState.name"
                                    :invalid-text="invalidTexts.name"
                     >
                         <template #default="{ invalid }">
@@ -318,13 +311,13 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
             <template #footer>
                 <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
                     <p-button style-type="transparent"
-                              :disabled="loading"
+                              :disabled="isProcessing"
                               @click="handleCancelOrClose"
                     >
                         {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :loading="loading"
+                              :loading="isProcessing"
                               :disabled="!isAllValid"
                               @click="handleFormConfirm"
                     >
