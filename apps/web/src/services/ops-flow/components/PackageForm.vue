@@ -245,10 +245,10 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
                     >
                         <p-textarea :value="description"
                                     :invalid="invalidState.description"
-                                    :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                    :placeholder="String($t('OPSFLOW.DESCRIBE_FIELD', {
                                         field: $t('OPSFLOW.PACKAGE'),
-                                        particle: getParticle( $t('OPSFLOW.PACKAGE'), 'object')
-                                    })"
+                                        particle: getParticle( String($t('OPSFLOW.PACKAGE')), 'object')
+                                    }))"
                                     @update:value="setForm('description', $event)"
                         />
                     </p-field-group>
