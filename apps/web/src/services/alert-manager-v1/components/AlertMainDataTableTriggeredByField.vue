@@ -10,9 +10,9 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ReferenceItem } from '@/store/reference/type';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -25,7 +25,7 @@ const props = defineProps<{
 }>();
 
 const queryHelper = new QueryHelper();
-const { getProperRouteLocation } = useProperRouteLocation();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
@@ -38,6 +38,7 @@ const state = reactive({
                 name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                 params: {
                     id: props.projectId ?? '',
+                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                 },
                 query: {
                     tab: 'webhook',
@@ -65,7 +66,7 @@ const state = reactive({
         <p-link v-if="state.link"
                 :action-icon="ACTION_ICON.INTERNAL_LINK"
                 new-tab
-                :to="getProperRouteLocation(state.link)"
+                :to="state.link"
         >
             {{ state.label }}
         </p-link>

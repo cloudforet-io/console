@@ -15,13 +15,13 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import EscalationPolicyFormRulesInput from '@/services/alert-manager-v1/components/EscalationPolicyFormRulesInput.vue';
@@ -40,9 +40,9 @@ const props = withDefaults(defineProps<{
     showResourceGroup: true,
     escalationPolicyData: undefined,
 });
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const userStore = useUserStore();
@@ -165,7 +165,10 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                  new-tab
-                                 :to="getProperRouteLocation(referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' }))"
+                                 :to="referenceRouter(escalationPolicyFormState.projectId,{
+                                     resource_type: 'identity.Project',
+                                     workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
+                                 })"
                                  :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
                                  highlight
                         />)
@@ -185,7 +188,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         size="sm"
-                        :to="getProperRouteLocation({ name: PROJECT_ROUTE._NAME })"
+                        :to="{ name: PROJECT_ROUTE._NAME, params: { workspaceId: userWorkspaceStore.getters.currentWorkspaceId } }"
                         :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
                         highlight
                 />
