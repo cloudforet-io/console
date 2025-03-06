@@ -2,8 +2,10 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import dayjs from 'dayjs';
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PCollapsibleToggle, PDataTable, PLink } from '@cloudforet/mirinae';
@@ -86,8 +88,6 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
             end: dayjs.utc(d.date).format('YYYY-MM'),
         };
         const ratio = getBudgetRatio(budgetTimeUnit, d.cost, totalBudgetLimit, d.limit);
-        // const ratio = (budgetTimeUnit === 'TOTAL') ? `${Math.round((d.cost / totalBudgetLimit) * 100)}%`
-        //     : `${Math.round((d.cost / d.limit) * 100)}%`;
         const link = getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
@@ -107,24 +107,6 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
     });
 };
 
-const getEnrichedBudgetUsageData = (
-    budgetUsageData: BudgetUsageModel[],
-    period: Period,
-    budgetTimeUnit: BudgetTimeUnit,
-    totalBudgetLimit: number,
-    providers: Providers,
-): EnrichedBudgetUsageData[] => {
-    const _budgetUsageData = cloneDeep(budgetUsageData);
-    const accumulatedBudgetData = getAccumulatedBudgetUsageData(_budgetUsageData, period);
-    const budgetUsageDataWithRatioAndLink = getBudgetUsageDataWithRatioAndLink(
-        accumulatedBudgetData,
-        budgetTimeUnit,
-        totalBudgetLimit,
-        providers,
-    );
-    return [firstColumnData, ...budgetUsageDataWithRatioAndLink] as unknown as EnrichedBudgetUsageData[];
-};
-
 const state = reactive({
     budgetUsageData: computed<BudgetUsageModel[]|null>(() => budgetPageState.budgetUsageData),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
@@ -135,20 +117,21 @@ const state = reactive({
     })),
     providers: computed<Providers>(() => state.budgetData?.provider_filter?.providers ?? []),
     totalBudgetLimit: computed<number>(() => state.budgetData?.limit ?? 0),
-    enrichedBudgetUsageData: computed<EnrichedBudgetUsageData[]>(
-        () => getEnrichedBudgetUsageData(
-            state.budgetUsageData,
-            state.budgetPeriod,
+    enrichedBudgetUsageData: computed<EnrichedBudgetUsageData[]>(() => {
+        const _budgetUsageData = state.budgetTimeUnit === 'TOTAL' ? getAccumulatedBudgetUsageData(state.budgetUsageData, state.budgetPeriod)
+            : cloneDeep(state.budgetUsageData);
+        const budgetUsageDataWithRatioAndLink = getBudgetUsageDataWithRatioAndLink(
+            _budgetUsageData,
             state.budgetTimeUnit,
             state.totalBudgetLimit,
             state.providers,
-        ),
-    ),
+        );
+        return [firstColumnData, ...budgetUsageDataWithRatioAndLink] as unknown as EnrichedBudgetUsageData[];
+    }),
     data: [],
     fields: computed(() => state.enrichedBudgetUsageData.map((d) => ({
         name: d.date,
         label: d.date ? dayjs.utc(d.date).format('MMM YYYY') : ' ',
-        // textAlign: 'right',
     }))),
     loading: true,
     showFormattedBudgetData: true,
@@ -199,7 +182,7 @@ setTableKeysAndItems();
                     ) }}
                 </template>
                 <template v-else-if="field.name && value.path === 'cost'">
-                    <p-link v-if="dayjs.utc(value.date).isSameOrBefore(dayjs.utc())"
+                    <p-link v-if="value[value.path] && dayjs.utc(value.date).isSameOrBefore(dayjs.utc())"
                             :to="value.link"
                             highlight
                     >
