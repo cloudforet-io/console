@@ -6,15 +6,12 @@ import {
 import { defineStore } from 'pinia';
 
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { PackageModel } from '@/schema/identity/package/model';
 
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
@@ -28,16 +25,12 @@ interface UseTaskManagementPageStoreState {
     visibleCategoryForm: boolean;
     targetCategoryId?: string;
     visibleDeleteCategoryModal: boolean;
-    // task
-    associatedTasksToCategoryMap: Record<string, TaskModel[]>;
-    loadingAssociatedTasksToCategory: boolean;
 }
 
 interface UseTaskManagementPageStoreGetters {
     targetPackage: PackageModel|undefined;
     associatedCategoriesToPackage: TaskCategoryModel[];
     associatedWorkspacesToPackage: WorkspaceItem[];
-    associatedTasksToCategory: TaskModel[];
     targetCategory: TaskCategoryModel|undefined;
     defaultPackage: PackageModel|undefined;
 }
@@ -46,7 +39,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
     const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
-    const taskAPI = useTaskAPI();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,
@@ -57,9 +49,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         visibleCategoryForm: false,
         targetCategoryId: undefined,
         visibleDeleteCategoryModal: false,
-        // task
-        associatedTasksToCategoryMap: {},
-        loadingAssociatedTasksToCategory: false,
     });
     const getters: UseTaskManagementPageStoreGetters = {
         targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
@@ -69,16 +58,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
             if (!targetPackageId) return [];
             const workspaceItems: WorkspaceItem[] = Object.values(workspaceReferenceStore.getters.workspaceItems);
             return workspaceItems.filter((w) => w.data.packages?.includes(targetPackageId));
-        }),
-        associatedTasksToCategory: computed<DeepReadonly<TaskModel[]>>(() => {
-            if (!state.targetCategoryId) return [];
-            const categoryId = state.targetCategoryId;
-            const packageId = getters.targetCategory?.package_id;
-            if (!packageId) return [];
-            const workspaceItems: WorkspaceItem[] = Object.values(workspaceReferenceStore.getters.workspaceItems);
-            const relatedWorkspaceIds = workspaceItems.filter((w) => w.data.packages?.includes(packageId)).map((w) => w.key);
-            const allTasks = state.associatedTasksToCategoryMap[categoryId] ?? [];
-            return allTasks.filter((t) => relatedWorkspaceIds.includes(t.workspace_id));
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
         defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
@@ -139,29 +118,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
         resetTargetCategoryId() {
             state.targetCategoryId = undefined;
-        },
-        // task
-        async loadAssociatedTasksToCategory(categoryId: string) {
-            state.loadingAssociatedTasksToCategory = true;
-            if (state.associatedTasksToCategoryMap[categoryId]) {
-                state.loadingAssociatedTasksToCategory = false;
-                return;
-            }
-            try {
-                const tasks = await taskAPI.list({ category_id: categoryId });
-                if (!tasks) return;
-                state.associatedTasksToCategoryMap = {
-                    ...state.associatedTasksToCategoryMap,
-                    [categoryId]: tasks,
-                };
-                state.loadingAssociatedTasksToCategory = false;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.loadingAssociatedTasksToCategory = false;
-            }
-        },
-        flushAssociatedTasksToCategoryMap() {
-            state.associatedTasksToCategoryMap = {};
         },
     };
 

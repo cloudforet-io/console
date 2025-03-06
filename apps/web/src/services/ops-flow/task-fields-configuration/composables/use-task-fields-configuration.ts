@@ -1,4 +1,4 @@
-import type { TaskField, TaskFieldSelectionType, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField, TaskFieldSelectionType, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
 
 import getRandomId from '@/lib/random-id-generator';
 

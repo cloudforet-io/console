@@ -9,7 +9,7 @@ import { isEqual } from 'lodash';
 import { PFieldGroup, PSelectDropdown, getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { OtherTaskField } from '@/api-clients/opsflow/_types/task-field-type';
 
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import {

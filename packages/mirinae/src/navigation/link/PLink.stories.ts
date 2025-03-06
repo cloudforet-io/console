@@ -45,6 +45,7 @@ const Template: Story = {
                     :new-tab="newTab"
                     :href="href"
                     :to="to"
+                    :line-height="lineHeight"
                 >
                     <span v-if="defaultSlot" v-html="defaultSlot"/>
                 </p-link>
@@ -179,6 +180,20 @@ export const UseAnchorScroll: Story = {
                 <p-link class='block' highlight href="#second"  use-anchor-scroll>Second Section</p-link>
                 <h1 id="first" class="py-8"># First Section</h1>
                 <h1 id="second" class="py-8"># Second Section</h1>
+            </div>
+        `,
+    }),
+};
+
+export const LineHeight: Story = {
+    render: () => ({
+        components: { PLink },
+        router,
+        template: `
+            <div>
+                <span class="block border border-gray-300 overflow-clip"><p-link href="https://www.google.com">Without line height</p-link></span><br/>
+                <span class="border border-gray-300"><p-link line-height="1.5" href="https://www.google.com">With line height 1.5</p-link></span><br/>
+                <span class="border border-gray-300"><p-link line-height="2" href="https://www.google.com">With line height 2</p-link></span><br/>
             </div>
         `,
     }),

@@ -56,7 +56,7 @@ export const getFormattedNumber = (val: number, numberFormatInfo?: NumberFormatI
     }
 };
 
-export const sanitizeWidgetOptions = (options: WidgetModel['options'] = {}, widgetType: WidgetType = 'table', dataTable?: DataTableModel): WidgetModel['options'] => {
+export const sanitizeWidgetOptions = (options: WidgetModel['options'] = {} as WidgetModel['options'], widgetType: WidgetType = 'table', dataTable?: DataTableModel): WidgetModel['options'] => {
     const currentOptionKeys = Object.keys(options ?? {});
     const widgetConfig = getWidgetConfig(widgetType);
     const _fieldsSchema = integrateFieldsSchema(widgetConfig?.requiredFieldsSchema ?? {}, widgetConfig?.optionalFieldsSchema ?? {});

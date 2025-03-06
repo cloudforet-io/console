@@ -8,7 +8,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n } from '@/translations';
 
 import type { UserReferenceItem } from '@/store/reference/user-reference-store';
@@ -18,7 +19,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useTaskAPI } from '@/services/ops-flow/composables/use-task-api';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
@@ -28,7 +28,7 @@ const taskAssignStore = useTaskAssignStore();
 const taskContentFormStore = useTaskContentFormStore();
 const taskDetailPageStore = useTaskDetailPageStore();
 
-const taskAPI = useTaskAPI();
+const { taskAPI } = useTaskApi();
 
 const fields: DataTableField[] = [
     { label: 'User ID', name: 'name' },
@@ -76,7 +76,10 @@ const updateTaskAssignee = async (): Promise<TaskModel|undefined> => {
     try {
         if (!taskAssignStore.state.taskId) throw new Error('task id is not defined');
         if (selectIndex.value.length === 0) throw new Error('assignee is not selected');
-        const newTask = await taskAPI.changeAssignee(taskAssignStore.state.taskId, refinedUserItems.value[selectIndex.value[0]].name);
+        const newTask = await taskAPI.changeAssignee({
+            task_id: taskAssignStore.state.taskId,
+            assignee: refinedUserItems.value[selectIndex.value[0]].name,
+        });
         taskContentFormStore.setAssigneeToOriginTask(newTask.assignee);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ASSIGN'), '');
         return newTask;

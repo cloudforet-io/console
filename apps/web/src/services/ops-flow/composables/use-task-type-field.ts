@@ -4,7 +4,7 @@ import { ref, computed } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
+import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
@@ -13,6 +13,7 @@ import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
 
 export const useTaskTypeField = ({
     isRequired, categoryId,
