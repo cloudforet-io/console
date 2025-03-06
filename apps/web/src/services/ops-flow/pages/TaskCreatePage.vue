@@ -109,7 +109,7 @@ const { data: createdTask, mutateAsync: createTaskMutation, isPending: isCreatin
     },
     onSuccess: () => {
         // Invalidate task list query to avoid using stale data
-        queryClient.invalidateQueries({ queryKey: taskListQueryKey });
+        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
     },
     onError: (error) => {

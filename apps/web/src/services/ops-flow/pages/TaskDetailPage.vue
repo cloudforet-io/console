@@ -164,12 +164,8 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
         return res;
     },
     onSuccess: () => {
-        queryClient.invalidateQueries({
-            queryKey: [
-                taskListQueryKey,
-                taskQueryKey,
-            ],
-        });
+        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: taskDetailQueryKey.value });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
         taskContentFormStore.resetUnsavedChanges();
     },
