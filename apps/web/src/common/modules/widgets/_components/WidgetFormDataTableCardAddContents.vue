@@ -44,7 +44,7 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE, GROUP_BY_INFO_ITEMS_FOR_TAGS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
