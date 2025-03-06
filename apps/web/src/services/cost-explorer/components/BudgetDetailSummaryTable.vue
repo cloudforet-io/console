@@ -13,14 +13,16 @@ import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/mode
 import { i18n } from '@/translations';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { getStackedChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
@@ -48,10 +50,9 @@ interface EnrichedBudgetUsageData {
 type Providers = BudgetModel['provider_filter']['providers'];
 type BudgetTimeUnit = BudgetModel['time_unit'];
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
-
+const appContextStore = useAppContextStore();
 const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageModel[], period: Period) => getStackedChartData(budgetUsageData, GRANULARITY.MONTHLY, period);
 
 const getBudgetRatio = (budgetTimeUnit: BudgetTimeUnit, cost: number, totalBudgetLimit: number, monthlyLimit: number) => {
@@ -86,19 +87,19 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
             end: dayjs.utc(d.date).format('YYYY-MM'),
         };
         const ratio = getBudgetRatio(budgetTimeUnit, d.cost, totalBudgetLimit, d.limit);
-        const link = getProperRouteLocation({
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        const link = {
+            name: appContextStore.getters.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: state.budgetData?.data_source_id,
                 costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
             },
             query: {
-                granularity: primitiveToQueryString(GRANULARITY.DAILY),
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                 group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
                 period: objectToQueryString(period),
                 filters: objectToQueryString(getConvertedConsoleFilters({ ...costTypeFilters, ...targetFilters })),
             },
-        });
+        };
         return {
             ...d, ratio, link,
         };
