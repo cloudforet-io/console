@@ -14,7 +14,7 @@ import type { ReferenceItem } from '@/store/reference/type';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const props = defineProps<{
     value?: string;

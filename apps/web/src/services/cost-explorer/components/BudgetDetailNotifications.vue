@@ -23,7 +23,7 @@ import BudgetDetailNotificationsChannelTable
 import BudgetDetailNotificationsConditionSettingModal
     from '@/services/cost-explorer/components/BudgetDetailNotificationsConditionSettingModal.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
 interface Props {
