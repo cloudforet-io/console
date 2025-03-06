@@ -19,7 +19,6 @@ import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 import { i18n as _i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
@@ -31,7 +30,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import type { DormancyConfig } from '@/services/advanced/types/preferences-type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 
 const router = useRouter();
 
@@ -77,7 +76,7 @@ const handleUpdateCost = (value?: string) => {
 };
 const handleClickReportButton = () => {
     window.open(router.resolve({
-        name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
+        name: ADMIN_COST_EXPLORER_ROUTE.COST_REPORT._NAME,
     }).href, '_blank');
 };
 const handleChangeToggleButton = async (value: boolean) => {

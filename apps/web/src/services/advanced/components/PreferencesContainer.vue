@@ -9,11 +9,9 @@ import {
 
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useDomainConfigStore } from '@/store/config/domain-config-store';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 
 
 const domainConfigStore = useDomainConfigStore();
@@ -23,9 +21,9 @@ const route = useRoute();
 const state = reactive({
     headingTitle: computed<TranslateResult>(() => {
         let title: TranslateResult = '';
-        if (route.name === makeAdminRouteName(ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME)) {
+        if (route.name === ADMIN_ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME) {
             title = i18n.t('IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION');
-        } else if (route.name === makeAdminRouteName(ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME)) {
+        } else if (route.name === ADMIN_ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME) {
             title = i18n.t('IAM.DOMAIN_SETTINGS.APPEARANCE');
         }
         return title;

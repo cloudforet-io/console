@@ -18,8 +18,6 @@ import { SpaceRouter } from '@/router';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
@@ -30,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CollectorContents from '@/services/asset-inventory-v1/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory-v1/components/CollectorMainNoData.vue';
 import ProviderList from '@/services/asset-inventory-v1/components/ProviderList.vue';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory-v1/stores/collector-page-store';
 import type {
     CollectorMainPageQuery,
@@ -124,7 +122,7 @@ onMounted(async () => {
             </template>
             <template #extra>
                 <router-link
-                    :to="{ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME) }"
+                    :to="{ name: ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME }"
                 >
                     <p-button style-type="tertiary"
                               class="history-button"

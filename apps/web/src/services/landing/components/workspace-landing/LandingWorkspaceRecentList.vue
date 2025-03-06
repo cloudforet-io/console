@@ -13,8 +13,6 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -23,7 +21,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
@@ -136,7 +134,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                                         <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
                                                 highlight
                                                 :to="{
-                                                    name: makeAdminRouteName(ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME)
+                                                    name: ADMIN_ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME
                                                 }"
                                         />
                                     </div>

@@ -13,14 +13,12 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 
 const PAGE_SIZE = 10;
 
@@ -95,7 +93,7 @@ const handleClickReloadButton = async () => {
 };
 
 const handleClickCreateButton = () => {
-    window.open(router.resolve({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) }).href);
+    window.open(router.resolve({ name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME }).href);
 };
 
 const handleClickShowMore = async () => {

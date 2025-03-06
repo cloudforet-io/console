@@ -35,7 +35,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
-import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 const props = defineProps<{
@@ -81,7 +81,7 @@ const handleClickEditButton = () => {
         return;
     }
     router.push(getProperRouteLocation({
-        name: INFO_ROUTE.NOTICE.UPDATE._NAME,
+        name: ADMIN_INFO_ROUTE.NOTICE.UPDATE._NAME,
         params: { postId: props.postId },
     }));
 };
@@ -95,7 +95,7 @@ const handleDeleteNoticeConfirm = async () => {
         if (!props.postId) throw new Error('postId is undefined');
         await noticeDetailStore.deleteNoticePost(props.postId);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
-        await router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME }));
+        await router.push({ name: ADMIN_INFO_ROUTE.NOTICE._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_DELETE_NOTICE'));
     } finally {

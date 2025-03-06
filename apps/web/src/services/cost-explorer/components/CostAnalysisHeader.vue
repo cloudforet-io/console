@@ -12,8 +12,6 @@ import type { CostQuerySetDeleteParameters } from '@/api-clients/cost-analysis/c
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -34,6 +32,7 @@ import { gray } from '@/styles/colors';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
@@ -123,7 +122,7 @@ const handleDeleteQueryConfirm = async () => {
 
 const handleRouteToUnifiedCostSettings = () => {
     router.push({
-        name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME),
+        name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME,
     }).catch(() => {});
 };
 

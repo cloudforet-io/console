@@ -12,8 +12,6 @@ import {
 
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -30,6 +28,7 @@ import {
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY, UNIDENTIFIED_PROVIDER,
 } from '@/services/asset-inventory-v1/constants/cloud-service-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory-v1/stores/cloud-service-page-store';
@@ -60,7 +59,7 @@ const storeState = reactive({
 const state = reactive({
     currentPath: computed(() => route.fullPath),
     isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME
-        || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME)),
+        || route.name === ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME),
     detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
         if (state.isCloudServiceDetailPage) return route.params as unknown as CloudServiceDetailPageParams;
         return undefined;
