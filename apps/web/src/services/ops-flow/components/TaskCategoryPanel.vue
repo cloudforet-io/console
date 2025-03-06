@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { reactive, computed, onMounted } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
+
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
+import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
-
-import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
@@ -22,9 +23,26 @@ import {
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskCategoryStore = useTaskCategoryStore();
-const packageStore = usePackageStore();
-
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+
+/* packages */
+const { packageAPI, packageListQueryKey } = usePackageApi();
+const { data: packageList } = useQuery({
+    queryKey: packageListQueryKey,
+    queryFn: async () => {
+        const { results } = await packageAPI.list({});
+        return results ?? [];
+    },
+    staleTime: 1000 * 60 * 5, // 5minutes
+    gcTime: 1000 * 60, // 1minute
+});
+const packageMap = computed(() => {
+    if (!packageList.value) return {};
+    return packageList.value.reduce((acc, cur) => {
+        acc[cur.package_id] = cur;
+        return acc;
+    }, {} as Record<string, any>);
+});
 
 const state = reactive({
     categoryFields: computed<DataTableField[]>(() => [
@@ -49,13 +67,6 @@ const state = reactive({
             label: ' ',
         },
     ]),
-    packageMap: computed(() => {
-        if (!packageStore.getters.packages) return {};
-        return packageStore.getters.packages.reduce((acc, cur) => {
-            acc[cur.package_id] = cur;
-            return acc;
-        }, {} as Record<string, any>);
-    }),
 });
 
 onMounted(() => {
@@ -112,7 +123,7 @@ onMounted(() => {
                          style-type="gray200"
                          size="md"
                 >
-                    {{ state.packageMap[item.package_id] ? state.packageMap[item.package_id].name : item.package_id }}
+                    {{ packageMap[item.package_id] ? packageMap[item.package_id].name : item.package_id }}
                 </p-badge>
             </template>
             <template #col-buttons-format="{ item }">
