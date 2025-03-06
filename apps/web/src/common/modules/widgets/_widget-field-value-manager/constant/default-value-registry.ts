@@ -5,7 +5,6 @@ import {
     COLOR_SCHEMA, DATA_FIELD_HEATMAP_COLOR, DATE_FORMAT, DEFAULT_COMPARISON_COLOR, NUMBER_FORMAT, TABLE_DEFAULT_MINIMUM_WIDTH, WIDGET_HEIGHT,
 } from '@/common/modules/widgets/_constants/widget-field-constant';
 import { integrateFieldsSchema } from '@/common/modules/widgets/_helpers/widget-field-helper';
-// eslint-disable-next-line import/no-cycle
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { FieldDefaultValueConvertor, WidgetFieldTypeMap } from '@/common/modules/widgets/_widget-field-value-manager/type';
 import type { CategoryByOptions } from '@/common/modules/widgets/_widget-fields/category-by/type';

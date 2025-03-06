@@ -27,7 +27,7 @@ import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_com
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';

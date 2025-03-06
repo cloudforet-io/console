@@ -23,7 +23,7 @@ import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetF
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { UNSUPPORTED_CHARTS_IN_PIVOT } from '@/common/modules/widgets/_constants/widget-constant';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
