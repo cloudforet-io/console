@@ -31,7 +31,7 @@ import { gray } from '@/styles/colors';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
-import type { TreeNode } from '@/services/project-v1/tree/type';
+import type { TreeNode } from '@/services/project/tree/type';
 
 interface Props {
   hideSidebar: boolean;
