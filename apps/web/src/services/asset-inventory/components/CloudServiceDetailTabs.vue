@@ -43,7 +43,7 @@ import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
     tableState: any;

@@ -127,7 +127,7 @@ const onSelectProject = (selected) => {
     margin-top: 2rem;
 }
 
-/* custom project-v1-select-dropdown */
+/* custom project-select-dropdown */
 :deep(.project-select-dropdown) {
     max-width: 25rem;
     flex-grow: 1;

@@ -24,7 +24,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import ProjectChannelList from '@/services/alert-manager-v1/components/ProjectChannelList.vue';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
 const NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_level']; label: string}[] = [

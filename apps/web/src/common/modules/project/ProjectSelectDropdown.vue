@@ -20,13 +20,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import type { ProjectTreeOptions } from '@/services/project-v1/composables/use-project-tree';
-import { useProjectTree } from '@/services/project-v1/composables/use-project-tree';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import type { ProjectTreeOptions } from '@/services/project/composables/use-project-tree';
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type {
     ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
     ProjectTreeNode,
-} from '@/services/project-v1/types/project-tree-type';
+} from '@/services/project/types/project-tree-type';
 
 interface ProjectGroupSelectOptions {
     id: string;

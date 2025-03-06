@@ -21,7 +21,7 @@ import { gray } from '@/styles/colors';
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
-import type { TreeNode } from '@/services/project-v1/tree/type';
+import type { TreeNode } from '@/services/project/tree/type';
 
 const gnbStore = useGnbStore();
 const bookmarkPageStore = useBookmarkPageStore();

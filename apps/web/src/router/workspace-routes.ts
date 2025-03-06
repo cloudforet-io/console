@@ -8,7 +8,7 @@ import dashboardsRoute from '@/services/dashboards/routes/routes';
 import iamRoutes from '@/services/iam/routes/routes';
 import infoRoute from '@/services/info/routes/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
-import projectRouteV1 from '@/services/project-v1/routes/routes';
+import projectRoute from '@/services/project/routes/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
 
@@ -17,7 +17,7 @@ export const workspaceRoutes: RouteConfig[] = [
     dashboardsRoute,
     iamRoutes,
     assetInventoryRouteV1,
-    projectRouteV1,
+    projectRoute,
     alertManagerRoute,
     costExplorerRoute,
     infoRoute,
