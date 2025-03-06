@@ -1,20 +1,39 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
+
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const packageStore = usePackageStore();
+
+/* delete package */
+const { packageAPI, packageListQueryKey } = usePackageApi();
+const queryClient = useQueryClient();
+const { mutateAsync: deletePackage, isPending: isDeleting } = useMutation({
+    mutationFn: packageAPI.delete,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: packageListQueryKey.value });
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string, '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string);
+    },
+    onSettled: () => {
+        taskManagementPageStore.closeDeletePackageModal();
+    },
+});
 
 const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length);
 const headerTitle = computed(() => (deletable.value
@@ -24,25 +43,19 @@ const headerTitle = computed(() => (deletable.value
     })
     : _i18n.t('OPSFLOW.DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') })));
 
-const loading = ref<boolean>(false);
-const handleConfirm = async () => {
-    loading.value = true;
-    try {
-        if (!taskManagementPageStore.state.targetPackageId) {
-            throw new Error('[Console Error] Cannot delete package without a target package');
-        }
-        await packageStore.delete(taskManagementPageStore.state.targetPackageId);
-        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string, '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string);
-    } finally {
-        taskManagementPageStore.closeDeletePackageModal();
-        loading.value = false;
+
+const handleConfirm = () => {
+    if (!taskManagementPageStore.state.targetPackageId) {
+        ErrorHandler.handleError(new Error('[Console Error] Cannot delete package without a target package'));
+        return;
     }
+    deletePackage({ package_id: taskManagementPageStore.state.targetPackageId });
 };
+
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeDeletePackageModal();
 };
+
 const handleClosed = () => {
     taskManagementPageStore.resetTargetPackageId();
 };
@@ -53,7 +66,7 @@ const handleClosed = () => {
                     theme-color="alert"
                     :header-title="headerTitle"
                     :size="deletable ? 'sm' : 'md'"
-                    :loading="loading"
+                    :loading="isDeleting"
                     :disabled="!deletable"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
