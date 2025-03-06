@@ -28,7 +28,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 
@@ -51,7 +50,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -175,7 +173,10 @@ const getEvents = async () => {
             return {
                 event: {
                     name: d.event_title,
-                    to: getProperRouteLocation(referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' })),
+                    to: referenceRouter(d.resource_id, {
+                        resource_type: 'inventory.CloudService',
+                        workspace_id: storeState.currentWorkspaceId,
+                    }),
                 },
                 region_code: d.region_code,
                 start_time: startTime,
@@ -279,7 +280,10 @@ watch(() => tabState.activeTab, () => {
                                     <p-tooltip :contents="resource.entity_value">
                                         <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                                 new-tab
-                                                :to="getProperRouteLocation(referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' }))"
+                                                :to="referenceRouter(resource.entity_value, {
+                                                    resource_type: 'inventory.CloudService',
+                                                    workspace_id: storeState.currentWorkspaceId,
+                                                })"
                                                 class="affected-resource-link"
                                                 highlight
                                         >

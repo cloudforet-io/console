@@ -4,14 +4,12 @@ import {
     onUnmounted,
     ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PSkeleton } from '@cloudforet/mirinae';
 
-import { SpaceRouter } from '@/router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
@@ -32,12 +30,12 @@ interface Props {
     dashboardId: string;
 }
 const props = defineProps<Props>();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 const route = useRoute();
+const router = useRouter();
 
 /* Query */
 const {
@@ -74,7 +72,7 @@ watch(widgetList, (_widgetList) => {
 watch(isError, (error) => {
     if (error) {
         ErrorHandler.handleError(error);
-        SpaceRouter.router.push(getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL._NAME }));
+        router.push({ name: PROJECT_ROUTE.DETAIL._NAME });
     }
 });
 

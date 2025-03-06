@@ -24,8 +24,9 @@ import type { ProjectChannelListParameters } from '@/schema/notification/project
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import { i18n as _i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ProjectChannelList from '@/services/alert-manager-v1/components/ProjectChannelList.vue';
 import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
@@ -44,8 +45,8 @@ const props = withDefaults(defineProps<Props>(), {
     escalationPolicy: undefined,
 });
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const queryHelper = new QueryHelper();
+const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
     finishConditions: computed<FinishConditionItem[]>(() => ([
         {
@@ -71,12 +72,15 @@ const state = reactive({
         const escalationPolicyId: string|undefined = get(props.escalationPolicy, 'escalation_policy_id');
         if (!escalationPolicyId) return undefined;
         filters.push({ k: 'escalation_policy_id', o: '=', v: escalationPolicyId });
-        return getProperRouteLocation({
+        return {
             name: ALERT_MANAGER_ROUTE_V1.ESCALATION_POLICY._NAME,
+            params: {
+                workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+            },
             query: {
                 filters: queryHelper.setFilters(filters).rawQueryStrings,
             },
-        });
+        };
     }),
 });
 

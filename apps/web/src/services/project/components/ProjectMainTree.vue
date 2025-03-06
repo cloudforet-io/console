@@ -15,7 +15,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -38,7 +37,6 @@ const route = useRoute();
 const gnbStore = useGnbStore();
 
 const allReferenceStore = useAllReferenceStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const projectTreeStore = useProjectTreeStore();
 const projectTreeState = projectTreeStore.state;
 
@@ -75,12 +73,12 @@ const state = reactive({
                     type: 'PROJECT_GROUP',
                     id: key,
                     parentGroupId: projectGroup.data.parentGroupInfo?.id,
-                    to: getProperRouteLocation({
+                    to: {
                         name: PROJECT_ROUTE._NAME,
                         params: {
                             projectGroupId: key,
                         },
-                    }),
+                    },
                 },
                 children: [],
             };
@@ -95,12 +93,12 @@ const state = reactive({
                     type: 'PROJECT',
                     id: key,
                     parentGroupId: project.data.groupInfo?.id,
-                    to: getProperRouteLocation({
+                    to: {
                         name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                         params: {
                             id: key,
                         },
-                    }),
+                    },
                 },
             };
         });
