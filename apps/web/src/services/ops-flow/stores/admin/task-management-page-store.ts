@@ -5,8 +5,8 @@ import {
 
 import { defineStore } from 'pinia';
 
+import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { PackageModel } from '@/schema/identity/package/model';
 
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';

@@ -7,12 +7,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PackageCreateParameters } from '@/schema/identity/package/api-verbs/create';
-import type { PackageDeleteParameters } from '@/schema/identity/package/api-verbs/delete';
-import type { PackageListParameters } from '@/schema/identity/package/api-verbs/list';
-import type { PackageSetDefaultParameters } from '@/schema/identity/package/api-verbs/set-default';
-import type { PackageUpdateParameters } from '@/schema/identity/package/api-verbs/update';
-import type { PackageModel } from '@/schema/identity/package/model';
+import type { PackageCreateParameters } from '@/api-clients/identity/package/schema/api-verbs/create';
+import type { PackageDeleteParameters } from '@/api-clients/identity/package/schema/api-verbs/delete';
+import type { PackageListParameters } from '@/api-clients/identity/package/schema/api-verbs/list';
+import type { PackageSetDefaultParameters } from '@/api-clients/identity/package/schema/api-verbs/set-default';
+import type { PackageUpdateParameters } from '@/api-clients/identity/package/schema/api-verbs/update';
+import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
