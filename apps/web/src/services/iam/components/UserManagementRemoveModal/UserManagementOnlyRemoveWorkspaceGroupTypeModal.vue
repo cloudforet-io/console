@@ -9,11 +9,9 @@ import {
     PStatus, PButtonModal, PDataTable, PI, PLink, PBadge,
 } from '@cloudforet/mirinae';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useUserStore } from '@/store/user/user-store';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
@@ -73,7 +71,7 @@ const handleClose = () => {
                                 action-icon="internal-link"
                                 new-tab
                                 highlight
-                                :to="{ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACE_GROUP._NAME)}"
+                                :to="{ name: ADMIN_ADVANCED_ROUTE.WORKSPACE_GROUP._NAME}"
                         /><p-i name="external-link" />
                     </div>
                 </div>

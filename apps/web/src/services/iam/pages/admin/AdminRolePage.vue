@@ -7,24 +7,22 @@ import {
 } from '@cloudforet/mirinae';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import RoleManagementTab from '@/services/iam/components/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/iam/components/RoleManagementTable.vue';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
 
 /* Component */
 const handleCreateRole = () => {
-    router.push(getProperRouteLocation({ name: IAM_ROUTE.ROLE.CREATE._NAME }));
+    router.push({ name: ADMIN_IAM_ROUTE.ROLE.CREATE._NAME });
 };
 
 onUnmounted(() => {

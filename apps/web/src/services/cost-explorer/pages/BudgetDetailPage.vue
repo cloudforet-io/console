@@ -8,8 +8,6 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -23,7 +21,7 @@ import BudgetDetailNotifications
     from '@/services/cost-explorer/components/BudgetDetailNotifications.vue';
 import BudgetDetailSummary
     from '@/services/cost-explorer/components/BudgetDetailSummary.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
@@ -43,7 +41,7 @@ const state = reactive({
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
     adminModeLink: computed<Location>(() => ({
-        name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
+        name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
         params: {
             budgetId: state.budgetData?.budget_id,
         },

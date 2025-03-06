@@ -8,11 +8,11 @@ import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables
 
 import { getParticle, i18n as _i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
-import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+
+import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
@@ -100,7 +100,7 @@ onMounted(() => {
             <template #col-name-format="{ item }">
                 <p-link :text="item.name"
                         :to="{
-                            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME),
+                            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME,
                             params: { taskCategoryId: item.category_id }
                         }"
                         highlight

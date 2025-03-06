@@ -13,8 +13,6 @@ import {
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -29,7 +27,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -93,7 +91,7 @@ const actionWorkspace = (type: string, workspaceId: string) => {
         speed: 1,
     });
     router.push({
-        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
+        name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME,
         query: {
             modalType: type,
             selectedWorkspaceId: workspaceId,

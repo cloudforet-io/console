@@ -29,7 +29,6 @@ import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useGoBack } from '@/common/composables/go-back';
 
@@ -38,7 +37,7 @@ import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
 import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
-import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
@@ -62,7 +61,7 @@ const {
     setPathFrom,
     handleClickBackButton,
 } = useGoBack({
-    name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME),
+    name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
 });
 
 /* tabs */
@@ -79,20 +78,20 @@ const tabs = computed<TabItem<object>[]>(() => [
     },
 ]);
 const activeTab = computed(() => {
-    if (route.name === makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME)) return 'taskType';
+    if (route.name === ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME) return 'taskType';
     return 'status';
 });
 const handleUpdateActiveTab = (tab: string) => {
     if (tab === 'taskType') {
         router.replace({
-            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME),
+            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME,
             params: {
                 taskCategoryId: props.taskCategoryId,
             },
         });
     } else {
         router.replace({
-            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME),
+            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME,
             params: {
                 taskCategoryId: props.taskCategoryId,
             },

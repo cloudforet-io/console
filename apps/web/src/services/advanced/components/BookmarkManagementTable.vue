@@ -13,12 +13,11 @@ import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+
 
 import { gray } from '@/styles/colors';
 
@@ -31,7 +30,7 @@ import {
 } from '@/services/advanced/composables/refined-table-data';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -168,7 +167,7 @@ const handleClickName = (item: BookmarkItem) => {
         return;
     }
     router.push({
-        name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+        name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME,
         params: {
             group: item.workspaceId || 'global',
             folder: item.name as string || '',

@@ -20,17 +20,13 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
 
 interface Props {
@@ -405,7 +401,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                 >
                             </template>
                             <template #button>
-                                <router-link :to="{ name: makeAdminRouteName(IAM_ROUTE.ROLE.CREATE._NAME) }">
+                                <router-link :to="{ name: ADMIN_IAM_ROUTE.ROLE.CREATE._NAME }">
                                     <p-button style-type="substitutive"
                                               icon-right="ic_arrow-right-up"
                                     >
@@ -467,7 +463,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                 >
                             </template>
                             <template #button>
-                                <router-link :to="{ name: IAM_ROUTE.ROLE.CREATE._NAME }">
+                                <router-link :to="{ name: ADMIN_IAM_ROUTE.ROLE.CREATE._NAME }">
                                     <p-button style-type="substitutive"
                                               icon-right="ic_arrow-right-up"
                                     >

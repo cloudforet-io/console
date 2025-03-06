@@ -15,7 +15,6 @@ import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-rep
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -25,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -85,7 +84,7 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
             <p-link v-if="storeState.isAdminMode"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     highlight
-                    :to="{ name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME) }"
+                    :to="{ name: ADMIN_IAM_ROUTE.ROLE._NAME }"
                     size="md"
                     new-tab
             >

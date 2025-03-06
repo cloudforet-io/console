@@ -6,18 +6,17 @@ import {
 } from '@cloudforet/mirinae';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const handleCreateBudgetSelect = () => {
-    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME }));
+    router.push({ name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME });
 };
 </script>
 
