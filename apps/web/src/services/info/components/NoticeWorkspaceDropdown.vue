@@ -11,8 +11,8 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dro
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
