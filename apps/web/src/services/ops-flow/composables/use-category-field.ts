@@ -9,7 +9,7 @@ import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
+import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 
@@ -22,7 +22,7 @@ export const useCategoryField = ({
     isRequired?: boolean;
     hasTaskTypeOnly?: boolean;
 } = {}) => {
-    const packageStore = usePackageStore();
+    const { defaultPackage } = useDefaultPackageQuery();
     const taskCategoryStore = useTaskCategoryStore();
     const taskTypeStore = useTaskTypeStore();
 
@@ -70,7 +70,7 @@ export const useCategoryField = ({
             name: c.category_id,
             label: c.name,
             packageId: c.package_id,
-        }) || []);
+        }));
     });
     const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
         const map: Record<string, CategoryItem[]> = {};
@@ -108,7 +108,6 @@ export const useCategoryField = ({
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
 
-
     const addPackageToCategories = async (packageId: string, categoryIds: string[]) => {
         const responses = await Promise.allSettled([
             ...categoryIds.map((categoryId) => taskCategoryStore.update({
@@ -127,8 +126,8 @@ export const useCategoryField = ({
         }
     };
     const bindDefaultPackageToCategories = async (categoryIds: string[]) => {
-        if (!packageStore.getters.defaultPackage) throw new Error('Default package not found');
-        const defaultPackageId = packageStore.getters.defaultPackage.package_id;
+        if (!defaultPackage.value) throw new Error('Default package not found');
+        const defaultPackageId = defaultPackage.value.package_id;
         const responses = await Promise.allSettled([
             ...categoryIds.map((categoryId) => taskCategoryStore.update({
                 package_id: defaultPackageId,
