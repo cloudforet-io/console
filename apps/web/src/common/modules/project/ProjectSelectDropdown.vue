@@ -50,7 +50,7 @@ interface Props {
     isInitSelectedItem?: boolean;
     block?: boolean;
     styleType?: string;
-    appearanceType?: 'stack';
+    appearanceType?: 'stack'|'badge';
     showDeleteAllButton?: boolean;
 }
 
