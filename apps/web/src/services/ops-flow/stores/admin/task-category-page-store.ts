@@ -145,16 +145,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         resetTargetStatus() {
             state.targetStatus = undefined;
         },
-        async listTaskTypes() {
-            try {
-                if (!state.currentCategoryId) throw new Error('currentCategoryId is not set');
-                const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId, true);
-                return taskTypes;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        },
         openAddTaskTypeForm() {
             state.targetTaskTypeId = undefined;
             state.visibleTaskTypeForm = true;
