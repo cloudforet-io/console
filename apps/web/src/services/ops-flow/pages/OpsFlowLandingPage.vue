@@ -10,7 +10,6 @@ import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/sche
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
@@ -28,7 +27,6 @@ const taskTypeStore = useTaskTypeStore();
 const taskTypeState = taskTypeStore.state;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -54,10 +52,10 @@ const handleChangeTaskType = (value: string) => {
     setForm('taskType', value);
 };
 const goToTaskCreatePage = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
         query: { categoryId: category.value, taskTypeId: taskType.value } as TaskCreatePageQuery,
-    }));
+    });
 };
 
 

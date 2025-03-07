@@ -16,11 +16,11 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
@@ -38,7 +38,6 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -103,12 +102,15 @@ const isPrivate = (dashboardId: string): boolean => dashboardId.startsWith('priv
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    router.push(getProperRouteLocation({
-        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    const dashboardDetailRouteName = storeState.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+        : DASHBOARDS_ROUTE.DETAIL._NAME;
+    router.push({
+        name: dashboardDetailRouteName,
         params: {
             dashboardId: item.dashboard_id || '',
         },
-    }));
+    });
 };
 
 const handleClickDeleteDashboard = (dashboardId: string) => {

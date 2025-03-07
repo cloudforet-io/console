@@ -16,7 +16,7 @@ import {
     CONFIG_TEMP_DATA,
     DETECTION_CONFIGURATION_HANDLERS,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -58,7 +58,7 @@ const tableState = reactive({
             <template #col-name-format="{value, item}">
                 <p-link highlight
                         :to="{
-                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
+                            name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
                             params: { configId: item.config_id}
                         }"
                         class="col-name"

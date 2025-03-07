@@ -16,15 +16,13 @@ import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/mode
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupManageOverlay.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
@@ -146,7 +144,7 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
                                    style-type="tertiary"
                                    size="sm"
                                    class="ml-1"
-                                   @click="() => { router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACE_GROUP._NAME)})}"
+                                   @click="() => { router.push({ name: ADMIN_ADVANCED_ROUTE.WORKSPACE_GROUP._NAME})}"
                     />
                 </template>
             </p-button-tab>

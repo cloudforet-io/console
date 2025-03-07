@@ -6,12 +6,12 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useAlertInfoItem } from '@/services/alert-manager-v1/composables/alert-info';
@@ -23,7 +23,6 @@ const props = defineProps<{
     alertData?: Record<string, any>;
     manageDisabled?: boolean;
 }>();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const {
     state: alertDetailItemState,
@@ -37,6 +36,7 @@ const {
 });
 
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     modalVisible: false,
@@ -60,9 +60,9 @@ const onSelectProject = (selected) => {
                 <p-copy-button :value="props.alertData.project_id">
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
-                            :to="getProperRouteLocation(referenceRouter(
+                            :to="referenceRouter(
                                 props.alertData.project_id,
-                                { resource_type: 'identity.Project' }))"
+                                { resource_type: 'identity.Project', workspace_id: userWorkspaceStore.getters.currentWorkspaceId },)"
                             highlight
                     >
                         {{ state.projects[props.alertData.project_id] ? state.projects[props.alertData.project_id].label : props.alertData.project_id }}
@@ -127,7 +127,7 @@ const onSelectProject = (selected) => {
     margin-top: 2rem;
 }
 
-/* custom project-v1-select-dropdown */
+/* custom project-select-dropdown */
 :deep(.project-select-dropdown) {
     max-width: 25rem;
     flex-grow: 1;

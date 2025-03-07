@@ -13,14 +13,15 @@ import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface TableItem {
     project_id?: string;
@@ -39,7 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-const { getProperRouteLocation } = useProperRouteLocation();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     loading: false,
@@ -136,7 +137,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-name-format="{item}">
                 <span class="project-name-wrapper">
-                    <router-link :to="getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id } })"
+                    <router-link :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id, workspaceId: userWorkspaceStore.getters.currentWorkspaceId } }"
                                  target="_blank"
                     >
                         <span>{{ item.name }}</span>

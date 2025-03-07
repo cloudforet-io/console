@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Location } from 'vue-router';
+import type { Location } from 'vue-router/types/router';
 
 import {
     PTextButton, PI, PLink, PSkeleton,
 } from '@cloudforet/mirinae';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const props = defineProps<{
     projectId: string;
@@ -21,14 +21,16 @@ const props = defineProps<{
 const emit = defineEmits<{(event: 'click'): void;
 }>();
 const projectReferenceStore = useProjectReferenceStore();
-const { getProperRouteLocation } = useProperRouteLocation();
+const userWorkspaceStore = useUserWorkspaceStore();
+
 const hasProjectReferenceLoaded = computed<boolean>(() => !!projectReferenceStore.getters.projectItems);
-const projectPageLocation = computed<Location>(() => (getProperRouteLocation({
+const projectPageLocation = computed<Location>(() => ({
     name: PROJECT_ROUTE.DETAIL._NAME,
     params: {
+        workspaceId: userWorkspaceStore.getters.currentWorkspaceId as string,
         id: props.projectId,
     },
-})));
+}));
 const getProjectName = (projectId: string): string|undefined => projectReferenceStore.getters.projectItems[projectId]?.label;
 </script>
 

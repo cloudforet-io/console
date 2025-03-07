@@ -7,7 +7,6 @@ import { PButton } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -37,7 +36,6 @@ const serviceCreateFormState = serviceCreateFormStore.state;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     currentStep: computed<number>(() => serviceCreateFormState.currentStep),
@@ -85,7 +83,7 @@ const state = reactive({
 });
 
 const handleCancel = () => {
-    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+    router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
 };
 const handleNavigation = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
@@ -96,13 +94,13 @@ const handleNavigation = (direction: 'prev' | 'next') => {
 };
 const handlePrevNavigation = () => {
     if (storeState.currentStep === 1) {
-        router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+        router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
         return;
     }
     if (storeState.currentStep === 2) {
         if (props.selectedItemId) {
             if (storeState.currentSubStep === 3) {
-                router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+                router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
                 return;
             }
             serviceCreateFormStore.setCurrentSubStep(state.previousSubStep);
@@ -138,7 +136,7 @@ const handleClickSelectButton = () => {
     }
 };
 const handleClickSkipButton = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
         params: {
             serviceId: storeState.createdServiceId,
@@ -146,7 +144,7 @@ const handleClickSkipButton = () => {
         query: {
             tab: SERVICE_DETAIL_TABS.SETTINGS,
         },
-    }));
+    }).catch(() => {});
 };
 </script>
 

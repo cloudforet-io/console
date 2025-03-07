@@ -30,6 +30,7 @@ import { numberFormatter } from '@cloudforet/utils';
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -44,7 +45,7 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
@@ -64,7 +65,7 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
 type CostAnalyzeRawData = {
@@ -78,12 +79,12 @@ type CostAnalyzeRawData = {
 };
 
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 
 const getValueSumKey = (dataType: string) => {
@@ -101,6 +102,7 @@ const getValueSumKey = (dataType: string) => {
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     projects: computed<ProjectReferenceMap>(
         () => allReferenceStore.getters.project,
     ),
@@ -405,21 +407,22 @@ const handleClickRowData = (fieldName: string, value: string) => {
     let _routeName: string;
     let _params = {};
 
+    if (storeState.isAdminMode) return;
     if (fieldName === GROUP_BY.PROJECT) {
         _routeName = PROJECT_ROUTE.DETAIL._NAME;
-        _params = { id: value };
+        _params = { id: value, workspaceId: storeState.currentWorkspaceId };
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
         _routeName = ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME;
-        _params = { serviceAccountId: value };
+        _params = { serviceAccountId: value, workspaceId: storeState.currentWorkspaceId };
     }
 
     if (!_routeName) return;
 
-    window.open(router.resolve(getProperRouteLocation({
+    window.open(router.resolve({
         name: _routeName,
         params: _params,
-    })).href, '_blank');
+    }).href, '_blank');
 };
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, {

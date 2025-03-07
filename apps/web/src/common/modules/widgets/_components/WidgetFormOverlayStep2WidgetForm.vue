@@ -28,7 +28,7 @@ import {
     getWidgetFieldComponent,
 } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import WidgetHeaderField from '@/common/modules/widgets/_widget-fields/header/WidgetHeaderField.vue';

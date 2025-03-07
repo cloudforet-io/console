@@ -16,13 +16,13 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -40,10 +40,10 @@ const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -106,14 +106,15 @@ const handleRouteViewButton = async (id: string) => {
         const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
             cloud_service_id: id,
         });
-        window.open(router.resolve(getProperRouteLocation({
+        window.open(router.resolve({
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
             params: {
                 provider: response.provider,
                 group: response.cloud_service_group,
                 name: response.cloud_service_type,
+                workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
             },
-        })).href, '_blank');
+        }).href, '_blank');
     } catch (e: any) {
         ErrorHandler.handleError(e, true);
     }

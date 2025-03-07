@@ -25,14 +25,13 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/stores/service-detail-page-store';
-import type { TreeNode } from '@/services/project-v1/tree/type';
+import type { TreeNode } from '@/services/project/tree/type';
 
 interface Props {
   items: EventRuleModel[];
@@ -50,7 +49,6 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { width } = useWindowSize();
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
@@ -155,7 +153,7 @@ const handleClickItem = (value: TreeNode, idx?: number) => {
         return;
     }
     if (route.query?.eventRuleId === value.data.to.query?.eventRuleId) return;
-    router.push(getProperRouteLocation(value.data.to));
+    router.push(value.data.to).catch(() => {});
     state.selectedTreeId = value.id;
 };
 const fetchAndSetEventRuleInfo = async (eventRuleId: string) => {

@@ -47,7 +47,7 @@ import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-wi
 import {
     DATA_TABLE_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     DataTableAlertModalMode, TransformDataTableInfo,

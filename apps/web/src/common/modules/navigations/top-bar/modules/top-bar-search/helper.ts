@@ -7,7 +7,7 @@ import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const queryHelper = new QueryHelper();
 

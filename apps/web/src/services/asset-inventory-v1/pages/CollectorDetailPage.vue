@@ -41,8 +41,6 @@ import type { CollectorGetParameters } from '@/schema/inventory/collector/api-ve
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
@@ -67,6 +65,7 @@ import CollectorScheduleSection from '@/services/asset-inventory-v1/components/C
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory-v1/components/CollectorDetailServiceAccountsSection.vue';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory-v1/constants/collector-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     useCollectorDataModalStore,
@@ -75,7 +74,6 @@ import { useCollectorDetailPageStore } from '@/services/asset-inventory-v1/store
 import { useCollectorFormStore } from '@/services/asset-inventory-v1/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory-v1/stores/collector-job-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
 
 const props = defineProps<{
     collectorId: string;
@@ -264,7 +262,7 @@ onUnmounted(() => {
                 <template #right>
                     <p-link v-if="state.isDomainAdmin"
                             :text="i18n.t('INVENTORY.COLLECTOR.DETAIL.VIEW_IN_ADMIN_MODE')"
-                            :to="{name: makeAdminRouteName($route.name)}"
+                            :to="{name: ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.DETAIL._NAME }"
                             size="sm"
                             highlight
                             action-icon="internal-link"

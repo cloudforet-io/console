@@ -22,7 +22,6 @@ import { i18n } from '@/translations';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray, red } from '@/styles/colors';
 
@@ -49,7 +48,6 @@ type AlertStatusInfoType = {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -105,13 +103,13 @@ const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
 
 const handleRouteAlerts = (id: string) => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
         params: {
             alertId: id,
             serviceId: storeState.serviceInfo.service_id,
         },
-    }));
+    }).catch(() => {});
 };
 const handleRouteAlertsTab = async () => {
     await serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.ALERTS);

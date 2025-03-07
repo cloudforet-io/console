@@ -10,7 +10,6 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
@@ -32,7 +31,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -58,12 +56,12 @@ const handleClickItem = () => {
     if (!props.item) return;
     const itemName = props.item.name as string;
     if (props.item.itemType === FAVORITE_TYPE.DASHBOARD) {
-        router.push(getProperRouteLocation({
+        router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: itemName,
             },
-        }));
+        }).catch(() => {});
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.PROJECT) {
@@ -76,39 +74,39 @@ const handleClickItem = () => {
     }
     if (props.item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
-        router.push(getProperRouteLocation({
+        router.push({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: props.item.dataSourceId,
                 costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
             },
-        }));
+        }).catch(() => {});
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.SECURITY) {
         const itemInfo: string[] = itemName.split('.');
-        router.push(getProperRouteLocation({
+        router.push({
             name: ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME,
             params: {
                 provider: itemInfo[0],
                 group: itemInfo[1],
                 name: props.item.label as string,
             },
-        }));
+        }).catch(() => {});
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.SERVICE) {
-        router.push(getProperRouteLocation({
+        router.push({
             name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
             params: {
                 serviceId: props.item.itemId,
             },
-        }));
+        }).catch(() => {});
         return;
     }
     const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
     if (menuInfo && router.currentRoute.name !== itemName) {
-        router.push(getProperRouteLocation({ name: menuInfo.routeName }));
+        router.push({ name: menuInfo.routeName }).catch(() => {});
     }
 };
 </script>

@@ -10,8 +10,9 @@ import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/typ
 import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
 import { i18n } from '@/translations';
 
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceDetailDeleteModal from '@/services/alert-manager/components/ServiceDetailDeleteModal.vue';
 import ServiceDetailEditModal from '@/services/alert-manager/components/ServiceDetailEditModal.vue';
@@ -27,7 +28,6 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
@@ -58,7 +58,13 @@ const handleActionModal = (type: ModalType) => {
     modalState.type = type;
 };
 const handleGoBackButton = () => {
-    router.push(getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }));
+    if (state.isSettingMode) {
+        router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
+        return;
+    }
+    replaceUrlQuery({
+        mode: 'settings',
+    });
 };
 </script>
 

@@ -16,13 +16,13 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardCreateBlankBoardItem from '@/services/dashboards/components/dashboard-create/DashboardCreateBlankBoardItem.vue';
 import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -31,7 +31,7 @@ import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboar
 
 const emit = defineEmits<{(e: 'click-next'): void }>();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
+
 
 const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
@@ -121,7 +121,10 @@ const handleSelectProvider = (providers: FilterLabelItem[]) => {
     filterState.selectedProviders = providers.map((d) => d.label.toLowerCase());
 };
 const handleClickCancel = () => {
-    router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
+    const dashboardRouteName = storeState.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE._NAME
+        : DASHBOARDS_ROUTE._NAME;
+    router.push({ name: dashboardRouteName }).catch(() => {});
 };
 
 onMounted(() => {

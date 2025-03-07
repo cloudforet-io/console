@@ -37,7 +37,7 @@
                         {{ state.description }}
                     </span>
                     <p-link v-if="state.pluginDetailLink"
-                            :to="getProperRouteLocation(state.pluginDetailLink)"
+                            :to="state.pluginDetailLink"
                             :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
                             size="sm"
@@ -74,9 +74,10 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory-v1/constants/collector-constant';
 
@@ -92,11 +93,13 @@ const props = withDefaults(defineProps<Props>(), {
     hideLabels: false,
     emphasizeName: false,
 });
-const { getProperRouteLocation } = useProperRouteLocation();
+
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
 
 const state = reactive({
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     icon: computed<string>(() => assetUrlConverter(props.plugin?.tags?.icon ?? '')),
     name: computed<string>(() => props.plugin?.name ?? ''),
     description: computed<string>(() => props.plugin?.tags?.long_description ?? ''),
@@ -106,7 +109,13 @@ const state = reactive({
         const link = props.plugin?.tags?.link ?? '';
         if (!link) return undefined;
         const resolvedResult = router.resolve(link);
-        return resolvedResult.resolved;
+        return {
+            ...resolvedResult.resolved,
+            params: {
+                ...resolvedResult.resolved?.params ?? {},
+                workspaceId: state.currentWorkspaceId,
+            },
+        };
     }),
     repositoryType: computed<string>(() => props.plugin?.repository_info?.repository_type ?? ''),
     repositoryName: computed<string>(() => props.plugin?.repository_info?.name ?? ''),

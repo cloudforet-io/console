@@ -17,7 +17,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
     DETECTION_HISTORY_HANDLERS, HISTORY_TEMP_DATA, NOTIFY_LEVEL_MAP,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -58,7 +58,7 @@ const tableState = reactive({
             <template #col-name-format="{value, item}">
                 <p-link highlight
                         :to="{
-                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY.DETAIL._NAME,
+                            name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
                             params: { historyId: item.history_id }
                         }"
                         class="col-name"

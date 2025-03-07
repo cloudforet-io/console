@@ -8,9 +8,6 @@ export const DASHBOARDS_ROUTE = Object.freeze({
     DETAIL: {
         _NAME: `${MENU_ID.DASHBOARDS}.detail`,
     },
-    CUSTOMIZE: {
-        _NAME: `${MENU_ID.DASHBOARDS}.customize`,
-    },
     CREATE: {
         _NAME: `${MENU_ID.DASHBOARDS}.create`,
     },

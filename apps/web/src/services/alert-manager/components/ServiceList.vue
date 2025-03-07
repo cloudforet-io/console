@@ -18,7 +18,6 @@ import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import ServiceListContent from '@/services/alert-manager/components/ServiceListContent.vue';
@@ -27,7 +26,6 @@ import type { AlertManagementTableHandlerType } from '@/services/alert-manager/t
 
 const pageSizeOptions = [15, 30, 45];
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
@@ -64,9 +62,9 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
     await fetchServiceList();
 };
 const handleClickCreateButton = () => {
-    router.push(getProperRouteLocation({
+    router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.CREATE._NAME,
-    }));
+    }).catch(() => {});
 };
 
 const fetchServiceList = async () => {

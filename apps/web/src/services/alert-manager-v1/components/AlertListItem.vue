@@ -12,12 +12,12 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ReferenceItem } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { red } from '@/styles/colors';
 
@@ -46,11 +46,11 @@ const props = withDefaults(defineProps<{
 });
 
 const userStore = useUserStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
     timezone: computed(() => userStore.state.timezone),
     alertStateI18n: useAlertStateI18n(),
 });
-const { getProperRouteLocation } = useProperRouteLocation();
 
 /* util */
 const badgeStyleTypeFormatter = (alertState) => {
@@ -94,7 +94,10 @@ const projectNameFormatter = (projectId) => props.projectReference?.label || pro
                         class="project-link"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="getProperRouteLocation(referenceRouter(props.item.project_id,{ resource_type: 'identity.Project' }))"
+                        :to="referenceRouter(props.item.project_id,{
+                            resource_type: 'identity.Project',
+                            workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
+                        })"
                         hide-icon
                 >
                     {{ projectNameFormatter(props.item.project_id) }}

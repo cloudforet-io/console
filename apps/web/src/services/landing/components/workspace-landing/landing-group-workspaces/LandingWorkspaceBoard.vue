@@ -15,11 +15,8 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -28,7 +25,7 @@ import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
@@ -51,7 +48,6 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     popoverVisible: false,
@@ -87,12 +83,12 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
     if (state.redirectLocation) {
-        router.replace(getProperRouteLocation({
+        router.replace({
             ...state.redirectLocation,
             params: { ...state.redirectLocation.params, workspaceId: item.workspace_id },
-        }));
+        });
     } else {
-        router.replace(getProperRouteLocation({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } }));
+        router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
     }
 };
 </script>
@@ -151,7 +147,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                                         <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
                                                 highlight
                                                 :to="{
-                                                    name: makeAdminRouteName(ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME)
+                                                    name: ADMIN_ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME
                                                 }"
                                         />
                                     </div>

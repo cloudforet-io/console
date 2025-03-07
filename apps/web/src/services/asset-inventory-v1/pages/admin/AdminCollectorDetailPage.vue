@@ -121,8 +121,6 @@ import type { CollectorGetParameters } from '@/schema/inventory/collector/api-ve
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
@@ -132,7 +130,6 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorAdditionalRule from '@/services/asset-inventory-v1/components/CollectorAdditionalRule.vue';
 import CollectorBaseInfoSection from '@/services/asset-inventory-v1/components/CollectorBaseInfoSection.vue';
@@ -146,7 +143,7 @@ import CollectorOptionsSection
     from '@/services/asset-inventory-v1/components/CollectorDetailOptionsSection.vue';
 import CollectorScheduleSection from '@/services/asset-inventory-v1/components/CollectorDetailScheduleSection.vue';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory-v1/constants/collector-constant';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory-v1/stores/collector-data-modal-store';
@@ -183,8 +180,6 @@ watch(() => collectorFormState.originCollector, async (collector) => {
     }
 });
 
-const { getProperRouteLocation } = useProperRouteLocation();
-
 const queryHelper = new QueryHelper();
 
 const storeState = reactive({
@@ -206,7 +201,7 @@ const state = reactive({
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
     collectorHistoryLink: computed<Location>(() => ({
-        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME),
+        name: ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR.HISTORY._NAME,
         query: {
             filters: queryHelper.setFilters([
                 {
@@ -222,7 +217,7 @@ const state = reactive({
     editModalVisible: false,
 });
 
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME) });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME });
 
 defineExpose({ setPathFrom });
 
@@ -245,9 +240,9 @@ const fetchDeleteCollector = async () => (collectorFormState.collectorId ? Space
 }) : undefined);
 
 const goBackToMainPage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
-    }));
+    SpaceRouter.router.push({
+        name: ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
+    });
 };
 
 const handleClickEditButton = () => {

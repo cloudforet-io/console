@@ -22,12 +22,14 @@ import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/ana
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
 import { GRANULARITY, SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
@@ -35,6 +37,7 @@ import {
     getAssetAnalysisDataTableDateFields,
     getRefinedAssetAnalysisTableData,
 } from '@/services/asset-inventory-v1/helpers/asset-analysis-data-table-helper';
+import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory-v1/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory-v1/types/asset-analysis-type';
@@ -51,6 +54,7 @@ import {
 
 
 
+
 const DATE_FORMAT_MAP = {
     [GRANULARITY.DAILY]: 'M/D',
     [GRANULARITY.MONTHLY]: 'MMM',
@@ -58,12 +62,15 @@ const DATE_FORMAT_MAP = {
 
 const router = useRouter();
 const route = useRoute();
-const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
 const state = reactive({
@@ -225,7 +232,7 @@ const handleClickRow = (item) => {
             }
         });
 
-    let _routeName = ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME;
+    let _routeName = storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME;
     let _params = {};
     const _query: CloudServiceMainPageUrlQuery|CloudServiceDetailPageUrlQuery = {
         filters: queryHelper.setFilters(_filters).rawQueryStrings,
@@ -234,18 +241,18 @@ const handleClickRow = (item) => {
     if (state.metricResourceType.startsWith('inventory.CloudService:')) {
         const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
         _params = { provider, group, name };
-        _routeName = ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME;
+        _routeName = storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME;
 
         if (state.metricAdditionalFilter.length) {
             (_query as CloudServiceDetailPageUrlQuery).default_filters = state.metricAdditionalFilter.map((d) => JSON.stringify(d));
         }
     }
 
-    window.open(router.resolve(getProperRouteLocation({
+    window.open(router.resolve({
         name: _routeName,
-        params: _params,
+        params: { ..._params, workspaceId: storeState.isAdminMode ? undefined : storeState.currentWorkspaceId },
         query: _query,
-    })).href, '_blank');
+    }).href, '_blank');
 };
 
 watch(

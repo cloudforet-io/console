@@ -1,11 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
 const DashboardsMainPage = () => import('@/services/dashboards/pages/DashboardsMainPage.vue');
@@ -22,13 +20,13 @@ const adminDashboardsRoute: RouteConfig = {
     children: [
         {
             path: '/',
-            name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME),
+            name: ADMIN_DASHBOARDS_ROUTE._NAME,
             meta: { lsbVisible: true, menuId: MENU_ID.DASHBOARDS },
             component: DashboardsMainPage,
         },
         {
             path: 'create',
-            name: makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME),
+            name: ADMIN_DASHBOARDS_ROUTE.CREATE._NAME,
             meta: {
                 translationId: 'DASHBOARDS.CREATE.TITLE',
             },
@@ -36,7 +34,7 @@ const adminDashboardsRoute: RouteConfig = {
         },
         {
             path: 'detail/:dashboardId',
-            name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
+            name: ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME,
             meta: { lsbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
             props: true,
             component: DashboardDetailPage,

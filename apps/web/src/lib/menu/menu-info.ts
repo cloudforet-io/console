@@ -1,17 +1,20 @@
 import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
@@ -102,25 +105,25 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.DATA_SOURCES]: {
         menuId: MENU_ID.DATA_SOURCES,
-        routeName: COST_EXPLORER_ROUTE.DATA_SOURCES._NAME,
+        routeName: ADMIN_COST_EXPLORER_ROUTE.DATA_SOURCES._NAME,
         translationId: 'MENU.COST_EXPLORER_DATA_SOURCES',
         icon: 'ic_service_data-sources',
     },
     [MENU_ID.COST_ADVANCED_SETTINGS]: {
         menuId: MENU_ID.COST_ADVANCED_SETTINGS,
-        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME,
+        routeName: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME,
         translationId: 'COST_EXPLORER.COST_ADVANCED_SETTINGS',
         highlightTag: 'new',
         icon: 'ic_service_advanced-settings',
     },
     [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
         menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
-        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+        routeName: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
         translationId: 'COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION',
     },
     [MENU_ID.CURRENCY_CONVERTER]: {
         menuId: MENU_ID.CURRENCY_CONVERTER,
-        routeName: COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME,
+        routeName: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME,
         translationId: 'COST_EXPLORER.CURRENCY_CONVERTER',
         highlightTag: 'new',
     },
@@ -176,7 +179,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.ROLE]: {
         menuId: MENU_ID.ROLE,
-        routeName: IAM_ROUTE.ROLE._NAME,
+        routeName: ADMIN_IAM_ROUTE.ROLE._NAME,
         translationId: 'MENU.ADMINISTRATION_ROLE',
         icon: 'ic_service_role',
     },
@@ -188,49 +191,49 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.ADVANCED]: {
         menuId: MENU_ID.ADVANCED,
-        routeName: ADVANCED_ROUTE._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE._NAME,
         translationId: 'MENU.ADMINISTRATION_ADVANCED',
     },
     [MENU_ID.PREFERENCES]: {
         menuId: MENU_ID.PREFERENCES,
-        routeName: ADVANCED_ROUTE.PREFERENCES._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.PREFERENCES._NAME,
         translationId: 'MENU.ADMINISTRATION_PREFERENCES',
         icon: 'ic_service_domain-settings',
     },
     [MENU_ID.DOMAIN_INFORMATION]: {
         menuId: MENU_ID.DOMAIN_INFORMATION,
-        routeName: ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.PREFERENCES.DOMAIN_INFORMATION._NAME,
         translationId: 'IAM.DOMAIN_SETTINGS.DOMAIN_INFORMATION',
     },
 
     [MENU_ID.APPEARANCE]: {
         menuId: MENU_ID.APPEARANCE,
-        routeName: ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.PREFERENCES.APPEARANCE._NAME,
         translationId: 'IAM.DOMAIN_SETTINGS.APPEARANCE',
     },
 
     [MENU_ID.AUTO_DORMANCY_CONFIGURATION]: {
         menuId: MENU_ID.AUTO_DORMANCY_CONFIGURATION,
-        routeName: ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.AUTO_DORMANCY_CONFIGURATION._NAME,
         translationId: 'IAM.AUTO_DORMANCY_CONFIGURATION',
         icon: 'ic_service_dormancy-configuration',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,
-        routeName: ADVANCED_ROUTE.WORKSPACES._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
     },
     [MENU_ID.WORKSPACE_GROUP]: {
         menuId: MENU_ID.WORKSPACE_GROUP,
-        routeName: ADVANCED_ROUTE.WORKSPACE_GROUP._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.WORKSPACE_GROUP._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACE_GROUP',
         icon: 'ic_workspaces',
         highlightTag: 'new',
     },
     [MENU_ID.BOOKMARK]: {
         menuId: MENU_ID.BOOKMARK,
-        routeName: ADVANCED_ROUTE.BOOKMARK._NAME,
+        routeName: ADMIN_ADVANCED_ROUTE.BOOKMARK._NAME,
         translationId: 'MENU.ADMINISTRATION_BOOKMARK',
         icon: 'ic_service_bookmark',
     },
@@ -285,7 +288,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.TASK_MANAGEMENT]: {
         menuId: MENU_ID.TASK_MANAGEMENT,
-        routeName: OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
+        routeName: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
         translationId: 'MENU.TASK_MANAGEMENT',
         icon: 'ic_service_task-management',
     },

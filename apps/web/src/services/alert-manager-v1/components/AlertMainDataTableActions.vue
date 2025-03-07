@@ -32,7 +32,7 @@ import AlertMainResolveModal from '@/services/alert-manager-v1/components/AlertM
 import { useAlertStateI18n } from '@/services/alert-manager-v1/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager-v1/composables/alert-urgency-i18n';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager-v1/helpers/alert-badge-helper';
-import { useProjectDetailPageStore } from '@/services/project-v1/stores/project-detail-page-store';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
