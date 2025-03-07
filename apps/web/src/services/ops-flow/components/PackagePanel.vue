@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
-
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PIconButton, PBadge,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import { i18n as _i18n } from '@/translations';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
@@ -17,20 +14,13 @@ import type { ActionMenuItem } from '@/common/components/buttons/type';
 import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
+import { usePackagesQuery } from '../composables/use-packages-query';
+
 const taskManagementPageStore = useTaskManagementPageStore();
-const { packageAPI, packageListQueryKey } = usePackageApi();
 const { defaultPackage } = useDefaultPackageQuery();
 
 /* package list query */
-const { data: packageList, isLoading: isPackageListLoading, refetch } = useQuery({
-    queryKey: packageListQueryKey,
-    queryFn: async () => {
-        const { results } = await packageAPI.list({});
-        return results ?? [];
-    },
-    staleTime: 1000 * 60 * 5, // 5minutes
-    gcTime: 1000 * 60, // 1minute
-});
+const { packages, isLoading, refetch } = usePackagesQuery();
 
 /* table fields */
 const packageFields = computed<DataTableField[]>(() => [
@@ -93,8 +83,8 @@ const defaultPackageActionMenu = computed<ActionMenuItem[]>(() => [
         <p class="px-4 mb-6 text-label-md text-gray-600">
             {{ $t('OPSFLOW.TASK_MANAGEMENT.PACKAGE.DESC') }}
         </p>
-        <p-data-table :loading="isPackageListLoading"
-                      :items="packageList"
+        <p-data-table :loading="isLoading"
+                      :items="packages"
                       :fields="packageFields"
         >
             <template #col-name-format="{ item }">

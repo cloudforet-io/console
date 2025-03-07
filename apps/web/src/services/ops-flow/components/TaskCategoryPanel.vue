@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { reactive, computed, onMounted } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
-
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
-import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 
@@ -21,24 +18,17 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+import { usePackagesQuery } from '../composables/use-packages-query';
+
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* packages */
-const { packageAPI, packageListQueryKey } = usePackageApi();
-const { data: packageList } = useQuery({
-    queryKey: packageListQueryKey,
-    queryFn: async () => {
-        const { results } = await packageAPI.list({});
-        return results ?? [];
-    },
-    staleTime: 1000 * 60 * 5, // 5minutes
-    gcTime: 1000 * 60, // 1minute
-});
+const { packages } = usePackagesQuery();
 const packageMap = computed(() => {
-    if (!packageList.value) return {};
-    return packageList.value.reduce((acc, cur) => {
+    if (!packages.value) return {};
+    return packages.value.reduce((acc, cur) => {
         acc[cur.package_id] = cur;
         return acc;
     }, {} as Record<string, any>);

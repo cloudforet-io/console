@@ -4,8 +4,6 @@ import {
     computed,
 } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
-import { useQuery } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -13,9 +11,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
 
-import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
-import type { PackageListParameters } from '@/api-clients/identity/package/schema/api-verbs/list';
-import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -27,14 +22,22 @@ import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 import { usePackageMuatations } from '../composables/use-package-mutations';
+import { usePackagesQuery } from '../composables/use-packages-query';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
 
+/* package data */
+const { packages } = usePackagesQuery();
+const targetPackage = computed(() => {
+    if (!taskManagementPageState.targetPackageId || !packages.value) return undefined;
+    return packages.value.find((pkg) => pkg.package_id === taskManagementPageState.targetPackageId);
+});
+const { createPackage, updatePackage, isProcessing } = usePackageMuatations();
 
-/* workspace */
+/* workspace field */
 const {
     selectedWorkspaceItems,
     workspaceMenuItemsHandler,
@@ -54,7 +57,7 @@ const handleUpdateWorkspaces = (items: SelectDropdownMenuItem[]) => {
     setSelectedWorkspaces(items);
 };
 
-/* category */
+/* category field */
 const {
     preloadCategories,
     selectedCategoryItems,
@@ -65,21 +68,6 @@ const {
     addedCategoryItems,
     removedCategoryItems,
 } = useCategoryField();
-
-/* packages */
-const { packageAPI, packageListQueryKey } = usePackageApi();
-const { data: packages } = useQuery({
-    queryKey: computed<[QueryKey, PackageListParameters]>(() => [
-        packageListQueryKey.value,
-        { query: { only: ['package_id', 'name'] } },
-    ]),
-    queryFn: async ({ queryKey }) => {
-        const { results } = await packageAPI.list(queryKey[1]);
-        return results as Pick<PackageModel, 'package_id'|'name'>[]|undefined;
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60, // 1 minute
-});
 
 
 /* form */
@@ -117,9 +105,6 @@ const {
         return true;
     },
 });
-
-/* mutations */
-const { createPackage, updatePackage, isProcessing } = usePackageMuatations();
 
 /* update confirm modal */
 const visibleUpdateConfirmModal = ref(false);
@@ -176,8 +161,7 @@ const handleFormConfirm = () => {
     }
 };
 
-
-watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPageGetters.targetPackage], async ([visible, targetPackage], [prevVisible]) => {
+watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async ([visible, currentTargetPackage], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -192,19 +176,19 @@ watch([() => taskManagementPageState.visiblePackageForm, () => taskManagementPag
         resetValidations();
         return;
     }
-    if (targetPackage) {
+    if (currentTargetPackage) {
         setForm({
-            name: targetPackage.name,
-            description: targetPackage.description,
+            name: currentTargetPackage.name,
+            description: currentTargetPackage.description,
         });
-        await setInitialWorkspaces(targetPackage.package_id);
+        await setInitialWorkspaces(currentTargetPackage.package_id);
         if (selectedWorkspaceItems.value.length > 0) {
             workspaceType.value = 'specific';
         } else {
             workspaceType.value = 'unset';
         }
         await preloadCategories();
-        setInitialCategoriesByPackageId(targetPackage.package_id);
+        setInitialCategoriesByPackageId(currentTargetPackage.package_id);
     }
 });
 </script>
