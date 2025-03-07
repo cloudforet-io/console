@@ -71,7 +71,7 @@ const handleChange = (options: ToolboxOptions) => {
     if (options.sortDesc !== undefined) sort.desc = options.sortDesc;
 };
 
-/* task api query */
+/* task api query filters */
 const taskFilters = ref<ConsoleFilter[]>([]);
 const _taskFilterHelper = new QueryHelper();
 const handleUpdateFilters = (values: TaskFilters) => {
@@ -106,7 +106,14 @@ const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
 });
 
 /* task types */
-const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery();
+const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery({
+    queryKey: computed(() => ({
+        query: {
+            filter: [{ k: 'category_id', v: categories.value?.map((c) => c.category_id) ?? [], o: 'in' }],
+        },
+    })),
+    enabled: computed(() => !isLoadingCategories.value),
+});
 const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
     const map = {} as Record<string, TaskTypeModel>;
     if (!taskTypes.value) return map;

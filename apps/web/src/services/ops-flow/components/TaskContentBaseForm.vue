@@ -35,6 +35,8 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+import { useCategoriesQuery } from '../composables/use-categories-query';
+
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
@@ -49,9 +51,9 @@ const taskCategoryStore = useTaskCategoryStore();
 const isCreateMode = computed(() => taskContentFormState.mode.startsWith('create'));
 const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
 
-/* category */
+/* category field */
+const { categories, isLoading: isCategoriesLoading } = useCategoriesQuery();
 const {
-    preloadCategories,
     selectedCategoryItems,
     categoryValidator,
     categoryMenuItemsHandler,
@@ -59,6 +61,7 @@ const {
 } = useCategoryField({
     isRequired: true,
     hasTaskTypeOnly: true,
+    categories,
 });
 const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
     if (isEqual(items, selectedCategoryItems.value)) return;
@@ -76,12 +79,13 @@ const taskCategoryDesciprion = computed<string>(() => {
     return taskContentFormGetters.currentCategory.description;
 });
 
-/* task type */
+/* task type field */
 const {
     selectedTaskTypeItems,
     taskTypeValidator,
     taskTypeMenuItemsHandler,
     setInitialTaskType,
+    taskTypesDropdownKey,
 } = useTaskTypeField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
     isRequired: true,
@@ -253,25 +257,25 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 let viewModeInitWatchStop;
 let createModeInitWatchStop;
 
-viewModeInitWatchStop = watch(() => taskContentFormState.originTask, async (task) => {
+viewModeInitWatchStop = watch([() => taskContentFormState.originTask, isCategoriesLoading], async ([task, categoriesLoading]) => {
+    if (categoriesLoading) return; // wait for categories to be loaded
+
     if (hasInitiated && viewModeInitWatchStop) {
         viewModeInitWatchStop();
         viewModeInitWatchStop = null;
         return;
     }
 
-    await preloadCategories();
-
     if (!isCreateMode.value) await initForViewMode(task);
 }, { immediate: true });
-createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType], async ([categoryId, taskType]) => {
+createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType, isCategoriesLoading], async ([categoryId, taskType, categoriesLoading]) => {
+    if (categoriesLoading) return; // wait for categories to be loaded
+
     if (hasInitiated && createModeInitWatchStop) {
         createModeInitWatchStop();
         createModeInitWatchStop = undefined;
         return;
     }
-
-    await preloadCategories();
 
     if (!isCreateMode.value) return;
     if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
@@ -317,7 +321,8 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                    :invalid-text="invalidTexts.taskType"
                     >
                         <template #default="{invalid}">
-                            <p-select-dropdown :selected="selectedTaskTypeItems"
+                            <p-select-dropdown :key="taskTypesDropdownKey"
+                                               :selected="selectedTaskTypeItems"
                                                :handler="taskTypeMenuItemsHandler"
                                                :page-size="10"
                                                :invalid="invalid"
