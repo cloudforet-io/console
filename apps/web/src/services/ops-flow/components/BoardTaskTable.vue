@@ -31,12 +31,13 @@ import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
+
+import { useCategoriesQuery } from '../composables/use-categories-query';
+import { useTaskTypesQuery } from '../composables/use-task-types-query';
 
 const props = defineProps<{
     categoryId?: string;
@@ -44,51 +45,10 @@ const props = defineProps<{
     tag?: string;
 }>();
 
-const taskTypeStore = useTaskTypeStore();
-const taskCategoryStore = useTaskCategoryStore();
 const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
-    const map = {} as Record<string, TaskCategoryModel>;
-    taskCategoryStore.getters.taskCategoriesIncludingDeleted.forEach((category) => {
-        map[category.category_id] = category;
-    });
-    return map;
-});
-const taskTypesById = ref<Record<string, TaskTypeModel>>({});
-
-
-/* table view formatter */
-const getTaskTypeName = (taskTypeId: string) => {
-    const taskType = taskTypesById.value[taskTypeId];
-    return taskType ? taskType.name : taskTypeId;
-};
-const getStatusName = (category: TaskCategoryModel|undefined, statusId: string, statusType: string) => {
-    const statusOptions = category?.status_options[statusType];
-    if (!statusOptions) return statusId;
-    const statusOption = statusOptions.find((option) => option.status_id === statusId);
-    if (!statusOption) {
-        const defaultOption = statusOptions.find((option) => option.is_default);
-        if (defaultOption) return defaultOption.name;
-        return statusId;
-    }
-    return statusOption.name;
-};
-const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: string, statusType: string) => {
-    const statusOptions = category?.status_options[statusType];
-    if (!statusOptions) return '';
-    const statusOption = statusOptions.find((option) => option.status_id === statusId);
-    if (!statusOption) {
-        const defaultOption = statusOptions.find((option) => option.is_default);
-        if (defaultOption) return defaultOption.color;
-        return '';
-    }
-    return statusOption.color;
-};
-const { getTimezoneDate, getDuration } = useTimezoneDate();
-
-/* api query */
+/* toolbox */
 const search = ref<string>('');
 const pagination = reactive({
     page: 1,
@@ -99,6 +59,19 @@ const sort = reactive({
     key: 'created_at',
     desc: true,
 });
+const handleRefresh = () => {
+    refetch();
+    // refetch({ throwOnError: true, cancelRefetch: false });
+};
+const handleChange = (options: ToolboxOptions) => {
+    if (options.searchText !== undefined) search.value = options.searchText;
+    if (options.pageStart !== undefined) pagination.page = options.pageStart;
+    if (options.pageLimit !== undefined) pagination.size = options.pageLimit;
+    if (options.sortBy !== undefined) sort.key = options.sortBy;
+    if (options.sortDesc !== undefined) sort.desc = options.sortDesc;
+};
+
+/* task api query */
 const taskFilters = ref<ConsoleFilter[]>([]);
 const _taskFilterHelper = new QueryHelper();
 const handleUpdateFilters = (values: TaskFilters) => {
@@ -121,10 +94,30 @@ const taskListApiQuery = computed<Query>(() => {
     return _taskListQueryHelper.dataV2;
 });
 
-/* list */
-const { taskListQueryKey, taskAPI } = useTaskApi();
-const hasCategoriesAndTypesLoaded = ref<boolean>(false);
+/* task categories */
+const { categories, isLoading: isLoadingCategories } = useCategoriesQuery();
+const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
+    const map = {} as Record<string, TaskCategoryModel>;
+    if (!categories.value) return map;
+    categories.value.forEach((category) => {
+        map[category.category_id] = category;
+    });
+    return map;
+});
 
+/* task types */
+const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery();
+const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
+    const map = {} as Record<string, TaskTypeModel>;
+    if (!taskTypes.value) return map;
+    taskTypes.value.forEach((taskType) => {
+        map[taskType.task_type_id] = taskType;
+    });
+    return map;
+});
+
+/* tasks */
+const { taskListQueryKey, taskAPI } = useTaskApi();
 const {
     data: tasks, error, refetch, isLoading,
 } = useQuery<TaskModel[], APIError>({
@@ -139,55 +132,18 @@ const {
         });
         return results ?? [];
     },
-    enabled: computed(() => hasCategoriesAndTypesLoaded.value),
+    enabled: computed(() => !isLoadingCategories.value && !isLoadingTaskTypes.value),
     retry: false,
     // time control
     gcTime: 1000 * 60 * 2, // 2 minutes
     staleTime: 1000 * 30, // 30 seconds
 });
-
 watch(error, (err) => {
     if (err) ErrorHandler.handleError(err);
 });
 
-const listCategoriesAndTaskTypes = async () => {
-    if (hasCategoriesAndTypesLoaded.value) return;
-    const results = await Promise.allSettled([
-        taskCategoryStore.list(),
-        taskTypeStore.list({
-            query: { only: ['task_type_id', 'name'] },
-        }),
-    ]);
-    results.forEach((result) => {
-        if (result.status === 'fulfilled') {
-            const taskTypes = result.value;
-            if (taskTypes) {
-                taskTypes.forEach((taskType) => {
-                    taskTypesById.value[taskType.task_type_id] = taskType;
-                });
-            }
-        }
-    });
-    taskTypesById.value = { ...taskTypesById.value };
-    hasCategoriesAndTypesLoaded.value = true;
-};
 
-listCategoriesAndTaskTypes();
-
-/* toolbox */
-const handleRefresh = () => {
-    refetch();
-    // refetch({ throwOnError: true, cancelRefetch: false });
-};
-const handleChange = (options: ToolboxOptions) => {
-    if (options.searchText !== undefined) search.value = options.searchText;
-    if (options.pageStart !== undefined) pagination.page = options.pageStart;
-    if (options.pageLimit !== undefined) pagination.size = options.pageLimit;
-    if (options.sortBy !== undefined) sort.key = options.sortBy;
-    if (options.sortDesc !== undefined) sort.desc = options.sortDesc;
-};
-
-/* table */
+/* table fields */
 const fields = computed<DataTableField[] >(() => [
     {
         name: 'name',
@@ -223,6 +179,35 @@ const fields = computed<DataTableField[] >(() => [
         label: i18n.t('OPSFLOW.TOTAL_DURATION') as string,
     },
 ]);
+
+/* table view formatter */
+const getTaskTypeName = (taskTypeId: string) => {
+    const taskType = taskTypesById.value[taskTypeId];
+    return taskType ? taskType.name : taskTypeId;
+};
+const getStatusName = (category: TaskCategoryModel|undefined, statusId: string, statusType: string) => {
+    const statusOptions = category?.status_options[statusType];
+    if (!statusOptions) return statusId;
+    const statusOption = statusOptions.find((option) => option.status_id === statusId);
+    if (!statusOption) {
+        const defaultOption = statusOptions.find((option) => option.is_default);
+        if (defaultOption) return defaultOption.name;
+        return statusId;
+    }
+    return statusOption.name;
+};
+const getStatusStyleType = (category: TaskCategoryModel|undefined, statusId: string, statusType: string) => {
+    const statusOptions = category?.status_options[statusType];
+    if (!statusOptions) return '';
+    const statusOption = statusOptions.find((option) => option.status_id === statusId);
+    if (!statusOption) {
+        const defaultOption = statusOptions.find((option) => option.is_default);
+        if (defaultOption) return defaultOption.color;
+        return '';
+    }
+    return statusOption.color;
+};
+const { getTimezoneDate, getDuration } = useTimezoneDate();
 
 </script>
 
