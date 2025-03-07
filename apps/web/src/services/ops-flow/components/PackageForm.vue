@@ -4,6 +4,7 @@ import {
     computed,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -13,6 +14,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dr
 
 import { getParticle, i18n as _i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -21,6 +24,7 @@ import { useCategoryField } from '@/services/ops-flow/composables/use-category-f
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
+import { useCategoriesQuery } from '../composables/use-categories-query';
 import { useDefaultPackageQuery } from '../composables/use-default-package-query';
 import { usePackageMuatations } from '../composables/use-package-mutations';
 import { usePackagesQuery } from '../composables/use-packages-query';
@@ -35,8 +39,8 @@ const targetPackage = computed(() => {
     if (!taskManagementPageState.targetPackageId || !packages.value) return undefined;
     return packages.value.find((pkg) => pkg.package_id === taskManagementPageState.targetPackageId);
 });
-const { createPackage, updatePackage, isProcessing } = usePackageMuatations();
 const { defaultPackage } = useDefaultPackageQuery();
+
 
 /* workspace field */
 const {
@@ -59,8 +63,8 @@ const handleUpdateWorkspaces = (items: SelectDropdownMenuItem[]) => {
 };
 
 /* category field */
+const { categories, isLoading: isCategoriesLoading } = useCategoriesQuery();
 const {
-    preloadCategories,
     selectedCategoryItems,
     categoryMenuItemsHandler,
     categoryValidator,
@@ -68,7 +72,7 @@ const {
     setInitialCategoriesByPackageId,
     addedCategoryItems,
     removedCategoryItems,
-} = useCategoryField();
+} = useCategoryField({ categories });
 
 
 /* form */
@@ -107,7 +111,28 @@ const {
     },
 });
 
-/* update confirm modal */
+/* package mutations */
+const { createPackageFn, updatePackageFn } = usePackageMuatations();
+const { mutateAsync: createPackage, isPending: isCreating } = useMutation({
+    mutationFn: createPackageFn,
+    onSuccess: () => {
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), true);
+    },
+});
+const { mutateAsync: updatePackage, isPending: isUpdating } = useMutation({
+    mutationFn: updatePackageFn,
+    onSuccess: () => {
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), true);
+    },
+});
+
+/* confirm modal */
 const visibleUpdateConfirmModal = ref(false);
 const handleUpdateCancel = () => {
     visibleUpdateConfirmModal.value = false;
@@ -162,21 +187,24 @@ const handleFormConfirm = () => {
     }
 };
 
-watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async ([visible, currentTargetPackage], [prevVisible]) => {
-    if (!visible) {
+watch([() => taskManagementPageState.visiblePackageForm, targetPackage, isCategoriesLoading], async ([visible, currentTargetPackage, categoriesLoading], [prevVisible]) => {
+    if (categoriesLoading) return; // wait for categories
+
+    if (!visible) { // reset form when closing
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
+
         setForm({
             name: '',
             description: '',
         });
         workspaceType.value = 'unset';
         await setInitialWorkspaces();
-        await preloadCategories();
         setInitialCategoriesByPackageId();
         resetValidations();
         return;
     }
+
     if (currentTargetPackage) {
         setForm({
             name: currentTargetPackage.name,
@@ -188,7 +216,6 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async (
         } else {
             workspaceType.value = 'unset';
         }
-        await preloadCategories();
         setInitialCategoriesByPackageId(currentTargetPackage.package_id);
     }
 });
@@ -206,7 +233,7 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async (
                 <div class="p-6 w-full">
                     <p-field-group :label="$t('OPSFLOW.NAME')"
                                    required
-                                   :invalid="!isProcessing && invalidState.name"
+                                   :invalid="!isCreating && !isUpdating && invalidState.name"
                                    :invalid-text="invalidTexts.name"
                     >
                         <template #default="{ invalid }">
@@ -296,13 +323,13 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async (
             <template #footer>
                 <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
                     <p-button style-type="transparent"
-                              :disabled="isProcessing"
+                              :disabled="isCreating || isUpdating"
                               @click="handleCancelOrClose"
                     >
                         {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :loading="isProcessing"
+                              :loading="isCreating || isUpdating"
                               :disabled="!isAllValid"
                               @click="handleFormConfirm"
                     >

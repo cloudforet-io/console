@@ -1,16 +1,7 @@
-import { ref } from 'vue';
-
-import { useMutation } from '@tanstack/vue-query';
 
 import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import type { PackageCreateParameters } from '@/api-clients/identity/package/schema/api-verbs/create';
 import type { PackageUpdateParameters } from '@/api-clients/identity/package/schema/api-verbs/update';
-import type { PackageModel } from '@/api-clients/identity/package/schema/model';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { usePackageCategoryBind } from '@/services/ops-flow/composables/use-package-category-bind';
 import { usePackageWorkspaceBind } from '@/services/ops-flow/composables/use-package-workspace-bind';
@@ -23,7 +14,7 @@ export const usePackageMuatations = () => {
     const { applyPackageToCategories } = usePackageCategoryBind();
     const { applyPackageToWorkspaces } = usePackageWorkspaceBind();
 
-    const bindWorkspacesAndCategories = async (packageId: string, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds) => {
+    const bindWorkspacesAndCategories = async (packageId: string, addedCategoryIds: string[], removedCategoryIds: string[], addedWorkspaceIds: string[], removedWorkspaceIds: string[]) => {
         const errorMessages: string[] = [];
         const responses = await Promise.allSettled([
             applyPackageToWorkspaces(packageId, addedWorkspaceIds, removedWorkspaceIds),
@@ -40,63 +31,37 @@ export const usePackageMuatations = () => {
     };
 
     const { packageAPI } = usePackageApi();
-    const isProcessing = ref(false);
 
-    interface CreateVariables {
-      createPackageParams: PackageCreateParameters;
-      addedCategoryIds: string[];
-      removedCategoryIds: string[];
-      addedWorkspaceIds: string[];
-      removedWorkspaceIds: string[];
-    }
-    const { mutateAsync: createPackage } = useMutation<PackageModel, Error, CreateVariables>({
-        mutationFn: ({ createPackageParams }) => packageAPI.create(createPackageParams),
-        onMutate: () => {
-            isProcessing.value = true;
-        },
-        onSettled: () => {
-            isProcessing.value = false;
-        },
-        onSuccess: async (createdPackage, {
-            addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds,
-        }) => {
-            await bindWorkspacesAndCategories(createdPackage.package_id, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds);
-            showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.PACKAGE') }), '');
-        },
-        onError: (error) => {
-            ErrorHandler.handleRequestError(error, i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: i18n.t('OPSFLOW.PACKAGE') }));
-        },
-    });
+    const createPackageFn = async ({
+        createPackageParams, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds,
+    }: {
+    createPackageParams: PackageCreateParameters;
+    addedCategoryIds: string[];
+    removedCategoryIds: string[];
+    addedWorkspaceIds: string[];
+    removedWorkspaceIds: string[];
+  }) => {
+        const createdPackage = await packageAPI.create(createPackageParams);
+        await bindWorkspacesAndCategories(createdPackage.package_id, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds);
+        return createdPackage;
+    };
 
-    interface UpdateVariables {
-      updatePackageParams: PackageUpdateParameters;
-      addedCategoryIds: string[];
-      removedCategoryIds: string[];
-      addedWorkspaceIds: string[];
-      removedWorkspaceIds: string[];
-    }
-    const { mutateAsync: updatePackage } = useMutation<PackageModel, Error, UpdateVariables>({
-        mutationFn: ({ updatePackageParams }) => packageAPI.update(updatePackageParams),
-        onMutate: () => {
-            isProcessing.value = true;
-        },
-        onSettled: () => {
-            isProcessing.value = false;
-        },
-        onSuccess: async (updatedPackage, {
-            addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds,
-        }) => {
-            await bindWorkspacesAndCategories(updatedPackage.package_id, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds);
-            showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.PACKAGE') }), '');
-        },
-        onError: (error) => {
-            ErrorHandler.handleRequestError(error, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.PACKAGE') }));
-        },
-    });
+    const updatePackageFn = async ({
+        updatePackageParams, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds,
+    }: {
+    updatePackageParams: PackageUpdateParameters;
+    addedCategoryIds: string[];
+    removedCategoryIds: string[];
+    addedWorkspaceIds: string[];
+    removedWorkspaceIds: string[];
+  }) => {
+        const updatedPackage = await packageAPI.update(updatePackageParams);
+        await bindWorkspacesAndCategories(updatedPackage.package_id, addedCategoryIds, removedCategoryIds, addedWorkspaceIds, removedWorkspaceIds);
+        return updatedPackage;
+    };
 
     return {
-        createPackage,
-        updatePackage,
-        isProcessing,
+        createPackageFn,
+        updatePackageFn,
     };
 };
