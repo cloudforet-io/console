@@ -10,7 +10,7 @@ export const useCategoriesQuery = () => {
     const { data: categories, isLoading, refetch } = useQuery({
         queryKey: computed<QueryKey>(() => taskCategoryListQueryKey.value),
         queryFn: async () => {
-            const { results } = await taskCategoryAPI.list({});
+            const { results } = await taskCategoryAPI.list({ include_deleted: true });
             return results ?? [];
         },
         staleTime: 1000 * 60 * 5, // 5 minutes

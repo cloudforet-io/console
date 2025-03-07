@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, computed, onMounted } from 'vue';
+import { computed } from 'vue';
 
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
@@ -13,15 +13,14 @@ import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+import { useCategoriesQuery } from '../composables/use-categories-query';
 import { usePackagesQuery } from '../composables/use-packages-query';
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* packages */
@@ -34,34 +33,33 @@ const packageMap = computed(() => {
     }, {} as Record<string, any>);
 });
 
-const state = reactive({
-    categoryFields: computed<DataTableField[]>(() => [
-        {
-            name: 'name',
-            label: _i18n.t('OPSFLOW.NAME') as string,
-            width: '30%',
-        },
-        {
-            name: 'package',
-            label: _i18n.t('OPSFLOW.PACKAGE') as string,
-            width: '25%',
-            sortable: true,
-        },
-        {
-            name: 'description',
-            label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
-            width: '45%',
-        },
-        {
-            name: 'buttons',
-            label: ' ',
-        },
-    ]),
-});
+/* task categories */
+const { categories, isLoading, refetch } = useCategoriesQuery();
 
-onMounted(() => {
-    if (!taskCategoryStore.state.loading) taskCategoryStore.list();
-});
+/* table fields */
+const categoryFields = computed<DataTableField[]>(() => [
+    {
+        name: 'name',
+        label: _i18n.t('OPSFLOW.NAME') as string,
+        width: '30%',
+    },
+    {
+        name: 'package',
+        label: _i18n.t('OPSFLOW.PACKAGE') as string,
+        width: '25%',
+        sortable: true,
+    },
+    {
+        name: 'description',
+        label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
+        width: '45%',
+    },
+    {
+        name: 'buttons',
+        label: ' ',
+    },
+]);
+
 
 </script>
 
@@ -75,7 +73,7 @@ onMounted(() => {
             </template>
             <template #extra>
                 <p-icon-button name="ic_refresh"
-                               @click="taskCategoryStore.list(true)"
+                               @click="refetch"
                 />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
@@ -94,9 +92,9 @@ onMounted(() => {
                 tasksObjectParticle: getParticle(taskManagementTemplateStore.templates.tasks, 'object'),
             }) }}
         </p>
-        <p-data-table :loading="taskCategoryStore.getters.loading"
-                      :items="taskCategoryStore.getters.taskCategories"
-                      :fields="state.categoryFields"
+        <p-data-table :loading="isLoading"
+                      :items="categories"
+                      :fields="categoryFields"
         >
             <template #col-name-format="{ item }">
                 <p-link :text="item.name"
