@@ -14,12 +14,21 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
+import { usePackagesQuery } from '../composables/use-packages-query';
+
 const taskManagementPageStore = useTaskManagementPageStore();
 const { packageAPI, packageQueryKey, packageListQueryKey } = usePackageApi();
 const queryClient = useQueryClient();
 
-const name = computed(() => taskManagementPageStore.getters.targetPackage?.name ?? '');
+/* package name */
+const { packages } = usePackagesQuery();
+const targetPackage = computed(() => {
+    if (!taskManagementPageStore.state.targetPackageId || !packages.value) return undefined;
+    return packages.value.find((pkg) => pkg.package_id === taskManagementPageStore.state.targetPackageId);
+});
+const name = computed(() => targetPackage.value?.name ?? '');
 
+/* set default package */
 const { mutateAsync: setDefaultPackage, isPending } = useMutation({
     mutationFn: packageAPI.setDefault,
     onSuccess: (data) => {
@@ -38,17 +47,16 @@ const { mutateAsync: setDefaultPackage, isPending } = useMutation({
     },
 });
 
+/* modal event handlers */
 const handleConfirm = async () => {
     if (!taskManagementPageStore.state.targetPackageId) {
         throw new Error('[Console Error] Cannot set default package without a target package');
     }
     await setDefaultPackage({ package_id: taskManagementPageStore.state.targetPackageId });
 };
-
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeSetDefaultPackageModal();
 };
-
 const handleClosed = () => {
     taskManagementPageStore.resetTargetPackageId();
 };

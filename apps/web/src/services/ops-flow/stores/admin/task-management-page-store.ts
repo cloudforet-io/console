@@ -5,14 +5,12 @@ import {
 
 import { defineStore } from 'pinia';
 
-import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 interface UseTaskManagementPageStoreState {
@@ -28,15 +26,12 @@ interface UseTaskManagementPageStoreState {
 }
 
 interface UseTaskManagementPageStoreGetters {
-    targetPackage: PackageModel|undefined;
     associatedCategoriesToPackage: TaskCategoryModel[];
     associatedWorkspacesToPackage: WorkspaceItem[];
     targetCategory: TaskCategoryModel|undefined;
-    defaultPackage: PackageModel|undefined;
 }
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
-    const packageStore = usePackageStore();
     const taskCategoryStore = useTaskCategoryStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const state = reactive<UseTaskManagementPageStoreState>({
@@ -51,7 +46,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         visibleDeleteCategoryModal: false,
     });
     const getters: UseTaskManagementPageStoreGetters = {
-        targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
         associatedCategoriesToPackage: computed<DeepReadonly<TaskCategoryModel[]>>(() => taskCategoryStore.getters.taskCategories.filter((c) => c.package_id === state.targetPackageId)),
         associatedWorkspacesToPackage: computed<WorkspaceItem[]>(() => {
             const targetPackageId = state.targetPackageId;
@@ -60,7 +54,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
             return workspaceItems.filter((w) => w.data.packages?.includes(targetPackageId));
         }),
         targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
-        defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
     } as unknown as UseTaskManagementPageStoreGetters; // HACK: to avoid type error
     const actions = {
         // support package

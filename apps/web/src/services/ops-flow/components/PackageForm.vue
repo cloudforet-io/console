@@ -21,13 +21,13 @@ import { useCategoryField } from '@/services/ops-flow/composables/use-category-f
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
+import { useDefaultPackageQuery } from '../composables/use-default-package-query';
 import { usePackageMuatations } from '../composables/use-package-mutations';
 import { usePackagesQuery } from '../composables/use-packages-query';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
-const taskManagementPageGetters = taskManagementPageStore.getters;
 
 /* package data */
 const { packages } = usePackagesQuery();
@@ -36,6 +36,7 @@ const targetPackage = computed(() => {
     return packages.value.find((pkg) => pkg.package_id === taskManagementPageState.targetPackageId);
 });
 const { createPackage, updatePackage, isProcessing } = usePackageMuatations();
+const { defaultPackage } = useDefaultPackageQuery();
 
 /* workspace field */
 const {
@@ -230,7 +231,7 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async (
                         />
                     </p-field-group>
                     <p-field-group v-if="!taskManagementPageState.targetPackageId
-                                       || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                                       || taskManagementPageState.targetPackageId !== defaultPackage?.package_id"
                                    :invalid="invalidState.workspaces"
                                    :invalid-text="invalidTexts.workspaces"
                                    :label="$t('OPSFLOW.WORKSPACE')"
@@ -270,7 +271,7 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage], async (
                         </div>
                     </p-field-group>
                     <p-field-group v-if="!taskManagementPageState.targetPackageId
-                                       || taskManagementPageState.targetPackageId !== taskManagementPageGetters.defaultPackage?.package_id"
+                                       || taskManagementPageState.targetPackageId !== defaultPackage?.package_id"
                                    :label="$t('OPSFLOW.CATEGORY')"
                                    :invalid="invalidState.categories"
                                    :invalid-text="invalidTexts.categories"

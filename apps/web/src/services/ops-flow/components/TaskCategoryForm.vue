@@ -17,11 +17,17 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
+import { useDefaultPackageQuery } from '../composables/use-default-package-query';
+
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementPageState = taskManagementPageStore.state;
 const taskManagementPageGetters = taskManagementPageStore.getters;
 const taskCategoryStore = useTaskCategoryStore();
 
+/* default package */
+const { defaultPackage } = useDefaultPackageQuery();
+
+/* form */
 const {
     forms: { name, description },
     invalidState,
@@ -75,11 +81,11 @@ const handleConfirm = async () => {
             });
             showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }), '');
         } else {
-            if (!taskManagementPageGetters.defaultPackage) throw Error('Default package is not found');
+            if (!defaultPackage.value) throw Error('Default package is not found');
             await taskCategoryStore.create({
                 name: name.value,
                 description: description.value,
-                package_id: taskManagementPageGetters.defaultPackage.package_id,
+                package_id: defaultPackage.value.package_id,
             });
             showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }), '');
         }
@@ -148,10 +154,10 @@ watch([() => taskManagementPageState.visibleCategoryForm, () => taskManagementPa
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
+                                :placeholder="String($t('OPSFLOW.DESCRIBE_FIELD', {
                                     field: $t('OPSFLOW.CATEGORY'),
-                                    particle: getParticle( $t('OPSFLOW.CATEGORY'), 'object')
-                                })"
+                                    particle: getParticle(String($t('OPSFLOW.CATEGORY')), 'object')
+                                }))"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
