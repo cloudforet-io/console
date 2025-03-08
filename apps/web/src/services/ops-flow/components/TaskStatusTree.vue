@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
+import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskStatusOption, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 import { i18n } from '@/translations';
 
@@ -11,10 +14,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import TaskStatusList from '@/services/ops-flow/components/TaskStatusList.vue';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
+
+import { useCategoryStatusOptions } from '../composables/use-category-status-options';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryStore = useTaskCategoryStore();
 
 const taskStatusTree = computed<{
     key: TaskStatusType,
@@ -25,23 +28,38 @@ const taskStatusTree = computed<{
     { key: 'COMPLETED', name: TASK_STATUS_LABELS.COMPLETED },
 ]);
 
-const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOption[]) => {
-    try {
-        if (!taskCategoryPageStore.state.currentCategoryId) {
-            throw new Error('Category ID is required');
-        }
-        await taskCategoryStore.update({
-            category_id: taskCategoryPageStore.state.currentCategoryId,
+/* cateogry status options */
+const categoryId = computed(() => taskCategoryPageStore.state.currentCategoryId);
+const { categoryStatusOptions } = useCategoryStatusOptions({ categoryId });
+
+/* update status options */
+const { taskCategoryAPI, taskCategoryListQueryKey, taskCategoryQueryKey } = useTaskCategoryApi();
+const queryClient = useQueryClient();
+const { mutate } = useMutation({
+    mutationFn: ({ statusType, items }: {statusType: TaskStatusType; items: TaskStatusOption[]}) => {
+        if (!categoryId.value) throw new Error('Category ID is required');
+        if (!categoryStatusOptions.value) throw new Error('Category status options are NOT loaded yet');
+        return taskCategoryAPI.update({
+            category_id: categoryId.value,
             status_options: {
-                ...taskCategoryPageStore.getters.statusOptions,
+                ...categoryStatusOptions.value,
                 [statusType]: items,
             },
             force: true,
         });
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: taskCategoryQueryKey.value });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
-    }
+    },
+});
+
+const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOption[]) => {
+    mutate({ statusType, items });
 };
 </script>
 
