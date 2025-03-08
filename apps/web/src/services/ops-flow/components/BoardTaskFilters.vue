@@ -45,6 +45,7 @@ const {
     selectedStatusItems,
     statusMenuItemsHandler,
     setSelectedStatusItems,
+    taskStatusDropdownKey,
 } = useTaskStatusField({
     categoryId: toRef(props, 'categoryId'),
     isRequired: true,
@@ -101,6 +102,7 @@ watch(taskFilters, (newValue, oldValue) => {
                            @update:selected="handleUpdateSelectedTaskTypeItems"
         />
         <p-select-dropdown v-if="props.categoryId"
+                           :key="taskStatusDropdownKey"
                            :selected="selectedStatusItems"
                            :handler="statusMenuItemsHandler"
                            :selection-label="$t('OPSFLOW.STATUS')"

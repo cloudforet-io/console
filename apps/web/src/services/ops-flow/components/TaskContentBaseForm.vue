@@ -117,6 +117,7 @@ const {
     statusMenuItemsHandler,
     setSelectedStatusItems,
     setInitialStatus,
+    taskStatusDropdownKey,
 } = useTaskStatusField({
     categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
 });
@@ -357,6 +358,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                         {{ getStatusTypeLabel(taskContentFormState.originTask?.status_type) }}
                     </template>
                     <p-select-dropdown v-else
+                                       :key="taskStatusDropdownKey"
                                        :selected="selectedStatusItems"
                                        :handler="statusMenuItemsHandler"
                                        ::page-size="10"

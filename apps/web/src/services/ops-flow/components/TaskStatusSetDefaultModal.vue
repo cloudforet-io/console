@@ -36,7 +36,7 @@ const { targetStatusOption } = useTargetStatusOption({ categoryStatusOptions, ta
 const name = computed(() => targetStatusOption.value?.name ?? '');
 
 /* set default status */
-const { taskCategoryAPI, taskCategoryListQueryKey } = useTaskCategoryApi();
+const { taskCategoryAPI, taskCategoryListQueryKey, taskCategoryQueryKey } = useTaskCategoryApi();
 const queryClient = useQueryClient();
 const { mutate: setAsDefaultStatus, isPending } = useMutation({
     mutationFn: ({ categoryId, statusType, statusId }: { categoryId: string; statusType: TaskStatusType; statusId: string }) => {
@@ -53,8 +53,14 @@ const { mutate: setAsDefaultStatus, isPending } = useMutation({
             force: true,
         });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
+        queryClient.invalidateQueries({
+            queryKey: [
+                ...taskCategoryQueryKey.value,
+                { category_id: data.category_id },
+            ],
+        });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }), '');
         taskCategoryPageStore.closeSetDefaultStatusModal();
     },

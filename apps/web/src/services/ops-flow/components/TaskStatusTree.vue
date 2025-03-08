@@ -47,9 +47,14 @@ const { mutate } = useMutation({
             force: true,
         });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
-        queryClient.invalidateQueries({ queryKey: taskCategoryQueryKey.value });
+        queryClient.invalidateQueries({
+            queryKey: [
+                ...taskCategoryQueryKey.value,
+                { category_id: data.category_id },
+            ],
+        });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
     },
     onError: (e) => {
