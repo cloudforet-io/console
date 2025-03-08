@@ -38,7 +38,6 @@ const queryClient = useQueryClient();
 const { mutate } = useMutation({
     mutationFn: ({ statusType, items }: {statusType: TaskStatusType; items: TaskStatusOption[]}) => {
         if (!categoryId.value) throw new Error('Category ID is required');
-        if (!categoryStatusOptions.value) throw new Error('Category status options are NOT loaded yet');
         return taskCategoryAPI.update({
             category_id: categoryId.value,
             status_options: {
@@ -69,7 +68,7 @@ const handleUpdateItems = async (statusType: TaskStatusType, items: TaskStatusOp
             <task-status-list :key="taskStatus.key"
                               :type="taskStatus.key"
                               :header="taskStatus.name"
-                              :items="taskCategoryPageStore.getters.statusOptions[taskStatus.key]"
+                              :items="categoryStatusOptions[taskStatus.key]"
                               @update:items="handleUpdateItems(taskStatus.key, $event)"
             />
         </template>
