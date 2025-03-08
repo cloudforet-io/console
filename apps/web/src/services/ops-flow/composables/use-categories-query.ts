@@ -1,6 +1,4 @@
-import { computed } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery } from '@tanstack/vue-query';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
@@ -8,7 +6,7 @@ import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composab
 export const useCategoriesQuery = () => {
     const { taskCategoryAPI, taskCategoryListQueryKey } = useTaskCategoryApi();
     const { data: categories, isLoading, refetch } = useQuery({
-        queryKey: computed<QueryKey>(() => taskCategoryListQueryKey.value),
+        queryKey: taskCategoryListQueryKey,
         queryFn: async () => {
             const { results } = await taskCategoryAPI.list({ include_deleted: true });
             return results ?? [];

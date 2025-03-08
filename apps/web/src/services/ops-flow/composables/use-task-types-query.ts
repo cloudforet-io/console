@@ -1,7 +1,6 @@
 import type { Ref } from 'vue';
 import { computed } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery } from '@tanstack/vue-query';
 
 import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
@@ -16,9 +15,9 @@ export const useTaskTypesQuery = ({
 }) => {
     const { taskTypeAPI, taskTypeListQueryKey } = useTaskTypeApi();
     const { data: taskTypes, isLoading, refetch } = useQuery({
-        queryKey: computed<[QueryKey, TaskTypeListParameters]>(() => [taskTypeListQueryKey.value, queryKey.value]),
-        queryFn: async ({ queryKey: qk }) => {
-            const { results } = await taskTypeAPI.list(qk[1]);
+        queryKey: computed(() => [...taskTypeListQueryKey.value, queryKey.value]),
+        queryFn: async () => {
+            const { results } = await taskTypeAPI.list(queryKey.value);
             return results ?? [];
         },
         enabled,

@@ -3,12 +3,14 @@ import {
     ref, nextTick, watch, computed,
 } from 'vue';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { isEqual, cloneDeep } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
+import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
@@ -29,20 +31,37 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 
+
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
 const taskCategoryPageGetters = taskCategoryPageStore.getters;
 const taskTypeStore = useTaskTypeStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
+/* task type */
+const { taskTypeAPI, taskTypeQueryKey, taskTypeListQueryKey } = useTaskTypeApi();
+const queryClient = useQueryClient();
+const { data: taskType } = useQuery({
+    queryKey: computed(() => [
+        ...taskTypeQueryKey.value,
+        taskCategoryPageState.targetTaskTypeId,
+    ]),
+    queryFn: async () => {
+        if (!taskCategoryPageState.targetTaskTypeId) return null;
+        return taskTypeAPI.get({ task_type_id: taskCategoryPageState.targetTaskTypeId });
+    },
+    enabled: computed(() => taskCategoryPageState.visibleTaskTypeForm && !!taskCategoryPageState.targetTaskTypeId),
+});
+
+/* form title */
 const title = computed(() => {
-    if (taskCategoryPageGetters.targetTaskType) {
+    if (taskType.value) {
         return _i18n.t('OPSFLOW.EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
     }
     return _i18n.t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
 
-/* scope */
+/* scope field */
 type Scope = 'PROJECT'|'WORKSPACE';
 const scopeValidator = useFieldValidator<Scope>('PROJECT', (val) => {
     if (!val) {
@@ -69,7 +88,7 @@ const {
     setInitialFields,
 } = useTaskFieldsConfiguration();
 
-/* form validation */
+/* form */
 const {
     forms: { name, description, assigneePool },
     invalidState,
@@ -99,7 +118,7 @@ const {
             });
         }
         if (!taskCategoryPageGetters.taskTypes) return true;
-        const isDuplicated = taskCategoryPageGetters.taskTypes.some((taskType) => taskType.name === value && taskType.task_type_id !== taskCategoryPageGetters.targetTaskType?.task_type_id);
+        const isDuplicated = taskCategoryPageGetters.taskTypes.some((tt) => tt.name === value && tt.task_type_id !== taskType.value?.task_type_id);
         if (isDuplicated) return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { topic: _i18n.t('OPSFLOW.NAME') });
         return true;
     },
@@ -114,13 +133,6 @@ const handleClosed = () => {
     taskCategoryPageStore.resetTargetTaskTypeId();
 };
 
-const updateTaskTypeFields = async (taskTypeId: string) => {
-    await taskTypeStore.updateFields({
-        task_type_id: taskTypeId,
-        fields: fields.value.map((f) => ({ ...f, _field_id: undefined })),
-        force: true,
-    });
-};
 
 const createTaskType = async (categoryId: string) => {
     try {
@@ -138,24 +150,55 @@ const createTaskType = async (categoryId: string) => {
     }
 };
 
-const updateTaskType = async (target: TaskTypeModel) => {
-    try {
+
+/* update task type */
+const { mutateAsync: updateTaskTypeMutation } = useMutation({
+    mutationFn: taskTypeAPI.update,
+    onSuccess: () => {
+        // Invalidate task type detail and list queries
+        queryClient.invalidateQueries({ queryKey: taskTypeQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: taskTypeListQueryKey.value });
+    },
+    throwOnError: true,
+});
+const { mutateAsync: updateTaskTypeFieldsMutation } = useMutation({
+    mutationFn: taskTypeAPI.updateFields,
+    onSuccess: () => {
+        // Only invalidate task type detail query
+        queryClient.invalidateQueries({ queryKey: taskTypeQueryKey.value });
+    },
+    throwOnError: true,
+});
+const { mutateAsync: updateTaskType } = useMutation({
+    mutationFn: async (target: TaskTypeModel) => {
         const promises: Promise<any>[] = [];
-        if (target.name !== name.value
+        const hasBasicChanges = target.name !== name.value
             || target.description !== description.value
-            || !isEqual(target.assignee_pool, assigneePool.value)
-        ) {
-            promises.push(taskTypeStore.update({
+            || !isEqual(target.assignee_pool, assigneePool.value);
+
+        // Execute only if basic info has changed
+        if (hasBasicChanges) {
+            promises.push(updateTaskTypeMutation({
                 task_type_id: target.task_type_id,
                 name: name.value,
                 description: description.value,
                 assignee_pool: assigneePool.value,
             }));
         }
+
+        // Execute only if fields have changed
         if (!isEqual(fields.value, target.fields)) {
-            promises.push(updateTaskTypeFields(target.task_type_id));
+            promises.push(updateTaskTypeFieldsMutation({
+                task_type_id: target.task_type_id,
+                fields: fields.value.map((f) => ({ ...f, _field_id: undefined })),
+                force: true,
+            }));
         }
+
+        // Wait for all promises to resolve
         const result = await Promise.allSettled(promises);
+
+        // Error handling
         const errorMessages: string[] = [];
         result.forEach((res) => {
             if (res.status === 'rejected') {
@@ -165,20 +208,23 @@ const updateTaskType = async (target: TaskTypeModel) => {
         if (errorMessages.length) {
             throw new Error(errorMessages.join('\n'));
         }
+    },
+    onSuccess: () => {
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
-    }
-};
+    },
+});
 
-let initialTaskType: TaskTypeModel|undefined;
+/* event handlers */
 const handleConfirm = async () => {
     if (!isAllValid.value) return;
     try {
         if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
         loading.value = true;
-        if (initialTaskType) {
-            await updateTaskType(initialTaskType);
+        if (taskType.value) {
+            await updateTaskType(taskType.value);
         } else {
             await createTaskType(taskCategoryPageState.currentCategoryId);
         }
@@ -190,7 +236,8 @@ const handleConfirm = async () => {
     }
 };
 
-watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGetters.targetTaskType], async ([visible, target], [prevVisible]) => {
+/* form initialization */
+watch([() => taskCategoryPageState.visibleTaskTypeForm, taskType], async ([visible, tt], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -201,12 +248,11 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
             assigneePool: [],
         });
         setInitialFields([]);
-        initialTaskType = undefined;
         resetValidations();
         return;
     }
-    if (target) {
-        initialTaskType = cloneDeep(target);
+    if (tt) {
+        const target = cloneDeep(tt);
         setForm({
             name: target.name,
             scope: target.require_project ? 'PROJECT' : 'WORKSPACE',
@@ -241,7 +287,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                         />
                     </template>
                 </p-field-group>
-                <p-field-group v-if="!taskCategoryPageGetters.targetTaskType"
+                <p-field-group v-if="!taskType"
                                :label="$t('OPSFLOW.SCOPE')"
                                required
                 >
@@ -284,7 +330,7 @@ watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGe
                     <task-fields-configuration class="mt-2"
                                                :require-project="scope === 'PROJECT'"
                                                :fields="fields"
-                                               :origin-fields="taskCategoryPageGetters.targetTaskType?.fields"
+                                               :origin-fields="taskType?.fields"
                                                @update:fields="setFields"
                                                @add-field="addField"
                                                @remove-field="removeField"

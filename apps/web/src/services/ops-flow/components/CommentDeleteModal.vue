@@ -21,7 +21,7 @@ const { mutateAsync: deleteComment, isPending: isDeleting } = useMutation({
     onSuccess: () => {
         if (taskDetailPageStore.state.task) {
             queryClient.invalidateQueries({
-                queryKey: [commentListQueryKey.value, taskDetailPageStore.state.task.task_id],
+                queryKey: [...commentListQueryKey.value, taskDetailPageStore.state.task.task_id],
             });
         }
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');

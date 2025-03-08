@@ -8,7 +8,6 @@ import { useQuery } from '@tanstack/vue-query';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -20,7 +19,6 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -127,15 +125,15 @@ const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
 const { taskListQueryKey, taskAPI } = useTaskApi();
 const {
     data: tasks, error, refetch, isLoading,
-} = useQuery<TaskModel[], APIError>({
+} = useQuery({
     queryKey: computed(() => [
-        taskListQueryKey.value,
+        ...taskListQueryKey.value,
         taskListApiQuery.value,
         props.categoryId,
     ]),
-    queryFn: async ({ queryKey }) => {
+    queryFn: async () => {
         const { results } = await taskAPI.list({
-            query: queryKey[1] as Query,
+            query: taskListApiQuery.value,
         });
         return results ?? [];
     },

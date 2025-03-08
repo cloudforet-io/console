@@ -51,10 +51,10 @@ const { getTimezoneDate } = useTimezoneDate();
 const queryClient = useQueryClient();
 const { commentAPI, commentListQueryKey } = useCommentApi();
 const { data: comments } = useQuery({
-    queryKey: computed<[QueryKey, string]>(() => [commentListQueryKey.value, props.taskId]),
-    queryFn: async ({ queryKey }) => {
+    queryKey: computed<QueryKey>(() => [...commentListQueryKey.value, props.taskId]),
+    queryFn: async () => {
         const response = await commentAPI.list({
-            task_id: queryKey[1],
+            task_id: props.taskId,
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },
@@ -72,7 +72,7 @@ const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.va
 const { mutateAsync: createComment, isPending: isCreating } = useMutation({
     mutationFn: commentAPI.create,
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [commentListQueryKey.value, props.taskId] });
+        queryClient.invalidateQueries({ queryKey: [...commentListQueryKey.value, props.taskId] });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');
     },
     onError: (error) => {

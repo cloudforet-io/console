@@ -1,17 +1,12 @@
 import type { Ref } from 'vue';
 import { computed, watch } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery } from '@tanstack/vue-query';
-
-import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskListParameters } from '@/api-clients/opsflow/task/schema/api-verbs/list';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 export const useAssociatedTasksQuery = ({
     queryKey,
@@ -23,14 +18,13 @@ export const useAssociatedTasksQuery = ({
     const { taskListQueryKey, taskAPI } = useTaskApi();
     const {
         data: tasks, isLoading, isError, refetch,
-    } = useQuery<TaskModel[], APIError, TaskModel[], [QueryKey, TaskListParameters]>({
+    } = useQuery({
         queryKey: computed(() => [
-            taskListQueryKey.value,
+            ...taskListQueryKey.value,
             queryKey.value,
         ]),
-        queryFn: async ({ queryKey: qk }) => {
-            const [, params] = qk;
-            const { results } = await taskAPI.list(params);
+        queryFn: async () => {
+            const { results } = await taskAPI.list(queryKey.value);
             return results ?? [];
         },
         enabled,

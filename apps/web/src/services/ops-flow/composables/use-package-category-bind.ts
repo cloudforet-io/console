@@ -12,7 +12,7 @@ const useTaskCategoryUpdate = () => {
     const { mutateAsync: updateTaskCategory } = useMutation({
         mutationFn: taskCategoryAPI.update,
         onSuccess: (updatedCategory) => {
-            queryClient.invalidateQueries({ queryKey: [taskCategoryQueryKey.value, { category_id: updatedCategory.category_id }] });
+            queryClient.invalidateQueries({ queryKey: [...taskCategoryQueryKey.value, { category_id: updatedCategory.category_id }] });
         },
         onError: (error) => {
             ErrorHandler.handleError(error);

@@ -1,6 +1,3 @@
-import { computed } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery } from '@tanstack/vue-query';
 
 import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
@@ -10,7 +7,7 @@ import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 export const usePackagesQuery = () => {
     const { packageAPI, packageListQueryKey } = usePackageApi();
     const { data: packages, isLoading, refetch } = useQuery({
-        queryKey: computed<QueryKey>(() => packageListQueryKey.value),
+        queryKey: packageListQueryKey,
         queryFn: async () => {
             const { results } = await packageAPI.list({});
             return results as PackageModel[]|undefined;

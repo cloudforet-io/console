@@ -30,7 +30,6 @@ import {
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
-import type { QueryKey } from '@tanstack/vue-query';
 import { QueryClient, useMutation, useQuery } from '@tanstack/vue-query';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
@@ -103,8 +102,8 @@ watch(error, (err) => {
 
 /* task */
 const { taskListQueryKey, taskQueryKey, taskAPI } = useTaskApi();
-const taskDetailQueryKey = computed<QueryKey>(() => [
-    taskQueryKey.value,
+const taskDetailQueryKey = computed(() => [
+    ...taskQueryKey.value,
     props.taskId,
 ]);
 const {
@@ -112,10 +111,9 @@ const {
     isLoading: loading,
 } = useQuery<TaskModel, APIError>({
     queryKey: taskDetailQueryKey,
-    queryFn: async ({ queryKey }) => {
-        const taskId = queryKey[1] as string;
+    queryFn: async () => {
         try {
-            const result = await taskAPI.get({ task_id: taskId });
+            const result = await taskAPI.get({ task_id: props.taskId });
             return result;
         } catch (e) {
             error.value = e as APIError;

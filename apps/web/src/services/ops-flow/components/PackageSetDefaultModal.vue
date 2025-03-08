@@ -35,7 +35,7 @@ const { mutateAsync: setDefaultPackage, isPending } = useMutation({
         queryClient.invalidateQueries({ queryKey: packageListQueryKey.value });
         queryClient.invalidateQueries({
             queryKey: [
-                packageQueryKey.value,
+                ...packageQueryKey.value,
                 { package_id: data.package_id },
             ],
         });
