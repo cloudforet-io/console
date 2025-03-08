@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { nextTick, watch, computed } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,6 +23,7 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 import { useTaskTypeFormMutations } from '../composables/use-task-type-form-mutations';
+import { useTaskTypeQuery } from '../composables/use-task-type-query';
 import type { Scope } from '../composables/use-task-type-scope-field';
 import { useTaskTypeScopeField } from '../composables/use-task-type-scope-field';
 import { useTaskTypesQuery } from '../composables/use-task-types-query';
@@ -41,16 +40,8 @@ const currentCategoryId = computed(() => taskCategoryPageState.currentCategoryId
 const visibleForm = computed(() => taskCategoryPageState.visibleTaskTypeForm);
 
 /* task type */
-const { taskTypeAPI, taskTypeQueryKey } = useTaskTypeApi();
-const { data: taskType } = useQuery({
-    queryKey: computed(() => [
-        ...taskTypeQueryKey.value,
-        targetTaskTypeId.value,
-    ]),
-    queryFn: async () => {
-        if (!targetTaskTypeId.value) return null;
-        return taskTypeAPI.get({ task_type_id: targetTaskTypeId.value });
-    },
+const { taskType } = useTaskTypeQuery({
+    queryKey: computed(() => ({ task_type_id: targetTaskTypeId.value as string })),
     enabled: computed(() => visibleForm.value && !!targetTaskTypeId.value),
 });
 

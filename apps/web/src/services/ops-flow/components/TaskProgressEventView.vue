@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { asyncComputed } from '@vueuse/core';
 import { computed } from 'vue';
-
 
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { EventAdditionalInfo, EventType } from '@/api-clients/opsflow/event/schema/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
+
+import { useTaskTypeQuery } from '../composables/use-task-type-query';
 
 const props = withDefaults(defineProps<{
     eventType: EventType;
@@ -25,22 +23,19 @@ const props = withDefaults(defineProps<{
     taskTypeId: undefined,
 });
 
-const taskTypeStore = useTaskTypeStore();
 const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
-const fields = asyncComputed<TaskField[]>(async () => {
-    if (!props.taskTypeId) return [];
-    const taskMap = taskTypeStore.state.fullFieldsItemMap[props.taskTypeId];
-    if (taskMap) {
-        return taskMap.fields;
-    }
-    try {
-        await taskTypeStore.getWithFullFields(props.taskTypeId);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-    return taskTypeStore.state.fullFieldsItemMap[props.taskTypeId]?.fields ?? [];
-}, [], { lazy: true });
+/* task type */
+const { taskType } = useTaskTypeQuery({
+    queryKey: computed(() => ({ task_type_id: props.taskTypeId as string, include_category_fields: true })),
+    enabled: computed(() => !!props.taskTypeId),
+});
+
+/* fields */
+const fields = computed<TaskField[]>(() => {
+    if (!taskType.value) return [];
+    return taskType.value.fields ?? [];
+});
 const fieldNameMap = computed(() => {
     const map: Record<string, string> = {};
     taskFieldMetadataStore.getters.allDefaultFields.forEach((field) => {
@@ -52,17 +47,20 @@ const fieldNameMap = computed(() => {
     return map;
 });
 
-
+/* times */
 const { getTimezoneDate } = useTimezoneDate();
+const createdAt = computed(() => (props.additionalInfo.created_at ? getTimezoneDate(props.additionalInfo.created_at) : ''));
+const updatedAt = computed(() => (props.additionalInfo.updated_at ? getTimezoneDate(props.additionalInfo.updated_at) : ''));
+const changedAt = computed(() => (props.additionalInfo.changed_at ? getTimezoneDate(props.additionalInfo.changed_at) : ''));
 </script>
 
 <template>
     <div>
         <template v-if="props.eventType === 'CREATED'">
-            {{ props.additionalInfo.created_by || 'Unknown' }} | {{ getTimezoneDate(props.additionalInfo.created_at) }}
+            {{ props.additionalInfo.created_by || 'Unknown' }} | {{ createdAt }}
         </template>
         <template v-else-if="props.eventType === 'UPDATED'">
-            <p>{{ props.additionalInfo.updated_by || 'Unknown' }} | {{ getTimezoneDate(props.additionalInfo.updated_at) }}</p>
+            <p>{{ props.additionalInfo.updated_by || 'Unknown' }} | {{ updatedAt }}</p>
             <template v-if="props.additionalInfo.updated_data">
                 <div v-for="(d, idx) in props.additionalInfo.updated_data"
                      :key="idx"
@@ -73,7 +71,7 @@ const { getTimezoneDate } = useTimezoneDate();
             </template>
         </template>
         <template v-else-if="props.eventType === 'CHANGE_STATUS'">
-            <p>{{ props.additionalInfo.changed_by || 'Unknown' }} | {{ getTimezoneDate(props.additionalInfo.changed_at) }}</p>
+            <p>{{ props.additionalInfo.changed_by || 'Unknown' }} | {{ changedAt }}</p>
             <template v-if="props.additionalInfo.before_status">
                 [{{ $t('OPSFLOW.TASK_BOARD.BEFORE') }}] {{ props.additionalInfo.before_status.name }}({{ TASK_STATUS_LABELS[props.additionalInfo.before_status.status_type] }}) →
             </template>
