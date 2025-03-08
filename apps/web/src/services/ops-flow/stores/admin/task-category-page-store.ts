@@ -1,4 +1,3 @@
-import { asyncComputed } from '@vueuse/core';
 import {
     reactive, computed, onUnmounted, onMounted,
 } from 'vue';
@@ -6,14 +5,10 @@ import {
 import { defineStore } from 'pinia';
 
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
-
 
 interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;
@@ -39,14 +34,10 @@ interface UseTaskCategoryPageStoreGetters {
         type: TaskStatusType;
         data: TaskStatusOption;
     }|undefined;
-    // task type
-    taskTypes: TaskTypeModel[]|undefined;
-    targetTaskType: TaskTypeModel|undefined;
 }
 
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
-    const taskTypeStore = useTaskTypeStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
         currentCategoryId: undefined,
         // status
@@ -87,16 +78,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
                 type,
                 data,
             };
-        }),
-        // task type
-        taskTypes: asyncComputed<TaskTypeModel[]|undefined>(async () => {
-            if (!state.currentCategoryId) return undefined;
-            if (!taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]) await taskTypeStore.listByCategoryId(state.currentCategoryId);
-            return taskTypeStore.state.itemsByCategoryId[state.currentCategoryId];
-        }, undefined, { lazy: true, onError: ErrorHandler.handleError }),
-        targetTaskType: computed<TaskTypeModel|undefined>(() => {
-            if (!state.targetTaskTypeId) return undefined;
-            return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
         }),
     } as unknown as UseTaskCategoryPageStoreGetters;
 
