@@ -1,7 +1,3 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
@@ -13,19 +9,7 @@ import type { TaskCategoryListParameters } from '@/api-clients/opsflow/task-cate
 import type { TaskCategoryUpdateParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/update';
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 
-interface UseTaskCategoryApiReturn {
-    taskCategoryQueryKey: ComputedRef<QueryKey>;
-    taskCategoryListQueryKey: ComputedRef<QueryKey>;
-    taskCategoryAPI: {
-        create: (params: TaskCategoryCreateParameters) => Promise<TaskCategoryModel>;
-        update: (params: TaskCategoryUpdateParameters) => Promise<TaskCategoryModel>;
-        delete: (params: TaskCategoryDeleteParameters) => Promise<void>;
-        get: (params: TaskCategoryGetParameters) => Promise<TaskCategoryModel>;
-        list: (params: TaskCategoryListParameters) => Promise<ListResponse<TaskCategoryModel>>;
-    }
-}
-
-export const useTaskCategoryApi = (): UseTaskCategoryApiReturn => {
+export const useTaskCategoryApi = () => {
     const taskCategoryQueryKey = useAPIQueryKey('opsflow', 'task-category', 'get');
     const taskCategoryListQueryKey = useAPIQueryKey('opsflow', 'task-category', 'list');
 

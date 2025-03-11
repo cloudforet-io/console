@@ -1,10 +1,13 @@
+import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import { usePackagesQuery } from './use-packages-query';
 
 
-export const useDefaultPackageQuery = () => {
-    const { packages, isLoading } = usePackagesQuery();
+export const useDefaultPackageQuery = (ops?: {
+    enabled?: Ref<boolean>;
+}) => {
+    const { packages, isLoading } = usePackagesQuery(ops);
 
     const defaultPackage = computed(() => packages.value?.find((p) => p.is_default));
 
