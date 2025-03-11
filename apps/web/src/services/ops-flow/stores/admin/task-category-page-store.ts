@@ -1,13 +1,11 @@
 import {
-    reactive, onUnmounted, onMounted,
+    reactive, onUnmounted,
 } from 'vue';
 
 import { defineStore } from 'pinia';
 
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
-
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 interface UseTaskCategoryPageStoreState {
     currentCategoryId?: string;
@@ -27,7 +25,6 @@ interface UseTaskCategoryPageStoreState {
 
 
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
-    const taskCategoryStore = useTaskCategoryStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
         currentCategoryId: undefined,
         // status
@@ -110,10 +107,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
             state.targetTaskTypeId = undefined;
         },
     };
-
-    onMounted(() => {
-        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
-    });
 
 
     const disposeSelf = () => {

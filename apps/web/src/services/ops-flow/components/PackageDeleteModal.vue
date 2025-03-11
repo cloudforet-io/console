@@ -12,11 +12,17 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
+import { useAssociatedCategoriesToPackage } from '@/services/ops-flow/composables/use-associated-categories-to-package';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
+
 const taskManagementPageStore = useTaskManagementPageStore();
+
+/* associated categories */
+const { associatedCategoriesToPackage } = useAssociatedCategoriesToPackage({
+    packageId: computed(() => taskManagementPageStore.state.targetPackageId),
+});
 
 /* delete package */
 const { packageAPI, packageListQueryKey } = usePackageApi();
@@ -35,7 +41,7 @@ const { mutateAsync: deletePackage, isPending: isDeleting } = useMutation({
     },
 });
 
-const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length);
+const deletable = computed(() => !associatedCategoriesToPackage.value.length);
 const headerTitle = computed(() => (deletable.value
     ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
         object: _i18n.t('OPSFLOW.PACKAGE'),
