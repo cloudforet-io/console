@@ -63,9 +63,9 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
     const getters: UseTaskDetailPageStoreGetters = {
         // task
         task: computed<TaskModel|undefined>(() => taskContentFormStore.state.originTask),
-        isArchivedTask: computed<boolean>(() => taskContentFormStore.state.isArchivedTask),
+        isArchivedTask: computed<boolean>(() => taskContentFormStore.getters.isArchivedTask),
         // form
-        hasUnsavedChanges: computed<boolean>(() => taskContentFormStore.state.hasUnsavedChanges),
+        hasUnsavedChanges: computed<boolean>(() => taskContentFormStore.getters.hasUnsavedChanges),
         isFormValid: computed<boolean>(() => taskContentFormStore.getters.isAllValid),
         isEditable: computed<boolean>(() => taskContentFormStore.getters.isEditable),
         // events
@@ -90,7 +90,6 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
             taskContentFormStore.setCurrentTask(task);
             taskContentFormStore.setMode('view');
         },
-        updateTask: taskContentFormStore.updateTask,
         openTaskDeleteModal() {
             state.visibleTaskDeleteModal = true;
         },

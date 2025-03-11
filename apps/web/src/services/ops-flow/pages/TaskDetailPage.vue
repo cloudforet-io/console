@@ -157,7 +157,7 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
         if (!task.value) throw new Error('Origin task is not defined');
         const res = await taskAPI.update({
             task_id: task.value.task_id,
-            name: taskContentFormStore.state.defaultData[DEFAULT_FIELD_ID_MAP.title],
+            name: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.title],
         });
         return res;
     },

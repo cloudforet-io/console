@@ -46,6 +46,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 
 import TaskContentBaseForm from '@/services/ops-flow/components/TaskContentBaseForm.vue';
+import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
@@ -55,8 +56,6 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
-
-
 
 
 const taskContentFormStore = useTaskContentFormStore();
@@ -89,21 +88,24 @@ const handleClickBack = () => {
     goBack();
 };
 
+/* task type */
+const { currentTaskType } = useCurrentTaskType({ taskTypeId });
+
 /* create task */
 const { taskAPI, taskListQueryKey } = useTaskApi();
 const queryClient = new QueryClient();
 const { data: createdTask, mutateAsync: createTaskMutation, isPending: isCreating } = useMutation<TaskModel, APIError>({
     mutationFn: async () => {
-        if (!taskContentFormState.currentTaskType) throw new Error('Task type is not selected');
+        if (!currentTaskType.value) throw new Error('Task type is not selected');
         const res = await taskAPI.create({
-            task_type_id: taskContentFormState.currentTaskType.task_type_id,
-            name: taskContentFormState.defaultData[DEFAULT_FIELD_ID_MAP.title],
+            task_type_id: currentTaskType.value.task_type_id,
+            name: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.title],
             status_id: taskContentFormState.statusId as string,
-            description: taskContentFormState.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
+            description: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
             assignee: taskContentFormState.assignee || undefined,
-            data: isEmpty(taskContentFormState.data) ? undefined : taskContentFormState.data,
+            data: isEmpty(taskContentFormGetters.data) ? undefined : taskContentFormGetters.data,
             files: taskContentFormState.fileIds,
-            project_id: taskContentFormState.currentTaskType.require_project ? taskContentFormState.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
+            project_id: currentTaskType.value.require_project ? taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
         });
         return res;
     },
@@ -124,7 +126,7 @@ const {
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormState.hasUnsavedChanges || !!createdTask.value),
+    passConfirmation: computed(() => !taskContentFormGetters.hasUnsavedChanges || !!createdTask.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
@@ -140,7 +142,7 @@ const handleConfirm = async () => {
 /* lifecycle */
 onBeforeMount(() => {
     taskContentFormStore.setCurrentCategoryId(categoryId.value);
-    taskContentFormStore.setCurrentTaskType(taskTypeId.value);
+    taskContentFormStore.setCurrentTaskTypeId(taskTypeId.value);
     taskContentFormStore.setMode(taskTypeId.value ? 'create-minimal' : 'create');
 });
 onUnmounted(() => {

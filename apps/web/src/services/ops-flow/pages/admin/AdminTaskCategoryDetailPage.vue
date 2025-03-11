@@ -19,8 +19,10 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
+import {
+    computed, onBeforeMount, onUnmounted, toRef,
 // eslint-disable-next-line import/no-duplicates
-import { computed, onBeforeMount, onUnmounted } from 'vue';
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
@@ -37,6 +39,7 @@ import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
 import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
+import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
 import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
@@ -54,9 +57,13 @@ const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
+/* category */
+const { currentCategory } = useCurrentCategory({
+    categoryId: toRef(props, 'taskCategoryId'),
+});
 /* header and back button */
 const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
+const headerTitle = computed<string>(() => currentCategory.value?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,

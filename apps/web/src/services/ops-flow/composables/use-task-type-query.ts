@@ -13,7 +13,7 @@ export const useTaskTypeQuery = ({
   enabled?: Ref<boolean>;
 }) => {
     const { taskTypeAPI, taskTypeQueryKey } = useTaskTypeApi();
-    const { data: taskType } = useQuery({
+    const { data: taskType, error, isLoading } = useQuery({
         queryKey: computed(() => [
             ...taskTypeQueryKey.value,
             queryKey.value,
@@ -23,6 +23,6 @@ export const useTaskTypeQuery = ({
     });
 
     return {
-        taskType,
+        taskType, error, isLoading,
     };
 };

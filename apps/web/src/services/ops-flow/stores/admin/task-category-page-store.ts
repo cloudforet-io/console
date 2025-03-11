@@ -1,11 +1,10 @@
 import {
-    reactive, computed, onUnmounted, onMounted,
+    reactive, onUnmounted, onMounted,
 } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
@@ -26,15 +25,6 @@ interface UseTaskCategoryPageStoreState {
     visibleTaskTypeDeleteModal: boolean;
 }
 
-interface UseTaskCategoryPageStoreGetters {
-    currentCategory: TaskCategoryModel|undefined;
-    // status
-    statusOptions: TaskStatusOptions;
-    targetStatusOption: {
-        type: TaskStatusType;
-        data: TaskStatusOption;
-    }|undefined;
-}
 
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
     const taskCategoryStore = useTaskCategoryStore();
@@ -50,36 +40,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         targetTaskTypeId: undefined,
         visibleTaskTypeDeleteModal: false,
     });
-    const getters: UseTaskCategoryPageStoreGetters = {
-        currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
-        // status
-        statusOptions: computed<TaskStatusOptions>(() => {
-            const category = getters.currentCategory;
-            if (!category) {
-                return {
-                    TODO: [],
-                    IN_PROGRESS: [],
-                    COMPLETED: [],
-                };
-            }
-            return category.status_options;
-        }),
-        targetStatusOption: computed<{
-            type: TaskStatusType;
-            data: TaskStatusOption;
-        }|undefined>(() => {
-            if (!state.targetStatus) return undefined;
-            const { statusId, type } = state.targetStatus;
-            const statusOptions = getters.statusOptions;
-            if (!statusOptions) return undefined;
-            const data = statusOptions[type].find((status) => status.status_id === statusId);
-            if (!data) return undefined;
-            return {
-                type,
-                data,
-            };
-        }),
-    } as unknown as UseTaskCategoryPageStoreGetters;
 
     const actions = {
         setCurrentCategoryId(categoryId: string) {
@@ -166,7 +126,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
     });
     return {
         state,
-        getters,
         ...actions,
     };
 });

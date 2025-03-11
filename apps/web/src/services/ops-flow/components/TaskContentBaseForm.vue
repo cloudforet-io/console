@@ -36,10 +36,11 @@ import {
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 import { useCategoriesQuery } from '../composables/use-categories-query';
+import { useCurrentCategory } from '../composables/use-current-category';
+import { useCurrentTaskType } from '../composables/use-current-task-type';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
-const taskContentFormGetters = taskContentFormStore.getters;
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
 const taskDetailPageStore = useTaskDetailPageStore();
@@ -48,8 +49,18 @@ const userStore = useUserStore();
 const taskCategoryStore = useTaskCategoryStore();
 
 
+/* mode */
 const isCreateMode = computed(() => taskContentFormState.mode.startsWith('create'));
 const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
+
+/* category */
+const { currentCategory } = useCurrentCategory({
+    categoryId: computed(() => taskContentFormState.currentCategoryId),
+});
+const taskCategoryDesciprion = computed<string>(() => {
+    if (!currentCategory.value) return '';
+    return currentCategory.value.description;
+});
 
 /* category field */
 const { categories, isLoading: isCategoriesLoading } = useCategoriesQuery();
@@ -67,17 +78,14 @@ const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
     if (isEqual(items, selectedCategoryItems.value)) return;
     setForm('category', items); // set form for validation
     taskContentFormStore.setCurrentCategoryId(items[0].name); // set current category id to store for other fields
-    const category = taskContentFormGetters.currentCategory;
+    const category = currentCategory.value;
     if (!category) {
         ErrorHandler.handleError(new Error('Failed to get category'));
         return;
     }
     initRelatedFieldsByCategorySelection(category);
 };
-const taskCategoryDesciprion = computed<string>(() => {
-    if (!taskContentFormGetters.currentCategory) return '';
-    return taskContentFormGetters.currentCategory.description;
-});
+
 
 /* task type field */
 const {
@@ -87,26 +95,28 @@ const {
     setInitialTaskType,
     taskTypesDropdownKey,
 } = useTaskTypeField({
-    categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
+    categoryId: computed(() => currentCategory.value?.category_id),
     isRequired: true,
+});
+const { currentTaskType, isLoading: isTaskTypeLoading } = useCurrentTaskType({
+    taskTypeId: computed(() => selectedTaskTypeItems[0]?.name),
 });
 const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => {
     if (isEqual(items, selectedTaskTypeItems)) return;
     setForm('taskType', items); // set form for validation
-    await taskContentFormStore.setCurrentTaskType(items[0].name); // set current task type to store for other fields
-    const taskType = taskContentFormState.currentTaskType;
-    const category = taskContentFormGetters.currentCategory;
+    await taskContentFormStore.setCurrentTaskTypeId(items[0].name); // set current task type to store for other fields
+    const category = currentCategory.value;
     if (items.length > 0 && !category) {
         ErrorHandler.handleError(new Error('Failed to get category'));
         return;
     }
-    if (category && taskType) {
-        initRelatedFieldsByTaskTypeSelection(category, taskType);
+    if (category && currentTaskType.value) {
+        initRelatedFieldsByTaskTypeSelection(category, currentTaskType.value);
     }
 };
 const taskTypeDescription = computed<string>(() => {
-    if (!taskContentFormState.currentTaskType) return '';
-    return taskContentFormState.currentTaskType.description;
+    if (!currentTaskType.value) return '';
+    return currentTaskType.value.description;
 });
 
 /* status */
@@ -119,7 +129,7 @@ const {
     setInitialStatus,
     taskStatusDropdownKey,
 } = useTaskStatusField({
-    categoryId: computed(() => taskContentFormGetters.currentCategory?.category_id),
+    categoryId: computed(() => currentCategory.value?.category_id),
 });
 const getStatusTypeLabel = (statusType?: TaskStatusType) => (statusType ? TASK_STATUS_LABELS[statusType] : '--');
 const changeStatus = async (statusId: string) => {
@@ -149,7 +159,7 @@ const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
 
 /* assignee */
 const handleClickAssign = () => {
-    if (!taskContentFormState.currentTaskType) {
+    if (!currentTaskType.value) {
         ErrorHandler.handleError(new Error('Task type is not selected'));
         return;
     }
@@ -157,7 +167,7 @@ const handleClickAssign = () => {
         ErrorHandler.handleError(new Error('Origin task is not defined'));
         return;
     }
-    taskAssignStore.openAssignModal(taskContentFormState.originTask.task_id, taskContentFormState.originTask.assignee, taskContentFormState.currentTaskType.assignee_pool);
+    taskAssignStore.openAssignModal(taskContentFormState.originTask.task_id, taskContentFormState.originTask.assignee, currentTaskType.value.assignee_pool);
 };
 const assigneeName = computed<string>(() => {
     const userId = taskContentFormState.originTask?.assignee;
@@ -215,9 +225,8 @@ const initForViewMode = async (task?: TaskModel) => {
     setInitialCategory(task.category_id);
     taskContentFormStore.setCurrentCategoryId(task.category_id);
     // set task type
-    await taskContentFormStore.setCurrentTaskType(task.task_type_id);
-    const taskType = taskContentFormState.currentTaskType;
-    setInitialTaskType(taskType);
+    await taskContentFormStore.setCurrentTaskTypeId(task.task_type_id);
+    setInitialTaskType(currentTaskType.value);
     // set status
     const category = await taskCategoryStore.get(task.category_id);
     if (category) {
@@ -236,7 +245,7 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 
     setInitialCategory(categoryId);
     // init selected status
-    const category = taskContentFormGetters.currentCategory;
+    const category = currentCategory.value;
     if (category) {
         const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
         setInitialStatus(defaultStatus);
@@ -269,7 +278,7 @@ viewModeInitWatchStop = watch([() => taskContentFormState.originTask, isCategori
 
     if (!isCreateMode.value) await initForViewMode(task);
 }, { immediate: true });
-createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, () => taskContentFormState.currentTaskType, isCategoriesLoading], async ([categoryId, taskType, categoriesLoading]) => {
+createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, currentTaskType, isCategoriesLoading], async ([categoryId, taskType, categoriesLoading]) => {
     if (categoriesLoading) return; // wait for categories to be loaded
 
     if (hasInitiated && createModeInitWatchStop) {
@@ -291,7 +300,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                class="flex flex-wrap"
                :class="isCreateMode ? '' : 'py-6 px-4'"
     >
-        <div v-if="!taskContentFormState.isArchivedTask"
+        <div v-if="!taskContentFormStore.getters.isArchivedTask"
              class="w-full"
         >
             <div class="base-form-top-wrapper">
@@ -327,7 +336,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                                :handler="taskTypeMenuItemsHandler"
                                                :page-size="10"
                                                :invalid="invalid"
-                                               :readonly="!isCreateMode || !taskContentFormGetters.currentCategory"
+                                               :readonly="!isCreateMode || !currentCategory"
                                                block
                                                @update:selected="handleUpdateSelectedTaskType"
                             />
@@ -351,10 +360,10 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                :invalid="invalidState.status"
                                :invalid-text="invalidTexts.status"
                 >
-                    <p-skeleton v-if="!taskContentFormState.hasTaskTypeLoaded"
+                    <p-skeleton v-if="isTaskTypeLoading"
                                 height="2rem"
                     />
-                    <template v-else-if="taskContentFormState.isArchivedTask">
+                    <template v-else-if="taskContentFormStore.getters.isArchivedTask">
                         {{ getStatusTypeLabel(taskContentFormState.originTask?.status_type) }}
                     </template>
                     <p-select-dropdown v-else
@@ -363,7 +372,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                                        :handler="statusMenuItemsHandler"
                                        ::page-size="10"
                                        :invalid="invalidState.status"
-                                       :readonly="!userStore.getters.isDomainAdmin || !taskContentFormGetters.currentCategory"
+                                       :readonly="!userStore.getters.isDomainAdmin || !currentCategory"
                                        block
                                        @update:selected="handleUpdateSelectedStatus"
                     >
@@ -393,7 +402,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, (
                         >
                             {{ userStore.getters.isDomainAdmin ? $t('OPSFLOW.TASK_BOARD.ASSIGN_TO') : $t('OPSFLOW.ASSIGNEE') }}
                         </p-field-title>
-                        <p-button v-if="userStore.getters.isDomainAdmin && !taskContentFormState.isArchivedTask"
+                        <p-button v-if="userStore.getters.isDomainAdmin && !taskContentFormStore.getters.isArchivedTask"
                                   size="sm"
                                   style-type="tertiary"
                                   @click="handleClickAssign"

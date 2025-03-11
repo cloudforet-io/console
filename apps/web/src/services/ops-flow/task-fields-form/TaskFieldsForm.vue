@@ -26,7 +26,10 @@ const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 
+/* fields for rendering */
 const isEditableFieldInViewMode = (fieldId: string) => fieldId === DEFAULT_FIELD_ID_MAP.title;
+
+/* fields form */
 onUnmounted(() => {
     taskContentFormStore.resetFieldsForm();
 });
@@ -39,7 +42,7 @@ onUnmounted(() => {
                    v-for="field in taskContentFormGetters.defaultFields"
                    :key="field.field_id"
                    :field="field"
-                   :value="taskContentFormState.defaultData[field.field_id]"
+                   :value="taskContentFormGetters.defaultData[field.field_id]"
                    :readonly="taskContentFormState.mode === 'view' ? !(taskContentFormGetters.isEditable && isEditableFieldInViewMode(field.field_id)) : false"
                    :files="taskContentFormState.originTask?.files"
                    :references="taskContentFormGetters.references"
@@ -49,10 +52,10 @@ onUnmounted(() => {
         />
         <!-- Dynamic Fields -->
         <component :is="COMPONENT_MAP[field.field_type] ?? UnknownTaskField"
-                   v-for="field in taskContentFormGetters.currentFields"
+                   v-for="field in taskContentFormGetters.fieldsToShow"
                    :key="field.field_id"
                    :field="field"
-                   :value="taskContentFormState.data[field.field_id]"
+                   :value="taskContentFormGetters.data[field.field_id]"
                    :readonly="taskContentFormState.mode === 'view'"
                    :files="taskContentFormState.originTask?.files"
                    :references="taskContentFormGetters.references"
