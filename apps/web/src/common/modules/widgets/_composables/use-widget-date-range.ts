@@ -39,7 +39,7 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
     const state = reactive<UseWidgetDateRangeState>({
         granularity: computed<GranularityValue['granularity']>(() => _granularityInfo.value?.granularity ?? 'MONTHLY'),
         isInherit: computed<boolean>(() => !!options.dateRangeFieldValue.value?.inherit),
-        dateRangeOptions: computed<DateRangeValue['options']>(() => options.dateRangeFieldValue.value?.options || 'auto'),
+        dateRangeOptions: computed<DateRangeValue['options']>(() => options.dateRangeFieldValue.value?.options || { value: 'auto' }),
         baseOnDate: computed<string|undefined>(() => (state.isInherit ? _baseOnDate.value : undefined)),
         dateRange: computed<DateRange>(() => {
             const dateRangePresetKey = state.dateRangeOptions?.value || 'auto';
@@ -123,7 +123,7 @@ export const useWidgetDateRange = (options: UseWidgetDateRangeOptions): UseWidge
                 const _date = baseDate.date();
                 const isEndOfMonth = _date === baseDate.endOf('month').date();
 
-                _start = baseDate.subtract(isEndOfMonth ? baseMonthDayCount - 1 : 29, 'day').format('YYYY-MM-DD');
+                _start = isEndOfMonth ? baseDate.subtract(baseMonthDayCount - 1, 'day').format('YYYY-MM-DD') : baseDate.subtract(1, 'month').add(1, 'day').format('YYYY-MM-DD');
                 _end = baseDate.format('YYYY-MM-DD');
             } else if (relativeDateRangeValue === 'today') {
                 _start = baseDate.format('YYYY-MM-DD');
