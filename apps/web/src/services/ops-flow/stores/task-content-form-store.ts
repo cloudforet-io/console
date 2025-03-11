@@ -16,10 +16,10 @@ import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configu
 import type { References } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 
 interface UseTaskContentFormStoreState {
-    originTask?: TaskModel;
     // base form
     currentCategoryId?: string;
     currentTaskTypeId?: string;
+    currentTaskId?: string;
     currentTaskType?: TaskTypeModel;
     statusId?: string;
     assignee?: string;
@@ -46,10 +46,10 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
     const userStore = useUserStore();
 
     const state = reactive<UseTaskContentFormStoreState>({
-        originTask: undefined,
         // base form
         currentCategoryId: undefined,
         currentTaskTypeId: undefined,
+        currentTaskId: undefined,
         currentTaskType: undefined,
         statusId: undefined,
         assignee: undefined,
@@ -91,16 +91,15 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         defaultData,
         data,
         // overall
+        isArchivedTask,
         isAllValid: computed<boolean>(() => {
             if (state.mode === 'view') return getters.isDefaultFieldValid;
             return state.isBaseFormValid && getters.isDefaultFieldValid && getters.isFieldValid;
         }),
         isEditable: computed<boolean>(() => {
             if (state.mode === 'create' || state.mode === 'create-minimal') return true;
-            if (!state.originTask) return true;
             if (isArchivedTask.value) return false;
             if (userStore.getters.isDomainAdmin) return true;
-            // if (state.originTask.created_by === userStore.state.userId) return true;
             return false;
         }),
         references: computed<References>(() => {
@@ -121,24 +120,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         setCurrentTaskTypeId(typeId?: string) {
             state.currentTaskTypeId = typeId;
         },
-        setCurrentTask(task: TaskModel) {
-            state.originTask = task;
-            state.currentCategoryId = task.category_id;
-            actions.setCurrentTaskTypeId(task.task_type_id);
-            state.statusId = task.status_id;
-            state.assignee = task.assignee;
-            initDefaultFieldData(task);
-            initFieldData(task);
-            state.fileIds = task.files?.map((f) => f.file_id) ?? [];
+        setCurrentTaskId(taskId?: string) {
+            state.currentTaskId = taskId;
         },
         // base form
         setStatusId(statusId?: string) {
             state.statusId = statusId;
-        },
-        setAssigneeToOriginTask(assignee: string) {
-            if (state.originTask) {
-                state.originTask = { ...state.originTask, assignee };
-            }
         },
         setIsBaseFormValid(isValid: boolean) {
             state.isBaseFormValid = isValid;
@@ -165,6 +152,16 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         resetUnsavedChanges() {
             resetUnsavedFieldsChanges();
             state.hasFileIdsChanged = false;
+        },
+        reset(task: TaskModel) {
+            state.currentCategoryId = task.category_id;
+            state.currentTaskTypeId = task.task_type_id;
+            state.currentTaskId = task.task_id;
+            state.statusId = task.status_id;
+            state.assignee = task.assignee;
+            initDefaultFieldData(task);
+            initFieldData(task);
+            state.fileIds = task.files?.map((f) => f.file_id) ?? [];
         },
     };
 

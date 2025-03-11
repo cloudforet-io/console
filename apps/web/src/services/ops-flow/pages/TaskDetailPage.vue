@@ -2,7 +2,6 @@
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 
-
 interface IInstance extends ComponentPublicInstance {
     setPathFrom(from: any): void;
 }
@@ -30,7 +29,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
-import { QueryClient, useMutation, useQuery } from '@tanstack/vue-query';
+import { QueryClient, useMutation } from '@tanstack/vue-query';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
@@ -56,16 +55,17 @@ import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vu
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
+import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
+import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
-import { DEFAULT_FIELD_ID_MAP } from '../task-fields-configuration/constants/default-field-constant';
 
 const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
 const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
@@ -101,29 +101,10 @@ watch(error, (err) => {
 });
 
 /* task */
-const { taskListQueryKey, taskQueryKey, taskAPI } = useTaskApi();
-const taskDetailQueryKey = computed(() => [
-    ...taskQueryKey.value,
-    props.taskId,
-]);
-const {
-    data: task,
-    isLoading: loading,
-} = useQuery<TaskModel, APIError>({
-    queryKey: taskDetailQueryKey,
-    queryFn: async () => {
-        try {
-            const result = await taskAPI.get({ task_id: props.taskId });
-            return result;
-        } catch (e) {
-            error.value = e as APIError;
-            throw e;
-        }
-    },
+const { taskListQueryKey, taskAPI } = useTaskApi();
+const { task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask } = useTaskQuery({
+    queryKey: computed(() => ({ task_id: props.taskId })),
     enabled: computed(() => !!props.taskId && !!pathFrom.value),
-    retry: false,
-    gcTime: 0,
-    staleTime: 0,
 });
 
 /* header and back button */
@@ -174,7 +155,7 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
 
 /* form button handling */
 const handleSaveChanges = async () => {
-    if (!taskDetailPageStore.getters.isFormValid) return;
+    if (!taskContentFormStore.getters.isAllValid) return;
     await updateTaskMutation();
 };
 
@@ -185,7 +166,7 @@ const {
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskDetailPageStore.getters.hasUnsavedChanges || isSuccess.value),
+    passConfirmation: computed(() => !taskContentFormStore.getters.hasUnsavedChanges || isSuccess.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
@@ -199,7 +180,11 @@ watch(task, (t) => {
     if (route.hash === '#progress') {
         activeTab.value = 'progress';
     }
-    taskDetailPageStore.setCurrentTask(t);
+    taskContentFormStore.reset(t);
+});
+watch(() => props.taskId, (id) => {
+    if (!id) return;
+    taskDetailPageStore.setTargetTaskId(id);
 });
 
 /* expose */
@@ -213,7 +198,7 @@ defineExpose({ setPathFrom });
                 <p-heading show-back-button
                            @click-back-button="goBack"
                 >
-                    <p-skeleton v-if="loading"
+                    <p-skeleton v-if="isLoadingTask"
                                 height="1.75rem"
                                 width="12rem"
                     />
@@ -231,7 +216,7 @@ defineExpose({ setPathFrom });
                 </p-button>
             </template>
         </p-heading-layout>
-        <p v-if="taskDetailPageStore.getters.isArchivedTask"
+        <p v-if="taskContentFormStore.getters.isArchivedTask"
            class="px-4 mb-6 text-label-md text-gray-600"
         >
             {{ $t('OPSFLOW.TASK_BOARD.ARCHIVED_TASK_DESC', {
@@ -254,7 +239,7 @@ defineExpose({ setPathFrom });
                         <task-progress-tab :task-id="props.taskId" />
                     </template>
                 </p-tab>
-                <div v-if="activeTab === 'content' && taskDetailPageStore.getters.isEditable"
+                <div v-if="activeTab === 'content' && taskContentFormStore.getters.isEditable"
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
@@ -265,7 +250,7 @@ defineExpose({ setPathFrom });
                     </p-button>
                     <p-button style-type="primary"
                               :loading="isUpdating"
-                              :disabled="!taskDetailPageStore.getters.hasUnsavedChanges || !taskDetailPageStore.getters.isFormValid"
+                              :disabled="!taskContentFormStore.getters.hasUnsavedChanges || !taskContentFormStore.getters.isAllValid"
                               @click="handleSaveChanges"
                     >
                         {{ $t('COMMON.BUTTONS.CONFIRM') }}

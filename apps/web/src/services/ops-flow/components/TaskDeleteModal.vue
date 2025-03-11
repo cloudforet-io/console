@@ -27,10 +27,10 @@ const loading = ref<boolean>(false);
 let hasDeleted = false;
 const deleteTask = async () => {
     try {
-        if (!taskDetailPageStore.getters.task) throw new Error('task is not defined');
+        if (!taskDetailPageStore.state.targetTaskId) throw new Error('task is not defined');
         loading.value = true;
         await SpaceConnector.clientV2.opsflow.task.delete<TaskDeleteParameters, TaskModel>({
-            task_id: taskDetailPageStore.getters.task.task_id,
+            task_id: taskDetailPageStore.state.targetTaskId,
         });
         hasDeleted = true;
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string, '');

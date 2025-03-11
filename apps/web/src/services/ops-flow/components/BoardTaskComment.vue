@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-    ref, computed,
-} from 'vue';
+import { ref, computed } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
@@ -27,6 +25,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
+
+import { useTaskEventsQuery } from '../composables/use-task-events-query';
+
 
 const props = defineProps<{
     taskId: string;
@@ -68,6 +69,12 @@ const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.va
     data: comment,
 })) ?? []);
 
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => props.taskId),
+    fetchOnCreation: false,
+});
+
 /* add comment */
 const { mutateAsync: createComment, isPending: isCreating } = useMutation({
     mutationFn: commentAPI.create,
@@ -85,7 +92,7 @@ const addCommentAndApplyToEvents = async (comment: string) => {
         task_id: props.taskId,
         comment,
     });
-    await taskDetailPageStore.loadNewEvents();
+    await refetchEvents();
 };
 
 /* comment form */
@@ -160,7 +167,7 @@ const handleClickAddComment = () => {
                                         size="sm"
                                         class="flex-shrink-0"
                                         :menu="['delete']"
-                                        @delete="taskDetailPageStore.openCommentDeleteModal(data)"
+                                        @delete="taskDetailPageStore.openCommentDeleteModal(data.comment_id)"
                     />
                 </div>
             </template>

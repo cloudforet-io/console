@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -27,22 +28,23 @@ import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categori
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
 import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
+import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
-import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
+import { useTaskEventsQuery } from '../composables/use-task-events-query';
 
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
-const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
 
@@ -59,6 +61,21 @@ const taskCategoryDesciprion = computed<string>(() => {
     if (!currentCategory.value) return '';
     return currentCategory.value.description;
 });
+
+/* task */
+const { task: originTask, setQueryData: setOriginTaskQueryData } = useTaskQuery({
+    queryKey: computed(() => ({
+        task_id: taskContentFormState.currentTaskId as string,
+    })),
+    enabled: computed(() => taskContentFormState.currentTaskId !== undefined),
+});
+
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => taskContentFormState.currentTaskId),
+    fetchOnCreation: false,
+});
+
 
 /* category field */
 const { categories, isLoading: isCategoriesLoading } = useCategoriesQuery();
@@ -118,7 +135,6 @@ const taskTypeDescription = computed<string>(() => {
 });
 
 /* status */
-const { taskAPI } = useTaskApi();
 const {
     selectedStatusItems,
     taskStatusValidator,
@@ -130,28 +146,38 @@ const {
     categoryId: computed(() => currentCategory.value?.category_id),
 });
 const getStatusTypeLabel = (statusType?: TaskStatusType) => (statusType ? TASK_STATUS_LABELS[statusType] : '--');
-const changeStatus = async (statusId: string) => {
-    try {
-        if (!taskContentFormState.originTask) {
-            throw new Error('Origin task is not defined');
-        }
-        await taskAPI.changeStatus({
-            task_id: taskContentFormState.originTask.task_id,
-            status_id: statusId,
-        });
+const { taskAPI } = useTaskApi();
+const { mutateAsync: changeStatus } = useMutation({
+    mutationFn: ({ taskId, statusId }: {
+        taskId: string;
+        statusId: string;
+    }) => taskAPI.changeStatus({
+        task_id: taskId,
+        status_id: statusId,
+    }),
+    onSuccess: (newTask: TaskModel) => {
+        setOriginTaskQueryData(newTask);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
-    }
-};
+    },
+});
 const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
     const statusId = items[0].name;
     if (taskContentFormState.statusId === statusId) return;
     taskContentFormStore.setStatusId(statusId);
     setSelectedStatusItems(items);
     if (!isCreateMode.value) { // only for view mode
-        await changeStatus(statusId);
-        await taskDetailPageStore.loadNewEvents();
+        if (!taskContentFormState.currentTaskId) {
+            ErrorHandler.handleRequestError(new Error('Task id is not defined'), 'Failed to update status', true);
+            return;
+        }
+        await changeStatus({
+            taskId: taskContentFormState.currentTaskId,
+            statusId,
+        });
+        await refetchEvents();
     }
 };
 
@@ -161,14 +187,14 @@ const handleClickAssign = () => {
         ErrorHandler.handleError(new Error('Task type is not selected'));
         return;
     }
-    if (!taskContentFormState.originTask) {
+    if (!originTask.value) {
         ErrorHandler.handleError(new Error('Origin task is not defined'));
         return;
     }
-    taskAssignStore.openAssignModal(taskContentFormState.originTask.task_id, taskContentFormState.originTask.assignee, currentTaskType.value.assignee_pool);
+    taskAssignStore.openAssignModal(originTask.value.task_id, originTask.value.assignee, currentTaskType.value.assignee_pool);
 };
 const assigneeName = computed<string>(() => {
-    const userId = taskContentFormState.originTask?.assignee;
+    const userId = originTask.value?.assignee;
     if (!userId) return '--';
     const user = userReferenceStore.getters.userItems[userId];
     return user?.label || user?.name || userId;
@@ -264,7 +290,7 @@ const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) 
 let viewModeInitWatchStop;
 let createModeInitWatchStop;
 
-viewModeInitWatchStop = watch([() => taskContentFormState.originTask, isCategoriesLoading], async ([task, categoriesLoading]) => {
+viewModeInitWatchStop = watch([originTask, isCategoriesLoading], async ([task, categoriesLoading]) => {
     if (categoriesLoading) return; // wait for categories to be loaded
 
     if (hasInitiated && viewModeInitWatchStop) {
@@ -361,7 +387,7 @@ createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, c
                                 height="2rem"
                     />
                     <template v-else-if="taskContentFormStore.getters.isArchivedTask">
-                        {{ getStatusTypeLabel(taskContentFormState.originTask?.status_type) }}
+                        {{ getStatusTypeLabel(originTask?.status_type) }}
                     </template>
                     <p-select-dropdown v-else
                                        :key="taskStatusDropdownKey"

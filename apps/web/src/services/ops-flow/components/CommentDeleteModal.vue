@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useCommentApi } from '@/api-clients/opsflow/comment/composables/use-comment-api';
@@ -9,38 +11,51 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 
+
 const taskDetailPageStore = useTaskDetailPageStore();
+
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => taskDetailPageStore.state.targetTaskId),
+    fetchOnCreation: false,
+});
 
 /* delete comment */
 const queryClient = useQueryClient();
 const { commentAPI, commentListQueryKey } = useCommentApi();
 const { mutateAsync: deleteComment, isPending: isDeleting } = useMutation({
-    mutationFn: commentAPI.delete,
-    onSuccess: () => {
-        if (taskDetailPageStore.state.task) {
-            queryClient.invalidateQueries({
-                queryKey: [...commentListQueryKey.value, taskDetailPageStore.state.task.task_id],
-            });
-        }
+    mutationFn: ({ commentId }: {commentId: string; taskId: string}) => commentAPI.delete({ comment_id: commentId }),
+    onSuccess: (data, { taskId }) => {
+        queryClient.invalidateQueries({
+            queryKey: [...commentListQueryKey.value, taskId],
+        });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');
+        refetchEvents();
     },
     onError: (error) => {
         ErrorHandler.handleRequestError(error, i18n.t('OPSFLOW.ERR_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
+    },
+    onSettled: () => {
+        taskDetailPageStore.closeCommentDeleteModal();
     },
 });
 
 /* modal event handlers */
 const handleConfirm = async () => {
-    try {
-        if (!taskDetailPageStore.state.targetComment) throw new Error('targetComment is not defined');
-
-        await deleteComment({ comment_id: taskDetailPageStore.state.targetComment.comment_id });
-        await taskDetailPageStore.loadNewEvents();
-    } finally {
-        taskDetailPageStore.closeCommentDeleteModal();
+    if (!taskDetailPageStore.state.targetCommentId) {
+        ErrorHandler.handleRequestError(new Error('targetCommentId is not defined'), 'Error occurred before deleting comment', true);
+        return;
     }
+    if (!taskDetailPageStore.state.targetTaskId) {
+        ErrorHandler.handleRequestError(new Error('targetTaskId is not defined'), 'Error occurred before deleting comment', true);
+        return;
+    }
+
+    await deleteComment({ commentId: taskDetailPageStore.state.targetCommentId, taskId: taskDetailPageStore.state.targetTaskId });
+    await refetchEvents();
 };
 </script>
 
