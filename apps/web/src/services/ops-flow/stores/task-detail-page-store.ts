@@ -1,12 +1,8 @@
-import { reactive, onUnmounted } from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
 import type { EventModel } from '@/api-clients/opsflow/event/schema/model';
-
-
-import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
-
 
 interface UseTaskDetailPageStoreState {
     // task
@@ -24,7 +20,6 @@ interface UseTaskDetailPageStoreState {
 
 
 export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
-    const taskContentFormStore = useTaskContentFormStore();
     const state = reactive<UseTaskDetailPageStoreState>({
         targetTaskId: undefined,
         visibleTaskDeleteModal: false,
@@ -60,16 +55,6 @@ export const useTaskDetailPageStore = defineStore('task-detail-page', () => {
         },
     };
 
-    const disposeSelf = () => {
-        const store = useTaskDetailPageStore();
-        store.$reset();
-        store.$dispose();
-    };
-    onUnmounted(() => {
-        disposeSelf();
-        taskContentFormStore.$reset();
-        taskContentFormStore.$dispose();
-    });
     return {
         state,
         ...actions,

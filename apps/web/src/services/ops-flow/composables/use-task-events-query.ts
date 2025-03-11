@@ -34,7 +34,7 @@ export const useTaskEventsQuery = ({
         ]),
         queryFn: async ({ pageParam = 1 }) => {
             try {
-                listEventsQueryHelper.setPage(pageParam, EVENT_PAGE_SIZE);
+                listEventsQueryHelper.setPage((pageParam - 1) * EVENT_PAGE_SIZE + 1, EVENT_PAGE_SIZE);
                 const res = await eventAPI.list({
                     task_id: taskId.value,
                     query: listEventsQueryHelper.dataV2,

@@ -58,10 +58,22 @@ import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
 
+/* glob stores */
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
+
+/* scoped stores */
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
-const taskManagementTemplateStore = useTaskManagementTemplateStore();
+onBeforeMount(() => {
+    taskContentFormStore.setCurrentCategoryId(categoryId.value);
+    taskContentFormStore.setCurrentTaskTypeId(taskTypeId.value);
+    taskContentFormStore.setMode(taskTypeId.value ? 'create-minimal' : 'create');
+});
+onUnmounted(() => {
+    taskContentFormStore.$reset();
+    taskContentFormStore.$dispose();
+});
 
 /* route and query */
 const router = useRouter();
@@ -137,17 +149,6 @@ const handleConfirm = async () => {
         goBack();
     }
 };
-
-/* lifecycle */
-onBeforeMount(() => {
-    taskContentFormStore.setCurrentCategoryId(categoryId.value);
-    taskContentFormStore.setCurrentTaskTypeId(taskTypeId.value);
-    taskContentFormStore.setMode(taskTypeId.value ? 'create-minimal' : 'create');
-});
-onUnmounted(() => {
-    taskContentFormStore.$reset();
-    taskContentFormStore.$dispose();
-});
 
 /* expose */
 defineExpose({ setPathFrom });

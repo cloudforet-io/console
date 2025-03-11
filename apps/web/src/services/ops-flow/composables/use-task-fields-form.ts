@@ -47,11 +47,11 @@ export const useTaskFieldsForm = ({
         if (mode.value === 'view') return defaultDataValidationMap.value[DEFAULT_FIELD_ID_MAP.title] ?? true;
         return defaultFields.value.every((field) => defaultDataValidationMap.value[field.field_id]);
     });
-    const setDefaultFieldData = (fieldId: DefaultTaskFieldId, value: string) => {
+    const setDefaultFieldData = (fieldId: string, value: string) => {
         hasUnsavedFieldsChanges.value = defaultData.value[fieldId] !== value;
         defaultData.value[fieldId] = value;
     };
-    const setDefaultFieldValidation = (fieldId: DefaultTaskFieldId, isValid: boolean) => {
+    const setDefaultFieldValidation = (fieldId: string, isValid: boolean) => {
         defaultDataValidationMap.value[fieldId] = isValid;
     };
     const initDefaultFieldData = (task?: TaskModel) => {

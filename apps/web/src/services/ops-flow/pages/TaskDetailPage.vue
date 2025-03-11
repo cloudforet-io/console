@@ -56,6 +56,7 @@ import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vu
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
 import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
@@ -67,7 +68,6 @@ import {
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
 
-
 const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
 const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
 
@@ -76,10 +76,19 @@ const props = defineProps<{
     taskId: string;
 }>();
 
+/* glob stores */
+const userStore = useUserStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
+
+/* scoped stores */
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskContentFormStore = useTaskContentFormStore();
-const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const userStore = useUserStore();
+onUnmounted(() => {
+    taskDetailPageStore.$reset();
+    taskDetailPageStore.$dispose();
+    taskContentFormStore.$reset();
+    taskContentFormStore.$dispose();
+});
 
 /* route */
 const router = useRouter();
@@ -154,10 +163,17 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
     },
 });
 
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => props.taskId),
+    fetchOnCreation: false,
+});
+
 /* form button handling */
 const handleSaveChanges = async () => {
     if (!taskContentFormStore.getters.isAllValid) return;
     await updateTaskMutation();
+    refetchEvents();
 };
 
 /* confirm leave modal */
@@ -170,12 +186,6 @@ const {
     passConfirmation: computed(() => !taskContentFormStore.getters.hasUnsavedChanges || isSuccess.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
-
-/* store lifecycle */
-onUnmounted(() => {
-    taskDetailPageStore.$reset();
-    taskDetailPageStore.$dispose();
-});
 
 /* init */
 watch(task, (t) => {
