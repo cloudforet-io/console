@@ -12,10 +12,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TaskStatusList from '@/services/ops-flow/components/TaskStatusList.vue';
+import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 
-import { useCategoryStatusOptions } from '../composables/use-category-status-options';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 

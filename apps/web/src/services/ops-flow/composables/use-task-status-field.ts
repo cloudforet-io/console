@@ -46,6 +46,7 @@ export const useTaskStatusField = ({
     const { categoryStatusOptions } = useCategoryStatusOptions({ categoryId });
     const allStatusItems = computed<StatusItem[]>(() => {
         const items: StatusItem[] = [];
+        if (!categoryStatusOptions.value) return items;
         items.push({ type: 'header', label: TASK_STATUS_LABELS.TODO, name: 'to-do' });
         items.push({ type: 'divider', name: 'todo-div' });
         categoryStatusOptions.value.TODO.forEach((status) => {
@@ -79,6 +80,7 @@ export const useTaskStatusField = ({
                 color: status.color,
             }]);
         }
+        taskStatusValidator.resetValidation();
     };
 
     // taskStatusDropdownKey is for the dropdown component to re-render when the allStatusItems value changes

@@ -9,8 +9,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
@@ -26,8 +24,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
+import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
 import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
 import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
 import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
@@ -38,7 +38,6 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-import { useTaskEventsQuery } from '../composables/use-task-events-query';
 
 
 const taskContentFormStore = useTaskContentFormStore();
@@ -51,19 +50,10 @@ const userStore = useUserStore();
 
 /* mode */
 const isCreateMode = computed(() => taskContentFormState.mode.startsWith('create'));
-const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
-
-/* category */
-const { currentCategory } = useCurrentCategory({
-    categoryId: computed(() => taskContentFormState.currentCategoryId),
-});
-const taskCategoryDesciprion = computed<string>(() => {
-    if (!currentCategory.value) return '';
-    return currentCategory.value.description;
-});
+// const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
 
 /* task */
-const { task: originTask, setQueryData: setOriginTaskQueryData } = useTaskQuery({
+const { task: originTask, isLoading: isOriginTaskLoading, setQueryData: setOriginTaskQueryData } = useTaskQuery({
     queryKey: computed(() => ({
         task_id: taskContentFormState.currentTaskId as string,
     })),
@@ -78,9 +68,10 @@ const { refetch: refetchEvents } = useTaskEventsQuery({
 
 
 /* category field */
-const { categories, isLoading: isCategoriesLoading } = useCategoriesQuery();
+const { categories } = useCategoriesQuery();
 const {
     selectedCategoryItems,
+    setSelectedCategoryItems,
     categoryValidator,
     categoryMenuItemsHandler,
     setInitialCategory,
@@ -89,22 +80,33 @@ const {
     hasTaskTypeOnly: true,
     categories,
 });
-const handleUpdateSelectedCategory = (items: SelectDropdownMenuItem[]) => {
+const handleUpdateSelectedCategory = (items: typeof selectedCategoryItems.value) => {
     if (isEqual(items, selectedCategoryItems.value)) return;
-    setForm('category', items); // set form for validation
-    taskContentFormStore.setCurrentCategoryId(items[0].name); // set current category id to store for other fields
-    const category = currentCategory.value;
-    if (!category) {
-        ErrorHandler.handleError(new Error('Failed to get category'));
-        return;
-    }
-    initRelatedFieldsByCategorySelection(category);
+    setSelectedCategoryItems(items);
 };
+watch(selectedCategoryItems, (items) => { // sync category id to store
+    taskContentFormStore.setCurrentCategoryId(items[0]?.name);
+});
+const { currentCategory, isLoading: isCategoryLoading } = useCurrentCategory({
+    categoryId: computed(() => taskContentFormState.currentCategoryId ?? originTask.value?.category_id),
+});
+const taskCategoryDesciprion = computed<string>(() => {
+    if (!currentCategory.value) return '';
+    return currentCategory.value.description;
+});
+
+watch([currentCategory, isCategoryLoading], ([category, loading]) => { // init selected category (both create and view mode)
+    if (loading) return;
+    if (category?.category_id !== selectedCategoryItems.value[0]?.name) {
+        setInitialCategory(category);
+    }
+}, { immediate: true });
 
 
 /* task type field */
 const {
     selectedTaskTypeItems,
+    setSelectedTaskTypeItems,
     taskTypeValidator,
     taskTypeMenuItemsHandler,
     setInitialTaskType,
@@ -113,26 +115,29 @@ const {
     categoryId: computed(() => currentCategory.value?.category_id),
     isRequired: true,
 });
-const { currentTaskType, isLoading: isTaskTypeLoading } = useCurrentTaskType({
-    taskTypeId: computed(() => selectedTaskTypeItems[0]?.name),
-});
 const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => {
     if (isEqual(items, selectedTaskTypeItems)) return;
-    setForm('taskType', items); // set form for validation
-    await taskContentFormStore.setCurrentTaskTypeId(items[0].name); // set current task type to store for other fields
-    const category = currentCategory.value;
-    if (items.length > 0 && !category) {
-        ErrorHandler.handleError(new Error('Failed to get category'));
-        return;
-    }
-    if (category && currentTaskType.value) {
-        initRelatedFieldsByTaskTypeSelection(category, currentTaskType.value);
-    }
+    setSelectedTaskTypeItems(items);
 };
+const { currentTaskType, isLoading: isTaskTypeLoading } = useCurrentTaskType({
+    taskTypeId: computed(() => taskContentFormState.currentTaskTypeId || originTask.value?.task_type_id),
+});
 const taskTypeDescription = computed<string>(() => {
     if (!currentTaskType.value) return '';
     return currentTaskType.value.description;
 });
+watch(selectedCategoryItems, () => { // reset task type when category is changed
+    setInitialTaskType(undefined);
+});
+watch(selectedTaskTypeItems, (items) => { // sync task type id to store
+    taskContentFormStore.setCurrentTaskTypeId(items[0]?.name);
+});
+watch([currentTaskType, isTaskTypeLoading], ([taskType, loading]) => { // init selected task type (both create and view mode)
+    if (loading) return;
+    if (taskType?.task_type_id !== selectedTaskTypeItems.value[0]?.name) {
+        setInitialTaskType(taskType);
+    }
+}, { immediate: true });
 
 /* status */
 const {
@@ -158,28 +163,39 @@ const { mutateAsync: changeStatus } = useMutation({
     onSuccess: (newTask: TaskModel) => {
         setOriginTaskQueryData(newTask);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
+        refetchEvents();
     },
     onError: (e) => {
-        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }));
+        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), true);
     },
 });
-const handleUpdateSelectedStatus = async (items: SelectDropdownMenuItem[]) => {
+const handleUpdateSelectedStatus = (items: SelectDropdownMenuItem[]) => {
     const statusId = items[0].name;
-    if (taskContentFormState.statusId === statusId) return;
-    taskContentFormStore.setStatusId(statusId);
+    if (selectedStatusItems[0]?.name === statusId) return;
     setSelectedStatusItems(items);
-    if (!isCreateMode.value) { // only for view mode
-        if (!taskContentFormState.currentTaskId) {
-            ErrorHandler.handleRequestError(new Error('Task id is not defined'), 'Failed to update status', true);
-            return;
-        }
-        await changeStatus({
-            taskId: taskContentFormState.currentTaskId,
-            statusId,
-        });
-        await refetchEvents();
+
+    if (!taskContentFormState.currentTaskId) {
+        ErrorHandler.handleRequestError(new Error('Task id is not defined'), 'Failed to update status', true);
+        return;
     }
+    changeStatus({
+        taskId: taskContentFormState.currentTaskId as string,
+        statusId,
+    });
 };
+watch(selectedStatusItems, (items) => { // sync status id to store
+    taskContentFormStore.setStatusId(items[0]?.name);
+});
+const { categoryStatusOptions } = useCategoryStatusOptions({
+    categoryId: computed(() => taskContentFormState.currentCategoryId ?? originTask.value?.category_id),
+});
+watch([originTask, isOriginTaskLoading, categoryStatusOptions], ([task, loading, stautsOps]) => { // init selected status by origin task (only for view mode)
+    if (loading || !stautsOps) return;
+    const statusOption = task ? stautsOps[task.status_type]?.find((status) => status.status_id === task.status_id) : undefined;
+    if (selectedStatusItems[0]?.name !== statusOption?.status_id) {
+        setInitialStatus(statusOption);
+    }
+}, { immediate: true });
 
 /* assignee */
 const handleClickAssign = () => {
@@ -205,9 +221,6 @@ const {
     invalidState,
     invalidTexts,
     isAllValid,
-    resetValidation,
-    resetValidations,
-    setForm,
 } = useFormValidator({
     category: categoryValidator,
     taskType: taskTypeValidator,
@@ -217,104 +230,6 @@ watch(isAllValid, (isValid) => {
     taskContentFormStore.setIsBaseFormValid(isValid);
 }, { immediate: true });
 
-
-/* form initiation */
-const initRelatedFieldsByCategorySelection = (category: TaskCategoryModel) => {
-    // init selected task type
-    setInitialTaskType();
-    // init selected status
-    const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
-    setInitialStatus(defaultStatus);
-    taskContentFormStore.setStatusId(defaultStatus?.status_id);
-    // reset validations
-    resetValidation('taskType');
-};
-const initRelatedFieldsByTaskTypeSelection = (category: TaskCategoryModel, taskType: TaskTypeModel) => {
-    // init selected task type
-    setInitialTaskType(taskType);
-    // init selected status
-    const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
-    setInitialStatus(defaultStatus);
-    taskContentFormStore.setStatusId(defaultStatus?.status_id);
-};
-
-let hasInitiated = false;
-
-/* initiation for 'view' mode */
-const initForViewMode = async (task?: TaskModel) => {
-    if (hasInitiated) return;
-
-    if (!task) return;
-    // set category
-    setInitialCategory(task.category_id);
-    taskContentFormStore.setCurrentCategoryId(task.category_id);
-    // set task type
-    await taskContentFormStore.setCurrentTaskTypeId(task.task_type_id);
-    setInitialTaskType(currentTaskType.value);
-    // set status
-    if (currentCategory.value) {
-        const statusOption = currentCategory.value.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
-        setInitialStatus(statusOption);
-    }
-
-    hasInitiated = true;
-};
-
-/* initiation for 'create' mode with initial category, task type */
-const initForCreateMode = async (categoryId?: string, taskType?: TaskTypeModel) => {
-    if (hasInitiated) return;
-
-    if (!categoryId) return;
-
-    setInitialCategory(categoryId);
-    // init selected status
-    const category = currentCategory.value;
-    if (category) {
-        const defaultStatus = category.status_options.TODO.find((status) => status.is_default);
-        setInitialStatus(defaultStatus);
-        taskContentFormStore.setStatusId(defaultStatus?.status_id);
-    } else {
-        ErrorHandler.handleError(new Error('Failed to get category'));
-        hasInitiated = true;
-        return;
-    }
-    // init task type
-    if (taskType) setInitialTaskType(taskType);
-
-    // reset validations
-    resetValidations();
-
-    hasInitiated = true;
-};
-
-let viewModeInitWatchStop;
-let createModeInitWatchStop;
-
-viewModeInitWatchStop = watch([originTask, isCategoriesLoading], async ([task, categoriesLoading]) => {
-    if (categoriesLoading) return; // wait for categories to be loaded
-
-    if (hasInitiated && viewModeInitWatchStop) {
-        viewModeInitWatchStop();
-        viewModeInitWatchStop = null;
-        return;
-    }
-
-    if (!isCreateMode.value) await initForViewMode(task);
-}, { immediate: true });
-createModeInitWatchStop = watch([() => taskContentFormState.currentCategoryId, currentTaskType, isCategoriesLoading], async ([categoryId, taskType, categoriesLoading]) => {
-    if (categoriesLoading) return; // wait for categories to be loaded
-
-    if (hasInitiated && createModeInitWatchStop) {
-        createModeInitWatchStop();
-        createModeInitWatchStop = undefined;
-        return;
-    }
-
-    if (!isCreateMode.value) return;
-    if (isMinimalCreateMode.value && !taskType) return; // minimal create is from landing page. task type is already selected and must be initialized.
-
-    await initForCreateMode(categoryId, taskType);
-}, { immediate: true });
 
 </script>
 

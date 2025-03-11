@@ -6,12 +6,12 @@ import type { EventAdditionalInfo, EventType } from '@/api-clients/opsflow/event
 
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
+import { useTaskTypeQuery } from '@/services/ops-flow/composables/use-task-type-query';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import {
     useTaskFieldMetadataStore,
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 
-import { useTaskTypeQuery } from '../composables/use-task-type-query';
 
 const props = withDefaults(defineProps<{
     eventType: EventType;

@@ -12,9 +12,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-import { usePackagesQuery } from '../composables/use-packages-query';
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const { packageAPI, packageQueryKey, packageListQueryKey } = usePackageApi();

@@ -14,13 +14,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TaskStatusBadge from '@/services/ops-flow/components/TaskStatusBadge.vue';
+import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
+import { useDefaultStatusOption } from '@/services/ops-flow/composables/use-default-status-option';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-import { useCategoryStatusOptions } from '../composables/use-category-status-options';
-import { useDefaultStatusOption } from '../composables/use-default-status-option';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;

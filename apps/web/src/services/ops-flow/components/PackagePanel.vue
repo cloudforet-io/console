@@ -12,9 +12,9 @@ import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 import type { ActionMenuItem } from '@/common/components/buttons/type';
 
 import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
+import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-import { usePackagesQuery } from '../composables/use-packages-query';
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const { defaultPackage } = useDefaultPackageQuery();

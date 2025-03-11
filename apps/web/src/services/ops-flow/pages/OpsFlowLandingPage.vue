@@ -9,14 +9,14 @@ import {
 import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
 
-import { useCategoriesQuery } from '../composables/use-categories-query';
-import { useTaskTypesQuery } from '../composables/use-task-types-query';
 
 
 const router = useRouter();

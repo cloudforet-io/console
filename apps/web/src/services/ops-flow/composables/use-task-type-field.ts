@@ -73,6 +73,7 @@ export const useTaskTypeField = ({
 
     const setInitialTaskType = (taskType?: TaskTypeModel) => {
         taskTypeValidator.setValue(taskType ? [{ name: taskType.task_type_id, label: taskType.name }] : []);
+        taskTypeValidator.resetValidation();
     };
 
 

@@ -113,9 +113,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
 
     const actions = {
         setCurrentCategoryId(categoryId?: string) {
-            if (state.currentCategoryId === categoryId) return;
             state.currentCategoryId = categoryId;
-            state.currentTaskTypeId = undefined;
         },
         setCurrentTaskTypeId(typeId?: string) {
             state.currentTaskTypeId = typeId;

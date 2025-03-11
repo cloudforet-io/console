@@ -10,7 +10,7 @@ export const useCategoryStatusOptions = (ops?: {
 }) => {
     const { categoryId } = ops ?? {};
     // specific category and its status options
-    const { currentCategory } = useCurrentCategory({
+    const { currentCategory, isLoading } = useCurrentCategory({
         categoryId: computed(() => categoryId?.value),
     });
     const getDefaultStatusOptions = () => ({
@@ -18,7 +18,8 @@ export const useCategoryStatusOptions = (ops?: {
         IN_PROGRESS: [],
         COMPLETED: [],
     });
-    const categoryStatusOptions = computed<TaskStatusOptions>(() => {
+    const categoryStatusOptions = computed<TaskStatusOptions|undefined>(() => {
+        if (isLoading.value) return undefined;
         if (!currentCategory.value) {
             return getDefaultStatusOptions();
         }

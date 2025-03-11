@@ -13,6 +13,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useTaskTypeFormMutations } from '@/services/ops-flow/composables/use-task-type-form-mutations';
+import { useTaskTypeQuery } from '@/services/ops-flow/composables/use-task-type-query';
+import type { Scope } from '@/services/ops-flow/composables/use-task-type-scope-field';
+import { useTaskTypeScopeField } from '@/services/ops-flow/composables/use-task-type-scope-field';
+import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
     useTaskFieldsConfiguration,
@@ -21,12 +26,6 @@ import TaskFieldsConfiguration from '@/services/ops-flow/task-fields-configurati
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-
-import { useTaskTypeFormMutations } from '../composables/use-task-type-form-mutations';
-import { useTaskTypeQuery } from '../composables/use-task-type-query';
-import type { Scope } from '../composables/use-task-type-scope-field';
-import { useTaskTypeScopeField } from '../composables/use-task-type-scope-field';
-import { useTaskTypesQuery } from '../composables/use-task-types-query';
 
 
 /* task management template store */

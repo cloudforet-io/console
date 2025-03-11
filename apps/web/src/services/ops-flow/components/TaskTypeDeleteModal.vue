@@ -13,12 +13,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedTasks from '@/services/ops-flow/components/AssociatedTasks.vue';
+import { useAssociatedTasksQuery } from '@/services/ops-flow/composables/use-associated-tasks-query';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-import { useAssociatedTasksQuery } from '../composables/use-associated-tasks-query';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;

@@ -11,10 +11,9 @@ import { useUserStore } from '@/store/user/user-store';
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 
 import TaskProgressEventView from '@/services/ops-flow/components/TaskProgressEventView.vue';
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
+import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
-
-import { useTaskEventsQuery } from '../composables/use-task-events-query';
-import { useTaskQuery } from '../composables/use-task-query';
 
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskDetailPageState = taskDetailPageStore.state;

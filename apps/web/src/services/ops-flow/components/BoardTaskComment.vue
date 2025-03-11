@@ -24,9 +24,9 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 
-import { useTaskEventsQuery } from '../composables/use-task-events-query';
 
 
 const props = defineProps<{

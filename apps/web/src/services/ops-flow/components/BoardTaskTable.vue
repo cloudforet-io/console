@@ -29,13 +29,13 @@ import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BoardTaskFilters from '@/services/ops-flow/components/BoardTaskFilters.vue';
 import BoardTaskNameField from '@/services/ops-flow/components/BoardTaskNameField.vue';
+import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
-import { useCategoriesQuery } from '../composables/use-categories-query';
-import { useTaskTypesQuery } from '../composables/use-task-types-query';
 
 const props = defineProps<{
     categoryId?: string;

@@ -22,7 +22,7 @@ export const useCategoryField = ({
     hasTaskTypeOnly?: boolean;
     categories: Ref<TaskCategoryModel[]|undefined>;
 }) => {
-    const categoryValidator = useFieldValidator<SelectDropdownMenuItem[]|CategoryItem[]>(
+    const categoryValidator = useFieldValidator<CategoryItem[]>(
         [],
         isRequired ? (val) => {
             if (val.length === 0) {
@@ -100,13 +100,10 @@ export const useCategoryField = ({
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
-    const setInitialCategory = (categoryId: string) => {
-        prevSelectedCategoryItems.value = categories.value?.filter((c) => c.category_id === categoryId)?.map((c) => ({
-            name: c.category_id,
-            label: c.name,
-            packageId: c.package_id,
-        })) ?? [];
+    const setInitialCategory = (category?: TaskCategoryModel) => {
+        prevSelectedCategoryItems.value = category ? [{ name: category.category_id, label: category.name, packageId: category.package_id }] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
+        categoryValidator.resetValidation();
     };
 
     const addedCategoryItems = computed(() => selectedCategoryItems.value.filter((item) => !prevSelectedCategoryItems.value.some((c) => c.name === item.name)));

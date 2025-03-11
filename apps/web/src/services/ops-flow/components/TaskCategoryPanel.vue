@@ -11,14 +11,14 @@ import { getParticle, i18n as _i18n } from '@/translations';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
+import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-import { useCategoriesQuery } from '../composables/use-categories-query';
-import { usePackagesQuery } from '../composables/use-packages-query';
 
 const taskManagementPageStore = useTaskManagementPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();

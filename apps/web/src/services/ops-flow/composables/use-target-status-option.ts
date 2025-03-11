@@ -6,7 +6,7 @@ import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-
 export const useTargetStatusOption = ({
     categoryStatusOptions, targetStatusType, targetStatusId,
 }: {
-  categoryStatusOptions: Ref<TaskStatusOptions>;
+  categoryStatusOptions: Ref<TaskStatusOptions|undefined>;
   // status options are identified by status type and status id
   targetStatusType: Ref<TaskStatusType | undefined>;
   targetStatusId: Ref<string | undefined>;

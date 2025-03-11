@@ -20,14 +20,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpdateConfirmModal.vue';
+import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
+import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
+import { usePackageMuatations } from '@/services/ops-flow/composables/use-package-mutations';
+import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
-
-import { useCategoriesQuery } from '../composables/use-categories-query';
-import { useDefaultPackageQuery } from '../composables/use-default-package-query';
-import { usePackageMuatations } from '../composables/use-package-mutations';
-import { usePackagesQuery } from '../composables/use-packages-query';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();

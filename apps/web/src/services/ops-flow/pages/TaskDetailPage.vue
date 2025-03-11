@@ -25,6 +25,7 @@ export default defineComponent({
 // eslint-disable-next-line import/no-duplicates,import/order
 import {
     computed, watch, onUnmounted, defineAsyncComponent, ref,
+    onBeforeMount,
     // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
@@ -170,11 +171,13 @@ const {
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
-/* lifecycle */
+/* store lifecycle */
 onUnmounted(() => {
     taskDetailPageStore.$reset();
     taskDetailPageStore.$dispose();
 });
+
+/* init */
 watch(task, (t) => {
     if (!t) return; // route guard will get task and go back if task is not found
     if (route.hash === '#progress') {
@@ -185,6 +188,9 @@ watch(task, (t) => {
 watch(() => props.taskId, (id) => {
     if (!id) return;
     taskDetailPageStore.setTargetTaskId(id);
+});
+onBeforeMount(() => {
+    taskContentFormStore.setMode('view');
 });
 
 /* expose */
