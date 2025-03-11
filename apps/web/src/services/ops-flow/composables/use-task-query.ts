@@ -22,9 +22,8 @@ export const useTaskQuery = ({
             return result;
         },
         enabled,
-        retry: false,
-        gcTime: 0,
         staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 0,
     });
 
     const setQueryData = (newTask: TaskModel) => {

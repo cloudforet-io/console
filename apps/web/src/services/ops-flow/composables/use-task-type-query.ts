@@ -20,6 +20,8 @@ export const useTaskTypeQuery = ({
         ]),
         queryFn: () => taskTypeAPI.get(queryKey.value),
         enabled,
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60, // 1 minute
     });
 
     return {

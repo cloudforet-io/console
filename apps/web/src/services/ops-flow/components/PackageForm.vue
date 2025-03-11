@@ -22,7 +22,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpdateConfirmModal.vue';
 import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
-import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
+import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
 import { usePackageMuatations } from '@/services/ops-flow/composables/use-package-mutations';
 import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
@@ -38,7 +38,7 @@ const targetPackage = computed(() => {
     if (!taskManagementPageState.targetPackageId || !packages.value) return undefined;
     return packages.value.find((pkg) => pkg.package_id === taskManagementPageState.targetPackageId);
 });
-const { defaultPackage } = useDefaultPackageQuery();
+const { defaultPackage } = useDefaultPackage();
 
 
 /* workspace field */

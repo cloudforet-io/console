@@ -17,7 +17,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
-import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
+import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
@@ -28,7 +28,7 @@ const taskManagementPageState = taskManagementPageStore.state;
 const enabled = computed(() => !!taskManagementPageState.visibleCategoryForm);
 
 /* default package */
-const { defaultPackage } = useDefaultPackageQuery({ enabled });
+const { defaultPackage } = useDefaultPackage({ enabled });
 
 /* task categories */
 const { categories } = useCategoriesQuery({ enabled });

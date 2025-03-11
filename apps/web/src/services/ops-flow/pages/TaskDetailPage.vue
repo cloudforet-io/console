@@ -188,7 +188,7 @@ watch(task, (t) => {
 watch(() => props.taskId, (id) => {
     if (!id) return;
     taskDetailPageStore.setTargetTaskId(id);
-});
+}, { immediate: true });
 onBeforeMount(() => {
     taskContentFormStore.setMode('view');
 });

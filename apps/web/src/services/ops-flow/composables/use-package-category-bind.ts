@@ -4,7 +4,7 @@ import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composab
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDefaultPackageQuery } from '@/services/ops-flow/composables/use-default-package-query';
+import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
 
 const useTaskCategoryUpdate = () => {
     const { taskCategoryAPI, taskCategoryQueryKey, taskCategoryListQueryKey } = useTaskCategoryApi();
@@ -47,7 +47,7 @@ export const usePackageCategoryBind = () => {
         }
     };
 
-    const { defaultPackage } = useDefaultPackageQuery();
+    const { defaultPackage } = useDefaultPackage();
     const bindDefaultPackageToCategories = async (categoryIds: string[]) => {
         if (!defaultPackage.value) throw new Error('Default package not found');
         const defaultPackageId = defaultPackage.value.package_id;

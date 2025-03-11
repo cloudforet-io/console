@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { usePackagesQuery } from './use-packages-query';
 
 
-export const useDefaultPackageQuery = (ops?: {
+export const useDefaultPackage = (ops?: {
     enabled?: Ref<boolean>;
 }) => {
     const { packages, isLoading } = usePackagesQuery(ops);
