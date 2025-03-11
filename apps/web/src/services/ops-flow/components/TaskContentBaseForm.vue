@@ -23,21 +23,20 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
+import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
+import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 import { useTaskAssignStore } from '@/services/ops-flow/stores/task-assign-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-import { useCategoriesQuery } from '../composables/use-categories-query';
-import { useCurrentCategory } from '../composables/use-current-category';
-import { useCurrentTaskType } from '../composables/use-current-task-type';
 
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
@@ -46,7 +45,6 @@ const taskAssignStore = useTaskAssignStore();
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const userStore = useUserStore();
-const taskCategoryStore = useTaskCategoryStore();
 
 
 /* mode */
@@ -228,9 +226,8 @@ const initForViewMode = async (task?: TaskModel) => {
     await taskContentFormStore.setCurrentTaskTypeId(task.task_type_id);
     setInitialTaskType(currentTaskType.value);
     // set status
-    const category = await taskCategoryStore.get(task.category_id);
-    if (category) {
-        const statusOption = category.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
+    if (currentCategory.value) {
+        const statusOption = currentCategory.value.status_options[task.status_type]?.find((status) => status.status_id === task.status_id);
         setInitialStatus(statusOption);
     }
 

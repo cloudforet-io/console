@@ -1,8 +1,7 @@
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, computed } from 'vue';
 
 import { isEqual } from 'lodash';
 import { defineStore } from 'pinia';
-
 
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
@@ -10,13 +9,11 @@ import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
+import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
+import { useTaskFieldsForm } from '@/services/ops-flow/composables/use-task-fields-form';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import type { DefaultTaskFieldId } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 import type { References } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
-
-import { useCurrentTaskType } from '../composables/use-current-task-type';
-import { useTaskFieldsForm } from '../composables/use-task-fields-form';
 
 interface UseTaskContentFormStoreState {
     originTask?: TaskModel;
@@ -46,7 +43,6 @@ interface UseTaskContentFormStoreGetters {
     isArchivedTask: boolean;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
-    const taskCategoryStore = useTaskCategoryStore();
     const userStore = useUserStore();
 
     const state = reactive<UseTaskContentFormStoreState>({
@@ -171,11 +167,6 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             state.hasFileIdsChanged = false;
         },
     };
-
-    onMounted(() => {
-        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
-    });
-
 
     return {
         state,

@@ -70,7 +70,6 @@ const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryS
 const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryStringToString(route.query.taskTypeId));
 
 /* header and back button */
-const loading = false; // computed<boolean>(() => taskCategoryStore.getters.loading);
 const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string);
 const {
     pathFrom,
@@ -89,7 +88,7 @@ const handleClickBack = () => {
 };
 
 /* task type */
-const { currentTaskType } = useCurrentTaskType({ taskTypeId });
+const { currentTaskType, isLoading } = useCurrentTaskType({ taskTypeId });
 
 /* create task */
 const { taskAPI, taskListQueryKey } = useTaskApi();
@@ -161,7 +160,7 @@ defineExpose({ setPathFrom });
                 <p-heading show-back-button
                            @click-back-button="handleClickBack"
                 >
-                    <p-skeleton v-if="loading"
+                    <p-skeleton v-if="isLoading"
                                 height="1.75rem"
                                 width="12rem"
                     />
