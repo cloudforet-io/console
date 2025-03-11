@@ -116,7 +116,7 @@ const {
     isRequired: true,
 });
 const handleUpdateSelectedTaskType = async (items: SelectDropdownMenuItem[]) => {
-    if (isEqual(items, selectedTaskTypeItems)) return;
+    if (isEqual(items, selectedTaskTypeItems.value)) return;
     setSelectedTaskTypeItems(items);
 };
 const { currentTaskType, isLoading: isTaskTypeLoading } = useCurrentTaskType({
@@ -171,7 +171,7 @@ const { mutateAsync: changeStatus } = useMutation({
 });
 const handleUpdateSelectedStatus = (items: SelectDropdownMenuItem[]) => {
     const statusId = items[0].name;
-    if (selectedStatusItems[0]?.name === statusId) return;
+    if (selectedStatusItems.value[0]?.name === statusId) return;
     setSelectedStatusItems(items);
 
     if (!taskContentFormState.currentTaskId) {

@@ -26,8 +26,8 @@ export const useTaskQuery = ({
         gcTime: 0,
     });
 
+    const queryClient = useQueryClient();
     const setQueryData = (newTask: TaskModel) => {
-        const queryClient = useQueryClient();
         queryClient.setQueryData(qk.value, newTask);
     };
     return {

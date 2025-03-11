@@ -79,6 +79,8 @@ export const useTaskStatusField = ({
                 label: status.name,
                 color: status.color,
             }]);
+        } else {
+            setSelectedStatusItems([]);
         }
         taskStatusValidator.resetValidation();
     };
