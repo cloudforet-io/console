@@ -42,7 +42,6 @@ import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
 import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
 import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -54,15 +53,13 @@ const router = useRouter();
 const route = useRoute();
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* category */
-const { currentCategory } = useCurrentCategory({
+const { currentCategory, isLoading } = useCurrentCategory({
     categoryId: toRef(props, 'taskCategoryId'),
 });
 /* header and back button */
-const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
 const headerTitle = computed<string>(() => currentCategory.value?.name ?? 'No Category');
 const {
     setPathFrom,
@@ -124,7 +121,7 @@ defineExpose({ setPathFrom });
                    show-back-button
                    @click-back-button="handleClickBackButton"
         >
-            <p-skeleton v-if="loading"
+            <p-skeleton v-if="isLoading"
                         height="1.75rem"
                         width="12rem"
             />
