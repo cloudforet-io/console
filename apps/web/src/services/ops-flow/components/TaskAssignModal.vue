@@ -3,7 +3,7 @@ import {
     computed, ref, watch,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PToolboxTable, getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
@@ -97,7 +97,8 @@ interface AssignVariables {
     taskId?: string;
     assignee?: string;
 }
-const { taskAPI } = useTaskApi();
+const { taskAPI, taskListQueryKey } = useTaskApi();
+const queryClient = useQueryClient();
 const { mutate: updateTaskAssignee, isPending: updating } = useMutation({
     mutationFn: async ({ taskId, assignee }: AssignVariables) => {
         if (!taskId) throw new Error('task id is not defined');
@@ -109,6 +110,7 @@ const { mutate: updateTaskAssignee, isPending: updating } = useMutation({
         return response;
     },
     onSuccess: (newTask: TaskModel) => {
+        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
         // update task data in cache
         setTaskQueryData(newTask);
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ASSIGN'), '');
