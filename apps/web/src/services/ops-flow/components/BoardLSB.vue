@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
 import LSBLoadingSpinner from '@/common/modules/navigations/new-lsb/LSBLoadingSpinner.vue';
@@ -11,7 +8,7 @@ import LSBRouterItem from '@/common/modules/navigations/new-lsb/LSBRouterItem.vu
 import LSBTopTitle from '@/common/modules/navigations/new-lsb/LSBTopTitle.vue';
 import type { LSBRouterPredicate } from '@/common/modules/navigations/new-lsb/type';
 
-import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import {
     useTaskManagementTemplateStore,
@@ -21,8 +18,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId === currentRoute.query.categoryId;
 
 /* categories */
-const { categories, isLoading } = useCategoriesQuery();
-const availableCategories = computed<TaskCategoryModel[]>(() => categories.value?.filter((category) => category.state !== 'DELETED') || []);
+const { availableCategories, isLoading } = useAvailableCategories();
 </script>
 
 <template>

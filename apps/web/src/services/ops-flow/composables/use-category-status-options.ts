@@ -1,7 +1,9 @@
 import type { Ref } from 'vue';
 import { computed } from 'vue';
 
-import type { TaskStatusOptions } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskStatusOptions, TaskStatusOptionWithOptionalId, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 
 import { useCurrentCategory } from './use-current-category';
 
@@ -13,15 +15,37 @@ export const useCategoryStatusOptions = (ops?: {
     const { currentCategory, isLoading } = useCurrentCategory({
         categoryId: computed(() => categoryId?.value),
     });
-    const getDefaultStatusOptions = () => ({
-        TODO: [],
-        IN_PROGRESS: [],
-        COMPLETED: [],
+    const getDefaultStatusOptions = (): Record<TaskStatusType, TaskStatusOptionWithOptionalId[]> => ({
+        TODO: [
+            {
+                name: TASK_STATUS_LABELS.TODO,
+                color: 'blue200',
+                is_default: true,
+            },
+        ],
+        IN_PROGRESS: [
+            {
+                name: TASK_STATUS_LABELS.IN_PROGRESS,
+                color: 'yellow200',
+                is_default: true,
+            },
+        ],
+        COMPLETED: [
+            {
+                name: TASK_STATUS_LABELS.COMPLETED,
+                color: 'green200',
+                is_default: true,
+            },
+        ],
     });
     const categoryStatusOptions = computed<TaskStatusOptions|undefined>(() => {
         if (isLoading.value) return undefined;
         if (!currentCategory.value) {
-            return getDefaultStatusOptions();
+            return {
+                TODO: [],
+                IN_PROGRESS: [],
+                COMPLETED: [],
+            };
         }
         return currentCategory.value.status_options;
     });

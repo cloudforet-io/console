@@ -9,7 +9,7 @@ import {
 import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
 import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import {
@@ -27,21 +27,20 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 /* categories */
-const { categories, isLoading: isLoadingCategories } = useCategoriesQuery();
-const nonDeletedCategories = computed(() => categories.value?.filter((c) => c.state !== 'DELETED'));
-const availableCategories = computed(() => {
-    if (!nonDeletedCategories.value) return [];
-    return nonDeletedCategories.value.filter((c) => !!taskTypesByCategoryId.value[c.category_id]?.length);
+const { availableCategories, isLoading: isLoadingCategories } = useAvailableCategories();
+const categoriesWithTaskType = computed(() => {
+    if (!availableCategories.value) return [];
+    return availableCategories.value.filter((c) => !!taskTypesByCategoryId.value[c.category_id]?.length);
 });
 
 /* task types */
 const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery({
     queryKey: computed(() => ({
         query: {
-            filter: [{ k: 'category_id', v: nonDeletedCategories.value?.map((c) => c.category_id), o: 'in' }],
+            filter: [{ k: 'category_id', v: availableCategories.value?.map((c) => c.category_id), o: 'in' }],
         },
     })),
-    enabled: computed(() => !!nonDeletedCategories.value?.length),
+    enabled: computed(() => !!availableCategories.value?.length),
 });
 const taskTypesByCategoryId = computed(() => {
     if (!taskTypes.value?.length) return {};
@@ -98,7 +97,7 @@ const goToTaskCreatePage = () => {
                 </div>
             </div>
             <p-data-loader :loading="isLoadingCategories || isLoadingTaskTypes"
-                           :data="availableCategories"
+                           :data="categoriesWithTaskType"
                            loader-backdrop-color="gray.100"
                            class="min-h-72"
             >
@@ -109,7 +108,7 @@ const goToTaskCreatePage = () => {
                         </p>
                         <div class="flex justify-center">
                             <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                                <p-select-card v-for="c in availableCategories"
+                                <p-select-card v-for="c in categoriesWithTaskType"
                                                :key="c.category_id"
                                                class="select-card"
                                                :value="c.category_id"

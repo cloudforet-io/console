@@ -11,7 +11,7 @@ import { getParticle, i18n as _i18n } from '@/translations';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
-import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
 import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
@@ -34,7 +34,7 @@ const packageMap = computed(() => {
 });
 
 /* task categories */
-const { categories, isLoading, refetch } = useCategoriesQuery();
+const { availableCategories, isLoading, refetch } = useAvailableCategories();
 
 /* table fields */
 const categoryFields = computed<DataTableField[]>(() => [
@@ -93,7 +93,7 @@ const categoryFields = computed<DataTableField[]>(() => [
             }) }}
         </p>
         <p-data-table :loading="isLoading"
-                      :items="categories"
+                      :items="availableCategories"
                       :fields="categoryFields"
         >
             <template #col-name-format="{ item }">

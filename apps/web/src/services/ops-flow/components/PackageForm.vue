@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpdateConfirmModal.vue';
-import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
+import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
 import { usePackageMutations } from '@/services/ops-flow/composables/use-package-mutations';
@@ -60,7 +60,7 @@ const handleUpdateWorkspaces = (items: SelectDropdownMenuItem[]) => {
 };
 
 /* category field */
-const { categories, isLoading: isCategoriesLoading } = useCategoriesQuery();
+const { availableCategories, isLoading: isCategoriesLoading } = useAvailableCategories();
 const {
     selectedCategoryItems,
     categoryMenuItemsHandler,
@@ -69,7 +69,7 @@ const {
     setInitialCategoriesByPackageId,
     addedCategoryItems,
     removedCategoryItems,
-} = useCategoryField({ categories });
+} = useCategoryField({ categories: availableCategories });
 
 
 /* form */
