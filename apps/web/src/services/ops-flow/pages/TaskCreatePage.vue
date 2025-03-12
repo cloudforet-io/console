@@ -20,12 +20,12 @@ export default defineComponent({
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
 import {
-    computed, onBeforeMount, onUnmounted,
+    computed, onBeforeMount, onUnmounted, watch,
     // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router/composables';
 
-import { QueryClient, useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
 import {
@@ -105,7 +105,7 @@ const { currentTaskType, isLoading } = useCurrentTaskType({
 
 /* create task */
 const { taskAPI, taskListQueryKey } = useTaskApi();
-const queryClient = new QueryClient();
+const queryClient = useQueryClient();
 interface CreateTaskVariables {
     taskTypeId: string;
     name: string;
@@ -115,27 +115,29 @@ interface CreateTaskVariables {
     projectId: string;
     statusId: string;
 }
-const { data: createdTask, mutateAsync: createTaskMutation, isPending: isCreating } = useMutation({
-    mutationFn: async (variables: CreateTaskVariables) => {
-        const res = await taskAPI.create({
-            task_type_id: variables.taskTypeId,
-            name: variables.name,
-            status_id: variables.statusId,
-            description: variables.description,
-            data: variables.data,
-            files: variables.files,
-            project_id: variables.projectId,
-        });
-        return res;
-    },
+const { mutate: createTaskMutation, isPending: isCreating, isSuccess } = useMutation({
+    mutationFn: (variables: CreateTaskVariables) => taskAPI.create({
+        task_type_id: variables.taskTypeId,
+        name: variables.name,
+        status_id: variables.statusId,
+        description: variables.description,
+        data: variables.data,
+        files: variables.files,
+        project_id: variables.projectId,
+    }),
     onSuccess: () => {
-        // Invalidate task list query to avoid using stale data
-        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
     },
     onError: (error) => {
         ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_CREATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
     },
+});
+watch(isSuccess, async (val) => {
+    if (val) {
+        // Invalidate task list query to avoid using stale data
+        await queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
+        goBack();
+    }
 });
 
 /* confirm leave modal */
@@ -145,12 +147,12 @@ const {
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormGetters.hasUnsavedChanges || !!createdTask.value),
+    passConfirmation: computed(() => !taskContentFormGetters.hasUnsavedChanges || isSuccess.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
 /* form button handling */
-const handleConfirm = async () => {
+const handleConfirm = () => {
     if (!taskContentFormGetters.isAllValid) return;
     if (!currentTaskType.value) {
         ErrorHandler.handleRequestError(new Error('Task type is not defined'), 'Error occurred before creating task', true);
@@ -160,7 +162,7 @@ const handleConfirm = async () => {
         ErrorHandler.handleRequestError(new Error('Status is not defined'), 'Error occurred before creating task', true);
         return;
     }
-    await createTaskMutation({
+    createTaskMutation({
         taskTypeId: currentTaskType.value.task_type_id,
         name: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.title],
         description: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.description],
@@ -170,9 +172,6 @@ const handleConfirm = async () => {
         statusId: taskContentFormState.statusId,
         // assignee: taskContentFormState.assignee || undefined,
     });
-    if (createdTask.value) {
-        goBack();
-    }
 };
 
 /* expose */
