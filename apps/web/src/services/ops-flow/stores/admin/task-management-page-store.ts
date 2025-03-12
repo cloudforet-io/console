@@ -1,6 +1,4 @@
-import {
-    reactive, onUnmounted,
-} from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -90,15 +88,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
     };
 
-
-    const disposeSelf = () => {
-        const store = useTaskManagementPageStore();
-        store.$reset();
-        store.$dispose();
-    };
-    onUnmounted(() => {
-        disposeSelf();
-    });
     return {
         state,
         ...actions,
