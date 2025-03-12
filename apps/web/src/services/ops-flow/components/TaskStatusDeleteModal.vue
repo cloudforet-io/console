@@ -40,6 +40,7 @@ const { mutateAsync: deleteStatusOption, isPending: isDeleting } = useMutation({
     mutationFn: () => {
         if (!categoryId.value) throw new Error('Category ID is required');
         if (!targetStatusType.value || !targetStatusId.value) throw new Error('Target status type and ID are required');
+        if (!categoryStatusOptions.value) throw new Error('Category status options are required');
         const newStatusOptions = cloneDeep(categoryStatusOptions.value);
         const idx = newStatusOptions[targetStatusType.value].findIndex((p) => p.status_id === targetStatusId.value);
         if (idx === -1) throw new Error('Status not found');
@@ -57,7 +58,7 @@ const { mutateAsync: deleteStatusOption, isPending: isDeleting } = useMutation({
         taskCategoryPageStore.closeDeleteStatusModal();
     },
     onError: (e) => {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }));
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }), true);
     },
 });
 
@@ -91,7 +92,7 @@ const handleClosed = () => {
             <div class="mb-4 flex items-end justify-between">
                 <i18n path="OPSFLOW.TASK_MANAGEMENT.STATUS.DELETE_CONTINUE"
                       tag="p"
-                      class="flex items-center text-paragraph-lg font-bold"
+                      class="text-paragraph-lg font-bold"
                 >
                     <!-- CAUTION: Do not remove the following comments. They are used to prevent auto-formatting of the template. -->
                     <!-- In this case, template tags must be in a single line to prevent inserting unnecessary spaces. -->
