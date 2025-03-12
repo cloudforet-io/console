@@ -30,11 +30,8 @@ const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 
 /* task */
-const { task: originTask } = useTaskQuery({
-    queryKey: computed(() => ({
-        task_id: taskContentFormState.currentTaskId as string,
-    })),
-    enabled: computed(() => taskContentFormState.currentTaskId !== undefined),
+const { data: originTask } = useTaskQuery({
+    taskId: computed(() => taskContentFormState.currentTaskId),
 });
 
 /* fields for rendering */

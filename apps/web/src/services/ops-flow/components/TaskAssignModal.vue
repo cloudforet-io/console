@@ -80,10 +80,7 @@ const handleChangeTable = async (options: ToolboxTableOptions = {}) => {
 
 /* task */
 const { setQueryData: setTaskQueryData } = useTaskQuery({
-    queryKey: computed(() => ({
-        task_id: taskAssignStore.state.taskId as string,
-    })),
-    enabled: computed(() => taskAssignStore.state.taskId !== undefined),
+    taskId: computed(() => taskAssignStore.state.taskId),
 });
 
 /* events */

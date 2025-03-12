@@ -55,11 +55,8 @@ const isCreateMode = computed(() => taskContentFormState.mode.startsWith('create
 // const isMinimalCreateMode = computed(() => taskContentFormState.mode === 'create-minimal');
 
 /* task */
-const { task: originTask, isLoading: isOriginTaskLoading, setQueryData: setOriginTaskQueryData } = useTaskQuery({
-    queryKey: computed(() => ({
-        task_id: taskContentFormState.currentTaskId as string,
-    })),
-    enabled: computed(() => taskContentFormState.currentTaskId !== undefined),
+const { data: originTask, isLoading: isOriginTaskLoading, setQueryData: setOriginTaskQueryData } = useTaskQuery({
+    taskId: computed(() => taskContentFormState.currentTaskId),
 });
 
 /* events */

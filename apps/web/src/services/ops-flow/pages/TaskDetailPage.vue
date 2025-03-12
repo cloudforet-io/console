@@ -30,7 +30,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
-import { QueryClient, useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
@@ -99,9 +99,9 @@ const {
 /* task */
 const { taskListQueryKey, taskAPI } = useTaskApi();
 const {
-    task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask, error: errorOnTask,
+    data: task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask, error: errorOnTask,
 } = useTaskQuery({
-    queryKey: computed(() => ({ task_id: props.taskId })),
+    taskId: computed(() => props.taskId),
     enabled: computed(() => !!props.taskId && !!pathFrom.value),
 });
 watch(errorOnTask, (err) => {
@@ -162,8 +162,14 @@ watch(task, (t) => {
     }
 });
 
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => props.taskId),
+    fetchOnCreation: false,
+});
+
 /* update task */
-const queryClient = new QueryClient();
+const queryClient = useQueryClient();
 const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = useMutation<TaskModel, APIError>({
     mutationFn: async () => {
         if (!task.value) throw new Error('Origin task is not defined');
@@ -178,23 +184,17 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
         queryClient.invalidateQueries({ queryKey: taskDetailQueryKey.value });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
         taskContentFormStore.resetUnsavedChanges();
+        refetchEvents();
     },
     onError: (error) => {
         ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
     },
 });
 
-/* events */
-const { refetch: refetchEvents } = useTaskEventsQuery({
-    taskId: computed(() => props.taskId),
-    fetchOnCreation: false,
-});
-
 /* form button handling */
 const handleSaveChanges = async () => {
     if (!taskContentFormStore.getters.isAllValid) return;
     await updateTaskMutation();
-    refetchEvents();
 };
 
 /* confirm leave modal */

@@ -3,37 +3,44 @@ import { computed } from 'vue';
 
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
+import type { APIError } from '@cloudforet/core-lib/space-connector/error';
+
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
-import type { TaskGetParameters } from '@/api-clients/opsflow/task/schema/api-verbs/get';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 export const useTaskQuery = ({
-    queryKey, enabled,
+    taskId, enabled,
 }: {
-  queryKey: Ref<TaskGetParameters>;
+  taskId: Ref<string|undefined>;
   enabled?: Ref<boolean>;
 }) => {
     const { taskQueryKey, taskAPI } = useTaskApi();
-    const qk = computed(() => [...taskQueryKey.value, queryKey.value]);
-    const { data: task, isLoading, error } = useQuery({
-        queryKey: qk,
+    const queryKey = computed(() => [...taskQueryKey.value, taskId.value]);
+    const { data, isLoading, error } = useQuery({
+        queryKey,
         queryFn: async () => {
-            const result = await taskAPI.get(queryKey.value);
+            const result = await taskAPI.get({ task_id: taskId.value as string });
             return result;
         },
-        enabled,
+        enabled: computed(() => (enabled ? (enabled.value && !!taskId.value) : !!taskId.value)),
+        retry: (failureCount, err) => {
+            if ((err as APIError).status === 404) {
+                return false;
+            }
+            return failureCount < 3;
+        },
         staleTime: 1000 * 60, // 1 minute
         gcTime: 1000 * 15, // 15 seconds
     });
 
     const queryClient = useQueryClient();
     const setQueryData = (newTask: TaskModel) => {
-        queryClient.setQueryData(qk.value, newTask);
+        queryClient.setQueryData(queryKey.value, newTask);
     };
     return {
-        task,
+        data,
         isLoading,
-        queryKey: qk,
+        queryKey,
         setQueryData,
         error,
     };

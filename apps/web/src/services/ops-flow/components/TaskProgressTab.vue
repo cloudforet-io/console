@@ -34,9 +34,8 @@ const getStyleType = (item: EventModel) => {
 };
 
 /* task */
-const { task } = useTaskQuery({
-    queryKey: computed(() => ({ task_id: taskDetailPageState.targetTaskId as string })),
-    enabled: computed(() => !!taskDetailPageState.targetTaskId),
+const { data: task } = useTaskQuery({
+    taskId: computed(() => taskDetailPageState.targetTaskId),
 });
 
 /* events */
