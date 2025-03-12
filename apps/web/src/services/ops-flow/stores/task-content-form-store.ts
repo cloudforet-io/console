@@ -158,6 +158,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
             initDefaultFieldData(task);
             initFieldData(task);
             state.fileIds = task.files?.map((f) => f.file_id) ?? [];
+            actions.resetUnsavedChanges();
         },
     };
 
