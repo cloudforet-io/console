@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
@@ -12,19 +12,18 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { usePackageQuery } from '@/services/ops-flow/composables/use-package-query';
 import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
 const taskManagementPageStore = useTaskManagementPageStore();
-const { packageAPI, packageQueryKey, packageListQueryKey } = usePackageApi();
-const queryClient = useQueryClient();
+const { packageAPI } = usePackageApi();
 
 /* package name */
-const { packages } = usePackagesQuery();
-const targetPackage = computed(() => {
-    if (!taskManagementPageStore.state.targetPackageId || !packages.value) return undefined;
-    return packages.value.find((pkg) => pkg.package_id === taskManagementPageStore.state.targetPackageId);
+const { invalidateQueries: invalidatePackagesQuery } = usePackagesQuery();
+const { data: targetPackage, setQueryData: setTargetPackageQueryData } = usePackageQuery({
+    packageId: computed(() => taskManagementPageStore.state.targetPackageId),
 });
 const name = computed(() => targetPackage.value?.name ?? '');
 
@@ -32,13 +31,8 @@ const name = computed(() => targetPackage.value?.name ?? '');
 const { mutateAsync: setDefaultPackage, isPending } = useMutation({
     mutationFn: packageAPI.setDefault,
     onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: packageListQueryKey.value });
-        queryClient.invalidateQueries({
-            queryKey: [
-                ...packageQueryKey.value,
-                { package_id: data.package_id },
-            ],
-        });
+        invalidatePackagesQuery();
+        setTargetPackageQueryData(data);
         taskManagementPageStore.closeSetDefaultPackageModal();
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_CHANGE_DEFAULT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
     },

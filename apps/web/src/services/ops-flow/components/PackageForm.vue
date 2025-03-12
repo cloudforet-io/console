@@ -4,7 +4,6 @@ import {
     computed,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -14,8 +13,6 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dr
 
 import { getParticle, i18n as _i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -23,7 +20,8 @@ import PackageUpdateConfirmModal from '@/services/ops-flow/components/PackageUpd
 import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
-import { usePackageMuatations } from '@/services/ops-flow/composables/use-package-mutations';
+import { usePackageMutations } from '@/services/ops-flow/composables/use-package-mutations';
+import { usePackageQuery } from '@/services/ops-flow/composables/use-package-query';
 import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useWorkspaceField } from '@/services/ops-flow/composables/use-workspace-field';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
@@ -34,9 +32,9 @@ const taskManagementPageState = taskManagementPageStore.state;
 
 /* package data */
 const { packages } = usePackagesQuery();
-const targetPackage = computed(() => {
-    if (!taskManagementPageState.targetPackageId || !packages.value) return undefined;
-    return packages.value.find((pkg) => pkg.package_id === taskManagementPageState.targetPackageId);
+const { data: targetPackage } = usePackageQuery({
+    packageId: computed(() => taskManagementPageState.targetPackageId),
+    enabled: computed(() => taskManagementPageState.visiblePackageForm),
 });
 const { defaultPackage } = useDefaultPackage();
 
@@ -111,24 +109,8 @@ const {
 });
 
 /* package mutations */
-const { createPackageFn, updatePackageFn } = usePackageMuatations();
-const { mutateAsync: createPackage, isPending: isCreating } = useMutation({
-    mutationFn: createPackageFn,
-    onSuccess: () => {
-        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
-    },
-    onError: (error) => {
-        ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), true);
-    },
-});
-const { mutateAsync: updatePackage, isPending: isUpdating } = useMutation({
-    mutationFn: updatePackageFn,
-    onSuccess: () => {
-        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
-    },
-    onError: (error) => {
-        ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), true);
-    },
+const { createPackage, updatePackage, isProcessing } = usePackageMutations({
+    packageId: computed(() => taskManagementPageState.targetPackageId),
 });
 
 /* confirm modal */
@@ -142,29 +124,29 @@ const handleUpdateConfirm = async () => {
     if (!isAllValid.value) {
         ErrorHandler.handleError(new Error('Invalid form'));
     }
+
+    const bindInfo = {
+        addedCategoryIds: addedCategoryItems.value.map((item) => item.name),
+        removedCategoryIds: removedCategoryItems.value.map((item) => item.name),
+        addedWorkspaceIds: addedWorkspaceItems.value.map((item) => item.name),
+        removedWorkspaceIds: removedWorkspaceItems.value.map((item) => item.name),
+    };
     if (taskManagementPageState.targetPackageId) {
         await updatePackage({
-            updatePackageParams: {
-                package_id: taskManagementPageState.targetPackageId,
+            packageId: taskManagementPageState.targetPackageId,
+            form: {
                 name: name.value,
                 description: description.value,
             },
-            addedCategoryIds: addedCategoryItems.value.map((item) => item.name),
-            removedCategoryIds: removedCategoryItems.value.map((item) => item.name),
-            addedWorkspaceIds: addedWorkspaceItems.value.map((item) => item.name),
-            removedWorkspaceIds: removedWorkspaceItems.value.map((item) => item.name),
+            bindInfo,
         });
     } else {
         await createPackage({
-            createPackageParams: {
+            form: {
                 name: name.value,
                 description: description.value,
-                tags: {},
             },
-            addedCategoryIds: addedCategoryItems.value.map((item) => item.name),
-            removedCategoryIds: removedCategoryItems.value.map((item) => item.name),
-            addedWorkspaceIds: addedWorkspaceItems.value.map((item) => item.name),
-            removedWorkspaceIds: removedWorkspaceItems.value.map((item) => item.name),
+            bindInfo,
         });
     }
     taskManagementPageStore.closePackageForm();
@@ -186,6 +168,7 @@ const handleFormConfirm = () => {
     }
 };
 
+/* form initialization */
 watch([() => taskManagementPageState.visiblePackageForm, targetPackage, isCategoriesLoading], async ([visible, currentTargetPackage, categoriesLoading], [prevVisible]) => {
     if (categoriesLoading) return; // wait for categories
 
@@ -232,7 +215,7 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage, isCatego
                 <div class="p-6 w-full">
                     <p-field-group :label="$t('OPSFLOW.NAME')"
                                    required
-                                   :invalid="!isCreating && !isUpdating && invalidState.name"
+                                   :invalid="!isProcessing && invalidState.name"
                                    :invalid-text="invalidTexts.name"
                     >
                         <template #default="{ invalid }">
@@ -322,13 +305,13 @@ watch([() => taskManagementPageState.visiblePackageForm, targetPackage, isCatego
             <template #footer>
                 <div class="py-3 px-6 flex flex-wrap gap-3 justify-end">
                     <p-button style-type="transparent"
-                              :disabled="isCreating || isUpdating"
+                              :disabled="isProcessing"
                               @click="handleCancelOrClose"
                     >
                         {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :loading="isCreating || isUpdating"
+                              :loading="isProcessing"
                               :disabled="!isAllValid"
                               @click="handleFormConfirm"
                     >

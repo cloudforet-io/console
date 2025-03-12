@@ -11,7 +11,7 @@ const useWorkspaceMutations = () => {
     const { mutateAsync: addPackageToWorkspace } = useMutation({
         mutationFn: workspaceAPI.addPackage,
         onSuccess: (updatedWorkspace) => {
-            queryClient.invalidateQueries({ queryKey: [...workspaceQueryKey.value, { workspace_id: updatedWorkspace.workspace_id }] });
+            queryClient.setQueryData([...workspaceQueryKey.value, { workspace_id: updatedWorkspace.workspace_id }], updatedWorkspace);
         },
         onError: (error) => {
             ErrorHandler.handleError(error);
@@ -21,7 +21,7 @@ const useWorkspaceMutations = () => {
     const { mutateAsync: removePackageFromWorkspace } = useMutation({
         mutationFn: workspaceAPI.removePackage,
         onSuccess: (updatedWorkspace) => {
-            queryClient.invalidateQueries({ queryKey: [...workspaceQueryKey.value, { workspace_id: updatedWorkspace.workspace_id }] });
+            queryClient.setQueryData([...workspaceQueryKey.value, { workspace_id: updatedWorkspace.workspace_id }], updatedWorkspace);
         },
         onError: (error) => {
             ErrorHandler.handleError(error);

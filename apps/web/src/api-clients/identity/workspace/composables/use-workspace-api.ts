@@ -1,7 +1,3 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
@@ -15,21 +11,7 @@ import type { WorkspaceRemovePackageParameters } from '@/api-clients/identity/wo
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/api-verbs/update';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 
-interface UseWorkspaceApiReturn {
-    workspaceQueryKey: ComputedRef<QueryKey>;
-    workspaceListQueryKey: ComputedRef<QueryKey>;
-    workspaceAPI: {
-        create: (params: WorkspaceCreateParameters) => Promise<WorkspaceModel>;
-        update: (params: WorkspaceUpdateParameters) => Promise<WorkspaceModel>;
-        delete: (params: WorkspaceDeleteParameters) => Promise<void>;
-        list: (params: WorkspaceListParameters) => Promise<ListResponse<WorkspaceModel>>;
-        addPackage: (params: WorkspaceAddPackageParameters) => Promise<WorkspaceModel>;
-        removePackage: (params: WorkspaceRemovePackageParameters) => Promise<WorkspaceModel>;
-        changeWorkspaceGroup: (params: WorkspaceChangeWorkspaceGroupParameters) => Promise<WorkspaceModel>;
-    }
-}
-
-export const useWorkspaceApi = (): UseWorkspaceApiReturn => {
+export const useWorkspaceApi = () => {
     const workspaceQueryKey = useAPIQueryKey('identity', 'workspace', 'get');
     const workspaceListQueryKey = useAPIQueryKey('identity', 'workspace', 'list');
 

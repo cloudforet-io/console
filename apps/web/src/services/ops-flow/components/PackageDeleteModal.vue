@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
@@ -14,6 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
 import { useAssociatedCategoriesToPackage } from '@/services/ops-flow/composables/use-associated-categories-to-package';
+import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
 
@@ -25,12 +26,12 @@ const { associatedCategoriesToPackage } = useAssociatedCategoriesToPackage({
 });
 
 /* delete package */
-const { packageAPI, packageListQueryKey } = usePackageApi();
-const queryClient = useQueryClient();
+const { invalidateQueries: invalidatePackagesQuery } = usePackagesQuery();
+const { packageAPI } = usePackageApi();
 const { mutateAsync: deletePackage, isPending: isDeleting } = useMutation({
     mutationFn: packageAPI.delete,
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: packageListQueryKey.value });
+        invalidatePackagesQuery();
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string, '');
     },
     onError: (e) => {

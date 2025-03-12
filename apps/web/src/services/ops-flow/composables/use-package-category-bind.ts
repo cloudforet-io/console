@@ -6,13 +6,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
 
-const useTaskCategoryUpdate = () => {
+const useTaskCategoryMutations = () => {
     const { taskCategoryAPI, taskCategoryQueryKey, taskCategoryListQueryKey } = useTaskCategoryApi();
     const queryClient = useQueryClient();
     const { mutateAsync: updateTaskCategory } = useMutation({
         mutationFn: taskCategoryAPI.update,
         onSuccess: (updatedCategory) => {
-            queryClient.invalidateQueries({ queryKey: [...taskCategoryQueryKey.value, { category_id: updatedCategory.category_id }] });
+            queryClient.setQueryData([...taskCategoryQueryKey.value, { category_id: updatedCategory.category_id }], updatedCategory);
         },
         onError: (error) => {
             ErrorHandler.handleError(error);
@@ -23,7 +23,7 @@ const useTaskCategoryUpdate = () => {
 
 export const usePackageCategoryBind = () => {
     const queryClient = useQueryClient();
-    const { updateTaskCategory, taskCategoryListQueryKey } = useTaskCategoryUpdate();
+    const { updateTaskCategory, taskCategoryListQueryKey } = useTaskCategoryMutations();
     const addPackageToCategories = async (packageId: string, categoryIds: string[]) => {
         const responses = await Promise.allSettled([
             ...categoryIds.map((categoryId) => updateTaskCategory({
