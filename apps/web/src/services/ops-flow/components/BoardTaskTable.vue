@@ -124,7 +124,7 @@ const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
 /* tasks */
 const { taskListQueryKey, taskAPI } = useTaskApi();
 const {
-    data: tasks, error, refetch, isLoading,
+    data, error, refetch, isLoading,
 } = useQuery({
     queryKey: computed(() => [
         ...taskListQueryKey.value,
@@ -132,10 +132,13 @@ const {
         props.categoryId,
     ]),
     queryFn: async () => {
-        const { results } = await taskAPI.list({
+        const res = await taskAPI.list({
             query: taskListApiQuery.value,
         });
-        return results ?? [];
+        return {
+            results: res.results ?? [],
+            totalCount: res.total_count,
+        };
     },
     enabled: computed(() => !isLoadingCategories.value && !isLoadingTaskTypes.value),
     refetchOnMount: true,
@@ -143,9 +146,14 @@ const {
     gcTime: 1000 * 60 * 2, // 2 minutes
     staleTime: 1000 * 30, // 30 seconds
 });
+const tasks = computed(() => data.value?.results);
+const total = computed(() => data.value?.totalCount);
 watch(error, (err) => {
     if (err) ErrorHandler.handleError(err);
 });
+watch(total, (val) => {
+    pagination.total = val || 0;
+}, { immediate: true });
 
 
 /* table fields */
