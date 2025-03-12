@@ -47,7 +47,7 @@ const assetInventoryRoute: RouteConfig = {
         menuId: MENU_ID.ASSET_INVENTORY,
         translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
     component: AssetInventoryContainer,
     children: [
         {

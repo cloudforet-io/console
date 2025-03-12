@@ -1,5 +1,7 @@
 import type { RoleType } from '@/api-clients/identity/role/type';
 
+import { useMenuStore } from '@/store/menu/menu-store';
+
 import type {
     PageAccessMap,
 } from '@/lib/access-control/config';
@@ -11,9 +13,7 @@ import {
     WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
     WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
-import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
-import { MENU_LIST, MENU_LIST_FOR_ALERT_MANAGER_V2 } from '@/lib/menu/menu-architecture';
 
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 
@@ -38,10 +38,10 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], domainId?: string): PageAccessMap => {
+export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): PageAccessMap => {
+    const menuStore = useMenuStore();
     const result: PageAccessMap = {};
-    const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
-    const menuListByVersion = (isAlertManagerVersionV2 ? MENU_LIST_FOR_ALERT_MANAGER_V2 : MENU_LIST);
+    const menuListByVersion = menuStore.state.menuList;
     const flattenedMenuList = flattenMenu(menuListByVersion);
     const setPermissions = (id: string, read = true, write = true, access = true) => {
         result[id] = { read, write, access };

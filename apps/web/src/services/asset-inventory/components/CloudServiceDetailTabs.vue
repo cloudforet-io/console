@@ -15,12 +15,10 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
-import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import config from '@/lib/config';
-import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
 
 
@@ -65,7 +63,6 @@ const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const displayStore = useDisplayStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const router = useRouter();
@@ -88,9 +85,10 @@ const singleItemTabState = reactive({
         if (isAlertManagerVersionV2) {
             defaultTabs.push({ name: 'alerts', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS') });
         }
-        if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
-            defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
-        }
+        // TODO: will be changed to store
+        // if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
+        //     defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
+        // }
         return defaultTabs;
     }),
     activeTab: 'detail',
@@ -102,9 +100,10 @@ const multiItemTabState = reactive({
             { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
             { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
         ];
-        if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
-            defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
-        }
+        // TODO: will be changed to store
+        // if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
+        //     defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
+        // }
         return defaultTabs;
     }),
     activeTab: 'data',
