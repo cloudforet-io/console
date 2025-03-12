@@ -10,8 +10,6 @@ import { PPaneLayout } from '@cloudforet/mirinae';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import { useDomainStore } from '@/store/domain/domain-store';
-
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getPageAccessMapFromRawData } from '@/lib/access-control/page-access-helper';
 
@@ -22,8 +20,6 @@ import RoleUpdateFormPolicy from '@/services/iam/components/RoleUpdateFormPolicy
 import { FORM_TYPE } from '@/services/iam/constants/role-constant';
 import { getPageAccessList, getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
 import type { PageAccessMenuItem, RoleFormData } from '@/services/iam/types/role-type';
-
-const domainStore = useDomainStore();
 
 interface Props {
     initialPageAccess?: string[];
@@ -95,7 +91,7 @@ const handleUpdateEditor = (value: string) => {
 };
 const setPageAccessPermissionsData = () => {
     if (!props.initialPageAccess) return;
-    const pageAccessPermissionMap = getPageAccessMapFromRawData(props.initialPageAccess, domainStore.state.domainId);
+    const pageAccessPermissionMap = getPageAccessMapFromRawData(props.initialPageAccess);
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
         if (!itemId) return;
@@ -130,7 +126,7 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessP
     emit('update-form', { page_access: pageAccessPermissions });
 });
 watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
-    menuItems.value = getPageAccessMenuListByRoleType(roleType, domainStore.state.domainId);
+    menuItems.value = getPageAccessMenuListByRoleType(roleType);
     setPageAccessPermissionsData();
 }, { immediate: true });
 </script>
