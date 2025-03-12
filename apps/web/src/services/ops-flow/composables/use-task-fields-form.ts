@@ -49,10 +49,16 @@ export const useTaskFieldsForm = ({
     });
     const setDefaultFieldData = (fieldId: string, value: string) => {
         hasUnsavedFieldsChanges.value = defaultData.value[fieldId] !== value;
-        defaultData.value[fieldId] = value;
+        defaultData.value = {
+            ...defaultData.value,
+            [fieldId]: value,
+        };
     };
     const setDefaultFieldValidation = (fieldId: string, isValid: boolean) => {
-        defaultDataValidationMap.value[fieldId] = isValid;
+        defaultDataValidationMap.value = {
+            ...defaultDataValidationMap.value,
+            [fieldId]: isValid,
+        };
     };
     const initDefaultFieldData = (task?: TaskModel) => {
         if (task) {
@@ -74,10 +80,16 @@ export const useTaskFieldsForm = ({
     const isFieldValid = computed<boolean>(() => fieldsToShow.value?.every((field) => dataValidationMap.value[field.field_id]) ?? true);
     const setFieldData = (fieldId: string, value: string) => {
         hasUnsavedFieldsChanges.value = data.value[fieldId] !== value;
-        data.value[fieldId] = value;
+        data.value = {
+            ...data.value,
+            [fieldId]: value,
+        };
     };
     const setFieldValidation = (fieldId: string, isValid: boolean) => {
-        dataValidationMap.value[fieldId] = isValid;
+        dataValidationMap.value = {
+            ...dataValidationMap.value,
+            [fieldId]: isValid,
+        };
     };
     const initFieldData = (task?: TaskModel) => {
         if (task) {

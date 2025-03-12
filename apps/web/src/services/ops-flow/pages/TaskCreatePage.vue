@@ -28,13 +28,11 @@ import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router/composables'
 import { QueryClient, useMutation } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
-import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
     PHeadingLayout, PHeading, PButton, PPaneLayout, PSkeleton,
 } from '@cloudforet/mirinae';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -66,9 +64,11 @@ const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
 const taskContentFormGetters = taskContentFormStore.getters;
 onBeforeMount(() => {
-    taskContentFormStore.setCurrentCategoryId(categoryId.value);
-    taskContentFormStore.setCurrentTaskTypeId(taskTypeId.value);
-    taskContentFormStore.setMode(taskTypeId.value ? 'create-minimal' : 'create');
+    const categoryId: TaskCreatePageQueryValue['categoryId'] = queryStringToString(route.query.categoryId);
+    const taskTypeId: TaskCreatePageQueryValue['taskTypeId'] = queryStringToString(route.query.taskTypeId);
+    taskContentFormStore.setCurrentCategoryId(categoryId);
+    taskContentFormStore.setCurrentTaskTypeId(taskTypeId);
+    taskContentFormStore.setMode(taskTypeId ? 'create-minimal' : 'create');
 });
 onUnmounted(() => {
     taskContentFormStore.$reset();
@@ -78,8 +78,7 @@ onUnmounted(() => {
 /* route and query */
 const router = useRouter();
 const route = useRoute();
-const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
-const taskTypeId = computed<TaskCreatePageQueryValue['taskTypeId']>(() => queryStringToString(route.query.taskTypeId));
+const { getProperRouteLocation } = useProperRouteLocation();
 
 /* header and back button */
 const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string);
@@ -89,8 +88,8 @@ const {
     goBack,
 } = useGoBack({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
-    query: { categoryId: categoryId.value } as BoardPageQuery,
-});
+    query: { categoryId: route.query.categoryId } as BoardPageQuery,
+}));
 const handleClickBack = () => {
     if (pathFrom.value?.name === OPS_FLOW_ROUTE.LANDING._NAME) {
         router.back();
@@ -100,23 +99,32 @@ const handleClickBack = () => {
 };
 
 /* task type */
-const { currentTaskType, isLoading } = useCurrentTaskType({ taskTypeId });
+const { currentTaskType, isLoading } = useCurrentTaskType({
+    taskTypeId: computed(() => taskContentFormState.currentTaskTypeId),
+});
 
 /* create task */
 const { taskAPI, taskListQueryKey } = useTaskApi();
 const queryClient = new QueryClient();
-const { data: createdTask, mutateAsync: createTaskMutation, isPending: isCreating } = useMutation<TaskModel, APIError>({
-    mutationFn: async () => {
-        if (!currentTaskType.value) throw new Error('Task type is not selected');
+interface CreateTaskVariables {
+    taskTypeId: string;
+    name: string;
+    description?: string;
+    data?: Record<string, any>;
+    files?: string[];
+    projectId: string;
+    statusId: string;
+}
+const { data: createdTask, mutateAsync: createTaskMutation, isPending: isCreating } = useMutation({
+    mutationFn: async (variables: CreateTaskVariables) => {
         const res = await taskAPI.create({
-            task_type_id: currentTaskType.value.task_type_id,
-            name: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.title],
-            status_id: taskContentFormState.statusId as string,
-            description: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.description] || undefined,
-            assignee: taskContentFormState.assignee || undefined,
-            data: isEmpty(taskContentFormGetters.data) ? undefined : taskContentFormGetters.data,
-            files: taskContentFormState.fileIds,
-            project_id: currentTaskType.value.require_project ? taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
+            task_type_id: variables.taskTypeId,
+            name: variables.name,
+            status_id: variables.statusId,
+            description: variables.description,
+            data: variables.data,
+            files: variables.files,
+            project_id: variables.projectId,
         });
         return res;
     },
@@ -144,7 +152,24 @@ onBeforeRouteLeave(handleBeforeRouteLeave);
 /* form button handling */
 const handleConfirm = async () => {
     if (!taskContentFormGetters.isAllValid) return;
-    await createTaskMutation();
+    if (!currentTaskType.value) {
+        ErrorHandler.handleRequestError(new Error('Task type is not defined'), 'Error occurred before creating task', true);
+        return;
+    }
+    if (!taskContentFormState.statusId) {
+        ErrorHandler.handleRequestError(new Error('Status is not defined'), 'Error occurred before creating task', true);
+        return;
+    }
+    await createTaskMutation({
+        taskTypeId: currentTaskType.value.task_type_id,
+        name: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.title],
+        description: taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.description],
+        data: isEmpty(taskContentFormGetters.data) ? undefined : taskContentFormGetters.data,
+        files: taskContentFormState.fileIds.length ? taskContentFormState.fileIds : undefined,
+        projectId: currentTaskType.value.require_project ? taskContentFormGetters.defaultData[DEFAULT_FIELD_ID_MAP.project] : '*',
+        statusId: taskContentFormState.statusId,
+        // assignee: taskContentFormState.assignee || undefined,
+    });
     if (createdTask.value) {
         goBack();
     }

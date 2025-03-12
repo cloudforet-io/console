@@ -27,6 +27,8 @@ import { useCategoryField } from '@/services/ops-flow/composables/use-category-f
 import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
 import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
 import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
+import { useDefaultStatusOption } from '@/services/ops-flow/composables/use-default-status-option';
+import { useTargetStatusOption } from '@/services/ops-flow/composables/use-target-status-option';
 import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
 import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
@@ -188,12 +190,18 @@ watch(selectedStatusItems, (items) => { // sync status id to store
 const { categoryStatusOptions } = useCategoryStatusOptions({
     categoryId: computed(() => taskContentFormState.currentCategoryId ?? originTask.value?.category_id),
 });
-watch([originTask, isOriginTaskLoading, categoryStatusOptions], ([task, loading, stautsOps]) => { // init selected status by origin task (only for view mode)
-    if (loading || !stautsOps) return;
-    const statusOption = task ? stautsOps[task.status_type]?.find((status) => status.status_id === task.status_id) : undefined;
-    if (selectedStatusItems[0]?.name !== statusOption?.status_id) {
-        setInitialStatus(statusOption);
-    }
+const targetStatusType = computed(() => originTask.value?.status_type ?? 'TODO');
+const { defaultStatusOption } = useDefaultStatusOption({ categoryStatusOptions, targetStatusType });
+const { targetStatusOption } = useTargetStatusOption({
+    categoryStatusOptions,
+    targetStatusType,
+    targetStatusId: computed(() => (isOriginTaskLoading.value ? undefined : originTask.value?.status_id)),
+});
+watch([isOriginTaskLoading, targetStatusOption, defaultStatusOption], ([loading, targetOp, defaultOp]) => { // init selected status by origin task (only for view mode)
+    if (loading) return;
+    const statusOp = targetOp ?? defaultOp;
+    if (statusOp?.status_id === selectedStatusItems.value[0]?.name) return;
+    setInitialStatus(statusOp);
 }, { immediate: true });
 
 /* assignee */
