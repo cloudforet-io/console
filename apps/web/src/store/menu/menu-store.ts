@@ -4,10 +4,11 @@ import { defineStore } from 'pinia';
 
 import type { Menu, MenuId } from '@/lib/menu/config';
 
+export type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
+
 interface MenuStoreState {
     menuList: Menu[];
 }
-export type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
 
 export const useMenuStore = defineStore('menu-store', () => {
     const state = reactive<MenuStoreState>({
@@ -15,7 +16,7 @@ export const useMenuStore = defineStore('menu-store', () => {
     });
 
     const getters = reactive({
-        generateFlattenedMenuMap: computed(() => {
+        generateFlattenedMenuMap: computed<FlattenedMenuMap>(() => {
             const map: FlattenedMenuMap = {};
 
             const getSubMenuIdsToMap = (menu: Menu, flattenedMenuMap: FlattenedMenuMap) => {
