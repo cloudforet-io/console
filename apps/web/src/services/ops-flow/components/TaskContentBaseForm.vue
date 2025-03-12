@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -149,7 +149,8 @@ const {
     categoryId: computed(() => currentCategory.value?.category_id),
 });
 const getStatusTypeLabel = (statusType?: TaskStatusType) => (statusType ? TASK_STATUS_LABELS[statusType] : '--');
-const { taskAPI } = useTaskApi();
+const { taskAPI, taskListQueryKey } = useTaskApi();
+const queryClient = useQueryClient();
 const { mutateAsync: changeStatus } = useMutation({
     mutationFn: ({ taskId, statusId }: {
         taskId: string;
@@ -160,6 +161,7 @@ const { mutateAsync: changeStatus } = useMutation({
     }),
     onSuccess: (newTask: TaskModel) => {
         setOriginTaskQueryData(newTask);
+        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: i18n.t('OPSFLOW.STATUS') }), '');
         refetchEvents();
     },
