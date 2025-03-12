@@ -62,7 +62,8 @@ const { data: comments } = useQuery({
         });
         return response.results ?? [];
     },
-    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 15, // 15 seconds
 });
 const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value?.map((comment) => ({
     title: comment.created_at,

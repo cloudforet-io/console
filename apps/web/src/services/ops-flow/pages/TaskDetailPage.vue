@@ -80,21 +80,13 @@ const props = defineProps<{
 const userStore = useUserStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-/* scoped stores */
-const taskDetailPageStore = useTaskDetailPageStore();
-const taskContentFormStore = useTaskContentFormStore();
-onUnmounted(() => {
-    taskDetailPageStore.$reset();
-    taskDetailPageStore.$dispose();
-    taskContentFormStore.$reset();
-    taskContentFormStore.$dispose();
-});
-
 /* route */
 const router = useRouter();
 const route = useRoute();
+
+/* go back */
+const { getProperRouteLocation } = useProperRouteLocation();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
-const error = ref<APIError | null>(null);
 const {
     pathFrom,
     setPathFrom,
@@ -102,20 +94,43 @@ const {
 } = useGoBack({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
+}));
+
+/* task */
+const { taskListQueryKey, taskAPI } = useTaskApi();
+const {
+    task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask, error: errorOnTask,
+} = useTaskQuery({
+    queryKey: computed(() => ({ task_id: props.taskId })),
+    enabled: computed(() => !!props.taskId && !!pathFrom.value),
 });
-watch(error, (err) => {
+watch(errorOnTask, (err) => {
     if (err) {
         goBack();
         ErrorHandler.handleRequestError(err, 'Failed to get task');
     }
 });
 
-/* task */
-const { taskListQueryKey, taskAPI } = useTaskApi();
-const { task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask } = useTaskQuery({
-    queryKey: computed(() => ({ task_id: props.taskId })),
-    enabled: computed(() => !!props.taskId && !!pathFrom.value),
+/* scoped stores */
+const taskDetailPageStore = useTaskDetailPageStore();
+const taskContentFormStore = useTaskContentFormStore();
+watch(task, (t) => {
+    if (t) taskContentFormStore.reset(t);
+}, { immediate: true });
+watch(() => props.taskId, (id) => {
+    if (!id) return;
+    taskDetailPageStore.setTargetTaskId(id);
+}, { immediate: true });
+onBeforeMount(() => {
+    taskContentFormStore.setMode('view');
 });
+onUnmounted(() => {
+    taskDetailPageStore.$reset();
+    taskDetailPageStore.$dispose();
+    taskContentFormStore.$reset();
+    taskContentFormStore.$dispose();
+});
+
 
 /* header and back button */
 const headerTitle = computed<string>(() => task.value?.name ?? '');
@@ -140,6 +155,12 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
         hash: `#${tab}`,
     });
 };
+watch(task, (t) => {
+    if (!t) return; // route guard will get task and go back if task is not found
+    if (route.hash === '#progress') {
+        activeTab.value = 'progress';
+    }
+});
 
 /* update task */
 const queryClient = new QueryClient();
@@ -187,21 +208,6 @@ const {
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
-/* init */
-watch(task, (t) => {
-    if (!t) return; // route guard will get task and go back if task is not found
-    if (route.hash === '#progress') {
-        activeTab.value = 'progress';
-    }
-    taskContentFormStore.reset(t);
-});
-watch(() => props.taskId, (id) => {
-    if (!id) return;
-    taskDetailPageStore.setTargetTaskId(id);
-}, { immediate: true });
-onBeforeMount(() => {
-    taskContentFormStore.setMode('view');
-});
 
 /* expose */
 defineExpose({ setPathFrom });

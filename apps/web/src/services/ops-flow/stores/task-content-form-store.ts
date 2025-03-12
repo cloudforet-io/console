@@ -4,7 +4,6 @@ import { isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -20,7 +19,6 @@ interface UseTaskContentFormStoreState {
     currentCategoryId?: string;
     currentTaskTypeId?: string;
     currentTaskId?: string;
-    currentTaskType?: TaskTypeModel;
     statusId?: string;
     assignee?: string;
     isBaseFormValid: boolean;
@@ -50,7 +48,6 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         currentCategoryId: undefined,
         currentTaskTypeId: undefined,
         currentTaskId: undefined,
-        currentTaskType: undefined,
         statusId: undefined,
         assignee: undefined,
         isBaseFormValid: false,
@@ -60,7 +57,8 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         hasFileIdsChanged: false,
     });
 
-    const taskTypeId = computed(() => state.currentTaskType?.task_type_id);
+    /* current task type */
+    const taskTypeId = computed(() => state.currentTaskTypeId);
     const { has403Error: isArchivedTask } = useCurrentTaskType({ taskTypeId });
 
     /* fields form */

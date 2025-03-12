@@ -15,15 +15,15 @@ export const useTaskQuery = ({
 }) => {
     const { taskQueryKey, taskAPI } = useTaskApi();
     const qk = computed(() => [...taskQueryKey.value, queryKey.value]);
-    const { data: task, isLoading } = useQuery({
+    const { data: task, isLoading, error } = useQuery({
         queryKey: qk,
         queryFn: async () => {
             const result = await taskAPI.get(queryKey.value);
             return result;
         },
         enabled,
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        gcTime: 0,
+        staleTime: 1000 * 60, // 1 minute
+        gcTime: 1000 * 15, // 15 seconds
     });
 
     const queryClient = useQueryClient();
@@ -35,5 +35,6 @@ export const useTaskQuery = ({
         isLoading,
         queryKey: qk,
         setQueryData,
+        error,
     };
 };

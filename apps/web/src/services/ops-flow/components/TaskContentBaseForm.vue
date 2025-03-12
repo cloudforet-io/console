@@ -38,14 +38,14 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+/* glob stores */
+const userStore = useUserStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-
+/* scoped stores */
 const taskContentFormStore = useTaskContentFormStore();
 const taskContentFormState = taskContentFormStore.state;
-const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
-const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const userStore = useUserStore();
 
 
 /* mode */
@@ -66,7 +66,6 @@ const { refetch: refetchEvents } = useTaskEventsQuery({
     fetchOnCreation: false,
 });
 
-
 /* category field */
 const { categories } = useCategoriesQuery();
 const {
@@ -85,6 +84,7 @@ const handleUpdateSelectedCategory = (items: typeof selectedCategoryItems.value)
     setSelectedCategoryItems(items);
 };
 watch(selectedCategoryItems, (items) => { // sync category id to store
+    if (items[0]?.name === taskContentFormState.currentCategoryId) return;
     taskContentFormStore.setCurrentCategoryId(items[0]?.name);
 });
 const { currentCategory, isLoading: isCategoryLoading } = useCurrentCategory({
@@ -94,7 +94,6 @@ const taskCategoryDesciprion = computed<string>(() => {
     if (!currentCategory.value) return '';
     return currentCategory.value.description;
 });
-
 watch([currentCategory, isCategoryLoading], ([category, loading]) => { // init selected category (both create and view mode)
     if (loading) return;
     if (category?.category_id !== selectedCategoryItems.value[0]?.name) {
@@ -198,6 +197,7 @@ watch([originTask, isOriginTaskLoading, categoryStatusOptions], ([task, loading,
 }, { immediate: true });
 
 /* assignee */
+const userReferenceStore = useUserReferenceStore();
 const handleClickAssign = () => {
     if (!currentTaskType.value) {
         ErrorHandler.handleError(new Error('Task type is not selected'));
