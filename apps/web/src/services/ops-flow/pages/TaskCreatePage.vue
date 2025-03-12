@@ -78,7 +78,6 @@ onUnmounted(() => {
 /* route and query */
 const router = useRouter();
 const route = useRoute();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 /* header and back button */
 const headerTitle = computed<string>(() => _i18n.t('OPSFLOW.CREATE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string);
@@ -89,7 +88,7 @@ const {
 } = useGoBack({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: route.query.categoryId } as BoardPageQuery,
-}));
+});
 const handleClickBack = () => {
     if (pathFrom.value?.name === OPS_FLOW_ROUTE.LANDING._NAME) {
         router.back();

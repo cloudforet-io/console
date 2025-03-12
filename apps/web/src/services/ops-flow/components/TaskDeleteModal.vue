@@ -24,15 +24,11 @@ const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { taskAPI, taskListQueryKey } = useTaskApi();
-const { queryKey: taskQueryKey } = useTaskQuery({
-    taskId: computed(() => taskDetailPageStore.state.targetTaskId),
-});
 const queryClient = useQueryClient();
-const { mutate: deleteTask, isSuccess, isPending } = useMutation({
+const { mutate: deleteTask, isSuccess: hasDeleted, isPending } = useMutation({
     mutationFn: ({ taskId }: { taskId: string }) => taskAPI.delete({ task_id: taskId }),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
-        queryClient.invalidateQueries({ queryKey: taskQueryKey.value });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string, '');
     },
     onError: (e) => {
@@ -41,6 +37,10 @@ const { mutate: deleteTask, isSuccess, isPending } = useMutation({
     onSettled: () => {
         taskDetailPageStore.closeTaskDeleteModal();
     },
+});
+const { removeQuery: removeTaskQuery } = useTaskQuery({
+    taskId: computed(() => taskDetailPageStore.state.targetTaskId),
+    enabled: computed(() => taskDetailPageStore.state.visibleTaskDeleteModal),
 });
 
 const handleConfirm = () => {
@@ -51,7 +51,10 @@ const handleConfirm = () => {
     deleteTask({ taskId: taskDetailPageStore.state.targetTaskId });
 };
 const handleClosed = () => {
-    if (isSuccess.value) emit('deleted');
+    if (hasDeleted.value) {
+        emit('deleted');
+        removeTaskQuery();
+    }
 };
 </script>
 

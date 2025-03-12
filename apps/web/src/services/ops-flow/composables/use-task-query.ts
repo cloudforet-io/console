@@ -37,11 +37,15 @@ export const useTaskQuery = ({
     const setQueryData = (newTask: TaskModel) => {
         queryClient.setQueryData(queryKey.value, newTask);
     };
+    const removeQuery = () => {
+        queryClient.removeQueries({ queryKey: queryKey.value });
+    };
     return {
         data,
         isLoading,
         queryKey,
         setQueryData,
         error,
+        removeQuery,
     };
 };

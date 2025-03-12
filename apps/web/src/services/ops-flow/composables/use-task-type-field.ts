@@ -69,7 +69,7 @@ export const useTaskTypeField = ({
 
     // taskTypesdropdownKey is for the dropdown component to re-render when the allTaskTypeItems value changes
     // This is a workaround for the issue that the dropdown component does not re-render when the allTaskTypeItems value changes
-    const taskTypesDropdownKey = computed<string>(() => allTaskTypeItems.value.map((item) => item.name).join(','));
+    const taskTypesDropdownKey = computed<string>(() => `task-type-${allTaskTypeItems.value.map((item) => item.name).join(',')}`);
 
     const setInitialTaskType = (taskType?: TaskTypeModel) => {
         taskTypeValidator.setValue(taskType ? [{ name: taskType.task_type_id, label: taskType.name }] : []);

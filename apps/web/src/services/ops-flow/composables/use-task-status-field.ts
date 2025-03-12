@@ -87,7 +87,7 @@ export const useTaskStatusField = ({
 
     // taskStatusDropdownKey is for the dropdown component to re-render when the allStatusItems value changes
     // This is a workaround for the issue that the dropdown component does not re-render when the allStatusItems value changes
-    const taskStatusDropdownKey = computed<string>(() => allStatusItems.value.map((item) => item.name).join(','));
+    const taskStatusDropdownKey = computed<string>(() => `task-status-${allStatusItems.value.map((item) => item.name).join(',')}`);
 
 
     return {

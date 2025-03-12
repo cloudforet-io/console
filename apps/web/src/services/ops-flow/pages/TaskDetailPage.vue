@@ -85,7 +85,6 @@ const router = useRouter();
 const route = useRoute();
 
 /* go back */
-const { getProperRouteLocation } = useProperRouteLocation();
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
 const {
     pathFrom,
@@ -94,7 +93,7 @@ const {
 } = useGoBack({
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
-}));
+});
 
 /* task */
 const { taskListQueryKey, taskAPI } = useTaskApi();
