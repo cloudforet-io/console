@@ -14,7 +14,6 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
-import { SpaceRouter } from '@/router';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
@@ -50,7 +49,7 @@ const router = useRouter();
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    timezone: computed<string|undefined>(() => userStore.state.timezone),
+    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
 });
 const state = reactive({
     loading: false,
