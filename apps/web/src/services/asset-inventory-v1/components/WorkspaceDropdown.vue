@@ -10,8 +10,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dr
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';

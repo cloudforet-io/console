@@ -1,3 +1,4 @@
+import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
 
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
@@ -9,24 +10,19 @@ import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import { useTaskTypesQuery } from './use-task-types-query';
 
 interface CategoryItem extends SelectDropdownMenuItem {
     packageId: string;
 }
 export const useCategoryField = ({
-    isRequired, hasTaskTypeOnly,
+    isRequired, hasTaskTypeOnly, categories,
 }: {
     isRequired?: boolean;
     hasTaskTypeOnly?: boolean;
-} = {}) => {
-    const packageStore = usePackageStore();
-    const taskCategoryStore = useTaskCategoryStore();
-    const taskTypeStore = useTaskTypeStore();
-
-    const categoryValidator = useFieldValidator<SelectDropdownMenuItem[]|CategoryItem[]>(
+    categories: Ref<TaskCategoryModel[]|undefined>;
+}) => {
+    const categoryValidator = useFieldValidator<CategoryItem[]>(
         [],
         isRequired ? (val) => {
             if (val.length === 0) {
@@ -45,32 +41,37 @@ export const useCategoryField = ({
         categoryValidator.setValue(selectedCategories);
     };
 
-    const taskCategories = computed<TaskCategoryModel[]>(() => taskCategoryStore.getters.taskCategoriesIncludingDeleted);
-    const taskTypesByCategoryId = computed<Record<string, TaskTypeModel[]|undefined>>(() => taskTypeStore.state.itemsByCategoryId);
-    const preloadCategories = async () => {
-        await taskCategoryStore.list();
-        if (hasTaskTypeOnly) {
-            await taskTypeStore.listByCategoryIds(taskCategories.value.map((c) => c.category_id));
-        }
-    };
+    const { taskTypes } = useTaskTypesQuery({
+        queryKey: computed(() => ({
+            query: { filter: [{ k: 'category_id', v: categories.value?.map((c) => c.category_id), o: 'in' }] },
+        })),
+        enabled: computed(() => !!categories.value),
+    });
+    const taskTypesByCategoryId = computed<Record<string, TaskTypeModel[]|undefined>>(() => {
+        const map: Record<string, TaskTypeModel[]> = {};
+        categories.value?.forEach((c) => {
+            map[c.category_id] ??= taskTypes.value?.filter((t) => t.category_id === c.category_id) ?? [];
+        });
+        return map;
+    });
 
     const dropdownCategoryItems = computed<CategoryItem[]>(() => {
         if (hasTaskTypeOnly) {
-            return taskCategories.value.filter((c) => c.state !== 'DELETED').map((c) => {
-                const taskTypes = taskTypesByCategoryId.value[c.category_id];
+            return categories.value?.filter((c) => c.state !== 'DELETED')?.map((c) => {
+                const tt = taskTypesByCategoryId.value[c.category_id];
                 return {
                     name: c.category_id,
                     label: c.name,
-                    disabled: !taskTypes || taskTypes.length === 0,
+                    disabled: !tt || tt.length === 0,
                     packageId: c.package_id,
                 };
-            });
+            }) ?? [];
         }
-        return taskCategories.value.map((c) => ({
+        return categories.value?.map((c) => ({
             name: c.category_id,
             label: c.name,
             packageId: c.package_id,
-        }) || []);
+        })) ?? [];
     });
     const categoryItemsByPackage = computed<Record<string, CategoryItem[]>>(() => {
         const map: Record<string, CategoryItem[]> = {};
@@ -99,74 +100,16 @@ export const useCategoryField = ({
         prevSelectedCategoryItems.value = packageId ? categoryItemsByPackage.value[packageId] ?? [] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
     };
-    const setInitialCategory = (categoryId: string) => {
-        prevSelectedCategoryItems.value = taskCategoryStore.getters.taskCategoriesIncludingDeleted.filter((c) => c.category_id === categoryId).map((c) => ({
-            name: c.category_id,
-            label: c.name,
-            packageId: c.package_id,
-        }));
+    const setInitialCategory = (category?: TaskCategoryModel) => {
+        prevSelectedCategoryItems.value = category ? [{ name: category.category_id, label: category.name, packageId: category.package_id }] : [];
         categoryValidator.setValue(prevSelectedCategoryItems.value);
+        categoryValidator.resetValidation();
     };
 
-
-    const addPackageToCategories = async (packageId: string, categoryIds: string[]) => {
-        const responses = await Promise.allSettled([
-            ...categoryIds.map((categoryId) => taskCategoryStore.update({
-                package_id: packageId,
-                category_id: categoryId,
-            })),
-        ]);
-        const errorMessages: string[] = [];
-        responses.forEach((response, index) => {
-            if (response.status === 'rejected') {
-                errorMessages.push(`- Category ID: ${categoryIds[index]}, Reason: ${response.reason.message}`);
-            }
-        });
-        if (errorMessages.length > 0) {
-            throw new Error(`Failed to add package to categories:\n${errorMessages.join('\n')}`);
-        }
-    };
-    const bindDefaultPackageToCategories = async (categoryIds: string[]) => {
-        if (!packageStore.getters.defaultPackage) throw new Error('Default package not found');
-        const defaultPackageId = packageStore.getters.defaultPackage.package_id;
-        const responses = await Promise.allSettled([
-            ...categoryIds.map((categoryId) => taskCategoryStore.update({
-                package_id: defaultPackageId,
-                category_id: categoryId,
-            })),
-        ]);
-        const errorMessages: string[] = [];
-        responses.forEach((response, index) => {
-            if (response.status === 'rejected') {
-                errorMessages.push(`- Category ID: ${categoryIds[index]}, Reason: ${response.reason.message}`);
-            }
-        });
-        if (errorMessages.length > 0) {
-            throw new Error(`Failed to bind default package to categories:\n${errorMessages.join('\n')}`);
-        }
-    };
     const addedCategoryItems = computed(() => selectedCategoryItems.value.filter((item) => !prevSelectedCategoryItems.value.some((c) => c.name === item.name)));
     const removedCategoryItems = computed(() => prevSelectedCategoryItems.value.filter((item) => !selectedCategoryItems.value.some((c) => c.name === item.name)));
-    const applyPackageToCategories = async (packageId: string) => {
-        const addedCategories = addedCategoryItems.value.map((item) => item.name);
-        const removedCategories = removedCategoryItems.value.map((item) => item.name);
-        const responses = await Promise.allSettled([
-            addPackageToCategories(packageId, addedCategories),
-            bindDefaultPackageToCategories(removedCategories),
-        ]);
-        const errorMessages: string[] = [];
-        responses.forEach((response) => {
-            if (response.status === 'rejected') {
-                errorMessages.push(response.reason.message);
-            }
-        });
-        if (errorMessages.length > 0) {
-            throw new Error(`Failed to apply package to categories:\n${errorMessages.join('\n')}`);
-        }
-    };
 
     return {
-        preloadCategories,
         selectedCategoryItems,
         selectedCategoryIds,
         categoryValidator,
@@ -174,7 +117,6 @@ export const useCategoryField = ({
         setSelectedCategoryItems,
         setInitialCategoriesByPackageId,
         setInitialCategory,
-        applyPackageToCategories,
         addedCategoryItems,
         removedCategoryItems,
     };

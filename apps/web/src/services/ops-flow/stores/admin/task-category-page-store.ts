@@ -1,18 +1,10 @@
-import { asyncComputed } from '@vueuse/core';
 import {
-    reactive, computed, onUnmounted, onMounted,
+    reactive, onUnmounted,
 } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
-import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
 
 interface UseTaskCategoryPageStoreState {
@@ -31,22 +23,8 @@ interface UseTaskCategoryPageStoreState {
     visibleTaskTypeDeleteModal: boolean;
 }
 
-interface UseTaskCategoryPageStoreGetters {
-    currentCategory: TaskCategoryModel|undefined;
-    // status
-    statusOptions: TaskStatusOptions;
-    targetStatusOption: {
-        type: TaskStatusType;
-        data: TaskStatusOption;
-    }|undefined;
-    // task type
-    taskTypes: TaskTypeModel[]|undefined;
-    targetTaskType: TaskTypeModel|undefined;
-}
 
 export const useTaskCategoryPageStore = defineStore('task-category-page', () => {
-    const taskCategoryStore = useTaskCategoryStore();
-    const taskTypeStore = useTaskTypeStore();
     const state = reactive<UseTaskCategoryPageStoreState>({
         currentCategoryId: undefined,
         // status
@@ -59,46 +37,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         targetTaskTypeId: undefined,
         visibleTaskTypeDeleteModal: false,
     });
-    const getters: UseTaskCategoryPageStoreGetters = {
-        currentCategory: computed<TaskCategoryModel|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.currentCategoryId)),
-        // status
-        statusOptions: computed<TaskStatusOptions>(() => {
-            const category = getters.currentCategory;
-            if (!category) {
-                return {
-                    TODO: [],
-                    IN_PROGRESS: [],
-                    COMPLETED: [],
-                };
-            }
-            return category.status_options;
-        }),
-        targetStatusOption: computed<{
-            type: TaskStatusType;
-            data: TaskStatusOption;
-        }|undefined>(() => {
-            if (!state.targetStatus) return undefined;
-            const { statusId, type } = state.targetStatus;
-            const statusOptions = getters.statusOptions;
-            if (!statusOptions) return undefined;
-            const data = statusOptions[type].find((status) => status.status_id === statusId);
-            if (!data) return undefined;
-            return {
-                type,
-                data,
-            };
-        }),
-        // task type
-        taskTypes: asyncComputed<TaskTypeModel[]|undefined>(async () => {
-            if (!state.currentCategoryId) return undefined;
-            if (!taskTypeStore.state.itemsByCategoryId[state.currentCategoryId]) await taskTypeStore.listByCategoryId(state.currentCategoryId);
-            return taskTypeStore.state.itemsByCategoryId[state.currentCategoryId];
-        }, undefined, { lazy: true, onError: ErrorHandler.handleError }),
-        targetTaskType: computed<TaskTypeModel|undefined>(() => {
-            if (!state.targetTaskTypeId) return undefined;
-            return getters.taskTypes?.find((taskType) => taskType.task_type_id === state.targetTaskTypeId);
-        }),
-    } as unknown as UseTaskCategoryPageStoreGetters;
 
     const actions = {
         setCurrentCategoryId(categoryId: string) {
@@ -145,16 +83,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         resetTargetStatus() {
             state.targetStatus = undefined;
         },
-        async listTaskTypes() {
-            try {
-                if (!state.currentCategoryId) throw new Error('currentCategoryId is not set');
-                const taskTypes = await taskTypeStore.listByCategoryId(state.currentCategoryId, true);
-                return taskTypes;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        },
         openAddTaskTypeForm() {
             state.targetTaskTypeId = undefined;
             state.visibleTaskTypeForm = true;
@@ -180,10 +108,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
         },
     };
 
-    onMounted(() => {
-        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
-    });
-
 
     const disposeSelf = () => {
         const store = useTaskCategoryPageStore();
@@ -195,7 +119,6 @@ export const useTaskCategoryPageStore = defineStore('task-category-page', () => 
     });
     return {
         state,
-        getters,
         ...actions,
     };
 });

@@ -1,37 +1,54 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PHeading, PSelectCard, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-
 import { useFormValidator } from '@/common/composables/form-validator';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
+import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-page-type';
 
 
+
 const router = useRouter();
 
-const taskCategoryStore = useTaskCategoryStore();
-const taskTypeStore = useTaskTypeStore();
-const taskTypeState = taskTypeStore.state;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const loading = ref(true);
-const availableCategories = ref<TaskCategoryModel[]>([]);
+/* categories */
+const { availableCategories, isLoading: isLoadingCategories } = useAvailableCategories();
+const categoriesWithTaskType = computed(() => {
+    if (!availableCategories.value) return [];
+    return availableCategories.value.filter((c) => !!taskTypesByCategoryId.value[c.category_id]?.length);
+});
+
+/* task types */
+const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery({
+    queryKey: computed(() => ({
+        query: {
+            filter: [{ k: 'category_id', v: availableCategories.value?.map((c) => c.category_id), o: 'in' }],
+        },
+    })),
+    enabled: computed(() => !!availableCategories.value?.length),
+});
+const taskTypesByCategoryId = computed(() => {
+    if (!taskTypes.value?.length) return {};
+    // Using Object.groupBy (ES2023)
+    return Object.groupBy(taskTypes.value, (taskType) => taskType.category_id);
+});
+
+/* form */
 const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator({
     category: '',
     taskType: '',
@@ -45,33 +62,19 @@ const { forms: { category, taskType }, setForm, isAllValid } = useFormValidator(
 });
 const handleChangeCategory = async (value: string) => {
     setForm('category', value);
-    await taskTypeStore.listByCategoryId(value);
     setForm('taskType', '');
 };
 const handleChangeTaskType = (value: string) => {
     setForm('taskType', value);
 };
+
+/* step */
 const goToTaskCreatePage = () => {
     router.push({
         name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
         query: { categoryId: category.value, taskTypeId: taskType.value } as TaskCreatePageQuery,
     });
 };
-
-
-onMounted(async () => {
-    loading.value = true;
-    let allCategories = await taskCategoryStore.list(true) ?? [];
-    allCategories = allCategories.filter((c) => c.state !== 'DELETED');
-    if (!allCategories.length) {
-        loading.value = false;
-        return;
-    }
-    await taskTypeStore.listByCategoryIds(allCategories.map((c) => c.category_id));
-    availableCategories.value = allCategories.filter((c) => taskTypeState.itemsByCategoryId[c.category_id]?.length);
-    setForm('category', '');
-    loading.value = false;
-});
 </script>
 
 <template>
@@ -93,8 +96,8 @@ onMounted(async () => {
                     >
                 </div>
             </div>
-            <p-data-loader :loading="loading"
-                           :data="availableCategories"
+            <p-data-loader :loading="isLoadingCategories || isLoadingTaskTypes"
+                           :data="categoriesWithTaskType"
                            loader-backdrop-color="gray.100"
                            class="min-h-72"
             >
@@ -105,7 +108,7 @@ onMounted(async () => {
                         </p>
                         <div class="flex justify-center">
                             <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                                <p-select-card v-for="c in availableCategories"
+                                <p-select-card v-for="c in categoriesWithTaskType"
                                                :key="c.category_id"
                                                class="select-card"
                                                :value="c.category_id"
@@ -132,7 +135,7 @@ onMounted(async () => {
                         </p>
                         <div class="flex justify-center">
                             <div class="grid grid-cols-2 gap-4 justify-center items-center">
-                                <p-select-card v-for="t in taskTypeState.itemsByCategoryId[category]"
+                                <p-select-card v-for="t in taskTypesByCategoryId[category]"
                                                :key="t.task_type_id"
                                                class="select-card"
                                                :label="t.name"

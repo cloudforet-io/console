@@ -1,6 +1,6 @@
-import type { Tags } from '../../../_common/schema/model';
-import type { TaskField } from '../../_types/task-field-type';
-import type { TaskStatusOptions } from '../../task/schema/type';
+import type { Tags } from '@/api-clients/_common/schema/model';
+import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TaskStatusOptions } from '@/api-clients/opsflow/task/schema/type';
 
 export interface TaskCategoryModel {
     category_id: string;

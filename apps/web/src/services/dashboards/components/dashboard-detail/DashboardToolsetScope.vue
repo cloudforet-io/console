@@ -10,8 +10,8 @@ import {
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';

@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
@@ -9,10 +9,11 @@ import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
-import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
+import { useTaskTypesQuery } from './use-task-types-query';
 
 
 export const useTaskTypeField = ({
@@ -21,7 +22,6 @@ export const useTaskTypeField = ({
     categoryId: Ref<string|undefined>;
     isRequired?: boolean;
 }) => {
-    const taskTypeStore = useTaskTypeStore();
     const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
     const taskTypeValidator = useFieldValidator<SelectDropdownMenuItem[]>(
@@ -43,18 +43,21 @@ export const useTaskTypeField = ({
         taskTypeValidator.setValue(selectedTaskTypes);
     };
 
-    const allTaskTypeItems = ref<SelectDropdownMenuItem[]>([]);
-    const loadAllTaskTypeItems = async () => {
+    const { taskTypes } = useTaskTypesQuery({
+        queryKey: computed(() => ({
+            query: { filter: [{ k: 'category_id', v: categoryId.value, o: 'eq' }] },
+        })),
+        enabled: computed(() => !!categoryId.value),
+    });
+    const allTaskTypeItems = computed<SelectDropdownMenuItem[]>(() => {
         if (!categoryId.value) return [];
-        const taskTypes = await taskTypeStore.listByCategoryId(categoryId.value);
-        if (!taskTypes) return [];
-        return taskTypes.map((t) => ({
+        if (!taskTypes.value) return [];
+        return taskTypes.value.map((t) => ({
             name: t.task_type_id,
             label: t.name,
         })) || [];
-    };
-    const taskTypeMenuItemsHandler: AutocompleteHandler = async (keyword: string, pageStart = 1, pageLimit = 10) => {
-        allTaskTypeItems.value = await loadAllTaskTypeItems();
+    });
+    const taskTypeMenuItemsHandler: AutocompleteHandler = (keyword: string, pageStart = 1, pageLimit = 10) => {
         const filteredItems = allTaskTypeItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label as string));
         const _totalCount = pageStart - 1 + Number(pageLimit);
         const _slicedResults = filteredItems.slice(pageStart - 1, _totalCount);
@@ -64,8 +67,13 @@ export const useTaskTypeField = ({
         };
     };
 
+    // taskTypesdropdownKey is for the dropdown component to re-render when the allTaskTypeItems value changes
+    // This is a workaround for the issue that the dropdown component does not re-render when the allTaskTypeItems value changes
+    const taskTypesDropdownKey = computed<string>(() => `task-type-${allTaskTypeItems.value.map((item) => item.name).join(',')}`);
+
     const setInitialTaskType = (taskType?: TaskTypeModel) => {
         taskTypeValidator.setValue(taskType ? [{ name: taskType.task_type_id, label: taskType.name }] : []);
+        taskTypeValidator.resetValidation();
     };
 
 
@@ -76,5 +84,6 @@ export const useTaskTypeField = ({
         taskTypeMenuItemsHandler,
         setSelectedTaskTypeItems,
         setInitialTaskType,
+        taskTypesDropdownKey,
     };
 };

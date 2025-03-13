@@ -19,8 +19,10 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
+import {
+    computed, onBeforeMount, onUnmounted, toRef,
 // eslint-disable-next-line import/no-duplicates
-import { computed, onBeforeMount, onUnmounted } from 'vue';
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
@@ -37,9 +39,9 @@ import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
 import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
+import { useCategoryQuery } from '@/services/ops-flow/composables/use-current-category';
 import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -51,12 +53,14 @@ const router = useRouter();
 const route = useRoute();
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
+/* category */
+const { data: currentCategory, isLoading } = useCategoryQuery({
+    categoryId: toRef(props, 'taskCategoryId'),
+});
 /* header and back button */
-const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
+const headerTitle = computed<string>(() => currentCategory.value?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,
@@ -117,7 +121,7 @@ defineExpose({ setPathFrom });
                    show-back-button
                    @click-back-button="handleClickBackButton"
         >
-            <p-skeleton v-if="loading"
+            <p-skeleton v-if="isLoading"
                         height="1.75rem"
                         width="12rem"
             />

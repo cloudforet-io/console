@@ -1,5 +1,5 @@
-import type { MentionTargets } from '../../../comment/schema/type';
-import type { TaskPriority } from '../type';
+import type { MentionTargets } from '@/api-clients/opsflow/comment/schema/type';
+import type { TaskPriority } from '@/api-clients/opsflow/task/schema/type';
 
 export interface TaskCreateParameters {
     task_type_id: string;

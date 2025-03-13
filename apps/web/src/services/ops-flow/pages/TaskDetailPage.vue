@@ -2,7 +2,6 @@
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 
-
 interface IInstance extends ComponentPublicInstance {
     setPathFrom(from: any): void;
 }
@@ -26,12 +25,12 @@ export default defineComponent({
 // eslint-disable-next-line import/no-duplicates,import/order
 import {
     computed, watch, onUnmounted, defineAsyncComponent, ref,
+    onBeforeMount,
     // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
-import type { QueryKey } from '@tanstack/vue-query';
-import { QueryClient, useMutation, useQuery } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
@@ -57,16 +56,17 @@ import BoardTaskComment from '@/services/ops-flow/components/BoardTaskComment.vu
 import CommentDeleteModal from '@/services/ops-flow/components/CommentDeleteModal.vue';
 import TaskAssignModal from '@/services/ops-flow/components/TaskAssignModal.vue';
 import TaskDeleteModal from '@/services/ops-flow/components/TaskDeleteModal.vue';
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
+import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
+import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { BoardPageQuery } from '@/services/ops-flow/types/board-page-type';
 import type { TaskCreatePageQueryValue } from '@/services/ops-flow/types/task-create-page-type';
-
-import { DEFAULT_FIELD_ID_MAP } from '../task-fields-configuration/constants/default-field-constant';
 
 const TaskContentTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskContentTab.vue'));
 const TaskProgressTab = defineAsyncComponent(() => import('@/services/ops-flow/components/TaskProgressTab.vue'));
@@ -76,16 +76,16 @@ const props = defineProps<{
     taskId: string;
 }>();
 
-const taskDetailPageStore = useTaskDetailPageStore();
-const taskContentFormStore = useTaskContentFormStore();
-const taskManagementTemplateStore = useTaskManagementTemplateStore();
+/* glob stores */
 const userStore = useUserStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* route */
 const router = useRouter();
 const route = useRoute();
+
+/* go back */
 const categoryId = computed<TaskCreatePageQueryValue['categoryId']>(() => queryStringToString(route.query.categoryId));
-const error = ref<APIError | null>(null);
 const {
     pathFrom,
     setPathFrom,
@@ -94,39 +94,42 @@ const {
     name: OPS_FLOW_ROUTE.BOARD._NAME,
     query: { categoryId: categoryId.value } as BoardPageQuery,
 });
-watch(error, (err) => {
+
+/* task */
+const { taskListQueryKey, taskAPI } = useTaskApi();
+const {
+    data: task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask, error: errorOnTask,
+} = useTaskQuery({
+    taskId: computed(() => props.taskId),
+    enabled: computed(() => !!props.taskId && !!pathFrom.value),
+});
+watch(errorOnTask, (err) => {
     if (err) {
         goBack();
         ErrorHandler.handleRequestError(err, 'Failed to get task');
     }
 });
 
-/* task */
-const { taskListQueryKey, taskQueryKey, taskAPI } = useTaskApi();
-const taskDetailQueryKey = computed<QueryKey>(() => [
-    taskQueryKey.value,
-    props.taskId,
-]);
-const {
-    data: task,
-    isLoading: loading,
-} = useQuery<TaskModel, APIError>({
-    queryKey: taskDetailQueryKey,
-    queryFn: async ({ queryKey }) => {
-        const taskId = queryKey[1] as string;
-        try {
-            const result = await taskAPI.get({ task_id: taskId });
-            return result;
-        } catch (e) {
-            error.value = e as APIError;
-            throw e;
-        }
-    },
-    enabled: computed(() => !!props.taskId && !!pathFrom.value),
-    retry: false,
-    gcTime: 0,
-    staleTime: 0,
+/* scoped stores */
+const taskDetailPageStore = useTaskDetailPageStore();
+const taskContentFormStore = useTaskContentFormStore();
+watch(task, (t) => {
+    if (t) taskContentFormStore.reset(t);
+}, { immediate: true });
+watch(() => props.taskId, (id) => {
+    if (!id) return;
+    taskDetailPageStore.setTargetTaskId(id);
+}, { immediate: true });
+onBeforeMount(() => {
+    taskContentFormStore.setMode('view');
 });
+onUnmounted(() => {
+    taskDetailPageStore.$reset();
+    taskDetailPageStore.$dispose();
+    taskContentFormStore.$reset();
+    taskContentFormStore.$dispose();
+});
+
 
 /* header and back button */
 const headerTitle = computed<string>(() => task.value?.name ?? '');
@@ -151,27 +154,36 @@ const handleUpdateActiveTab = (tab: 'content'|'progress') => {
         hash: `#${tab}`,
     });
 };
+watch(task, (t) => {
+    if (!t) return; // route guard will get task and go back if task is not found
+    if (route.hash === '#progress') {
+        activeTab.value = 'progress';
+    }
+});
+
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => props.taskId),
+    fetchOnCreation: false,
+});
 
 /* update task */
-const queryClient = new QueryClient();
+const queryClient = useQueryClient();
 const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = useMutation<TaskModel, APIError>({
     mutationFn: async () => {
         if (!task.value) throw new Error('Origin task is not defined');
         const res = await taskAPI.update({
             task_id: task.value.task_id,
-            name: taskContentFormStore.state.defaultData[DEFAULT_FIELD_ID_MAP.title],
+            name: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.title],
         });
         return res;
     },
     onSuccess: () => {
-        queryClient.invalidateQueries({
-            queryKey: [
-                taskListQueryKey,
-                taskQueryKey,
-            ],
-        });
+        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: taskDetailQueryKey.value });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
         taskContentFormStore.resetUnsavedChanges();
+        refetchEvents();
     },
     onError: (error) => {
         ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
@@ -180,7 +192,7 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
 
 /* form button handling */
 const handleSaveChanges = async () => {
-    if (!taskDetailPageStore.getters.isFormValid) return;
+    if (!taskContentFormStore.getters.isAllValid) return;
     await updateTaskMutation();
 };
 
@@ -191,22 +203,10 @@ const {
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskDetailPageStore.getters.hasUnsavedChanges || isSuccess.value),
+    passConfirmation: computed(() => !taskContentFormStore.getters.hasUnsavedChanges || isSuccess.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
-/* lifecycle */
-onUnmounted(() => {
-    taskDetailPageStore.$reset();
-    taskDetailPageStore.$dispose();
-});
-watch(task, (t) => {
-    if (!t) return; // route guard will get task and go back if task is not found
-    if (route.hash === '#progress') {
-        activeTab.value = 'progress';
-    }
-    taskDetailPageStore.setCurrentTask(t);
-});
 
 /* expose */
 defineExpose({ setPathFrom });
@@ -219,7 +219,7 @@ defineExpose({ setPathFrom });
                 <p-heading show-back-button
                            @click-back-button="goBack"
                 >
-                    <p-skeleton v-if="loading"
+                    <p-skeleton v-if="isLoadingTask"
                                 height="1.75rem"
                                 width="12rem"
                     />
@@ -237,7 +237,7 @@ defineExpose({ setPathFrom });
                 </p-button>
             </template>
         </p-heading-layout>
-        <p v-if="taskDetailPageStore.getters.isArchivedTask"
+        <p v-if="taskContentFormStore.getters.isArchivedTask"
            class="px-4 mb-6 text-label-md text-gray-600"
         >
             {{ $t('OPSFLOW.TASK_BOARD.ARCHIVED_TASK_DESC', {
@@ -260,7 +260,7 @@ defineExpose({ setPathFrom });
                         <task-progress-tab :task-id="props.taskId" />
                     </template>
                 </p-tab>
-                <div v-if="activeTab === 'content' && taskDetailPageStore.getters.isEditable"
+                <div v-if="activeTab === 'content' && taskContentFormStore.getters.isEditable"
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
@@ -271,7 +271,7 @@ defineExpose({ setPathFrom });
                     </p-button>
                     <p-button style-type="primary"
                               :loading="isUpdating"
-                              :disabled="!taskDetailPageStore.getters.hasUnsavedChanges || !taskDetailPageStore.getters.isFormValid"
+                              :disabled="!taskContentFormStore.getters.hasUnsavedChanges || !taskContentFormStore.getters.isAllValid"
                               @click="handleSaveChanges"
                     >
                         {{ $t('COMMON.BUTTONS.CONFIRM') }}
