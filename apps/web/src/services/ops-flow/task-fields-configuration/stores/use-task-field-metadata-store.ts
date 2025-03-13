@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';

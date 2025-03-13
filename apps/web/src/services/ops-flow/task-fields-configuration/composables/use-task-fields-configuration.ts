@@ -1,4 +1,5 @@
-import type { TaskField, TaskFieldSelectionType, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+
+import type { TaskField, TaskFieldSelectionType, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
 
 import getRandomId from '@/lib/random-id-generator';
 
@@ -8,6 +9,7 @@ import type { MutableTaskField } from '@/services/ops-flow/task-fields-configura
 import type {
     TaskFieldTypeMetadata,
 } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+
 
 const DEFAULT_SELECTION_TYPE_MAP: Record<TaskFieldType, TaskFieldSelectionType|undefined> = {
     GLOBAL: undefined,

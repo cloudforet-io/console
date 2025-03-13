@@ -3,7 +3,7 @@ import { watch } from 'vue';
 
 import { isEqual } from 'lodash';
 
-import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

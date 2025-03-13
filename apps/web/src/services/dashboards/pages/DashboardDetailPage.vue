@@ -16,6 +16,8 @@ import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -111,6 +113,7 @@ const { mutate: updateDashboard, isPending: dashboardUpdateLoading } = useMutati
             });
         },
         onError: (e) => {
+            showErrorMessage(e.message, e);
             ErrorHandler.handleError(e);
         },
     },

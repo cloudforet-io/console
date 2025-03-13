@@ -5,7 +5,7 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { ProjectTaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { ProjectTaskField } from '@/api-clients/opsflow/_types/task-field-type';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 

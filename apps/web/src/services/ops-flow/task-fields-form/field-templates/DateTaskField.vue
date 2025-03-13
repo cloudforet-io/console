@@ -5,7 +5,8 @@ import {
     PFieldGroup, PDatetimePicker,
 } from '@cloudforet/mirinae';
 
-import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
+
+import type { OtherTaskField } from '@/api-clients/opsflow/_types/task-field-type';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type {

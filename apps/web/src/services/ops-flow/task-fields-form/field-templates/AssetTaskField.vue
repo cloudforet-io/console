@@ -8,9 +8,9 @@ import {
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { OtherTaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
-import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
 import type {
