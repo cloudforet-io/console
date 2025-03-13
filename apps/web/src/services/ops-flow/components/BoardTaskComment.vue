@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import {
-    ref, computed, onBeforeMount, onUnmounted,
-} from 'vue';
+import { ref, computed } from 'vue';
+
+import type { QueryKey } from '@tanstack/vue-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PPaneLayout, PHeading, PButton, PCollapsibleList, PBadge, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/collapsible/collapsible-list/type';
 
+import { useCommentApi } from '@/api-clients/opsflow/comment/composables/use-comment-api';
 import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
 import { i18n } from '@/translations';
 
@@ -22,15 +24,16 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 
-import { useCommentStore } from '@/services/ops-flow/stores/comment-store';
+import { useTaskEventsQuery } from '@/services/ops-flow/composables/use-task-events-query';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
+
+
 
 const props = defineProps<{
     taskId: string;
 }>();
 
 const taskDetailPageStore = useTaskDetailPageStore();
-const commentStore = useCommentStore();
 const userReferenceStore = useUserReferenceStore();
 const userStore = useUserStore();
 
@@ -43,36 +46,58 @@ const getAuthor = (item: CommentModel) => {
 const getSourceIcon = (item: CommentModel) => item.source?.icon ?? '';
 const getSourceName = (item: CommentModel) => item.source?.name ?? '';
 const getWritePermission = (item: CommentModel) => item.created_by === userId.value;
-const comments = computed<CommentModel[]>(() => commentStore.comments ?? []);
-const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value.map((comment) => ({
-    title: comment.created_at,
-    data: comment,
-})));
 const { getTimezoneDate } = useTimezoneDate();
 
-/* add comment */
-const addingComment = ref<boolean>(false);
-const addComment = async (comment: string) => {
-    try {
-        addingComment.value = true;
-        await commentStore.create({
+/* comments */
+const queryClient = useQueryClient();
+const { commentAPI, commentListQueryKey } = useCommentApi();
+const { data: comments } = useQuery({
+    queryKey: computed<QueryKey>(() => [...commentListQueryKey.value, props.taskId]),
+    queryFn: async () => {
+        const response = await commentAPI.list({
             task_id: props.taskId,
-            comment,
-        }, true);
-        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
-    } finally {
-        addingComment.value = false;
-    }
-};
+            query: {
+                sort: [{ key: 'created_at', desc: true }],
+            },
+        });
+        return response.results ?? [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 15, // 15 seconds
+});
+const commentItems = computed<CollapsibleItem<CommentModel>[]>(() => comments.value?.map((comment) => ({
+    title: comment.created_at,
+    data: comment,
+})) ?? []);
+
+/* events */
+const { refetch: refetchEvents } = useTaskEventsQuery({
+    taskId: computed(() => props.taskId),
+    fetchOnCreation: false,
+});
+
+/* add comment */
+const { mutateAsync: createComment, isPending: isCreating } = useMutation({
+    mutationFn: commentAPI.create,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [...commentListQueryKey.value, props.taskId] });
+        showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }));
+    },
+});
 const addCommentAndApplyToEvents = async (comment: string) => {
     if (!comment.trim().length) return;
-    await addComment(comment);
-    await taskDetailPageStore.loadNewEvents();
+    await createComment({
+        task_id: props.taskId,
+        comment,
+    });
+    await refetchEvents();
 };
-const contents = ref<string>('');
 
+/* comment form */
+const contents = ref<string>('');
 
 /* mention */
 // const allUserItems = computed<SelectDropdownMenuItem[]>(() => (Object.values(userReferenceStore.getters.userItems) as UserReferenceItem[]).map((u) => ({
@@ -92,19 +117,6 @@ const handleClickAddComment = () => {
 };
 
 
-/* list comments for initial load */
-onBeforeMount(async () => {
-    await commentStore.listByTaskId(props.taskId, {
-        query: {
-            sort: [{ key: 'created_at', desc: true }],
-        },
-    });
-});
-
-onUnmounted(() => {
-    commentStore.$reset();
-    commentStore.$dispose();
-});
 </script>
 
 <template>
@@ -114,7 +126,7 @@ onUnmounted(() => {
                    :title="$t('OPSFLOW.TASK_BOARD.COMMENT')"
         />
         <div class="mb-3">
-            <text-editor :placeholder="$t('OPSFLOW.TASK_BOARD.COMMENT')"
+            <text-editor :placeholder="String($t('OPSFLOW.TASK_BOARD.COMMENT'))"
                          contents-type="markdown"
                          :show-undo-redo-buttons="false"
                          :value="contents"
@@ -124,7 +136,7 @@ onUnmounted(() => {
         </div>
         <p-button class="mb-6"
                   style-type="tertiary"
-                  :loading="addingComment"
+                  :loading="isCreating"
                   @click="handleClickAddComment"
         >
             {{ $t('OPSFLOW.ADD_TARGET', { target: $t('OPSFLOW.TASK_BOARD.COMMENT') }) }}
@@ -156,7 +168,7 @@ onUnmounted(() => {
                                         size="sm"
                                         class="flex-shrink-0"
                                         :menu="['delete']"
-                                        @delete="taskDetailPageStore.openCommentDeleteModal(data)"
+                                        @delete="taskDetailPageStore.openCommentDeleteModal(data.comment_id)"
                     />
                 </div>
             </template>

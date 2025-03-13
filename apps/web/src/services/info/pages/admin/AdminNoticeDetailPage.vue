@@ -11,9 +11,9 @@ import {
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import type { PostModel } from '@/schema/board/post/model';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

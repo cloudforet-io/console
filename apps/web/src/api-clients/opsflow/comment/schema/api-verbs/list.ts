@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CommentType } from '../type';
+import type { CommentType } from '@/api-clients/opsflow/comment/schema/type';
 
 export interface CommentListParameters {
     query?: Query;

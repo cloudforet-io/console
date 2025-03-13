@@ -50,7 +50,7 @@ interface Props {
     isInitSelectedItem?: boolean;
     block?: boolean;
     styleType?: string;
-    appearanceType?: 'stack';
+    appearanceType?: 'stack'|'badge';
     showDeleteAllButton?: boolean;
 }
 
@@ -325,7 +325,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
             <template v-if="props.projectGroupSelectOptions && state.selectedItems.length"
                       #dropdown-button
             >
-                <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
+                <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions?.currentProjectGroupId)"
                          badge-type="subtle"
                          style-type="gray200"
                          class="current-badge"

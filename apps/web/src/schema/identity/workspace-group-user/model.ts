@@ -1,7 +1,7 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { UserState } from '@/schema/identity/user/type';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 export interface WorkspaceGroupUserModel {
     workspace_group_id: string;

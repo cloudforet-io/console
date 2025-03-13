@@ -1,13 +1,8 @@
-import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
-
-
-import type { QueryKey } from '@tanstack/vue-query';
 
 import type {
     ResourceName, ServiceName, Verb,
 } from '@/api-clients/_common/types/query-key-type';
-
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -40,7 +35,7 @@ export const useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>,
     resource: R,
     verb: V,
     additionalGlobalParams?: Partial<GlobalQueryParams>,
-): ComputedRef<QueryKey> => {
+) => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
 
@@ -55,5 +50,5 @@ export const useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>,
         ...additionalGlobalParams,
     });
 
-    return computed<QueryKey>(() => [service, resource, verb, { ...globalQueryParams }]);
+    return computed(() => [service, resource, verb, { ...globalQueryParams }]);
 };

@@ -16,7 +16,7 @@ import type {
     ReferenceVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 

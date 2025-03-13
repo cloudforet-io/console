@@ -19,7 +19,7 @@ const props = defineProps<{
 
 <template>
     <div class=" flex items-center gap-1 h-8 mt-1 pb-2 px-2 text-gray-800 font-bold text-label-md">
-        <div class="flex items-center h-6">
+        <div class="flex items-center h-6 w-full">
             <p-lazy-img
                 v-if="props.icon"
                 :src="assetUrlConverter(props.icon)"
@@ -27,12 +27,15 @@ const props = defineProps<{
                 height="1.5rem"
                 class="icon rounded flex-shrink-0"
             />
-            <span>
+            <div class="flex-grow">
                 <slot>{{ props.label }}</slot>
                 <span v-if="props.subText"
                       class="font-normal"
                 >{{ props.subText }}</span>
-            </span>
+            </div>
+            <div class="flex-shrink-0 inline-flex">
+                <slot name="right-end" />
+            </div>
         </div>
     </div>
 </template>

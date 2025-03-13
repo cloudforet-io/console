@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import type { TaskDeleteParameters } from '@/api-clients/opsflow/task/schema/api-verbs/delete';
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import { getParticle, i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -12,6 +11,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskDetailPageStore } from '@/services/ops-flow/stores/task-detail-page-store';
 import {
     useTaskManagementTemplateStore,
@@ -22,34 +22,39 @@ const emit = defineEmits<{(event: 'deleted'): void;
 }>();
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const loading = ref<boolean>(false);
 
-let hasDeleted = false;
-const deleteTask = async () => {
-    try {
-        if (!taskDetailPageStore.getters.task) throw new Error('task is not defined');
-        loading.value = true;
-        await SpaceConnector.clientV2.opsflow.task.delete<TaskDeleteParameters, TaskModel>({
-            task_id: taskDetailPageStore.getters.task.task_id,
-        });
-        hasDeleted = true;
+const { taskAPI, taskListQueryKey } = useTaskApi();
+const queryClient = useQueryClient();
+const { mutate: deleteTask, isSuccess: hasDeleted, isPending } = useMutation({
+    mutationFn: ({ taskId }: { taskId: string }) => taskAPI.delete({ task_id: taskId }),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: taskListQueryKey.value });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }) as string, '');
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('OPSFLOW.ERR_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.Task }));
-    } finally {
-        loading.value = false;
+    },
+    onSettled: () => {
         taskDetailPageStore.closeTaskDeleteModal();
-    }
-};
+    },
+});
+const { removeQuery: removeTaskQuery } = useTaskQuery({
+    taskId: computed(() => taskDetailPageStore.state.targetTaskId),
+    enabled: computed(() => taskDetailPageStore.state.visibleTaskDeleteModal),
+});
 
-const handleConfirm = async () => {
-    await deleteTask();
+const handleConfirm = () => {
+    if (!taskDetailPageStore.state.targetTaskId) {
+        ErrorHandler.handleRequestError(new Error('targetTaskId is not defined'), 'Error occurred before deleting task', true);
+        return;
+    }
+    deleteTask({ taskId: taskDetailPageStore.state.targetTaskId });
 };
 const handleClosed = () => {
-    if (hasDeleted) {
+    if (hasDeleted.value) {
         emit('deleted');
+        removeTaskQuery();
     }
-    hasDeleted = false;
 };
 </script>
 
@@ -58,7 +63,7 @@ const handleClosed = () => {
                       object: taskManagementTemplateStore.templates.task,
                       particle: getParticle(taskManagementTemplateStore.templates.task,'object') })"
                   :visible="taskDetailPageStore.state.visibleTaskDeleteModal"
-                  :loading="loading"
+                  :loading="isPending"
                   @close="taskDetailPageStore.closeTaskDeleteModal()"
                   @cancel="taskDetailPageStore.closeTaskDeleteModal()"
                   @closed="handleClosed"
