@@ -3,11 +3,14 @@ import { reactive, computed } from 'vue';
 import { isEqual } from 'lodash';
 import { defineStore } from 'pinia';
 
+import { APIError } from '@cloudforet/core-lib/space-connector/error';
+
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
+import { useCategoryQuery } from '@/services/ops-flow/composables/use-current-category';
 import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
 import { useTaskFieldsForm } from '@/services/ops-flow/composables/use-task-fields-form';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
@@ -57,11 +60,12 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         hasFileIdsChanged: false,
     });
 
-    /* current task type */
-    const taskTypeId = computed(() => state.currentTaskTypeId);
-    const { has403Error: isArchivedTask } = useCurrentTaskType({ taskTypeId });
+    /* current category */
+    const { error: categoryError, data: currentCategory } = useCategoryQuery({ categoryId: computed(() => state.currentCategoryId) });
+    const isArchivedTask = computed(() => (categoryError.value instanceof APIError && categoryError.value.status === 403) || currentCategory.value?.state === 'DELETED');
 
     /* fields form */
+    const taskTypeId = computed(() => state.currentTaskTypeId);
     const { currentTaskType } = useCurrentTaskType({ taskTypeId });
     const {
         fieldsToShow,

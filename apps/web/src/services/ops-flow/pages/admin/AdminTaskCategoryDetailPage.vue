@@ -39,7 +39,7 @@ import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
 import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
-import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
+import { useCategoryQuery } from '@/services/ops-flow/composables/use-current-category';
 import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
@@ -56,7 +56,7 @@ const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 /* category */
-const { currentCategory, isLoading } = useCurrentCategory({
+const { data: currentCategory, isLoading } = useCategoryQuery({
     categoryId: toRef(props, 'taskCategoryId'),
 });
 /* header and back button */

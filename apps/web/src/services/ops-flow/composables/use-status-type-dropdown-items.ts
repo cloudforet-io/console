@@ -4,7 +4,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
-import { TASK_STATUS_LABELS } from '../constants/task-status-label-constant';
+import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
+
 
 interface StatusTypeDropdownItem extends SelectDropdownMenuItem {
     name: TaskStatusType;

@@ -128,8 +128,8 @@ const {
 } = useQuery({
     queryKey: computed(() => [
         ...taskListQueryKey.value,
+        props.categoryId ?? 'all',
         taskListApiQuery.value,
-        props.categoryId,
     ]),
     queryFn: async () => {
         const res = await taskAPI.list({
@@ -147,12 +147,12 @@ const {
     staleTime: 1000 * 30, // 30 seconds
 });
 const tasks = computed(() => data.value?.results);
-const total = computed(() => data.value?.totalCount);
 watch(error, (err) => {
     if (err) ErrorHandler.handleError(err);
 });
-watch(total, (val) => {
-    pagination.total = val || 0;
+watch(data, (d) => {
+    if (!d) return;
+    pagination.total = d.totalCount || 0;
 }, { immediate: true });
 
 
@@ -231,7 +231,6 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
         <div class="px-4 pb-4">
             <p-toolbox class="mb-2"
                        :search-text="search"
-                       :this-page="pagination.page"
                        :page-size="pagination.size"
                        :total-count="pagination.total"
                        @refresh="handleRefresh"
@@ -259,7 +258,8 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
                 {{ getTaskTypeName(value) }}
             </template>
             <template #col-status_id-format="{item}">
-                <p-badge class="ml-2"
+                <p-badge :key="item.status_id"
+                         class="ml-2"
                          badge-type="subtle"
                          shape="square"
                          :style-type="getStatusStyleType(categoriesById[item.category_id], item.status_id, item.status_type)"

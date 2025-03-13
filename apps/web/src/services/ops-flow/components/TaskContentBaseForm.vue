@@ -25,7 +25,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useCategoriesQuery } from '@/services/ops-flow/composables/use-categories-query';
 import { useCategoryField } from '@/services/ops-flow/composables/use-category-field';
 import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
-import { useCurrentCategory } from '@/services/ops-flow/composables/use-current-category';
+import { useCategoryQuery } from '@/services/ops-flow/composables/use-current-category';
 import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
 import { useDefaultStatusOption } from '@/services/ops-flow/composables/use-default-status-option';
 import { useTargetStatusOption } from '@/services/ops-flow/composables/use-target-status-option';
@@ -86,7 +86,7 @@ watch(selectedCategoryItems, (items) => { // sync category id to store
     if (items[0]?.name === taskContentFormState.currentCategoryId) return;
     taskContentFormStore.setCurrentCategoryId(items[0]?.name);
 });
-const { currentCategory, isLoading: isCategoryLoading } = useCurrentCategory({
+const { data: currentCategory, isLoading: isCategoryLoading } = useCategoryQuery({
     categoryId: computed(() => taskContentFormState.currentCategoryId ?? originTask.value?.category_id),
 });
 const taskCategoryDesciprion = computed<string>(() => {

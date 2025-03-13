@@ -2,8 +2,6 @@ import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 
-import { APIError } from '@cloudforet/core-lib/space-connector/error';
-
 import { useTaskTypeQuery } from './use-task-type-query';
 
 export const useCurrentTaskType = ({ taskTypeId }: {
@@ -17,7 +15,6 @@ export const useCurrentTaskType = ({ taskTypeId }: {
         })),
         enabled: computed(() => !!taskTypeId.value),
     });
-    const has403Error = computed(() => !!error.value && error.value instanceof APIError && error.value.status === 403);
 
-    return { currentTaskType: taskType, has403Error, isLoading };
+    return { currentTaskType: taskType, error, isLoading };
 };

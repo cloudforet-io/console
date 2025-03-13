@@ -13,7 +13,7 @@ import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
 import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
 import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
-import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 import {
     useTaskManagementTemplateStore,

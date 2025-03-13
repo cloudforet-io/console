@@ -1,6 +1,7 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { EventType } from '../type';
+import type { EventType } from '@/api-clients/opsflow/event/schema/type';
+
 
 export interface EventListParameters {
     query?: Query;

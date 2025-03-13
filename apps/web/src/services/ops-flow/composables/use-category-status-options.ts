@@ -5,14 +5,14 @@ import type { TaskStatusOptions, TaskStatusOptionWithOptionalId, TaskStatusType 
 
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
 
-import { useCurrentCategory } from './use-current-category';
+import { useCategoryQuery } from './use-current-category';
 
 export const useCategoryStatusOptions = (ops?: {
   categoryId?: Ref<string | undefined>;
 }) => {
     const { categoryId } = ops ?? {};
     // specific category and its status options
-    const { currentCategory, isLoading } = useCurrentCategory({
+    const { data: currentCategory, isLoading } = useCategoryQuery({
         categoryId: computed(() => categoryId?.value),
     });
     const getDefaultStatusOptions = (): Record<TaskStatusType, TaskStatusOptionWithOptionalId[]> => ({

@@ -10,7 +10,9 @@ export const useCategoriesQuery = (ops?: {
 }) => {
     const { enabled } = ops ?? {};
     const { taskCategoryAPI, taskCategoryListQueryKey } = useTaskCategoryApi();
-    const { data: categories, isLoading, refetch } = useQuery({
+    const {
+        data: categories, isLoading, refetch, error,
+    } = useQuery({
         queryKey: taskCategoryListQueryKey,
         queryFn: async () => {
             const { results } = await taskCategoryAPI.list({ include_deleted: true });
@@ -24,5 +26,6 @@ export const useCategoriesQuery = (ops?: {
         categories,
         isLoading,
         refetch,
+        error,
     };
 };
