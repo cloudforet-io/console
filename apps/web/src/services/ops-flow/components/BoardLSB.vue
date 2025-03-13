@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { PIconButton } from '@cloudforet/mirinae';
+
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
 import LSBLoadingSpinner from '@/common/modules/navigations/new-lsb/LSBLoadingSpinner.vue';
@@ -18,7 +19,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const predicate: LSBRouterPredicate = (to, currentRoute) => to.query?.categoryId === currentRoute.query.categoryId;
 
 /* categories */
-const { availableCategories, isLoading } = useAvailableCategories();
+const { availableCategories, isLoading, refetch } = useAvailableCategories();
 </script>
 
 <template>
@@ -35,7 +36,16 @@ const { availableCategories, isLoading } = useAvailableCategories();
             }) }}</span>
         </l-s-b-router-button>
         <l-s-b-divider />
-        <l-s-b-top-title>{{ taskManagementTemplateStore.templates.TaskCategory }}</l-s-b-top-title>
+        <l-s-b-top-title>
+            {{ taskManagementTemplateStore.templates.TaskCategory }}
+            <template #right-end>
+                <p-icon-button name="ic_refresh"
+                               size="sm"
+                               shape="square"
+                               @click="refetch"
+                />
+            </template>
+        </l-s-b-top-title>
         <l-s-b-loading-spinner :loading="isLoading" />
         <l-s-b-router-item v-for="(category, idx) in availableCategories"
                            :id="`${category.category_id}-${idx}`"
