@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { ParagraphTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
+
+import type { ParagraphTaskFieldOptions } from '@/api-clients/opsflow/_types/task-field-type';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 

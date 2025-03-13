@@ -32,7 +32,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
-import type { TaskModel } from '@/schema/opsflow/task/model';
+import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
