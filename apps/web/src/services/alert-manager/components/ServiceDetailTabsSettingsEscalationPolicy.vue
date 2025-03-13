@@ -58,9 +58,18 @@ const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
         {
             type: 'item',
+            name: 'UPDATE',
+            label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.SET_POLICY'),
+            disabled: !state.selectedItem,
+        },
+        {
+            type: 'item',
             name: 'STATE',
-            label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.DEFAULT'),
+            label: _i18n.t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
             disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
+        },
+        {
+            type: 'divider',
         },
         {
             type: 'item',
@@ -203,14 +212,6 @@ onUnmounted(() => {
                     <template v-if="hasReadWriteAccess"
                               #extra
                     >
-                        <p-button style-type="tertiary"
-                                  icon-left="ic_settings-filled"
-                                  size="sm"
-                                  :disabled="!state.selectedItem"
-                                  @click="handleActionModal('UPDATE')"
-                        >
-                            {{ $t('ALERT_MANAGER.ESCALATION_POLICY.SET_POLICY') }}
-                        </p-button>
                         <p-button style-type="secondary"
                                   icon-left="ic_plus_bold"
                                   size="sm"

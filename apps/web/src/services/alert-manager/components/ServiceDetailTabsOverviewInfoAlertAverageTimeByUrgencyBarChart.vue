@@ -12,6 +12,8 @@ import { reduce } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PEmpty } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -123,22 +125,22 @@ const state = reactive<AverageTimeByUrgencyState>({
         },
         series: [
             {
-                name: 'Acknowledged, High Urgency',
+                name: `${i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED')}, ${i18n.t('ALERT_MANAGER.SERVICE.HIGH_URGENCY')}`,
                 type: 'bar',
                 data: [state.acknowledgedHighData],
             },
             {
-                name: 'Acknowledged, Low Urgency',
+                name: `${i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED')}, ${i18n.t('ALERT_MANAGER.SERVICE.LOW_URGENCY')}`,
                 type: 'bar',
                 data: [state.acknowledgedLowData],
             },
             {
-                name: 'Resolved, High Urgency',
+                name: `${i18n.t('ALERT_MANAGER.ALERTS.RESOLVED')}, ${i18n.t('ALERT_MANAGER.SERVICE.HIGH_URGENCY')}`,
                 type: 'bar',
                 data: [state.resolvedHighData],
             },
             {
-                name: 'Resolved, Low Urgency',
+                name: `${i18n.t('ALERT_MANAGER.ALERTS.RESOLVED')}, ${i18n.t('ALERT_MANAGER.SERVICE.LOW_URGENCY')}`,
                 type: 'bar',
                 data: [state.resolvedLowData],
             },
