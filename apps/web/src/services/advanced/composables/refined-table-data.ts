@@ -2,7 +2,7 @@
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';

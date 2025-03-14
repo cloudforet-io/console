@@ -12,9 +12,9 @@ import {
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceGroupCreateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/api-verbs/change-workspace-group';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

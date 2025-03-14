@@ -17,8 +17,8 @@ import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';

@@ -13,8 +13,8 @@ import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

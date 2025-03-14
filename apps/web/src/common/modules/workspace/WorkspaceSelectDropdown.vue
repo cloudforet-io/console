@@ -14,8 +14,8 @@ import type {
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -13,7 +13,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserProfileGetWorkspacesParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/get-workspaces';
 import type { MyWorkspaceModel } from '@/api-clients/identity/user-profile/schema/model';
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';

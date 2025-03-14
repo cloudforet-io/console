@@ -20,7 +20,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import { iso8601Formatter, numberFormatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';

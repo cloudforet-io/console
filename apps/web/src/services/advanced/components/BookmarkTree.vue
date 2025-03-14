@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView, PTextButton } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';

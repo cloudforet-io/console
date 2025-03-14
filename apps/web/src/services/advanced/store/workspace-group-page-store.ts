@@ -17,8 +17,8 @@ import type { WorkspaceGroupUserListParameters } from '@/api-clients/identity/wo
 import type { WorkspaceGroupUserModel, WorkspaceGroupUser } from '@/api-clients/identity/workspace-group-user/schema/model';
 import type { WorkspaceGroupListParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/list';
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import type { Currency } from '@/store/display/type';
 

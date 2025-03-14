@@ -12,8 +12,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SharedConfigListParameters } from '@/api-clients/config/shared-config/schema/api-verbs/list';
 import type { SharedConfigModel } from '@/api-clients/config/shared-config/schema/model';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
