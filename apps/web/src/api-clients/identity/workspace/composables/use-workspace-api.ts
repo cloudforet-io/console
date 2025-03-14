@@ -16,27 +16,13 @@ export const useWorkspaceApi = () => {
     const workspaceListQueryKey = useAPIQueryKey('identity', 'workspace', 'list');
 
     const actions = {
-        async create(params: WorkspaceCreateParameters) {
-            return SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>(params);
-        },
-        async update(params: WorkspaceUpdateParameters) {
-            return SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters, WorkspaceModel>(params);
-        },
-        async delete(params: WorkspaceDeleteParameters) {
-            return SpaceConnector.clientV2.identity.workspace.delete<WorkspaceDeleteParameters>(params);
-        },
-        async list(params: WorkspaceListParameters) {
-            return SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>(params);
-        },
-        async addPackage(params: WorkspaceAddPackageParameters) {
-            return SpaceConnector.clientV2.identity.workspace.addPackage<WorkspaceAddPackageParameters, WorkspaceModel>(params);
-        },
-        async removePackage(params: WorkspaceRemovePackageParameters) {
-            return SpaceConnector.clientV2.identity.workspace.removePackage<WorkspaceRemovePackageParameters, WorkspaceModel>(params);
-        },
-        async changeWorkspaceGroup(params: WorkspaceChangeWorkspaceGroupParameters) {
-            return SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>(params);
-        },
+        create: SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>,
+        update: SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters, WorkspaceModel>,
+        delete: SpaceConnector.clientV2.identity.workspace.delete<WorkspaceDeleteParameters>,
+        list: SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>,
+        addPackage: SpaceConnector.clientV2.identity.workspace.addPackage<WorkspaceAddPackageParameters, WorkspaceModel>,
+        removePackage: SpaceConnector.clientV2.identity.workspace.removePackage<WorkspaceRemovePackageParameters, WorkspaceModel>,
+        changeWorkspaceGroup: SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>,
     };
 
     return {

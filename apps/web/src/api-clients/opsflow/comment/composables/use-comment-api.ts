@@ -1,7 +1,3 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
@@ -13,38 +9,16 @@ import type { CommentListParameters } from '@/api-clients/opsflow/comment/schema
 import type { CommentUpdateParameters } from '@/api-clients/opsflow/comment/schema/api-verbs/update';
 import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
 
-interface UseCommentApiReturn {
-    commentQueryKey: ComputedRef<QueryKey>;
-    commentListQueryKey: ComputedRef<QueryKey>;
-    commentAPI: {
-        create: (params: CommentCreateParameters) => Promise<CommentModel>;
-        update: (params: CommentUpdateParameters) => Promise<CommentModel>;
-        delete: (params: CommentDeleteParameters) => Promise<void>;
-        get: (params: CommentGetParameters) => Promise<CommentModel>;
-        list: (params: CommentListParameters) => Promise<ListResponse<CommentModel>>;
-    }
-}
-
-export const useCommentApi = (): UseCommentApiReturn => {
+export const useCommentApi = () => {
     const commentQueryKey = useAPIQueryKey('opsflow', 'comment', 'get');
     const commentListQueryKey = useAPIQueryKey('opsflow', 'comment', 'list');
 
     const actions = {
-        async create(params: CommentCreateParameters) {
-            return SpaceConnector.clientV2.opsflow.comment.create<CommentCreateParameters, CommentModel>(params);
-        },
-        async update(params: CommentUpdateParameters) {
-            return SpaceConnector.clientV2.opsflow.comment.update<CommentUpdateParameters, CommentModel>(params);
-        },
-        async delete(params: CommentDeleteParameters) {
-            return SpaceConnector.clientV2.opsflow.comment.delete<CommentDeleteParameters>(params);
-        },
-        async get(params: CommentGetParameters) {
-            return SpaceConnector.clientV2.opsflow.comment.get<CommentGetParameters, CommentModel>(params);
-        },
-        async list(params: CommentListParameters) {
-            return SpaceConnector.clientV2.opsflow.comment.list<CommentListParameters, ListResponse<CommentModel>>(params);
-        },
+        create: SpaceConnector.clientV2.opsflow.comment.create<CommentCreateParameters, CommentModel>,
+        update: SpaceConnector.clientV2.opsflow.comment.update<CommentUpdateParameters, CommentModel>,
+        delete: SpaceConnector.clientV2.opsflow.comment.delete<CommentDeleteParameters>,
+        get: SpaceConnector.clientV2.opsflow.comment.get<CommentGetParameters, CommentModel>,
+        list: SpaceConnector.clientV2.opsflow.comment.list<CommentListParameters, ListResponse<CommentModel>>,
     };
 
     return {
