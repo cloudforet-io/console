@@ -1,4 +1,4 @@
-import type { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
+import type { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
 
 export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK_OIDC' | 'SAML';
 

@@ -1,4 +1,4 @@
-import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
+import { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
