@@ -2,8 +2,10 @@
 import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { throttle } from 'lodash';
 
+import { SERVICE_PREFIX } from '@/api-clients/_common/constants/query-key-constant';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
@@ -20,6 +22,7 @@ const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const router = useRouter();
+const queryClient = useQueryClient();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -34,6 +37,7 @@ const handleToggleAdminMode = throttle(async () => {
         return;
     }
     appContextStore.setGlobalGrantLoading(true);
+    await queryClient.invalidateQueries({ queryKey: [SERVICE_PREFIX] });
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
         if (state.workspaceList.length === 0) {
