@@ -14,12 +14,12 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
+import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
-import type { AppModel } from '@/schema/identity/app/model';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

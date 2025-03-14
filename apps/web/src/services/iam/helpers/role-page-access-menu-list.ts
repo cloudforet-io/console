@@ -1,4 +1,4 @@
-import type { RoleType } from '@/schema/identity/role/type';
+import type { RoleType } from '@/api-clients/identity/role/type';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';

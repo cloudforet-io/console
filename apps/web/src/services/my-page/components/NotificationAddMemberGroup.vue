@@ -10,10 +10,10 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';

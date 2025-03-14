@@ -9,8 +9,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { IconSet } from '@cloudforet/mirinae/src/data-display/board-item/type';
 
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

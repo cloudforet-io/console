@@ -1,7 +1,7 @@
 
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 
 
 export interface ProjectMemberItem {

@@ -33,8 +33,8 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/type';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

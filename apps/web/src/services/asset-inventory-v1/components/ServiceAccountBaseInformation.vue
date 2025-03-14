@@ -8,12 +8,12 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { SchemaModel } from '@/schema/identity/schema/model';
-import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
+import type { ServiceAccountUpdateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/update';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

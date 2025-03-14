@@ -3,17 +3,17 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AppCreateParameters } from '@/schema/identity/app/api-verbs/create';
-import type { AppDeleteParameters } from '@/schema/identity/app/api-verbs/delete';
-import type { AppDisableParameters } from '@/schema/identity/app/api-verbs/disable';
-import type { AppEnableParameters } from '@/schema/identity/app/api-verbs/enable';
-import type { AppGenerateApiKeyParameters } from '@/schema/identity/app/api-verbs/generateApiKey';
-import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
-import type { AppUpdateParameters } from '@/schema/identity/app/api-verbs/update';
-import type { AppModel } from '@/schema/identity/app/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { AppCreateParameters } from '@/api-clients/identity/app/schema/api-verbs/create';
+import type { AppDeleteParameters } from '@/api-clients/identity/app/schema/api-verbs/delete';
+import type { AppDisableParameters } from '@/api-clients/identity/app/schema/api-verbs/disable';
+import type { AppEnableParameters } from '@/api-clients/identity/app/schema/api-verbs/enable';
+import type { AppGenerateApiKeyParameters } from '@/api-clients/identity/app/schema/api-verbs/generateApiKey';
+import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
+import type { AppUpdateParameters } from '@/api-clients/identity/app/schema/api-verbs/update';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { ROLE_STATE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

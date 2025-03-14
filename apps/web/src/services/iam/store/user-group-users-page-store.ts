@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { UserListPerUserGroupItemType } from '@/schema/identity/user-group/type';
+import type { UserListPerUserGroupItemType } from '@/api-clients/identity/user-group/schema/type';
 
 export const useUserGroupUsersPageStore = defineStore('page-user-group-users', () => {
     const state = reactive({

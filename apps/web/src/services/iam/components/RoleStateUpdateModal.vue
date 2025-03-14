@@ -10,10 +10,10 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { RoleDisableParameters } from '@/schema/identity/role/api-verbs/disable';
-import type { RoleEnableParameters } from '@/schema/identity/role/api-verbs/enable';
-import { ROLE_STATE } from '@/schema/identity/role/constant';
-import type { RoleState } from '@/schema/identity/role/type';
+import { ROLE_STATE } from '@/api-clients/identity/role/constant';
+import type { RoleDisableParameters } from '@/api-clients/identity/role/schema/api-verbs/disable';
+import type { RoleEnableParameters } from '@/api-clients/identity/role/schema/api-verbs/enable';
+import type { RoleState } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

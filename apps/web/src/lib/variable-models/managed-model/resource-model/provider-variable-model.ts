@@ -1,4 +1,4 @@
-import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

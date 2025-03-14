@@ -14,12 +14,12 @@ import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mi
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
+import type { RoleBindingUpdateRoleParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/update-role';
+import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

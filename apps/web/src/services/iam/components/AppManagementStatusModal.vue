@@ -11,7 +11,7 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { AppModel } from '@/schema/identity/app/model';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

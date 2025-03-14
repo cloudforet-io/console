@@ -8,12 +8,12 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
-import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import type { ServiceAccountUpdateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/update';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
+import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

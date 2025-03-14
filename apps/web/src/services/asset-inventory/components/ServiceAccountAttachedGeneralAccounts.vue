@@ -30,9 +30,9 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import { SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import { SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

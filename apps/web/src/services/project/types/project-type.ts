@@ -1,4 +1,4 @@
-import type { ProjectType } from '@/schema/identity/project/type';
+import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 
 export interface ProjectCardItemType {
     type: 'project' | 'projectGroup';

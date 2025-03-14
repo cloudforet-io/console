@@ -7,7 +7,7 @@ import {
     PTextInput, PIconButton, PSpinner, screens, PTextarea,
 } from '@cloudforet/mirinae';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 
 import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 

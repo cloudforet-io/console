@@ -9,8 +9,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';

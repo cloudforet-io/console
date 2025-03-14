@@ -4,10 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query, Sort } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectGroupListParameters } from '@/api-clients/identity/project-group/schema/api-verbs/list';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import type { ProjectListParameters } from '@/api-clients/identity/project/schema/api-verbs/list';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
 import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 

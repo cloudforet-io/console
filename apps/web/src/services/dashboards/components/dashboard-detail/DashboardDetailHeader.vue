@@ -8,7 +8,7 @@ import type { BadgeStyleType, BadgeType } from '@cloudforet/mirinae/src/data-dis
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardScope } from '@/api-clients/dashboard/_types/dashboard-type';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

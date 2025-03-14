@@ -4,10 +4,10 @@ import { reactive, computed } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { MyWorkspaceGroupModel } from '@/schema/identity/user-profile/model';
-import type { WorkspaceGroupUserRemoveParameters } from '@/schema/identity/workspace-group-user/api-verbs/remove';
-import type { WorkspaceUser, WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { MyWorkspaceGroupModel } from '@/api-clients/identity/user-profile/schema/model';
+import type { WorkspaceGroupUserRemoveParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/remove';
+import type { WorkspaceUser, WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';

@@ -6,8 +6,8 @@ import {
 import { isEmpty } from 'lodash';
 
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

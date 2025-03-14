@@ -8,15 +8,15 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { SchemaModel } from '@/schema/identity/schema/model';
-import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
-import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
-import type { TrustedAccountCreateParameters } from '@/schema/identity/trusted-account/api-verbs/create';
-import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
+import type { ServiceAccountCreateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/create';
+import type { ServiceAccountDeleteParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+import type { TrustedAccountCreateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/create';
+import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 

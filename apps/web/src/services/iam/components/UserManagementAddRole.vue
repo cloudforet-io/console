@@ -10,9 +10,9 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dro
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

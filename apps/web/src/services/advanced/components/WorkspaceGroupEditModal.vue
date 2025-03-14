@@ -4,8 +4,8 @@ import { computed, reactive, watch } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { WorkspaceGroupUpdateParameters } from '@/schema/identity/workspace-group/api-verbs/update';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupUpdateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/update';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

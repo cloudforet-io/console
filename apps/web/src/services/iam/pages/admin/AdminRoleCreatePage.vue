@@ -6,8 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 
-import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleCreateParameters } from '@/api-clients/identity/role/schema/api-verbs/create';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

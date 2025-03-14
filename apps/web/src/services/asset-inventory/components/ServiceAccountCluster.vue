@@ -7,7 +7,7 @@ import {
     PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { AgentModel } from '@/schema/identity/agent/model';
+import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { red } from '@/styles/colors';

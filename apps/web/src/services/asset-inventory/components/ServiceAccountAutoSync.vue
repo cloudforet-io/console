@@ -8,10 +8,10 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ProviderModel } from '@/schema/identity/provider/model';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

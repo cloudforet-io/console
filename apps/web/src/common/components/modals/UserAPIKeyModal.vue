@@ -10,7 +10,7 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
-import type { AppModel } from '@/schema/identity/app/model';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

@@ -9,13 +9,13 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
-import type { IdentityJobListParameters } from '@/schema/identity/job/api-verbs/list';
-import type { IdentityJobModel } from '@/schema/identity/job/model';
-import type { IdentityJobStatus } from '@/schema/identity/job/type';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { IdentityJobListParameters } from '@/api-clients/identity/job/schema/api-verbs/list';
+import type { IdentityJobModel } from '@/api-clients/identity/job/schema/model';
+import type { IdentityJobStatus } from '@/api-clients/identity/job/schema/type';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { Currency } from '@/store/display/type';

@@ -9,11 +9,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProviderModel } from '@/schema/identity/provider/model';
-import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
-import type { SchemaModel } from '@/schema/identity/schema/model';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/type';
+import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
+import type { SchemaListParameters } from '@/api-clients/identity/schema/schema/api-verbs/list';
+import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

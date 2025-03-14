@@ -16,9 +16,9 @@ import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
-import type { AppModel } from '@/schema/identity/app/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { APP_STATUS_TYPE } from '@/api-clients/identity/app/schema/constant';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -1,7 +1,7 @@
 import type { ItemOptions } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { QuerySearchTableOptions } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import type { SchemaModel } from '@/schema/identity/schema/model';
+import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 
 export type ResourceType = 'identity.ServiceAccount'|'identity.TrustedAccount'|'inventory.CloudService'|'inventory.Server';
 

@@ -7,8 +7,8 @@ import { clone } from 'lodash';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
-import type { GrantScope } from '@/schema/identity/token/type';
+import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
+import type { GrantScope } from '@/api-clients/identity/token/schema/type';
 
 import { ERROR_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import {
