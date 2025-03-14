@@ -4,13 +4,13 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { AgentCreateParameters } from '@/schema/identity/agent/api-verbs/create';
-import type { AgentDeleteParameters } from '@/schema/identity/agent/api-verbs/delete';
-import type { AgentDisableParameters } from '@/schema/identity/agent/api-verbs/disable';
-import type { AgentEnableParameters } from '@/schema/identity/agent/api-verbs/enable';
-import type { AgentGetParameters } from '@/schema/identity/agent/api-verbs/get';
-import type { AgentRegenerateParameters } from '@/schema/identity/agent/api-verbs/regenerate';
-import type { AgentModel } from '@/schema/identity/agent/model';
+import type { AgentCreateParameters } from '@/api-clients/identity/agent/schema/api-verbs/create';
+import type { AgentDeleteParameters } from '@/api-clients/identity/agent/schema/api-verbs/delete';
+import type { AgentDisableParameters } from '@/api-clients/identity/agent/schema/api-verbs/disable';
+import type { AgentEnableParameters } from '@/api-clients/identity/agent/schema/api-verbs/enable';
+import type { AgentGetParameters } from '@/api-clients/identity/agent/schema/api-verbs/get';
+import type { AgentRegenerateParameters } from '@/api-clients/identity/agent/schema/api-verbs/regenerate';
+import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

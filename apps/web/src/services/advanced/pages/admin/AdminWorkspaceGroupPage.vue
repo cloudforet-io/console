@@ -6,8 +6,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupListParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/list';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';

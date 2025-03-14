@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { NotificationChannelListPerUserGroupItemType } from '@/schema/identity/user-group/type';
+import type { NotificationChannelListPerUserGroupItemType } from '@/api-clients/identity/user-group/schema/type';
 
 export const useUserGroupNotificationChannelPageStore = defineStore('page-user-group-notification-channel', () => {
     const state = reactive({

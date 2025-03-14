@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import type { AgentModel } from '@/schema/identity/agent/model';
+import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

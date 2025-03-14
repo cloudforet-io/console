@@ -14,21 +14,11 @@ export const useTaskCategoryApi = () => {
     const taskCategoryListQueryKey = useAPIQueryKey('opsflow', 'task-category', 'list');
 
     const actions = {
-        async create(params: TaskCategoryCreateParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>(params);
-        },
-        async update(params: TaskCategoryUpdateParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
-        },
-        async delete(params: TaskCategoryDeleteParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.delete<TaskCategoryDeleteParameters>(params);
-        },
-        async get(params: TaskCategoryGetParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.get<TaskCategoryGetParameters, TaskCategoryModel>(params);
-        },
-        async list(params: TaskCategoryListParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.list<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(params);
-        },
+        create: SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>,
+        update: SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>,
+        delete: SpaceConnector.clientV2.opsflow.taskCategory.delete<TaskCategoryDeleteParameters>,
+        get: SpaceConnector.clientV2.opsflow.taskCategory.get<TaskCategoryGetParameters, TaskCategoryModel>,
+        list: SpaceConnector.clientV2.opsflow.taskCategory.list<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>,
     };
 
     return {

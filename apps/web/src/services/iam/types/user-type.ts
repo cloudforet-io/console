@@ -3,10 +3,10 @@ import type { TranslateResult } from 'vue-i18n';
 import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { RoleType } from '@/schema/identity/role/type';
-import type { UserModel } from '@/schema/identity/user/model';
-import type { AuthType } from '@/schema/identity/user/type';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { RoleType } from '@/api-clients/identity/role/type';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import type { AuthType } from '@/api-clients/identity/user/schema/type';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
 import type { LOCAL_TYPE } from '@/services/iam/constants/user-constant';
 

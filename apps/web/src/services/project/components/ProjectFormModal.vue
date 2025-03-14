@@ -11,11 +11,11 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
-import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
-import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
-import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { ProjectType } from '@/schema/identity/project/type';
+import type { ProjectCreateParameters } from '@/api-clients/identity/project/schema/api-verbs/create';
+import type { ProjectUpdateParameters } from '@/api-clients/identity/project/schema/api-verbs/udpate';
+import type { ProjectUpdateProjectTypeParameters } from '@/api-clients/identity/project/schema/api-verbs/update-project-type';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { i18n } from '@/translations';
 
 import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';

@@ -5,8 +5,8 @@ import {
     PI, PTooltip, PFieldTitle, PToggleButton,
 } from '@cloudforet/mirinae';
 
-import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
-import type { UserMfa } from '@/schema/identity/user/model';
+import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
+import type { UserMfa } from '@/api-clients/identity/user/schema/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

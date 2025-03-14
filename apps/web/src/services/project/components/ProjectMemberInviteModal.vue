@@ -11,17 +11,17 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { ProjectAddUsersParameters } from '@/api-clients/identity/project/schema/api-verbs/add-users';
+import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import type { ProjectAddUsersParameters } from '@/schema/identity/project/api-verbs/add-users';
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

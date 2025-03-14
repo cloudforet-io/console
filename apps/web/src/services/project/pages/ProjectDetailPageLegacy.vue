@@ -14,8 +14,8 @@ import {
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 
 
-import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectDeleteParameters } from '@/api-clients/identity/project/schema/api-verbs/delete';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 

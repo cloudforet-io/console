@@ -5,11 +5,11 @@ import {
 
 import { isEmpty } from 'lodash';
 
-import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
-import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
-import type { RoleType } from '@/schema/identity/role/type';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleCreateParameters } from '@/api-clients/identity/role/schema/api-verbs/create';
+import type { RoleUpdateParameters } from '@/api-clients/identity/role/schema/api-verbs/update';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import type { RoleType } from '@/api-clients/identity/role/type';
 
 import RoleUpdateFormBaseInformation from '@/services/iam/components/RoleUpdateFormBaseInformation.vue';
 import RoleUpdateFormPermissionForm from '@/services/iam/components/RoleUpdateFormPermissionForm.vue';

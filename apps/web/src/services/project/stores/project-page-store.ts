@@ -5,14 +5,14 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type';
 
-import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
-import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
-import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
-import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
-import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectGroupCreateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/create';
+import type { ProjectGroupDeleteParameters } from '@/api-clients/identity/project-group/schema/api-verbs/delete';
+import type { ProjectGroupUpdateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/update';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import type { ProjectCreateParameters } from '@/api-clients/identity/project/schema/api-verbs/create';
+import type { ProjectUpdateParameters } from '@/api-clients/identity/project/schema/api-verbs/udpate';
+import type { ProjectUpdateProjectTypeParameters } from '@/api-clients/identity/project/schema/api-verbs/update-project-type';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

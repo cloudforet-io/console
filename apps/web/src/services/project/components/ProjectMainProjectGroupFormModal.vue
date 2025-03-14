@@ -9,10 +9,10 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
-import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
-import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectGroupCreateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/create';
+import type { ProjectGroupListParameters } from '@/api-clients/identity/project-group/schema/api-verbs/list';
+import type { ProjectGroupUpdateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/update';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

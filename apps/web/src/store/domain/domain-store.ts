@@ -5,13 +5,13 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
-import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
-import type { ExtendedAuthType, ExtraMenuSet } from '@/schema/config/domain-config/type';
+import { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
+import type { ExtendedAuthType, ExtraMenuSet } from '@/api-clients/config/domain-config/schema/type';
 import type {
     DomainGetAuthInfoParams,
     DomainGetAuthInfoResponse,
     Metadata,
-} from '@/schema/identity/domain/api-verbs/get-auth-info';
+} from '@/api-clients/identity/domain/schema/api-verbs/get-auth-info';
 
 import type { Currency } from '@/store/display/type';
 

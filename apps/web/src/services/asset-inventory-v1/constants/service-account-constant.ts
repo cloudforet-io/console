@@ -1,4 +1,4 @@
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 
 import * as styles from '@/styles/colors';
 

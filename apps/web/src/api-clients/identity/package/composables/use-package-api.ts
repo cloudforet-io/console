@@ -1,7 +1,3 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
@@ -15,46 +11,19 @@ import type { PackageSetDefaultParameters } from '@/api-clients/identity/package
 import type { PackageUpdateParameters } from '@/api-clients/identity/package/schema/api-verbs/update';
 import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 
-interface UsePackageApiReturn {
-    packageQueryKey: ComputedRef<QueryKey>;
-    packageListQueryKey: ComputedRef<QueryKey>;
-    packageAPI: {
-        create: (params: PackageCreateParameters) => Promise<PackageModel>;
-        update: (params: PackageUpdateParameters) => Promise<PackageModel>;
-        delete: (params: PackageDeleteParameters) => Promise<void>;
-        get: (params: PackageGetParameters) => Promise<PackageModel>;
-        list: (params: PackageListParameters) => Promise<ListResponse<PackageModel>>;
-        setDefault: (params: PackageSetDefaultParameters) => Promise<PackageModel>;
-        changeOrder: (params: PackageChangeOrderParameters) => Promise<PackageModel>;
-    }
-}
 
-export const usePackageApi = (): UsePackageApiReturn => {
+export const usePackageApi = () => {
     const packageQueryKey = useAPIQueryKey('identity', 'package', 'get');
     const packageListQueryKey = useAPIQueryKey('identity', 'package', 'list');
 
     const actions = {
-        async create(params: PackageCreateParameters) {
-            return SpaceConnector.clientV2.identity.package.create<PackageCreateParameters, PackageModel>(params);
-        },
-        async update(params: PackageUpdateParameters) {
-            return SpaceConnector.clientV2.identity.package.update<PackageUpdateParameters, PackageModel>(params);
-        },
-        async delete(params: PackageDeleteParameters) {
-            return SpaceConnector.clientV2.identity.package.delete<PackageDeleteParameters>(params);
-        },
-        async get(params: PackageGetParameters) {
-            return SpaceConnector.clientV2.identity.package.get<PackageGetParameters, PackageModel>(params);
-        },
-        async list(params: PackageListParameters) {
-            return SpaceConnector.clientV2.identity.package.list<PackageListParameters, ListResponse<PackageModel>>(params);
-        },
-        async setDefault(params: PackageSetDefaultParameters) {
-            return SpaceConnector.clientV2.identity.package.setDefault<PackageSetDefaultParameters, PackageModel>(params);
-        },
-        async changeOrder(params: PackageChangeOrderParameters) {
-            return SpaceConnector.clientV2.identity.package.changeOrder<PackageChangeOrderParameters, PackageModel>(params);
-        },
+        create: SpaceConnector.clientV2.identity.package.create<PackageCreateParameters, PackageModel>,
+        update: SpaceConnector.clientV2.identity.package.update<PackageUpdateParameters, PackageModel>,
+        delete: SpaceConnector.clientV2.identity.package.delete<PackageDeleteParameters>,
+        get: SpaceConnector.clientV2.identity.package.get<PackageGetParameters, PackageModel>,
+        list: SpaceConnector.clientV2.identity.package.list<PackageListParameters, ListResponse<PackageModel>>,
+        setDefault: SpaceConnector.clientV2.identity.package.setDefault<PackageSetDefaultParameters, PackageModel>,
+        changeOrder: SpaceConnector.clientV2.identity.package.changeOrder<PackageChangeOrderParameters, PackageModel>,
     };
 
     return {

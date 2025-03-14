@@ -2,8 +2,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
-import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
-import type { TokenGrantModel } from '@/schema/identity/token/model';
+import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
+import type { TokenGrantModel } from '@/api-clients/identity/token/schema/model';
 
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';

@@ -4,12 +4,12 @@ import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynami
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
-import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
-import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
-import type { SchemaModel } from '@/schema/identity/schema/model';
+import type { UserConfigCreateParameters } from '@/api-clients/config/user-config/schema/api-verbs/create';
+import type { UserConfigGetParameters } from '@/api-clients/config/user-config/schema/api-verbs/get';
+import type { UserConfigUpdateParameters } from '@/api-clients/config/user-config/schema/api-verbs/update';
+import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
+import type { SchemaListParameters } from '@/api-clients/identity/schema/schema/api-verbs/list';
+import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

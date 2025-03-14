@@ -6,9 +6,9 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { ProjectType } from '@/schema/identity/project/type';
+import type { ProjectListParameters } from '@/api-clients/identity/project/schema/api-verbs/list';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';

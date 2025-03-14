@@ -7,8 +7,8 @@ import { find, isEqual } from 'lodash';
 
 import { PPaneLayout } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 

@@ -7,8 +7,8 @@ import {
     PI, PToggleButton, PDataTable, PSelectDropdown, PCheckboxGroup, PCheckbox, PHeading,
 } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';

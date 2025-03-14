@@ -6,8 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceGroupListParameters } from '@/schema/identity/workspace-group/api-verbs/list';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupListParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/list';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {

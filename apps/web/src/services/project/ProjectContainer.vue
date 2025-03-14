@@ -2,8 +2,8 @@
 import { computed, onUnmounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';

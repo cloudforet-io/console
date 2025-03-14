@@ -5,12 +5,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PDoubleCheckModal, PLink } from '@cloudforet/mirinae';
 
 
+import type { ServiceAccountDeleteParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { SpaceRouter } from '@/router';
-import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
-import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

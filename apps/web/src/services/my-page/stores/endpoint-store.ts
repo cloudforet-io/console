@@ -4,8 +4,8 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { EndpointListParameters, EndpointListResponse } from '@/schema/identity/endpoint/api-verbs/list';
-import type { EndpointModel } from '@/schema/identity/endpoint/model';
+import type { EndpointListParameters, EndpointListResponse } from '@/api-clients/identity/endpoint/schema/api-verbs/list';
+import type { EndpointModel } from '@/api-clients/identity/endpoint/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

@@ -8,9 +8,9 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
-import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectListParameters } from '@/api-clients/identity/project/schema/api-verbs/list';
+import type { ProjectRemoveUsersParameters } from '@/api-clients/identity/project/schema/api-verbs/remove-users';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

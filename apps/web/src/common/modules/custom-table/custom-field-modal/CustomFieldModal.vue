@@ -11,10 +11,10 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
-import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
-import type { UserType } from '@/schema/identity/user/type';
+import type { UserConfigGetParameters } from '@/api-clients/config/user-config/schema/api-verbs/get';
+import type { UserConfigUpdateParameters } from '@/api-clients/config/user-config/schema/api-verbs/update';
+import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
+import type { UserType } from '@/api-clients/identity/user/schema/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

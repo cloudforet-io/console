@@ -7,16 +7,16 @@ import {
     PHeadingLayout, PPaneLayout, PLazyImg, PAvatar, PButton, PHeading, PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
+import type { TokenIssueParameters } from '@/api-clients/identity/token/schema/api-verbs/issue';
+import type { TokenIssueModel } from '@/api-clients/identity/token/schema/model';
+import type { AuthType } from '@/api-clients/identity/user/schema/type';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
-import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
-import type { TokenIssueModel } from '@/schema/identity/token/model';
-import type { AuthType } from '@/schema/identity/user/type';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';

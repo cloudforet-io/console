@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-import type { UserType } from '@/schema/identity/user/type';
+import type { UserType } from '@/api-clients/identity/user/schema/type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
