@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PI, PLink } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

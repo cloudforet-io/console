@@ -6,7 +6,7 @@ import type { KeyItem } from '@cloudforet/mirinae/src/controls/search/query-sear
 import type { ValueHandler, KeyDataType } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { DATASOURCE_STATE_COLOR } from '@/services/cost-explorer/constants/datasource-constant';
 

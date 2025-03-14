@@ -7,7 +7,7 @@ import {
     PI, PTextInput, PFieldGroup, PButton, PBadge, PDefinitionTable,
 } from '@cloudforet/mirinae';
 
-import type { AuthType } from '@/schema/identity/user/type';
+import type { AuthType } from '@/api-clients/identity/user/schema/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

@@ -48,7 +48,7 @@ import type {
 } from '@tanstack/vue-query';
 import { useQuery } from '@tanstack/vue-query';
 
-import type { GrantScope } from '@/schema/identity/token/type';
+import type { GrantScope } from '@/api-clients/identity/token/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

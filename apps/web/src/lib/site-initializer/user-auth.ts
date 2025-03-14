@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserModel } from '@/schema/identity/user/model';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 import { pinia } from '@/store/pinia';

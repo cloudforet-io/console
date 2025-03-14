@@ -1,4 +1,4 @@
-import type { SchemaModel } from '@/schema/identity/schema/model';
+import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 
 import type { Tag } from '@/common/modules/tags/type';
 

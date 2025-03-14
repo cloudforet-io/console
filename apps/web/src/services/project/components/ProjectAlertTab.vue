@@ -12,7 +12,7 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model.js';
 import { i18n } from '@/translations';
 

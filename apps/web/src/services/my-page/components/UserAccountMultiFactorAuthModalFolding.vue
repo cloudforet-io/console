@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PTextButton, PCollapsibleToggle } from '@cloudforet/mirinae';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 
 import { useUserStore } from '@/store/user/user-store';
 

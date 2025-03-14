@@ -12,7 +12,7 @@ import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

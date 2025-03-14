@@ -3,8 +3,8 @@ import VueI18n from 'vue-i18n';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
-import type { UserModel } from '@/schema/identity/user/model';
+import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;

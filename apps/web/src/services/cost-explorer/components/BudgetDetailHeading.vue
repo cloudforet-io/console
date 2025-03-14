@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';

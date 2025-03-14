@@ -7,7 +7,7 @@ import {
     PButton, PIconButton, PFieldGroup, PI, PTextInput, PTextButton,
 } from '@cloudforet/mirinae';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

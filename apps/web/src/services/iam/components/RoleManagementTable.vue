@@ -12,8 +12,8 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleState } from '@/schema/identity/role/type';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleState } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

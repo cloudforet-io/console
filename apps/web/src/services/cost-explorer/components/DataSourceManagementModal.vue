@@ -10,8 +10,8 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dro
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/api-clients/cost-analysis/data-source-account/schema/model';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

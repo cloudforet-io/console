@@ -8,7 +8,7 @@ import { PTab, PBadge } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';

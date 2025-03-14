@@ -83,6 +83,8 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     };
 
     const stringOrStringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
+        if (val === undefined) return !props.field.is_required;
+
         if (props.field.selection_type === 'MULTI') {
             if (!Array.isArray(val)) {
                 return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY') as string;

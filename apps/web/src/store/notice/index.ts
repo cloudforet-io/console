@@ -8,13 +8,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
+import type { UserConfigSetParameters } from '@/api-clients/config/user-config/schema/api-verbs/set';
+import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import type { NoticeConfigData } from '@/schema/board/post/type';
-import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
-import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

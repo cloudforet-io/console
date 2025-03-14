@@ -1,8 +1,8 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserProfileConfirmEmailParameters } from '@/schema/identity/user-profile/api-verbs/confirm-email';
-import type { UserProfileVerifyEmailParameters } from '@/schema/identity/user-profile/api-verbs/verify-email';
-import type { UserVerifyEmailParameters } from '@/schema/identity/user/api-verbs/verify-email';
+import type { UserProfileConfirmEmailParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/confirm-email';
+import type { UserProfileVerifyEmailParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/verify-email';
+import type { UserVerifyEmailParameters } from '@/api-clients/identity/user/schema/api-verbs/verify-email';
 import { i18n } from '@/translations';
 
 import type { useUserStore } from '@/store/user/user-store';

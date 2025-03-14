@@ -13,10 +13,10 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 
-import type { ProjectGroupAddUsersParameters } from '@/schema/identity/project-group/api-verbs/add-users';
-import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
-import type { ProjectGroupRemoveUsersParameters } from '@/schema/identity/project-group/api-verbs/remove-users';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectGroupAddUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/add-users';
+import type { ProjectGroupGetParameters } from '@/api-clients/identity/project-group/schema/api-verbs/get';
+import type { ProjectGroupRemoveUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/remove-users';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

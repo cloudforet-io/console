@@ -10,12 +10,12 @@ import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
 } from '@cloudforet/mirinae';
 
-import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
-import type { UserModel } from '@/schema/identity/user/model';
-import type { AuthType } from '@/schema/identity/user/type';
-import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
-import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
-import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-verbs/get';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import type { AuthType } from '@/api-clients/identity/user/schema/type';
+import type { FindWorkspaceUserParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/find';
+import type { WorkspaceUserGetParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/get';
+import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';

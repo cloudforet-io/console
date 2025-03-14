@@ -5,8 +5,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PRadio, PRadioGroup } from '@cloudforet/mirinae';
 
 
-import type { ProjectGroupChangeParentGroupParameters } from '@/schema/identity/project-group/api-verbs/change-parent-group';
-import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
+import type { ProjectGroupChangeParentGroupParameters } from '@/api-clients/identity/project-group/schema/api-verbs/change-parent-group';
+import type { ProjectChangeProjectGroupParameters } from '@/api-clients/identity/project/schema/api-verbs/change-project-group';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PI } from '@cloudforet/mirinae';
 
-import type { WorkspaceGroupDeleteParameters } from '@/schema/identity/workspace-group/api-verbs/delete';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupDeleteParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/delete';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

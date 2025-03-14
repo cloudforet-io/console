@@ -1,7 +1,3 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
@@ -13,38 +9,16 @@ import type { TaskCategoryListParameters } from '@/api-clients/opsflow/task-cate
 import type { TaskCategoryUpdateParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/update';
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 
-interface UseTaskCategoryApiReturn {
-    taskCategoryQueryKey: ComputedRef<QueryKey>;
-    taskCategoryListQueryKey: ComputedRef<QueryKey>;
-    taskCategoryAPI: {
-        create: (params: TaskCategoryCreateParameters) => Promise<TaskCategoryModel>;
-        update: (params: TaskCategoryUpdateParameters) => Promise<TaskCategoryModel>;
-        delete: (params: TaskCategoryDeleteParameters) => Promise<void>;
-        get: (params: TaskCategoryGetParameters) => Promise<TaskCategoryModel>;
-        list: (params: TaskCategoryListParameters) => Promise<ListResponse<TaskCategoryModel>>;
-    }
-}
-
-export const useTaskCategoryApi = (): UseTaskCategoryApiReturn => {
+export const useTaskCategoryApi = () => {
     const taskCategoryQueryKey = useAPIQueryKey('opsflow', 'task-category', 'get');
     const taskCategoryListQueryKey = useAPIQueryKey('opsflow', 'task-category', 'list');
 
     const actions = {
-        async create(params: TaskCategoryCreateParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>(params);
-        },
-        async update(params: TaskCategoryUpdateParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>(params);
-        },
-        async delete(params: TaskCategoryDeleteParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.delete<TaskCategoryDeleteParameters>(params);
-        },
-        async get(params: TaskCategoryGetParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.get<TaskCategoryGetParameters, TaskCategoryModel>(params);
-        },
-        async list(params: TaskCategoryListParameters) {
-            return SpaceConnector.clientV2.opsflow.taskCategory.list<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>(params);
-        },
+        create: SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>,
+        update: SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>,
+        delete: SpaceConnector.clientV2.opsflow.taskCategory.delete<TaskCategoryDeleteParameters>,
+        get: SpaceConnector.clientV2.opsflow.taskCategory.get<TaskCategoryGetParameters, TaskCategoryModel>,
+        list: SpaceConnector.clientV2.opsflow.taskCategory.list<TaskCategoryListParameters, ListResponse<TaskCategoryModel>>,
     };
 
     return {

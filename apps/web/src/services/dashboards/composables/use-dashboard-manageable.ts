@@ -2,7 +2,7 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

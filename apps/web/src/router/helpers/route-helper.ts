@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import {
     ERROR_ROUTE, EXTERNAL_PAGES, ROOT_ROUTE, ROUTE_SCOPE,

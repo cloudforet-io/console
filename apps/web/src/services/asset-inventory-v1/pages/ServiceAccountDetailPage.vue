@@ -14,12 +14,12 @@ import {
 import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { ServiceAccountGetParameters } from '@/api-clients/identity/service-account/schema/api-verbs/get';
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { TrustedAccountGetParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/get';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

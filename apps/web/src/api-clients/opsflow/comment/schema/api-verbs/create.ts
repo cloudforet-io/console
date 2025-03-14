@@ -1,4 +1,4 @@
-import type { MentionTargets } from '../type';
+import type { MentionTargets } from '@/api-clients/opsflow/comment/schema/type';
 
 export interface CommentCreateParameters {
     task_id: string;

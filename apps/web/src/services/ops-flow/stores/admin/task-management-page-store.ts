@@ -1,19 +1,8 @@
-import type { DeepReadonly } from 'vue';
-import {
-    reactive, computed, onUnmounted, onMounted,
-} from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
-import type { PackageModel } from '@/schema/identity/package/model';
 
-import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
-import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
-
-
-import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
 interface UseTaskManagementPageStoreState {
     // support package
@@ -27,18 +16,8 @@ interface UseTaskManagementPageStoreState {
     visibleDeleteCategoryModal: boolean;
 }
 
-interface UseTaskManagementPageStoreGetters {
-    targetPackage: PackageModel|undefined;
-    associatedCategoriesToPackage: TaskCategoryModel[];
-    associatedWorkspacesToPackage: WorkspaceItem[];
-    targetCategory: TaskCategoryModel|undefined;
-    defaultPackage: PackageModel|undefined;
-}
 
 export const useTaskManagementPageStore = defineStore('task-management-page', () => {
-    const packageStore = usePackageStore();
-    const taskCategoryStore = useTaskCategoryStore();
-    const workspaceReferenceStore = useWorkspaceReferenceStore();
     const state = reactive<UseTaskManagementPageStoreState>({
         // support package
         visiblePackageForm: false,
@@ -50,18 +29,6 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         targetCategoryId: undefined,
         visibleDeleteCategoryModal: false,
     });
-    const getters: UseTaskManagementPageStoreGetters = {
-        targetPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.package_id === state.targetPackageId)),
-        associatedCategoriesToPackage: computed<DeepReadonly<TaskCategoryModel[]>>(() => taskCategoryStore.getters.taskCategories.filter((c) => c.package_id === state.targetPackageId)),
-        associatedWorkspacesToPackage: computed<WorkspaceItem[]>(() => {
-            const targetPackageId = state.targetPackageId;
-            if (!targetPackageId) return [];
-            const workspaceItems: WorkspaceItem[] = Object.values(workspaceReferenceStore.getters.workspaceItems);
-            return workspaceItems.filter((w) => w.data.packages?.includes(targetPackageId));
-        }),
-        targetCategory: computed<DeepReadonly<TaskCategoryModel>|undefined>(() => taskCategoryStore.getters.taskCategories.find((c) => c.category_id === state.targetCategoryId)),
-        defaultPackage: computed<PackageModel|undefined>(() => packageStore.getters.packages.find((p) => p.is_default)),
-    } as unknown as UseTaskManagementPageStoreGetters; // HACK: to avoid type error
     const actions = {
         // support package
         openAddPackageForm() {
@@ -121,22 +88,8 @@ export const useTaskManagementPageStore = defineStore('task-management-page', ()
         },
     };
 
-    onMounted(() => {
-        if (!taskCategoryStore.state.loading) taskCategoryStore.list();
-    });
-
-
-    const disposeSelf = () => {
-        const store = useTaskManagementPageStore();
-        store.$reset();
-        store.$dispose();
-    };
-    onUnmounted(() => {
-        disposeSelf();
-    });
     return {
         state,
-        getters,
         ...actions,
     };
 });

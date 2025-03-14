@@ -24,13 +24,13 @@ import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/typ
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
-import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -10,7 +10,7 @@ import {
     PButton, PHeading, PI, PTextButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

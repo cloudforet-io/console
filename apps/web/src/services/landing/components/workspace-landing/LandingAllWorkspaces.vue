@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { partition, sortBy } from 'lodash';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 

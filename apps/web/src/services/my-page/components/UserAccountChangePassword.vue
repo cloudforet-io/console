@@ -6,7 +6,7 @@ import {
     PButton, PFieldGroup, PTextInput, PFieldTitle, PDefinitionTable,
 } from '@cloudforet/mirinae';
 
-import type { UserProfileUpdatePasswordParameters } from '@/schema/identity/user-profile/api-verbs/update-password';
+import type { UserProfileUpdatePasswordParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/update-password';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

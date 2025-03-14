@@ -4,8 +4,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { WorkspaceAddPackageParameters } from '@/schema/identity/workspace/api-verbs/add-package';
-import type { WorkspaceRemovePackageParameters } from '@/schema/identity/workspace/api-verbs/remove-package';
+import type { WorkspaceAddPackageParameters } from '@/api-clients/identity/workspace/schema/api-verbs/add-package';
+import type { WorkspaceRemovePackageParameters } from '@/api-clients/identity/workspace/schema/api-verbs/remove-package';
 
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 

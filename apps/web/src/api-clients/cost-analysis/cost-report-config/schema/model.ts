@@ -1,5 +1,5 @@
 import type { CostReportConfigStatus } from '@/api-clients/cost-analysis/cost-report-config/schema/type';
-import type { RoleType } from '@/schema/identity/role/type';
+import type { RoleType } from '@/api-clients/identity/role/type';
 
 import type { Currency } from '@/store/display/type';
 import type { LanguageCode } from '@/store/user/type';

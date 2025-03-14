@@ -6,9 +6,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 
-import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
-import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-verbs/get';
+import type { RoleUpdateParameters } from '@/api-clients/identity/role/schema/api-verbs/update';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

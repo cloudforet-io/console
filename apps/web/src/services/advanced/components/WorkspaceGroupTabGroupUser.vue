@@ -10,12 +10,12 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
-import type { RoleType } from '@/schema/identity/role/type';
-import type { WorkspaceGroupUpdateRoleParameters } from '@/schema/identity/workspace-group/api-verbs/update-role';
-import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import type { RoleType } from '@/api-clients/identity/role/type';
+import type { WorkspaceGroupUpdateRoleParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/update-role';
+import type { WorkspaceUser } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

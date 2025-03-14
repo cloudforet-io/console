@@ -11,11 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { UnifiedCostAnalyzeParameters } from '@/api-clients/cost-analysis/unified-cost/schema/api-verbs/analyze';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';

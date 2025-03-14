@@ -6,7 +6,7 @@ import {
 
 import { PLazyImg, PButton } from '@cloudforet/mirinae';
 
-import type { Metadata } from '@/schema/identity/domain/api-verbs/get-auth-info';
+import type { Metadata } from '@/api-clients/identity/domain/schema/api-verbs/get-auth-info';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 

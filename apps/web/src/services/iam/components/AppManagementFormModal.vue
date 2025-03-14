@@ -17,10 +17,10 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { AppModel } from '@/schema/identity/app/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 
 import { PI, PTextButton } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';

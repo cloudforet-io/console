@@ -12,11 +12,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import type { DomainConfigGetParameters } from '@/api-clients/config/domain-config/schema/api-verbs/get';
+import type { DomainConfigSetParameters } from '@/api-clients/config/domain-config/schema/api-verbs/set';
+import { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
+import type { DomainConfigModel } from '@/api-clients/config/domain-config/schema/model';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import type { DomainConfigGetParameters } from '@/schema/config/domain-config/api-verbs/get';
-import type { DomainConfigSetParameters } from '@/schema/config/domain-config/api-verbs/set';
-import { DOMAIN_CONFIG_NAMES } from '@/schema/config/domain-config/constant';
-import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

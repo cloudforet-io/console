@@ -10,7 +10,7 @@ import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-vi
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
