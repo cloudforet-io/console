@@ -104,6 +104,7 @@ export interface DynamicFieldOptions extends CommonOptions {
     // more
     layout?: DynamicLayout;
     // enum
+    items?: Record<string, EnumValue>;
     default?: any;
 }
 
