@@ -5,7 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PTooltip, PI, PToggleButton, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 
 import type {
@@ -82,7 +82,7 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
         </template>
         <template #right-extra>
             <p-link v-if="storeState.isAdminMode"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     highlight
                     :to="{ name: ADMIN_IAM_ROUTE.ROLE._NAME }"
                     size="md"

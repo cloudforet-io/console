@@ -31,7 +31,7 @@
                            :type="querySearchState.inputElType"
                            :step="querySearchState.currentDataType === 'integer' ? 1 : undefined"
                            :min="querySearchState.currentDataType === 'integer' ? 0 : undefined"
-                           size="1"
+                           :size="1"
                            @input="onInput"
                            @keyup.enter="onEnter"
                            @keydown="onKeydownCheck"
@@ -83,7 +83,7 @@
 
 <script lang="ts">
 import type {
-    PropType, DirectiveFunction, SetupContext,
+    PropType, DirectiveFunction,
 } from 'vue';
 import {
     computed,
@@ -94,7 +94,6 @@ import { vOnClickOutside } from '@vueuse/components';
 import { focus as vFocus } from 'vue-focus';
 
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
-import type { FilterableQueryDropdownProps } from '@/controls/dropdown/filterable-query-dropdown/type';
 import type { SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';
 import type { KeyMenuItem, ValueMenuItem, QueryItem } from '@/controls/search/query-search/type';
 import PSearch from '@/controls/search/search/PSearch.vue';
@@ -103,7 +102,7 @@ import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/use-query-search/use-query-search';
 
-export default defineComponent<FilterableQueryDropdownProps>({
+export default defineComponent({
     name: 'PFilterableQueryDropdown',
     components: {
         PContextMenu,
@@ -154,7 +153,7 @@ export default defineComponent<FilterableQueryDropdownProps>({
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props, { emit }) {
         const state = reactive({
             proxySelected: useProxyValue('selected', props, emit),
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),

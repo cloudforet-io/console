@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import {
     PLink, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { GRANULARITY, WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
@@ -250,7 +250,7 @@ const handleClickFullModeButton = () => {
                                 new-tab
                                 :href="props.widgetLink"
                                 :to="props.widgetLocation"
-                                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                action-icon="internal-link"
                                 class="link-button"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}

@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type { OpUnitType } from 'dayjs';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';

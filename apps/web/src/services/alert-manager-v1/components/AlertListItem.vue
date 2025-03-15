@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import {
     PI, PBadge, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 
@@ -92,7 +92,7 @@ const projectNameFormatter = (projectId) => props.projectReference?.label || pro
                 <p-link v-if="props.showProjectLink"
                         v-tooltip.bottom="projectNameFormatter(props.item.project_id)"
                         class="project-link"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="referenceRouter(props.item.project_id,{
                             resource_type: 'identity.Project',

@@ -18,14 +18,16 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import DOMPurify from 'dompurify';
 
-import type { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
+import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { HtmlOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 
@@ -39,7 +41,7 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
         node.setAttribute('rel', 'noopener');
     }
 });
-export default {
+export default defineComponent({
     name: 'PDynamicLayoutHtml',
     components: { PHeading },
     props: {
@@ -48,7 +50,7 @@ export default {
             required: true,
         },
         options: {
-            type: Object,
+            type: Object as PropType<HtmlOptions>,
             default: () => ({}),
         },
         data: {
@@ -56,15 +58,15 @@ export default {
             default: undefined,
         },
         fetchOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutFetchOptions>,
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutTypeOptions>,
             default: undefined,
         },
     },
-    setup(props: HtmlDynamicLayoutProps) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
@@ -94,7 +96,7 @@ export default {
             onLoadIFrame,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

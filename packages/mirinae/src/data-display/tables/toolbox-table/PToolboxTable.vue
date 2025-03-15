@@ -68,7 +68,7 @@
             <template v-for="(_, slot) of $scopedSlots"
                       #[slot]="scope"
             >
-                <slot v-if="!slot.startsWith('toolbox')"
+                <slot v-if="typeof slot === 'string' && !slot.startsWith('toolbox')"
                       :name="slot"
                       v-bind="scope"
                 />
@@ -82,18 +82,22 @@
 import {
     defineComponent, reactive, watch,
 } from 'vue';
-import type { SetupContext } from 'vue';
+import type { PropType } from 'vue';
 
+import type { QueryTag } from '@/controls/search/query-search-tags/type';
+import type { KeyItemSet } from '@/controls/search/query-search/type';
+import type { SearchType } from '@/controls/toolbox/config';
 import { SEARCH_TYPES } from '@/controls/toolbox/config';
 import PToolbox from '@/controls/toolbox/PToolbox.vue';
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
-import type { ToolboxTableOptions, ToolboxTableProps } from '@/data-display/tables/toolbox-table/type';
+import type { DataTableField, DataTableStyleType } from '@/data-display/tables/data-table/type';
+import type { ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
 import { useProxyValue } from '@/hooks';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
 
-export default defineComponent<ToolboxTableProps>({
+export default defineComponent({
     name: 'PToolboxTable',
     components: {
         PPaneLayout,
@@ -107,12 +111,12 @@ export default defineComponent<ToolboxTableProps>({
             default: false,
         },
         fields: {
-            type: Array,
+            type: Array as PropType<DataTableField[]>,
             required: true,
             default: () => [],
         },
         items: {
-            type: Array,
+            type: Array as PropType<any[]>,
             default: () => [],
         },
         sortable: {
@@ -136,7 +140,7 @@ export default defineComponent<ToolboxTableProps>({
             default: false,
         },
         selectIndex: {
-            type: Array,
+            type: Array as PropType<number[]|number>,
             default: () => [],
         },
         multiSelect: {
@@ -148,7 +152,7 @@ export default defineComponent<ToolboxTableProps>({
             default: false,
         },
         tableStyleType: {
-            type: String,
+            type: String as PropType<DataTableStyleType>,
             default: DATA_TABLE_STYLE_TYPE.default,
         },
         striped: {
@@ -213,7 +217,7 @@ export default defineComponent<ToolboxTableProps>({
             default: true,
         },
         searchType: {
-            type: String,
+            type: String as PropType<SearchType>,
             default: SEARCH_TYPES.plain,
         },
         thisPage: {
@@ -229,7 +233,7 @@ export default defineComponent<ToolboxTableProps>({
             default: 0,
         },
         pageSizeOptions: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: () => [15, 30, 45],
         },
         sortByOptions: {
@@ -237,7 +241,7 @@ export default defineComponent<ToolboxTableProps>({
             default: () => [],
         },
         keyItemSets: {
-            type: Array,
+            type: Array as PropType<KeyItemSet[]>,
             default: () => [],
         },
         valueHandlerMap: {
@@ -245,7 +249,7 @@ export default defineComponent<ToolboxTableProps>({
             default: () => ({}),
         },
         queryTags: {
-            type: Array,
+            type: Array as PropType<QueryTag[]>,
             default: () => [],
         },
         searchText: {
@@ -261,15 +265,15 @@ export default defineComponent<ToolboxTableProps>({
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props, { emit }) {
         const proxyState = reactive({
             selectIndex: useProxyValue<number[]>('selectIndex', props, emit, ['select']),
             sortBy: useProxyValue<string>('sortBy', props, emit),
             sortDesc: useProxyValue<boolean>('sortDesc', props, emit),
             thisPage: useProxyValue<number>('thisPage', props, emit),
             pageSize: useProxyValue<number>('pageSize', props, emit),
-            queryTags: useProxyValue<number>('queryTags', props, emit),
-            searchText: useProxyValue<number>('searchText', props, emit),
+            queryTags: useProxyValue<QueryTag[]>('queryTags', props, emit),
+            searchText: useProxyValue<string>('searchText', props, emit),
         });
 
 

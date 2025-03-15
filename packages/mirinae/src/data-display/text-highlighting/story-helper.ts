@@ -1,3 +1,5 @@
+import type { ArgTypes } from '@storybook/vue';
+
 import { getTextHighlightingProps } from '@/data-display/text-highlighting/mock';
 import { TEXT_HIGHLIGHTING_STYLE_TYPE } from '@/data-display/text-highlighting/type';
 
@@ -20,7 +22,7 @@ export const getTextHighlightingParameters = () => ({
     },
 });
 
-export const getTextHighlightingArgTypes = () => ({
+export const getTextHighlightingArgTypes = (): ArgTypes => ({
     text: {
         name: 'text',
         type: { name: 'string' },

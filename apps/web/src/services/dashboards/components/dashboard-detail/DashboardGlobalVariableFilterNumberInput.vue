@@ -10,7 +10,7 @@ import { cloneDeep, isEqual } from 'lodash';
 import {
     PIconButton, PTextInput, PPopover, PButton, PI,
 } from '@cloudforet/mirinae';
-import type { InputItem } from '@cloudforet/mirinae/src/controls/input/text-input/type';
+import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import type {
     DashboardGlobalVariable,

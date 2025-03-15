@@ -31,21 +31,20 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
 import { map, replace } from 'lodash';
 
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import type {
-    ListDynamicLayoutProps,
-} from '@/data-display/dynamic/dynamic-layout/templates/list/type';
-import type { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutFetchOptions, DynamicLayoutFieldHandler, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { DynamicLayout, ListOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import { makeByPassListeners } from '@/utils/composition-helpers';
 
-export default {
+export default defineComponent({
     name: 'PDynamicLayoutList',
     components: { PDynamicLayout },
     props: {
@@ -54,7 +53,7 @@ export default {
             required: true,
         },
         options: {
-            type: Object,
+            type: Object as PropType<ListOptions>,
             default: () => ({}),
         },
         data: {
@@ -62,19 +61,19 @@ export default {
             default: undefined,
         },
         fetchOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutFetchOptions>,
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutTypeOptions>,
             default: undefined,
         },
         fieldHandler: {
-            type: Function,
+            type: Function as PropType<DynamicLayoutFieldHandler>,
             default: undefined,
         },
     },
-    setup(props: ListDynamicLayoutProps, { slots, listeners }) {
+    setup(props, { slots, listeners }) {
         const state = reactive({
             layouts: computed<DynamicLayout[]>(() => props.options.layouts || []),
             rootData: computed(() => {
@@ -104,5 +103,5 @@ export default {
             },
         };
     },
-};
+});
 </script>

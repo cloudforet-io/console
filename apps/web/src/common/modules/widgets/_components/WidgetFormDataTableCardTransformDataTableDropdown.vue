@@ -6,7 +6,7 @@ import {
 } from 'vue';
 
 import { PI, PContextMenu, PFieldTitle } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';

@@ -125,11 +125,11 @@ export const Basic: Story = {
                         },
                     }],
                 },
-                data: null,
+                data: null as null|any[],
             });
-            const fetchData = async (options = {}) => {
+            const fetchData = async (options = {} as any) => {
                 state.typeOptions.loading = true;
-                state.data = await new Promise((resolve) => {
+                state.data = await new Promise<any[]>((resolve) => {
                     setTimeout(() => {
                         state.typeOptions.totalCount = faker.datatype.number({ min: 0 });
                         resolve(range(options.pageLimit || 15)

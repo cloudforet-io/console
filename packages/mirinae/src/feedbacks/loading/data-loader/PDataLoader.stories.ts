@@ -65,11 +65,11 @@ export const Basic: Story = {
         setup() {
             const state = reactive({
                 loading: true,
-                data: [],
+                data: []as string[],
             });
             const fetchData = async () => {
                 state.loading = true;
-                state.data = await new Promise((resolve) => {
+                state.data = await new Promise<string[]>((resolve) => {
                     setTimeout(() => {
                         resolve(range(15).map(() => faker.lorem.lines()));
                     }, 2000);
@@ -191,11 +191,11 @@ export const MinLoading: Story = {
         setup() {
             const state = reactive({
                 loading: true,
-                data: [],
+                data: [] as string[],
             });
             const fetchData = async () => {
                 state.loading = true;
-                state.data = await new Promise((resolve) => {
+                state.data = await new Promise<string[]>((resolve) => {
                     setTimeout(() => {
                         resolve(range(15).map(() => faker.lorem.lines()));
                     }, 2000);
@@ -268,11 +268,11 @@ export const LazyLoadingAndMinLoading: Story = {
         setup() {
             const state = reactive({
                 loading: true,
-                data: [],
+                data: [] as string[],
             });
             const fetchData = async () => {
                 state.loading = true;
-                state.data = await new Promise((resolve) => {
+                state.data = await new Promise<string[]>((resolve) => {
                     setTimeout(() => {
                         resolve(range(15).map(() => faker.lorem.lines()));
                     }, 1500);
@@ -378,11 +378,11 @@ export const DisableTransition: Story = {
         setup() {
             const state = reactive({
                 loading: true,
-                data: [],
+                data: [] as string[],
             });
             const fetchData = async () => {
                 state.loading = true;
-                state.data = await new Promise((resolve) => {
+                state.data = await new Promise<string[]>((resolve) => {
                     setTimeout(() => {
                         resolve(range(15).map(() => faker.lorem.lines()));
                     }, 1000);

@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import { PLink, PScopedNotification } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
@@ -77,7 +77,7 @@ const state = reactive({
                           #right
                 >
                     <p-link class="notification-link"
-                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            action-icon="internal-link"
                             highlight
                             new-tab
                             :to="state.adminModeLink"

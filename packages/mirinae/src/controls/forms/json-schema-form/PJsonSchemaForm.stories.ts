@@ -68,7 +68,6 @@ const Template: Story = {
             const menu = getSelectDropdownMenuWithMultiTypes();
             let allResults = [];
             const simpleHandler = async (inputText) => {
-                state.loading = true;
                 allResults = await new Promise((resolve) => {
                     setTimeout(() => {
                         let filtered;
@@ -86,7 +85,6 @@ const Template: Story = {
                         resolve(filtered);
                     }, 500);
                 });
-                state.loading = false;
                 const results = allResults.slice(0, 5);
                 return { results, more: allResults.length > results.length };
             };

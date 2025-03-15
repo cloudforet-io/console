@@ -7,7 +7,6 @@ import {
     cloneDeep, debounce, find, throttle,
 } from 'lodash';
 
-import type PContextMenu from '@/controls/context-menu/PContextMenu.vue';
 import {
     defaultHandlerMap, formatterMap,
     inputTypeMap, inputValidatorMap,
@@ -25,6 +24,7 @@ import type {
     KeyMenuItem, ValueMenuItem,
     QueryItem, ValueItem, KeyItemSet, ValueHandlerMap,
 } from '@/controls/search/query-search/type';
+import type { ISimpleContextMenu } from '@/hooks/use-context-menu-style/use-context-menu-style';
 
 const ROOT_KEY_SETTER = ':';
 const NUMBER_TYPES = ['integer', 'float'];
@@ -38,7 +38,7 @@ export interface QuerySearchStateArgs {
     keyItemSets: Ref<KeyItemSet[]>;
     valueHandlerMap: Ref<ValueHandlerMap>;
     visibleMenu: Ref<boolean | undefined>;
-    menuRef?: Ref<null|typeof PContextMenu>;
+    menuRef?: Ref<null|ISimpleContextMenu>;
 }
 
 export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySearchOptions = {}) => {
@@ -346,7 +346,9 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
             if (!validator(e.key)) e.preventDefault();
         }
     };
-    const onPaste = (e: ClipboardEvent) => {
+    const onPaste = (event) => {
+        // HACK: to prevent type error of event
+        const e = event as ClipboardEvent;
         if (state.selectedKeys.length > 0) return;
 
         const paste: string = (e.clipboardData || (window as any).clipboardData).getData('text');

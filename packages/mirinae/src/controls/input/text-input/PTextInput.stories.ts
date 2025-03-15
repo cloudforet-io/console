@@ -190,7 +190,6 @@ export const AutocompletewithPageSize: Story = {
             const menu = getTextInputMenuWithMultiTypes();
             let allResults = [];
             const simpleHandler = async (inputText) => {
-                state.loading = true;
                 allResults = await new Promise((resolve) => {
                     setTimeout(() => {
                         let filtered;
@@ -208,7 +207,6 @@ export const AutocompletewithPageSize: Story = {
                         resolve(filtered);
                     }, 500);
                 });
-                state.loading = false;
                 const results = allResults.slice(0, 5);
                 return { results, more: allResults.length > results.length };
             };
@@ -509,7 +507,7 @@ export const InputAttributes: Story = {
                     state.attributes = JSON.parse(code);
                     state.errorMessage = '';
                 } catch (e) {
-                    state.errorMessage = e.message;
+                    state.errorMessage = (e as any).message;
                 }
             };
             return {

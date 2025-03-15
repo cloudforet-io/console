@@ -17,19 +17,24 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import type { ListDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/list/type';
+import type { ListTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/list/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { ListOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTextList from '@/data-display/text-list/PTextList.vue';
 import { isNotEmpty } from '@/utils/helpers';
 
-export default {
+export default defineComponent({
     name: 'PDynamicFieldList',
     components: { PDynamicField, PTextList },
     props: {
         options: {
-            type: Object,
+            type: Object as PropType<ListOptions>,
             default: () => ({}),
         },
         data: {
@@ -41,15 +46,15 @@ export default {
             default: () => ({}),
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<ListTypeOptions>,
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },
-    setup(props: ListDynamicFieldProps) {
+    setup(props) {
         const state = reactive({
             items: computed(() => {
                 const data = props.data === undefined || props.data === null ? props.options.default : props.data;
@@ -64,7 +69,7 @@ export default {
             isNotEmpty,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

@@ -11,7 +11,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -258,7 +257,7 @@ onDeactivated(() => {
         </template>
         <template #col-service_account_id-format="{ value }">
             <p-link v-if="storeState.serviceAccounts[value]"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     new-tab
                     :to="referenceRouter(
                         value,
@@ -288,7 +287,7 @@ onDeactivated(() => {
         </template>
         <template #col-project_id-format="{ value, item }">
             <p-link v-if="storeState.projects[value]"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     new-tab
                     :to="referenceRouter(
                         value,

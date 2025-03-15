@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { PLink, PButton, PPaneLayout } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { i18n } from '@/translations';
 
@@ -53,7 +53,7 @@ const SERVICE_CONTENTS = {
                 </p-button>
                 <br>
                 <p-link text="More information"
-                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        action-icon="external-link"
                         :href="SERVICE_CONTENTS.topic.link"
                         highlight
                 >
@@ -75,7 +75,7 @@ const SERVICE_CONTENTS = {
                         {{ SERVICE_CONTENTS.sub_menu[0].description }}
                     </p>
                     <p-link :text="SERVICE_CONTENTS.sub_menu[0].link_text"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            action-icon="external-link"
                             highlight
                             :href="SERVICE_CONTENTS.sub_menu[0].link"
                     />
@@ -94,7 +94,7 @@ const SERVICE_CONTENTS = {
                         {{ SERVICE_CONTENTS.sub_menu[1].description }}
                     </p>
                     <p-link :text="SERVICE_CONTENTS.sub_menu[1].link_text"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            action-icon="external-link"
                             highlight
                             :href="SERVICE_CONTENTS.sub_menu[1].link"
                     />

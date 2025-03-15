@@ -8,12 +8,18 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import { merge } from 'lodash';
 import { VTooltip } from 'v-tooltip';
+import type { TranslateResult } from 'vue-i18n';
 
-export default {
+import type { TooltipPosition } from '@/data-display/tooltips/type';
+
+export default defineComponent({
     name: 'PTooltip',
     directives: { tooltip: VTooltip },
     props: {
@@ -22,22 +28,16 @@ export default {
             default: 'span',
         },
         contents: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: null,
         },
         position: {
-            type: String,
+            type: String as PropType<TooltipPosition>,
             default: 'top',
         },
         options: {
             type: Object,
             default: () => ({}),
-            validator() {
-                /**
-                 * HACK: ADD VALIDATOR FUNCTION TO TOOLTIPMAP AND USE THAT HERE.
-                 */
-                return true;
-            },
         },
     },
     setup(props) {
@@ -52,7 +52,7 @@ export default {
             ...toRefs(state),
         };
     },
-};
+});
 
 </script>
 

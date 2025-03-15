@@ -4,9 +4,9 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertGetParameters } from '@/schema/monitoring/alert/api-verbs/get';
 import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

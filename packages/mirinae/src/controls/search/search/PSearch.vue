@@ -68,11 +68,9 @@ import {
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import { debounce } from 'lodash';
-import type { TranslateResult } from 'vue-i18n';
 
 import type { MenuItem } from '@/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';
-import type { SearchProps } from '@/controls/search/search/type';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuStyle, useProxyValue } from '@/hooks';
 import { I18nConnector } from '@/translations';
@@ -83,7 +81,7 @@ const PContextMenu = () => ({
     component: import('@/controls/context-menu/PContextMenu.vue'),
 });
 
-export default defineComponent<SearchProps>({
+export default defineComponent({
     name: 'PSearch',
     components: { PI, PContextMenu },
     directives: { clickOutside: vOnClickOutside as DirectiveFunction },
@@ -159,8 +157,8 @@ export default defineComponent<SearchProps>({
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             inputRef: null as null|HTMLElement,
             handlerLoading: true,
-            placeholderText: computed<TranslateResult>(() => {
-                if (props.placeholder === undefined) return I18nConnector.i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
+            placeholderText: computed<string>(() => {
+                if (props.placeholder === undefined) return I18nConnector.i18n.t('COMPONENT.SEARCH.PLACEHOLDER') as string;
                 return props.placeholder;
             }),
             filteredMenu: [] as MenuItem[],

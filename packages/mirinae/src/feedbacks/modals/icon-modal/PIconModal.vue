@@ -73,6 +73,7 @@
 import { reactive } from 'vue';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
+import type { ButtonStyle } from '@/controls/buttons/button/type';
 import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import { useProxyValue } from '@/hooks';
@@ -91,7 +92,7 @@ interface IconModalProps {
     headerTitle?: string;
     headerDesc?: string;
     buttonText: string;
-    buttonStyleType?: string;
+    buttonStyleType?: ButtonStyle;
     backdrop?: boolean;
     hideButton?: boolean;
 }

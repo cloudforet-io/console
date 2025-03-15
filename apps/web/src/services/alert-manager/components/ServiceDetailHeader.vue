@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip, PButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';

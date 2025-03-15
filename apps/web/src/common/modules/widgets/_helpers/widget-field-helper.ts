@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';

@@ -48,7 +48,7 @@
                            :type="inputElType"
                            :step="currentDataType === 'integer' ? 1 : undefined"
                            :min="currentDataType === 'integer' ? 0 : undefined"
-                           size="1"
+                           :size="1"
                            :disabled="disabled"
                            @input="onInput"
                            @keyup.enter="handleInputKeyupEnter"
@@ -111,7 +111,9 @@ import type {
     KeyMenuItem, ValueMenuItem, QueryItem, KeyItemSet, ValueHandlerMap,
 } from '@/controls/search/query-search/type';
 import PI from '@/foundation/icons/PI.vue';
-import { useContextMenuStyle, useProxyValue } from '@/hooks';
+import type { ISimpleContextMenu } from '@/hooks/use-context-menu-style/use-context-menu-style';
+import { useContextMenuStyle } from '@/hooks/use-context-menu-style/use-context-menu-style';
+import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import { useQuerySearch } from '@/hooks/use-query-search/use-query-search';
 
 const PBadge = () => import('@/data-display/badge/PBadge.vue');
@@ -152,7 +154,7 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
 
 /* input focusing */
 const targetRef = ref<HTMLElement|null>(null);
-const menuRef = ref<null|typeof PContextMenu>(null);
+const menuRef = ref<null|ISimpleContextMenu>(null);
 const inputRef = ref<HTMLElement|null>(null);
 const { focused: isInputFocused } = useFocus(inputRef);
 

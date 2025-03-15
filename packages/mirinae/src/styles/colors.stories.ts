@@ -2,10 +2,12 @@ import type { Meta, StoryObj } from '@storybook/vue';
 
 import PStatus from '@/data-display/status/PStatus.vue';
 
-import { semanticColors, palette } from '@/styles/colors.cjs';
+import * as colors from '@/styles/colors.cjs';
 import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 
 import { getColorsArgTypes, getColorsParameters, getColorsArgs } from './story-helper';
+
+const { semanticColors, palette } = colors;
 
 const meta : Meta = {
     title: 'Foundation/Styles/Colors',

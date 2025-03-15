@@ -38,21 +38,13 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
 } from 'vue';
 
-interface ChildrenListProps {
-  rtl: boolean;
-  parentPath: number[];
-  indent: number;
-  nodes: any[];
-  parent: any;
-  rootNode: any;
-  selectedPaths: number[][];
-}
-export default defineComponent<ChildrenListProps>({
+export default defineComponent({
     name: 'ChildrenList',
     props: {
         rtl: {
@@ -60,7 +52,7 @@ export default defineComponent<ChildrenListProps>({
             default: false,
         },
         parentPath: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: () => [],
         },
         indent: {
@@ -68,7 +60,7 @@ export default defineComponent<ChildrenListProps>({
             default: 16,
         },
         nodes: {
-            type: Array,
+            type: Array as PropType<any[]>,
             default: () => [],
         },
         parent: {
@@ -80,7 +72,7 @@ export default defineComponent<ChildrenListProps>({
             default: () => ({}),
         },
         selectedPaths: {
-            type: Array,
+            type: Array as PropType<number[][]>,
             default: () => [],
         },
     },

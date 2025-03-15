@@ -5,7 +5,7 @@ import type { SelectDropdownAppearanceType, SelectDropdownMenuItem } from '@/con
 
 interface UseDropdownButtonDisplay {
     multiSelectable: Ref<boolean|undefined>;
-    selected: Ref<SelectDropdownMenuItem[]|string|number>;
+    selected: Ref<SelectDropdownMenuItem[]|string|number|undefined>;
     appearanceType: Ref<SelectDropdownAppearanceType|undefined>;
 }
 export const useSelectDropdownButtonDisplay = ({
@@ -26,7 +26,7 @@ export const useSelectDropdownButtonDisplay = ({
             return undefined;
         }
         // single select case
-        if (selected.value[0]) return selected.value[0].label || selected.value[0].name;
+        if (selected.value?.[0]) return selected.value[0].label || selected.value[0].name;
         return undefined;
     });
     const showTagsOnDropdownButton = computed(() => multiSelectable.value && appearanceType.value === 'stack');

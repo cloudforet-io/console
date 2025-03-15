@@ -6,7 +6,7 @@ import {
 import {
     PButton, PDefinitionTable, PHeading, PI, PStatus, PHeadingLayout, PTag,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';

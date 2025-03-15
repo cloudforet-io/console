@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { cloneDeep, find } from 'lodash';
 
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';

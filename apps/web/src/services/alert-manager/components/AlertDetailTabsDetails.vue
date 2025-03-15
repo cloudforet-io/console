@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { map } from 'lodash';
 
 import { PDefinitionTable, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 

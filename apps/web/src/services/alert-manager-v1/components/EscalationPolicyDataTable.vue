@@ -5,7 +5,6 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PDataTable, PLink, PBadge,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
@@ -133,7 +132,7 @@ const onChangeSort = (sortBy: string, sortDesc?: boolean) => {
         </template>
         <template #col-project_id-format="{ value }">
             <template v-if="value && value !== '*'">
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
                         :to="referenceRouter(
                             value,

@@ -4,8 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PToolboxTable, PLink, PLazyImg, PToggleButton, PBadge,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -67,7 +66,7 @@ const tableState = reactive({
                 </p-link>
             </template>
             <template #col-policy-format="{value}">
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
                         :to="{}"
                 >
@@ -101,7 +100,7 @@ const tableState = reactive({
             </template>
             <template #col-history_button-format="{item}">
                 <p-link v-if="item.lasted_at"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="{}"
                 >

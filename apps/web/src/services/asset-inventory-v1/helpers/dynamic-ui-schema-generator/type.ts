@@ -1,5 +1,4 @@
-import type { ItemOptions } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { QuerySearchTableOptions } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ItemOptions, QuerySearchTableOptions } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 

@@ -21,6 +21,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { computed, defineComponent, reactive } from 'vue';
 
 
@@ -42,19 +43,7 @@ import { useSelect } from '@/hooks/use-select/use-select';
 import { gray, white } from '@/styles/colors.cjs';
 
 
-interface Props {
-    value?: any;
-    selected?: any | any[];
-    disabled?: boolean;
-    predicate?: SelectionPredicate;
-    multiSelectable?: boolean;
-    layout?: SelectButtonLayoutType;
-    styleType?: SelectButtonStyleType;
-    size?: SelectButtonSize;
-    iconName?: string;
-}
-
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PSelectButton',
     components: { PI },
     model: {
@@ -64,15 +53,15 @@ export default defineComponent<Props>({
     props: {
         /* select props */
         selected: {
-            type: [Boolean, String, Number, Object, Array],
+            type: [Boolean, String, Number, Object, Array] as PropType<any | any[]>,
             default: undefined,
         },
         value: {
-            type: [Boolean, String, Number, Object, Array],
+            type: [Boolean, String, Number, Object, Array] as PropType<any>,
             default: true,
         },
         predicate: {
-            type: Function,
+            type: Function as PropType<SelectionPredicate>,
             default: undefined,
         },
         multiSelectable: {
@@ -85,25 +74,16 @@ export default defineComponent<Props>({
         },
         /* select button props */
         layout: {
-            type: String,
+            type: String as PropType<SelectButtonLayoutType>,
             default: SELECT_BUTTON_LAYOUT_TYPE.TEXT_ONLY,
-            validator(layout: any) {
-                return Object.values(SELECT_BUTTON_LAYOUT_TYPE).includes(layout);
-            },
         },
         styleType: {
-            type: String,
+            type: String as PropType<SelectButtonStyleType>,
             default: SELECT_BUTTON_STYLE_TYPE.secondary,
-            validator(styleType: any) {
-                return Object.values(SELECT_BUTTON_STYLE_TYPE).includes(styleType);
-            },
         },
         size: {
-            type: String,
+            type: String as PropType<SelectButtonSize>,
             default: SELECT_BUTTON_SIZE.md,
-            validator(size: any) {
-                return Object.values(SELECT_BUTTON_SIZE).includes(size);
-            },
         },
         iconName: {
             type: String,

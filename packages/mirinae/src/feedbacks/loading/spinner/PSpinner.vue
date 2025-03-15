@@ -3,18 +3,24 @@
         <svg class="p-spinner-svg"
              :class="[styleType, size]"
              viewBox="0 0 32 32"
-             fill="none" xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             xmlns="http://www.w3.org/2000/svg"
         >
             <g>
                 <circle class="spinner-bg"
-                        cx="16" cy="16" r="14"
+                        cx="16"
+                        cy="16"
+                        r="14"
                         stroke-opacity="0.3"
                         stroke-width="9%"
                 />
                 <circle class="spinner"
-                        cx="16" cy="16" r="14"
+                        cx="16"
+                        cy="16"
+                        r="14"
                         stroke-width="9%"
-                        stroke-linecap="round" stroke-dasharray="32 200"
+                        stroke-linecap="round"
+                        stroke-dasharray="32 200"
                 />
             </g>
         </svg>
@@ -30,12 +36,8 @@ import {
 import type { SpinnerSize, SpinnerStyleType } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE, SPINNER_STYLE_TYPE } from '@/feedbacks/loading/spinner/type';
 
-interface Props {
-    size?: string;
-    styleType?: string;
-}
 
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PSpinner',
     components: {
     },

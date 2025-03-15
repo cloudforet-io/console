@@ -14,7 +14,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBadge, PDivider, PI, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
@@ -121,7 +121,7 @@ onActivated(async () => {
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.NAME_LABEL') }}</span>
             <p-link class="value"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     new-tab
                     :to="state.escalationPolicyLink"
                     highlight

@@ -505,7 +505,7 @@ export default function makeTreeDraggable(treeEl: HTMLElement, options: TreeDrag
 
             store.updateMovedElementStyle();
             //
-            await options.afterDrop(store, dhOptions);
+            if (options.afterDrop) await options.afterDrop(store, dhOptions);
             // remove mask tree
             if (maskTree) {
                 removeEl(maskTree);

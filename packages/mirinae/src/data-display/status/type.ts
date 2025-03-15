@@ -5,7 +5,8 @@ export interface StatusProps {
     text?: TranslateResult|null;
     textColor?: string|null;
     iconColor?: string|null;
-    theme?: string|null;
+    theme?: StatusTheme|null;
     disableIcon?: boolean;
     iconSize?: number;
 }
+export type StatusTheme = 'yellow'|'green'|'red'|'gray';

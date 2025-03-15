@@ -34,8 +34,8 @@ import {
 import type { PropType, AsyncComponent } from 'vue';
 import type { ImportedComponent } from 'vue/types/options';
 
-import type { DynamicFieldProps, DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
-import type { DynamicFieldType } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldHandler, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
+import type { DynamicFieldOptions, DynamicFieldType } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTextList from '@/data-display/text-list/PTextList.vue';
 
@@ -76,7 +76,7 @@ const componentMap: Record<DynamicFieldType, AsyncComponent> = {
     }),
 };
 
-export default defineComponent<DynamicFieldProps>({
+export default defineComponent({
     name: 'PDynamicField',
     components: { PTextList, PDynamicField },
     props: {
@@ -85,11 +85,11 @@ export default defineComponent<DynamicFieldProps>({
             default: 'text',
         },
         options: {
-            type: Object,
+            type: Object as PropType<DynamicFieldOptions>,
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number] as PropType<any>,
             default: undefined,
         },
         extraData: {
@@ -97,7 +97,7 @@ export default defineComponent<DynamicFieldProps>({
             default: () => ({}),
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DynamicFieldTypeOptions>,
             default: () => ({}),
         },
         handler: {
@@ -105,9 +105,9 @@ export default defineComponent<DynamicFieldProps>({
             default: undefined,
         },
     },
-    setup(props: DynamicFieldProps) {
+    setup(props) {
         const state = reactive({
-            component: null as null|AsyncComponent,
+            component: null as any,
             proxyType: props.type,
             proxyOptions: props.options,
             proxyData: props.data,

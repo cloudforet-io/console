@@ -11,7 +11,7 @@ import { sortBy } from 'lodash';
 import {
     PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Page } from '@/api-clients/_common/schema/type';

@@ -9,8 +9,6 @@ import { useMutation } from '@tanstack/vue-query';
 import {
     PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
-import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
-
 
 import type { WidgetCreateParams, WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
@@ -374,7 +372,7 @@ watch(() => state.showPopover, (val) => {
                position="right-start"
                hide-close-button
                hide-padding
-               :trigger="POPOVER_TRIGGER.NONE"
+               trigger="none"
     >
         <button :class="{'add-button': true, opened: state.showPopover}"
                 @click="handleClickAddDataSourceButton"

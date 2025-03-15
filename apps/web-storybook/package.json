@@ -11,9 +11,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@cloudforet/mirinae": "*",
     "@cloudforet/core-lib": "*",
     "@cloudforet/language-pack": "*",
-    "@cloudforet/mirinae": "*",
     "@cloudforet/utils": "*",
     "eslint-config-custom": "*",
     "mirinae-foundation": "*",

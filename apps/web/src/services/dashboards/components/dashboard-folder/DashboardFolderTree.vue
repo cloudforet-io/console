@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PI, PCheckbox, PButton, PIconButton,
 } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

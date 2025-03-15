@@ -24,7 +24,7 @@
                         <p-tag v-for="([objKey, objValue], idx) in Object.entries(displayData)"
                                :key="`tag-${idx}-${objKey}`"
                                :key-item="{ name: objKey, label: objKey }"
-                               :value-item="{ name: objValue, label: objValue }"
+                               :value-item="{ name: objValue, label: String(objValue) }"
                                :deletable="false"
                         />
                     </template>
@@ -41,7 +41,7 @@
                 <p-copy-button v-else
                                width="0.8rem"
                                height="0.8rem"
-                               :value="copyValueFormatter ? copyValueFormatter(data, $props) : copyValue"
+                               :value="copyValueFormatter ? String(copyValueFormatter(data, $props)) : String(copyValue)"
                                auto-hide-icon
                 >
                     <slot name="default"
@@ -51,7 +51,7 @@
                             <p-tag v-for="([objKey, objValue], idx) in Object.entries(displayData)"
                                    :key="`tag-${idx}-${objKey}`"
                                    :key-item="{ name: objKey, label: objKey }"
-                                   :value-item="{ name: objValue, label: objValue }"
+                                   :value-item="{ name: objValue, label: String(objValue) }"
                                    :deletable="false"
                             />
                         </template>
@@ -90,7 +90,7 @@ import PTag from '@/data-display/tags/PTag.vue';
 import PTextList from '@/data-display/text-list/PTextList.vue';
 
 type DataType = 'string'|'boolean'|'number'|'object'|'array'|'array_of_object'|'undefined';
-export default defineComponent<DefinitionProps>({
+export default defineComponent({
     name: 'PDefinition',
     components: {
         PTag,
@@ -103,11 +103,11 @@ export default defineComponent<DefinitionProps>({
             default: '',
         },
         label: {
-            type: String,
+            type: String as PropType<DefinitionProps['label']>,
             default: '',
         },
         data: {
-            type: [String, Object, Array, Boolean, Number] as PropType<string|boolean|number|object|undefined>,
+            type: [String, Object, Array, Boolean, Number],
             default: undefined,
         },
         disableCopy: {
@@ -115,7 +115,7 @@ export default defineComponent<DefinitionProps>({
             default: undefined,
         },
         formatter: {
-            type: Function,
+            type: Function as PropType<DefinitionProps['formatter']>,
             default: undefined,
         },
         block: {
@@ -127,7 +127,7 @@ export default defineComponent<DefinitionProps>({
             default: undefined,
         },
         copyValueFormatter: {
-            type: Function,
+            type: Function as PropType<DefinitionProps['copyValueFormatter']>,
             default: undefined,
         },
         autoKeyWidth: {
@@ -141,7 +141,7 @@ export default defineComponent<DefinitionProps>({
     },
     setup(props) {
         const state = reactive({
-            displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
+            displayData: computed<any>(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
             parsedData: computed<any>(() => {
                 let parsed;
                 if (typeof props.data === 'string') {

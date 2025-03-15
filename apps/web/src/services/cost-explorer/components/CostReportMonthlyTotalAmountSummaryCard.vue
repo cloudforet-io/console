@@ -17,8 +17,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectButton, PDatePagination, PDataTable, PTextButton, PI, PTooltip, PDataLoader,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/buttons/select-button-group/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';

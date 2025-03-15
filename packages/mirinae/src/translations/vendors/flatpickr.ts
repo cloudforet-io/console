@@ -11,7 +11,7 @@ import type { SupportLanguage } from '@/translations';
 const localeFiles: Record<SupportLanguage, Locale|CustomLocale> = {
     en: english,
     ko: Korean,
-    jp: Japanese,
+    ja: Japanese,
 };
 
 export const getLocaleFile = (locale: string) => localeFiles[locale];

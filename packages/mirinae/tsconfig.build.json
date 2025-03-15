@@ -1,21 +1,26 @@
 {
+  "extends": "tsconfig/base.json",
   "compilerOptions": {
+    "types": ["vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "outDir": "types",
+    "allowImportingTsExtensions": true,
     "checkJs": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "types": ["vitest/globals"],
-    "baseUrl": ".",
-    "outDir": "types",
-    "paths": {
-      "@/*": ["src/*"]
-    }
   },
-  "include": ["./src/**/*.ts"],
+  "include": [ "./**/*.ts", "./**/*.tsx", "./**/*.vue" ],
   "exclude": [
     "node_modules",
+    "dist",
+    ".out",
     "./src/**/*.stories.ts",
     "./src/**/story-helper.ts",
     "./src/**/mock.ts",
-    "./**/__tests__/**/*.ts"
+    "./**/__tests__/**/*.ts",
+    "./**/*.d.ts"
   ]
 }

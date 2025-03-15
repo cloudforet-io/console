@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
 } from '@cloudforet/mirinae';
-import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { NamespaceModel } from '@/schema/inventory-v2/namespace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';

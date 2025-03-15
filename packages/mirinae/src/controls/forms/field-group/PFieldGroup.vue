@@ -45,6 +45,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
@@ -52,32 +53,21 @@ import type { TranslateResult } from 'vue-i18n';
 import PFieldTitle from '@/data-display/field-title/PFieldTitle.vue';
 
 type FieldGroupStyleType = 'primary' | 'secondary';
-interface Props {
-    label?: string|TranslateResult;
-    helpText?: string|TranslateResult;
-    invalidText?: string;
-    validText?: string;
-    invalid?: boolean;
-    valid?: boolean;
-    required?: boolean;
-    styleType?: FieldGroupStyleType;
-    noSpacing?: boolean;
-}
 
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PFieldGroup',
     components: { PFieldTitle },
     props: {
         label: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         helpText: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         invalidText: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         validText: {
@@ -97,7 +87,7 @@ export default defineComponent<Props>({
             default: false,
         },
         styleType: {
-            type: String,
+            type: String as PropType<FieldGroupStyleType>,
             default: 'primary',
         },
         noSpacing: {

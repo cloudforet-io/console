@@ -1,4 +1,4 @@
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 
 export const SERVICE_ALERT_TABLE_FIELDS: DataTableFieldType[] = [

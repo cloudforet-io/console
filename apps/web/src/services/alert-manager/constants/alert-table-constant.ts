@@ -1,5 +1,5 @@
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 

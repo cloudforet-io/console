@@ -1,8 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import { defineComponent, ref } from 'vue';
 
-import { describe, expect } from 'vitest';
-
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/controls/context-menu/type';
 import type { UseContextMenuControllerOptions } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
@@ -90,7 +88,6 @@ describe('Context Menu Controller', () => {
                 targetRef: ref<HTMLElement|null>(null),
                 contextMenuRef: ref<any|null>(null),
                 useReorderBySelection: true,
-                menu: [],
             }));
             expect(error).toBeTruthy();
             const { error: secondError } = mockLoadComposableInApp(() => ({
@@ -133,7 +130,6 @@ describe('Context Menu Controller', () => {
                 targetRef: ref<HTMLElement|null>(null),
                 contextMenuRef: ref<any|null>(null),
                 useMenuFiltering: true,
-                menu: [],
             }));
             expect(error).toBeTruthy();
             const { error: secondError } = mockLoadComposableInApp(() => ({

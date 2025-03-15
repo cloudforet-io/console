@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PDataTable, PLink, PBadge,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 
 import type { Tags } from '@/api-clients/_common/schema/model';
@@ -121,7 +121,7 @@ watch(() => props.userId, () => {
         >
             <template #col-project_group_info.project_group_id-format="{value}">
                 <p-link v-if="value"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="getProjectLink(value, false)"
                 >
@@ -133,7 +133,7 @@ watch(() => props.userId, () => {
             </template>
             <template #col-project_info.project_id-format="{value}">
                 <p-link v-if="value"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="getProjectLink(value, true)"
                 >

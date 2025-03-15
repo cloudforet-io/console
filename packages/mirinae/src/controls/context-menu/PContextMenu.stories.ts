@@ -240,7 +240,7 @@ export const MenuSlot: Story = {
         `,
         setup() {
             const state = reactive({
-                slotPropsRef: null,
+                slotPropsRef: null as any,
                 slotPropsText: '',
             });
             watch(() => state.slotPropsRef, (slotPropsRef) => {
@@ -285,7 +285,7 @@ export const ItemSlots: Story = {
         `,
         setup() {
             const state = reactive({
-                slotPropsRef: null,
+                slotPropsRef: null as any,
                 slotPropsText: '',
             });
             watch(() => state.slotPropsRef, (slotPropsRef) => {
@@ -330,7 +330,7 @@ export const HeaderSlots: Story = {
         `,
         setup() {
             const state = reactive({
-                slotPropsRef: null,
+                slotPropsRef: null as any,
                 slotPropsText: '',
             });
             watch(() => state.slotPropsRef, (slotPropsRef) => {
@@ -443,7 +443,7 @@ export const HighlightTermAndItemTextListSlot: Story = {
         `,
         setup() {
             const state = reactive({
-                slotPropsRef: null,
+                slotPropsRef: null as any,
                 slotPropsText: '',
             });
             watch(() => state.slotPropsRef, (slotPropsRef) => {
@@ -577,7 +577,7 @@ export const Searchable: Story = {
                         const regex = getTextHighlightRegex(value);
                         resolve(allItems.filter((item) => {
                             // check only item type
-                            if (!item.type || item.type === 'item') return regex.test(item.label);
+                            if (!item.type || item.type === 'item') return regex.test(item.label as string);
                             return true;
                         }));
                     }, 200);

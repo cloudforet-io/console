@@ -16,9 +16,9 @@ import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 
 const FOCUS_GROUP_ID = 'context-item';
 
-interface ContextMenuProps {
+interface ContextMenuProps<M extends MenuItem = MenuItem> {
     title?: string;
-    menu: MenuItem[];
+    menu: M[];
     loading?: boolean;
     selected?: MenuItem[];
     multiSelectable?: boolean;
@@ -41,7 +41,7 @@ interface ContextMenuEmits {
     (e: 'blur'): void,
     (e: 'keyup:up:end'): void,
     (e: 'keyup:down:end'): void,
-    (e: 'select', item: MenuItem, index: number, isSelected: boolean): void,
+    <I extends MenuItem>(e: 'select', item: I, index: number, isSelected: boolean): void,
     (e: 'update:search-text', searchText: string): void,
     (e: 'keyup:esc', mouseEvent: MouseEvent): void,
     (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
@@ -186,7 +186,7 @@ onUnmounted(() => {
 const searchSlots = computed(() => reduce(slots, (res, d, name) => {
     if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
     return res;
-}, {}));
+}, {} as Record<string, typeof slots[string]>));
 
 /* exposes */
 defineExpose({
@@ -209,11 +209,11 @@ defineExpose({
             </slot>
         </div>
         <div class="menu-container">
-            <slot v-show="props.menu.length > 0"
-                  name="menu"
+            <slot name="menu"
                   v-bind="{...props}"
             >
                 <div v-if="props.showSelectHeader && props.multiSelectable"
+                     v-show="props.menu.length > 0"
                      class="selected-list-wrapper"
                 >
                     <div>
@@ -230,6 +230,7 @@ defineExpose({
                     </p-button>
                 </div>
                 <div v-if="props.searchable"
+                     v-show="props.menu.length > 0"
                      class="search-wrapper"
                 >
                     <p-search :value="state.proxySearchText"
@@ -270,13 +271,13 @@ defineExpose({
                                              :icon="item.icon"
                                              :icon-color="item.iconColor"
                                              :readonly="readonly"
-                                             :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
+                                             :selected="!props.noSelectIndication && !!item.name && state.selectedNameMap[item.name] !== undefined"
                                              :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
                                              :ellipsis="props.itemHeightFixed"
                                              :highlight-term="state.proxySearchText || props.highlightTerm"
                                              :tabindex="readonly ? -1 : index"
-                                             @click.stop.prevent="onClickMenu(item, index, $event)"
-                                             @keyup.enter="onClickMenu(item, index, $event)"
+                                             @click.stop.prevent="onClickMenu(item, index)"
+                                             @keyup.enter="onClickMenu(item, index)"
                                              @keydown.up="onKeyUp(index)"
                                              @keydown.down="onKeyDown(index)"
                         >
@@ -355,7 +356,7 @@ defineExpose({
         <div v-show="loading"
              class="loader-wrapper"
         >
-            <div class="loader-backdrop" />
+            <div :class="'loader-backdrop'" />
             <p-spinner class="loader" />
         </div>
     </div>

@@ -13,7 +13,7 @@ import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PButtonModal, PCheckboxGroup, PCheckbox, PDataLoader,
 } from '@cloudforet/mirinae';
-import type { DynamicField } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';

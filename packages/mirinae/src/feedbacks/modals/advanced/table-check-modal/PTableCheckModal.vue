@@ -18,7 +18,7 @@
                     </h4>
                 </slot>
                 <div class="overflow-auto"
-                     :style="{'max-height': '300px'}"
+                     :style="{maxHeight: '300px'}"
                 >
                     <slot v-bind="$props">
                         <p-data-table :sortable="true"
@@ -53,7 +53,8 @@ import type { TranslateResult } from 'vue-i18n';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { SizeMapping } from '@/feedbacks/modals/type';
+import type { ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
+import type { ModalSizeType } from '@/feedbacks/modals/type';
 import { useProxyValue } from '@/hooks';
 
 
@@ -62,16 +63,15 @@ export default defineComponent({
     components: { PButtonModal, PDataTable },
     props: {
         modalSize: {
-            type: String,
+            type: String as PropType<ModalSizeType>,
             default: 'md',
-            validator: (value: any) => Object.keys(SizeMapping).includes(value),
         },
         visible: { // sync
             type: Boolean,
             default: false,
         },
         themeColor: {
-            type: String,
+            type: String as PropType<ModalThemeColor>,
             default: 'primary',
         },
         headerTitle: {

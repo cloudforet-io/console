@@ -120,10 +120,11 @@ function resolveOptions(options: Record<string, any> = {}) {
  * @param handler
  * @param options
  */
-function off<T extends Event>(
+function off(
     el: Node | Window | Document,
     name: string,
-    handler: (event: T) => void,
+    // eslint-disable-next-line no-undef
+    handler: EventListenerOrEventListenerObject,
     // eslint-disable-next-line no-undef
     options?: boolean | AddEventListenerOptions,
 ) {
@@ -138,10 +139,11 @@ function off<T extends Event>(
  * @param handler
  * @param options
  */
-function on<T extends Event>(
+function on(
     el: Node | Window | Document,
     name: string,
-    handler: (event: T) => void,
+    // eslint-disable-next-line no-undef
+    handler: EventListenerOrEventListenerObject,
     // eslint-disable-next-line no-undef
     options?: boolean | AddEventListenerOptions,
 ) {

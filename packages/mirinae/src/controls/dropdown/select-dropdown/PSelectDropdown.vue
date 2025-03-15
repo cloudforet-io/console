@@ -204,7 +204,7 @@ const handleClickDropdownButton = () => {
     if (state.proxyVisibleMenu) hideMenu();
     else showMenu();
 };
-const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boolean) => {
+const handleSelectMenuItem = (item: SelectDropdownMenuItem, _: number, isSelected: boolean) => {
     if (!props.multiSelectable) {
         hideMenu();
         if (!props.indexMode) {

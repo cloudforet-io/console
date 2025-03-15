@@ -26,7 +26,8 @@ import {
     defineComponent, reactive, toRefs,
 } from 'vue';
 
-import type { MoreDynamicFieldProps, MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
+import type { MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { MoreOptions, CommonOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
@@ -34,7 +35,7 @@ const PDynamicLayout = () => import('@/data-display/dynamic/dynamic-layout/PDyna
 const PDynamicField = () => import('@/data-display/dynamic/dynamic-field/PDynamicField.vue');
 
 const SUPPORTED_TYPES = ['popup'];
-export default defineComponent<MoreDynamicFieldProps>({
+export default defineComponent({
     name: 'PDynamicFieldMore',
     components: { PDynamicLayout, PDynamicField },
     props: {
@@ -55,7 +56,7 @@ export default defineComponent<MoreDynamicFieldProps>({
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },

@@ -9,9 +9,11 @@ import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
 import { useProxyValue } from '@/hooks';
 import PLink from '@/navigation/link/PLink.vue';
 
-import { peacock } from '@/styles/colors.cjs';
+import * as colors from '@/styles/colors.cjs';
 
 import PSelectCard from './PSelectCard.vue';
+
+const { peacock } = colors;
 
 
 type PSelectCardPropsAndCustomArgs = ComponentProps<typeof PSelectCard>;

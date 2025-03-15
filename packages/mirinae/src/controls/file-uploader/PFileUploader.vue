@@ -22,7 +22,6 @@ import {
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import vueFilePond from 'vue-filepond';
 
-import type { FileUploaderProps } from '@/controls/file-uploader/type';
 import { useProxyValue } from '@/hooks';
 
 
@@ -35,7 +34,7 @@ const ACCEPTED_FILE_TYPES = [
     'application/x-msdownload',
     'text/csv',
 ];
-export default defineComponent<FileUploaderProps>({
+export default defineComponent({
     name: 'PFileUploader',
     components: {
         FilePond,

@@ -9,7 +9,7 @@ import { cloneDeep } from 'lodash';
 import {
     PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable, PScopedNotification,
 } from '@cloudforet/mirinae';
-import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';

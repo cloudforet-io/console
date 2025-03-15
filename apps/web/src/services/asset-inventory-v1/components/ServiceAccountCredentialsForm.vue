@@ -11,7 +11,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PFieldGroup, PRadio, PCodeEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
@@ -299,7 +298,7 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
                     <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TRUSTED_ACCOUNT_HELP_TEXT') }}</span>
                     <p-link class="see-more-text"
                             :text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            action-icon="external-link"
                             :href="state.trustedAccountInfoLink"
                     />
                 </template>

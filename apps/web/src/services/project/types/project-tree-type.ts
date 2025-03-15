@@ -1,5 +1,4 @@
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/type';
-import type { TreeItem, Tree } from '@cloudforet/mirinae/types/data-display/tree/type';
+import type { TreeNode, TreeItem, Tree } from '@cloudforet/mirinae/types/data-display/tree/type';
 
 
 export type ProjectTreeItemType = 'PROJECT_GROUP'|'PROJECT'|'ROOT';

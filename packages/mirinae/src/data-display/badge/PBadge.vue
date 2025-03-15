@@ -4,13 +4,19 @@ import { computed, reactive } from 'vue';
 import { get } from 'lodash';
 
 import type {
-    BadgeShape, BadgeStyleType, BadgeType, BadgeFontWeight,
+    BadgeFontWeight,
+    BadgeShape,
+    BadgeStyleType,
+    BadgeType,
 } from '@/data-display/badge/type';
 import { BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
 import { getColor } from '@/utils/helpers';
 
 import colors from '@/styles/colors.cjs';
 
+
+// HACK: Props MUST be defined in the same file as the setup function due to a limitation of Vue 2.x
+// This type is also defined in the type.ts file
 interface BadgeProps {
     badgeType?: BadgeType;
     styleType?: BadgeStyleType;
@@ -40,7 +46,7 @@ const state = reactive({
         }
         return [];
     }),
-    inlineStyles: computed(() => {
+    inlineStyles: computed<Record<string, any>>(() => {
         // custom case
         if (props.backgroundColor || props.textColor || props.outlineColor) {
             const inlineStyle = {} as {[prop: string]: string};
@@ -82,7 +88,7 @@ const state = reactive({
 <template>
     <span class="p-badge"
           :class="[`badge-${props.shape}`, ...state.badgeClassList, props.fontWeight]"
-          :style="[state.inlineStyles]"
+          :style="state.inlineStyles"
     >
         <slot />
     </span>

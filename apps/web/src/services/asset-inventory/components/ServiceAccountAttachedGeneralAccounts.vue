@@ -23,7 +23,6 @@ import {
     PDivider,
     PSelectStatus, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
@@ -330,7 +329,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                           @changeSort="handleSort"
             >
                 <template #col-name-format="{value, item}">
-                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    <p-link action-icon="internal-link"
                             new-tab
                             :to="{
                                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,

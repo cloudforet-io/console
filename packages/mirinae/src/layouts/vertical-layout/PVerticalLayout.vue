@@ -215,7 +215,7 @@ onBeforeMount(() => {
                         @dblclick="handleControllerDoubleClick"
                     />
                 </div>
-                <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
+                <p-tooltip :contents="state.hide ? String($t('COMPONENT.VERTICAL_LAYOUT.EXPAND')) : String($t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE'))"
                            position="right"
                            :class="{hide: state.hide}"
                            class="resizer"

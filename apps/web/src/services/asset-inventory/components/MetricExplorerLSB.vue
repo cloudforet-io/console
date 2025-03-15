@@ -12,8 +12,6 @@ import {
 import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@cloudforet/mirinae';
-import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
-
 
 import type { NamespaceGroupModel } from '@/schema/inventory-v2/namespace-group/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
@@ -287,7 +285,7 @@ onMounted(() => {
                    ignore-outside-click
                    ignore-target-click
                    boundary=".metric-explorer-l-s-b"
-                   :trigger="POPOVER_TRIGGER.NONE"
+                   trigger="none"
                    min-width="21.5rem"
                    :style="{ left: `${lsbWidth}px`}"
         >

@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash';
 import {
     PButtonModal, PDefinitionTable, PI, PStatus,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AppModel } from '@/api-clients/identity/app/schema/model';

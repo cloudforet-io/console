@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash';
 import {
     PButton, PIconButton, PTextInput, PFieldTitle, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
@@ -128,7 +128,7 @@ watch(() => state.invalid, (_invalid) => {
                         {{ $t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_CONDITION') }}
                     </p-button>
                     <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.query.html"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            action-icon="external-link"
                             highlight
                             size="sm"
                             class="external-link"
