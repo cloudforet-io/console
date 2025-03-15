@@ -14,7 +14,7 @@
     "eslint": "eslint --max-warnings=0 --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "ts-check": "tsc -p tsconfig.json --noEmit",
-    "lint": "npm run eslint && npm run stylelint",
+    "lint": "npm run eslint && npm run ts-check && npm run stylelint",
     "eslint:fix": "eslint --fix --ext .js,.vue,.ts .",
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,vue,pcss,scss}\"",
     "format": "npm run eslint:fix && npm run stylelint:fix",
