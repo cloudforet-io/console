@@ -16,6 +16,7 @@
     "./src/**/*.stories.ts",
     "./src/**/story-helper.ts",
     "./src/**/mock.ts",
-    "./**/__tests__/**/*.ts"
+    "./**/__tests__/**/*.ts",
+    "./**/*.d.ts"
   ]
 }
