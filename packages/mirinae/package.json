@@ -22,10 +22,8 @@
   "typings": "types/index.d.ts",
   "files": [
     "/dist/*",
-    "/src/**/*",
     "/types/*",
-    "/css/*",
-    "/tailwind.config.cjs"
+    "/css/*"
   ],
   "repository": {
     "type": "git",
