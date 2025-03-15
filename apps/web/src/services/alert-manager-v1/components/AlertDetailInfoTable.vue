@@ -5,7 +5,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PBadge, PDefinitionTable, PLink, PPaneLayout,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
@@ -125,7 +124,7 @@ const getEscalationPolicy = async () => {
                 </p-badge>
             </template>
             <template #data-escalation_policy_id>
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
                         :to="{ name: ALERT_MANAGER_ROUTE_V1.ESCALATION_POLICY._NAME, workspaceId: userWorkspaceStore.getters.currentWorkspaceId }"
                         highlight

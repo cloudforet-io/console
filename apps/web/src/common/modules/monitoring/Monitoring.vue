@@ -20,7 +20,7 @@
             <div>
                 <p-link v-for="resource in availableResources"
                         :key="resource.id"
-                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        action-icon="external-link"
                         class="legend"
                         :href="resource.link"
                 >
@@ -119,7 +119,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 
@@ -377,7 +377,6 @@ export default {
         return {
             ...toRefs(state),
             TIME_RANGE,
-            ACTION_ICON,
             legendFormatter(resource): string {
                 return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;
             },

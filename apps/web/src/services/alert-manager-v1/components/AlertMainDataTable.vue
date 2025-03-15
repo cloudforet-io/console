@@ -14,7 +14,6 @@ import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
@@ -486,7 +485,7 @@ initPage();
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
-                        <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        <p-link action-icon="internal-link"
                                 new-tab
                                 :to="referenceRouter(value,{
                                     resource_type: 'identity.Project',

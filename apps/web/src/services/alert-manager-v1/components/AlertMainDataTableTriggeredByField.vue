@@ -6,7 +6,7 @@ import type { Location } from 'vue-router';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { PLink } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 
 
@@ -64,7 +64,7 @@ const state = reactive({
 <template>
     <span>
         <p-link v-if="state.link"
-                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                action-icon="internal-link"
                 new-tab
                 :to="state.link"
         >

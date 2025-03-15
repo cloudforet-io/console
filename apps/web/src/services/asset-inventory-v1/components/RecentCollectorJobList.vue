@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import {
     PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { i18n } from '@/translations';
 
@@ -90,7 +90,7 @@ watch(() => props.recentJobs, () => {
             </p>
             <p-link v-if="props.fullMode && props.historyLink"
                     size="sm"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     highlight
                     :to="props.historyLink"
                     class="view-all-link"

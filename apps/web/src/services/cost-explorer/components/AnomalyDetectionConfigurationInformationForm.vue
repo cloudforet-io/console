@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PFieldGroup, PTextInput, PSelectDropdown, PButton, PBoardItem, PBadge, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { i18n } from '@/translations';
 
@@ -121,7 +121,7 @@ const handleClickBoardItem = (item) => {
                                         <span v-if="item.rules.length > 1">{{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.AND_MORE') }}</span>
                                     </p>
                                 </div>
-                                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                <p-link action-icon="internal-link"
                                         new-tab
                                         highlight
                                         :to="{}"

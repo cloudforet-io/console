@@ -10,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
@@ -170,7 +170,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
             </span>
             <p-link v-if="escalationPolicyFormState.resourceGroup === RESOURCE_GROUP.PROJECT && escalationPolicyFormState.projectId"
                     class="link-text"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     new-tab
                     :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
                     :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: {

@@ -9,7 +9,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -216,7 +215,7 @@ watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFi
             </template>
             <template #col-project_id-format="{value}">
                 <p-link v-if="state.projects[value]"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="getProperRouteLocation(referenceRouter(value,{ resource_type: 'identity.Project' }))"
                 >

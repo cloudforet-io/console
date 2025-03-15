@@ -4,7 +4,7 @@
         <section class="items-container">
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
                         :to="getProperRouteLocation(state.collector.linkLocation)"
                         class="contents"
@@ -49,7 +49,6 @@ import {
 } from 'vue';
 
 import { PLink, PLazyImg, PPaneLayout } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';

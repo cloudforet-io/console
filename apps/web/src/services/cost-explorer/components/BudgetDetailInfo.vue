@@ -7,7 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import {
     PPaneLayout, PLink, PI, PTextButton, PPopover,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
@@ -141,7 +141,7 @@ watch(() => costTypeRef.value, (costType) => {
                     />
                 </span>
                 <p-link v-if="state.targetLocation"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         highlight
                         :to="state.targetLocation"
