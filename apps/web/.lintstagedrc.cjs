@@ -1,4 +1,5 @@
 module.exports = {
     "**/!(*spec).{ts,tsx,js,jsx,vue}": ["eslint --fix --max-warnings=0"],
+    "**/!(*spec).{ts,tsx,vue}": ["vue-tsc -p tsconfig.json --noEmit"],
     "src/**/*.{css,vue,pcss,scss}": ["stylelint --fix"]
 }
