@@ -23,6 +23,7 @@
   },
   "main": "dist/cloudforet-component.common.js",
   "dependencies": {
+    "@cloudforet/mirinae": "*",
     "@amcharts/amcharts5": "^5.4.7",
     "@amcharts/amcharts5-geodata": "^5.1.1",
     "@cloudforet/core-lib": "*",

@@ -25,6 +25,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@cloudforet/mirinae": "*",
     "@types/bytes": "^3.1.1",
     "@types/node": "^16.11.43",
     "concurrently": "^7.6.0",

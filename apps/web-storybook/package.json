@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@cloudforet/mirinae": "*",
     "@cloudforet/core-lib": "*",
     "@cloudforet/language-pack": "*",
     "@cloudforet/utils": "*",
