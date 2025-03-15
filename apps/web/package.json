@@ -23,11 +23,11 @@
   },
   "main": "dist/cloudforet-component.common.js",
   "dependencies": {
-    "@cloudforet/mirinae": "*",
     "@amcharts/amcharts5": "^5.4.7",
     "@amcharts/amcharts5-geodata": "^5.1.1",
     "@cloudforet/core-lib": "*",
     "@cloudforet/language-pack": "*",
+    "@cloudforet/mirinae": "*",
     "@cloudforet/utils": "*",
     "@gtm-support/vue2-gtm": "^1.3.0",
     "@lottiefiles/vue-lottie-player": "^1.1.0",
@@ -115,6 +115,7 @@
     "vite": "^4.5.6",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
+    "vitest": "^3.0.8",
     "vue-template-compiler": "2.7.16"
   },
   "browserslist": [
