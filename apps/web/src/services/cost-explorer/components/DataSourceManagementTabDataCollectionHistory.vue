@@ -10,9 +10,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PToolboxTable, PHeading, PHeadingLayout, PSelectStatus, PProgressBar, PStatus,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 import type { CostJobStatus } from '@/api-clients/cost-analysis/job/schema/type';
 import { i18n } from '@/translations';

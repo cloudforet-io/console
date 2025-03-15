@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PBadge, PI,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ServiceChannelGetParameters } from '@/schema/alert-manager/service-channel/api-verbs/get';

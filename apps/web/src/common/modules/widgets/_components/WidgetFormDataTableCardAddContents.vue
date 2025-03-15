@@ -8,8 +8,8 @@ import {
     cloneDeep, isArray, isEqual, uniq,
 } from 'lodash';
 
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';

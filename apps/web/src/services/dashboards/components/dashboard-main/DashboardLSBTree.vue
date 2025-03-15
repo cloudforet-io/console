@@ -5,9 +5,8 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PI, PTreeView, PSelectDropdown } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
+import type { TreeNode, TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';

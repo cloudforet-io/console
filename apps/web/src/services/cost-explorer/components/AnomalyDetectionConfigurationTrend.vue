@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 

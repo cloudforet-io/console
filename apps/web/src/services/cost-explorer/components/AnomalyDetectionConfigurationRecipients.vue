@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router/composables';
 import {
     PHeading, PButton, PDefinitionTable, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 import AnomalyDetectionConfigurationRecipientsForm
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationRecipientsForm.vue';

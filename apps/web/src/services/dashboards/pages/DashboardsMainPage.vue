@@ -14,12 +14,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type {
     HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DashboardListParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';

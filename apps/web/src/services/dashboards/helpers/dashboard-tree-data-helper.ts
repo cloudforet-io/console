@@ -1,4 +1,4 @@
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';

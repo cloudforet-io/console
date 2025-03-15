@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import { PTreeView, PI, PTextHighlighting } from '@cloudforet/mirinae';
-import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 

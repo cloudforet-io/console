@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeadingLayout, PHeading, PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
