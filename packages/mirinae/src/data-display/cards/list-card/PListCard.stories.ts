@@ -154,10 +154,10 @@ export const CustomizeWithSlots: Story = {
                     value: faker.lorem.sentence(6),
                     icon: faker.helpers.arrayElement(['ic_error-filled', 'ic_warning-filled']),
                     badge: faker.helpers.arrayElement(['Acknowledged', 'Triggered']),
-                    date: dayjs(faker.date.past('2021')).format('MM/DD hh:mm'),
+                    date: dayjs(faker.date.past(2021)).format('MM/DD hh:mm'),
                     description: faker.helpers.arrayElement([{
                         message: faker.lorem.sentence(6),
-                        date: dayjs(faker.date.past('2021')).format('MM/DD hh:mm'),
+                        date: dayjs(faker.date.past(2021)).format('MM/DD hh:mm'),
                     }, undefined]),
                 })),
             };

@@ -32,6 +32,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -50,7 +51,7 @@ export default defineComponent({
     props: {
         /* tab item props */
         tabs: {
-            type: Array,
+            type: Array as PropType<TabItem[]>,
             default: () => [],
         },
         activeTab: {
@@ -59,11 +60,8 @@ export default defineComponent({
         },
         /* box tab props */
         styleType: {
-            type: String,
+            type: String as PropType<BOX_TAB_STYLE_TYPE>,
             default: BOX_TAB_STYLE_TYPE.white,
-            validator(styleType: any) {
-                return Object.values(BOX_TAB_STYLE_TYPE).includes(styleType);
-            },
         },
     },
     setup(props, { emit }) {

@@ -51,16 +51,9 @@ import { SIZE } from '@/controls/buttons/copy-button/type';
 import PI from '@/foundation/icons/PI.vue';
 import { copyAnyData, isNotEmpty } from '@/utils/helpers';
 
-interface Props {
-    value?: string;
-    size?: string;
-    autoHideIcon?: boolean;
-    copyManually?: boolean;
-}
-
 const ALERT_PAD = 8;
 
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PCopyButton',
     components: { PI },
     props: {
@@ -81,7 +74,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
         const { width } = useWindowSize();
         const state = reactive({
             click: false,
@@ -89,7 +82,7 @@ export default defineComponent<Props>({
             iconRef: null as Vue|null,
             alertRef: null as Element|null,
             textRef: null as Element|null,
-            alertStyle: computed<Partial<CSSStyleDeclaration>>(() => {
+            alertStyle: computed(() => {
                 if (!state.iconRef?.$el || !state.alertRef) return {};
 
                 const iconRect: DOMRect = state.iconRef.$el.getBoundingClientRect();

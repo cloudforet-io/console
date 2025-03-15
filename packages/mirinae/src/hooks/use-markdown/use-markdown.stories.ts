@@ -1,6 +1,8 @@
 import { computed } from 'vue';
 
 import type { Meta, StoryObj } from '@storybook/vue';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import highlightStyle from 'highlight.js/scss/atom-one-dark.scss';
 import type { ComponentProps } from 'vue-component-type-helpers';
 

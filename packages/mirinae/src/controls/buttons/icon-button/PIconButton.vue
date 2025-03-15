@@ -30,24 +30,24 @@ import PButton from '@/controls/buttons/button/PButton.vue';
 import type { ButtonSize } from '@/controls/buttons/button/type';
 import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import type {
-    IconButtonProps, IconButtonShape, IconButtonSize, IconButtonStyleType,
+    IconButtonShape, IconButtonSize, IconButtonStyleType,
 } from '@/controls/buttons/icon-button/type';
 import {
     ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE,
 } from '@/controls/buttons/icon-button/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import type { AnimationType } from '@/foundation/icons/config';
-import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 
 
-const LOADING_SIZE: Record<ButtonSize, string> = {
+const LOADING_SIZE: Record<ButtonSize, SpinnerSize> = {
     sm: SPINNER_SIZE.sm,
     md: SPINNER_SIZE.lg,
     lg: SPINNER_SIZE.xl,
 };
-export default defineComponent<IconButtonProps>({
+export default defineComponent({
     name: 'PIconButton',
     components: { PSpinner, PButton, PI },
     props: {
@@ -56,11 +56,8 @@ export default defineComponent<IconButtonProps>({
             default: '',
         },
         styleType: {
-            type: String,
+            type: String as PropType<IconButtonStyleType>,
             default: BUTTON_STYLE.transparent,
-            validator(value: IconButtonStyleType) {
-                return Object.values(BUTTON_STYLE).includes(value);
-            },
         },
         color: {
             type: String,
@@ -79,25 +76,16 @@ export default defineComponent<IconButtonProps>({
             default: false,
         },
         size: {
-            type: String,
+            type: String as PropType<IconButtonSize>,
             default: 'md',
-            validator(value: IconButtonSize) {
-                return Object.keys(ICON_BUTTON_SIZE).includes(value);
-            },
         },
         animation: {
             type: String as PropType<AnimationType|undefined>,
             default: undefined,
-            validator(animation: AnimationType|undefined) {
-                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-            },
         },
         shape: {
-            type: String,
+            type: String as PropType<IconButtonShape>,
             default: ICON_BUTTON_SHAPE.circle,
-            validator(value: IconButtonShape) {
-                return Object.values(ICON_BUTTON_SHAPE).includes(value);
-            },
         },
     },
     setup(props) {

@@ -25,7 +25,7 @@ interface UseContextMenuItemsReturns<Item extends MenuItem = MenuItem> {
     loading: Ref<boolean>;
     initiateMenu: () => Promise<void>; // reset pagination, capture current items, and reattach menu items.
     reloadMenu: () => Promise<void>; // reset pagination and reattach menu items.
-    showMoreMenu: () => Promise<void>; // attach more menu items.
+    showMoreMenu: (resultIndex?: number) => Promise<void>; // attach more menu items.
 }
 
 

@@ -34,7 +34,7 @@ interface Props {
     multiSelectable?: boolean;
     selectedItems?: SelectDropdownMenuItem[];
 }
-
+const CHEVRON_ICON_STYLES: SelectDropdownStyleType[] = [SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON, SELECT_DROPDOWN_STYLE_TYPE.TERTIARY_ICON_BUTTON];
 const props = withDefaults(defineProps<Props>(), {
     styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
     appearanceType: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
@@ -66,7 +66,7 @@ const {
 });
 
 const handleClickDeleteAll = () => {
-    if (!props.disabled && props.selectedItems.length > 0) {
+    if (!props.disabled && props.selectedItems && props.selectedItems.length > 0) {
         emit('click-delete');
     }
 };
@@ -85,13 +85,13 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         disabled: props.disabled,
         readonly: props.readonly,
         opened: props.isVisibleMenu,
-        selected: props.selectedItems.length > 0,
+        selected: props.selectedItems && props.selectedItems.length > 0,
         'is-fixed-width': props.isFixedWidth,
-        'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
+        'selection-highlight': props.selectionHighlight && props.selectedItems && props.selectedItems.length > 0,
         'has-items': props.readonly && displayBadgeValueOnDropdownButton,
     }"
     >
-        <span v-if="[SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON, SELECT_DROPDOWN_STYLE_TYPE.TERTIARY_ICON_BUTTON].includes(props.styleType)"
+        <span v-if="CHEVRON_ICON_STYLES.includes(props.styleType)"
               class="dropdown-icon-button-wrapper"
               @click.stop="emit('click-dropdown-button')"
         >
@@ -163,7 +163,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 </slot>
             </div>
             <div class="extra-button-wrapper">
-                <span v-if="!props.readonly && !props.disabled && props.showDeleteAllButton && props.selectedItems.length > 0"
+                <span v-if="!props.readonly && !props.disabled && props.showDeleteAllButton && props.selectedItems && props.selectedItems.length > 0"
                       :class="{'delete-all-button': true, 'disabled': props.disabled}"
                       @click.stop="handleClickDeleteAll"
                 >

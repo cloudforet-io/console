@@ -48,23 +48,23 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import type {
-    SimpleTableDynamicLayoutProps,
-} from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
+import type { DynamicLayoutFetchOptions, DynamicLayoutFieldHandler, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { SimpleTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 
 
-export default {
+export default defineComponent({
     name: 'PDynamicLayoutSimpleTable',
     components: {
         PDynamicField,
@@ -77,7 +77,7 @@ export default {
             required: true,
         },
         options: {
-            type: Object,
+            type: Object as PropType<SimpleTableOptions>,
             default: () => ({}),
         },
         data: {
@@ -85,19 +85,19 @@ export default {
             default: undefined,
         },
         fetchOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutFetchOptions>,
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutTypeOptions>,
             default: undefined,
         },
         fieldHandler: {
-            type: Function,
+            type: Function as PropType<DynamicLayoutFieldHandler|undefined>,
             default: undefined,
         },
     },
-    setup(props: SimpleTableDynamicLayoutProps) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
@@ -181,5 +181,5 @@ export default {
             getFieldData,
         };
     },
-};
+});
 </script>

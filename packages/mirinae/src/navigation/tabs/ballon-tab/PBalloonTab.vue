@@ -41,8 +41,10 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     reactive, toRefs, computed, onMounted, onUnmounted, onUpdated,
+    defineComponent,
 } from 'vue';
 
 
@@ -52,12 +54,11 @@ import { useTab } from '@/hooks/use-tab/use-tab';
 import {
     BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE,
 } from '@/navigation/tabs/ballon-tab/config';
-import type { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 
 
-export default {
+export default defineComponent({
     name: 'PBalloonTab',
     model: {
         prop: 'activeTab',
@@ -66,7 +67,7 @@ export default {
     props: {
         /* tab item props */
         tabs: {
-            type: Array,
+            type: Array as PropType<Array<string|TabItem>>,
             default: () => [],
         },
         activeTab: {
@@ -79,32 +80,23 @@ export default {
             default: false,
         },
         styleType: {
-            type: String,
+            type: String as PropType<BALLOON_TAB_STYLE_TYPE>,
             default: BALLOON_TAB_STYLE_TYPE.primary,
-            validator(styleType: any) {
-                return Object.values(BALLOON_TAB_STYLE_TYPE).includes(styleType);
-            },
         },
         size: {
-            type: String,
+            type: String as PropType<BALLOON_TAB_SIZE>,
             default: BALLOON_TAB_SIZE.md,
-            validator(size: any) {
-                return Object.values(BALLOON_TAB_SIZE).includes(size);
-            },
         },
         position: {
-            type: String,
+            type: String as PropType<BALLOON_TAB_POSITION>,
             default: BALLOON_TAB_POSITION.top,
-            validator(position: any) {
-                return Object.values(BALLOON_TAB_POSITION).includes(position);
-            },
         },
         stretch: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props: BalloonTabProps, { emit }) {
+    setup(props, { emit }) {
         const {
             tabItems,
             keepAliveTabNames,
@@ -183,7 +175,7 @@ export default {
             handleClickTab,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
