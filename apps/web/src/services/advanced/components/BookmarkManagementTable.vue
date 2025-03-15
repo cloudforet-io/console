@@ -6,7 +6,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink, PSelectStatus,
 } from '@cloudforet/mirinae';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
@@ -194,7 +193,7 @@ const getDropdownMenu = (item: BookmarkItem) => {
                 name: 'add',
                 label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
             },
-            { type: CONTEXT_MENU_TYPE.divider },
+            { type: 'divider' },
             ...defaultSets,
         ];
     }

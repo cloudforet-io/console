@@ -1,4 +1,3 @@
-import { DEFINITION_TABLE_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/tables/definition-table/config';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
@@ -12,7 +11,7 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
     type: 'item',
     options: {
         translation_id: 'PAGE_SCHEMA.BASE_INFO',
-        styleType: DEFINITION_TABLE_STYLE_TYPE.white,
+        styleType: 'white',
         fields: [
             {
                 key: 'account_type',

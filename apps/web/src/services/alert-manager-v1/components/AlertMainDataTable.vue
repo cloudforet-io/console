@@ -13,9 +13,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
