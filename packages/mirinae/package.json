@@ -49,7 +49,7 @@
     "css": "node scripts/css.js",
     "eslint": "eslint --quiet --ext .js,.vue,.ts ./src/",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
-    "lint": "npm run eslint && npm run stylelint",
+    "lint": "concurrently \"npm run eslint\" \"npm run stylelint\" \"npm run ts-check\"",
     "test": "vitest run",
     "test:watch": "vitest watch --ui",
     "test:coverage": "vitest run --coverage",

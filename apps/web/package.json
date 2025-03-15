@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage",
     "eslint": "eslint --max-warnings=0 --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
+    "ts-check": "tsc -p tsconfig.json --noEmit",
     "lint": "npm run eslint && npm run stylelint",
     "eslint:fix": "eslint --fix --ext .js,.vue,.ts .",
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,vue,pcss,scss}\"",
