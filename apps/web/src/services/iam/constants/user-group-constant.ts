@@ -1,4 +1,4 @@
-import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 export const USER_GROUP_SEARCH_HANDLERS: KeyItemSet[] = [
     {
