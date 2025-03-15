@@ -42,7 +42,6 @@ import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { PropType } from 'vue';
-import type Vue from 'vue';
 
 import { useWindowSize } from '@vueuse/core';
 
@@ -79,7 +78,7 @@ export default defineComponent({
         const state = reactive({
             click: false,
             isAlertVisible: false,
-            iconRef: null as Vue|null,
+            iconRef: null as any|null,
             alertRef: null as Element|null,
             textRef: null as Element|null,
             alertStyle: computed(() => {
