@@ -10,12 +10,14 @@ import VTooltip from 'v-tooltip';
 import SpaceDesignSystem from '@cloudforet/mirinae';
 
 import directive from '@/directives';
+import { queryClient } from '@/query';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { pinia } from '@/store/pinia';
 
 import { siteInit } from '@/lib/site-initializer';
+
 
 import App from './App.vue';
 
@@ -30,7 +32,7 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(PortalVue);
 Vue.use(PiniaVuePlugin);
-Vue.use(VueQueryPlugin);
+Vue.use(VueQueryPlugin, { queryClient });
 
 directive(Vue);
 
