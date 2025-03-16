@@ -1,10 +1,13 @@
+import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { getReferencePrimaryQueryKey } from '@/query/reference/helper';
-import type { ReferenceResourceType } from '@/query/reference/type';
+import type { QueryKeyBaseParams } from '@/query/_composables/use-query-key-base';
+import { useQueryKeyBase } from '@/query/_composables/use-query-key-base';
+import { getReferencePrimaryQueryKey } from '@/query/reference/_helper/reference-query-key-helper';
+import type { ReferenceQueryKey } from '@/query/reference/_types/reference-query-key-type';
+import type { ReferenceResourceType } from '@/query/reference/_types/reference-resource-type';
 
-import type { GlobalQueryParams } from './use-global-query-params';
-import { useGlobalQueryParams } from './use-global-query-params';
+
 
 /**
  * Composable that generates a reference query key with global parameters.
@@ -12,7 +15,7 @@ import { useGlobalQueryParams } from './use-global-query-params';
  * from regular API query keys but still includes global parameters.
  *
  * @param resourceType - The type of reference resource (e.g., 'public-dashboard', 'project')
- * @param additionalGlobalParams - Optional additional global parameters to include in the query key
+ * @param queryKeyOptions - Optional query key options to merge with default params
  * @returns A computed reference to the query key array, structured as `[REFERENCE_PREFIX, ...referencePrimaryKey, { globalParams }]`
  *
  * ### Example Usage:
@@ -31,12 +34,12 @@ import { useGlobalQueryParams } from './use-global-query-params';
  */
 export const useReferenceQueryKey = (
     resourceType: ReferenceResourceType,
-    additionalGlobalParams?: Partial<GlobalQueryParams>,
-) => {
-    const globalQueryParams = useGlobalQueryParams(additionalGlobalParams);
+    queryKeyOptions?: Partial<QueryKeyBaseParams>,
+): ComputedRef<ReferenceQueryKey> => {
+    const queryKeyBase = useQueryKeyBase(queryKeyOptions);
 
     return computed(() => [
+        ...queryKeyBase.value,
         ...getReferencePrimaryQueryKey(resourceType),
-        { ...globalQueryParams.value },
     ]);
 };
