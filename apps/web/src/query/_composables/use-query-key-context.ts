@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import type { QueryKeyBase } from '@/query/_types/query-key-type';
+import type { QueryContext } from '@/query/_types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -11,13 +11,10 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
  * Interface for global query parameters used across API requests.
  * These parameters are automatically included in API and reference query keys.
  */
-export interface QueryKeyBaseParams {
-    /** Flag indicating whether admin mode is enabled */
+export interface QueryKeyContextParams {
     isAdminMode?: boolean;
-    /** Current workspace ID from the workspace context */
     workspaceId?: string;
-    /** Additional parameters that might be added */
-    [key: string]: any;
+    context: 'service' | 'reference';
 }
 
 /**
@@ -26,24 +23,28 @@ export interface QueryKeyBaseParams {
  * that are commonly used across different API queries.
  *
  * @param queryKeyOptions - Optional query key options to merge with default params
- * @returns A computed reference containing the combined global query parameters as an ordered array
+ * @returns A computed reference containing the combined global query parameters as a QueryContext object
  *
  * ### Example Usage:
  * ```ts
- * const queryKeyBase = useQueryKeyBase();
- * // Access params (now returns array)
- * const [mode, workspaceId, others] = queryKeyBase.value;
+ * const queryContext = useQueryKeyContext({ context: 'service' });
+ * // Access params
+ * const { mode, workspaceId, context } = queryContext.value;
  *
  * // With additional params
- * const params = useQueryKeyBase({ customParam: 'value' });
+ * const params = useQueryKeyContext({
+ *   context: 'service',
+ *   isAdminMode: true,
+ *   workspaceId: 'custom-id'
+ * });
  * ```
  *
  * ### Features:
- * - **Ordered Parameters**: Guarantees consistent parameter order: [mode, workspaceId, others]
+ * - **Structured Context**: Returns a QueryContext object with mode, workspaceId, and context
  * - **Reactive State**: Automatically updates when workspace or admin mode changes
- * - **Parameter Merging**: Allows adding custom parameters in the others object
+ * - **Type Safety**: Ensures context is always provided with valid values
  */
-export const useQueryKeyBase = (queryKeyOptions?: Partial<QueryKeyBaseParams>): ComputedRef<QueryKeyBase> => {
+export const useQueryKeyContext = (queryKeyOptions: QueryKeyContextParams): ComputedRef<QueryContext> => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
 
@@ -52,15 +53,17 @@ export const useQueryKeyBase = (queryKeyOptions?: Partial<QueryKeyBaseParams>): 
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 
-    return computed<QueryKeyBase>(() => {
-        const { isAdminMode, workspaceId: _workspaceId, ...otherParams } = queryKeyOptions || {};
-        const mode = (isAdminMode || _state.isAdminMode) ? 'ADMIN' : 'WORKSPACE';
+    return computed<QueryContext>(() => {
+        const {
+            isAdminMode, workspaceId: _workspaceId, context,
+        } = queryKeyOptions || {};
+        const mode = (isAdminMode || _state.isAdminMode) ? 'admin' : 'workspace';
         const workspaceId = _workspaceId || _state.currentWorkspaceId;
 
-        return [
+        return {
             mode,
             workspaceId,
-            Object.keys(otherParams).length > 0 ? otherParams : undefined,
-        ];
+            context,
+        };
     });
 };

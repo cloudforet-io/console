@@ -1,9 +1,9 @@
 
-export type QueryKeyBase = [
-    mode: 'ADMIN' | 'WORKSPACE',
+export interface QueryContext {
+    mode: 'admin' | 'workspace',
     workspaceId: string | undefined,
-    others: Record<string, any> | undefined,
-];
+    context: 'service' | 'reference',
+}
 
 
 

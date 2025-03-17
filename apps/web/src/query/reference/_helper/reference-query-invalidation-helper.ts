@@ -1,13 +1,17 @@
 import { queryClient } from '@/query';
-import { REFERENCE_PREFIX } from '@/query/reference/_constant/query-key-constant';
+import type { QueryContext } from '@/query/_types/query-key-type';
 
-
-export const invalidateReferenceQuery = (mode?: 'ADMIN' | 'WORKSPACE') => {
-    queryClient.invalidateQueries({
+/**
+ * Invalidates all reference queries based on the specified mode.
+ *
+ * @param mode - Optional mode filter ('ADMIN' | 'WORKSPACE')
+ */
+export const invalidateReferenceQuery = async (mode?: 'admin' | 'workspace') => {
+    await queryClient.invalidateQueries({
         predicate: (query) => {
-            const [queryMode,,, queryType] = query.queryKey;
-            if (queryType !== REFERENCE_PREFIX) return false;
-            if (mode && mode !== queryMode) return false;
+            const [queryContext] = query.queryKey as [QueryContext, ...unknown[]];
+            if (!queryContext || queryContext.context !== 'reference') return false;
+            if (mode && mode !== queryContext.mode) return false;
             return true;
         },
     });
