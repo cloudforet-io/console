@@ -6,9 +6,9 @@ import { useRouter } from 'vue-router/composables';
 import {
     PI, PTreeItem, PLabel, PPopover, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';

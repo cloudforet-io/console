@@ -11,7 +11,7 @@ import {
     PPagination, PToolbox,
     PButton,
 } from '@cloudforet/mirinae';
-import type { ValueItem } from '@cloudforet/mirinae/src/controls/search/query-search/type';
+import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';

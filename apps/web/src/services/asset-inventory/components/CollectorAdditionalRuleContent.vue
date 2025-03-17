@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PLink, PI, PTooltip } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
 import {
@@ -130,7 +129,7 @@ const state = reactive({
                         >
                             <td>{{ field.label }}</td>
                             <td v-if="field.name === 'change_project'">
-                                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                <p-link action-icon="internal-link"
                                         new-tab
                                         :to="referenceRouter(
                                             state.changeProjectId,

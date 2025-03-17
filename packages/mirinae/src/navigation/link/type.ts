@@ -11,3 +11,17 @@ export const ACTION_ICON = {
     EXTERNAL_LINK: 'external-link',
 } as const;
 export type ActionIcon = typeof ACTION_ICON[keyof typeof ACTION_ICON];
+
+export interface LinkProps {
+    text?: string;
+    disabled?: boolean;
+    highlight?: boolean;
+    size?: LinkSize;
+    iconLeft?: string;
+    actionIcon?: ActionIcon;
+    newTab?: boolean;
+    href?: string;
+    to?: Location;
+    useAnchorScroll?: boolean;
+    lineHeight?: string;
+}

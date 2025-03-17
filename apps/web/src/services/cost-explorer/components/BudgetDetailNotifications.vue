@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { i18n } from '@/translations';
 
@@ -145,7 +145,7 @@ const handleBudgetNotifications = () => {
                                 <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
                                 <p-link v-if="state.budgetTargetId"
                                         class="link-text"
-                                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        action-icon="internal-link"
                                         new-tab
                                         size="md"
                                         :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"

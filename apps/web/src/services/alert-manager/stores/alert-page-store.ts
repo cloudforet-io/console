@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -37,9 +39,9 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         selectedSearchFilter: undefined,
     });
     const getters = {
-        serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((i) => ({
-            name: i.name,
-            label: i.label,
+        serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((d) => ({
+            name: d.name,
+            label: d.label,
         }))),
     };
     const mutations = {

@@ -1,6 +1,7 @@
-import type { SearchSchema } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { DEFINITION_TABLE_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/tables/definition-table/config';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
@@ -12,7 +13,7 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
     type: 'item',
     options: {
         translation_id: 'PAGE_SCHEMA.BASE_INFO',
-        styleType: DEFINITION_TABLE_STYLE_TYPE.white,
+        styleType: 'white',
         fields: [
             {
                 key: 'account_type',

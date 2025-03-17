@@ -41,7 +41,6 @@
             >
                 <div class="overlay-contents">
                     <p-select-dropdown v-if="iconSetList.length > 1"
-                                       :menu="iconSetList"
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
@@ -85,12 +84,12 @@ import type { PropType } from 'vue';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
-import type { BoardItemProps, IconSet } from '@/data-display/board-item/type';
+import type { IconSet } from '@/data-display/board-item/type';
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useSelect } from '@/hooks';
 
-export default defineComponent<BoardItemProps>({
+export default defineComponent({
     name: 'PBoardItem',
     components: {
         PTooltip, PIconButton, PSelectDropdown, PI,

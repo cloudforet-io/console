@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
 } from '@cloudforet/mirinae';
-import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { getParticle, i18n as _i18n } from '@/translations';
 

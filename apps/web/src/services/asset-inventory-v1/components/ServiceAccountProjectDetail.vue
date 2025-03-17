@@ -1,7 +1,7 @@
 <template>
     <div class="service-account-project-detail">
         <p-link v-if="!!projectName"
-                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                action-icon="internal-link"
                 new-tab
                 :to="projectLink"
         >
@@ -31,7 +31,7 @@ import { useRouter } from 'vue-router/composables';
 import {
     PLink, PI, PTooltip,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
@@ -85,7 +85,6 @@ export default {
         return {
             ...toRefs(state),
             ACCOUNT_TYPE,
-            ACTION_ICON,
         };
     },
 };

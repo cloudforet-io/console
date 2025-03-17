@@ -10,7 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolbox, PDataLoader, PEmpty, PButton,
 } from '@cloudforet/mirinae';
-import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';

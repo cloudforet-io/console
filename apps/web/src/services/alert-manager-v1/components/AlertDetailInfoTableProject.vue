@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PLink, PButtonModal, PCopyButton,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -58,7 +58,7 @@ const onSelectProject = (selected) => {
         >
             <span class="project">
                 <p-copy-button :value="props.alertData.project_id">
-                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    <p-link action-icon="internal-link"
                             new-tab
                             :to="referenceRouter(
                                 props.alertData.project_id,

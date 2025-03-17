@@ -1,5 +1,5 @@
-import type { DataTableFieldType } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 

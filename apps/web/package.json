@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "eslint": "eslint --max-warnings=0 --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
-    "lint": "npm run eslint && npm run stylelint",
+    "ts-check": "tsc -p tsconfig.json --noEmit",
+    "lint": "npm run eslint && npm run ts-check && npm run stylelint",
     "eslint:fix": "eslint --fix --ext .js,.vue,.ts .",
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,vue,pcss,scss}\"",
     "format": "npm run eslint:fix && npm run stylelint:fix",
@@ -102,8 +103,6 @@
     "@types/uuid": "^8.3.0",
     "@vitejs/plugin-vue2": "^2.2.0",
     "@vitest/coverage-c8": "^0.24.3",
-    "@vitest/coverage-istanbul": "^0.34.5",
-    "@vitest/ui": "^0.26.3",
     "@vue/test-utils": "^1.3.3",
     "axios-mock-adapter": "^1.17.0",
     "dotenv": "^16.0.3",
@@ -116,7 +115,7 @@
     "vite": "^4.5.6",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
-    "vitest": "^0.34.5",
+    "vitest": "^3.0.8",
     "vue-template-compiler": "2.7.16"
   },
   "browserslist": [

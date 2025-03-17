@@ -26,11 +26,13 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import type { DictDynamicFieldProps, DictTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
+import type { DictTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { DictOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTag from '@/data-display/tags/PTag.vue';
 import PLink from '@/navigation/link/PLink.vue';
 
-export default defineComponent<DictDynamicFieldProps>({
+export default defineComponent({
     name: 'PDynamicFieldDict',
     components: {
         PTag,
@@ -38,7 +40,7 @@ export default defineComponent<DictDynamicFieldProps>({
     },
     props: {
         options: {
-            type: Object as PropType<DictTypeOptions>,
+            type: Object as PropType<DictOptions>,
             default: () => ({}),
         },
         data: {
@@ -46,7 +48,7 @@ export default defineComponent<DictDynamicFieldProps>({
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DictTypeOptions>,
             default: () => ({}),
         },
         extraData: {
@@ -54,7 +56,7 @@ export default defineComponent<DictDynamicFieldProps>({
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },

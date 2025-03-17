@@ -42,18 +42,7 @@ import { defineComponent } from 'vue';
 import type { CategoryItem, KeyItem, ValueItem } from '@/controls/search/query-search/type';
 import PI from '@/foundation/icons/PI.vue';
 
-interface Props {
-    keyItem?: KeyItem;
-    valueItem: ValueItem;
-    categoryItem?: CategoryItem;
-    deletable?: boolean;
-    outline?: boolean;
-    selected?: boolean;
-    invalid?: boolean;
-    errorMessage?: string;
-}
-
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PTag',
     components: {
         PI,

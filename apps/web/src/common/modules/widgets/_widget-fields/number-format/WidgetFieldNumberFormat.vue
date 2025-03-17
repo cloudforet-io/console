@@ -225,7 +225,7 @@ watch(() => state.customModalVisible, (modalVisible) => {
                         </p>
                         <!--                        TODO: To be activated after guide completion-->
                         <!--                        <p-link :href="state.numberFormatHelpLink"-->
-                        <!--                                :action-icon="ACTION_ICON.EXTERNAL_LINK"-->
+                        <!--                                action-icon="external-link"-->
                         <!--                                highlight-->
                         <!--                        >-->
                         <!--                            {{ $t('COMMON.WIDGETS.NUMBER_FORMAT.HELP') }}-->

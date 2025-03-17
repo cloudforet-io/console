@@ -7,7 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PFieldGroup, PRadio, PTextInput, PLink,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
@@ -163,7 +163,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                 >
                     <span>{{ state.resourceGroupLabels[escalationPolicyFormState.resourceGroup] }}</span>
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
-                        (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        (<p-link action-icon="internal-link"
                                  new-tab
                                  :to="referenceRouter(escalationPolicyFormState.projectId,{
                                      resource_type: 'identity.Project',
@@ -185,7 +185,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
             <template #label>
                 <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
                 <p-link class="link-text"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         size="sm"
                         :to="{ name: PROJECT_ROUTE._NAME, params: { workspaceId: userWorkspaceStore.getters.currentWorkspaceId } }"

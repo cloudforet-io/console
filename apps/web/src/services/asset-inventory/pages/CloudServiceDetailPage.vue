@@ -13,7 +13,7 @@ import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/typ
 import {
     PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
+import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions,

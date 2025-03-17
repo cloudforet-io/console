@@ -11,7 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
@@ -219,7 +219,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                           class="link-button"
                 >
                     <p-link :href="state.consoleLink"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            action-icon="external-link"
                     >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
                     </p-link>
