@@ -21,7 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 
 interface TableItem {
     project_id?: string;

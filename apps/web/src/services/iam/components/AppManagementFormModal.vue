@@ -32,7 +32,7 @@ import { useRoleFormatter } from '@/services/iam/composables/refined-table-data'
 import { getInputItemsFromTagKeys } from '@/services/iam/composables/tag-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+import type { ProjectTreeNodeData } from '@/services/project/v1/types/project-tree-type';
 
 
 interface AppDropdownMenuItem extends SelectDropdownMenuItem {

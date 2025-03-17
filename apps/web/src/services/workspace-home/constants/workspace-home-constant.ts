@@ -6,7 +6,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 import type { StarredServiceItem } from '@/services/workspace-home/types/workspace-home-type';
 
 // Bookmark

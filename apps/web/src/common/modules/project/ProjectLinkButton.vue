@@ -10,7 +10,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 
 const props = defineProps<{
     projectId: string;

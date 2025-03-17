@@ -28,8 +28,8 @@ import EscalationPolicyFormRulesInput from '@/services/alert-manager-v1/componen
 import { ACTION } from '@/services/alert-manager-v1/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
 import type { ActionMode } from '@/services/alert-manager-v1/types/alert-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import type { ProjectTreeNodeData } from '@/services/project/v1/types/project-tree-type';
 
 const props = withDefaults(defineProps<{
     mode: ActionMode;

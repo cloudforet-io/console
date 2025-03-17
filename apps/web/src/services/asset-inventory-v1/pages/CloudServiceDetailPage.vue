@@ -65,7 +65,7 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory-v1/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory-v1/types/type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {

@@ -65,7 +65,7 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 
 
 type CostAnalyzeRawData = {

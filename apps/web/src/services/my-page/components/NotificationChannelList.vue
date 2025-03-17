@@ -40,7 +40,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 
 interface EnrichedProtocolItem extends ProtocolModel {
     label: TranslateResult;

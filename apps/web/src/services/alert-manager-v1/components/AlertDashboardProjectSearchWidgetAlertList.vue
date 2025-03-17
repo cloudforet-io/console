@@ -21,7 +21,7 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertListItem from '@/services/alert-manager-v1/components/AlertListItem.vue';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
 
 const props = defineProps<{
     projectId: string;
