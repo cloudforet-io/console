@@ -16,7 +16,7 @@ import { indigo } from '@/styles/colors';
 
 import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface Props {
     item: ProjectCardItemType;
@@ -60,9 +60,10 @@ const state = reactive({
     toolsetMenuVisible: false,
 });
 
+// TODO: change the route
 const handleSelectProjectGroup = () => {
     router.push({
-        name: PROJECT_ROUTE_V1._NAME,
+        name: PROJECT_ROUTE_V2._NAME,
         params: {
             projectGroupId: props.item.id as string,
         },

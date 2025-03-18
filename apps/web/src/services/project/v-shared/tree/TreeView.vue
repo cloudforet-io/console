@@ -13,7 +13,7 @@ import { reactive } from 'vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { TreeNode, TreeDisplayMap } from '@/services/project/v1/tree/type';
+import type { TreeNode, TreeDisplayMap } from '@/services/project/v-shared/tree/type';
 
 import TreeItem from './TreeItem.vue';
 

@@ -29,8 +29,8 @@ import ProjectGroupMemberManagementModal from '@/services/project/v-shared/compo
 import ProjectMainProjectGroupMoveModal from '@/services/project/v-shared/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
-import ProjectMain from '@/services/project/v1/components/ProjectMain.vue';
-import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMainDeleteModal.vue';
+import ProjectMain from '@/services/project/v2/components/ProjectMain.vue';
+import ProjectMainDeleteModal from '@/services/project/v2/components/ProjectMainDeleteModal.vue';
 
 
 const gnbStore = useGnbStore();

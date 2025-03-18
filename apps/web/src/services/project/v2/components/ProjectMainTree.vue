@@ -24,7 +24,7 @@ import { indigo, peacock } from '@/styles/colors';
 
 import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
 import type { TreeNode, TreeDisplayMap, TreeData } from '@/services/project/v-shared/tree/type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface ProjectDataType extends TreeData {
     name: string;
@@ -52,13 +52,15 @@ const state = reactive({
         const allPaths = state.currentParentPathIds.map((id) => ({
             name: storeState.projectGroup[id].name,
             to: {
-                name: PROJECT_ROUTE_V1._NAME,
+                // TODO: check route
+                name: PROJECT_ROUTE_V2._NAME,
                 params: {
                     projectGroupId: id,
                 },
             },
         }));
-        return [{ name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE_V1._NAME } }, ...allPaths];
+        // TODO: check route
+        return [{ name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE_V2._NAME } }, ...allPaths];
     }),
     selectedTreeId: undefined as string|undefined,
     projectTreeData: computed<TreeNode<ProjectDataType>[]>(() => {
@@ -74,7 +76,8 @@ const state = reactive({
                     id: key,
                     parentGroupId: projectGroup.data.parentGroupInfo?.id,
                     to: {
-                        name: PROJECT_ROUTE_V1._NAME,
+                        // TODO: check route
+                        name: PROJECT_ROUTE_V2._NAME,
                         params: {
                             projectGroupId: key,
                         },
@@ -94,7 +97,8 @@ const state = reactive({
                     id: key,
                     parentGroupId: project.data.groupInfo?.id,
                     to: {
-                        name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+                        // TODO: check route
+                        name: PROJECT_ROUTE_V2._NAME,
                         params: {
                             id: key,
                         },

@@ -21,8 +21,8 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
-import ProjectMainProjectCard from '@/services/project/v1/components/ProjectMainProjectCard.vue';
-import ProjectMainProjectGroupCard from '@/services/project/v1/components/ProjectMainProjectGroupCard.vue';
+import ProjectMainProjectCard from '@/services/project/v2/components/ProjectMainProjectCard.vue';
+import ProjectMainProjectGroupCard from '@/services/project/v2/components/ProjectMainProjectGroupCard.vue';
 
 
 const route = useRoute();

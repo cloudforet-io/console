@@ -9,7 +9,7 @@ import { PI, PSpinner } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { TreeNode } from '@/services/project/v1/tree/type';
+import type { TreeNode } from '@/services/project/v-shared/tree/type';
 
 interface Props {
     node: TreeNode;

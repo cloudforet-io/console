@@ -4,14 +4,12 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 
-import { find } from 'lodash';
 
 import {
-    PTextInput, PTextHighlighting, PEmpty, PBadge, PContextMenu, PIconButton,
+    PTextInput, PTextHighlighting, PEmpty, PContextMenu, PIconButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -30,9 +28,8 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { indigo, peacock } from '@/styles/colors';
 
 import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
-import ProjectMainTree from '@/services/project/v1/components/ProjectMainTree.vue';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
-import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import ProjectMainTree from '@/services/project/v2/components/ProjectMainTree.vue';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
@@ -40,8 +37,6 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
-const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.state;
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 const menuRef = ref<any|null>(null);
@@ -68,7 +63,8 @@ const state = reactive({
                 id: d.name,
                 icon: { name: 'ic_folder-filled', color: indigo[500] },
                 to: {
-                    name: PROJECT_ROUTE_V1._NAME,
+                    // TODO: check route
+                    name: PROJECT_ROUTE_V2._NAME,
                     params: { projectGroupId: d.itemId },
                 },
                 favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.name },
@@ -80,20 +76,23 @@ const state = reactive({
             id: d.name,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: {
-                name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+                // TODO: check route
+                name: PROJECT_ROUTE_V2._NAME,
                 params: { id: d.itemId },
             },
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
         };
     })),
-    isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE_V1._NAME),
+    // TODO: check route
+    isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE_V2._NAME),
     projectLandingMenuSet: computed(() => [
         {
             type: MENU_ITEM_TYPE.SLOT,
             label: i18n.t('PROJECT.LANDING.ALL_PROJECTS'),
             id: MENU_ID.PROJECT,
             icon: 'ic_dots-4-square',
-            to: { name: PROJECT_ROUTE_V1._NAME },
+            // TODO: check route
+            to: { name: PROJECT_ROUTE_V2._NAME },
             hideFavorite: true,
         },
         {
@@ -126,14 +125,11 @@ const state = reactive({
             id: project.key,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: {
-                name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+                name: PROJECT_ROUTE_V2._NAME,
                 params: { id: project.key, workspaceId: storeState.currentWorkspaceId },
             },
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
         }))),
-    alertCounts: computed(() => ({
-        TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
-    })),
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'project',
@@ -224,14 +220,6 @@ onClickOutside(menuRef, () => {
                 </p-empty>
             </template>
             <project-main-tree v-else />
-        </template>
-        <template #after-text-project-alert>
-            <p-badge style-type="primary3"
-                     badge-type="subtle"
-                     class="ml-1"
-            >
-                {{ state.alertCounts.TRIGGERED }}
-            </p-badge>
         </template>
     </l-s-b>
 </template>

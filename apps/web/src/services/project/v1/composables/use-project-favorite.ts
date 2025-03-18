@@ -16,7 +16,7 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
-import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
+import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 
 
 export const useProjectFavorite = () => {

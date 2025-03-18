@@ -23,7 +23,7 @@ import { peacock } from '@/styles/colors';
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 
 
@@ -82,9 +82,10 @@ const state = reactive({
 
 const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
+// TODO: change the route
 const handleSelectProject = () => {
     router.push({
-        name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+        name: PROJECT_ROUTE_V2._NAME,
         params: {
             id: props.item.id as string,
         },

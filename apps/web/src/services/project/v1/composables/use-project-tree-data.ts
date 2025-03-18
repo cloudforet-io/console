@@ -11,9 +11,9 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
+import type { TreeNode, TreeDisplayMap } from '@/services/project/v-shared/tree/type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
-import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
-import type { TreeNode, TreeDisplayMap } from '@/services/project/v1/tree/type';
 
 interface ParentGroupItem {
     name: string;

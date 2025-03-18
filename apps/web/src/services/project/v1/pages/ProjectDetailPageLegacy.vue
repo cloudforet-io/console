@@ -39,11 +39,11 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { peacock } from '@/styles/colors';
 
-import ProjectFormModal from '@/services/project/v1/components/ProjectFormModal.vue';
-import ProjectMainProjectGroupMoveModal from '@/services/project/v1/components/ProjectMainProjectGroupMoveModal.vue';
+import ProjectFormModal from '@/services/project/v-shared/components/ProjectFormModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/v-shared/components/ProjectMainProjectGroupMoveModal.vue';
+import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
-import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 
 
 interface Props {
