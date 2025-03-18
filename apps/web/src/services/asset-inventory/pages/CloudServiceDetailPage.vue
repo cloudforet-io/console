@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { isEmpty, get, cloneDeep } from 'lodash';
 
+import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,7 +14,6 @@ import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/typ
 import {
     PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions,
@@ -93,8 +93,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
-
-assetInventorySettingsStore.initState();
+assetInventorySettingsStore.initState(userStore.state.userId);
 
 const route = useRoute();
 const router = useRouter();
@@ -125,7 +124,7 @@ const state = reactive({
 const typeOptionState = reactive({
     loading: true,
     totalCount: 0,
-    timezone: computed(() => userStore.state.timezone || 'UTC'),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     selectIndex: [] as number[],
 });
 

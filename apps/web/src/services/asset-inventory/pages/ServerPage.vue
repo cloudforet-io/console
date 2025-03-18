@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CloudServiceDetailPage
-    from '@/services/asset-inventory-v1/pages/CloudServiceDetailPage.vue';
+    from '@/services/asset-inventory/pages/CloudServiceDetailPage.vue';
 </script>
 
 <template>

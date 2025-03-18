@@ -7,8 +7,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
-import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface LinkFormatter {
@@ -103,7 +103,7 @@ type RouterMap = Record<ResourceType, { name: string; formatter: LinkFormatter}>
 const routerMap = (isAdminMode?: boolean): RouterMap => ({
     'inventory.Server':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVER._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
             formatter: serverLinkFormatter,
         },
     'identity.Project':
@@ -118,27 +118,27 @@ const routerMap = (isAdminMode?: boolean): RouterMap => ({
         },
     'inventory.Collector':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME : ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'identity.TrustedAccount':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.SEARCH._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.SEARCH._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.TYPE_SEARCH._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.TYPE_SEARCH._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
         },
 });

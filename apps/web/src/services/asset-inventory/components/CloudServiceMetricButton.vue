@@ -6,11 +6,13 @@ import {
     PTextButton,
 } from '@cloudforet/mirinae';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 
@@ -29,9 +31,10 @@ const props = withDefaults(defineProps<Props>(), {
     name: '',
 });
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
 });
@@ -47,12 +50,13 @@ const state = reactive({
 });
 
 const handleClickGoToMetric = () => {
-    window.open(router.resolve(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+    window.open(router.resolve({
+        name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
+            workspaceId: appContextStore.getters.isAdminMode ? undefined : userWorkspaceStore.getters.currentWorkspaceId,
             metricId: props.goToMetricServerPage ? METRIC_SERVER_ID : state.targetMetric.key,
         },
-    })).href, '_blank');
+    }).href, '_blank');
 };
 </script>
 

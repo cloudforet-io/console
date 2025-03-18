@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PDoubleCheckModal, PLink } from '@cloudforet/mirinae';
@@ -10,21 +11,22 @@ import type { ServiceAccountModel } from '@/api-clients/identity/service-account
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { SpaceRouter } from '@/router';
 import { i18n as _i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
+
 
 interface Props {
     visible: boolean;
@@ -43,9 +45,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
-const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const recentStore = useRecentStore();
-
+const router = useRouter();
 const state = reactive({
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     proxyVisible: useProxyValue('visible', props, emit),
@@ -87,7 +89,10 @@ const deleteServiceAccount = async () => {
 /* Event */
 const handleConfirmDelete = async () => {
     await deleteServiceAccount();
-    await SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: serviceAccountPageStore.state.selectedProvider } }));
+    await router.push({
+        name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+        query: { provider: serviceAccountPageStore.state.selectedProvider },
+    }).catch(() => {});
 };
 </script>
 

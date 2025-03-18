@@ -15,8 +15,8 @@ import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory-v1/helpers/cloud-service-analyze-query-helper';
-import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory-v1/types/cloud-service-card-type';
+import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
+import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 
 interface CloudServiceTypeListItem {
     group?: string;

@@ -1,6 +1,6 @@
 import { MENU_ID } from '@/lib/menu/config';
 
-export const ADMIN_ASSET_INVENTORY_ROUTE_V1 = Object.freeze({
+export const ADMIN_ASSET_INVENTORY_ROUTE = Object.freeze({
     _NAME: `admin.${MENU_ID.ASSET_INVENTORY}`,
     CLOUD_SERVICE: {
         _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,
@@ -8,6 +8,13 @@ export const ADMIN_ASSET_INVENTORY_ROUTE_V1 = Object.freeze({
         TYPE_SEARCH: { _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.type_search` },
         NO_RESOURCE: { _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.no_resource` },
         DETAIL: { _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.detail` },
+    },
+    SERVER: {
+        _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
+    },
+    SECURITY: {
+        _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}`,
+        DETAIL: { _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}.detail` },
     },
     COLLECTOR: {
         _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}`,

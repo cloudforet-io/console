@@ -2,14 +2,16 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { render } from 'ejs';
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
+
 
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
@@ -25,9 +27,11 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/components/ServiceAccountAttachedGeneralAccounts.vue';
@@ -40,9 +44,11 @@ import ServiceAccountCredentials
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountEditModal from '@/services/asset-inventory/components/ServiceAccountEditModal.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const router = useRouter();
 
@@ -56,8 +62,7 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
-const { getProperRouteLocation } = useProperRouteLocation();
-const { hasReadWriteAccess } = usePageEditableStatus();
+const route = useRoute();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -67,9 +72,20 @@ const storeState = reactive({
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: true,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     originServiceAccountItem: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
@@ -96,7 +112,7 @@ const state = reactive({
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
-    isEditable: computed<boolean>(() => (hasReadWriteAccess.value || false) && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
+    isEditable: computed<boolean>(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
 });
 
 /* Api */
@@ -138,9 +154,9 @@ const handleRefresh = () => {
     if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
 const handleClickBackbutton = () => {
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
-    }));
+    router.push({
+        name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
+    }).catch(() => {});
 };
 
 onMounted(async () => {
@@ -219,7 +235,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
-                                                       :has-read-write-access="hasReadWriteAccess"
+                                                       :has-read-write-access="state.hasReadWriteAccess"
             />
             <service-account-cluster v-if="state.isKubernetesAgentMode"
                                      :service-account-id="props.serviceAccountId"
@@ -234,7 +250,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                        :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
-            <!--            HACK: To be implemented after further discussion-->
+            <!--            TODO: To be implemented after further discussion-->
             <!--            <service-account-usage-overview v-if="!state.isTrustedAccount"-->
             <!--                                            :service-account-loading="state.loading"-->
             <!--                                            :service-account-id="props.serviceAccountId"-->

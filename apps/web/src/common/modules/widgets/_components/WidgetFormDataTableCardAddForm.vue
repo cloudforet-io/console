@@ -37,7 +37,7 @@ import {
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
-import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
+import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 const TAGS_DATA_KEY = 'tags';

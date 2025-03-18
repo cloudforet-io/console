@@ -35,11 +35,11 @@ import {
     primary,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type {
     CloudServiceDetailPageUrlQuery,
     CloudServiceMainPageUrlQuery,
-} from '@/services/asset-inventory-v1/types/cloud-service-page-type';
+} from '@/services/asset-inventory/types/cloud-service-page-type';
 import ProjectSummaryAllSummaryWidgetRegionService
     from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project/constants/project-summary-constant';
@@ -194,7 +194,7 @@ const getLocation = (type: ServiceCategory) => {
         query.service = type;
     }
     const location: Location = {
-        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query,
     };
     return location;
@@ -339,7 +339,7 @@ const getSummaryInfo = async (type) => {
                 type: d.display_name || d.cloud_service_group,
                 count: type === SERVICE_CATEGORY.STORAGE ? byteFormatter(d.size) : numberFormatter(d.count),
                 to: {
-                    name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: d.provider,
                         group: d.cloud_service_group,

@@ -21,6 +21,9 @@ const CloudServiceTypeSearch = () => import('@/services/asset-inventory/pages/Cl
 const CloudServicePage = () => import('@/services/asset-inventory/pages/CloudServicePage.vue');
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
+const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
+const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage.vue');
+
 const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
 const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/MetricExplorerDetailPage.vue');
 
@@ -36,6 +39,7 @@ const CollectJobPage = () => import('@/services/asset-inventory/pages/CollectHis
 const CollectorDetailPage = () => import('@/services/asset-inventory/pages/CollectorDetailPage.vue');
 
 
+const userStore = useUserStore(pinia);
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
@@ -43,10 +47,7 @@ const assetInventoryRoute: RouteConfig = {
         menuId: MENU_ID.ASSET_INVENTORY,
         translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
     },
-    redirect: (to) => {
-        const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId);
-    },
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId),
     component: AssetInventoryContainer,
     children: [
         {
@@ -86,6 +87,34 @@ const assetInventoryRoute: RouteConfig = {
                         {
                             path: ':name?',
                             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                            meta: { lsbVisible: true, label: ({ params }) => params.name },
+                            props: true,
+                            component: CloudServiceDetailPage as any,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            path: 'server',
+            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
+            meta: { menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
+            component: ServerPage as any,
+        },
+        {
+            path: 'security',
+            name: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
+            meta: { lsbVisible: true, menuId: MENU_ID.SECURITY, translationId: MENU_INFO_MAP[MENU_ID.SECURITY].translationId },
+            component: SecurityPage as any,
+            children: [
+                {
+                    path: ':provider/:group',
+                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':name?',
+                            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
                             meta: { lsbVisible: true, label: ({ params }) => params.name },
                             props: true,
                             component: CloudServiceDetailPage as any,

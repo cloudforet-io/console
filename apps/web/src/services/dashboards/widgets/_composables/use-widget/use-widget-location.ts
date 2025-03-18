@@ -13,9 +13,9 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 
-import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -42,7 +42,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const query: CloudServiceDetailPageUrlQuery = {
                 filters: assetQueryHelper.setFilters(consoleFilters).rawQueryStrings,
             };
-            const cloudServiceDetailRouteName = appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME;
+            const cloudServiceDetailRouteName = appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
             return {
                 name: cloudServiceDetailRouteName,
                 params: {

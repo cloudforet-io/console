@@ -21,11 +21,11 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import CloudServiceDetailPage
-    from '@/services/asset-inventory-v1/pages/CloudServiceDetailPage.vue';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import { useSecurityPageStore } from '@/services/asset-inventory-v1/stores/security-page-store';
-import type { CloudServiceDetailPageParams } from '@/services/asset-inventory-v1/types/cloud-service-detail-page-type';
-import type { EmptyData } from '@/services/asset-inventory-v1/types/type';
+    from '@/services/asset-inventory/pages/CloudServiceDetailPage.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
+import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+import type { EmptyData } from '@/services/asset-inventory/types/type';
 
 const allReferenceStore = useAllReferenceStore();
 const securityPageStore = useSecurityPageStore();
@@ -49,14 +49,14 @@ const state = reactive({
         let result = {} as EmptyData;
         if (!Object.keys(storeState.serviceAccounts).length) {
             result = {
-                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME } : {},
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
                 buttonText: state.writableServiceAccount ? i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') : undefined,
                 desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };
         } else {
             if (!Object.keys(storeState.collectors).length) {
                 result = {
-                    to: state.writableCollector ? { name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME } : {},
+                    to: state.writableCollector ? { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } : {},
                     buttonText: state.writableCollector ? i18n.t('INVENTORY.CREATE_COLLECTOR') : undefined,
                     desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE'),
                 };

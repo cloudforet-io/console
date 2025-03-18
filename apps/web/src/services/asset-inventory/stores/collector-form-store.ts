@@ -22,7 +22,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { Tag } from '@/common/modules/tags/type';
 
-
 /**
  * @name useCollectorDataModalStore
  * @description This directory contains the forms used by the collector service(create or update).

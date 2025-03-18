@@ -82,12 +82,12 @@ const formState = reactive({
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: undefined,
     },
     firstStepValid: computed(() => !invalidState.clusterName && invalidState.clusterName !== undefined
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] !== undefined
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
     commonValidForDelay: false,
     isValid: computed(() => {
         if (state.step === 1) return formState.firstStepValid;
-        // HACK: apply loading state
+        // TODO: apply loading state
         return true;
     }),
 });

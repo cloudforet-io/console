@@ -17,10 +17,10 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
-import { useSecurityPageStore } from '@/services/asset-inventory-v1/stores/security-page-store';
-import type { CloudServiceDetailPageParams } from '@/services/asset-inventory-v1/types/cloud-service-detail-page-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
+import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -54,7 +54,7 @@ const state = reactive({
                     type: MENU_ITEM_TYPE.ITEM,
                     label: `[${allReferenceGetters.provider[i.data.provider].label}] ${i.name}`,
                     id: i.key,
-                    to: { name: ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME, params: { group: i.data.group, provider: i.data.provider, name: i.name } },
+                    to: { name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME, params: { group: i.data.group, provider: i.data.provider, name: i.name } },
                 });
             });
             if (index !== array.length - 1) {
@@ -66,15 +66,15 @@ const state = reactive({
     securityNavigation: computed(() => {
         if (state.pageParams.name) {
             return [
-                { name: i18n.t('MENU.ASSET_INVENTORY'), to: { name: ASSET_INVENTORY_ROUTE_V1._NAME } },
-                { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: { name: ASSET_INVENTORY_ROUTE_V1.SECURITY._NAME } },
+                { name: i18n.t('MENU.ASSET_INVENTORY'), to: { name: ASSET_INVENTORY_ROUTE._NAME } },
+                { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: { name: ASSET_INVENTORY_ROUTE.SECURITY._NAME } },
                 { name: state.pageParams.group || '', data: null },
                 { name: `[${allReferenceGetters.provider[state.pageParams.provider || '']?.label}] ${state.pageParams.name || ''}` },
             ];
         }
         return [
-            { name: i18n.t('MENU.ASSET_INVENTORY'), to: { name: ASSET_INVENTORY_ROUTE_V1._NAME } },
-            { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: { name: ASSET_INVENTORY_ROUTE_V1.SECURITY._NAME } },
+            { name: i18n.t('MENU.ASSET_INVENTORY'), to: { name: ASSET_INVENTORY_ROUTE._NAME } },
+            { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: { name: ASSET_INVENTORY_ROUTE.SECURITY._NAME } },
         ];
     }),
 });
@@ -83,7 +83,7 @@ const routeToFirstCloudServiceType = async () => {
     const selectedCloudServiceType = storeState.selectedCloudServiceType;
     if (selectedCloudServiceType) {
         await router.replace({
-            name: ASSET_INVENTORY_ROUTE_V1.SECURITY.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
             params: {
                 provider: selectedCloudServiceType?.data.provider || '',
                 group: selectedCloudServiceType?.data.group || '',
