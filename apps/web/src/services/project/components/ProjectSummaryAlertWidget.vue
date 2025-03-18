@@ -29,9 +29,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { alert, secondary } from '@/styles/colors';
 
-import AlertListItem from '@/services/alert-manager-v1/components/AlertListItem.vue';
-import { ALERT_ASSIGNED_FILTER } from '@/services/alert-manager-v1/constants/alert-constant';
-import type { AlertListPageUrlQuery } from '@/services/alert-manager-v1/types/alert-type';
+import AlertListItem from '@/services/alert-manager/v1/components/AlertListItem.vue';
+import { ALERT_ASSIGNED_FILTER } from '@/services/alert-manager/v1/constants/alert-constant';
+import type { AlertListPageUrlQuery } from '@/services/alert-manager/v1/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface AlertState {

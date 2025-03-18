@@ -6,16 +6,16 @@ import { queryStringToString } from '@/lib/router-query-string';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import AlertMainDataTable from '@/services/alert-manager-v1/components/AlertMainDataTable.vue';
+import AlertMainDataTable from '@/services/alert-manager/v1/components/AlertMainDataTable.vue';
 import {
     ALERT_STATE_FILTER, ALERT_ASSIGNED_FILTER, ALERT_URGENCY_FILTER,
-} from '@/services/alert-manager-v1/constants/alert-constant';
+} from '@/services/alert-manager/v1/constants/alert-constant';
 import type {
     AlertAssignedFilter,
     AlertListPageUrlQuery,
     AlertListTableFilters,
     AlertStateFilter, AlertUrgencyFilter,
-} from '@/services/alert-manager-v1/types/alert-type';
+} from '@/services/alert-manager/v1/types/alert-type';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 interface Props {

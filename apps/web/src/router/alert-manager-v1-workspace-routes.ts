@@ -1,6 +1,6 @@
 import type { RouteConfig } from 'vue-router';
 
-import alertManagerRouteV1 from '@/services/alert-manager-v1/routes/routes';
+import alertManagerRouteV1 from '@/services/alert-manager/v1/routes/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes/routes';
 import dashboardsRoute from '@/services/dashboards/routes/routes';

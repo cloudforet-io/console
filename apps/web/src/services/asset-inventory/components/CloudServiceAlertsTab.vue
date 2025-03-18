@@ -35,14 +35,14 @@ import { gray, red } from '@/styles/colors';
 import {
     alertStatusBadgeStyleTypeFormatter,
     calculateTime, getAlertStateI18n, getAlertUrgencyI18n,
-} from '@/services/alert-manager/composables/alert-table-data';
+} from '@/services/alert-manager/v2/composables/alert-table-data';
 import {
     ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS, ALERT_MANAGEMENT_TABLE_HANDLER,
     ALERT_STATUS_FILTERS,
-} from '@/services/alert-manager/constants/alert-table-constant';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
-import type { AlertFilterType } from '@/services/alert-manager/types/alert-manager-type';
+} from '@/services/alert-manager/v2/constants/alert-table-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
+import type { AlertFilterType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 
 
