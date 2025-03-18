@@ -17,7 +17,8 @@ const ProjectAlertWebhookCreatePage = () => import('@/services/project/v1/pages/
 const ProjectNotificationsPage = () => import('@/services/project/v1/pages/ProjectNotificationPage.vue');
 const ProjectAlertEventRulePage = () => import('@/services/project/v1/pages/ProjectAlertEventRulePage.vue');
 const ProjectNotificationAddPage = () => import('@/services/project/v1/pages/ProjectNotificationAddPage.vue');
-export default {
+
+const projectRoutes: RouteConfig = {
     path: 'project',
     meta: {
         menuId: MENU_ID.PROJECT,
@@ -106,4 +107,6 @@ export default {
             ],
         },
     ],
-} as RouteConfig;
+};
+
+export default projectRoutes;
