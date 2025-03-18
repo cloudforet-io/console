@@ -5,14 +5,13 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PI, PTreeView, PSelectDropdown } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
+import type { TreeNode, TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

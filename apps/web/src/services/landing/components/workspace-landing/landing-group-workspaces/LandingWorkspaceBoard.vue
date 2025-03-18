@@ -8,12 +8,11 @@ import dayjs from 'dayjs';
 import {
     PBoard, PI, PPopover, PStatus, PLink,
 } from '@cloudforet/mirinae';
-import { BOARD_STYLE_TYPE } from '@cloudforet/mirinae/src/data-display/board/type';
 
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -96,7 +95,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
 <template>
     <p-board :board-sets="props.boardSets"
              selectable
-             :style-type="BOARD_STYLE_TYPE.cards"
+             style-type="cards"
              class="landing-workspace-board"
              @item-click="handleClickBoardItem"
     >

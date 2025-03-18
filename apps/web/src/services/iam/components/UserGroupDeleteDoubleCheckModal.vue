@@ -6,9 +6,9 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable, PButtonModal, PBadge } from '@cloudforet/mirinae';
 
-import type { UserGroupDeleteUserGroupParameters } from '@/schema/identity/user-group/api-verbs/delete';
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
-import type { UserGroupListItemType } from '@/schema/identity/user-group/type';
+import type { UserGroupDeleteUserGroupParameters } from '@/api-clients/identity/user-group/schema/api-verbs/delete';
+import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import type { UserGroupListItemType } from '@/api-clients/identity/user-group/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

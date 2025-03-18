@@ -31,10 +31,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import EscalationPolicyDataTable from '@/services/alert-manager-v1/components/EscalationPolicyDataTable.vue';
-import EscalationPolicyForm from '@/services/alert-manager-v1/components/EscalationPolicyForm.vue';
-import { ACTION } from '@/services/alert-manager-v1/constants/alert-constant';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
+import EscalationPolicyDataTable from '@/services/alert-manager/v1/components/EscalationPolicyDataTable.vue';
+import EscalationPolicyForm from '@/services/alert-manager/v1/components/EscalationPolicyForm.vue';
+import { ACTION } from '@/services/alert-manager/v1/constants/alert-constant';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/v1/stores/escalation-policy-form-store';
 
 interface TableItem extends Omit<EscalationPolicyModel, 'name'> {
     name: {

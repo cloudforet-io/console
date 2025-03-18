@@ -29,8 +29,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red } from '@/styles/colors';
 
-import EscalationPolicyFormModal from '@/services/alert-manager-v1/components/EscalationPolicyFormModal.vue';
-import { ACTION } from '@/services/alert-manager-v1/constants/alert-constant';
+import EscalationPolicyFormModal from '@/services/alert-manager/v1/components/EscalationPolicyFormModal.vue';
+import { ACTION } from '@/services/alert-manager/v1/constants/alert-constant';
 import ProjectAlertSettingsAutoRecoveryUpdateModal
     from '@/services/project/components/ProjectAlertSettingsAutoRecoveryUpdateModal.vue';
 import ProjectAlertSettingsEscalationPolicy

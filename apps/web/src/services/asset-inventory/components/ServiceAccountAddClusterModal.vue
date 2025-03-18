@@ -6,9 +6,9 @@ import {
 import {
     PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import type { AgentModel } from '@/schema/identity/agent/model';
+
+import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -82,12 +82,12 @@ const formState = reactive({
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: undefined,
     },
     firstStepValid: computed(() => !invalidState.clusterName && invalidState.clusterName !== undefined
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] !== undefined
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
     commonValidForDelay: false,
     isValid: computed(() => {
         if (state.step === 1) return formState.firstStepValid;
-        // HACK: apply loading state
+        // TODO: apply loading state
         return true;
     }),
 });
@@ -244,7 +244,7 @@ watch(() => props.visible, (visible) => {
                             </p>
                             <p-link :href="'https://kubernetes.io/docs/reference/kubectl/quick-reference/#kubectl-context-and-configuration'"
                                     highlight
-                                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                    action-icon="external-link"
                             >
                                 {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIND_OUT') }}
                             </p-link>
@@ -303,7 +303,7 @@ watch(() => props.visible, (visible) => {
                             </p>
                             <p-link :href="`https://cloudforet.io/${storeState.language}/docs/guides/account-hierarchy/kubernetes`"
                                     highlight
-                                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                    action-icon="external-link"
                             >
                                 {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.LEARN_MORE') }}
                             </p-link>

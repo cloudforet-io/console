@@ -12,7 +12,7 @@ import {
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

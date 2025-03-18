@@ -47,7 +47,7 @@ import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -413,7 +413,7 @@ const handleClickRowData = (fieldName: string, value: string) => {
         _params = { id: value, workspaceId: storeState.currentWorkspaceId };
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
-        _routeName = ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME;
+        _routeName = ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME;
         _params = { serviceAccountId: value, workspaceId: storeState.currentWorkspaceId };
     }
 

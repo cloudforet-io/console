@@ -73,7 +73,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         async getCollectorList(queryData: Query) {
             state.loading.collectorList = true;
             try {
-                const res = await SpaceConnector.clientV2.inventoryV2.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
+                const res = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
                     query: queryData,
                 });
                 state.collectors = res.results ?? [];
@@ -87,7 +87,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         async getCollectorJobs(ids) {
             try {
-                const { results } = await SpaceConnector.clientV2.inventoryV2.job.analyze({
+                const { results } = await SpaceConnector.clientV2.inventory.job.analyze({
                     query: {
                         filter: [
                             {
@@ -123,7 +123,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         async getJobs() {
             try {
-                const res = await SpaceConnector.clientV2.inventoryV2.job.list();
+                const res = await SpaceConnector.clientV2.inventory.job.list();
                 state.recentJobs = res.results;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -131,7 +131,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         async updateCollectorSchedule(params) {
             try {
-                const response = await SpaceConnector.clientV2.inventoryV2.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+                const response = await SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
                 const updatedCollectorIndex = state.collectors.findIndex((collector) => collector.collector_id === response.collector_id);
                 state.collectors[updatedCollectorIndex] = response;
                 showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');

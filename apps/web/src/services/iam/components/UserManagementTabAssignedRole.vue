@@ -8,12 +8,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PDataTable, PLink, PBadge,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
-import type { UserModel } from '@/schema/identity/user/model';
+import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-verbs/get';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -121,7 +121,7 @@ watch(() => props.userId, () => {
         >
             <template #col-project_group_info.project_group_id-format="{value}">
                 <p-link v-if="value"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="getProjectLink(value, false)"
                 >
@@ -133,7 +133,7 @@ watch(() => props.userId, () => {
             </template>
             <template #col-project_info.project_id-format="{value}">
                 <p-link v-if="value"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        action-icon="internal-link"
                         new-tab
                         :to="getProjectLink(value, true)"
                 >

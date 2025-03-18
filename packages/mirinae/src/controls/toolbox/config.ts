@@ -3,4 +3,4 @@ export const SEARCH_TYPES = {
     query: 'query',
 } as const;
 
-export type SEARCH_TYPES = typeof SEARCH_TYPES[keyof typeof SEARCH_TYPES];
+export type SearchType = typeof SEARCH_TYPES[keyof typeof SEARCH_TYPES];

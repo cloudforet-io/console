@@ -1,4 +1,4 @@
-import type { RoleType } from '@/schema/identity/role/type';
+import type { RoleType } from '@/api-clients/identity/role/type';
 
 
 export interface CostReportConfigUpdateRecipientsParameters {

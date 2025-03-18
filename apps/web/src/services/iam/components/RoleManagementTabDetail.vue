@@ -11,9 +11,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-verbs/get';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';

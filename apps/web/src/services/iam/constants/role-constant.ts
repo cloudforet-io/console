@@ -1,7 +1,7 @@
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 

@@ -12,7 +12,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PToolboxTable, PTooltip,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
@@ -29,7 +28,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 
 
@@ -127,7 +126,7 @@ const summaryLinkFormatter = (category) => {
     filters.push({ k: 'data.status_code', o: '=', v: status });
 
     return {
-        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         query: {
             filters: queryHelper.setFilters(filters).rawQueryStrings,
         },
@@ -254,7 +253,7 @@ watch(() => tabState.activeTab, () => {
                 >
                     <template #col-event-format="{ value }">
                         <p-link :to="value.to"
-                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                action-icon="external-link"
                                 highlight
                         >
                             {{ value.name }}
@@ -278,7 +277,7 @@ watch(() => tabState.activeTab, () => {
                                 </template>
                                 <template v-else>
                                     <p-tooltip :contents="resource.entity_value">
-                                        <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        <p-link action-icon="internal-link"
                                                 new-tab
                                                 :to="referenceRouter(resource.entity_value, {
                                                     resource_type: 'inventory.CloudService',

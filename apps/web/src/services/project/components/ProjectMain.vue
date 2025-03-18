@@ -11,8 +11,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';

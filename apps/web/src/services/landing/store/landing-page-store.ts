@@ -2,7 +2,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceUser } from '@/api-clients/identity/workspace-group/schema/model';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 

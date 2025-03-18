@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { reactive, computed, toRef } from 'vue';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

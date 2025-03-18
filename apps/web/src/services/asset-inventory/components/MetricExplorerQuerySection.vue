@@ -136,7 +136,7 @@ watch(() => route.params, async () => {
 .metric-explorer-query-section {
     position: relative;
     margin-top: 1.5rem;
-    z-index: 1;
+
     .filter-wrapper {
         @apply relative flex justify-between;
         align-items: flex-start;

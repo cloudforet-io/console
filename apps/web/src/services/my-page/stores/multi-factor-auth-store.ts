@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 import { constant, mapValues } from 'lodash';
 import { defineStore } from 'pinia';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 
 
 type modelType = 'FORM'|'RE_SYNC'|'DISABLED'|'SWITCH';

@@ -47,15 +47,6 @@ export default defineComponent({
             instance.setPathFrom(from);
         });
     },
-    beforeRouteLeave(to, from, next) {
-        next((vm) => {
-            const instance = vm as unknown as IInstance;
-            if (!instance.isConfirmBackModalVisible.value) {
-                instance.isConfirmBackModalVisible.value = true;
-                instance.nextRoute.value = to;
-            }
-        });
-    },
 });
 </script>
 

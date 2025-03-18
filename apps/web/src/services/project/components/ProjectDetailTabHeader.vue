@@ -14,18 +14,18 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
+import type { ProjectRemoveUsersParameters } from '@/api-clients/identity/project/schema/api-verbs/remove-users';
+import type { ProjectUpdateParameters } from '@/api-clients/identity/project/schema/api-verbs/udpate';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
-import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
@@ -47,7 +47,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
@@ -122,7 +122,7 @@ const state = reactive({
         {
             label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
             to: {
-                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 params: {
                     workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                 },
@@ -134,7 +134,7 @@ const state = reactive({
         {
             label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
             to: {
-                name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                 params: {
                     workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                 },

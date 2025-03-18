@@ -5,6 +5,8 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { clone } from 'lodash';
+
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -22,13 +24,13 @@ import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/typ
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
-import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
-import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
-import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -39,9 +41,12 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -49,8 +54,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import AutoSyncState from '@/common/components/badge/auto-sync-state/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
 import { gray } from '@/styles/colors';
@@ -63,9 +66,11 @@ import {
 import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
 import { stateFormatter } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const { width } = useWindowSize();
 
@@ -83,13 +88,22 @@ const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
-const { getProperRouteLocation } = useProperRouteLocation();
-const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
     currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
 });
 const state = reactive({
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -177,7 +191,7 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
         { k: 'provider', v: state.selectedProvider, o: '=' },
     ]).apiQuery.filter),
 );
-/** Handling API with SpaceConnector * */
+    /** Handling API with SpaceConnector * */
 
 const apiQuery = new ApiQueryHelper();
 const getQuery = () => {
@@ -263,11 +277,11 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 
 /** Add & Delete Service Accounts Action (Dropdown) * */
 const clickAddServiceAccount = () => {
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
+    router.push({
+        name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
         params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : serviceAccountSchemaState.selectedAccountType },
         query: { nextPath: route.fullPath },
-    }));
+    }).catch(() => {});
 };
 
 const handleClickSettings = () => {
@@ -277,10 +291,10 @@ const handleClickSettings = () => {
 const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+    router.push({
+        name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
         params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
-    }));
+    }).catch(() => {});
 };
 const handleDynamicLayoutFetch = (changed) => {
     if (tableState.schema === null) return;
@@ -387,7 +401,7 @@ onMounted(async () => {
                     </p-heading>
                 </template>
                 <template #extra>
-                    <p-button v-if="hasReadWriteAccess"
+                    <p-button v-if="state.hasReadWriteAccess"
                               style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="tableState.isTrustedAccount && tableState.isWorkspaceMember"

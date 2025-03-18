@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PToolbox } from '@cloudforet/mirinae';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 

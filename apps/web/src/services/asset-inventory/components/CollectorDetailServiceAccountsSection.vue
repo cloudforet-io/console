@@ -110,7 +110,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-    return SpaceConnector.clientV2.inventoryV2.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 
 

@@ -7,10 +7,10 @@ import yaml from 'js-yaml';
 import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PCodeEditor,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
-import type { AppModel } from '@/schema/identity/app/model';
+
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -153,7 +153,7 @@ watch(() => props.visible, async (visible) => {
                         <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
                                 <p-link :href="state.githubLink"
-                                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                        action-icon="external-link"
                                 >
                                     {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
                                 </p-link>

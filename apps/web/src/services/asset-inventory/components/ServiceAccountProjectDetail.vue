@@ -1,9 +1,9 @@
 <template>
     <div class="service-account-project-detail">
         <p-link v-if="!!projectName"
-                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                action-icon="internal-link"
                 new-tab
-                :to="getProperRouteLocation(projectLink)"
+                :to="projectLink"
         >
             {{ projectName }}
         </p-link>
@@ -26,21 +26,20 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PLink, PI, PTooltip,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
-import { SpaceRouter } from '@/router';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/type';
 
+import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
+import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 
 export default {
@@ -61,9 +60,9 @@ export default {
         },
     },
     setup(props) {
-        const { getProperRouteLocation } = useProperRouteLocation();
-
         const allReferenceStore = useAllReferenceStore();
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const router = useRouter();
         const storeState = reactive({
             projects: computed(() => allReferenceStore.getters.project),
         });
@@ -74,8 +73,9 @@ export default {
             }),
             projectLink: computed(() => {
                 if (props.projectId) {
-                    return SpaceRouter.router.resolve(referenceRouter(props.projectId, {
+                    return router.resolve(referenceRouter(props.projectId, {
                         resource_type: 'identity.Project',
+                        workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                     })).resolved;
                 }
                 return undefined;
@@ -85,8 +85,6 @@ export default {
         return {
             ...toRefs(state),
             ACCOUNT_TYPE,
-            ACTION_ICON,
-            getProperRouteLocation,
         };
     },
 };

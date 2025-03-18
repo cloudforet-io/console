@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { computed, reactive, watch } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -5,7 +7,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
+import type { UserConfigDeleteParameters } from '@/api-clients/config/user-config/schema/api-verbs/delete';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';

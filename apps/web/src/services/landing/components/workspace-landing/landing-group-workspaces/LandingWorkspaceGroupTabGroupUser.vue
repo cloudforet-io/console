@@ -10,11 +10,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
-import type { WorkspaceGroupUserUpdateRoleParameters } from '@/schema/identity/workspace-group-user/api-verbs/update-role';
-import type { WorkspaceGroupModel, WorkspaceUser } from '@/schema/identity/workspace-group/model';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { BasicRoleModel, RoleModel } from '@/api-clients/identity/role/schema/model';
+import type { WorkspaceGroupUserUpdateRoleParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/update-role';
+import type { WorkspaceGroupModel, WorkspaceUser } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';

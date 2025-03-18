@@ -11,15 +11,15 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
-import type { UserModel } from '@/schema/identity/user/model';
-import type { AuthType } from '@/schema/identity/user/type';
-import type { WorkspaceGroupAddUsersParameters } from '@/schema/identity/workspace-group/api-verbs/add-users';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { RoleCreateParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/create';
+import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import type { UserCreateParameters } from '@/api-clients/identity/user/schema/api-verbs/create';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import type { AuthType } from '@/api-clients/identity/user/schema/type';
+import type { WorkspaceGroupAddUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/add-users';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import type { WorkspaceUserCreateParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/create';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';

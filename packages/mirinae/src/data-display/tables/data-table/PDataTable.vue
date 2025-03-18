@@ -11,11 +11,10 @@
         <div
             class="table-container"
             :style="
-                tableCustomStyle.maxHeight && {
+                tableCustomStyle.maxHeight ? {
                     maxHeight: 'inherit',
                     height: 'inherit',
-                }
-            "
+                } : undefined"
         >
             <table>
                 <thead>
@@ -269,13 +268,12 @@ import {
 import { get, range } from 'lodash';
 
 import {
-    DATA_TABLE_STYLE_TYPE,
     DATA_TABLE_CELL_TEXT_ALIGN,
 } from '@/data-display/tables/data-table/config';
 import type {
     DataTableField,
     DataTableFieldType,
-    DataTableProps,
+    DataTableStyleType,
 } from '@/data-display/tables/data-table/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
@@ -291,7 +289,7 @@ interface TableField extends DataTableFieldType {
   depth?: number;
 }
 
-export default defineComponent<DataTableProps, any>({
+export default defineComponent({
     name: 'PDataTable',
     components: {
         PSpinner,
@@ -307,7 +305,7 @@ export default defineComponent<DataTableProps, any>({
             default: false,
         },
         fields: {
-            type: Array as PropType<DataTableFieldType[]>,
+            type: Array as PropType<DataTableField[]>,
             required: true,
             default: () => [],
         },
@@ -336,7 +334,7 @@ export default defineComponent<DataTableProps, any>({
             default: false,
         },
         selectIndex: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: () => [],
         },
         multiSelect: {
@@ -352,11 +350,8 @@ export default defineComponent<DataTableProps, any>({
             default: false,
         },
         tableStyleType: {
-            type: String,
+            type: String as PropType<DataTableStyleType>,
             default: 'default',
-            validator(value: any) {
-                return Object.values(DATA_TABLE_STYLE_TYPE).includes(value);
-            },
         },
         tableCustomStyle: {
             type: Object as PropType<{ [key: string]: string }>,

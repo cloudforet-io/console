@@ -5,7 +5,7 @@
                    :key="i"
                    class="list-item-wrapper"
                    :class="{'line-break': isLineBreak && i < displayItems.length - 1}"
-                   :href="getHref(item, i)"
+                   :href="getHref()"
                    :target="linkTarget || undefined"
         >
             <slot name="default"
@@ -33,11 +33,11 @@ import {
 
 import { get } from 'lodash';
 
-import type { TextListItem, TextListProps } from '@/data-display/text-list/type';
+import type { TextListItem } from '@/data-display/text-list/type';
 import PLink from '@/navigation/link/PLink.vue';
 import { isNotEmpty } from '@/utils/helpers';
 
-export default defineComponent<TextListProps>({
+export default defineComponent({
     name: 'PTextList',
     components: { PLink },
     props: {
@@ -65,11 +65,11 @@ export default defineComponent<TextListProps>({
     setup(props) {
         const state = reactive({
             component: computed(() => (props.link ? PLink : 'span')),
-            displayItems: computed(() => props.items.reduce((res, item) => {
-                let data;
+            displayItems: computed(() => props.items.reduce((res: string[], item) => {
+                let data: string;
                 if (typeof item === 'object' && props.subKey) {
                     data = get(item, props.subKey, '');
-                } else data = item;
+                } else data = item as string;
 
                 if (isNotEmpty(data)) res.push(data);
                 return res;

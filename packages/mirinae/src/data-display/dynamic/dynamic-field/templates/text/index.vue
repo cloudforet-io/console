@@ -13,13 +13,15 @@ import { computed, defineComponent } from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
 
-import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
+import type { TextTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/text/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/navigation/link/PLink.vue';
+import type { LinkProps } from '@/navigation/link/type';
 import { ACTION_ICON } from '@/navigation/link/type';
 import { commaFormatter } from '@/utils/helpers';
 
-export default defineComponent<TextDynamicFieldProps>({
+export default defineComponent({
     name: 'PDynamicFieldText',
     components: { PLink },
     props: {
@@ -32,7 +34,7 @@ export default defineComponent<TextDynamicFieldProps>({
             default: null,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<TextTypeOptions>,
             default: () => ({}),
         },
         extraData: {
@@ -40,7 +42,7 @@ export default defineComponent<TextDynamicFieldProps>({
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },
@@ -57,11 +59,11 @@ export default defineComponent<TextDynamicFieldProps>({
             }
             return `${props.options.prefix ?? ''}${textValue}${props.options.postfix ?? ''}`;
         });
-        const linkProps = computed(() => {
+        const linkProps = computed<LinkProps>(() => {
             if (props.options.link) {
                 return {
                     href: props.options?.link,
-                    text: text.value,
+                    text: text.value as string,
                     actionIcon: text.value ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE,
                     newTab: true,
                 };

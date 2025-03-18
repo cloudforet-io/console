@@ -84,7 +84,7 @@ const errorMessageFormatter = (message) => {
         .replace(/'/g, '')
         .replace(/(\\r\\n|\\n|\\r)/gm, '\n')
         .replace(/(\\t)/gm, '');
-    result = result.replace(/^\n+/g, '');
+    if (result.startsWith('\n')) result = result.replace('\n', '');
     return result;
 };
 

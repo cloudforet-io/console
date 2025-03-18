@@ -29,6 +29,7 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
 
@@ -47,7 +48,15 @@ const state = reactive({
     currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     loading: true,
     randomId: getRandomId(),
-    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+    refinedMetricLabelKeysWithProjectGroup: computed<MetricLabelKey[]>(() => {
+        const _labelKeys = cloneDeep(metricExplorerPageGetters.refinedMetricLabelKeys);
+        const _projectLabelInfoIndex = _labelKeys.findIndex((d) => d.key === 'project_id');
+        if (_projectLabelInfoIndex > -1) {
+            _labelKeys.splice(_projectLabelInfoIndex, 0, PROJECT_GROUP_LABEL_INFO);
+        }
+        return _labelKeys;
+    }),
+    enabledFilters: computed<SelectDropdownMenuItem[]>(() => state.refinedMetricLabelKeysWithProjectGroup.map((d) => ({
         name: d.key,
         label: d.name,
     }))),
@@ -57,7 +66,7 @@ const state = reactive({
     })),
     handlerMap: computed(() => {
         const handlerMaps = {};
-        metricExplorerPageGetters.refinedMetricLabelKeys.forEach((labelKey: MetricLabelKey) => {
+        state.refinedMetricLabelKeysWithProjectGroup.forEach((labelKey: MetricLabelKey) => {
             handlerMaps[labelKey.key] = getMenuHandler(labelKey, state.primaryMetricStatOptions);
         });
         return handlerMaps;

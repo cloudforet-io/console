@@ -51,7 +51,7 @@
         >
             <p-link :text="$t('INVENTORY.COLLECTOR.DETAIL.DETAIL_JOB_LINK')"
                     size="sm"
-                    :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id ?? ''} })"
+                    :to="state.detailJobLink"
                     highlight
                     action-icon="internal-link"
             />
@@ -67,11 +67,13 @@ import dayjs from 'dayjs';
 import { PI, PProgressBar, PLink } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 
 import { peacock } from '@/styles/colors';
 
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
 
@@ -85,11 +87,12 @@ interface Props {
     isPopoverMode?: boolean;
 }
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const props = defineProps<Props>();
+const appContextStore = useAppContextStore();
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     status: computed<string|undefined>(() => props.recentJob?.status),
     diffSchedule: computed(() => {
         if (props.hours) {
@@ -123,6 +126,10 @@ const state = reactive({
         const remainedTasks = state.remainedTasksPercentage;
         return numberFormatter(remainedTasks);
     }),
+    detailJobLink: computed(() => ({
+        name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        params: { jobId: props.recentJob?.job_id ?? '' },
+    })),
 });
 </script>
 

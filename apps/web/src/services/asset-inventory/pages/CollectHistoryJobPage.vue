@@ -39,7 +39,7 @@ const apiQuery = new ApiQueryHelper();
 const getJob = async () => {
     try {
         apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
-        const { results } = await SpaceConnector.clientV2.inventoryV2.job.list({
+        const { results } = await SpaceConnector.clientV2.inventory.job.list({
             query: apiQuery.data,
         });
         state.job = results[0] || {};

@@ -48,7 +48,7 @@ export const useCollectorJobStore = defineStore('collector-job', {
                 allJobsCountQueryHelper.setFilters([
                     { k: 'collector_id', v: this.collector.collector_id, o: '=' },
                 ]);
-                const { total_count } = await SpaceConnector.clientV2.inventoryV2.job.list({
+                const { total_count } = await SpaceConnector.clientV2.inventory.job.list({
                     query: allJobsCountQueryHelper.data,
                 });
                 this.allJobsCount = total_count ?? 0;
@@ -65,7 +65,7 @@ export const useCollectorJobStore = defineStore('collector-job', {
                     { k: 'collector_id', v: this.collector.collector_id, o: '=' },
                     { k: 'created_at', v: fiveDaysAgo, o: '>' },
                 ]);
-                const { results } = await SpaceConnector.clientV2.inventoryV2.job.list<JobListParameters, ListResponse<JobModel>>({
+                const { results } = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({
                     query: jobQueryHelper.data,
                 });
                 this.recentJobs = results ?? [];

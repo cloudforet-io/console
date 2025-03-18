@@ -22,7 +22,7 @@ export const getKeyItemSets = (itemLength = 10, setLength = 3) => range(setLengt
 
 export const getValueItems = (length = 20) => range(length).map(() => ({ label: faker.random.word(), name: faker.datatype.uuid() }));
 
-export const getValueHandler = (items = getValueItems()): ValueHandler => (inputText: string) => {
+export const getValueHandler = (items = getValueItems()): ValueHandler => (inputText) => {
     let results = items;
     if (inputText) {
         const regex = getTextHighlightRegex(inputText);
