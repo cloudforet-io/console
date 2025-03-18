@@ -1,8 +1,6 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import type { QueryContext } from '@/query/_types/query-key-type';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -11,10 +9,18 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
  * Interface for global query parameters used across API requests.
  * These parameters are automatically included in API and reference query keys.
  */
+export type QueryContextType = 'service' | 'reference';
+
 export interface QueryKeyContextParams {
     isAdminMode?: boolean;
     workspaceId?: string;
-    context: 'service' | 'reference';
+    context: QueryContextType;
+}
+
+export interface QueryContext {
+    mode: 'admin' | 'workspace';
+    workspaceId?: string;
+    context: QueryContextType;
 }
 
 /**
@@ -67,3 +73,42 @@ export const useQueryKeyContext = (queryKeyOptions: QueryKeyContextParams): Comp
         };
     });
 };
+
+
+interface AdminModeState {
+    isAdminMode: true;
+    workspaceId?: undefined;
+}
+
+interface WorkspaceModeState {
+    isAdminMode: false;
+    workspaceId: string;
+}
+
+type QueryKeyState = AdminModeState | WorkspaceModeState;
+
+
+export const useQueryKeyAppContext = (context: QueryContextType = 'service') => {
+    const appContextStore = useAppContextStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
+
+    const _state = reactive({
+        isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+        workspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+    });
+
+    return computed(() => {
+        const state: QueryKeyState = _state.isAdminMode
+            ? { isAdminMode: true }
+            : {
+                isAdminMode: false,
+                // workspaceId: _state.workspaceId!
+                workspaceId: _state.workspaceId ?? '',
+            };
+
+        return state.isAdminMode
+            ? [context, 'admin']
+            : [context, 'workspace', state.workspaceId];
+    });
+};
+

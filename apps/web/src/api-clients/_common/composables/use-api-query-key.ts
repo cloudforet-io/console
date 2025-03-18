@@ -1,51 +1,118 @@
 import type { ComputedRef } from 'vue';
-import { computed } from 'vue';
+import { reactive, computed } from 'vue';
 
+import type { QueryKey } from '@tanstack/vue-query';
+
+import { API_QUERY_KEY_MAP } from '@/api-clients/_common/constants/api-query-key-map';
 import type {
-    ResourceName, ServiceName, ServiceQueryKey, Verb,
+    APIQueryKeyMapService, APIQueryKeyMapResource, APIQueryKeyMapVerb, ServiceName, ResourceName, Verb,
 } from '@/api-clients/_common/types/query-key-type';
-import type { QueryKeyContextParams } from '@/query/_composables/use-query-key-context';
-import { useQueryKeyContext } from '@/query/_composables/use-query-key-context';
+import { useQueryKeyAppContext } from '@/query/_composables/use-query-key-app-context';
 
-/**
- * Generates a computed query key for API requests, incorporating global parameters.
- *
- * @param service - The service name, representing the API service scope (e.g., 'dashboard').
- * @param resource - The resource name, specifying the target API resource (e.g., 'public-data-table').
- * @param verb - The API action verb, defining the type of request (e.g., 'get', 'list', 'update').
- * @param queryKeyOptions - Optional query key options to merge with default params
- * @returns A computed reference to the query key array, structured as `[QueryContext, service, resource, verb]`
- *
- * ### Example Usage:
- * ```ts
- * // Basic usage
- * const queryKey = useAPIQueryKey('dashboard', 'public-data-table', 'get');
- *
- * // With additional params
- * const queryKey = useAPIQueryKey('dashboard', 'public-data-table', 'get', {
- *   workspaceId: 'custom-id',
- *   isAdminMode: true
- * });
- * ```
- *
- * The generated query key ensures:
- * - **Type safety**: Prevents invalid API calls by enforcing a valid `service/resource/verb` combination
- * - **Auto-completion**: Provides intelligent suggestions based on predefined API structure
- * - **Cache management**: Enables precise cache invalidation and data synchronization
- */
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+
+type QueryKeyArray = unknown[];
+type QueryKeyArrayWithDep = QueryKeyArray & {
+    addDep: (deps: Record<string, unknown>) => QueryKeyArray;
+};
+type ExtractParams<T> = T extends (params: infer P) => any ? P : never;
+
+type VerbFunction<T> = {
+    (params?: ExtractParams<T>): QueryKeyArrayWithDep;
+    addDep: (deps: Record<string, unknown>) => QueryKeyArray;
+};
+
+type MapVerbToReturnType<T> = T extends QueryKeyArray
+    ? QueryKeyArray
+    : T extends (params: any) => any
+        ? VerbFunction<T>
+        : never;
+
+type UseAPIQueryResult = {
+    [S in APIQueryKeyMapService]: {
+        [R in APIQueryKeyMapResource<S>]: {
+            [V in APIQueryKeyMapVerb<S, R>]: MapVerbToReturnType<(typeof API_QUERY_KEY_MAP)[S][R][V]>;
+        };
+    };
+};
+
+type APIQueryKeyValue = QueryKeyArray | ((params?: Record<string, unknown>) => QueryKeyArray);
+
+export const _useAPIQueryKey = (): ComputedRef<UseAPIQueryResult> => {
+    const queryKeyAppContext = useQueryKeyAppContext();
+
+    return computed(() => {
+        const createKeyWithContext = <T extends APIQueryKeyValue>(queryKeyValue: T): MapVerbToReturnType<T> => {
+            if (Array.isArray(queryKeyValue)) {
+                return [...queryKeyAppContext.value, ...queryKeyValue] as MapVerbToReturnType<T>;
+            }
+
+            const verbFunction = (params?: ExtractParams<T>) => {
+                const baseKey = queryKeyValue(params);
+                const result = [...queryKeyAppContext.value, ...baseKey] as QueryKeyArrayWithDep;
+                result.addDep = (deps) => [...queryKeyAppContext.value, ...baseKey, deps];
+                return result;
+            };
+
+            verbFunction.addDep = (deps) => [...queryKeyAppContext.value, ...queryKeyValue(), deps];
+            return verbFunction as MapVerbToReturnType<T>;
+        };
+
+        return Object.entries(API_QUERY_KEY_MAP).reduce<UseAPIQueryResult>((services, [serviceName, resources]) => ({
+            ...services,
+            [serviceName]: Object.entries(resources).reduce((resourceMap, [resourceName, verbs]) => ({
+                ...resourceMap,
+                [resourceName]: Object.entries(verbs).reduce((verbMap, [verb, queryKeyValue]) => ({
+                    ...verbMap,
+                    [verb]: createKeyWithContext(queryKeyValue as APIQueryKeyValue),
+                }), {}),
+            }), {}),
+        }), {} as UseAPIQueryResult);
+    });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+interface GlobalQueryParams {
+    workspaceId?: string;
+    isAdminMode?: boolean;
+}
 export const useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>>(
     service: S,
     resource: R,
     verb: V,
-    queryKeyOptions?: Partial<QueryKeyContextParams>,
-): ComputedRef<ServiceQueryKey<S, R, V>> => {
-    const queryKeyContext = useQueryKeyContext({ ...queryKeyOptions, context: 'service' });
+    additionalGlobalParams?: Partial<GlobalQueryParams>,
+): ComputedRef<QueryKey> => {
+    const appContextStore = useAppContextStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
 
-    return computed(() => [
-        queryKeyContext.value,
-        service,
-        resource,
-        verb,
-    ]);
+    const _state = reactive({
+        currentWorkdpaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+    });
+
+    const globalQueryParams = reactive<GlobalQueryParams>({
+        workspaceId: _state.currentWorkdpaceId,
+        isAdminMode: _state.isAdminMode,
+        ...additionalGlobalParams,
+    });
+
+    return computed<QueryKey>(() => [service, resource, verb, { ...globalQueryParams }]);
 };

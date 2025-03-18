@@ -1,8 +1,8 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import type { QueryKeyContextParams } from '@/query/_composables/use-query-key-context';
-import { useQueryKeyContext } from '@/query/_composables/use-query-key-context';
+import type { QueryKeyContextParams } from '@/query/_composables/use-query-key-app-context';
+import { useQueryKeyContext } from '@/query/_composables/use-query-key-app-context';
 import type { ReferenceQueryKey } from '@/query/reference/_types/reference-query-key-type';
 import type { ReferenceResourceType } from '@/query/reference/_types/reference-resource-type';
 
