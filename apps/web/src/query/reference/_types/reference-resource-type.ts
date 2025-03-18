@@ -1,27 +1,4 @@
-export type ReferenceResourceType =
-    'app'
-    |'cloud-service-type'
-    |'cloud-service-query-set'
-    |'collector'
-    |'cost-data-source'
-    |'escalation-policy'
-    |'metric'
-    |'namespace'
-    |'plugin'
-    |'project-group'
-    |'project'
-    |'protocol'
-    |'provider'
-    |'public-dashboard'
-    |'public-folder'
-    |'region'
-    |'role'
-    |'secret'
-    |'service-account'
-    |'service'
-    |'trusted-service-account'
-    |'user-group'
-    |'user'
-    |'webhook'
-    |'workspace-group'
-    |'workspace';
+import type { REFERENCE_TYPE_MAP } from '@/query/reference/_constants/reference-type-map';
+
+
+export type ReferenceResourceType = typeof REFERENCE_TYPE_MAP[keyof typeof REFERENCE_TYPE_MAP];
