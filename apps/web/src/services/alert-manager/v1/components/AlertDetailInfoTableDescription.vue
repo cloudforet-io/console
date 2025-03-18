@@ -67,7 +67,7 @@ const {
 </template>
 
 <style lang="postcss" scoped>
-@import 'alertInfoItem.pcss';
+@import './styles/alertInfoItem.pcss';
 .p-collapsible-panel {
     padding: 0;
     margin-right: 0.5rem;
