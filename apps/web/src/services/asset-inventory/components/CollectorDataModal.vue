@@ -125,7 +125,7 @@ const handleClickConfirm = async () => {
 
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.inventoryV2.collector.collect<CollectorCollectParameters, JobModel>({
+        await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
             collector_id: collectorDataModalState.selectedCollector.collector_id,
             secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });

@@ -47,7 +47,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
@@ -122,7 +122,7 @@ const state = reactive({
         {
             label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
             to: {
-                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 params: {
                     workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                 },
@@ -134,7 +134,7 @@ const state = reactive({
         {
             label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
             to: {
-                name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                 params: {
                     workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                 },

@@ -52,7 +52,7 @@ const state = reactive({
         return users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
             return d.user_id.toLowerCase().includes(searchText)
-                || d.user_name.toLowerCase().includes(searchText);
+                        || d.user_name.toLowerCase().includes(searchText);
         });
     }),
     loading: true,

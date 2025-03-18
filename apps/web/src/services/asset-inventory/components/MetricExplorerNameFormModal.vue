@@ -22,7 +22,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -45,7 +44,6 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const router = useRouter();
 const route = useRoute();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const gnbStore = useGnbStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -117,13 +115,13 @@ const createMetricExample = async () => {
         state.proxyVisible = false;
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         await gnbStore.fetchMetricExample();
-        await router.replace(getProperRouteLocation({
+        await router.replace({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
                 metricId: metricExample.metric_id,
                 metricExampleId: metricExample.example_id,
             },
-        })).catch(() => {});
+        }).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
     }

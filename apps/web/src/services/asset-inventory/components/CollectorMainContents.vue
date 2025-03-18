@@ -2,6 +2,9 @@
 import {
     onMounted, computed, reactive, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -16,20 +19,20 @@ import type {
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import { SpaceRouter } from '@/router';
 
-
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
@@ -37,9 +40,12 @@ import CollectorContentItem from '@/services/asset-inventory/components/Collecto
 import CollectorListNoData from '@/services/asset-inventory/components/CollectorMainListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/components/CollectorMainScheduleModal.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+
 
 /** * @function
  *   @name makePluginReferenceValueHandler
@@ -76,13 +82,15 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
-const { hasReadWriteAccess } = usePageEditableStatus();
+const appContextStore = useAppContextStore();
+const router = useRouter();
+const route = useRoute();
 
 const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const keyItemSets: KeyItemSet[] = [{
@@ -99,8 +107,8 @@ const keyItemSets: KeyItemSet[] = [{
 }];
 const collectorSearchHandler = reactive({
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id', undefined, isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
-        name: makeDistinctValueHandler('inventory.Collector', 'name', undefined, isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
+        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id', undefined, storeState.isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
+        name: makeDistinctValueHandler('inventory.Collector', 'name', undefined, storeState.isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
         'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
         'plugin_info.plugin_id': makePluginReferenceValueHandler('plugin_info.plugin_id', storeState.plugins),
         'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
@@ -120,6 +128,16 @@ const historyLinkQueryHelper = new QueryHelper();
 
 const state = reactive({
     loading: computed(() => collectorPageState.loading.collectorList),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     searchTags: computed(() => {
         const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
         return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {
@@ -159,10 +177,10 @@ const state = reactive({
                     query: {
                         filters: historyLinkQueryHelper.rawQueryStrings,
                     },
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                 },
                 detailLink: {
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                     params: {
                         collectorId: d.collector_id,
                     },
@@ -195,7 +213,7 @@ const collectorApiQueryHelper = new ApiQueryHelper()
 
 /* Components */
 const routeToCreatePage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }));
+    router.push({ name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }).catch(() => {});
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
     if (options.pageStart !== undefined) collectorApiQueryHelper.setPageStart(options.pageStart);
@@ -211,7 +229,7 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
     fetchCollectorList();
 };
 const handleClickListItem = (detailLink) => {
-    SpaceRouter.router.push(getProperRouteLocation(detailLink));
+    router.push(detailLink).catch(() => {});
 };
 const handleClickCollectDataConfirm = () => {
     fetchCollectorList();
@@ -267,7 +285,7 @@ onMounted(async () => {
             @refresh="fetchCollectorList"
             @export="handleExportExcel"
         >
-            <template v-if="hasReadWriteAccess"
+            <template v-if="state.hasReadWriteAccess"
                       #left-area
             >
                 <p-button
@@ -289,7 +307,7 @@ onMounted(async () => {
                      @click="handleClickListItem(item.detailLink)"
                 >
                     <collector-content-item :item="item"
-                                            :has-read-write-access="hasReadWriteAccess"
+                                            :has-read-write-access="state.hasReadWriteAccess"
                     />
                 </div>
             </div>

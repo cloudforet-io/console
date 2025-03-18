@@ -36,7 +36,7 @@ import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
 
-import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
+import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';

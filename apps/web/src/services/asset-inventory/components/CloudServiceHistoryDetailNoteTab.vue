@@ -2,6 +2,9 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -19,9 +22,15 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
+import type { PageAccessMap } from '@/lib/access-control/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+
 
 interface Props {
     recordId: string;
@@ -35,17 +44,18 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'refresh-note-count'): void}>();
 
+const route = useRoute();
+
 const userStore = useUserStore();
-
-const { hasReadWriteAccess } = usePageEditableStatus();
-
+const storeState = reactive({
+    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+});
 const state = reactive({
     id: '',
     noteInput: '',
     noteList: [] as NoteModel[],
     loading: true,
-    timezone: computed(() => userStore.state.timezone),
-    userId: computed(() => userStore.state.userId),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
     menuItems: computed(() => [
         {
             label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
@@ -53,6 +63,16 @@ const state = reactive({
     ]),
     selectedNoteIdForDelete: '',
     totalCount: 0,
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return '';
+        }
+        return targetMenuId;
+    }),
+    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleChangeNoteInput = (e) => {
@@ -161,7 +181,7 @@ watch(() => state.id, () => {
                             <span class="author">{{ title }}</span>
                             <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
-                        <p-select-dropdown v-if="hasReadWriteAccess"
+                        <p-select-dropdown v-if="state.hasReadWriteAccess"
                                            style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            :menu="state.menuItems"
@@ -178,7 +198,7 @@ watch(() => state.id, () => {
                 </template>
             </p-collapsible-list>
         </article>
-        <article v-if="hasReadWriteAccess"
+        <article v-if="state.hasReadWriteAccess"
                  class="add-note-wrapper"
         >
             <p-textarea :value="state.noteInput"

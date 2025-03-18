@@ -1,6 +1,6 @@
 import { mapKeys } from 'lodash';
 
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory-v1/types/asset-analysis-type';
+import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import {
     COST_SUMMARY_STATE_COLOR,
     SERVICE_ACCOUNT_SUMMARY_STATE_COLOR,

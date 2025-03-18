@@ -18,6 +18,7 @@ import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list
 import type { SecretModel } from '@/schema/secret/secret/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -27,7 +28,6 @@ import { useUserStore } from '@/store/user/user-store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
@@ -43,9 +43,9 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 }>();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
@@ -217,7 +217,10 @@ watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFi
                 <p-link v-if="state.projects[value]"
                         action-icon="internal-link"
                         new-tab
-                        :to="getProperRouteLocation(referenceRouter(value,{ resource_type: 'identity.Project' }))"
+                        :to="referenceRouter(value,{
+                            resource_type: 'identity.Project',
+                            workspace_id: userWorkspaceStore.getters.currentWorkspaceId
+                        })"
                 >
                     {{ state.projects[value].label }}
                 </p-link>
