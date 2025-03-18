@@ -122,7 +122,7 @@ const onSelectProject = (selected) => {
 </template>
 
 <style lang="postcss" scoped>
-@import 'alertInfoItem.pcss';
+@import './styles/alertInfoItem.pcss';
 .modal-body {
     margin-top: 2rem;
 }
