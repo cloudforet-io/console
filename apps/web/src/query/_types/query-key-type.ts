@@ -6,4 +6,5 @@ export interface QueryContext {
 }
 
 
+export type QueryKeyArray = unknown[];
 

@@ -8,12 +8,12 @@ import type {
     APIQueryKeyMapService, APIQueryKeyMapResource, APIQueryKeyMapVerb, ServiceName, ResourceName, Verb,
 } from '@/api-clients/_common/types/query-key-type';
 import { useQueryKeyAppContext } from '@/query/_composables/use-query-key-app-context';
+import type { QueryKeyArray } from '@/query/_types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
-type QueryKeyArray = unknown[];
 type QueryKeyArrayWithDep = QueryKeyArray & {
     addDep: (deps: Record<string, unknown>) => QueryKeyArray;
 };
@@ -41,7 +41,7 @@ type UseAPIQueryResult = {
 type APIQueryKeyValue = QueryKeyArray | ((params?: Record<string, unknown>) => QueryKeyArray);
 
 export const _useAPIQueryKey = (): ComputedRef<UseAPIQueryResult> => {
-    const queryKeyAppContext = useQueryKeyAppContext();
+    const queryKeyAppContext = useQueryKeyAppContext('service');
 
     return computed(() => {
         const createKeyWithContext = <T extends APIQueryKeyValue>(queryKeyValue: T): MapVerbToReturnType<T> => {

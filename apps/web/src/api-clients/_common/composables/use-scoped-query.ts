@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /**
  * useScopedQuery - A custom wrapper around `useQuery` to enforce scope-based API fetching.
  *
@@ -10,8 +8,8 @@
  *
  * ## Functionality
  * - Extends `useQuery` with **grant scope validation**.
- * - Runs queries only when **the user’s scope is valid** and the app is **ready**.
- * - Uses Vue’s **reactivity** to dynamically compute the `enabled` state.
+ * - Runs queries only when **the user's scope is valid** and the app is **ready**.
+ * - Uses Vue's **reactivity** to dynamically compute the `enabled` state.
  * - Supports both **static and reactive `enabled` values**.
  *
  * ## Parameters:
@@ -43,7 +41,7 @@
 
 import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 
 import type {
     UseQueryOptions,
@@ -57,21 +55,19 @@ import { useUserStore } from '@/store/user/user-store';
 
 export const useScopedQuery = <TQueryFnData = unknown, TError = unknown, TData = TQueryFnData>(
     options: UseQueryOptions<TQueryFnData, TError, TData>,
-    requiredScopes: GrantScope[] = [],
+    requiredScopes: GrantScope[],
 ) => {
     const appContextStore = useAppContextStore();
     const userStore = useUserStore();
 
-    const _state = reactive({
-        currentGrantScope: computed<GrantScope>(() => userStore.state.currentGrantInfo?.scope || 'USER'),
-        isLoading: computed(() => appContextStore.getters.globalGrantLoading),
-        isValidScope: computed(() => requiredScopes.includes(_state.currentGrantScope)),
-    });
+    const currentGrantScope = computed<GrantScope>(() => userStore.state.currentGrantInfo?.scope || 'USER');
+    const isLoading = computed(() => appContextStore.getters.globalGrantLoading);
+    const isValidScope = computed(() => requiredScopes.includes(currentGrantScope.value));
 
     const queryEnabled = computed<boolean>(() => {
-        const _inheritedEnabled = options?.enabled as MaybeRef<boolean> | undefined;
+        const _inheritedEnabled = ('enabled' in options ? options.enabled : undefined) as MaybeRef<boolean> | undefined;
         if (_inheritedEnabled !== undefined && !toValue(_inheritedEnabled)) return false;
-        return _state.isValidScope && !_state.isLoading;
+        return isValidScope.value && !isLoading.value;
     });
 
     return useQuery<TQueryFnData, TError, TData>({
