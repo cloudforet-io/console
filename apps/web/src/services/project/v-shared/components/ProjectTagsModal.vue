@@ -13,7 +13,7 @@ import {
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { Tag } from '@/common/modules/tags/type';
 
-import ProjectTagsInputGroup from '@/services/project/v1/components/ProjectTagsInputGroup.vue';
+import ProjectTagsInputGroup from '@/services/project/v-shared/components/ProjectTagsInputGroup.vue';
 
 interface Props {
     visible?: boolean;

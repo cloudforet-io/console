@@ -15,14 +15,12 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -32,11 +30,9 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import ProjectAlertTab from '@/services/project/v1/components/ProjectAlertTab.vue';
-import ProjectDetailTab from '@/services/project/v1/components/ProjectDetailTab.vue';
-import ProjectDetailTabHeader from '@/services/project/v1/components/ProjectDetailTabHeader.vue';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
-import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
+import ProjectTabs from '@/services/project/v2/components/ProjectTabs.vue';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface Props {
     id?: string;
@@ -45,10 +41,7 @@ const props = defineProps<Props>();
 const route = useRoute();
 
 const gnbStore = useGnbStore();
-const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
-const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const userStore = useUserStore();
@@ -59,7 +52,6 @@ const {
     publicFolderList,
 } = useDashboardQuery();
 
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -67,12 +59,13 @@ const storeState = reactive({
     language: computed<string|undefined>(() => userStore.state.language),
 });
 const state = reactive({
-    item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
+    // TODO: need to be updated by real data
+    item: computed<ProjectModel|undefined>(() => undefined),
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE_V1._NAME } },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE_V2._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
@@ -80,43 +73,23 @@ const state = reactive({
                 to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
-        // if (route.name === PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME) {
-        //     results = results.concat([
-        //         { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
-        //         { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
-        //     ]);
-        // } else if (route.name === PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
-        //     results = results.concat([
-        //         { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
-        //         { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
-        //     ]);
-        // } else {
-        // }
         results.push({ name: state.item?.name });
         return results;
     }),
     projectGroupMoveModalVisible: false,
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.PROJECT,
-        id: projectDetailPageState.projectId,
+        // TODO: need to be updated by real data
+        id: '',
     })),
 });
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
-            name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+            // TODO: check route
+            name: PROJECT_ROUTE_V2._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        ...(isAlertManagerV2Enabled.value ? [] : [
-            {
-                name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
-                label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-            },
-            {
-                name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME,
-                label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-            },
-        ]),
         ...(singleItemTabState.dashboardTabs.length
             ? [
                 {
@@ -154,15 +127,17 @@ const singleItemTabState = reactive({
             ...dashboardTabs,
         ];
     }),
-    activeTab: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+    // TODO: check route
+    activeTab: PROJECT_ROUTE_V2._NAME,
 });
 
 /* Watchers */
-watch(() => projectDetailPageState.projectId, async (projectId) => {
-    if (projectId) {
-        await projectDetailPageStore.getProject(projectId);
-    }
-});
+// TODO: check if it is needed
+// watch(() => projectDetailPageState.projectId, async (projectId) => {
+//     if (projectId) {
+//         await projectDetailPageStore.getProject(projectId);
+//     }
+// });
 watch(() => route.name, (routeName) => {
     const flattenTabs = singleItemTabState.tabs.reduce((acc, tab) => {
         if (tab?.subItems) {
@@ -173,60 +148,56 @@ watch(() => route.name, (routeName) => {
         return acc;
     }, [] as TabItem[]);
     const exactRoute = route.matched.find((d) => flattenTabs.find((tab) => tab.name === d.name));
-    if (routeName === PROJECT_ROUTE_V1.DETAIL.TAB.DASHBOARD._NAME) {
+    // TODO: check route
+    if (routeName === PROJECT_ROUTE_V2._NAME) {
         singleItemTabState.activeTab = route.params.dashboardId;
     } else {
-        singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME;
+        // TODO: check route
+        singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE_V2._NAME;
     }
 }, { immediate: true });
-watch([
-    () => props.id,
-    () => appContextStore.getters.globalGrantLoading,
-], ([id, globalGrantLoading]) => {
-    if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
-}, { immediate: true });
+// TODO: check if it is needed
+// watch([
+//     () => props.id,
+//     () => appContextStore.getters.globalGrantLoading,
+// ], ([id, globalGrantLoading]) => {
+//     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
+// }, { immediate: true });
 watch([() => singleItemTabState.activeTab, () => state.item], () => {
     gnbStore.setBreadcrumbs(state.pageNavigation);
 });
-watch(() => projectDetailPageState.projectId, (projectId) => {
-    gnbStore.setId(projectId);
-}, { immediate: true });
+// TODO: check if it is needed
+// watch(() => projectDetailPageState.projectId, (projectId) => {
+//     gnbStore.setId(projectId);
+// }, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {
-    projectDetailPageStore.reset();
     dashboardStore.reset();
 });
 </script>
 
 <template>
-    <div class="project-detail-tab-page">
-        <project-detail-tab-header :id="props.id" />
+    <div class="project-detail-page">
+        <project-header :id="props.id" />
+        <!-- TODO: bind loading with the real state -->
         <p-data-loader class="detail-tab-content"
-                       :loading="projectDetailPageState.loading"
+                       :loading="false"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
-            <project-alert-tab v-if="singleItemTabState.activeTab === PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME
-                                   && route.query?.tab === 'webhook'"
-                               :id="props.id"
-                               :tabs="singleItemTabState.tabs"
-                               :active-tab.sync="singleItemTabState.activeTab"
+            <project-tabs :id="props.id"
+                          :item="state.item"
+                          :tabs="singleItemTabState.tabs"
+                          :active-tab.sync="singleItemTabState.activeTab"
             />
-            <div v-else>
-                <project-detail-tab :id="props.id"
-                                    :item="state.item"
-                                    :tabs="singleItemTabState.tabs"
-                                    :active-tab.sync="singleItemTabState.activeTab"
-                />
-            </div>
         </p-data-loader>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.project-detail-tab-page {
+.project-detail-page {
     height: 100%;
     .detail-tab-content {
 

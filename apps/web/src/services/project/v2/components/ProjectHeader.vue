@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
-import type { Location } from 'vue-router/types/router';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PI, PIconButton, PSelectDropdown, PButtonModal, PButton, PEmpty, PLazyImg, PLink,
+    PI, PIconButton, PSelectDropdown, PButtonModal, PButton, PEmpty, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -18,6 +15,7 @@ import type { ProjectGetParameters } from '@/api-clients/identity/project/schema
 import type { ProjectRemoveUsersParameters } from '@/api-clients/identity/project/schema/api-verbs/remove-users';
 import type { ProjectUpdateParameters } from '@/api-clients/identity/project/schema/api-verbs/udpate';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
@@ -26,38 +24,28 @@ import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { arrayToQueryString } from '@/lib/router-query-string';
 
+import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import ProjectFormModal from '@/services/project/v-shared/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/v-shared/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMemberInviteModal from '@/services/project/v-shared/components/ProjectMemberInviteModal.vue';
 import ProjectTagsModal from '@/services/project/v-shared/components/ProjectTagsModal.vue';
 import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
-import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMainDeleteModal.vue';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
-import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import ProjectMainDeleteModal from '@/services/project/v2/components/ProjectMainDeleteModal.vue';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 
 const ROLE_INFO_MAP = {
@@ -67,10 +55,6 @@ const ROLE_INFO_MAP = {
     [ROLE_TYPE.WORKSPACE_MEMBER]: { icon: WorkspaceMemberImage, label: 'Workspace Member' },
     [ROLE_TYPE.USER]: { icon: UserImage, label: 'User' },
 } as const;
-interface ViewInItem {
-    label: TranslateResult;
-    to: Location;
-}
 interface Props {
     id: string;
 }
@@ -78,19 +62,37 @@ const props = defineProps<Props>();
 // const route = useRoute();
 const router = useRouter();
 
-const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.state;
-const projectDetailPageGetters = projectDetailPageStore.getters;
 const projectTreeStore = useProjectTreeStore();
 
-const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
 
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
+/* project */
+// TODO: change it with real data
+const project = ref<ProjectModel|undefined>();
+const projectId = computed(() => project.value?.project_id);
+const projectType = computed<ProjectType|undefined>(() => project.value?.project_type);
+const setProject = (p: ProjectModel|undefined) => {
+    project.value = p;
+};
+const getProject = async (pid: string) => {
+    try {
+        const _projectId = pid;
+        if (!_projectId) throw new Error('projectId is required');
+        state.currentProject = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+            project_id: _projectId,
+        });
+    } catch (e) {
+        state.currentProject = undefined;
+        ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE_V2._NAME }));
+    }
+};
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const setProjectId = (pid: string) => {
+// TODO: implement
+};
 
-const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
@@ -118,51 +120,7 @@ const state = reactive({
             icon: 'ic_delete',
         },
     ]),
-    viewInItems: computed<ViewInItem[]>(() => ([
-        {
-            label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
-            to: {
-                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
-                params: {
-                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                },
-                query: {
-                    project: [props.id],
-                },
-            },
-        },
-        {
-            label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
-            to: {
-                name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
-                params: {
-                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                },
-                query: {
-                    filters: queryHelper.setFilters([
-                        { k: 'project_id', v: [props.id], o: '' },
-                    ]).rawQueryStrings,
-                },
-            },
-        },
-        {
-            label: i18n.t('PROJECT.DETAIL.COST_ANALYSIS'),
-            to: {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                params: {
-                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                    dataSourceId: Object.keys(storeState.costDataSource)?.[0],
-                    costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-                },
-                query: {
-                    filters: arrayToQueryString([
-                        { k: 'project_id', v: [props.id], o: 'in' },
-                    ]),
-                },
-            },
-        },
-    ])),
-    currentProject: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
+    currentProject: computed<ProjectModel|undefined>(() => project.value),
     parentGroupId: computed(() => storeState.projects[props.id]?.data?.groupInfo?.id),
     projectGroupMoveModalVisible: false,
     projectDeleteModalVisible: false,
@@ -191,11 +149,6 @@ const tagsState = reactive({
     tags: computed(() => state.currentProject?.tags ?? {}),
 });
 
-const webhooksState = reactive({
-    loading: false,
-    webhookCount: 0,
-    alertActivated: false,
-});
 
 /* Event */
 const handleSelectItem = (selected: MenuItem) => {
@@ -204,14 +157,6 @@ const handleSelectItem = (selected: MenuItem) => {
     if (selected.name === 'delete') state.projectDeleteModalVisible = true;
 };
 
-const handleClickWebhook = () => {
-    if (!props.id) return;
-    if (!webhooksState.alertActivated) {
-        router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }).catch(() => {});
-        return;
-    }
-    router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }).catch(() => {});
-};
 const handleOpenMemberModal = () => {
     memberState.memberModalVisible = true;
 };
@@ -235,7 +180,7 @@ const handleTagUpdate = async (newTags) => {
             project_id: props.id,
             tags: newTags,
         });
-        projectDetailPageStore.setProject(result);
+        setProject(result);
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
@@ -245,11 +190,11 @@ const handleTagUpdate = async (newTags) => {
     }
 };
 const handleConfirmProjectForm = (_, data: ProjectModel) => {
-    projectDetailPageStore.setProject(data);
+    setProject(data);
 };
 
 const handleConfirmProjectGroupMoveModal = () => {
-    projectDetailPageStore.getProject();
+    if (projectId.value) getProject(projectId.value);
 };
 
 const handleRefreshTree = () => {
@@ -262,12 +207,14 @@ const handleHeaderIconHover = (isHovered: boolean) => {
 const handleClickBackButton = () => {
     if (state.parentGroupId) {
         router.push({
-            name: PROJECT_ROUTE_V1._NAME,
+            // TODO: check route
+            name: PROJECT_ROUTE_V2._NAME,
             params: { projectGroupId: state.parentGroupId },
         });
         return;
     }
-    router.push({ name: PROJECT_ROUTE_V1._NAME });
+    // TODO: check route
+    router.push({ name: PROJECT_ROUTE_V2._NAME });
 };
 
 const handleRemoveProjectUser = async (userId: string) => {
@@ -317,54 +264,22 @@ const fetchProjectUsers = async () => {
     }
 };
 const fetchUserList = async () => {
-    if (projectDetailPageGetters.projectType === 'PUBLIC') {
+    if (projectType.value === 'PUBLIC') {
         await fetchWorkspaceUserList();
     } else {
         await fetchProjectUsers();
     }
 };
 
-const listWebhooks = async () => {
-    if (!props.id) return;
-    try {
-        const res = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
-            project_id: props.id,
-        });
-        webhooksState.webhookCount = res.total_count ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-const getProjectAlertActivated = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
-            project_id: props.id,
-        });
-        webhooksState.alertActivated = !!results?.length;
-    } catch (e) {
-        webhooksState.alertActivated = false;
-        ErrorHandler.handleError(e);
-    }
-};
-
 
 /* Watchers */
-watch(() => projectDetailPageGetters.projectType, async () => {
-    if (!isAlertManagerV2Enabled.value) {
-        await Promise.allSettled([
-            getProjectAlertActivated(),
-            listWebhooks(),
-        ]);
-    }
+watch(projectType, async () => {
     await fetchUserList();
 });
 
-watch(() => projectDetailPageState.projectId, async (projectId) => {
-    if (projectId) {
-        await Promise.allSettled([
-            projectDetailPageStore.getProject(projectId),
-            projectDetailPageStore.getAlertCounts(projectId),
-        ]);
+watch(projectId, (pid) => {
+    if (pid) {
+        getProject(pid);
     }
 });
 
@@ -373,11 +288,11 @@ watch([
     () => props.id,
     () => appContextStore.getters.globalGrantLoading,
 ], ([id, globalGrantLoading]) => {
-    if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
+    if (!globalGrantLoading) setProjectId(id);
 }, { immediate: true });
 
-watch(() => projectDetailPageState.projectId, (projectId) => {
-    gnbStore.setId(projectId);
+watch(projectId, (pid) => {
+    gnbStore.setId(pid);
 }, { immediate: true });
 
 </script>
@@ -427,7 +342,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                 </div>
                 <div class="header-sub-contents">
                     <div class="description">
-                        <template v-if="projectDetailPageGetters.projectType === 'PRIVATE'">
+                        <template v-if="projectType === 'PRIVATE'">
                             <div class="info-item invite-only">
                                 <p-i name="ic_lock-filled"
                                      width="0.625rem"
@@ -444,7 +359,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                             <div class="info-item"
                                  @click="handleOpenMemberModal"
                             >
-                                <template v-if="projectDetailPageGetters.projectType === 'PRIVATE' && memberState.totalCount === 0">
+                                <template v-if="projectType === 'PRIVATE' && memberState.totalCount === 0">
                                     <p-i class="info-icon"
                                          name="ic_plus"
                                          width="0.75rem"
@@ -469,18 +384,6 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  :color="gray[400]"
                             />
                         </template>
-                        <div v-if="!isAlertManagerV2Enabled"
-                             class="info-item"
-                             @click="handleClickWebhook"
-                        >
-                            <p-i class="info-icon"
-                                 name="ic_webhook"
-                                 width="0.75rem"
-                                 height="0.75rem"
-                                 color="inherit"
-                            />
-                            <span>{{ webhooksState.webhookCount }} {{ $t('PROJECT.DETAIL.WEBHOOKS') }}</span>
-                        </div>
                         <p-i name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"
@@ -511,7 +414,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                         <div class="member-contents">
                             <div class="contents-header">
                                 <span>{{ $t('PROJECT.DETAIL.INVITE_MEMBER_DESC') }}</span>
-                                <p-button v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                                <p-button v-if="projectType === 'PRIVATE'"
                                           icon-left="ic_plus_bold"
                                           style-type="tertiary"
                                           @click="handleClickInvite"
@@ -580,7 +483,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
             <project-main-project-group-move-modal v-if="state.projectGroupMoveModalVisible"
                                                    :visible.sync="state.projectGroupMoveModalVisible"
                                                    is-project
-                                                   :target-id="projectDetailPageState.projectId"
+                                                   :target-id="projectId"
                                                    @confirm="handleConfirmProjectGroupMoveModal"
             />
             <project-main-delete-modal v-if="state.projectDeleteModalVisible"
@@ -589,19 +492,6 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                        :target-id="props.id"
                                        @confirm="handleRefreshTree"
             />
-        </div>
-
-        <div class="quick-link-wrapper">
-            <span class="field-title">{{ $t('PROJECT.DETAIL.VIEW_IN') }}</span>
-            <p-link v-for="(item, idx) in state.viewInItems"
-                    :key="`view-in-${idx}`"
-                    new-tab
-                    action-icon="internal-link"
-                    size="md"
-                    :to="item.to"
-            >
-                {{ item.label }}
-            </p-link>
         </div>
     </div>
 </template>
