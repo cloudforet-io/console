@@ -1,5 +1,6 @@
 import type { RouteConfig } from 'vue-router';
 
+import { useGlobalConfigSettingStore } from '@/store/config/global-config-setting-store';
 import { useMenuStore } from '@/store/menu/menu-store';
 
 import config from '@/lib/config';
@@ -30,10 +31,20 @@ interface GlobalConfig {
     };
 }
 
+export interface FeatureVersions {
+    DASHBOARD: string;
+    PROJECT: string;
+    ASSET_INVENTORY: string;
+    COST_EXPLORER: string;
+    ALERT_MANAGER: string;
+    OPS_FLOW: string;
+    IAM: string;
+}
+
 class ServiceConfigurator {
     private config: GlobalConfig | null = null;
 
-    private featureVersions: Record<string, string> = {};
+    private featureVersions: FeatureVersions = {};
 
     private featureConfigurators: Record<string, any> = {
         DASHBOARD: DashboardConfigurator,
@@ -46,20 +57,20 @@ class ServiceConfigurator {
     };
 
     async initialize() {
-        // const serviceVersionUiStore = useServiceVersionUiStore();
+        const globalConfigSettingStore = useGlobalConfigSettingStore();
 
         await config.init();
         this.config = config.get('SERVICES') || {};
 
-        // if (!this.config) return;
-        // const featureVersions = {
-        //     IAM: 'V1',
-        //     ...Object.fromEntries(
-        //         Object.entries(this.config).map(([key, value]) => [key, value.VERSION]),
-        //     ),
-        // };
-        // serviceVersionUiStore.setFeatureVersion(featureVersions);
-        // this.featureVersions = serviceVersionUiStore.state.featureVersions;
+        if (!this.config) return;
+        const featureVersions = {
+            IAM: 'V1',
+            ...Object.fromEntries(
+                Object.entries(this.config).map(([key, value]) => [key, value.VERSION]),
+            ),
+        };
+        globalConfigSettingStore.setFeatureVersion(featureVersions);
+        this.featureVersions = globalConfigSettingStore.state.featureVersions;
     }
 
     private get allServices() {
