@@ -22,7 +22,7 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 import type { TreeNode, TreeDisplayMap, TreeData } from '@/services/project/v1/tree/type';
 
@@ -52,13 +52,13 @@ const state = reactive({
         const allPaths = state.currentParentPathIds.map((id) => ({
             name: storeState.projectGroup[id].name,
             to: {
-                name: PROJECT_ROUTE._NAME,
+                name: PROJECT_ROUTE_V1._NAME,
                 params: {
                     projectGroupId: id,
                 },
             },
         }));
-        return [{ name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE._NAME } }, ...allPaths];
+        return [{ name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE_V1._NAME } }, ...allPaths];
     }),
     selectedTreeId: undefined as string|undefined,
     projectTreeData: computed<TreeNode<ProjectDataType>[]>(() => {
@@ -74,7 +74,7 @@ const state = reactive({
                     id: key,
                     parentGroupId: projectGroup.data.parentGroupInfo?.id,
                     to: {
-                        name: PROJECT_ROUTE._NAME,
+                        name: PROJECT_ROUTE_V1._NAME,
                         params: {
                             projectGroupId: key,
                         },
@@ -94,7 +94,7 @@ const state = reactive({
                     id: key,
                     parentGroupId: project.data.groupInfo?.id,
                     to: {
-                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                        name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
                         params: {
                             id: key,
                         },

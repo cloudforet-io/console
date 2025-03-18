@@ -11,7 +11,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 import type { TreeNode, TreeDisplayMap } from '@/services/project/v1/tree/type';
 
@@ -124,12 +124,12 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         children: item.type === 'PROJECT' ? undefined : convertItemsToTreeData([], depth + 1),
     }));
     const convertProjectTreeNodeToLocation = (item: ProjectDataType): Location => (item.type === 'PROJECT' ? {
-        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+        name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
         params: {
             id: item.id,
         },
     } : {
-        name: PROJECT_ROUTE._NAME,
+        name: PROJECT_ROUTE_V1._NAME,
         params: {
             projectGroupId: item.id,
         },

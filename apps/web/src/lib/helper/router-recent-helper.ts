@@ -11,7 +11,7 @@ import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/r
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface RecentConfig {
     itemType: RecentType;
@@ -49,7 +49,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* PROJECT GROUP */
-    if (to.name === PROJECT_ROUTE._NAME) {
+    if (to.name === PROJECT_ROUTE_V1._NAME) {
         const projectGroupId = to?.params?.projectGroupId;
         if (projectGroupId?.length) {
             return { itemType: RECENT_TYPE.PROJECT_GROUP, workspaceId, itemId: projectGroupId as string };
@@ -57,7 +57,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* PROJECT */
-    if (to.name === PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME) {
+    if (to.name === PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME) {
         const projectId = to?.params?.id;
         if (!projectId) return undefined;
         return { itemType: RECENT_TYPE.PROJECT, workspaceId, itemId: projectId };

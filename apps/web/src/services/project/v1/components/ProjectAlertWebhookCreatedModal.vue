@@ -23,7 +23,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import type { WebhookType } from '@/services/project/v1/types/project-alert-type';
 
 interface Props {
@@ -68,7 +68,7 @@ const state = reactive({
 
 const handleCloseSucceedModal = () => {
     state.proxyVisible = false;
-    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
+    router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
 };
 const handleCopyWebhookUrl = () => {
     copyAnyData(props.succeedWebhook?.webhook_url || '');

@@ -65,7 +65,7 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 type CostAnalyzeRawData = {
@@ -409,7 +409,7 @@ const handleClickRowData = (fieldName: string, value: string) => {
 
     if (storeState.isAdminMode) return;
     if (fieldName === GROUP_BY.PROJECT) {
-        _routeName = PROJECT_ROUTE.DETAIL._NAME;
+        _routeName = PROJECT_ROUTE_V1.DETAIL._NAME;
         _params = { id: value, workspaceId: storeState.currentWorkspaceId };
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {

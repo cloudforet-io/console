@@ -14,7 +14,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const LIMIT_COUNT = 5;
 
@@ -43,7 +43,7 @@ const state = reactive({
     }),
     hoveredItem: null as null|FavoriteItem,
     isExpanded: false,
-    selectedItem: computed(() => (route.name === PROJECT_ROUTE._NAME ? route.params.projectGroupId : route.params.id)),
+    selectedItem: computed(() => (route.name === PROJECT_ROUTE_V1._NAME ? route.params.projectGroupId : route.params.id)),
 });
 
 const getResourceType = (type: FavoriteType) => {

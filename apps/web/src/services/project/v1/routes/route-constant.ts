@@ -1,6 +1,6 @@
 import { MENU_ID } from '@/lib/menu/config';
 
-export const PROJECT_ROUTE = Object.freeze({
+export const PROJECT_ROUTE_V1 = Object.freeze({
     _NAME: MENU_ID.PROJECT,
     DETAIL: {
         _NAME: `${MENU_ID.PROJECT}.detail`,

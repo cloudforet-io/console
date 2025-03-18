@@ -41,7 +41,7 @@ import { peacock } from '@/styles/colors';
 
 import ProjectFormModal from '@/services/project/v1/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/v1/components/ProjectMainProjectGroupMoveModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 
@@ -78,7 +78,7 @@ const state = reactive({
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         let results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE_V1._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
@@ -86,12 +86,12 @@ const state = reactive({
                 to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
-        if (route.name === PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME) {
+        if (route.name === PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME) {
             results = results.concat([
                 { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
                 { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
             ]);
-        } else if (route.name === PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
+        } else if (route.name === PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
             results = results.concat([
                 { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
                 { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
@@ -111,9 +111,9 @@ const state = reactive({
     })),
     isHeaderVisible: computed<boolean>(() => {
         const excludeRoutes = [
-            PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
-            PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
-            PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
+            PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME,
+            PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+            PROJECT_ROUTE_V1.DETAIL.TAB.ALERT.WEBHOOK.CREATE._NAME,
         ];
         return route.name ? !excludeRoutes.includes(route.name) : true;
     }),
@@ -153,7 +153,7 @@ const projectDeleteFormConfirm = async () => {
             itemId: projectDetailPageState.projectId as string,
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
-        router.push({ name: PROJECT_ROUTE._NAME });
+        router.push({ name: PROJECT_ROUTE_V1._NAME });
         const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectDetailPageState.projectId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
@@ -178,7 +178,7 @@ const handleConfirmProjectGroupMoveModal = () => {
     projectDetailPageStore.getProject();
 };
 const handleGoBackProjectLanding = () => {
-    router.push(getProperRouteLocation({ name: PROJECT_ROUTE._NAME, params: { projectGroupId: state.projectGroupId } }));
+    router.push(getProperRouteLocation({ name: PROJECT_ROUTE_V1._NAME, params: { projectGroupId: state.projectGroupId } }));
 };
 
 /* Watchers */

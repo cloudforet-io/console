@@ -22,7 +22,7 @@ import { indigo, peacock } from '@/styles/colors';
 
 import type { ProjectTreeOptions } from '@/services/project/v1/composables/use-project-tree';
 import { useProjectTree } from '@/services/project/v1/composables/use-project-tree';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import type {
     ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
     ProjectTreeNode,
@@ -253,7 +253,7 @@ const refreshProjectTree = async () => {
 
 const handleClickCreateButton = () => {
     window.open(SpaceRouter.router.resolve({
-        name: PROJECT_ROUTE._NAME,
+        name: PROJECT_ROUTE_V1._NAME,
         ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
     }).href);
     state.visibleMenu = false;

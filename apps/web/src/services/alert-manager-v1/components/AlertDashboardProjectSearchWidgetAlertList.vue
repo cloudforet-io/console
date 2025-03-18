@@ -21,7 +21,7 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertListItem from '@/services/alert-manager-v1/components/AlertListItem.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = defineProps<{
     projectId: string;
@@ -85,7 +85,7 @@ watch(() => props.projectId, async (projectId) => {
             <div v-else
                  class="view-all-text"
             >
-                <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.projectId } }"
+                <p-link :to="{ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.projectId } }"
                         :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
                         highlight
                 />

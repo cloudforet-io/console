@@ -35,7 +35,7 @@ import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboa
 import ProjectAlertTab from '@/services/project/v1/components/ProjectAlertTab.vue';
 import ProjectDetailTab from '@/services/project/v1/components/ProjectDetailTab.vue';
 import ProjectDetailTabHeader from '@/services/project/v1/components/ProjectDetailTabHeader.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 
 interface Props {
@@ -72,7 +72,7 @@ const state = reactive({
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE_V1._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
@@ -104,16 +104,16 @@ const state = reactive({
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
         ...(isAlertManagerV2Enabled.value ? [] : [
             {
-                name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
+                name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
                 label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
             },
             {
-                name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME,
                 label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
             },
         ]),
@@ -154,7 +154,7 @@ const singleItemTabState = reactive({
             ...dashboardTabs,
         ];
     }),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+    activeTab: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
 });
 
 /* Watchers */
@@ -173,10 +173,10 @@ watch(() => route.name, (routeName) => {
         return acc;
     }, [] as TabItem[]);
     const exactRoute = route.matched.find((d) => flattenTabs.find((tab) => tab.name === d.name));
-    if (routeName === PROJECT_ROUTE.DETAIL.TAB.DASHBOARD._NAME) {
+    if (routeName === PROJECT_ROUTE_V1.DETAIL.TAB.DASHBOARD._NAME) {
         singleItemTabState.activeTab = route.params.dashboardId;
     } else {
-        singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+        singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME;
     }
 }, { immediate: true });
 watch([
@@ -208,7 +208,7 @@ onUnmounted(() => {
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
-            <project-alert-tab v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME
+            <project-alert-tab v-if="singleItemTabState.activeTab === PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME
                                    && route.query?.tab === 'webhook'"
                                :id="props.id"
                                :tabs="singleItemTabState.tabs"

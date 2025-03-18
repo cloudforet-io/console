@@ -22,7 +22,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {
@@ -69,7 +69,7 @@ const handleConfirmDelete = async () => {
         state.proxyVisible = false;
         if (!props.skipRedirect) {
             await router.replace({
-                name: PROJECT_ROUTE._NAME,
+                name: PROJECT_ROUTE_V1._NAME,
             });
         }
     }

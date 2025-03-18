@@ -23,7 +23,7 @@ import BudgetDetailNotificationsChannelTable
 import BudgetDetailNotificationsConditionSettingModal
     from '@/services/cost-explorer/components/BudgetDetailNotificationsConditionSettingModal.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {
@@ -150,7 +150,7 @@ const handleBudgetNotifications = () => {
                                         size="md"
                                         :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
                                         :to="{
-                                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                                            name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME,
                                             params: {
                                                 workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                                                 id: state.budgetTargetId

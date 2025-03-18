@@ -65,7 +65,7 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory-v1/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory-v1/types/type';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {
@@ -287,7 +287,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
         }
     } else {
         window.open(router.resolve({
-            name: PROJECT_ROUTE.DETAIL._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL._NAME,
             params: { id, workspaceId },
         }).href, '_blank');
     }

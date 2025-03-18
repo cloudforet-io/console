@@ -55,7 +55,7 @@ import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMain
 import ProjectMainProjectGroupMoveModal from '@/services/project/v1/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMemberInviteModal from '@/services/project/v1/components/ProjectMemberInviteModal.vue';
 import ProjectTagsModal from '@/services/project/v1/components/ProjectTagsModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 
@@ -207,10 +207,10 @@ const handleSelectItem = (selected: MenuItem) => {
 const handleClickWebhook = () => {
     if (!props.id) return;
     if (!webhooksState.alertActivated) {
-        router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }).catch(() => {});
+        router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.id } }).catch(() => {});
         return;
     }
-    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }).catch(() => {});
+    router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: props.id }, query: { tab: 'webhook' } }).catch(() => {});
 };
 const handleOpenMemberModal = () => {
     memberState.memberModalVisible = true;
@@ -262,12 +262,12 @@ const handleHeaderIconHover = (isHovered: boolean) => {
 const handleClickBackButton = () => {
     if (state.parentGroupId) {
         router.push({
-            name: PROJECT_ROUTE._NAME,
+            name: PROJECT_ROUTE_V1._NAME,
             params: { projectGroupId: state.parentGroupId },
         });
         return;
     }
-    router.push({ name: PROJECT_ROUTE._NAME });
+    router.push({ name: PROJECT_ROUTE_V1._NAME });
 };
 
 const handleRemoveProjectUser = async (userId: string) => {

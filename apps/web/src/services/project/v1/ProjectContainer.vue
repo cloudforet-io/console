@@ -13,7 +13,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import ProjectFormModal from '@/services/project/v1/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/v1/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectLSB from '@/services/project/v1/ProjectLSB.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 
@@ -28,7 +28,7 @@ const projectTreeStore = useProjectTreeStore();
 
 const state = reactive({
     currentProjectGroupId: computed(() => route.params.projectGroupId),
-    isProjectRootPage: computed(() => route.name === PROJECT_ROUTE._NAME && !state.currentProjectGroupId),
+    isProjectRootPage: computed(() => route.name === PROJECT_ROUTE_V1._NAME && !state.currentProjectGroupId),
 });
 
 /* Event */
@@ -53,13 +53,13 @@ const refreshProejctTree = () => {
 const handleConfirmProjectFormModal = (isCreating: boolean, result: ProjectModel) => {
     refreshProejctTree();
     if (isCreating && !result.project_group_id && !state.isProjectRootPage) {
-        router.push({ name: PROJECT_ROUTE._NAME });
+        router.push({ name: PROJECT_ROUTE_V1._NAME });
     }
 };
 const handleConfirmProjectGroupFormModal = (isCreating: boolean, result: ProjectGroupModel) => {
     refreshProejctTree();
     if (isCreating && !result.parent_group_id && !state.isProjectRootPage) {
-        router.push({ name: PROJECT_ROUTE._NAME });
+        router.push({ name: PROJECT_ROUTE_V1._NAME });
     }
 };
 

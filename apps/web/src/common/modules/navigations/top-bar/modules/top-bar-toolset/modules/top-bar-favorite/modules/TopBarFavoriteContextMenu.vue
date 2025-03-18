@@ -53,7 +53,7 @@ import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/r
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const FAVORITE_LIMIT = 5;
 
@@ -244,7 +244,7 @@ const handleClickMenuButton = (type: FavoriteType) => {
     // Dashboard and Cost Analysis are added after (Planning).
     if (type === FAVORITE_TYPE.PROJECT) {
         router.replace({
-            name: PROJECT_ROUTE._NAME,
+            name: PROJECT_ROUTE_V1._NAME,
         });
     }
     emit('close');

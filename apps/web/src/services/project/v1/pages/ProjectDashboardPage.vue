@@ -21,7 +21,7 @@ import DashboardWidgetContainerV2
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 
@@ -72,7 +72,7 @@ watch(widgetList, (_widgetList) => {
 watch(isError, (error) => {
     if (error) {
         ErrorHandler.handleError(error);
-        router.push({ name: PROJECT_ROUTE.DETAIL._NAME });
+        router.push({ name: PROJECT_ROUTE_V1.DETAIL._NAME });
     }
 });
 

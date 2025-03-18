@@ -18,7 +18,7 @@ import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 export interface AlertCount {
     state: AlertState;
@@ -76,7 +76,7 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
             });
         } catch (e) {
             state.currentProject = undefined;
-            ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
+            ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE_V1._NAME }));
         } finally {
             state.loading = false;
         }

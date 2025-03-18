@@ -39,7 +39,7 @@ import ProjectAlertSettingsEscalationPolicyChangeModal
     from '@/services/project/v1/components/ProjectAlertSettingsEscalationPolicyChangeModal.vue';
 import ProjectAlertSettingsNotificationPolicyUpdateModal
     from '@/services/project/v1/components/ProjectAlertSettingsNotificationPolicyUpdateModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface NotificationUrgencyOption {
     name: ProjectAlertConfigNotiUrgency;
@@ -130,7 +130,7 @@ const onClickChangeEscalationPolicy = () => {
 };
 const onClickEditEventRule = () => {
     router.push({
-        name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
+        name: PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME,
         params: { projectId: props.id ?? '' },
     }).catch(() => {});
 };

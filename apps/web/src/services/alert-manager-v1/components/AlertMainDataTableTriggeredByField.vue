@@ -14,7 +14,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { ReferenceItem } from '@/store/reference/type';
 
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = defineProps<{
     value?: string;
@@ -35,7 +35,7 @@ const state = reactive({
         if (props.disableLink) return undefined;
         if (props.webhookReference) {
             return {
-                name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
+                name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
                 params: {
                     id: props.projectId ?? '',
                     workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
@@ -47,7 +47,7 @@ const state = reactive({
             };
         } if (props.userReference) {
             return {
-                name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
                 params: {
                     id: props.projectId ?? '',
                 },

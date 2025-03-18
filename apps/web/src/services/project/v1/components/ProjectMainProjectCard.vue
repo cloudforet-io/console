@@ -21,7 +21,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { peacock } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/v1/types/project-type';
 
@@ -84,7 +84,7 @@ const getProvider = (name: string): ProviderItem => storeState.providers[name] |
 
 const handleSelectProject = () => {
     router.push({
-        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+        name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
         params: {
             id: props.item.id as string,
         },

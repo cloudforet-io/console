@@ -12,7 +12,7 @@ import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 import type { WebhookType } from '@/services/project/v1/types/project-alert-type';
 
@@ -33,7 +33,7 @@ const handleClickNextStep = () => {
     emit('update:currentStep', 2, state.selectedWebhookType);
 };
 const handleClickGoBack = () => {
-    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
+    router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, query: { tab: 'webhook' } });
 };
 
 onMounted(async () => {

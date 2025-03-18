@@ -26,7 +26,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import ProjectChannelList from '@/services/alert-manager-v1/components/ProjectChannelList.vue';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager-v1/stores/escalation-policy-form-store';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 const NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_level']; label: string}[] = [
@@ -173,7 +173,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     action-icon="internal-link"
                     new-tab
                     :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
-                    :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: {
+                    :to="{ name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME, params: {
                         id: escalationPolicyFormState.projectId,
                         workspaceId: userWorkspaceStore.getters.currentWorkspaceId
                     } }"

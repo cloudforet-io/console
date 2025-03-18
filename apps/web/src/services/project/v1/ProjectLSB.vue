@@ -30,7 +30,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { indigo, peacock } from '@/styles/colors';
 
 import ProjectMainTree from '@/services/project/v1/components/ProjectMainTree.vue';
-import { PROJECT_ROUTE } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 
@@ -68,7 +68,7 @@ const state = reactive({
                 id: d.name,
                 icon: { name: 'ic_folder-filled', color: indigo[500] },
                 to: {
-                    name: PROJECT_ROUTE._NAME,
+                    name: PROJECT_ROUTE_V1._NAME,
                     params: { projectGroupId: d.itemId },
                 },
                 favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.name },
@@ -80,20 +80,20 @@ const state = reactive({
             id: d.name,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: {
-                name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
                 params: { id: d.itemId },
             },
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
         };
     })),
-    isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE._NAME),
+    isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE_V1._NAME),
     projectLandingMenuSet: computed(() => [
         {
             type: MENU_ITEM_TYPE.SLOT,
             label: i18n.t('PROJECT.LANDING.ALL_PROJECTS'),
             id: MENU_ID.PROJECT,
             icon: 'ic_dots-4-square',
-            to: { name: PROJECT_ROUTE._NAME },
+            to: { name: PROJECT_ROUTE_V1._NAME },
             hideFavorite: true,
         },
         {
@@ -126,7 +126,7 @@ const state = reactive({
             id: project.key,
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: {
-                name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
                 params: { id: project.key, workspaceId: storeState.currentWorkspaceId },
             },
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
