@@ -1,22 +1,32 @@
+
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import adminIamRoutes from '@/services/iam/routes/admin/routes';
-import iamRoutes from '@/services/iam/routes/routes';
+import type { FeatureVersions } from '@/services/configurator';
+import adminIamRoutes, { ADMIN_USER_GROUP_ROUTE } from '@/services/iam/routes/admin/routes';
+import iamRoutes, { USER_GROUP_ROUTE } from '@/services/iam/routes/routes';
 
 class IamConfigurator {
-    static getAdminRoutes() {
-        return adminIamRoutes;
+    static getAdminRoutes(featureVersions: FeatureVersions) {
+        const adminRoutes = adminIamRoutes;
+        if (featureVersions.ALERT_MANAGER === 'V2') {
+            adminRoutes.children?.push(ADMIN_USER_GROUP_ROUTE);
+        }
+        return adminRoutes;
     }
 
-    static getWorkspaceRoutes() {
-        return iamRoutes;
+    static getWorkspaceRoutes(featureVersions: FeatureVersions) {
+        const routes = iamRoutes;
+        if (featureVersions.ALERT_MANAGER === 'V2') {
+            routes.children?.push(USER_GROUP_ROUTE);
+        }
+        return routes;
     }
 
-    static getAdminMenu(version: string): Menu {
+    static getAdminMenu(featureVersions: FeatureVersions): Menu {
         return {
             id: MENU_ID.IAM,
-            subMenuList: version === 'V1' ? [
+            subMenuList: featureVersions.ALERT_MANAGER === 'V1' ? [
                 { id: MENU_ID.USER },
                 { id: MENU_ID.APP },
                 { id: MENU_ID.ROLE },
@@ -29,11 +39,11 @@ class IamConfigurator {
         };
     }
 
-    static getWorkspaceMenu(version: string): Menu {
+    static getWorkspaceMenu(featureVersions: FeatureVersions): Menu {
         return {
             id: MENU_ID.IAM,
             needPermissionByRole: true,
-            subMenuList: version === 'V1' ? [
+            subMenuList: featureVersions.ALERT_MANAGER === 'V1' ? [
                 { id: MENU_ID.USER, needPermissionByRole: true },
                 { id: MENU_ID.APP, needPermissionByRole: true },
             ] : [

@@ -9,6 +9,8 @@ export const DEFAULT_MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.INFO,
+        hideOnGNB: true,
+        hideOnSiteMap: true,
         subMenuList: [
             { id: MENU_ID.NOTICE },
         ],

@@ -12,20 +12,17 @@ class AssetInventoryConfigurator {
         return assetInventoryRoute;
     }
 
-    static getAdminMenu(version: string) {
-        const defaultSubMenuList = [
-            { id: MENU_ID.CLOUD_SERVICE },
-            { id: MENU_ID.METRIC_EXPLORER },
-            { id: MENU_ID.COLLECTOR },
-            { id: MENU_ID.SERVICE_ACCOUNT },
-        ];
+    static getAdminMenu() {
         return {
             id: MENU_ID.ASSET_INVENTORY,
-            subMenuList: version === 'V1' ? [
-                ...defaultSubMenuList,
+            subMenuList: [
+                { id: MENU_ID.CLOUD_SERVICE },
                 { id: MENU_ID.SERVER },
                 { id: MENU_ID.SECURITY },
-            ] : defaultSubMenuList,
+                { id: MENU_ID.METRIC_EXPLORER },
+                { id: MENU_ID.COLLECTOR },
+                { id: MENU_ID.SERVICE_ACCOUNT },
+            ],
         };
     }
 
