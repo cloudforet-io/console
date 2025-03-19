@@ -39,6 +39,9 @@ export const useCloudServiceLSBStore = defineStore('cloud-service-l-s-b', () => 
     };
 
     const actions = {
+        init() {
+            state.globalFilters = {};
+        },
         setSelectedProjectsToFilters(projects: string[] = []) {
             const _globalFilters = { ...state.globalFilters };
             _globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT] = projects;

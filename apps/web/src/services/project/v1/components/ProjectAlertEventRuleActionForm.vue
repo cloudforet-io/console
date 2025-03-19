@@ -22,7 +22,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import type { Tag } from '@/common/modules/tags/type';
 
-import { alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager-v1/helpers/alert-badge-helper';
+import { alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager/v1/helpers/alert-badge-helper';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 
 const URGENCY = Object.freeze({

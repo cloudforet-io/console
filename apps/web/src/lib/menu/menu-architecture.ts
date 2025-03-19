@@ -217,6 +217,8 @@ export const ADMIN_MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
             { id: MENU_ID.CLOUD_SERVICE },
+            { id: MENU_ID.SERVER },
+            { id: MENU_ID.SECURITY },
             { id: MENU_ID.METRIC_EXPLORER },
             { id: MENU_ID.COLLECTOR },
             { id: MENU_ID.SERVICE_ACCOUNT },

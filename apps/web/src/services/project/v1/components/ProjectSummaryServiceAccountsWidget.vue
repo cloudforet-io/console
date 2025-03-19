@@ -21,8 +21,8 @@ import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-s
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 const DATA_TYPE = {
@@ -79,7 +79,7 @@ const getLocation = (type, provider, serviceAccountId) => {
     };
 
     const location: Location = {
-        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query,
     };
     return location;
@@ -89,14 +89,14 @@ const getConvertedData = (rawData): Item[] => rawData.map((item) => ({
         label: state.providers[item.provider]?.label,
         color: state.providers[item.provider]?.color,
         to: {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
             query: { provider: item.provider },
         },
     },
     service_account: {
         label: item.service_account_name,
         to: {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
             query: {
                 provider: item.provider,
                 filters: arrayToQueryString([item.service_account_id]),

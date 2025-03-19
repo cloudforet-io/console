@@ -163,7 +163,7 @@ const handleChangePagination = () => {
 const getJobs = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventoryV2.job.list<JobListParameters, ListResponse<JobModel>>({ query: getQuery() });
+        const res = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({ query: getQuery() });
         state.totalCount = res.total_count ?? 0;
         state.items = (res.results ?? []).map((job) => {
             const collector = storeState.collectors[job.collector_id];

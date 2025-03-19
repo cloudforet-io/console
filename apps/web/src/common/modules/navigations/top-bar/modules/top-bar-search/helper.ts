@@ -5,7 +5,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
@@ -15,7 +15,7 @@ export const topBarSearchReferenceRouter = (type: Exclude<SearchTab, 'service'>,
     switch (type) {
     case SEARCH_TAB.SERVICE_ACCOUNT:
         return {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
             params: { serviceAccountId: resourceId, workspaceId },
         };
     case SEARCH_TAB.PROJECT:
@@ -31,7 +31,7 @@ export const topBarSearchReferenceRouter = (type: Exclude<SearchTab, 'service'>,
     case SEARCH_TAB.CLOUD_SERVICE:
         if (!options.name || !options.group || !options.provider) throw new Error('provider and group are required for cloudService type');
         return {
-            name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
             params: {
                 name: options.name,
                 workspaceId,

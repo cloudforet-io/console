@@ -27,8 +27,8 @@ import {
     gray, coral, yellow, secondary1,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 
 interface Data {
@@ -101,7 +101,7 @@ const getLocation = (provider: string, region: string, projectId: string, label:
     if (label !== 'All') query.service = arrayToQueryString([label]);
 
     const location: Location = {
-        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query,
     };
     return location;

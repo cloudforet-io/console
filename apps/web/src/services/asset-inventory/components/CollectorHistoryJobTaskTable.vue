@@ -5,12 +5,12 @@ import {
 
 
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
-import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -20,6 +20,8 @@ import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
@@ -28,7 +30,6 @@ import { useUserStore } from '@/store/user/user-store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import {
     statusIconColorFormatter,
@@ -43,12 +44,9 @@ interface Props {
     jobId: string;
 }
 
-const { isAdminMode } = useProperRouteLocation();
-
 const props = withDefaults(defineProps<Props>(), {
     jobId: '',
 });
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const adminFields = [
     { label: 'Service Account', name: 'service_account_id', sortable: false },
@@ -78,8 +76,12 @@ const statusList = computed(() => [
 const emit = defineEmits<{(e: 'select', array): void}>();
 
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspaces: computed(() => allReferenceStore.getters.workspace),
@@ -172,7 +174,7 @@ const handleChange = async (options: any = {}) => {
 const getJobTasks = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventoryV2.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
+        const res = await SpaceConnector.clientV2.inventory.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
             query: getQuery(),
             job_id: props.jobId,
         });
@@ -226,7 +228,7 @@ onDeactivated(() => {
                      sortable
                      search-type="query"
                      :loading="state.loading"
-                     :fields="isAdminMode ? adminFields : fields"
+                     :fields="storeState.isAdminMode ? adminFields : fields"
                      :items="state.items"
                      :select-index.sync="state.selectIndex"
                      :sort-by="state.sortBy"
@@ -257,15 +259,19 @@ onDeactivated(() => {
             <p-link v-if="storeState.serviceAccounts[value]"
                     action-icon="internal-link"
                     new-tab
-                    :to="getProperRouteLocation(referenceRouter(
+                    :to="referenceRouter(
                         value,
-                        { resource_type: 'identity.ServiceAccount' }))"
+                        {
+                            resource_type: 'identity.ServiceAccount',
+                            workspace_id: storeState.isAdminMode ? undefined : item.workspace_id,
+                            isAdminMode: storeState.isAdminMode,
+                        })"
             >
                 {{ storeState.serviceAccounts[value].label }}
             </p-link>
             <span v-else>--</span>
         </template>
-        <template v-if="isAdminMode"
+        <template v-if="storeState.isAdminMode"
                   #col-workspace_id-format="{ value }"
         >
             <span v-if="value === '*'">Global</span>

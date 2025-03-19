@@ -28,8 +28,8 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import ProjectChannelList from '@/services/alert-manager-v1/components/ProjectChannelList.vue';
-import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
+import ProjectChannelList from '@/services/alert-manager/v1/components/ProjectChannelList.vue';
+import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager/v1/routes/route-constant';
 
 interface FinishConditionItem {
     name: EscalationPolicyFinishCondition;
