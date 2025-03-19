@@ -13,7 +13,7 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -59,7 +59,7 @@ const ALERT_ACTION = {
 type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION];
 
 const props = withDefaults(defineProps<{
-    selectedItems?: AlertModel[];
+    selectedItems?: AlertModelV1[];
     manageDisabled?: boolean;
 }>(), {
     selectedItems: () => [],

@@ -9,7 +9,7 @@ import {
 
 import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/create';
 import type { NoteModel } from '@/schema/monitoring/note/model';
 import { i18n } from '@/translations';
@@ -21,7 +21,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 const props = withDefaults(defineProps<{
     visible: boolean;
-    alerts?: AlertModel[];
+    alerts?: AlertModelV1[];
 }>(), {
     visible: false,
     alerts: () => [],
@@ -37,7 +37,7 @@ const state = reactive({
 /* api */
 const updateAlertAndCreateNote = async (alertId: string) => {
     try {
-        await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModel>({
+        await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModelV1>({
             alert_id: alertId,
             state: ALERT_STATE.RESOLVED,
         });
