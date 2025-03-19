@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+import type { ProjectTreeNodeData } from '@/services/project/v-shared/types/project-tree-type';
 
 const props = defineProps<{
     visible: boolean;

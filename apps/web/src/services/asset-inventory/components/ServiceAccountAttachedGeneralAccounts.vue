@@ -50,7 +50,7 @@ import { getAccountFields, stateFormatter } from '@/services/asset-inventory/hel
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = withDefaults(defineProps<{
     serviceAccountId: string;
@@ -360,7 +360,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                 </template>
                 <template #col-project_id-format="{value, item}">
                     <span class="project-id-wrapper">
-                        <router-link :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: value, workspaceId: item.workspace_id } }"
+                        <router-link :to="{ name: PROJECT_ROUTE_V1.DETAIL._NAME, params: { id: value, workspaceId: item.workspace_id } }"
                                      target="_blank"
                         >
                             <span>{{ state.project[value]?.label }}</span>
