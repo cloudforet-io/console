@@ -1,7 +1,10 @@
 import type { RouteConfig } from 'vue-router';
 
+import { useMenuStore } from '@/store/menu/menu-store';
 
 import config from '@/lib/config';
+import type { Menu } from '@/lib/menu/config';
+import { DEFAULT_ADMIN_MENU_LIST, DEFAULT_MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import adminAdvancedRoutes from '@/services/advanced/routes/admin/routes';
 import AlertManagerConfigurator from '@/services/alert-manager/configurator';
@@ -9,16 +12,14 @@ import AssetInventoryConfigurator from '@/services/asset-inventory/configurator'
 import CostExplorerConfigurator from '@/services/cost-explorer/configurator';
 import DashboardConfigurator from '@/services/dashboards/configurator';
 import IamConfigurator from '@/services/iam/configurator';
-import adminInfoRoute from '@/services/info/routes/admin/routes';
-import infoRoute from '@/services/info/routes/routes';
+import adminInfoRoutes from '@/services/info/routes/admin/routes';
+import infoRoutes from '@/services/info/routes/routes';
 import OpsFlowConfigurator from '@/services/ops-flow/configurator';
 import ProjectConfigurator from '@/services/project/configurator';
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
-import type { ServiceConfig } from '@/service-configurator/type';
-
-export interface ServiceConfig {
+interface ServiceConfig {
     ENABLED: boolean;
     VERSION: string;
 }
@@ -32,37 +33,54 @@ interface GlobalConfig {
 class ServiceConfigurator {
     private config: GlobalConfig | null = null;
 
+    private featureVersions: Record<string, string> = {};
+
     private featureConfigurators: Record<string, any> = {
         DASHBOARD: DashboardConfigurator,
         PROJECT: ProjectConfigurator,
         ASSET_INVENTORY: AssetInventoryConfigurator,
         COST_EXPLORER: CostExplorerConfigurator,
-        OPS_FLOW: OpsFlowConfigurator,
         ALERT_MANAGER: AlertManagerConfigurator,
+        OPS_FLOW: OpsFlowConfigurator,
         IAM: IamConfigurator,
     };
 
     async initialize() {
+        // const serviceVersionUiStore = useServiceVersionUiStore();
+
         await config.init();
         this.config = config.get('SERVICES') || {};
+
+        // if (!this.config) return;
+        // const featureVersions = {
+        //     IAM: 'V1',
+        //     ...Object.fromEntries(
+        //         Object.entries(this.config).map(([key, value]) => [key, value.VERSION]),
+        //     ),
+        // };
+        // serviceVersionUiStore.setFeatureVersion(featureVersions);
+        // this.featureVersions = serviceVersionUiStore.state.featureVersions;
     }
 
-    getRoutes(mode: 'admin' | 'workspace'): RouteConfig[] {
+    private get allServices() {
         if (!this.config) {
             throw new Error('ServiceConfigurator is not initialized.');
         }
+        return { ...this.config, IAM: { ENABLED: true, VERSION: 'V1' } };
+    }
 
+    getRoutes(mode: 'admin' | 'workspace'): RouteConfig[] {
         const baseRoutes = mode === 'admin'
-            ? [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoute]
-            : [workspaceHomeRoute, infoRoute];
+            ? [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes]
+            : [workspaceHomeRoute, infoRoutes];
 
-        Object.entries(this.config).forEach(([serviceName, serviceConfig]) => {
+        Object.entries(this.allServices).forEach(([serviceName, serviceConfig]) => {
             if (serviceConfig.ENABLED) {
                 const configurator = this.featureConfigurators[serviceName];
                 if (configurator) {
                     const route = mode === 'admin'
-                        ? configurator.getAdminRoutes(serviceConfig.VERSION)
-                        : configurator.getWorkspaceRoutes(serviceConfig.VERSION);
+                        ? configurator.getAdminRoutes(this.featureVersions)
+                        : configurator.getWorkspaceRoutes(this.featureVersions);
                     if (route && !baseRoutes.some((existingRoute) => existingRoute.path === route.path)) {
                         baseRoutes.push(route);
                     }
@@ -71,6 +89,34 @@ class ServiceConfigurator {
         });
 
         return baseRoutes;
+    }
+
+    getMenuList(mode: 'admin' | 'workspace'): Menu[] {
+        const menuStore = useMenuStore();
+
+        const menuList: Menu[] = mode === 'admin' ? [] : DEFAULT_MENU_LIST;
+
+        Object.entries(this.allServices).forEach(([serviceName, serviceConfig]) => {
+            if (serviceConfig.ENABLED) {
+                const configurator = this.featureConfigurators[serviceName];
+                if (configurator) {
+                    const serviceMenu = mode === 'admin'
+                        ? configurator.getAdminMenu(this.featureVersions)
+                        : configurator.getWorkspaceMenu(this.featureVersions);
+                    if (serviceMenu && !menuList.some((existingRoute) => existingRoute.id === serviceMenu.id)) {
+                        menuList.push(serviceMenu);
+                    }
+                }
+            }
+        });
+
+        if (mode === 'admin') {
+            menuList.push(...DEFAULT_ADMIN_MENU_LIST);
+        }
+
+        menuStore.setMenuList(menuList);
+
+        return menuList;
     }
 }
 

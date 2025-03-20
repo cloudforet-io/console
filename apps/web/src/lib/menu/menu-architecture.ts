@@ -1,6 +1,28 @@
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+
+export const DEFAULT_MENU_LIST: Menu[] = [
+    {
+        id: MENU_ID.WORKSPACE_HOME,
+        needPermissionByRole: true,
+    },
+    {
+        id: MENU_ID.INFO,
+        subMenuList: [
+            { id: MENU_ID.NOTICE },
+        ],
+    },
+    {
+        id: MENU_ID.MY_PAGE,
+        hideOnSiteMap: true,
+        subMenuList: [
+            { id: MENU_ID.ACCOUNT_PROFILE },
+            { id: MENU_ID.NOTIFICATIONS },
+        ],
+    },
+];
+
 export const MENU_LIST: Menu[] = [
     {
         id: MENU_ID.WORKSPACE_HOME,
@@ -151,6 +173,25 @@ export const MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
     },
 ];
 
+export const DEFAULT_ADMIN_MENU_LIST: Menu[] = [
+    {
+        id: MENU_ID.ADVANCED,
+        subMenuList: [
+            { id: MENU_ID.WORKSPACES },
+            { id: MENU_ID.WORKSPACE_GROUP },
+            { id: MENU_ID.BOOKMARK },
+            { id: MENU_ID.AUTO_DORMANCY_CONFIGURATION },
+            { id: MENU_ID.PREFERENCES },
+        ],
+    },
+    {
+        id: MENU_ID.INFO,
+        hideOnSiteMap: true,
+        subMenuList: [
+            { id: MENU_ID.NOTICE },
+        ],
+    },
+];
 export const ADMIN_MENU_LIST: Menu[] = [
     {
         id: MENU_ID.DASHBOARDS,
@@ -186,7 +227,6 @@ export const ADMIN_MENU_LIST: Menu[] = [
         id: MENU_ID.IAM,
         subMenuList: [
             { id: MENU_ID.USER },
-            { id: MENU_ID.USER_GROUP },
             { id: MENU_ID.APP },
             { id: MENU_ID.ROLE },
         ],
@@ -217,8 +257,6 @@ export const ADMIN_MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
             { id: MENU_ID.CLOUD_SERVICE },
-            { id: MENU_ID.SERVER },
-            { id: MENU_ID.SECURITY },
             { id: MENU_ID.METRIC_EXPLORER },
             { id: MENU_ID.COLLECTOR },
             { id: MENU_ID.SERVICE_ACCOUNT },
@@ -244,6 +282,7 @@ export const ADMIN_MENU_LIST_FOR_ALERT_MANAGER_V2: Menu[] = [
         id: MENU_ID.IAM,
         subMenuList: [
             { id: MENU_ID.USER },
+            { id: MENU_ID.USER_GROUP },
             { id: MENU_ID.APP },
             { id: MENU_ID.ROLE },
         ],

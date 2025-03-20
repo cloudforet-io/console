@@ -15,7 +15,7 @@ const NoticeMainPage = () => import('@/services/info/pages/NoticeMainPage.vue');
 const NoticeDetailPage = () => import('@/services/info/pages/NoticeDetailPage.vue');
 
 
-const infoRoute: RouteConfig = {
+const infoRoutes: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
     meta: {
@@ -55,4 +55,4 @@ const infoRoute: RouteConfig = {
     ],
 };
 
-export default infoRoute;
+export default infoRoutes;
