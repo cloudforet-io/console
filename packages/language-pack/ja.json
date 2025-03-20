@@ -3451,6 +3451,7 @@
 				"SECRET_TYPE_LABEL": "暗号化キーのタイプ",
 				"SEE_MORE": "詳細はこちら",
 				"SERVICE_ACCOUNT": "サービスアカウント",
+				"SERVICE_ACCOUNT_MANAGER": "",
 				"TAB_INPUT": "直接入力",
 				"TAB_JSON": "JSONで入力",
 				"TAG_ADD": "タグ追加",
