@@ -14,7 +14,7 @@ import {
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
@@ -32,7 +32,7 @@ const props = defineProps<{
 const userStore = useUserStore();
 const state = reactive({
     totalCount: 0,
-    alerts: [] as AlertModel[],
+    alerts: [] as AlertModelV1[],
     moreCount: undefined as undefined | number,
     timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
@@ -70,7 +70,7 @@ const getQuery = () => {
 };
 const getAlerts = async () => {
     try {
-        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModelV1>>({
             project_id: props.projectId,
             query: {
                 ...getQuery(),

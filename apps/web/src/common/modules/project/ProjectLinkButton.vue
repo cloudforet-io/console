@@ -10,7 +10,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = defineProps<{
     projectId: string;
@@ -25,7 +25,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const hasProjectReferenceLoaded = computed<boolean>(() => !!projectReferenceStore.getters.projectItems);
 const projectPageLocation = computed<Location>(() => ({
-    name: PROJECT_ROUTE.DETAIL._NAME,
+    name: PROJECT_ROUTE_V1.DETAIL._NAME,
     params: {
         workspaceId: userWorkspaceStore.getters.currentWorkspaceId as string,
         id: props.projectId,

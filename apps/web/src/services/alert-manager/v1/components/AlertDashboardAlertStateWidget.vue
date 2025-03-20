@@ -17,7 +17,7 @@ import { numberFormatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -114,7 +114,7 @@ const state = reactive({
     selectedUrgency: ALERT_URGENCY_FILTER.ALL,
     selectedAssignedState: ALERT_ASSIGNED_FILTER.ALL,
     isAssignedToMe: false,
-    items: [] as AlertModel[],
+    items: [] as AlertModelV1[],
     thisPage: 1,
     allPage: 1,
     pageSize: 10,
@@ -146,7 +146,7 @@ const getQuery = () => {
 const listAlerts = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModelV1>>({
             query: getQuery(),
             workspace_id: storeState.currentWorkspaceId,
         });

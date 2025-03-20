@@ -21,7 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface TableItem {
     project_id?: string;
@@ -137,7 +137,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-name-format="{item}">
                 <span class="project-name-wrapper">
-                    <router-link :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id, workspaceId: userWorkspaceStore.getters.currentWorkspaceId } }"
+                    <router-link :to="{ name: PROJECT_ROUTE_V1.DETAIL._NAME, params: { id: item.project_id, workspaceId: userWorkspaceStore.getters.currentWorkspaceId } }"
                                  target="_blank"
                     >
                         <span>{{ item.name }}</span>

@@ -46,7 +46,7 @@ import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface Props {
     tableState: any;
@@ -131,7 +131,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
         }
     } else {
         window.open(router.resolve({
-            name: PROJECT_ROUTE.DETAIL._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL._NAME,
             params: { id, workspaceId },
         }).href, '_blank');
     }

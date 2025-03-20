@@ -9,7 +9,7 @@ import type { Reference, ResourceType } from '@/lib/reference/type';
 
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -108,12 +108,12 @@ const routerMap = (isAdminMode?: boolean): RouterMap => ({
         },
     'identity.Project':
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
             formatter: projectLinkFormatter,
         },
     'identity.ProjectGroup':
         {
-            name: PROJECT_ROUTE._NAME,
+            name: PROJECT_ROUTE_V1._NAME,
             formatter: projectGroupLinkFormatter,
         },
     'inventory.Collector':

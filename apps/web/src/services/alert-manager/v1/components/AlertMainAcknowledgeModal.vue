@@ -5,7 +5,7 @@ import {
 
 import { PButtonModal, PCheckbox } from '@cloudforet/mirinae';
 
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -18,7 +18,7 @@ import { useAlertAssignUserStore } from '@/services/alert-manager/v1/stores/aler
 
 const props = defineProps<{
     visible: boolean;
-    alerts: AlertModel[];
+    alerts: AlertModelV1[];
 }>();
 const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
     (event: 'confirm'): void;

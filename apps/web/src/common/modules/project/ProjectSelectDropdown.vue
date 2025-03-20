@@ -20,13 +20,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import type { ProjectTreeOptions } from '@/services/project/composables/use-project-tree';
-import { useProjectTree } from '@/services/project/composables/use-project-tree';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import type { ProjectTreeOptions } from '@/services/project/v-shared/composables/use-project-tree';
+import { useProjectTree } from '@/services/project/v-shared/composables/use-project-tree';
 import type {
     ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
     ProjectTreeNode,
-} from '@/services/project/types/project-tree-type';
+} from '@/services/project/v-shared/types/project-tree-type';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface ProjectGroupSelectOptions {
     id: string;
@@ -253,7 +253,7 @@ const refreshProjectTree = async () => {
 
 const handleClickCreateButton = () => {
     window.open(SpaceRouter.router.resolve({
-        name: PROJECT_ROUTE._NAME,
+        name: PROJECT_ROUTE_V1._NAME,
         ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
     }).href);
     state.visibleMenu = false;

@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import AlertDashboardProjectSearchWidgetAlertList from '@/services/alert-manager/v1/components/AlertDashboardProjectSearchWidgetAlertList.vue';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 const props = defineProps<{
@@ -99,7 +99,7 @@ const onChange = async (options?: any) => {
     await listAlertByProject();
 };
 const onClickProjectBox = (item) => {
-    router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: item.project_id } });
+    router.push({ name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME, params: { id: item.project_id } });
 };
 
 /* init */

@@ -30,7 +30,7 @@ import { gray } from '@/styles/colors';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { TreeNode } from '@/services/project/tree/type';
+import type { TreeNode } from '@/services/project/v-shared/tree/type';
 
 interface Props {
   hideSidebar: boolean;
