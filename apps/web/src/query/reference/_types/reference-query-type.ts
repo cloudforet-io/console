@@ -19,3 +19,10 @@ export interface ReferenceItem<Data = Record<string, any>> {
 }
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
+
+export interface ReferenceTypeInfo {
+    type: string; // 'project'
+    key: string; // project_id
+    name: string; // Project
+    referenceMap: ReferenceMap;
+}

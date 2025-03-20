@@ -11,6 +11,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 
 const REFERENCE_LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
+const INITIAL_LIST_RESPONSE_DATA: ListResponse<unknown> = { results: [] };
 
 export const useReferenceQuery = <TQueryFnData extends ListResponse<unknown>, TError = unknown, TData = TQueryFnData>(
     options: UseQueryOptions<TQueryFnData, TError, TData>,
@@ -33,6 +34,6 @@ export const useReferenceQuery = <TQueryFnData extends ListResponse<unknown>, TE
             }
             return failureCount < 3;
         },
-        // TODO: add error handler
+        initialData: (() => INITIAL_LIST_RESPONSE_DATA as TQueryFnData),
     });
 };

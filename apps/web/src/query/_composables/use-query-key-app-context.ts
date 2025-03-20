@@ -9,18 +9,18 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
  * Interface for global query parameters used across API requests.
  * These parameters are automatically included in API and reference query keys.
  */
-export type QueryContextType = 'service' | 'reference';
+export type QueryScope = 'service' | 'reference';
 
 export interface QueryKeyContextParams {
     isAdminMode?: boolean;
     workspaceId?: string;
-    context: QueryContextType;
+    scope: QueryScope;
 }
 
 export interface QueryContext {
     mode: 'admin' | 'workspace';
     workspaceId?: string;
-    context: QueryContextType;
+    scope: QueryScope;
 }
 
 /**
@@ -61,7 +61,7 @@ export const useQueryKeyContext = (queryKeyOptions: QueryKeyContextParams): Comp
 
     return computed<QueryContext>(() => {
         const {
-            isAdminMode, workspaceId: _workspaceId, context,
+            isAdminMode, workspaceId: _workspaceId, scope,
         } = queryKeyOptions || {};
         const mode = (isAdminMode || _state.isAdminMode) ? 'admin' : 'workspace';
         const workspaceId = _workspaceId || _state.currentWorkspaceId;
@@ -69,7 +69,7 @@ export const useQueryKeyContext = (queryKeyOptions: QueryKeyContextParams): Comp
         return {
             mode,
             workspaceId,
-            context,
+            scope,
         };
     });
 };
@@ -88,7 +88,7 @@ interface WorkspaceModeState {
 type QueryKeyState = AdminModeState | WorkspaceModeState;
 
 
-export const useQueryKeyAppContext = (context: QueryContextType = 'service') => {
+export const useQueryKeyAppContext = (queryScope: QueryScope = 'service') => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
 
@@ -107,8 +107,8 @@ export const useQueryKeyAppContext = (context: QueryContextType = 'service') => 
             };
 
         return state.isAdminMode
-            ? [context, 'admin']
-            : [context, 'workspace', state.workspaceId];
+            ? [queryScope, 'admin']
+            : [queryScope, 'workspace', state.workspaceId];
     });
 };
 
