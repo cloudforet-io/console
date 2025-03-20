@@ -12,7 +12,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
@@ -26,7 +26,7 @@ import ProjectChannelList from '@/services/alert-manager/v1/components/ProjectCh
 
 interface Props {
     id?: string;
-    alertData?: Partial<AlertModel>;
+    alertData?: Partial<AlertModelV1>;
     manageDisabled?: boolean;
 }
 interface RuleItem {

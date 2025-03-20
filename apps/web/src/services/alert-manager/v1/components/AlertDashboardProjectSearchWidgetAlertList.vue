@@ -13,7 +13,7 @@ import {
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -31,7 +31,7 @@ const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    items: [] as AlertModel[],
+    items: [] as AlertModelV1[],
     totalCount: 0,
 });
 
@@ -47,7 +47,7 @@ const getQuery = () => {
 const listAlerts = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModelV1>>({
             project_id: props.projectId,
             query: getQuery(),
         });
