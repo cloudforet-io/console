@@ -15,6 +15,7 @@ import type { PublicDashboardShareParameters } from '@/api-clients/dashboard/pub
 import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/unshare';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import { useReferenceQuerySync } from '@/query/reference/_composables/use-reference-query-sync';
 
 interface UsePublicDashboardApiReturn {
     publicDashboardGetQueryKey: ComputedRef<QueryKey>;
@@ -34,13 +35,14 @@ interface UsePublicDashboardApiReturn {
 export const usePublicDashboardApi = (): UsePublicDashboardApiReturn => {
     const publicDashboardGetQueryKey = useAPIQueryKey('dashboard', 'public-dashboard', 'get');
     const publicDashboardListQueryKey = useAPIQueryKey('dashboard', 'public-dashboard', 'list');
+    const { withReferenceUpdate, withReferenceRefresh } = useReferenceQuerySync<PublicDashboardModel>('publicDashboard');
 
     const actions = {
         async create(params: PublicDashboardCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDashboard.create<PublicDashboardCreateParameters, PublicDashboardModel>(params);
+            return withReferenceUpdate(() => SpaceConnector.clientV2.dashboard.publicDashboard.create<PublicDashboardCreateParameters, PublicDashboardModel>(params));
         },
         async update(params: PublicDashboardUpdateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDashboard.update<PublicDashboardUpdateParameters, PublicDashboardModel>(params);
+            return withReferenceUpdate(() => SpaceConnector.clientV2.dashboard.publicDashboard.update<PublicDashboardUpdateParameters, PublicDashboardModel>(params));
         },
         async changeFolder(params: PublicDashboardChangeFolderParameters) {
             return SpaceConnector.clientV2.dashboard.publicDashboard.changeFolder<PublicDashboardChangeFolderParameters, PublicDashboardModel>(params);
@@ -52,7 +54,7 @@ export const usePublicDashboardApi = (): UsePublicDashboardApiReturn => {
             return SpaceConnector.clientV2.dashboard.publicDashboard.unshare<PublicDashboardUnshareParameters, PublicDashboardModel>(params);
         },
         async delete(params: PublicDashboardDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDashboard.delete<PublicDashboardUnshareParameters>(params);
+            return withReferenceRefresh(() => SpaceConnector.clientV2.dashboard.publicDashboard.delete<PublicDashboardUnshareParameters>(params));
         },
         async get(params: PublicDashboardGetParameters) {
             return SpaceConnector.clientV2.dashboard.publicDashboard.get<PublicDashboardGetParameters, PublicDashboardModel>(params);
