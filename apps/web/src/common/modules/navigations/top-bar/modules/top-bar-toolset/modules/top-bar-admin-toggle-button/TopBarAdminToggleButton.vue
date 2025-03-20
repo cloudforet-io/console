@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { throttle } from 'lodash';
 
+import { invalidateServiceQuery } from '@/api-clients/_common/helpers/service-query-invalidation-helper';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
@@ -15,6 +16,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+
 
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -34,6 +36,7 @@ const handleToggleAdminMode = throttle(async () => {
         return;
     }
     appContextStore.setGlobalGrantLoading(true);
+    await invalidateServiceQuery(state.isAdminMode ? 'admin' : 'workspace');
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
         if (state.workspaceList.length === 0) {
