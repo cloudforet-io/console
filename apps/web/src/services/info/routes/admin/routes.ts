@@ -14,7 +14,7 @@ const AdminNoticeDetailPage = () => import('@/services/info/pages/admin/AdminNot
 const AdminNoticeCreatePage = () => import('@/services/info/pages/admin/AdminNoticeCreatePage.vue');
 const AdminNoticeUpdatePage = () => import('@/services/info/pages/admin/AdminNoticeUpdatePage.vue');
 
-const infoRoute: RouteConfig = {
+const adminInfoRoutes: RouteConfig = {
     path: 'info',
     name: ADMIN_INFO_ROUTE._NAME,
     meta: {
@@ -65,4 +65,4 @@ const infoRoute: RouteConfig = {
     ],
 };
 
-export default infoRoute;
+export default adminInfoRoutes;
