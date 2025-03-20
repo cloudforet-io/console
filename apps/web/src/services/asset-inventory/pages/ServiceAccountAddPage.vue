@@ -148,6 +148,7 @@ const createAccount = async (): Promise<string|undefined> => {
                 secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
                 secret_data: secretData,
                 tags: formState.baseInformationForm.tags,
+                service_account_mgr_id: formState.baseInformationForm.serviceAccountManagerId,
                 trusted_account_id: attachedTrustedAccountId,
                 project_id: formState.baseInformationForm.projectForm?.selectedProjectId ?? '',
             });
