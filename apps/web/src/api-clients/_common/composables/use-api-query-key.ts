@@ -8,6 +8,7 @@ import type {
     APIQueryKeyMapService, APIQueryKeyMapResource, APIQueryKeyMapVerb, ServiceName, ResourceName, Verb,
 } from '@/api-clients/_common/types/query-key-type';
 import { useQueryKeyAppContext } from '@/query/_composables/use-query-key-app-context';
+import { createImmutableObject } from '@/query/_helper/immutable-key-helper';
 import type { QueryKeyArray } from '@/query/_types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -46,17 +47,31 @@ export const _useAPIQueryKey = (): ComputedRef<UseAPIQueryResult> => {
     return computed(() => {
         const createKeyWithContext = <T extends APIQueryKeyValue>(queryKeyValue: T): MapVerbToReturnType<T> => {
             if (Array.isArray(queryKeyValue)) {
-                return [...queryKeyAppContext.value, ...queryKeyValue] as MapVerbToReturnType<T>;
+                return [
+                    ...queryKeyAppContext.value,
+                    ...createImmutableObject(queryKeyValue),
+                ] as MapVerbToReturnType<T>;
             }
 
             const verbFunction = (params?: ExtractParams<T>) => {
                 const baseKey = queryKeyValue(params);
-                const result = [...queryKeyAppContext.value, ...baseKey] as QueryKeyArrayWithDep;
-                result.addDep = (deps) => [...queryKeyAppContext.value, ...baseKey, deps];
+                const result = [
+                    ...queryKeyAppContext.value,
+                    ...createImmutableObject(baseKey),
+                ] as QueryKeyArrayWithDep;
+                result.addDep = (deps) => [
+                    ...queryKeyAppContext.value,
+                    ...createImmutableObject(baseKey),
+                    createImmutableObject(deps),
+                ];
                 return result;
             };
 
-            verbFunction.addDep = (deps) => [...queryKeyAppContext.value, ...queryKeyValue(), deps];
+            verbFunction.addDep = (deps) => [
+                ...queryKeyAppContext.value,
+                ...createImmutableObject(queryKeyValue()),
+                createImmutableObject(deps),
+            ];
             return verbFunction as MapVerbToReturnType<T>;
         };
 
