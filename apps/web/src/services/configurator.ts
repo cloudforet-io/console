@@ -17,6 +17,7 @@ import adminInfoRoutes from '@/services/info/routes/admin/routes';
 import infoRoutes from '@/services/info/routes/routes';
 import OpsFlowConfigurator from '@/services/ops-flow/configurator';
 import ProjectConfigurator from '@/services/project/configurator';
+import ServiceAccountConfigurator from '@/services/service-account/configurator';
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
@@ -34,6 +35,7 @@ interface GlobalConfig {
 export interface FeatureVersions {
     DASHBOARD: string;
     PROJECT: string;
+    SERVICE_ACCOUNT: string;
     ASSET_INVENTORY: string;
     COST_EXPLORER: string;
     ALERT_MANAGER: string;
@@ -44,11 +46,12 @@ export interface FeatureVersions {
 class ServiceConfigurator {
     private config: GlobalConfig | null = null;
 
-    private featureVersions: FeatureVersions = {};
+    private featureVersions: FeatureVersions = {} as FeatureVersions;
 
     private featureConfigurators: Record<string, any> = {
         DASHBOARD: DashboardConfigurator,
         PROJECT: ProjectConfigurator,
+        SERVICE_ACCOUNT: ServiceAccountConfigurator,
         ASSET_INVENTORY: AssetInventoryConfigurator,
         COST_EXPLORER: CostExplorerConfigurator,
         ALERT_MANAGER: AlertManagerConfigurator,

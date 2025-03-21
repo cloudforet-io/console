@@ -21,7 +21,6 @@ class AssetInventoryConfigurator {
                 { id: MENU_ID.SECURITY },
                 { id: MENU_ID.METRIC_EXPLORER },
                 { id: MENU_ID.COLLECTOR },
-                { id: MENU_ID.SERVICE_ACCOUNT },
             ],
         };
     }
@@ -36,7 +35,6 @@ class AssetInventoryConfigurator {
                 { id: MENU_ID.SECURITY, needPermissionByRole: true },
                 { id: MENU_ID.METRIC_EXPLORER, needPermissionByRole: true },
                 { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
-                { id: MENU_ID.SERVICE_ACCOUNT, needPermissionByRole: true },
             ],
         };
     }

@@ -5,7 +5,6 @@ import { upperCase } from 'lodash';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 
 const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
@@ -27,10 +26,6 @@ const AdminCollectorCreatePage = () => import('@/services/asset-inventory/pages/
 const AdminCollectorHistoryPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorHistoryPage.vue');
 const AdminCollectHistoryJobPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectHistoryJobPage.vue');
 const AdminCollectorDetailPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorDetailPage.vue');
-
-const ServiceAccountPage = () => import('@/services/asset-inventory/pages/ServiceAccountPage.vue');
-const ServiceAccountDetailPage = () => import('@/services/asset-inventory/pages/ServiceAccountDetailPage.vue');
-const ServiceAccountAddPage = () => import('@/services/asset-inventory/pages/ServiceAccountAddPage.vue');
 
 
 const adminAssetInventoryRoute: RouteConfig = {
@@ -158,44 +153,6 @@ const adminAssetInventoryRoute: RouteConfig = {
                     props: true,
                     meta: { label: ({ params }) => params.collectorId, copiable: true },
                     component: AdminCollectorDetailPage as any,
-                },
-            ],
-        },
-        {
-            path: 'service-account',
-            meta: { menuId: MENU_ID.SERVICE_ACCOUNT, translationId: MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId },
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: '/',
-                    name: ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                    meta: { menuId: MENU_ID.SERVICE_ACCOUNT },
-                    props: true,
-                    component: ServiceAccountPage as any,
-                },
-                {
-                    path: 'no-resource',
-                    name: ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
-                    meta: { translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
-                    component: NoResourcePage as any,
-                },
-                {
-                    path: ':serviceAccountId',
-                    name: ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                    meta: { label: ({ params }) => params.serviceAccountId, copiable: true },
-                    props: true,
-                    component: ServiceAccountDetailPage,
-                },
-                {
-                    path: 'add/:provider/:serviceAccountType',
-                    name: ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: {
-                        translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
-                            type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
-                        }]),
-                    },
-                    props: true,
-                    component: ServiceAccountAddPage as any,
                 },
             ],
         },
