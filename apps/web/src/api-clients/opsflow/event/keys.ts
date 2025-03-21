@@ -1,7 +1,7 @@
 import type { EventListParameters } from '@/api-clients/opsflow/event/schema/api-verbs/list';
 
 export const eventKeys = {
-    all: ['event'],
-    list: (params: EventListParameters) => [...eventKeys.all, 'list', params],
+    all: ['event'] as const,
+    list: (params: EventListParameters) => [...eventKeys.all, 'list', params] as const,
 };
 

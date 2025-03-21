@@ -4,9 +4,9 @@ import type { PublicWidgetLoadParameters } from '@/api-clients/dashboard/public-
 import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/load-sum';
 
 export const publicWidgetKeys = {
-    all: ['public-widget'],
-    list: (params: PublicWidgetListParameters) => [...publicWidgetKeys.all, 'list', params],
-    get: (idParam: PublicWidgetGetParameters['widget_id']) => [...publicWidgetKeys.all, 'get', idParam],
-    load: (idParam: PublicWidgetLoadParameters['widget_id']) => [...publicWidgetKeys.all, 'load', idParam],
-    loadSum: (idParam: PublicWidgetLoadSumParameters['widget_id']) => [...publicWidgetKeys.all, 'load-sum', idParam],
+    all: ['public-widget'] as const,
+    list: (params: PublicWidgetListParameters) => [...publicWidgetKeys.all, 'list', params] as const,
+    get: (idParam: PublicWidgetGetParameters['widget_id']) => [...publicWidgetKeys.all, 'get', idParam] as const,
+    load: (idParam: PublicWidgetLoadParameters['widget_id']) => [...publicWidgetKeys.all, 'load', idParam] as const,
+    loadSum: (idParam: PublicWidgetLoadSumParameters['widget_id']) => [...publicWidgetKeys.all, 'load-sum', idParam] as const,
 };
