@@ -22,14 +22,11 @@ type ExtractParams<T> = T extends (params: infer P) => any ? P : never;
 
 type VerbFunction<T> = {
     (params?: ExtractParams<T>): QueryKeyArrayWithDep;
-    addDep: (deps: Record<string, unknown>) => QueryKeyArray;
 };
 
-type MapVerbToReturnType<T> = T extends QueryKeyArray
-    ? QueryKeyArray
-    : T extends (params: any) => any
-        ? VerbFunction<T>
-        : never;
+type MapVerbToReturnType<T> = T extends (params: any) => any
+    ? VerbFunction<T>
+    : never;
 
 type UseAPIQueryResult = {
     [S in APIQueryKeyMapService]: {
@@ -39,68 +36,48 @@ type UseAPIQueryResult = {
     };
 };
 
-type APIQueryKeyValue = QueryKeyArray | ((params?: Record<string, unknown>) => QueryKeyArray);
+type APIQueryKeyValue = (params?: Record<string, unknown>) => QueryKeyArray;
+
 
 export const _useAPIQueryKey = (): ComputedRef<UseAPIQueryResult> => {
     const queryKeyAppContext = useQueryKeyAppContext('service');
+    const globalContext = computed(() => queryKeyAppContext.value);
 
-    return computed(() => {
-        const createKeyWithContext = <T extends APIQueryKeyValue>(queryKeyValue: T): MapVerbToReturnType<T> => {
-            if (Array.isArray(queryKeyValue)) {
-                return [
-                    ...queryKeyAppContext.value,
-                    ...createImmutableObject(queryKeyValue),
-                ] as MapVerbToReturnType<T>;
-            }
 
-            const verbFunction = (params?: ExtractParams<T>) => {
-                const baseKey = queryKeyValue(params);
-                const result = [
-                    ...queryKeyAppContext.value,
-                    ...createImmutableObject(baseKey),
-                ] as QueryKeyArrayWithDep;
-                result.addDep = (deps) => [
-                    ...queryKeyAppContext.value,
-                    ...createImmutableObject(baseKey),
-                    createImmutableObject(deps),
-                ];
-                return result;
-            };
+    const apiStructure = Object.entries(API_QUERY_KEY_MAP).reduce<Record<APIQueryKeyMapService, any>>((result, [serviceName, resources]) => {
+        result[serviceName as APIQueryKeyMapService] = Object.entries(resources).reduce((resourceResult, [resourceName, verbs]) => {
+            resourceResult[resourceName] = Object.entries(verbs).reduce((verbResult, [verb, queryKeyValue]) => {
+                const staticKey = createImmutableObject([serviceName, resourceName, verb]);
 
-            verbFunction.addDep = (deps) => [
-                ...queryKeyAppContext.value,
-                ...createImmutableObject(queryKeyValue()),
-                createImmutableObject(deps),
-            ];
-            return verbFunction as MapVerbToReturnType<T>;
-        };
+                const verbFunction = <T extends APIQueryKeyValue>(params?: ExtractParams<T>) => {
+                    const baseKey = computed(() => (queryKeyValue as T)(params));
+                    const queryKey = [
+                        ...globalContext.value,
+                        ...staticKey,
+                        ...createImmutableObject(baseKey.value),
+                    ] as QueryKeyArray;
 
-        return Object.entries(API_QUERY_KEY_MAP).reduce<UseAPIQueryResult>((services, [serviceName, resources]) => ({
-            ...services,
-            [serviceName]: Object.entries(resources).reduce((resourceMap, [resourceName, verbs]) => ({
-                ...resourceMap,
-                [resourceName]: Object.entries(verbs).reduce((verbMap, [verb, queryKeyValue]) => ({
-                    ...verbMap,
-                    [verb]: createKeyWithContext(queryKeyValue as APIQueryKeyValue),
-                }), {}),
-            }), {}),
-        }), {} as UseAPIQueryResult);
-    });
+                    (queryKey as QueryKeyArrayWithDep).addDep = (deps: Record<string, unknown>): QueryKeyArray => [
+                        ...globalContext.value,
+                        ...staticKey,
+                        ...createImmutableObject(baseKey.value),
+                        createImmutableObject(deps),
+                    ];
+
+                    return queryKey as QueryKeyArrayWithDep;
+                };
+
+                verbResult[verb] = verbFunction;
+                return verbResult;
+            }, {});
+            return resourceResult;
+        }, {});
+        return result;
+    }, {} as Record<APIQueryKeyMapService, any>);
+
+
+    return computed(() => apiStructure as UseAPIQueryResult);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
