@@ -2,10 +2,19 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { FeatureVersions } from '@/services/configurator';
-
 interface GlobalConfigSettingState {
     featureVersions: FeatureVersions,
+}
+
+export interface FeatureVersions {
+    DASHBOARD: string;
+    PROJECT: string;
+    SERVICE_ACCOUNT: string;
+    ASSET_INVENTORY: string;
+    COST_EXPLORER: string;
+    ALERT_MANAGER: string;
+    OPS_FLOW: string;
+    IAM: string;
 }
 
 export const useGlobalConfigSettingStore = defineStore('global-config-setting-store', () => {
@@ -19,7 +28,6 @@ export const useGlobalConfigSettingStore = defineStore('global-config-setting-st
             ALERT_MANAGER: 'V1',
             OPS_FLOW: 'V1',
             IAM: 'V1',
-            INFO: 'V1',
         },
     });
 
