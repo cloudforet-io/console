@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "2.0.0-devfix201",
+  "version": "2.0.0",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
