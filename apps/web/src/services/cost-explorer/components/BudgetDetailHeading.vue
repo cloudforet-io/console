@@ -93,7 +93,7 @@ const handleClickBackButton = () => {
             <template v-if="!props.loading"
                       #title-right-extra
             >
-                <div v-if="state.hasReadWriteAccess && (storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner))"
+                <div v-if="storeState.isAdminMode || (state.hasReadWriteAccess && state.isProjectTarget && storeState.isWorkspaceOwner)"
                      class="title-button-group"
                 >
                     <p-icon-button name="ic_delete"
