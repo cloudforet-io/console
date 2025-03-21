@@ -59,10 +59,10 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
             },
         };
 
-        const { client } = APIClientLoader.getAPIClient('ALERT_MANAGER');
-        if (!client) return;
+        const alertManagerClient = APIClientLoader.alertManager;
+        if (!alertManagerClient) return;
         try {
-            const { results } = await client.service.list(params);
+            const { results } = await alertManagerClient.endpoint.service.list(params);
 
             const serviceReferenceMap: ServiceReferenceMap = {};
 
