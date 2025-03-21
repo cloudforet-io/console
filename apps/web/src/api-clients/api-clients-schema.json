@@ -1,0 +1,12 @@
+{
+  "DASHBOARD": {
+    "V1": "v1/dashboard"
+  },
+  "ALERT_MANAGER": {
+    "V1": "v1/monitoring",
+    "V2": "v2/alertManager"
+  },
+  "PROJECT": {
+    "V1": "v1/project"
+  }
+}

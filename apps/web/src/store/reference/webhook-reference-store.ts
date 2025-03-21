@@ -53,10 +53,8 @@ export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
 
         const referenceMap: WebhookReferenceMap = {};
 
-        const { client } = APIClientLoader.getAPIClient('ALERT_MANAGER');
-        if (!client) return;
         try {
-            const fetcher = client.webhook.list;
+            const fetcher = APIClientLoader.alertManager.endpoint.webhook.list;
             const response = await fetcher({
                 query: {
                     only: ['webhook_id', 'name', 'plugin_info'],

@@ -53,12 +53,11 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
         ) return;
 
         const referenceMap: EscalationPolicyReferenceMap = {};
-        const { client, version } = APIClientLoader.getAPIClient('ALERT_MANAGER');
-        if (!client) return;
+        const alertManagerClient = APIClientLoader.alertManager;
         try {
-            const fetcher = client.escalationPolicy.list({
+            const fetcher = alertManagerClient.endpoint.escalationPolicy.list({
                 query: {
-                    only: version === 'V1' ? ['escalation_policy_id', 'name', 'resource_group', 'project_id'] : ['escalation_policy_id', 'name', 'service_id'],
+                    only: alertManagerClient.version === 'V1' ? ['escalation_policy_id', 'name', 'resource_group', 'project_id'] : ['escalation_policy_id', 'name', 'service_id'],
                 },
             });
 
