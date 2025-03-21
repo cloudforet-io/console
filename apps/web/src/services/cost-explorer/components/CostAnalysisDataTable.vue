@@ -46,8 +46,6 @@ import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -66,6 +64,7 @@ import type {
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 
 type CostAnalyzeRawData = {
@@ -413,7 +412,7 @@ const handleClickRowData = (fieldName: string, value: string) => {
         _params = { id: value, workspaceId: storeState.currentWorkspaceId };
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
-        _routeName = ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME;
+        _routeName = SERVICE_ACCOUNT_ROUTE.DETAIL._NAME;
         _params = { serviceAccountId: value, workspaceId: storeState.currentWorkspaceId };
     }
 

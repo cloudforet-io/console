@@ -10,6 +10,8 @@ import type { Reference, ResourceType } from '@/lib/reference/type';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { ADMIN_SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/admin/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -123,12 +125,12 @@ const routerMap = (isAdminMode?: boolean): RouterMap => ({
         },
     'identity.ServiceAccount':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'identity.TrustedAccount':
         {
-            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':

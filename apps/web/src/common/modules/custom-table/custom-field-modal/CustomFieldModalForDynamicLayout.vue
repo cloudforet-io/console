@@ -21,12 +21,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItemForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItemForDynamicLayout.vue';
 
-import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
-import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import { convertAgentModeOptions } from '@/services/service-account/helpers/agent-mode-helper';
+import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
 import type {
     GetSchemaParams,
     ResourceType,
-} from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
+} from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
 
 const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
 const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');

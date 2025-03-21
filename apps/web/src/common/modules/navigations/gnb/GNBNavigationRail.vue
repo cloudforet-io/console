@@ -60,7 +60,7 @@ const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
 });
 
-const noParentsMenuList:MenuId[] = [MENU_ID.DASHBOARDS, MENU_ID.WORKSPACE_HOME, MENU_ID.PROJECT];
+const noParentsMenuList:MenuId[] = [MENU_ID.WORKSPACE_HOME, MENU_ID.DASHBOARDS, MENU_ID.PROJECT, MENU_ID.SERVICE_ACCOUNT];
 
 const state = reactive({
     isInit: false as boolean|undefined,

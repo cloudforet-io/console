@@ -58,6 +58,7 @@ import type {
     CloudServiceMainPageUrlQueryValue,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { EmptyData, Period } from '@/services/asset-inventory/types/type';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface Response {
     results: CloudServiceAnalyzeResult[];
@@ -129,7 +130,7 @@ const state = reactive({
         let result = {} as EmptyData;
         if (state.isNoServiceAccounts) {
             result = {
-                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
+                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : {},
                 buttonText: state.writableServiceAccount ? i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') : undefined,
                 desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };

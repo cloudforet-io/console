@@ -2,8 +2,10 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { FeatureVersions } from '@/services/configurator';
+
 interface GlobalConfigSettingState {
-    featureVersions: Record<string, string>,
+    featureVersions: FeatureVersions,
 }
 
 export const useGlobalConfigSettingStore = defineStore('global-config-setting-store', () => {
@@ -11,6 +13,7 @@ export const useGlobalConfigSettingStore = defineStore('global-config-setting-st
         featureVersions: {
             DASHBOARD: 'V1',
             PROJECT: 'V1',
+            SERVICE_ACCOUNT: 'V1',
             ASSET_INVENTORY: 'V1',
             COST_EXPLORER: 'V1',
             ALERT_MANAGER: 'V1',
@@ -21,7 +24,7 @@ export const useGlobalConfigSettingStore = defineStore('global-config-setting-st
     });
 
     const mutations = {
-        setFeatureVersion(featureVersions: Record<string, string>) {
+        setFeatureVersion(featureVersions: FeatureVersions) {
             state.featureVersions = featureVersions;
         },
     };

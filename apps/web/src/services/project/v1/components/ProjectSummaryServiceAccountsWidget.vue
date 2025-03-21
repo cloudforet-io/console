@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
-
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 const DATA_TYPE = {
     SERVER: 'SERVER',
@@ -89,14 +89,14 @@ const getConvertedData = (rawData): Item[] => rawData.map((item) => ({
         label: state.providers[item.provider]?.label,
         color: state.providers[item.provider]?.color,
         to: {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+            name: SERVICE_ACCOUNT_ROUTE._NAME,
             query: { provider: item.provider },
         },
     },
     service_account: {
         label: item.service_account_name,
         to: {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+            name: SERVICE_ACCOUNT_ROUTE._NAME,
             query: {
                 provider: item.provider,
                 filters: arrayToQueryString([item.service_account_id]),

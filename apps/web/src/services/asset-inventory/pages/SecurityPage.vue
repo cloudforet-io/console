@@ -26,6 +26,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 import type { EmptyData } from '@/services/asset-inventory/types/type';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const securityPageStore = useSecurityPageStore();
@@ -49,7 +50,7 @@ const state = reactive({
         let result = {} as EmptyData;
         if (!Object.keys(storeState.serviceAccounts).length) {
             result = {
-                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
+                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : {},
                 buttonText: state.writableServiceAccount ? i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') : undefined,
                 desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };

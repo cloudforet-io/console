@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -20,13 +19,10 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { peacock } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
-
-
-
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface Props {
     item: ProjectCardItemType;
@@ -154,7 +150,7 @@ const handleSelectItem = (selected: MenuItem) => {
                     <template v-for="(provider, index) in props.serviceAccountProviderList">
                         <router-link v-if="index < 5"
                                      :key="index"
-                                     :to="{name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,query: { provider: getProvider(provider) ? provider : null },}"
+                                     :to="{name: SERVICE_ACCOUNT_ROUTE._NAME,query: { provider: getProvider(provider) ? provider : null },}"
                                      class="icon-link"
                                      :style="{backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`}"
                                      @click.native.stop.prevent
@@ -168,7 +164,7 @@ const handleSelectItem = (selected: MenuItem) => {
                 </span>
                 <router-link v-if="props.serviceAccountProviderList.length !== 0"
                              class="icon-wrapper"
-                             :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             :to="{ name: SERVICE_ACCOUNT_ROUTE._NAME }"
                              @click.native.stop.prevent
                 >
                     <p-i name="ic_plus_thin"
@@ -180,7 +176,7 @@ const handleSelectItem = (selected: MenuItem) => {
             <div v-else
                  class="account-add"
             >
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                <router-link :to="{ name: SERVICE_ACCOUNT_ROUTE._NAME }"
                              @click.native.stop.prevent
                 >
                     <p-i name="ic_plus_thin"
@@ -188,7 +184,7 @@ const handleSelectItem = (selected: MenuItem) => {
                          color="inherit"
                     />
                 </router-link>
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                <router-link :to="{ name: SERVICE_ACCOUNT_ROUTE._NAME }"
                              @click.native.stop.prevent
                 >
                     <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
