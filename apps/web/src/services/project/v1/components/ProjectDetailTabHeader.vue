@@ -38,7 +38,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
@@ -89,12 +88,11 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
 
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
-
 const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
+    visibleAlertTab: computed<boolean>(() => projectDetailPageState.visibleAlertTab),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
@@ -351,7 +349,7 @@ const getProjectAlertActivated = async () => {
 
 /* Watchers */
 watch(() => projectDetailPageGetters.projectType, async () => {
-    if (!isAlertManagerV2Enabled.value) {
+    if (storeState.visibleAlertTab) {
         await Promise.allSettled([
             getProjectAlertActivated(),
             listWebhooks(),
@@ -470,7 +468,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  :color="gray[400]"
                             />
                         </template>
-                        <div v-if="!isAlertManagerV2Enabled"
+                        <div v-if="storeState.visibleAlertTab"
                              class="info-item"
                              @click="handleClickWebhook"
                         >

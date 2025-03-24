@@ -22,7 +22,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -59,9 +58,8 @@ const {
     publicFolderList,
 } = useDashboardQuery();
 
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
-
 const storeState = reactive({
+    visibleAlertTab: computed<boolean>(() => projectDetailPageState.visibleAlertTab),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     language: computed<string|undefined>(() => userStore.state.language),
@@ -107,7 +105,7 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        ...(isAlertManagerV2Enabled.value ? [] : [
+        ...(!storeState.visibleAlertTab ? [] : [
             {
                 name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
                 label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),

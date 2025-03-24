@@ -5,6 +5,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import costExplorerRoutes from '@/services/cost-explorer/routes/routes';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 class CostExplorerConfigurator {
     static getAdminRoutes() {
@@ -37,6 +38,11 @@ class CostExplorerConfigurator {
             needPermissionByRole: true,
             subMenuList: subMenuIds,
         };
+    }
+
+    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        const budgetDetailPageStore = useBudgetDetailPageStore();
+        budgetDetailPageStore.setVisibleBudgetNotification(settings.uiAffects?.visibleBudgetNotification);
     }
 }
 

@@ -23,6 +23,10 @@ class ServiceAccountConfigurator {
         const menuId = Object.keys(settings.menu)[0];
         return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
     }
+
+    static applyUiAffects(): void|null {
+        return null;
+    }
 }
 
 export default ServiceAccountConfigurator;

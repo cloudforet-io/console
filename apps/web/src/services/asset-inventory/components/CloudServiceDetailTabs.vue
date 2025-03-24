@@ -15,12 +15,9 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import config from '@/lib/config';
 import type { Reference } from '@/lib/reference/type';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
@@ -40,6 +37,7 @@ import CloudServiceLogTab
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/components/CloudServiceTagsPanel.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import {
     useTaskManagementTemplateStore,
@@ -58,16 +56,19 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const domainStore = useDomainStore();
-const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
 const router = useRouter();
 
 /* Tabs */
+const state = reactive({
+    visibleAlertTab: computed(() => cloudServiceDetailPageState.visibleAlertTab),
+});
 const singleItemTabState = reactive({
     tabs: computed(() => {
         const defaultTabs = [
@@ -82,7 +83,7 @@ const singleItemTabState = reactive({
                 { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
             );
         }
-        if (isAlertManagerVersionV2) {
+        if (state.visibleAlertTab) {
             defaultTabs.push({ name: 'alerts', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS') });
         }
         // TODO: will be changed to store

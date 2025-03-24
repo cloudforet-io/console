@@ -16,11 +16,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useBudgetDetailPageStore = defineStore('page-budget-detail', {
     state: () => ({
+        visibleBudgetNotification: false,
         loading: true,
         budgetData: null as BudgetModel|null,
         budgetUsageData: null as BudgetUsageModel[]|null,
     }),
     actions: {
+        setVisibleBudgetNotification(val: boolean) {
+            this.visibleBudgetNotification = val;
+        },
         async getBudgetData(budgetId: string): Promise<void> {
             this.loading = true;
             try {

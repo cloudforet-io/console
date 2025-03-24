@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+    computed,
     reactive, watch,
 } from 'vue';
 
@@ -9,8 +10,6 @@ import { PI, PIconButton } from '@cloudforet/mirinae';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
@@ -24,19 +23,22 @@ import ProjectSummaryBillingWidget from '@/services/project/v1/components/Projec
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/v1/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
 import ProjectSummaryServiceAccountsWidget from '@/services/project/v1/components/ProjectSummaryServiceAccountsWidget.vue';
 import ProjectSummaryTrustedAdvisorWidget from '@/services/project/v1/components/ProjectSummaryTrustedAdvisorWidget.vue';
-
-
+import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 
 interface Props {
     id: string;
 }
 const props = defineProps<Props>();
+
+
+const projectDetailPageStore = useProjectDetailPageStore();
+const projectDetailPageState = projectDetailPageStore.state;
+
 const state = reactive({
+    visibleAlertTab: computed<boolean>(() => projectDetailPageState.visibleAlertTab),
     hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
-
 const handleClickNotiClose = () => {
     state.deprecatedNotiVisible = false;
 };
@@ -54,7 +56,7 @@ const getProjectAlertConfig = async () => {
 };
 
 watch(() => props.id, () => {
-    if (!isAlertManagerV2Enabled.value) getProjectAlertConfig();
+    if (state.visibleAlertTab) getProjectAlertConfig();
 }, { immediate: true });
 </script>
 
@@ -92,7 +94,7 @@ watch(() => props.id, () => {
             :project-id="props.id"
         />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-summary-alert-widget v-if="!isAlertManagerV2Enabled && state.hasAlertConfig"
+            <project-summary-alert-widget v-if="state.visibleAlertTab && state.hasAlertConfig"
                                           :key="`project-summary-alert-widget-${props.id}`"
                                           class="col-span-12"
                                           :project-id="props.id"

@@ -71,6 +71,7 @@ class ServiceConfigurator {
             if (configurator) {
                 const feature = this.featureSchema[serviceName];
                 const versionSchema = feature[feature.currentVersion];
+                configurator.applyUiAffects(versionSchema);
                 const serviceMenu = mode === 'admin'
                     ? configurator.getAdminMenu(versionSchema)
                     : configurator.getWorkspaceMenu(versionSchema);

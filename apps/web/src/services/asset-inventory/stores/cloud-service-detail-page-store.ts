@@ -15,6 +15,7 @@ import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/ty
 
 export const useCloudServiceDetailPageStore = defineStore('page-cloud-service-detail', {
     state: () => ({
+        visibleAlertTab: false,
         provider: '' as string,
         group: '' as string,
         name: undefined as undefined | string,
@@ -45,6 +46,9 @@ export const useCloudServiceDetailPageStore = defineStore('page-cloud-service-de
             this.provider = provider;
             this.group = group;
             this.name = name;
+        },
+        setVisibleAlertTab(val: boolean) {
+            this.visibleAlertTab = val;
         },
     },
 });

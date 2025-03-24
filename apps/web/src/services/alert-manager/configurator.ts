@@ -3,8 +3,11 @@ import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+
 import alertManagerRouteV1 from '@/services/alert-manager/v1/routes/routes';
 import alertManagerRoute from '@/services/alert-manager/v2/routes/routes';
+import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 
 class AlertManagerConfigurator {
     static getAdminRoutes() {
@@ -31,6 +34,14 @@ class AlertManagerConfigurator {
             needPermissionByRole: true,
             subMenuList: subMenuIds,
         };
+    }
+
+    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        const gnbStore = useGnbStore();
+        const myPageStore = useMyPageStore();
+
+        gnbStore.setVisibleAlertIcon(settings.uiAffects?.visibleAlertIcon);
+        myPageStore.setVisibleUserNotification(settings.uiAffects?.visibleUserNotification);
     }
 }
 
