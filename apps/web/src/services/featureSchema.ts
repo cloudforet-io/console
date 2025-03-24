@@ -33,7 +33,7 @@ export type schemaType = {
 export type FeatureSchema = Record<featuresType, schemaType>;
 
 export const initialFeatureSchema: FeatureSchema = {
-    [FEATURES.DASHBOARD]: {
+    [FEATURES.DASHBOARDS]: {
         currentVersion: 'V1',
         V1: {
             menu: { [MENU_ID.DASHBOARDS]: true },
