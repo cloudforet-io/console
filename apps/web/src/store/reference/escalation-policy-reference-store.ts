@@ -5,7 +5,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import APIClientLoader from '@/api-clients/loader';
+import APIClientManager from '@/api-clients/api-client-manager';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { EscalationPolicyModel as EscalationPolicyModelV1 } from '@/schema/monitoring/escalation-policy/model';
 
@@ -53,7 +53,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
         ) return;
 
         const referenceMap: EscalationPolicyReferenceMap = {};
-        const alertManagerClient = APIClientLoader.alertManager;
+        const alertManagerClient = APIClientManager.alertManager;
         try {
             const fetcher = alertManagerClient.endpoint.escalationPolicy.list({
                 query: {

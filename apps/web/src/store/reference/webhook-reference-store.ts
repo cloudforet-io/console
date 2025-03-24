@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import APIClientLoader from '@/api-clients/loader';
+import APIClientManager from '@/api-clients/api-client-manager';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { WebhookModel as WebhookModelV1 } from '@/schema/monitoring/webhook/model';
 
@@ -54,7 +54,7 @@ export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
         const referenceMap: WebhookReferenceMap = {};
 
         try {
-            const fetcher = APIClientLoader.alertManager.endpoint.webhook.list;
+            const fetcher = APIClientManager.alertManager.endpoint.webhook.list;
             const response = await fetcher({
                 query: {
                     only: ['webhook_id', 'name', 'plugin_info'],

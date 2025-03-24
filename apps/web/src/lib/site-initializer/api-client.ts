@@ -2,7 +2,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
-import APIClientLoader from '@/api-clients/loader';
+import APIClientManager from '@/api-clients/api-client-manager';
 
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
@@ -436,7 +436,7 @@ export const initApiClient = async (config) => {
         getAfterCallApiMap(),
         serviceConfig,
     );
-    await APIClientLoader.initialize();
+    await APIClientManager.initialize();
     const existingRefreshToken = SpaceConnector.getRefreshToken();
 
     if (!existingRefreshToken) return;

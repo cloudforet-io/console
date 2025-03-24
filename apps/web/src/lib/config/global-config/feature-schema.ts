@@ -1,38 +1,8 @@
-import type { MenuId } from '@/lib/menu/config';
+import { FEATURES } from '@/lib/config/global-config/constants';
+import type { FeatureSchemaType } from '@/lib/config/global-config/type';
 import { MENU_ID } from '@/lib/menu/config';
 
-export const FEATURES = {
-    DASHBOARDS: 'DASHBOARDS',
-    PROJECT: 'PROJECT',
-    SERVICE_ACCOUNT: 'SERVICE_ACCOUNT',
-    ASSET_INVENTORY: 'ASSET_INVENTORY',
-    COST_EXPLORER: 'COST_EXPLORER',
-    ALERT_MANAGER: 'ALERT_MANAGER',
-    OPS_FLOW: 'OPS_FLOW',
-    IAM: 'IAM',
-    COMMON: 'COMMON',
-} as const;
-
-export type featuresType = typeof FEATURES[keyof typeof FEATURES];
-
-type affectsUIType = {
-    showAlert?: boolean;
-};
-export type versionSchemaType = {
-    menu: Record<MenuId, boolean>;
-    adminMenu: Record<MenuId, boolean>;
-    affectsUI?: affectsUIType;
-};
-export type schemaType = {
-    currentVersion: string;
-    V1: versionSchemaType;
-    V2?: versionSchemaType;
-    affectsUI?: affectsUIType;
-};
-
-export type FeatureSchema = Record<featuresType, schemaType>;
-
-export const initialFeatureSchema: FeatureSchema = {
+export const initialFeatureSchema: FeatureSchemaType = {
     [FEATURES.DASHBOARDS]: {
         currentVersion: 'V1',
         V1: {
@@ -43,7 +13,7 @@ export const initialFeatureSchema: FeatureSchema = {
         currentVersion: 'V1',
         V1: {
             menu: { [MENU_ID.PROJECT]: true },
-            affectsUI: {
+            uiAffects: {
                 showAlert: true,
             },
         },
@@ -64,7 +34,7 @@ export const initialFeatureSchema: FeatureSchema = {
                 [MENU_ID.METRIC_EXPLORER]: true,
                 [MENU_ID.COLLECTOR]: true,
             },
-            affectsUI: {
+            uiAffects: {
                 showAlert: true,
             },
         },

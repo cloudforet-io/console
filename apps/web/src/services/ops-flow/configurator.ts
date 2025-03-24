@@ -1,8 +1,8 @@
+import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import type { versionSchemaType } from '@/services/featureSchema';
 import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
 
@@ -15,8 +15,8 @@ class OpsFlowConfigurator {
         return opsFlowRoutes;
     }
 
-    static getAdminMenu(versionSchema: versionSchemaType): Menu {
-        const menu = versionSchema.adminMenu || versionSchema.menu;
+    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
+        const menu = settings.adminMenu || settings.menu;
         const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
             .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
         return {
@@ -25,8 +25,8 @@ class OpsFlowConfigurator {
         };
     }
 
-    static getWorkspaceMenu(versionSchema: versionSchemaType): Menu {
-        const menu = versionSchema.menu;
+    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
+        const menu = settings.menu;
         const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
             .map((menuId) => ({
                 id: MENU_INFO_MAP[menuId].menuId,

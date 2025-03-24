@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import APIClientLoader from '@/api-clients/loader';
+import APIClientManager from '@/api-clients/api-client-manager';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
@@ -59,7 +59,7 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
             },
         };
 
-        const alertManagerClient = APIClientLoader.alertManager;
+        const alertManagerClient = APIClientManager.alertManager;
         if (!alertManagerClient) return;
         try {
             const { results } = await alertManagerClient.endpoint.service.list(params);

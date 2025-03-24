@@ -1,17 +1,6 @@
-type apiClientType = {
-    V1: string;
-    V2?: string;
-};
-export interface ApiClients {
-    DASHBOARDS: apiClientType,
-    PROJECT: apiClientType,
-    ASSET_INVENTORY: apiClientType,
-    COST_ANALYSIS: apiClientType,
-    OPS_FLOW: apiClientType,
-    ALERT_MANAGER: apiClientType,
-}
+import type { ApiClientsSchemaType } from '@/lib/config/global-config/type';
 
-export const ApiClientSchema: ApiClients = {
+export const ApiClientSchema: ApiClientsSchemaType = {
     DASHBOARDS: {
         V1: 'dashboard',
     },

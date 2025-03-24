@@ -5,6 +5,8 @@ import { isEmpty } from 'lodash';
 import { useMenuStore } from '@/store/menu/menu-store';
 
 import config from '@/lib/config';
+import { FeatureSchemaManager } from '@/lib/config/global-config/feature-schema-manager';
+import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/type';
 import type { Menu } from '@/lib/menu/config';
 import { DEFAULT_ADMIN_MENU_LIST, DEFAULT_MENU_LIST } from '@/lib/menu/menu-architecture';
 
@@ -13,8 +15,6 @@ import AlertManagerConfigurator from '@/services/alert-manager/configurator';
 import AssetInventoryConfigurator from '@/services/asset-inventory/configurator';
 import CostExplorerConfigurator from '@/services/cost-explorer/configurator';
 import DashboardConfigurator from '@/services/dashboards/configurator';
-import type { FeatureSchema } from '@/services/featureSchema';
-import { FeatureSchemaManager } from '@/services/featureSchemaManager';
 import IamConfigurator from '@/services/iam/configurator';
 import adminInfoRoutes from '@/services/info/routes/admin/routes';
 import infoRoutes from '@/services/info/routes/routes';
@@ -24,12 +24,10 @@ import ServiceAccountConfigurator from '@/services/service-account/configurator'
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
-export type ServiceConfigType = Record<string, { ENABLED: boolean; VERSION: string }>;
-
 class ServiceConfigurator {
-    private config: ServiceConfigType = {} as ServiceConfigType;
+    private config: GlobalServiceConfig = {} as GlobalServiceConfig;
 
-    private featureSchema: FeatureSchema = {} as FeatureSchema;
+    private featureSchema: FeatureSchemaType = {} as FeatureSchemaType;
 
     async initialize() {
         await config.init();
