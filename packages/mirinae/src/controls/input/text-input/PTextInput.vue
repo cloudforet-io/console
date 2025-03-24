@@ -47,7 +47,7 @@
                            :value="displayedInputValue"
                            :disabled="disabled"
                            :readonly="readonly"
-                           :placeholder="placeholder"
+                           :placeholder="stringPlaceholder"
                            :autocomplete="!$attrs.autocomplete ? 'off' : $attrs.autocomplete"
                            :size="1"
                            v-on="$listeners"
@@ -129,6 +129,7 @@ import {
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import { unionBy } from 'lodash';
+import type { TranslateResult } from 'vue-i18n';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
@@ -194,7 +195,7 @@ export default defineComponent({
             default: false,
         },
         placeholder: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         multiInput: {
@@ -273,6 +274,9 @@ export default defineComponent({
             if (val === isInputFocused.value) return;
             isInputFocused.value = !!val;
         });
+
+        /* placeholder */
+        const stringPlaceholder = computed(() => String(props.placeholder));
 
         /* selected */
         const proxySelected = ref<InputItem[]>(props.selected);
@@ -495,6 +499,8 @@ export default defineComponent({
             inputRef,
             isInputFocused,
             focusOnInput,
+            /* placeholder */
+            stringPlaceholder,
             /* context menu controller */
             menuRef,
             targetRef,
