@@ -1,7 +1,8 @@
+import { MENU_ID } from '@/lib/menu/config';
+
 import type { ServiceConfigType } from '@/services/configurator';
 import type { FeatureSchema } from '@/services/featureSchema';
-import { initialFeatureSchema } from '@/services/featureSchema';
-
+import { FEATURES, initialFeatureSchema } from '@/services/featureSchema';
 
 export class FeatureSchemaManager {
     private serviceConfig: ServiceConfigType;
@@ -22,35 +23,33 @@ export class FeatureSchemaManager {
             }
         });
 
-        return this.schema;
+        return {
+            ...this.schema,
+            [FEATURES.COMMON]: {
+                affectsUI: {
+                    showAlert: true,
+                },
+            },
+        };
     }
 
     private updateSchema(serviceName: string, version: string): void {
-        if (!this.schema) return;
+        if (!this.schema || !this.schema[serviceName]) return;
 
-        if (this.schema[serviceName]) {
-            this.schema[serviceName].version = version;
-        }
+        this.schema[serviceName].currentVersion = version;
 
-        if (serviceName === 'ALERT_MANAGER') {
-            this.schema.ALERT_MANAGER.menu = {
-                ALERT_MANAGER_DASHBOARD: version === 'V1',
-                SERVICE: version === 'V2',
-                ALERTS: true,
-                ESCALATION_POLICY: version === 'V1',
-            };
-
+        if (serviceName === FEATURES.ALERT_MANAGER) {
             if (version === 'V2') {
-                if (this.schema.IAM?.menu) {
-                    this.schema.IAM.menu.USER_GROUP = true;
+                this.schema.IAM.V1.menu[MENU_ID.USER_GROUP] = true;
+                this.schema.IAM.V1.adminMenu[MENU_ID.USER_GROUP] = true;
+                if (this.schema.PROJECT.V1?.affectsUI) {
+                    this.schema.PROJECT.V1.affectsUI.showAlert = false;
                 }
-
-                if (this.schema.PROJECT?.affectsUI) {
-                    this.schema.PROJECT.affectsUI.AlertTab = false;
+                if (this.schema.ASSET_INVENTORY.V1?.affectsUI) {
+                    this.schema.ASSET_INVENTORY.V1.affectsUI.showAlert = false;
                 }
-
                 if (this.schema.COMMON?.affectsUI) {
-                    this.schema.COMMON.affectsUI.topBarAlertIcon = false;
+                    this.schema.COMMON.affectsUI.showAlert = false;
                 }
             }
         }

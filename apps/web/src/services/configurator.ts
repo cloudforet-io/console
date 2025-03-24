@@ -50,9 +50,10 @@ class ServiceConfigurator {
         Object.keys(this.featureSchema).forEach((serviceName) => {
             const configurator = ServiceConfigurator.getFeatureConfigurator(serviceName);
             if (configurator) {
+                const version = this.featureSchema[serviceName].currentVersion;
                 const route = mode === 'admin'
-                    ? configurator.getAdminRoutes(this.featureSchema[serviceName])
-                    : configurator.getWorkspaceRoutes(this.featureSchema[serviceName]);
+                    ? configurator.getAdminRoutes(version)
+                    : configurator.getWorkspaceRoutes(version);
                 if (route && !baseRoutes.some((existingRoute) => existingRoute.path === route.path)) {
                     baseRoutes.push(route);
                 }
@@ -70,9 +71,11 @@ class ServiceConfigurator {
         Object.keys(this.featureSchema).forEach((serviceName) => {
             const configurator = ServiceConfigurator.getFeatureConfigurator(serviceName);
             if (configurator) {
+                const feature = this.featureSchema[serviceName];
+                const versionSchema = feature[feature.currentVersion];
                 const serviceMenu = mode === 'admin'
-                    ? configurator.getAdminMenu(this.featureSchema[serviceName])
-                    : configurator.getWorkspaceMenu(this.featureSchema[serviceName]);
+                    ? configurator.getAdminMenu(versionSchema)
+                    : configurator.getWorkspaceMenu(versionSchema);
                 if (serviceMenu && !menuList.some((existingRoute) => existingRoute.id === serviceMenu.id)) {
                     menuList.push(serviceMenu);
                 }

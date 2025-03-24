@@ -1,7 +1,7 @@
 import type { Menu } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import type { schemaType } from '@/services/featureSchema';
+import type { versionSchemaType } from '@/services/featureSchema';
 import projectRoutesV1 from '@/services/project/v1/routes/routes';
 import projectRoutes from '@/services/project/v2/routes/routes';
 
@@ -10,16 +10,17 @@ class ProjectConfigurator {
         return null;
     }
 
-    static getWorkspaceRoutes(featureSchema: schemaType) {
-        return featureSchema.version === 'V1' ? projectRoutesV1 : projectRoutes;
+    static getWorkspaceRoutes(version: string) {
+        return version === 'V1' ? projectRoutesV1 : projectRoutes;
     }
 
     static getAdminMenu(): Menu|null {
         return null;
     }
 
-    static getWorkspaceMenu(): Menu {
-        return { id: MENU_ID.PROJECT, needPermissionByRole: true };
+    static getWorkspaceMenu(versionSchema: versionSchemaType): Menu {
+        const menuId = Object.keys(versionSchema.menu)[0];
+        return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
     }
 }
 

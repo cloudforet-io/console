@@ -1,5 +1,7 @@
-import { MENU_ID } from '@/lib/menu/config';
+import type { Menu } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import type { versionSchemaType } from '@/services/featureSchema';
 import adminServiceAccountRoute from '@/services/service-account/routes/admin/routes';
 import serviceAccountRoute from '@/services/service-account/routes/routes';
 
@@ -12,12 +14,14 @@ class ServiceAccountConfigurator {
         return serviceAccountRoute;
     }
 
-    static getAdminMenu() {
-        return { id: MENU_ID.SERVICE_ACCOUNT };
+    static getAdminMenu(versionSchema: versionSchemaType): Menu {
+        const menuId = Object.keys(versionSchema.adminMenu || versionSchema.menu)[0];
+        return { id: MENU_INFO_MAP[menuId].menuId };
     }
 
-    static getWorkspaceMenu() {
-        return { id: MENU_ID.SERVICE_ACCOUNT, needPermissionByRole: true };
+    static getWorkspaceMenu(versionSchema: versionSchemaType): Menu {
+        const menuId = Object.keys(versionSchema.menu)[0];
+        return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
     }
 }
 
