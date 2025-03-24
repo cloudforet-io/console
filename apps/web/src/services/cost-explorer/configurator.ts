@@ -1,8 +1,10 @@
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import costExplorerRoutes from '@/services/cost-explorer/routes/routes';
+import type { versionSchemaType } from '@/services/featureSchema';
 
 class CostExplorerConfigurator {
     static getAdminRoutes() {
@@ -13,28 +15,27 @@ class CostExplorerConfigurator {
         return costExplorerRoutes;
     }
 
-    static getAdminMenu(): Menu {
+    static getAdminMenu(versionSchema: versionSchemaType): Menu {
+        const menu = versionSchema.adminMenu || versionSchema.menu;
+        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
+            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
         return {
             id: MENU_ID.COST_EXPLORER,
-            subMenuList: [
-                { id: MENU_ID.COST_ANALYSIS },
-                { id: MENU_ID.BUDGET },
-                { id: MENU_ID.COST_REPORT },
-                { id: MENU_ID.DATA_SOURCES },
-                { id: MENU_ID.COST_ADVANCED_SETTINGS },
-            ],
+            subMenuList: subMenuIds,
         };
     }
 
-    static getWorkspaceMenu(): Menu {
+    static getWorkspaceMenu(versionSchema: versionSchemaType): Menu {
+        const menu = versionSchema.menu;
+        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
+            .map((menuId) => ({
+                id: MENU_INFO_MAP[menuId].menuId,
+                needPermissionByRole: true,
+            }));
         return {
             id: MENU_ID.COST_EXPLORER,
             needPermissionByRole: true,
-            subMenuList: [
-                { id: MENU_ID.COST_ANALYSIS, needPermissionByRole: true },
-                { id: MENU_ID.BUDGET, needPermissionByRole: true },
-                { id: MENU_ID.COST_REPORT, needPermissionByRole: true },
-            ],
+            subMenuList: subMenuIds,
         };
     }
 }

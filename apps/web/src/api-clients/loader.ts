@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import apiClientsSchema from '@/api-clients/api-clients-schema.json';
+import type { ApiClients } from '@/api-clients/schema';
+import { ApiClientSchema } from '@/api-clients/schema';
 
 import config from '@/lib/config';
 
@@ -21,12 +22,12 @@ class APIClientLoader {
 
     private config: GlobalConfig['SERVICES'] | null = null;
 
-    private apiClientsSchema: Record<string, Record<string, string>> = {};
+    private apiClientsSchema: ApiClients = {} as ApiClients;
 
     async initialize() {
         await config.init();
         this.config = config.get('SERVICES') || {};
-        this.apiClientsSchema = apiClientsSchema;
+        this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientSchema));
 
         this.defineDynamicServices();
     }
@@ -61,20 +62,13 @@ class APIClientLoader {
         }
 
         const version = serviceConfig.VERSION;
-        const endpointDefinition = apiClientSchemaByService[version];
-        if (!endpointDefinition) {
+        const clientEndpoint = apiClientSchemaByService[version];
+        if (!clientEndpoint) {
             console.error(`[APIClientLoader] No endpoint mapping found for ${serviceName} with version ${version}.`);
             return null;
         }
 
-        const [clientVersion, clientEndpoint] = endpointDefinition.split('/');
-
-        const client = clientVersion === 'v1' ? SpaceConnector.client : SpaceConnector.clientV2;
-        const endpoint = client[clientEndpoint];
-        if (!endpoint) {
-            console.error(`[APIClientLoader] No client found for endpoint "${clientEndpoint}" using "${clientVersion}".`);
-            return null;
-        }
+        const endpoint = SpaceConnector.clientV2[clientEndpoint];
 
         return { endpoint, version };
     }
