@@ -14,7 +14,7 @@ export const initialFeatureSchema: FeatureSchemaType = {
         V1: {
             menu: { [MENU_ID.PROJECT]: true },
             uiAffects: {
-                showAlert: true,
+                visibleAlertTabAtDetail: true,
             },
         },
     },
@@ -35,7 +35,7 @@ export const initialFeatureSchema: FeatureSchemaType = {
                 [MENU_ID.COLLECTOR]: true,
             },
             uiAffects: {
-                showAlert: true,
+                visibleAlertTabAtDetail: true,
             },
         },
     },
@@ -54,6 +54,9 @@ export const initialFeatureSchema: FeatureSchemaType = {
                 [MENU_ID.DATA_SOURCES]: true,
                 [MENU_ID.COST_ADVANCED_SETTINGS]: true,
             },
+            uiAffects: {
+                visibleBudgetNotification: false,
+            },
         },
     },
     [FEATURES.ALERT_MANAGER]: {
@@ -64,11 +67,19 @@ export const initialFeatureSchema: FeatureSchemaType = {
                 [MENU_ID.ALERTS]: true,
                 [MENU_ID.ESCALATION_POLICY]: true,
             },
+            uiAffects: {
+                visibleAlertIcon: true,
+                visibleUserNotification: false,
+            },
         },
         V2: {
             menu: {
                 [MENU_ID.SERVICE]: true,
                 [MENU_ID.ALERTS]: true,
+            },
+            uiAffects: {
+                visibleAlertIcon: false,
+                visibleUserNotification: true,
             },
         },
     },

@@ -46,6 +46,10 @@ class IamConfigurator {
             subMenuList: subMenuIds,
         };
     }
+
+    static applyUiAffects(): void|null {
+        return null;
+    }
 }
 
 export default IamConfigurator;

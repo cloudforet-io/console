@@ -7,5 +7,4 @@ export const FEATURES = {
     ALERT_MANAGER: 'ALERT_MANAGER',
     OPS_FLOW: 'OPS_FLOW',
     IAM: 'IAM',
-    COMMON: 'COMMON',
 } as const;

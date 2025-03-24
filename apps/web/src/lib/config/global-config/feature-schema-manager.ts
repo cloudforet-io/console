@@ -22,14 +22,7 @@ export class FeatureSchemaManager {
             }
         });
 
-        return {
-            ...this.schema,
-            [FEATURES.COMMON]: {
-                uiAffects: {
-                    showAlert: true,
-                },
-            },
-        };
+        return this.schema;
     }
 
     private updateSchema(serviceName: string, version: string): void {
@@ -41,16 +34,17 @@ export class FeatureSchemaManager {
             if (version === 'V2') {
                 this.schema[FEATURES.IAM].V1.menu[MENU_ID.USER_GROUP] = true;
                 this.schema[FEATURES.IAM].V1.adminMenu[MENU_ID.USER_GROUP] = true;
-                if (this.schema[FEATURES.PROJECT].V1?.uiAffects) {
-                    this.schema[FEATURES.PROJECT].V1.uiAffects.showAlert = false;
-                }
-                if (this.schema[FEATURES.ASSET_INVENTORY].V1?.uiAffects) {
-                    this.schema[FEATURES.ASSET_INVENTORY].V1.uiAffects.showAlert = false;
-                }
-                if (this.schema[FEATURES.COMMON]?.uiAffects) {
-                    this.schema[FEATURES.COMMON].uiAffects.showAlert = false;
-                }
+                this.updateUiAffects(FEATURES.PROJECT, 'V1', 'visibleAlertTabAtDetail', false);
+                this.updateUiAffects(FEATURES.ASSET_INVENTORY, 'V1', 'visibleAlertTabAtDetail', false);
+                this.updateUiAffects(FEATURES.COST_EXPLORER, 'V1', 'visibleBudgetNotification', true);
             }
+        }
+    }
+
+    private updateUiAffects(featureKey: string, version: string, affectKey: string, value: boolean): void {
+        const feature = this.schema[featureKey]?.[version];
+        if (feature?.uiAffects?.[affectKey] !== undefined) {
+            feature.uiAffects[affectKey] = value;
         }
     }
 }

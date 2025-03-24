@@ -5,6 +5,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 
 class AssetInventoryConfigurator {
     static getAdminRoutes() {
@@ -37,6 +38,11 @@ class AssetInventoryConfigurator {
             needPermissionByRole: true,
             subMenuList: subMenuIds,
         };
+    }
+
+    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+        cloudServiceDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
     }
 }
 
