@@ -1,31 +1,87 @@
-import { computed, reactive } from 'vue';
+import type { ComputedRef } from 'vue';
+import { reactive, computed } from 'vue';
 
+
+import { API_QUERY_KEY_MAP } from '@/api-clients/_common/constants/api-query-key-map-constant';
 import type {
-    ResourceName, ServiceName, Verb,
+    APIQueryKeyMapService, APIQueryKeyMapResource, APIQueryKeyMapVerb, ServiceName, ResourceName, Verb,
 } from '@/api-clients/_common/types/query-key-type';
+import { useQueryKeyAppContext } from '@/query/_composables/use-query-key-app-context';
+import { createImmutableObject } from '@/query/_helpers/immutable-key-helper';
+import type { QueryKeyArray } from '@/query/_types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-/**
- * Generates a computed query key for API requests, incorporating global parameters.
- *
- * @param service - The service name, representing the API service scope (e.g., 'dashboard').
- * @param resource - The resource name, specifying the target API resource (e.g., 'public-data-table').
- * @param verb - The API action verb, defining the type of request (e.g., 'get', 'list', 'update').
- * @param additionalGlobalParams - Optional additional global parameters (e.g., workspace ID, admin mode).
- * @returns A computed reference to the query key array, structured as `[service, resource, verb, { globalParams }]`.
- *
- * ### Example Usage:
- * ```ts
- *  const queryKey = useAPIQueryKey('dashboard', 'public-data-table', 'get');
- * ```
- * The generated query key ensures:
- * - **Type safety**: Prevents invalid API calls by enforcing a valid `service/resource/verb` combination.
- * - **Auto-completion**: Provides intelligent suggestions based on predefined API structure.
- * - **Cache management**: Enables precise cache invalidation and data synchronization.
- */
 
+
+type QueryKeyArrayWithDep = QueryKeyArray & {
+    addDep: (deps: Record<string, unknown>) => QueryKeyArray;
+};
+type ExtractParams<T> = T extends (params: infer P) => any ? P : never;
+
+type VerbFunction<T> = {
+    (params?: ExtractParams<T>): QueryKeyArrayWithDep;
+};
+
+type MapVerbToReturnType<T> = T extends (params: any) => any
+    ? VerbFunction<T>
+    : never;
+
+type UseAPIQueryResult = {
+    [S in APIQueryKeyMapService]: {
+        [R in APIQueryKeyMapResource<S>]: {
+            [V in APIQueryKeyMapVerb<S, R>]: MapVerbToReturnType<(typeof API_QUERY_KEY_MAP)[S][R][V]>;
+        };
+    };
+};
+
+type APIQueryKeyValue = (params?: Record<string, unknown>) => QueryKeyArray;
+
+
+export const _useAPIQueryKey = (): ComputedRef<UseAPIQueryResult> => {
+    const queryKeyAppContext = useQueryKeyAppContext('service');
+    const globalContext = computed(() => queryKeyAppContext.value);
+
+
+    const apiStructure = Object.entries(API_QUERY_KEY_MAP).reduce<Record<APIQueryKeyMapService, any>>((result, [serviceName, resources]) => {
+        result[serviceName as APIQueryKeyMapService] = Object.entries(resources).reduce((resourceResult, [resourceName, verbs]) => {
+            resourceResult[resourceName] = Object.entries(verbs).reduce((verbResult, [verb, queryKeyValue]) => {
+                const staticKey = createImmutableObject([serviceName, resourceName, verb]);
+
+                const verbFunction = <T extends APIQueryKeyValue>(params?: ExtractParams<T>) => {
+                    const baseKey = computed(() => (queryKeyValue as T)(params));
+                    const queryKey = [
+                        ...globalContext.value,
+                        ...staticKey,
+                        ...createImmutableObject(baseKey.value),
+                    ] as QueryKeyArray;
+
+                    (queryKey as QueryKeyArrayWithDep).addDep = (deps: Record<string, unknown>): QueryKeyArray => [
+                        ...globalContext.value,
+                        ...staticKey,
+                        ...createImmutableObject(baseKey.value),
+                        createImmutableObject(deps),
+                    ];
+
+                    return queryKey as QueryKeyArrayWithDep;
+                };
+
+                verbResult[verb] = verbFunction;
+                return verbResult;
+            }, {});
+            return resourceResult;
+        }, {});
+        return result;
+    }, {} as Record<APIQueryKeyMapService, any>);
+
+
+    return computed(() => apiStructure as UseAPIQueryResult);
+};
+
+
+
+// TODO: Deprecate this
 interface GlobalQueryParams {
     workspaceId?: string;
     isAdminMode?: boolean;
