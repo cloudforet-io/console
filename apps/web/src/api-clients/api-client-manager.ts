@@ -1,9 +1,8 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ApiClients } from '@/api-clients/schema';
-import { ApiClientSchema } from '@/api-clients/schema';
-
 import config from '@/lib/config';
+import { ApiClientSchema } from '@/lib/config/global-config/api-client-schema';
+import type { ApiClientsSchemaType } from '@/lib/config/global-config/type';
 
 interface ServiceConfig {
     ENABLED: boolean;
@@ -16,13 +15,13 @@ interface GlobalConfig {
     };
 }
 
-class APIClientLoader {
+class APIClientManager {
     // eslint-disable-next-line no-undef
     [key: string]: any;
 
     private config: GlobalConfig['SERVICES'] | null = null;
 
-    private apiClientsSchema: ApiClients = {} as ApiClients;
+    private apiClientsSchema: ApiClientsSchemaType = {} as ApiClientsSchemaType;
 
     async initialize() {
         await config.init();
@@ -34,7 +33,7 @@ class APIClientLoader {
 
     private defineDynamicServices() {
         if (!this.apiClientsSchema) {
-            throw new Error('[APIClientLoader] APIClientLoader is not initialized. Call initialize() first.');
+            throw new Error('[APIClientManager] APIClientManager is not initialized. Call initialize() first.');
         }
 
         Object.keys(this.apiClientsSchema).forEach((serviceName) => {
@@ -51,20 +50,20 @@ class APIClientLoader {
     private createServiceHandler(serviceName: string) {
         const serviceConfig = this.config?.[serviceName] || null;
         if (!serviceConfig || !serviceConfig.ENABLED) {
-            console.warn(`[APIClientLoader] ${serviceName} is disabled or not configured.`);
+            console.warn(`[APIClientManager] ${serviceName} is disabled or not configured.`);
             return null;
         }
 
         const apiClientSchemaByService = this.apiClientsSchema[serviceName];
         if (!apiClientSchemaByService) {
-            console.warn('[APIClientLoader] apiClientSchemaByService is not configured.');
+            console.warn('[APIClientManager] apiClientSchemaByService is not configured.');
             return null;
         }
 
         const version = serviceConfig.VERSION;
         const clientEndpoint = apiClientSchemaByService[version];
         if (!clientEndpoint) {
-            console.error(`[APIClientLoader] No endpoint mapping found for ${serviceName} with version ${version}.`);
+            console.error(`[APIClientManager] No endpoint mapping found for ${serviceName} with version ${version}.`);
             return null;
         }
 
@@ -74,4 +73,4 @@ class APIClientLoader {
     }
 }
 
-export default new APIClientLoader();
+export default new APIClientManager();
