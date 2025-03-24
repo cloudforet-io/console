@@ -9,7 +9,6 @@ import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
@@ -30,10 +29,6 @@ const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
 
-const ServiceAccountPage = () => import('@/services/asset-inventory/pages/ServiceAccountPage.vue');
-const ServiceAccountDetailPage = () => import('@/services/asset-inventory/pages/ServiceAccountDetailPage.vue');
-const ServiceAccountAddPage = () => import('@/services/asset-inventory/pages/ServiceAccountAddPage.vue');
-
 const CollectorHistoryPage = () => import('@/services/asset-inventory/pages/CollectorHistoryPage.vue');
 const CollectJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
 const CollectorDetailPage = () => import('@/services/asset-inventory/pages/CollectorDetailPage.vue');
@@ -47,7 +42,7 @@ const assetInventoryRoute: RouteConfig = {
         menuId: MENU_ID.ASSET_INVENTORY,
         translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
     component: AssetInventoryContainer,
     children: [
         {
@@ -166,44 +161,6 @@ const assetInventoryRoute: RouteConfig = {
                     props: true,
                     meta: { label: ({ params }) => params.collectorId, copiable: true },
                     component: CollectorDetailPage as any,
-                },
-            ],
-        },
-        {
-            path: 'service-account',
-            meta: { menuId: MENU_ID.SERVICE_ACCOUNT, translationId: MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId },
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: '/',
-                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                    meta: { menuId: MENU_ID.SERVICE_ACCOUNT },
-                    props: true,
-                    component: ServiceAccountPage as any,
-                },
-                {
-                    path: 'no-resource',
-                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
-                    meta: { translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
-                    component: NoResourcePage as any,
-                },
-                {
-                    path: ':serviceAccountId',
-                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                    meta: { label: ({ params }) => params.serviceAccountId, copiable: true },
-                    props: true,
-                    component: ServiceAccountDetailPage,
-                },
-                {
-                    path: 'add/:provider/:serviceAccountType',
-                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: {
-                        translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
-                            type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
-                        }]),
-                    },
-                    props: true,
-                    component: ServiceAccountAddPage as any,
                 },
             ],
         },

@@ -58,6 +58,7 @@ import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-
 import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMainDeleteModal.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 
 const ROLE_INFO_MAP = {
@@ -134,7 +135,7 @@ const state = reactive({
         {
             label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
             to: {
-                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                name: SERVICE_ACCOUNT_ROUTE._NAME,
                 params: {
                     workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                 },

@@ -15,6 +15,7 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
@@ -75,8 +76,8 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.SERVICE_ACCOUNT]: {
         menuId: MENU_ID.SERVICE_ACCOUNT,
-        routeName: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-        translationId: 'MENU.ASSET_INVENTORY_SERVICE_ACCOUNT',
+        routeName: SERVICE_ACCOUNT_ROUTE._NAME,
+        translationId: 'MENU.SERVICE_ACCOUNT',
         icon: 'ic_service_service-account',
     },
     [MENU_ID.COST_EXPLORER]: {
