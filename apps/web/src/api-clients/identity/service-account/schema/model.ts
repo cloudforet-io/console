@@ -20,6 +20,7 @@ export interface ServiceAccountModel {
     created_at: string;
     last_synced_at: string;
     state: ServiceAccountType;
+    service_account_mgr_id: string;
     // asset_info: ServiceAccountAssetInfoType;
     // cost_info: ServiceAccountCostInfoType;
 }

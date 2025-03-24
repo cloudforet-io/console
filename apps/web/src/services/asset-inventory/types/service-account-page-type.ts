@@ -8,6 +8,7 @@ export type PageMode = 'CREATE' | 'UPDATE' | 'READ';
 export interface BaseInformationForm {
     accountName: string;
     customSchemaForm: { [key: string]: any; };
+    serviceAccountManagerId?: string;
     tags: Tag;
     projectForm?: ProjectForm;
 }
