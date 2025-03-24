@@ -1,7 +1,6 @@
 import { FEATURES } from '@/lib/config/global-config/constants';
-import type { FeatureSchemaType } from '@/lib/config/global-config/feature-schema';
 import { initialFeatureSchema } from '@/lib/config/global-config/feature-schema';
-import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
+import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/type';
 import { MENU_ID } from '@/lib/menu/config';
 
 export class FeatureSchemaManager {

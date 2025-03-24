@@ -5,9 +5,8 @@ import { isEmpty } from 'lodash';
 import { useMenuStore } from '@/store/menu/menu-store';
 
 import config from '@/lib/config';
-import type { FeatureSchemaType } from '@/lib/config/global-config/feature-schema';
 import { FeatureSchemaManager } from '@/lib/config/global-config/feature-schema-manager';
-import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
+import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/type';
 import type { Menu } from '@/lib/menu/config';
 import { DEFAULT_ADMIN_MENU_LIST, DEFAULT_MENU_LIST } from '@/lib/menu/menu-architecture';
 
