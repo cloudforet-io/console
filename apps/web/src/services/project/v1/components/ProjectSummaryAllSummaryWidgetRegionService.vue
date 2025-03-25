@@ -40,10 +40,12 @@ interface Props {
     projectId: string;
     label?: string;
     count?: number;
+    visibleContents: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     label: undefined,
     count: undefined,
+    visibleContents: true,
 });
 const allReferenceStore = useAllReferenceStore();
 
@@ -203,10 +205,12 @@ watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => 
                     </div>
                 </template>
                 <template v-else>
-                    <router-link v-for="(d, idx) of state.data"
-                                 :key="idx"
-                                 :to="d.to"
-                                 class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                    <component :is="props.visibleContents ? 'router-link' : 'div'"
+                               v-for="(d, idx) of state.data"
+                               :key="idx"
+                               :to="d.to"
+                               class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                               :class="{ 'text-only': !visibleContents }"
                     >
                         <span class="circle"
                               :style="{ 'background-color': d.color }"
@@ -216,7 +220,7 @@ watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => 
                             <span class="type truncate">{{ d.region }}</span>
                         </div>
                         <span class="count">{{ d.count }}</span>
-                    </router-link>
+                    </component>
                 </template>
             </div>
         </div>
@@ -268,16 +272,22 @@ watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => 
         padding: 0.25rem 0.5rem;
         margin: auto 0;
 
-        &:hover {
-            @apply bg-secondary2;
-            .provider {
-                text-decoration: underline;
-            }
-            .type {
-                text-decoration: underline;
-            }
-            .count {
-                text-decoration: underline;
+        &.text-only {
+            cursor: default;
+        }
+
+        &:not(.text-only) {
+            &:hover {
+                @apply bg-secondary2;
+                .provider {
+                    text-decoration: underline;
+                }
+                .type {
+                    text-decoration: underline;
+                }
+                .count {
+                    text-decoration: underline;
+                }
             }
         }
 

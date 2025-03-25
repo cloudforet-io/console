@@ -92,7 +92,7 @@ class ServiceConfigurator {
 
     private static getFeatureConfigurator(featureName: string): any | null {
         const configurators = {
-            DASHBOARD: DashboardConfigurator,
+            DASHBOARDS: DashboardConfigurator,
             PROJECT: ProjectConfigurator,
             SERVICE_ACCOUNT: ServiceAccountConfigurator,
             ASSET_INVENTORY: AssetInventoryConfigurator,

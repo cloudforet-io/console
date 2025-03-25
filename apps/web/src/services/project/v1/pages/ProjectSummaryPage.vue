@@ -11,6 +11,9 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 
+import { MENU_ID } from '@/lib/menu/config';
+
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
@@ -30,12 +33,14 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 
+const { visibleContents: visibleAssetContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
+const { visibleContents: visibleAlertContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
+
 const state = reactive({
-    visibleAlertTab: computed<boolean>(() => projectDetailPageState.visibleAlertTab),
+    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && projectDetailPageState.visibleAlertTab),
     hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });
@@ -109,6 +114,7 @@ watch(() => props.id, () => {
                 :project-id="props.id"
             />
             <project-summary-personal-health-dashboard-widget
+                v-if="visibleAssetContents"
                 :key="`project-summary-personal-health-dashboard-widget-${props.id}`"
                 class="col-span-12"
                 :project-id="props.id"
@@ -120,16 +126,19 @@ watch(() => props.id, () => {
             />
         </div>
         <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
-            <daily-updates :key="`daily-updates-${props.id}`"
+            <daily-updates v-if="visibleAssetContents"
+                           :key="`daily-updates-${props.id}`"
                            class="col-span-12 daily-updates"
                            :project-id="props.id"
             />
-            <cloud-services :key="`cloud-services-${props.id}`"
+            <cloud-services v-if="visibleAssetContents"
+                            :key="`cloud-services-${props.id}`"
                             class="col-span-12 cloud-services"
                             :more-info="true"
                             :project-id="props.id"
             />
             <project-summary-trusted-advisor-widget
+                v-if="visibleAssetContents"
                 :key="`project-summary-trusted-advisor-widget-${props.id}`"
                 class="col-span-12 trusted-advisor"
                 :project-id="props.id"

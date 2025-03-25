@@ -22,8 +22,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -52,6 +54,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const userStore = useUserStore();
 
+const { visibleContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
+
 /* Query */
 const {
     publicDashboardList,
@@ -59,7 +63,7 @@ const {
 } = useDashboardQuery();
 
 const storeState = reactive({
-    visibleAlertTab: computed<boolean>(() => projectDetailPageState.visibleAlertTab),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && projectDetailPageState.visibleAlertTab),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     language: computed<string|undefined>(() => userStore.state.language),
