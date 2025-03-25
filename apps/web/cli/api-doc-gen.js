@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const API_DIR = './src/api-clients';
-const OUTPUT_PATH = './src/api-clients/_common/constants/api-doc.ts';
+const OUTPUT_PATH = './src/api-clients/_common/constants/api-doc-constant.ts';
 
 
 const generateAPIDocumentation = (basePath) => {
