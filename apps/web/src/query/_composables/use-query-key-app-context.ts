@@ -1,7 +1,5 @@
 import { computed, reactive } from 'vue';
 
-import type { QueryScope } from '@/query/_types/query-key-type';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -21,7 +19,7 @@ interface WorkspaceModeState {
 type QueryKeyState = AdminModeState | WorkspaceModeState;
 
 
-export const useQueryKeyAppContext = (queryScope: QueryScope = 'service') => {
+export const useQueryKeyAppContext = () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
 
@@ -40,7 +38,7 @@ export const useQueryKeyAppContext = (queryScope: QueryScope = 'service') => {
             };
 
         return state.isAdminMode
-            ? [queryScope, 'admin']
-            : [queryScope, 'workspace', state.workspaceId];
+            ? ['admin']
+            : ['workspace', state.workspaceId];
     });
 };

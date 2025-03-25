@@ -8,7 +8,7 @@ import { REFERENCE_TYPE_INFO_MAP } from '@/query/reference/_constants/reference-
 type UseReferenceQueryKeyResult = Record<keyof typeof REFERENCE_TYPE_INFO_MAP, QueryKeyArray>;
 
 export const useReferenceQueryKey = (): ComputedRef<UseReferenceQueryKeyResult> => {
-    const queryKeyAppContext = useQueryKeyAppContext('reference');
+    const queryKeyAppContext = useQueryKeyAppContext();
 
     return computed(() => Object.entries(REFERENCE_TYPE_INFO_MAP).reduce((acc, [key, value]) => ({
         ...acc,
