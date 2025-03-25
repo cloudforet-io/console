@@ -3,7 +3,6 @@ import {
     computed, type ComputedRef, reactive, watch,
 } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
 import { type QueryClient, useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -21,6 +20,8 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
+import type { QueryKeyArray } from '@/query/_types/query-key-type';
+import { _useAPIQueryKey } from '@/query/composables/use-api-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -38,10 +39,10 @@ interface UseDashboardQueryReturn {
     privateFolderList: Ref<PrivateFolderModel[]>;
     isLoading: ComputedRef<boolean>;
     keys: {
-        publicDashboardListQueryKey: ComputedRef<QueryKey>;
-        privateDashboardListQueryKey: ComputedRef<QueryKey>;
-        publicFolderListQueryKey: ComputedRef<QueryKey>;
-        privateFolderListQueryKey: ComputedRef<QueryKey>;
+        publicDashboardListQueryKey: ComputedRef<QueryKeyArray>;
+        privateDashboardListQueryKey: ComputedRef<QueryKeyArray>;
+        publicFolderListQueryKey: ComputedRef<QueryKeyArray>;
+        privateFolderListQueryKey: ComputedRef<QueryKeyArray>;
     };
     fetcher: {
         updateFolderFn: (args: FolderUpdateParams) => Promise<FolderModel>
@@ -56,10 +57,11 @@ interface UseDashboardQueryReturn {
 }
 
 export const useDashboardQuery = (): UseDashboardQueryReturn => {
-    const { publicDashboardAPI, publicDashboardListQueryKey } = usePublicDashboardApi();
-    const { privateDashboardAPI, privateDashboardListQueryKey } = usePrivateDashboardApi();
-    const { publicFolderAPI, publicFolderListQueryKey } = usePublicFolderApi();
-    const { privateFolderAPI, privateFolderListQueryKey } = usePrivateFolderApi();
+    const { publicDashboardAPI } = usePublicDashboardApi();
+    const { privateDashboardAPI } = usePrivateDashboardApi();
+    const { publicFolderAPI } = usePublicFolderApi();
+    const { privateFolderAPI } = usePrivateFolderApi();
+
 
     const queryClient = useQueryClient();
 
@@ -86,52 +88,44 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         },
     });
 
-    /* Query Keys */
-    const _publicDashboardListQueryKey = computed(() => [
-        ...publicDashboardListQueryKey.value,
-        _state.defaultListQuery,
-        _state.publicDashboardListApiQuery.filter,
-    ]);
-    const _privateDashboardListQueryKey = computed(() => [
-        ...privateDashboardListQueryKey.value,
-        _state.defaultListQuery,
-    ]);
-    const _publicFolderListQueryKey = computed(() => [
-        ...publicFolderListQueryKey.value,
-        _state.defaultListQuery,
-        _state.publicFolderListApiQuery.filter,
-    ]);
-    const _privateFolderListQueryKey = computed(() => [
-        ...privateFolderListQueryKey.value,
-        _state.defaultListQuery,
-    ]);
-
+    /* Query Keys and Params */
+    const { key: publicDashboardListQueryKey, params: publicDashboardListParams } = _useAPIQueryKey('dashboard', 'public-dashboard', 'list', {
+        params: computed(() => ({
+            query: {
+                ..._state.publicDashboardListApiQuery,
+                ..._state.defaultListQuery.query,
+            },
+        })),
+    });
+    const { key: privateDashboardListQueryKey, params: privateDashboardListParams } = _useAPIQueryKey('dashboard', 'private-dashboard', 'list', {
+        params: computed(() => _state.defaultListQuery),
+    });
+    const { key: publicFolderListQueryKey, params: publicFolderListParams } = _useAPIQueryKey('dashboard', 'public-folder', 'list', {
+        params: computed(() => ({
+            query: {
+                ..._state.publicFolderListApiQuery,
+                ..._state.defaultListQuery.query,
+            },
+        })),
+    });
+    const { key: privateFolderListQueryKey, params: privateFolderListParams } = _useAPIQueryKey('dashboard', 'private-folder', 'list', {
+        params: computed(() => _state.defaultListQuery),
+    });
 
     /* Querys */
     const publicDashboardListQuery = useScopedQuery<ListResponse<PublicDashboardModel>, unknown, PublicDashboardModel[]>({
-        queryKey: _publicDashboardListQueryKey,
-        queryFn: () => publicDashboardAPI.list({
-            query: {
-                ..._state.publicDashboardListApiQuery,
-                sort: [{
-                    key: 'created_at',
-                    desc: true,
-                }],
-            },
-        }),
+        queryKey: publicDashboardListQueryKey,
+        queryFn: () => publicDashboardAPI.list(publicDashboardListParams.value),
         select: (data) => data?.results ?? [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
         enabled: computed(() => !!_state.publicDashboardListApiQuery?.filter),
     }, ['DOMAIN', 'WORKSPACE']);
+
     const privateDashboardListQuery = useScopedQuery<ListResponse<PrivateDashboardModel>, unknown, PrivateDashboardModel[]>({
-        queryKey: _privateDashboardListQueryKey,
-        queryFn: () => privateDashboardAPI.list({
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        }),
+        queryKey: privateDashboardListQueryKey,
+        queryFn: () => privateDashboardAPI.list(privateDashboardListParams.value),
         select: (data) => data?.results || [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
@@ -139,13 +133,8 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         enabled: computed(() => !_state.isAdminMode),
     }, ['WORKSPACE']);
     const publicFolderListQuery = useScopedQuery<ListResponse<PublicFolderModel>, unknown, PublicFolderModel[]>({
-        queryKey: _publicFolderListQueryKey,
-        queryFn: () => publicFolderAPI.list({
-            query: {
-                ..._state.publicFolderListApiQuery,
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        }),
+        queryKey: publicFolderListQueryKey,
+        queryFn: () => publicFolderAPI.list(publicFolderListParams.value),
         select: (data) => data?.results || [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
@@ -153,12 +142,8 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         enabled: computed(() => !!_state.publicFolderListApiQuery?.filter),
     }, ['DOMAIN', 'WORKSPACE']);
     const privateFolderListQuery = useScopedQuery<ListResponse<PrivateFolderModel>, unknown, PrivateFolderModel[]>({
-        queryKey: _privateFolderListQueryKey,
-        queryFn: () => privateFolderAPI.list({
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        }),
+        queryKey: privateFolderListQueryKey,
+        queryFn: () => privateFolderAPI.list(privateFolderListParams.value),
         select: (data) => data?.results || [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
@@ -199,10 +184,10 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         privateFolderList: computed<PrivateFolderModel[]>(() => privateFolderListQuery.data.value ?? []),
         isLoading,
         keys: {
-            publicDashboardListQueryKey: _publicDashboardListQueryKey,
-            privateDashboardListQueryKey: _privateDashboardListQueryKey,
-            publicFolderListQueryKey: _publicFolderListQueryKey,
-            privateFolderListQueryKey: _privateFolderListQueryKey,
+            publicDashboardListQueryKey,
+            privateDashboardListQueryKey,
+            publicFolderListQueryKey,
+            privateFolderListQueryKey,
         },
         fetcher: {
             updateFolderFn,

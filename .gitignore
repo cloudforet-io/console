@@ -9,6 +9,7 @@ node_modules.nosync/
 # Dev tools
 .DS_Store
 .vscode
+.cursor
 .idea
 *.swp
 *.bak
