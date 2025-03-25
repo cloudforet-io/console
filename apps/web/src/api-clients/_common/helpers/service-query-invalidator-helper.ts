@@ -1,7 +1,7 @@
-import { queryClient } from '@/query';
+import { apiQueryClient } from '@/query/clients';
 
 export const invalidateServiceQuery = async (mode: 'admin' | 'workspace') => {
-    await queryClient.invalidateQueries({
+    await apiQueryClient.invalidateQueries({
         queryKey: ['service', mode],
     });
 };
