@@ -32,8 +32,11 @@ export class FeatureSchemaManager {
 
         if (serviceName === FEATURES.ALERT_MANAGER) {
             if (version === 'V2') {
-                this.schema[FEATURES.IAM].V1.menu[MENU_ID.USER_GROUP] = true;
-                this.schema[FEATURES.IAM].V1.adminMenu[MENU_ID.USER_GROUP] = true;
+                const iamFeatureSettings = this.schema[FEATURES.IAM].V1;
+                iamFeatureSettings.menu[MENU_ID.USER_GROUP] = true;
+                if (iamFeatureSettings.adminMenu) {
+                    iamFeatureSettings.adminMenu[MENU_ID.USER_GROUP] = true;
+                }
                 this.updateUiAffects(FEATURES.PROJECT, 'V1', 'visibleAlertTabAtDetail', false);
                 this.updateUiAffects(FEATURES.ASSET_INVENTORY, 'V1', 'visibleAlertTabAtDetail', false);
                 this.updateUiAffects(FEATURES.COST_EXPLORER, 'V1', 'visibleBudgetNotification', true);
