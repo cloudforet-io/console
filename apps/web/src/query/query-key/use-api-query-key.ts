@@ -2,11 +2,11 @@ import { toValue } from '@vueuse/core';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
-import { createImmutableObjectKeyItem } from '@/query/_helpers/immutable-query-key-helper';
+import { useQueryKeyAppContext } from '@/query/query-key/_composable/use-app-context-query-key';
+import { createImmutableObjectKeyItem } from '@/query/query-key/_helpers/immutable-query-key-helper';
 import type {
     QueryKeyArray, ResourceName, ServiceName, Verb,
-} from '@/query/_types/query-key-type';
-import { useQueryKeyAppContext } from '@/query/composables/use-app-context-query-key';
+} from '@/query/query-key/_types/query-key-type';
 
 
 
@@ -57,6 +57,14 @@ export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>
     verb: V,
     options: UseAPIQueryKeyOptions<P>,
 ): UseAPIQueryKeyResult<P> => {
+    // Runtime validation for development environment
+    if (import.meta.env.DEV) {
+        if (!service || !resource || !verb) {
+            console.warn('Required parameters (service, resource, verb) must be provided');
+        }
+        _validateQueryKeyOptions(options);
+    }
+
     const { id, params, deps } = options;
 
     const queryKeyAppContext = useQueryKeyAppContext();
@@ -76,10 +84,45 @@ export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>
         ];
     });
 
+
+    // NOTE: Only for development environment. After using tanstack query devtools, this will be removed.
+    if (import.meta.env.DEV) {
+        console.debug(`[QueryKey] ${String(service)}/${String(resource)}/${String(verb)}`, JSON.stringify(queryKey.value, null, 2));
+    }
+
     return {
         key: queryKey,
         params: computed(() => toValue(params)),
         deps: deps ? computed(() => toValue(deps)) : undefined,
         id: id ? computed(() => toValue(id)) : undefined,
     };
+};
+
+
+
+const _validateQueryKeyOptions = <P extends object>(options: {
+    id?: _MaybeRefOrGetter<string>;
+    params: _MaybeRefOrGetter<P>;
+    deps?: _MaybeRefOrGetter<object>;
+}) => {
+    if (options.params) {
+        const rawParams = toValue(options.params);
+        if (rawParams === null || typeof rawParams !== 'object') {
+            console.warn('params must be a non-null object');
+        }
+    }
+
+    if (options.deps) {
+        const rawDeps = toValue(options.deps);
+        if (rawDeps === null || typeof rawDeps !== 'object') {
+            console.warn('deps must be a non-null object');
+        }
+    }
+
+    if (options.id) {
+        const id = toValue(options.id);
+        if (typeof id !== 'string') {
+            console.warn('id must be a string');
+        }
+    }
 };
