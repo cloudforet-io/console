@@ -89,7 +89,7 @@ const singleItemTabState = reactive({
         if (state.visibleAlertTab) {
             defaultTabs.push({ name: 'alerts', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS') });
         }
-        if (visibleContents) {
+        if (visibleContents.value) {
             defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
         }
         return defaultTabs;
@@ -103,7 +103,7 @@ const multiItemTabState = reactive({
             { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
             { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
         ];
-        if (visibleContents) {
+        if (visibleContents.value) {
             defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
         }
         return defaultTabs;

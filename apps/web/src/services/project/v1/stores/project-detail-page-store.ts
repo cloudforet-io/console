@@ -26,7 +26,7 @@ export interface AlertCount {
 }
 
 interface ProjectDetailPageState {
-    visibleAlertTab: boolean,
+    visibleAlertTab?: boolean,
     loading: boolean,
     projectId?: string,
     currentProject?: ProjectModel,
@@ -54,7 +54,7 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     });
 
     /* mutations */
-    const setVisibleAlertTab = (val: boolean) => {
+    const setVisibleAlertTab = (val?: boolean) => {
         state.visibleAlertTab = val;
     };
     const setProjectId = (projectId?: string) => {

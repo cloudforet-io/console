@@ -22,7 +22,7 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 interface GnbStoreState {
-    visibleAlertIcon: boolean;
+    visibleAlertIcon?: boolean;
     breadcrumbs: Breadcrumb[];
     selectedItem: Breadcrumb;
     id?: string;
@@ -68,7 +68,7 @@ export const useGnbStore = defineStore('gnb', () => {
     });
 
     const mutations = {
-        setVisibleAlertIcon: (val: boolean) => {
+        setVisibleAlertIcon: (val?: boolean) => {
             state.visibleAlertIcon = val;
         },
         setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
