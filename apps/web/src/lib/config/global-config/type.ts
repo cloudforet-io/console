@@ -5,10 +5,10 @@ export type GlobalServiceConfig = Record<string, { ENABLED: boolean; VERSION: st
 
 type FeatureKeyType = typeof FEATURES[keyof typeof FEATURES];
 
-type MenuConfig = Record<MenuId, boolean>;
+type MenuConfig = Partial<Record<MenuId, boolean>>;
 export type FeatureVersionSettingsType = {
     menu: MenuConfig;
-    adminMenu: MenuConfig;
+    adminMenu?: MenuConfig;
     uiAffects?: Record<string, boolean>;
 };
 type FeatureSettingType = {

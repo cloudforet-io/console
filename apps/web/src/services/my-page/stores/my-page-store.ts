@@ -4,11 +4,11 @@ import { defineStore } from 'pinia';
 
 export const useMyPageStore = defineStore('my-page', () => {
     const state = reactive({
-        visibleUserNotification: false,
+        visibleUserNotification: false as undefined | boolean,
     });
 
     const mutations = {
-        setVisibleUserNotification: (val: boolean) => {
+        setVisibleUserNotification: (val?: boolean) => {
             state.visibleUserNotification = val;
         },
     };
