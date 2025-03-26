@@ -153,7 +153,7 @@ describe('_useAPIQueryKey', () => {
   },
   {
     "filter": "active",
-  }
+  },
 ]
 `);
     });
@@ -191,7 +191,7 @@ describe('_useAPIQueryKey', () => {
   },
   {
     "filter": "active",
-  }
+  },
 ]
 `);
     });
