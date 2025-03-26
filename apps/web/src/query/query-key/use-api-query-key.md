@@ -42,7 +42,8 @@ interface UseAPIQueryKeyOptions<P extends object> {
 
 ```typescript
 interface UseAPIQueryKeyResult<P> {
-  key: ComputedRef<QueryKeyArray>;    // query key
+  key: ComputedRef<QueryKeyArray>;    // full query key
+  namespaces: ComputedRef<QueryKeyArray>; // hierarchical structure for cache management
   params?: ComputedRef<P>;            // parameters
   deps?: ComputedRef<object>;        // dependencies (optional)
   id?: ComputedRef<string>;          // ID (optional)
@@ -108,11 +109,32 @@ const { data } = useQuery({
 });
 ```
 
+### Cache Invalidation
+```typescript
+const { key, namespaces, params } = _useAPIQueryKey(
+    'dashboard',
+    'public-data-table',
+    'get',
+    {
+        id: toRef(state, 'currentDataTableId')
+        params: computed<PublicDataTableListParams>(() => state.params)
+        deps: computed(() => ({ filter: 'active' }),
+    }
+);
+
+// Invalidate specific query
+queryClient.invalidateQueries({ queryKey: key.value });
+
+// Invalidate all queries under a namespace
+queryClient.invalidateQueries({ queryKey: [...namespaces.value, state.currentDataTableId] });
+```
+
 ### Best Practices
 1. Always type your params interface for better type safety
 2. Use the returned `params` in your `queryFn` to maintain consistency
 3. Leverage TypeScript's type inference for better development experience
 4. Consider using `deps` for values that should trigger cache invalidation but aren't part of the API request
+5. Use `namespaces` for hierarchical cache invalidation when needed
 
 
 ## Maintenance Guide

@@ -48,6 +48,7 @@ interface UseAPIQueryKeyOptions<T extends object = object> {
 
 type UseAPIQueryKeyResult<T extends object = object> = {
     key: ComputedRef<QueryKeyArray>;
+    namespaces: ComputedRef<QueryKeyArray>;
     params: T extends undefined ? undefined : ComputedRef<T>;
     deps?: ComputedRef<object>;
     id?: ComputedRef<string>;
@@ -57,7 +58,7 @@ export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>
     service: S,
     resource: R,
     verb: V,
-    options: UseAPIQueryKeyOptions<T>,
+    options: UseAPIQueryKeyOptions<T> = {},
 ): UseAPIQueryKeyResult<T> => {
     // Runtime validation for development environment
     if (import.meta.env.DEV) {
@@ -86,6 +87,11 @@ export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>
         ];
     });
 
+    const namespaces = computed(() => [
+        ...globalContext.value,
+        service, resource, verb,
+    ]);
+
     // NOTE: Only for development environment. After using tanstack query devtools, this will be removed.
     // if (import.meta.env.DEV) {
     //     _logQueryKeyDebug(queryKey.value);
@@ -93,6 +99,7 @@ export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>
 
     return {
         key: queryKey,
+        namespaces,
         params: params ? computed(() => toValue(params)) : undefined,
         deps: deps ? computed(() => toValue(deps)) : undefined,
         id: id ? computed(() => toValue(id)) : undefined,
