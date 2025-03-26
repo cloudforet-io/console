@@ -91,11 +91,11 @@ const state = reactive({
             const info = channelInfo as AlertHistoryNotificationChannelInfoType;
             let target = '';
             if (type === TYPE.SERVICE) {
-                target = storeState.service[storeState.alertInfo.service_id].label;
+                target = storeState.service[storeState.alertInfo.service_id]?.label;
             } else if (type === TYPE.USER_GROUP) {
-                target = storeState.userGroup[info.user_group_id || ''].label;
+                target = storeState.userGroup[info.user_group_id || '']?.label;
             } else if (type === TYPE.USER) {
-                target = storeState.user[info.user_id || ''].label;
+                target = storeState.user[info.user_id || '']?.label;
             }
             return {
                 type,
