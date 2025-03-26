@@ -23,7 +23,7 @@ This predictable structure allows for precise cache management and query invalid
     resource,         // resource name (e.g., 'public-data-table')
     verb,            // action (e.g., 'get', 'list', 'load')
     id?,             // (optional) resource identifier (with 'get' verb)
-    params,          // request parameters
+    params?,         // (optional) request parameters
     deps?            // (optional) dependencies
 ]
 ```
@@ -33,7 +33,7 @@ This predictable structure allows for precise cache management and query invalid
 ```typescript
 interface UseAPIQueryKeyOptions<P extends object> {
   id?: _MaybeRefOrGetter<string>;
-  params: _MaybeRefOrGetter<P>;
+  params?: _MaybeRefOrGetter<P>;
   deps?: _MaybeRefOrGetter<object>;
 }
 ```
@@ -43,7 +43,7 @@ interface UseAPIQueryKeyOptions<P extends object> {
 ```typescript
 interface UseAPIQueryKeyResult<P> {
   key: ComputedRef<QueryKeyArray>;    // query key
-  params: ComputedRef<P>;            // parameters
+  params?: ComputedRef<P>;            // parameters
   deps?: ComputedRef<object>;        // dependencies (optional)
   id?: ComputedRef<string>;          // ID (optional)
 }

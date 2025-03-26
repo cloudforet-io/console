@@ -8,10 +8,12 @@ import type {
     QueryKeyArray, ResourceName, ServiceName, Verb,
 } from '@/query/query-key/_types/query-key-type';
 
+// Cache for debug logs
+// const debugLogCache = new Map<string, number>();
+// const DEBUG_LOG_THROTTLE = 1000; // 1초
 
 
 type _MaybeRefOrGetter<T> = T | Ref<T> | (() => T);
-
 /**
  * Options for generating API query keys.
  *
@@ -25,7 +27,7 @@ type _MaybeRefOrGetter<T> = T | Ref<T> | (() => T);
  *   resource,
  *   verb,
  *   id?,           // Optional, appears first in namespace if present
- *   params,        // Required, always present
+ *   params?,       // Optional, appears second if present
  *   deps?          // Optional, appears last if present
  * ]
  *
@@ -35,28 +37,28 @@ type _MaybeRefOrGetter<T> = T | Ref<T> | (() => T);
  * @property id - Optional identifier for single resource operations (e.g., get, load).
  *               When present, it appears first in the namespace part of the query key,
  *               enabling hierarchical cache management for single-resource operations.
- * @property params - Required parameters for the API request.
+ * @property params - Optional parameters for the API request.
  * @property deps - Optional dependencies that affect the query key.
  */
-interface UseAPIQueryKeyOptions<P extends object> {
+interface UseAPIQueryKeyOptions<T extends object = object> {
     id?: _MaybeRefOrGetter<string>;
-    params: _MaybeRefOrGetter<P>;
+    params?: _MaybeRefOrGetter<T>;
     deps?: _MaybeRefOrGetter<object>;
 }
 
-interface UseAPIQueryKeyResult<P> {
+type UseAPIQueryKeyResult<T extends object = object> = {
     key: ComputedRef<QueryKeyArray>;
-    params: ComputedRef<P>;
+    params: T extends undefined ? undefined : ComputedRef<T>;
     deps?: ComputedRef<object>;
     id?: ComputedRef<string>;
-}
+};
 
-export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, P extends object>(
+export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
     service: S,
     resource: R,
     verb: V,
-    options: UseAPIQueryKeyOptions<P>,
-): UseAPIQueryKeyResult<P> => {
+    options: UseAPIQueryKeyOptions<T>,
+): UseAPIQueryKeyResult<T> => {
     // Runtime validation for development environment
     if (import.meta.env.DEV) {
         if (!service || !resource || !verb) {
@@ -79,30 +81,27 @@ export const _useAPIQueryKey = <S extends ServiceName, R extends ResourceName<S>
             ...globalContext.value,
             service, resource, verb,
             ...(resolvedId ? [resolvedId] : []),
-            createImmutableObjectKeyItem(resolvedParams),
+            ...(resolvedParams ? [createImmutableObjectKeyItem(resolvedParams)] : []),
             ...(resolvedDeps ? [createImmutableObjectKeyItem(resolvedDeps)] : []),
         ];
     });
 
-
     // NOTE: Only for development environment. After using tanstack query devtools, this will be removed.
-    if (import.meta.env.DEV) {
-        console.debug(`[QueryKey] ${String(service)}/${String(resource)}/${String(verb)}`, JSON.stringify(queryKey.value, null, 2));
-    }
+    // if (import.meta.env.DEV) {
+    //     _logQueryKeyDebug(queryKey.value);
+    // }
 
     return {
         key: queryKey,
-        params: computed(() => toValue(params)),
+        params: params ? computed(() => toValue(params)) : undefined,
         deps: deps ? computed(() => toValue(deps)) : undefined,
         id: id ? computed(() => toValue(id)) : undefined,
-    };
+    } as UseAPIQueryKeyResult<T>;
 };
-
-
 
 const _validateQueryKeyOptions = <P extends object>(options: {
     id?: _MaybeRefOrGetter<string>;
-    params: _MaybeRefOrGetter<P>;
+    params?: _MaybeRefOrGetter<P>;
     deps?: _MaybeRefOrGetter<object>;
 }) => {
     if (options.params) {
@@ -126,3 +125,14 @@ const _validateQueryKeyOptions = <P extends object>(options: {
         }
     }
 };
+
+// const _logQueryKeyDebug = (queryKey: QueryKeyArray) => {
+//     const now = Date.now();
+//     const key = queryKey.join('/');
+//     const lastLogTime = debugLogCache.get(key) || 0;
+
+//     if (now - lastLogTime >= DEBUG_LOG_THROTTLE) {
+//         console.debug('[QueryKey]', { queryKey });
+//         debugLogCache.set(key, now);
+//     }
+// };
