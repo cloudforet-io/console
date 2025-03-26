@@ -10,15 +10,16 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 
-
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
 
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
@@ -65,6 +66,8 @@ const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
 const router = useRouter();
 
+const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
+
 /* Tabs */
 const state = reactive({
     visibleAlertTab: computed(() => cloudServiceDetailPageState.visibleAlertTab),
@@ -86,10 +89,9 @@ const singleItemTabState = reactive({
         if (state.visibleAlertTab) {
             defaultTabs.push({ name: 'alerts', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS') });
         }
-        // TODO: will be changed to store
-        // if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
-        //     defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
-        // }
+        if (visibleContents) {
+            defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
+        }
         return defaultTabs;
     }),
     activeTab: 'detail',
@@ -101,10 +103,9 @@ const multiItemTabState = reactive({
             { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
             { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
         ];
-        // TODO: will be changed to store
-        // if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
-        //     defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
-        // }
+        if (visibleContents) {
+            defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
+        }
         return defaultTabs;
     }),
     activeTab: 'data',
