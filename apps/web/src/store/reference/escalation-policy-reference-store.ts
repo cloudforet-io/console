@@ -54,6 +54,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
 
         const referenceMap: EscalationPolicyReferenceMap = {};
         const alertManagerClient = APIClientManager.alertManager;
+        if (!alertManagerClient) return;
         try {
             const fetcher = alertManagerClient.endpoint.escalationPolicy.list({
                 query: {

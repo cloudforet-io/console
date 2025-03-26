@@ -50,20 +50,17 @@ class APIClientManager {
     private createServiceHandler(serviceName: string) {
         const serviceConfig = this.config?.[serviceName] || null;
         if (!serviceConfig || !serviceConfig.ENABLED) {
-            console.warn(`[APIClientManager] ${serviceName} is disabled or not configured.`);
             return null;
         }
 
         const apiClientSchemaByService = this.apiClientsSchema[serviceName];
         if (!apiClientSchemaByService) {
-            console.warn('[APIClientManager] apiClientSchemaByService is not configured.');
             return null;
         }
 
         const version = serviceConfig.VERSION;
         const clientEndpoint = apiClientSchemaByService[version];
         if (!clientEndpoint) {
-            console.error(`[APIClientManager] No endpoint mapping found for ${serviceName} with version ${version}.`);
             return null;
         }
 
