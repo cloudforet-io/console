@@ -156,7 +156,7 @@ const changeVariables = (changedSelected?: number) => {
 watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchema) => {
     if (!varsSchema) return;
     const _variable = props.variable as NumberAnyVariable;
-    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[_variable.key])) return;
+    if (isEqual(varsSchema[_variable.key], prevVarsSchema?.[varsSchema[_variable.key]])) return;
 
     state.value = (dashboard.value?.vars?.[_variable.key] as number) || _variable.options.min;
     changeVariables(state.value);

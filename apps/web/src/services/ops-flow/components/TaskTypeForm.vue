@@ -9,7 +9,7 @@ import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

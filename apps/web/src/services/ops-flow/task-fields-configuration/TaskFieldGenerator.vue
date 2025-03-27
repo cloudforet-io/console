@@ -9,7 +9,11 @@ import {
     PFieldGroup, PTextInput, PToggleButton, PCheckbox, PButton, PSelectButton, PCodeEditor,
 } from '@cloudforet/mirinae';
 
-import type { TaskField, TaskFieldOptions, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
+import type {
+    TaskField,
+    TaskFieldOptions,
+    TaskFieldType,
+} from '@/schema/opsflow/_types/task-field-type';
 import { getParticle, i18n } from '@/translations';
 
 import InfoTooltip from '@/common/components/guidance/InfoTooltip.vue';
@@ -31,7 +35,6 @@ import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-conf
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-
 
 const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsyncComponent>>> = {
     DROPDOWN: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-configuration/options-generator-templates/DropdownOptionsGenerator.vue')),

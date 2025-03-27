@@ -4,7 +4,7 @@ import { ref, computed } from 'vue';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { TaskStatusOption, TaskStatusOptions } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskStatusOption, TaskStatusOptions } from '@/schema/opsflow/task/type';
 import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';

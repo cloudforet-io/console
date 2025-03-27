@@ -3,7 +3,7 @@ import {
     defineAsyncComponent, onUnmounted,
 } from 'vue';
 
-import type { TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
 
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
 import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';

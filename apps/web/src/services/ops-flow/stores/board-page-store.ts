@@ -5,7 +5,7 @@ import {
 
 import { defineStore } from 'pinia';
 
-import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
+import type { TaskCategoryModel } from '@/schema/opsflow/task-category/model';
 
 import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 

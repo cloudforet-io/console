@@ -2,7 +2,6 @@
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 
-
 interface IInstance extends ComponentPublicInstance {
     setPathFrom(from: any): void
 }
@@ -30,7 +29,7 @@ import {
     PHeadingLayout, PHeading, PButton, PPaneLayout, PSkeleton,
 } from '@cloudforet/mirinae';
 
-import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import type { TaskModel } from '@/schema/opsflow/task/model';
 import { i18n as _i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';

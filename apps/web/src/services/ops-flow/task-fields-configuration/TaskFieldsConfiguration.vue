@@ -4,9 +4,8 @@ import draggable from 'vuedraggable';
 
 import { PI } from '@cloudforet/mirinae';
 
-
-import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

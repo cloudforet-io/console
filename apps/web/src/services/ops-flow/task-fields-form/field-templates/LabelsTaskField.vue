@@ -3,7 +3,7 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { OtherTaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import LabelsInput from '@/common/components/inputs/LabelsInput.vue';
 

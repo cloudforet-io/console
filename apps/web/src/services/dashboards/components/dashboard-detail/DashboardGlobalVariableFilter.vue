@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, defineAsyncComponent,
+    computed, reactive,
 } from 'vue';
 
 import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
@@ -8,20 +8,22 @@ import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-typ
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-const FILTER_COMPONENT_MAP: Record<GlobalVariableFilterType, ReturnType<typeof defineAsyncComponent>> = {
-    ENUM: defineAsyncComponent(() => import('@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterEnum.vue')),
-    REFERENCE: defineAsyncComponent(() => import('@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterReference.vue')),
-    TEXT_INPUT: defineAsyncComponent(() => import('@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterTextInput.vue')),
-    NUMBER_INPUT: defineAsyncComponent(() => import('@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterNumberInput.vue')),
-    NUMBER_SLIDER: defineAsyncComponent(() => import('@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterNumberSlider.vue')),
-};
+import DashboardGlobalVariableFilterEnum
+    from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterEnum.vue';
+import DashboardGlobalVariableFilterNumberInput
+    from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterNumberInput.vue';
+import DashboardGlobalVariableFilterNumberSlider
+    from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterNumberSlider.vue';
+import DashboardGlobalVariableFilterReference
+    from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterReference.vue';
+import DashboardGlobalVariableFilterTextInput
+    from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilterTextInput.vue';
 
 
 interface Props {
     variable: DashboardGlobalVariable;
     vars?: DashboardVars;
 }
-
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void;
@@ -44,9 +46,25 @@ const state = reactive({
 
 <template>
     <div class="dashboard-global-variable-filter">
-        <component :is="FILTER_COMPONENT_MAP[state.variableFilterType]"
-                   :variable="props.variable"
-                   :vars.sync="state.proxyVars"
+        <dashboard-global-variable-filter-enum v-if="state.variableFilterType === 'ENUM'"
+                                               :variable="props.variable"
+                                               :vars.sync="state.proxyVars"
+        />
+        <dashboard-global-variable-filter-reference v-else-if="state.variableFilterType === 'REFERENCE'"
+                                                    :variable="props.variable"
+                                                    :vars.sync="state.proxyVars"
+        />
+        <dashboard-global-variable-filter-text-input v-else-if="state.variableFilterType === 'TEXT_INPUT'"
+                                                     :variable="props.variable"
+                                                     :vars.sync="state.proxyVars"
+        />
+        <dashboard-global-variable-filter-number-input v-else-if="state.variableFilterType === 'NUMBER_INPUT'"
+                                                       :variable="props.variable"
+                                                       :vars.sync="state.proxyVars"
+        />
+        <dashboard-global-variable-filter-number-slider v-else-if="state.variableFilterType === 'NUMBER_SLIDER'"
+                                                        :variable="props.variable"
+                                                        :vars.sync="state.proxyVars"
         />
     </div>
 </template>

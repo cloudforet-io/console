@@ -3,8 +3,7 @@ import {
     PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
-
-import type { TextTaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TextTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type { TaskFieldFormEmits, TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';

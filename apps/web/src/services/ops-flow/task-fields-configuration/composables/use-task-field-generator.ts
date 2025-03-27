@@ -1,8 +1,7 @@
 import type { Ref } from 'vue';
 import { ref, computed } from 'vue';
 
-
-import type { TaskFieldOptions } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
 
 import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
 
