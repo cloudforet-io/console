@@ -99,6 +99,8 @@ const { key } = useServiceQueryKey(
         params: computed(() => ({ page: 1, limit: 10 })), 
     }
 );
+
+// Key Result : ['workspace', 'workspace-123', 'dashboard', 'public-data-table', 'list', { page: 1, limit: 10 }]
 ```
 
 ### With Context Key
@@ -112,6 +114,8 @@ const { key } = useServiceQueryKey(
         params: computed(() => ({ page: 1, limit: 10 })), 
     }
 );
+
+// Key Result : ['workspace', 'workspace-123', 'dashboard', 'public-data-table', 'get', 'table-123', { page: 1, limit: 10 }]
 ```
 
 ### With useQuery
@@ -129,6 +133,9 @@ const { data } = useQuery({
   queryKey: key,
   queryFn: () => publicDataTableAPI.list(params.value)
 });
+
+// Key Result : ['workspace', 'workspace-123', 'dashboard', 'public-data-table', 'list', { page: 1, limit: 10 }]
+// Params Result : { page: 1, limit: 10 } (ComputedRef Value)
 ```
 
 ## Query Parameters Management
