@@ -1,34 +1,44 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { PublicConfigGetParameters } from '@/api-clients/config/public-config/schema/api-verbs/get';
+import { PUBLIC_CONFIG_NAMES } from '@/api-clients/config/public-config/schema/constant';
+import type { PublicConfigModel } from '@/api-clients/config/public-config/schema/model';
+
 import config from '@/lib/config';
 import type { ApiClientsSchemaType } from '@/lib/config/global-config/api-client-schema';
 import { ApiClientEndpoint } from '@/lib/config/global-config/api-client-schema';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
 
-interface ServiceConfig {
-    ENABLED: boolean;
-    VERSION: string;
-}
-
-interface GlobalConfig {
-    SERVICES: {
-        [key: string]: ServiceConfig;
-    };
-}
 
 class APIClientManager {
     // eslint-disable-next-line no-undef
     [key: string]: any;
 
-    private config: GlobalConfig['SERVICES'] | null = null;
+    private config: GlobalServiceConfig = {} as GlobalServiceConfig;
 
     private apiClientsSchema: ApiClientsSchemaType = {} as ApiClientsSchemaType;
 
-    async initialize() {
+    async initialize(domainId: string) {
         await config.init();
         this.config = config.get('SERVICES') || {};
-        this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientEndpoint));
 
+        this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientEndpoint));
         this.defineDynamicServices();
+
+        const { data: overrideConfigData } = await SpaceConnector.clientV2.config.publicConfig.get<PublicConfigGetParameters, PublicConfigModel>({
+            name: PUBLIC_CONFIG_NAMES.OVERRIDE_SERVICE_SETTING,
+            domainId,
+        });
+        const overrideConfig = overrideConfigData.SERVICES || {};
+
+        Object.keys(overrideConfig).forEach((serviceName) => {
+            if (this.config[serviceName]) {
+                this.config[serviceName] = {
+                    ...this.config[serviceName],
+                    ...overrideConfig[serviceName],
+                };
+            }
+        });
     }
 
     private defineDynamicServices() {

@@ -2,6 +2,12 @@ import type { RouteConfig } from 'vue-router';
 
 import { isEmpty } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { PublicConfigGetParameters } from '@/api-clients/config/public-config/schema/api-verbs/get';
+import { PUBLIC_CONFIG_NAMES } from '@/api-clients/config/public-config/schema/constant';
+import type { PublicConfigModel } from '@/api-clients/config/public-config/schema/model';
+
 import { useMenuStore } from '@/store/menu/menu-store';
 
 import config from '@/lib/config';
@@ -24,14 +30,31 @@ import ServiceAccountConfigurator from '@/services/service-account/configurator'
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
+
 class ServiceConfigurator {
     private config: GlobalServiceConfig = {} as GlobalServiceConfig;
 
     private featureSchema: FeatureSchemaType = {} as FeatureSchemaType;
 
-    async initialize() {
+    async initialize(domainId: string) {
         await config.init();
         this.config = config.get('SERVICES') || {};
+
+        const { data: overrideConfigData } = await SpaceConnector.clientV2.config.publicConfig.get<PublicConfigGetParameters, PublicConfigModel>({
+            name: PUBLIC_CONFIG_NAMES.OVERRIDE_SERVICE_SETTING,
+            domainId,
+        });
+        const overrideConfig = overrideConfigData.SERVICES || {};
+
+        Object.keys(overrideConfig).forEach((serviceName) => {
+            if (this.config[serviceName]) {
+                this.config[serviceName] = {
+                    ...this.config[serviceName],
+                    ...overrideConfig[serviceName],
+                };
+            }
+        });
+
         const featureSchemaManager = new FeatureSchemaManager(this.config);
         const featureSchema = await featureSchemaManager.applyGlobalConfig();
 

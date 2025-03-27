@@ -2,6 +2,7 @@ import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import APIClientManager from '@/api-clients/api-client-manager';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
@@ -83,10 +84,11 @@ const init = async () => {
     /* Init SpaceONE Console */
     try {
         await config.init();
-        await ServiceConfigurator.initialize();
         await initApiClient(config);
         const domainId = await initDomain(config);
         const userId = await initUserAndAuth(config);
+        await ServiceConfigurator.initialize(domainId);
+        await APIClientManager.initialize(domainId);
         initDomainSettings();
         initModeSetting();
         await initWorkspace(userId);
