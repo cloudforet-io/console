@@ -21,9 +21,11 @@ import type { NamespaceReferenceMap } from '@/store/reference/namespace-referenc
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { MENU_ID } from '@/lib/menu/config';
 import getRandomId from '@/lib/random-id-generator';
 import type { ListResponse } from '@/lib/variable-models/_base/types';
 
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
@@ -46,7 +48,6 @@ import type {
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
-
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
@@ -55,6 +56,8 @@ const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'scroll'): void;}>();
+
+const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 
 /* Query */
 const {
@@ -455,31 +458,33 @@ watch(() => state.showPopover, (val) => {
                             </div>
                         </p-select-card>
 
-                        <p class="data-source-domain-title mt-2">
-                            {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.INVENTORY') }}
-                        </p>
-                        <p-select-card :class="{'custom-select-card': true, 'selected': state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET }"
-                                       :value="DATA_SOURCE_DOMAIN.ASSET"
-                                       @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.ASSET)"
-                        >
-                            <div class="domain-contents">
-                                <p-i v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET"
-                                     class="selected-marker"
-                                     name="ic_checkbox-circle-selected"
-                                     width="1.25rem"
-                                     height="1.25rem"
-                                />
-                                <div class="icon-wrapper">
-                                    <p-i name="ic_data-domain-asset"
+                        <template v-if="visibleContents">
+                            <p class="data-source-domain-title mt-2">
+                                {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.INVENTORY') }}
+                            </p>
+                            <p-select-card :class="{'custom-select-card': true, 'selected': state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET }"
+                                           :value="DATA_SOURCE_DOMAIN.ASSET"
+                                           @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.ASSET)"
+                            >
+                                <div class="domain-contents">
+                                    <p-i v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET"
+                                         class="selected-marker"
+                                         name="ic_checkbox-circle-selected"
                                          width="1.25rem"
                                          height="1.25rem"
                                     />
+                                    <div class="icon-wrapper">
+                                        <p-i name="ic_data-domain-asset"
+                                             width="1.25rem"
+                                             height="1.25rem"
+                                        />
+                                    </div>
+                                    <p class="name">
+                                        {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ASSET') }}
+                                    </p>
                                 </div>
-                                <p class="name">
-                                    {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ASSET') }}
-                                </p>
-                            </div>
-                        </p-select-card>
+                            </p-select-card>
+                        </template>
                     </div>
                     <template v-if="state.selectedDataSourceDomain">
                         <widget-form-cost-data-source-popper

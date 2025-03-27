@@ -16,14 +16,16 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CloudServiceMainPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
-
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 const DATA_TYPE = {
     SERVER: 'SERVER',
@@ -53,6 +55,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+
+const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
+
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
@@ -89,14 +94,14 @@ const getConvertedData = (rawData): Item[] => rawData.map((item) => ({
         label: state.providers[item.provider]?.label,
         color: state.providers[item.provider]?.color,
         to: {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+            name: SERVICE_ACCOUNT_ROUTE._NAME,
             query: { provider: item.provider },
         },
     },
     service_account: {
         label: item.service_account_name,
         to: {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+            name: SERVICE_ACCOUNT_ROUTE._NAME,
             query: {
                 provider: item.provider,
                 filters: arrayToQueryString([item.service_account_id]),
@@ -167,25 +172,31 @@ watch(() => state.providers, (providers) => {
                 </router-link>
             </template>
             <template #col-server-format="{ value }">
-                <router-link :to="value.to"
-                             class="link-text"
+                <component :is="visibleContents ? 'router-link' : 'div'"
+                           :to="value.to"
+                           class="link-text"
+                           :class="{ 'text-only': !visibleContents }"
                 >
                     {{ value.count }}
-                </router-link>
+                </component>
             </template>
             <template #col-database-format="{ value }">
-                <router-link :to="value.to"
-                             class="link-text"
+                <component :is="visibleContents ? 'router-link' : 'div'"
+                           :to="value.to"
+                           class="link-text"
+                           :class="{ 'text-only': !visibleContents }"
                 >
                     {{ value.count }}
-                </router-link>
+                </component>
             </template>
             <template #col-storage-format="{ value }">
-                <router-link :to="value.to"
-                             class="link-text"
+                <component :is="visibleContents ? 'router-link' : 'div'"
+                           :to="value.to"
+                           class="link-text"
+                           :class="{ 'text-only': !visibleContents }"
                 >
                     {{ value.count }}
-                </router-link>
+                </component>
             </template>
         </p-data-table>
     </widget-layout>
@@ -209,8 +220,10 @@ watch(() => state.providers, (providers) => {
         td {
             height: 2rem;
             .link-text {
-                &:hover {
-                    text-decoration: underline;
+                &:not(.text-only) {
+                    &:hover {
+                        text-decoration: underline;
+                    }
                 }
             }
         }

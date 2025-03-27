@@ -26,9 +26,11 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
@@ -71,6 +73,9 @@ const allReferenceStore = useAllReferenceStore();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const userWorkspaceStore = useUserWorkspaceStore();
+
+const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
+
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -463,8 +468,10 @@ onUnmounted(() => {
                     </div>
                     <template v-if="!state.loading && state.summaryData.length > 0">
                         <div class="summary-content-wrapper">
-                            <router-link :to="getLocation(state.activeTab)"
-                                         class="summary-row"
+                            <component :is="visibleContents ? 'router-link' : 'div'"
+                                       class="summary-row"
+                                       :class="{ 'text-only': !visibleContents }"
+                                       :to="getLocation(state.activeTab)"
                             >
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
@@ -472,11 +479,13 @@ onUnmounted(() => {
                                 <span class="count">
                                     {{ state.activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(state.countMap[state.activeTab]) : numberFormatter(state.countMap[state.activeTab]) }}
                                 </span>
-                            </router-link>
-                            <router-link v-for="(data, idx) of state.summaryData"
-                                         :key="idx"
-                                         :to="data.to"
-                                         class="summary-row"
+                            </component>
+                            <component :is="visibleContents ? 'router-link' : 'div'"
+                                       v-for="(data, idx) of state.summaryData"
+                                       :key="idx"
+                                       class="summary-row"
+                                       :class="{ 'text-only': !visibleContents }"
+                                       :to="data.to"
                             >
                                 <div class="text-group">
                                     <span class="provider"
@@ -485,7 +494,7 @@ onUnmounted(() => {
                                     <span class="type">{{ data.type }}</span>
                                 </div>
                                 <span class="count">{{ data.count }}</span>
-                            </router-link>
+                            </component>
                         </div>
                     </template>
                     <template v-else-if="!state.loading">
@@ -517,6 +526,7 @@ onUnmounted(() => {
                         :project-id="projectId"
                         :label="state.activeTab"
                         :count="state.countMap[state.activeTab]"
+                        :visible-contents="visibleContents"
                     />
                 </div>
             </div>
@@ -644,16 +654,22 @@ onUnmounted(() => {
                 padding: 0.25rem 0.5rem;
                 margin: auto 0;
 
-                &:hover {
-                    @apply bg-secondary2;
-                    .provider {
-                        text-decoration: underline;
-                    }
-                    .type {
-                        text-decoration: underline;
-                    }
-                    .count {
-                        text-decoration: underline;
+                &.text-only {
+                    cursor: default;
+                }
+
+                &:not(.text-only) {
+                    &:hover {
+                        @apply bg-secondary2;
+                        .provider {
+                            text-decoration: underline;
+                        }
+                        .type {
+                            text-decoration: underline;
+                        }
+                        .count {
+                            text-decoration: underline;
+                        }
                     }
                 }
 

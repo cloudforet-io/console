@@ -20,12 +20,9 @@ import type { ProtocolListParameters } from '@/schema/notification/protocol/api-
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import { i18n } from '@/translations';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,7 +33,7 @@ import type { NotificationAddFormDataPayload } from '@/services/my-page/types/no
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const domainStore = useDomainStore();
+
 const PROTOCOL_TYPE = {
     INTERNAL: 'INTERNAL',
     EXTERNAL: 'EXTERNAL',
@@ -46,15 +43,15 @@ const props = withDefaults(defineProps<{
     projectId: string;
     protocolType: string;
     protocolId: string;
+    visibleUserNotification: boolean;
 }>(), {
     projectId: '',
     protocolType: '',
     protocolId: '',
+    visibleUserNotification: false,
 });
 const emit = defineEmits<{(event: 'change', payload: NotificationAddFormDataPayload|{channelName: string; data: Record<string, any>}): void;
 }>();
-
-const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const storeState = reactive({
     protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
@@ -100,7 +97,7 @@ const apiQuery = new ApiQueryHelper();
 const getSchema = async (): Promise<JsonSchema|null> => {
     try {
         apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
-        const fetcher = isAlertManagerVersionV2
+        const fetcher = props.visibleUserNotification
             ? SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>
             : SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>;
         const res = await fetcher({
@@ -114,7 +111,7 @@ const getSchema = async (): Promise<JsonSchema|null> => {
 };
 
 const emitChange = () => {
-    emit('change', !isAlertManagerVersionV2 ? {
+    emit('change', !props.visibleUserNotification ? {
         channelName: state.channelName,
         data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL)
             ? state.schemaForm
@@ -165,7 +162,7 @@ const initStates = () => {
 watch([() => props.protocolId, () => props.protocolType], async ([protocolId, protocolType]) => {
     if (!protocolId) return;
     initStates();
-    if (!isAlertManagerVersionV2 && protocolType !== PROTOCOL_TYPE.EXTERNAL) return;
+    if (!props.visibleUserNotification && protocolType !== PROTOCOL_TYPE.EXTERNAL) return;
     state.schema = await getSchema();
 }, { immediate: true });
 </script>

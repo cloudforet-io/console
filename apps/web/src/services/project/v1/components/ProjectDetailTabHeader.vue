@@ -38,10 +38,11 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { MENU_ID } from '@/lib/menu/config';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -58,6 +59,7 @@ import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-
 import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMainDeleteModal.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 
 const ROLE_INFO_MAP = {
@@ -88,12 +90,13 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
 
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
+const { visibleContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
 
 const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && projectDetailPageState.visibleAlertTab),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
@@ -118,50 +121,55 @@ const state = reactive({
             icon: 'ic_delete',
         },
     ]),
-    viewInItems: computed<ViewInItem[]>(() => ([
-        {
-            label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
-            to: {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                params: {
-                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                },
-                query: {
-                    project: [props.id],
-                },
-            },
-        },
-        {
-            label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
-            to: {
-                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                params: {
-                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                },
-                query: {
-                    filters: queryHelper.setFilters([
-                        { k: 'project_id', v: [props.id], o: '' },
-                    ]).rawQueryStrings,
+    viewInItems: computed<ViewInItem[]>(() => {
+        const defaultItems = [
+            {
+                label: i18n.t('PROJECT.DETAIL.SERVICE_ACCOUNT'),
+                to: {
+                    name: SERVICE_ACCOUNT_ROUTE._NAME,
+                    params: {
+                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+                    },
+                    query: {
+                        filters: queryHelper.setFilters([
+                            { k: 'project_id', v: [props.id], o: '' },
+                        ]).rawQueryStrings,
+                    },
                 },
             },
-        },
-        {
-            label: i18n.t('PROJECT.DETAIL.COST_ANALYSIS'),
-            to: {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                params: {
-                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                    dataSourceId: Object.keys(storeState.costDataSource)?.[0],
-                    costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-                },
-                query: {
-                    filters: arrayToQueryString([
-                        { k: 'project_id', v: [props.id], o: 'in' },
-                    ]),
+            {
+                label: i18n.t('PROJECT.DETAIL.COST_ANALYSIS'),
+                to: {
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    params: {
+                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+                        dataSourceId: Object.keys(storeState.costDataSource)?.[0],
+                        costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+                    },
+                    query: {
+                        filters: arrayToQueryString([
+                            { k: 'project_id', v: [props.id], o: 'in' },
+                        ]),
+                    },
                 },
             },
-        },
-    ])),
+        ];
+        if (visibleContents.value) {
+            defaultItems.unshift({
+                label: i18n.t('PROJECT.DETAIL.CLOUD_SERVICE'),
+                to: {
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                    params: {
+                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+                    },
+                    query: {
+                        project: [props.id],
+                    },
+                },
+            });
+        }
+        return defaultItems;
+    }),
     currentProject: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
     parentGroupId: computed(() => storeState.projects[props.id]?.data?.groupInfo?.id),
     projectGroupMoveModalVisible: false,
@@ -350,7 +358,7 @@ const getProjectAlertActivated = async () => {
 
 /* Watchers */
 watch(() => projectDetailPageGetters.projectType, async () => {
-    if (!isAlertManagerV2Enabled.value) {
+    if (storeState.visibleAlertTab) {
         await Promise.allSettled([
             getProjectAlertActivated(),
             listWebhooks(),
@@ -469,7 +477,7 @@ watch(() => projectDetailPageState.projectId, (projectId) => {
                                  :color="gray[400]"
                             />
                         </template>
-                        <div v-if="!isAlertManagerV2Enabled"
+                        <div v-if="storeState.visibleAlertTab"
                              class="info-item"
                              @click="handleClickWebhook"
                         >

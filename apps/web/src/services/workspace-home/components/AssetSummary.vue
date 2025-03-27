@@ -19,6 +19,7 @@ import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import AssetSummaryDailyUpdates from '@/services/workspace-home/components/AssetSummaryDailyUpdates.vue';
 import AssetSummaryProvider from '@/services/workspace-home/components/AssetSummaryProvider.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
@@ -55,7 +56,7 @@ const state = reactive({
         let result;
         if (state.isNoServiceAccounts) {
             result = {
-                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : {},
+                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : {},
                 title: i18n.t('HOME.NO_ACCOUNT'),
                 desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
                 buttonText: state.writableServiceAccount ? i18n.t('HOME.NO_ACCOUNT_ADD_NEW') : undefined,
