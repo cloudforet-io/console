@@ -43,7 +43,7 @@ interface UseServiceQueryKeyOptions<T extends object> {
 ```typescript
 interface UseServiceQueryKeyResult<T> {
   key: ComputedRef<QueryKeyArray>;    // full query key
-  params?: ComputedRef<T>;            // parameters
+  params?: Readonly<T>;            // parameters
   withSuffix: (arg: ContextKeyType) => QueryKeyArray;  // dynamic namespace builder
 }
 ```
@@ -56,7 +56,7 @@ The query key structure is carefully designed to ensure consistent cache managem
 ### Correct Usage Pattern
 ```typescript
 // ✅ Recommended: Using key as-is
-const { key } = useServiceQueryKey(
+const { key, params } = useServiceQueryKey(
     'dashboard',
     'public-data-table',
     'list',
@@ -67,13 +67,13 @@ const { key } = useServiceQueryKey(
 
 const { data } = useQuery({
     queryKey: key,  // Use the key directly
-    queryFn: () => publicDataTableAPI.list(params.value)
+    queryFn: () => publicDataTableAPI.list(params)
 });
 
 // ❌ Not Recommended: Modifying query key structure
 const { data } = useQuery({
     queryKey: [...key.value, 'additional', 'parts'],  // Avoid modifying the key structure
-    queryFn: () => publicDataTableAPI.list(params.value)
+    queryFn: () => publicDataTableAPI.list(params)
 });
 ```
 
@@ -131,7 +131,7 @@ const { key, params } = useServiceQueryKey(
 
 const { data } = useQuery({
   queryKey: key,
-  queryFn: () => publicDataTableAPI.list(params.value)
+  queryFn: () => publicDataTableAPI.list(params)
 });
 
 // Key Result : ['workspace', 'workspace-123', 'dashboard', 'public-data-table', 'list', { page: 1, limit: 10 }]
@@ -158,7 +158,7 @@ const { key, params } = useServiceQueryKey(
 // ✅ Use params from useServiceQueryKey
 const { data } = useQuery({
     queryKey: key,
-    queryFn: () => publicDataTableAPI.list(params.value)  // Don't forget to use `.value` if params is reactive
+    queryFn: () => publicDataTableAPI.list(params)
 });
 
 // ❌ Not Recommended: Creating params separately
@@ -175,8 +175,7 @@ const { data } = useQuery({
 
 ### Best Practices
 1. Always use the `params` returned from `useServiceQueryKey` in your `queryFn`
-2. Keep params reactive using `computed`
-3. Maintain type safety by properly typing your params
+2. Maintain type safety by properly typing your params
 
 ## Dynamic Namespace with withSuffix
 

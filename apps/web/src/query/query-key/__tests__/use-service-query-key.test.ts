@@ -20,7 +20,7 @@ describe('_useServiceQueryKey', () => {
             'public-data-table',
             'list',
             {
-                params: computed(() => ({ page: 1, limit: 10 })),
+                params: { page: 1, limit: 10 },
             },
         );
 
