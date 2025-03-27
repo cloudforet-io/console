@@ -13,7 +13,7 @@ import type {
 // const DEBUG_LOG_THROTTLE = 1000; // 1초
 
 
-type _MaybeRefOrGetter<T> = T | Ref<T> | (() => T);
+type _MaybeRefOrGetter<T> = T | Ref<T> | ComputedRef<T> | (() => T);
 /**
  * Options for generating service query keys.
  *
@@ -41,13 +41,13 @@ type _MaybeRefOrGetter<T> = T | Ref<T> | (() => T);
  */
 interface UseServiceQueryKeyOptions<T extends object = object> {
     contextKey?: _MaybeRefOrGetter<ContextKeyType>;
-    params?: ComputedRef<T>;
+    params?: _MaybeRefOrGetter<T>;
 }
 type ContextKeyType = string|unknown[]|object;
 
 type UseServiceQueryKeyResult<T extends object = object> = {
     key: ComputedRef<QueryKeyArray>;
-    params: T extends undefined ? undefined : ComputedRef<T>;
+    params: T extends undefined ? undefined : Readonly<T>;
     withSuffix: (arg: ContextKeyType) => QueryKeyArray;
 };
 
@@ -101,7 +101,9 @@ export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceNam
     const suffixCache = new WeakMap<object, QueryKeyArray>();
     return {
         key: queryKey,
-        params,
+        params: params
+            ? Object.freeze(toValue(params)) as Readonly<T>
+            : undefined,
         withSuffix: (arg) => {
             if (typeof arg === 'object' && arg !== null) {
                 const cached = suffixCache.get(arg);
