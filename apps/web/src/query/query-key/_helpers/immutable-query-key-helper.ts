@@ -1,4 +1,4 @@
-export const createImmutableObjectKeyItem = <T extends Record<string, any>>(obj: T): T => {
+export const createImmutableObjectKeyItem = <T>(obj: T): T => {
     if (obj === null || typeof obj !== 'object') {
         return obj;
     }

@@ -1,10 +1,10 @@
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 import {
     describe, it, expect, vi,
 } from 'vitest';
 
-import { _useAPIQueryKey } from '../use-api-query-key';
+import { _useServiceQueryKey } from '../use-service-query-key';
 
 // Mock useQueryKeyAppContext
 vi.mock('@/query/query-key/_composable/use-app-context-query-key', () => ({
@@ -13,14 +13,14 @@ vi.mock('@/query/query-key/_composable/use-app-context-query-key', () => ({
     }),
 }));
 
-describe('_useAPIQueryKey', () => {
+describe('_useServiceQueryKey', () => {
     it('should generate correct query key structure for basic usage', () => {
-        const { key } = _useAPIQueryKey(
+        const { key } = _useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'list',
             {
-                params: { page: 1, limit: 10 },
+                params: computed(() => ({ page: 1, limit: 10 })),
             },
         );
 
@@ -39,14 +39,14 @@ describe('_useAPIQueryKey', () => {
 `);
     });
 
-    it('should generate correct query key structure with id', () => {
-        const { key } = _useAPIQueryKey(
+    it('should generate correct query key structure with contextKey', () => {
+        const { key } = _useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
             {
-                id: 'table-123',
-                params: { id: 'table-123' },
+                contextKey: computed(() => 'table-123'),
+                params: computed(() => ({ id: 'table-123' })),
             },
         );
 
@@ -60,53 +60,22 @@ describe('_useAPIQueryKey', () => {
   "table-123",
   {
     "id": "table-123",
-  },
-]
-`);
-    });
-
-    it('should generate correct query key structure with deps', () => {
-        const { key } = _useAPIQueryKey(
-            'dashboard',
-            'public-data-table',
-            'list',
-            {
-                params: { page: 1, limit: 10 },
-                deps: { filter: 'active' },
-            },
-        );
-
-        expect(key.value).toMatchInlineSnapshot(`
-[
-  "workspace",
-  "workspace-123",
-  "dashboard",
-  "public-data-table",
-  "list",
-  {
-    "limit": 10,
-    "page": 1,
-  },
-  {
-    "filter": "active",
   },
 ]
 `);
     });
 
     it('should handle reactive values correctly', () => {
-        const params = ref({ id: 'table-123' });
-        const deps = ref({ filter: 'active' });
-        const id = ref('table-123');
+        const params = computed(() => ({ id: 'table-123' }));
+        const contextKey = computed(() => 'table-123');
 
-        const { key } = _useAPIQueryKey(
+        const { key } = _useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
             {
-                id,
+                contextKey,
                 params,
-                deps,
             },
         );
 
@@ -120,23 +89,19 @@ describe('_useAPIQueryKey', () => {
   "table-123",
   {
     "id": "table-123",
-  },
-  {
-    "filter": "active",
   },
 ]
 `);
     });
 
     it('should handle function getters correctly', () => {
-        const { key } = _useAPIQueryKey(
+        const { key } = _useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
             {
-                id: () => 'table-123',
-                params: () => ({ id: 'table-123' }),
-                deps: () => ({ filter: 'active' }),
+                contextKey: () => 'table-123',
+                params: computed(() => ({ id: 'table-123' })),
             },
         );
 
@@ -151,30 +116,26 @@ describe('_useAPIQueryKey', () => {
   {
     "id": "table-123",
   },
-  {
-    "filter": "active",
-  },
 ]
 `);
     });
 
     it('should maintain consistent key structure with different option orders', () => {
-        const params = { id: 'table-123' };
-        const deps = { filter: 'active' };
-        const id = 'table-123';
+        const params = computed(() => ({ id: 'table-123' }));
+        const contextKey = computed(() => 'table-123');
 
-        const { key: key1 } = _useAPIQueryKey(
+        const { key: key1 } = _useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
-            { id, params, deps },
+            { contextKey, params },
         );
 
-        const { key: key2 } = _useAPIQueryKey(
+        const { key: key2 } = _useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
-            { deps, params, id },
+            { params, contextKey },
         );
 
         expect(key1.value).toEqual(key2.value);
@@ -189,9 +150,26 @@ describe('_useAPIQueryKey', () => {
   {
     "id": "table-123",
   },
-  {
-    "filter": "active",
-  },
+]
+`);
+    });
+
+    it('should handle withSuffix correctly', () => {
+        const { withSuffix } = _useServiceQueryKey(
+            'dashboard',
+            'public-data-table',
+            'load',
+        );
+
+        const result = withSuffix('table-123');
+        expect(result).toMatchInlineSnapshot(`
+[
+  "workspace",
+  "workspace-123",
+  "dashboard",
+  "public-data-table",
+  "load",
+  "table-123",
 ]
 `);
     });
