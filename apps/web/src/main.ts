@@ -10,7 +10,7 @@ import VTooltip from 'v-tooltip';
 import SpaceDesignSystem from '@cloudforet/mirinae';
 
 import directive from '@/directives';
-import { apiQueryClient } from '@/query/clients';
+import { serviceQueryClient } from '@/query/clients';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -30,7 +30,7 @@ Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(PortalVue);
 Vue.use(PiniaVuePlugin);
-Vue.use(VueQueryPlugin, { defaultQueryClient: apiQueryClient });
+Vue.use(VueQueryPlugin, { defaultQueryClient: serviceQueryClient });
 
 directive(Vue);
 
