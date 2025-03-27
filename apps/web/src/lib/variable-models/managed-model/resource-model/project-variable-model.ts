@@ -2,9 +2,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse as ApiListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectGroupListParameters } from '@/api-clients/identity/project-group/schema/api-verbs/list';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { ListQuery, ListResponse, VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

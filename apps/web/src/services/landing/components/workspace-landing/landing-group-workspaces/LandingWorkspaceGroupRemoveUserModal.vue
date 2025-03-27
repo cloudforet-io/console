@@ -4,10 +4,10 @@ import { reactive, computed } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { MyWorkspaceGroupModel } from '@/schema/identity/user-profile/model';
-import type { WorkspaceGroupUserRemoveParameters } from '@/schema/identity/workspace-group-user/api-verbs/remove';
-import type { WorkspaceUser, WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { MyWorkspaceGroupModel } from '@/api-clients/identity/user-profile/schema/model';
+import type { WorkspaceGroupUserRemoveParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/remove';
+import type { WorkspaceUser, WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
@@ -20,9 +20,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { workspaceStateFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 const emit = defineEmits<{(e: 'confirm'): void;
     (e: 'update:visible'): void;
@@ -61,7 +61,7 @@ const getUserRouteLocationByWorkspaceId = (item) => ({
 });
 
 const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
-    name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+    name: SERVICE_ACCOUNT_ROUTE._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },

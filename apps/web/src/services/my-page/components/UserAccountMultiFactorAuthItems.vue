@@ -7,8 +7,8 @@ import {
     PI, PToggleButton, PBadge, PButton,
 } from '@cloudforet/mirinae';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
-import type { UserMfa } from '@/schema/identity/user/model';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
+import type { UserMfa } from '@/api-clients/identity/user/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

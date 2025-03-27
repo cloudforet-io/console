@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -16,9 +16,9 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetDetailDeleteModal from '@/services/cost-explorer/components/BudgetDetailDeleteModal.vue';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
@@ -29,7 +29,6 @@ const props = withDefaults(defineProps<Props>(), {
     loading: false,
 });
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -63,10 +62,10 @@ const handleUpdateDelete = (visible) => {
     state.deleteModalVisible = visible;
 };
 const handleConfirmDelete = () => {
-    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }));
+    router.push({ name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET._NAME : COST_EXPLORER_ROUTE.BUDGET._NAME }).catch(() => {});
 };
 const handleClickBackButton = () => {
-    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }));
+    router.push({ name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET._NAME : COST_EXPLORER_ROUTE.BUDGET._NAME }).catch(() => {});
 };
 </script>
 

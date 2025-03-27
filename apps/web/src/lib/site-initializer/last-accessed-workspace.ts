@@ -1,9 +1,9 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
-import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
+import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
+import type { UserConfigSetParameters } from '@/api-clients/config/user-config/schema/api-verbs/set';
+import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 
 const LAST_ACCESSED_WORKSPACE_KEY = 'console:last-accessed-workspace';
 

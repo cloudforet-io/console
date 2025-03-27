@@ -31,10 +31,12 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
+
+import type { TranslateResult } from 'vue-i18n';
 
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
@@ -42,24 +44,10 @@ import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useSelect } from '@/hooks/use-select/use-select';
 
 
-interface Props {
-    value?: any;
-    selected?: any | any[];
-    disabled?: boolean;
-    predicate?: SelectionPredicate;
-    multiSelectable?: boolean;
-    block?: boolean;
-    imageUrl?: string;
-    icon?: string|boolean;
-    iconColor?: string;
-    label?: string;
-    tabIndex?: number|undefined;
-    showSelectMarker?: boolean;
-}
-// FIXME:: tabIndex should be a required member;
 
 
-export default defineComponent<Props>({
+
+export default defineComponent({
     name: 'PSelectCard',
     components: {
         PI,
@@ -72,11 +60,11 @@ export default defineComponent<Props>({
     props: {
         /* select props */
         selected: {
-            type: [Boolean, String, Number, Object, Array],
+            type: [Boolean, String, Number, Object, Array] as PropType<any|any[]>,
             default: undefined,
         },
         value: {
-            type: [Boolean, String, Number, Object, Array],
+            type: [Boolean, String, Number, Object, Array] as PropType<any>,
             default: true,
         },
         disabled: {
@@ -84,7 +72,7 @@ export default defineComponent<Props>({
             default: false,
         },
         predicate: {
-            type: Function,
+            type: Function as PropType<SelectionPredicate>,
             default: undefined,
         },
         multiSelectable: {
@@ -101,7 +89,7 @@ export default defineComponent<Props>({
             default: undefined,
         },
         icon: {
-            type: [String, Boolean],
+            type: [String, Boolean] as PropType<string|boolean>,
             default: undefined,
         },
         iconColor: {
@@ -109,11 +97,12 @@ export default defineComponent<Props>({
             default: '',
         },
         label: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
+        // FIXME:: tabIndex should be a required member;
         tabIndex: {
-            type: Number,
+            type: Number as PropType<number|undefined>,
             default: undefined,
         },
         showSelectMarker: {

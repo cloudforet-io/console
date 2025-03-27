@@ -28,7 +28,7 @@
               :class="{ellipsis}"
         >
             <p-text-highlighting v-if="highlightTerm && !$slots.default"
-                                 :text="label"
+                                 :text="String(label)"
                                  :term="highlightTerm"
                                  class="text"
                                  style-type="secondary"
@@ -68,7 +68,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import { SELECT_MARKERS } from '@/controls/context-menu/context-menu-item/config';
+import type { SELECT_MARKERS } from '@/controls/context-menu/context-menu-item/config';
 import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
@@ -91,7 +91,7 @@ export interface ContextMenuItemProps {
     imageUrl?: string;
 }
 
-export default defineComponent<ContextMenuItemProps>({
+export default defineComponent({
     name: 'PContextMenuItem',
     components: {
         PLazyImg,
@@ -104,7 +104,7 @@ export default defineComponent<ContextMenuItemProps>({
             default: '',
         },
         label: {
-            type: [String, Number],
+            type: [String, Number] as PropType<number | TranslateResult>,
             default: '',
         },
         link: {
@@ -126,9 +126,6 @@ export default defineComponent<ContextMenuItemProps>({
         selectMarker: {
             type: String as PropType<SelectMarker|undefined>,
             default: undefined,
-            validator(marker?: SelectMarker) {
-                return marker === undefined || SELECT_MARKERS.includes(marker);
-            },
         },
         ellipsis: {
             type: Boolean,

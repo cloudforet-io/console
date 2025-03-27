@@ -11,11 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { UnifiedCostAnalyzeParameters } from '@/api-clients/cost-analysis/unified-cost/schema/api-verbs/analyze';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -30,7 +30,6 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -45,7 +44,6 @@ import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/works
 import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
 
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const allReferenceStore = useAllReferenceStore();
@@ -261,7 +259,7 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                     <p-divider class="divider" />
                     <div class="link-footer">
                         <p-link highlight
-                                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME })"
+                                :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
                                 action-icon="internal-link"
                                 class="link"
                         >
@@ -273,7 +271,7 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                             />
                         </div>
                         <p-link highlight
-                                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
+                                :to="{ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME }"
                                 action-icon="internal-link"
                                 class="link"
                         >

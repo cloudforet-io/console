@@ -6,11 +6,11 @@ import {
 import {
     PButton, PDefinitionTable, PHeading, PI, PStatus, PHeadingLayout, PTag,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

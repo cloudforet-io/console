@@ -4370,7 +4370,6 @@
 		"ASSET_INVENTORY_METRIC_EXPLORER": "메트릭 분석",
 		"ASSET_INVENTORY_SECURITY": "보안",
 		"ASSET_INVENTORY_SERVER": "서버",
-		"ASSET_INVENTORY_SERVICE_ACCOUNT": "서비스 어카운트",
 		"CONSOLE_HOME": "콘솔 홈",
 		"COST_EXPLORER": "비용 관리",
 		"COST_EXPLORER_ANOMALY_DETECTION": "이상 비용 탐지",
@@ -4396,6 +4395,7 @@
 		"OPS_FLOW": "옵스플로우",
 		"PROJECT": "프로젝트",
 		"PROVIDER": "프로바이더",
+		"SERVICE_ACCOUNT": "서비스 어카운트",
 		"TASK_BOARD": "{task} 보드",
 		"TASK_MANAGEMENT": "태스크 관리",
 		"WORKSPACE_HOME": "홈"

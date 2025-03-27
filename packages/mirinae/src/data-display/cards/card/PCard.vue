@@ -1,29 +1,28 @@
 <template>
     <div class="p-card"
-         :class="{
-             [styleType]: true,
-             [size]: true,
-         }"
+         :class="[styleType, size]"
     >
         <header v-if="header !== false || $scopedSlots.header">
             <slot name="header">
                 {{ header }}
             </slot>
         </header>
-        <div class="body" :class="{ 'no-header': !header.length && !$scopedSlots.header }">
+        <div class="body"
+             :class="{ 'no-header': !header && !$scopedSlots.header }"
+        >
             <slot />
         </div>
     </div>
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 import type { CardProps } from '@/data-display/cards/card/type';
 
-
-export default defineComponent<CardProps>({
+export default defineComponent({
     name: 'PCard',
     props: {
         header: {
@@ -31,18 +30,12 @@ export default defineComponent<CardProps>({
             default: '',
         },
         styleType: {
-            type: String,
+            type: String as PropType<CardProps['styleType']>,
             default: CARD_STYLE_TYPE.gray100,
-            validator(styleType: any) {
-                return Object.values(CARD_STYLE_TYPE).includes(styleType);
-            },
         },
         size: {
-            type: String,
+            type: String as PropType<CardProps['size']>,
             default: CARD_SIZE.md,
-            validator(size: any) {
-                return Object.values(CARD_SIZE).includes(size);
-            },
         },
     },
     setup() {
@@ -85,6 +78,9 @@ export default defineComponent<CardProps>({
     }
     &.gray100 {
         @mixin style-type theme('colors.gray.100'), theme('colors.gray.200'), theme('colors.gray.900');
+    }
+    &.gray200 {
+        @mixin style-type theme('colors.gray.200'), theme('colors.gray.200'), theme('colors.gray.900');
     }
     &.yellow100 {
         @mixin style-type theme('colors.yellow.100'), theme('colors.gray.200'), theme('colors.gray.500');

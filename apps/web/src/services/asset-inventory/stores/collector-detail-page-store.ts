@@ -33,7 +33,7 @@ export const useCollectorDetailPageStore = defineStore('page-collector-detail', 
     const action = {
         fetchCollector: async (collectorId: string) => {
             try {
-                state.collector = await SpaceConnector.clientV2.inventoryV2.collector.get<CollectorGetParameters, CollectorModel>({
+                state.collector = await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
                     collector_id: collectorId,
                 });
             } catch (e) {

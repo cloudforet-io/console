@@ -13,10 +13,8 @@ import type { ProjectChannelSetScheduleParameters } from '@/schema/notification/
 import type { UserChannelSetScheduleParameters } from '@/schema/notification/user-channel/api-verbs/set-schedule';
 import { i18n } from '@/translations';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
@@ -28,16 +26,15 @@ import { useNotificationItem } from '@/services/my-page/composables/notification
 import type { NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
 import type { NotiChannelItemV1, NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
-const domainStore = useDomainStore();
-const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
-
 const props = withDefaults(defineProps<{
     channelData: Partial<NotiChannelItem> & Partial<NotiChannelItemV1>;
     projectId?: string;
     disableEdit?: boolean;
+    visibleUserNotification: boolean;
 }>(), {
     projectId: undefined,
     disableEdit: false,
+    visibleUserNotification: false,
 });
 
 const emit = defineEmits<{(event: 'change'): void;
@@ -60,8 +57,8 @@ const {
     startEdit,
     updateUserChannel,
 } = useNotificationItem<undefined>({
-    userChannelId: isAlertManagerVersionV2 ? props.channelData.channel_id : props.channelData.user_channel_id,
-    projectChannelId: isAlertManagerVersionV2 ? '' : props.channelData.project_channel_id,
+    userChannelId: props.visibleUserNotification ? props.channelData.channel_id : props.channelData.user_channel_id,
+    projectChannelId: props.visibleUserNotification ? '' : props.channelData.project_channel_id,
     isEditMode: false,
 }, emit);
 
@@ -109,7 +106,7 @@ const setProjectChannelSchedule = async () => {
 
 const saveChangedSchedule = async () => {
     if (props.projectId) await setProjectChannelSchedule();
-    else if (!isAlertManagerVersionV2) {
+    else if (!props.visibleUserNotification) {
         await setUserChannelSchedule();
     } else {
         await updateUserChannel('schedule', state.scheduleSettingFormType);
@@ -191,7 +188,7 @@ const getScheduleInfo = (schedule: ScheduleSettingFormType) => {
         <div v-else
              class="content"
         >
-            <div v-if="!isAlertManagerVersionV2">
+            <div v-if="!props.visibleUserNotification">
                 <p v-if="Array.isArray(props.channelData.schedule?.day_of_week)">
                     <span v-for="day in props.channelData.schedule?.day_of_week"
                           :key="day"
@@ -200,7 +197,7 @@ const getScheduleInfo = (schedule: ScheduleSettingFormType) => {
                 </p>
                 <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
             </div>
-            <div v-else-if="isAlertManagerVersionV2">
+            <div v-else-if="props.visibleUserNotification">
                 <div class="inline-flex items-center gap-2">
                     <p-badge badge-type="solid-outline"
                              :style-type="getScheduleInfo(props.channelData.schedule).styleType"

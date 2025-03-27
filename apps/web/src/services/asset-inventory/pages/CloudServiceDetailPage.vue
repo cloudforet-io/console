@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { isEmpty, get, cloneDeep } from 'lodash';
 
+import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,7 +14,6 @@ import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/typ
 import {
     PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { ToolboxOptions } from '@cloudforet/mirinae/src/controls/toolbox/type';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions,
@@ -65,7 +65,7 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory/types/type';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {
@@ -93,8 +93,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
-
-assetInventorySettingsStore.initState();
+assetInventorySettingsStore.initState(userStore.state.userId);
 
 const route = useRoute();
 const router = useRouter();
@@ -125,7 +124,7 @@ const state = reactive({
 const typeOptionState = reactive({
     loading: true,
     totalCount: 0,
-    timezone: computed(() => userStore.state.timezone || 'UTC'),
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     selectIndex: [] as number[],
 });
 
@@ -288,7 +287,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
         }
     } else {
         window.open(router.resolve({
-            name: PROJECT_ROUTE.DETAIL._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL._NAME,
             params: { id, workspaceId },
         }).href, '_blank');
     }

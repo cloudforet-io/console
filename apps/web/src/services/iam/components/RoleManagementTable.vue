@@ -12,8 +12,8 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleState } from '@/schema/identity/role/type';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleState } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -22,7 +22,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import RoleDeleteModal
@@ -33,7 +32,7 @@ import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
 } from '@/services/iam/constants/role-constant';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
 
 interface Props {
@@ -48,7 +47,6 @@ const props = withDefaults(defineProps<Props>(), {
 const userStore = useUserStore();
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -117,7 +115,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 /* Component */
 const getRowSelectable = (item) => item.role_type !== ROLE_TYPE.SYSTEM_ADMIN;
 const handleEditRole = (id: string) => {
-    router.push(getProperRouteLocation({ name: IAM_ROUTE.ROLE.EDIT._NAME, params: { id } }));
+    router.push({ name: ADMIN_IAM_ROUTE.ROLE.EDIT._NAME, params: { id } });
 };
 const handleSelectDropdown = (name) => {
     switch (name) {

@@ -1,4 +1,4 @@
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

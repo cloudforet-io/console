@@ -47,9 +47,9 @@
                            :value="displayedInputValue"
                            :disabled="disabled"
                            :readonly="readonly"
-                           :placeholder="placeholder"
+                           :placeholder="stringPlaceholder"
                            :autocomplete="!$attrs.autocomplete ? 'off' : $attrs.autocomplete"
-                           size="1"
+                           :size="1"
                            v-on="$listeners"
                            @input="handleInput"
                            @focus="handleInputFocus"
@@ -144,36 +144,12 @@ import PBadge from '@/data-display/badge/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuController } from '@/hooks/use-context-menu-controller/use-context-menu-controller';
+import type { ISimpleContextMenu } from '@/hooks/use-context-menu-style/use-context-menu-style';
 import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/use-ignore-window-arrow-keydown-events/use-ignore-window-arrow-keydown-events';
 import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 
 
-interface TextInputProps {
-    value?: string|number;
-    size?: InputSize;
-    isFocused?: boolean;
-    disabled: boolean;
-    readonly: boolean;
-    block: boolean;
-    invalid: boolean;
-    placeholder: string;
-    multiInput: boolean;
-    selected: InputItem[];
-    visibleMenu?: boolean;
-    useFixedMenuStyle: boolean;
-    menu: MenuItem[];
-    loading: boolean;
-    handler?: TextInputHandler;
-    disableHandler: boolean;
-    useAutoComplete: boolean;
-    showPassword: boolean;
-    appearanceType?: InputAppearanceType;
-    pageSize?: number;
-    skipMaskToggleTabIndex?: boolean;
-    hideSpinButton?: boolean;
-}
-
-export default defineComponent<TextInputProps>({
+export default defineComponent({
     name: 'PTextInput',
     components: {
         PBadge,
@@ -197,9 +173,6 @@ export default defineComponent<TextInputProps>({
         size: {
             type: String as PropType<InputSize>,
             default: INPUT_SIZE.md,
-            validator(size: InputSize) {
-                return Object.values(INPUT_SIZE).includes(size);
-            },
         },
         isFocused: {
             type: Boolean,
@@ -222,7 +195,7 @@ export default defineComponent<TextInputProps>({
             default: false,
         },
         placeholder: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         multiInput: {
@@ -275,9 +248,6 @@ export default defineComponent<TextInputProps>({
         appearanceType: {
             type: String as PropType<InputAppearanceType>,
             default: INPUT_APPEARANCE_TYPES[0],
-            validator(appearanceType: InputAppearanceType) {
-                return INPUT_APPEARANCE_TYPES.includes(appearanceType);
-            },
         },
         pageSize: {
             type: Number,
@@ -305,6 +275,9 @@ export default defineComponent<TextInputProps>({
             isInputFocused.value = !!val;
         });
 
+        /* placeholder */
+        const stringPlaceholder = computed(() => String(props.placeholder));
+
         /* selected */
         const proxySelected = ref<InputItem[]>(props.selected);
         const updateSelected = (selected: InputItem[]) => {
@@ -325,11 +298,11 @@ export default defineComponent<TextInputProps>({
             proxyInputValue.value = value;
             emit('update:value', value);
         };
-        const displayedInputValue = computed<TranslateResult|number|undefined>(() => {
+        const displayedInputValue = computed<string|number|undefined>(() => {
             if (props.multiInput) return proxyInputValue.value;
             if (props.useAutoComplete) {
                 const item = proxySelected.value[0];
-                if (item) return item.label ?? item.name;
+                if (item) return item.label as string ?? item.name;
             }
             return proxyInputValue.value;
         });
@@ -369,7 +342,7 @@ export default defineComponent<TextInputProps>({
 
         /* context menu controller */
         const unionSelected = computed<InputItem[]>(() => unionBy<InputItem>(proxySelected.value, 'name'));
-        const menuRef = ref<null|typeof PContextMenu>(null);
+        const menuRef = ref<null|ISimpleContextMenu>(null);
         const targetRef = ref<null|HTMLElement>(null);
         const {
             contextMenuStyle, loading: contextMenuLoading, refinedMenu,
@@ -445,12 +418,12 @@ export default defineComponent<TextInputProps>({
         });
 
         /* input type */
-        const inputType = computed(() => {
+        const inputType = computed<string>(() => {
             if (maskingMode.value) {
                 if (attrs.type === 'password') return proxyShowPassword.value ? 'password' : 'text';
-                return attrs.type;
+                return attrs.type as string;
             }
-            return attrs.type;
+            return attrs.type as string;
         });
 
         /* input event listeners */
@@ -526,6 +499,8 @@ export default defineComponent<TextInputProps>({
             inputRef,
             isInputFocused,
             focusOnInput,
+            /* placeholder */
+            stringPlaceholder,
             /* context menu controller */
             menuRef,
             targetRef,

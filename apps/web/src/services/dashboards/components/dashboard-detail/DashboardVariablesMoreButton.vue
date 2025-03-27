@@ -21,14 +21,16 @@ import type {
 } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -44,9 +46,9 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-
+const appContextStore = useAppContextStore();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
+
 
 /* Query */
 const {
@@ -58,6 +60,7 @@ const {
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any | null,
     searchText: '',
@@ -125,7 +128,7 @@ const { mutate, isPending: loading } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (_dashboard: DashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
                 if (!oldDashboard) return oldDashboard;
                 return {
@@ -149,11 +152,14 @@ const { mutate, isPending: loading } = useMutation(
 /* Event */
 const handleOpenOverlay = () => {
     hideContextMenu();
-    router.push(getProperRouteLocation({
-        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    const dashboardDetailRouteName = state.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+        : DASHBOARDS_ROUTE.DETAIL._NAME;
+    router.push({
+        name: dashboardDetailRouteName,
         params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
         hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-    }));
+    }).catch(() => {});
 };
 const handleClickButton = () => {
     if (visibleMenu.value) hideContextMenu();

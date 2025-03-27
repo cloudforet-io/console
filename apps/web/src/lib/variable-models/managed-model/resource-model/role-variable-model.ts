@@ -1,4 +1,4 @@
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

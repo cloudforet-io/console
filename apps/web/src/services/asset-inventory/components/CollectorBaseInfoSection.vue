@@ -137,7 +137,7 @@ const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
         version: collectorFormState.version,
         upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
     };
-    return SpaceConnector.clientV2.inventoryV2.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
+    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
@@ -145,7 +145,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         collector_id: collectorFormState.collectorId,
         tags: collectorFormState.tags,
     };
-    return SpaceConnector.clientV2.inventoryV2.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 const getRepositoryPlugin = async (pluginId: string) => {
     try {

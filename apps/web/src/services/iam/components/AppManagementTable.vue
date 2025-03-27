@@ -10,15 +10,15 @@ import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge, PI,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
-import type { AppModel } from '@/schema/identity/app/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { APP_STATUS_TYPE } from '@/api-clients/identity/app/schema/constant';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

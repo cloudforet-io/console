@@ -1,4 +1,4 @@
-import type { ExtendedAuthType } from '@/schema/config/domain-config/type';
+import type { ExtendedAuthType } from '@/api-clients/config/domain-config/schema/type';
 
 import { GoogleAuth } from '@/services/auth/authenticator/external/GOOGLE_OAUTH2/authenticator/google-auth';
 import { KeycloakAuth } from '@/services/auth/authenticator/external/KEYCLOAK_OIDC/authenticator/keycloak-auth';

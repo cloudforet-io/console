@@ -8,7 +8,7 @@ import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-conf
 
 const props = defineProps<{
     fieldMetadata: TaskFieldTypeMetadata;
-    name: string;
+    name?: string;
     isRequired: boolean;
     isDeletable: boolean;
     isFolded: boolean;

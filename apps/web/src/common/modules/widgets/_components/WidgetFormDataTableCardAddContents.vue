@@ -8,8 +8,8 @@ import {
     cloneDeep, isArray, isEqual, uniq,
 } from 'lodash';
 
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/src/controls/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
@@ -44,7 +44,7 @@ import {
     DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE, GROUP_BY_INFO_ITEMS_FOR_TAGS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
@@ -287,8 +287,8 @@ const { mutateAsync: updateWidget } = useMutation({
     mutationFn: fetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? keys.privateWidgetQueryKey
-            : keys.publicWidgetQueryKey;
+            ? keys.privateWidgetGetQueryKey
+            : keys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {

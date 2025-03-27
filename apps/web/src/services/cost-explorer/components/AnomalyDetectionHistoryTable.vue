@@ -6,8 +6,8 @@ import { capitalize } from 'lodash';
 import {
     PToolboxTable, PLink, PLazyImg, PI,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
+
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -17,7 +17,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
     DETECTION_HISTORY_HANDLERS, HISTORY_TEMP_DATA, NOTIFY_LEVEL_MAP,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -58,7 +58,7 @@ const tableState = reactive({
             <template #col-name-format="{value, item}">
                 <p-link highlight
                         :to="{
-                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.HISTORY.DETAIL._NAME,
+                            name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
                             params: { historyId: item.history_id }
                         }"
                         class="col-name"
@@ -67,7 +67,7 @@ const tableState = reactive({
                 </p-link>
             </template>
             <template #col-config_id-format="{value}">
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
                         :to="{}"
                         class="col-config"
@@ -76,7 +76,7 @@ const tableState = reactive({
                 </p-link>
             </template>
             <template #col-policy-format="{value}">
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
                         :to="{}"
                 >

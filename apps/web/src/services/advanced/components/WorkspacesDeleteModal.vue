@@ -6,8 +6,8 @@ import {
     PDoubleCheckModal, PButtonModal, PLink, PStatus,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceDeleteParameters } from '@/schema/identity/workspace/api-verbs/delete';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/schema/api-verbs/delete';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -19,7 +19,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface Props {
     visible: boolean;
@@ -136,7 +136,7 @@ const handleConfirm = async () => {
                             <p-link new-tab
                                     highlight
                                     action-icon="external-link"
-                                    :to="{ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.relatedTrustedAccount.trusted_account_id }}"
+                                    :to="{ name: SERVICE_ACCOUNT_ROUTE.DETAIL._NAME, params: { serviceAccountId: state.relatedTrustedAccount.trusted_account_id }}"
                             >
                                 {{ state.relatedTrustedAccount.name }}
                             </p-link>

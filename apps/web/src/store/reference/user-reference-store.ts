@@ -6,14 +6,14 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
-import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
-import type { UserModel } from '@/schema/identity/user/model';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import { ROLE_STATE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
+import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {

@@ -6,9 +6,9 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import type { RoleListBasicRoleParameters } from '@/schema/identity/role/api-verbs/list-basic-role';
-import type { BasicRoleModel, RoleModel } from '@/schema/identity/role/model';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleListBasicRoleParameters } from '@/api-clients/identity/role/schema/api-verbs/list-basic-role';
+import type { BasicRoleModel, RoleModel } from '@/api-clients/identity/role/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {

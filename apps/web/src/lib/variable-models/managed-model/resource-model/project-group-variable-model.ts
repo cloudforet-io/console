@@ -1,4 +1,4 @@
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

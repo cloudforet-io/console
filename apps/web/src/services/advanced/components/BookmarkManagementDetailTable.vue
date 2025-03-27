@@ -6,8 +6,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PToolboxTable, PLazyImg, PI, PDataLoader, PSelectStatus, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type {
     KeyItemSet,
     ValueHandlerMap,
@@ -15,8 +14,6 @@ import type {
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { i18n } from '@/translations';
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
@@ -27,7 +24,7 @@ import { gray } from '@/styles/colors';
 
 import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/advanced/composables/bookmark-data-helper';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 
 const bookmarkStore = useBookmarkStore();
@@ -113,7 +110,7 @@ const getDropdownMenu = (item: BookmarkItem) => {
                 name: 'add',
                 label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
             },
-            { type: CONTEXT_MENU_TYPE.divider },
+            { type: 'divider' },
             ...defaultSets,
         ];
     }
@@ -161,7 +158,7 @@ const handleClickName = (item: BookmarkItem) => {
         return;
     }
     router.push({
-        name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+        name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME,
         params: {
             group: item.workspaceId || 'global',
             folder: item.name as string || '',

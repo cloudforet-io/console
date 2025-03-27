@@ -19,8 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      GROUP1: '["WANZARGEN", "sulmoJ", "skdud4659", "piggggggggy"]'
-      GROUP2: '["kkdy21", "seungyeoneeee", "Hansoo-mzc"]'
+      REVIEWERS: '["WANZARGEN", "seungyeoneeee", "skdud4659", "piggggggggy"]'
     
     steps:
       - uses: actions/checkout@v3
@@ -30,12 +29,13 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const group1 = JSON.parse(process.env.GROUP1).filter(user => user !== context.payload.pull_request.user.login);
-            const group2 = JSON.parse(process.env.GROUP2).filter(user => user !== context.payload.pull_request.user.login);
-            console.log('group1:', group1, 'group2:', group2);
+            const reviewers = JSON.parse(process.env.REVIEWERS).filter(user => user !== context.payload.pull_request.user?.login);
+            console.log('available reviewers:', reviewers);
             
-            const randomReviewer1 = group1[Math.floor(Math.random() * group1.length)];
-            const randomReviewer2 = group2[Math.floor(Math.random() * group2.length)];
+            // Shuffle array and pick first two reviewers
+            const shuffled = reviewers.sort(() => 0.5 - Math.random());
+            const randomReviewer1 = shuffled[0];
+            const randomReviewer2 = shuffled[1];
             console.log('randomReviewer1:', randomReviewer1, 'randomReviewer2:', randomReviewer2);
 
             core.setOutput('randomReviewer1', randomReviewer1);
@@ -68,7 +68,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const prAuthor = context.payload.pull_request.user.login;
+            const prAuthor = context.payload.pull_request.user?.login;
             const org = context.repo.owner;
             const prNumber = context.payload.pull_request.number;
 

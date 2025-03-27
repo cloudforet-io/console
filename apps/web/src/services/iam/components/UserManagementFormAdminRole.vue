@@ -14,9 +14,9 @@ import type {
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
-import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, UserListItemType } from '@/services/iam/types/user-type';
 
@@ -181,7 +181,7 @@ watch(() => roleState.proxySelectedItems, (role) => {
                                 >
                             </template>
                             <template #button>
-                                <router-link :to="{ name: IAM_ROUTE.ROLE.CREATE._NAME }">
+                                <router-link :to="{ name: ADMIN_IAM_ROUTE.ROLE.CREATE._NAME }">
                                     <p-button style-type="substitutive"
                                               icon-right="ic_arrow-right-up"
                                     >

@@ -86,7 +86,7 @@ const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|Definitio
 }));
 
 
-export default defineComponent<DefinitionTableProps>({
+export default defineComponent({
     name: 'PDefinitionTable',
     components: {
         PDataLoader,
@@ -94,7 +94,7 @@ export default defineComponent<DefinitionTableProps>({
     },
     props: {
         fields: {
-            type: Array,
+            type: Array as PropType<DefinitionField[]>,
             default: () => [],
         },
         data: {
@@ -114,11 +114,8 @@ export default defineComponent<DefinitionTableProps>({
             default: false,
         },
         styleType: {
-            type: String,
+            type: String as PropType<DefinitionTableProps['styleType']>,
             default: DEFINITION_TABLE_STYLE_TYPE.primary,
-            validator(styleType: any) {
-                return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
-            },
         },
         block: {
             type: Boolean,

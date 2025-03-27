@@ -3,7 +3,7 @@ import { watch } from 'vue';
 
 import { isEqual } from 'lodash';
 
-import type { TaskField, TaskFieldType } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskField, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -83,6 +83,8 @@ export const useTaskFieldValidation = <TField extends TaskField, TValue>(
     };
 
     const stringOrStringArrayValidator: ValidatorFn<TValue> = (val): string|boolean => {
+        if (val === undefined) return !props.field.is_required;
+
         if (props.field.selection_type === 'MULTI') {
             if (!Array.isArray(val)) {
                 return i18n.t('OPSFLOW.VALIDATION.VALUE_ARRAY') as string;

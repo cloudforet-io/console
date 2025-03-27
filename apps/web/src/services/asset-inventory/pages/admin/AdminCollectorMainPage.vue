@@ -18,8 +18,6 @@ import { SpaceRouter } from '@/router';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
@@ -30,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type {
     CollectorMainPageQuery,
@@ -92,7 +90,7 @@ const handleSelectedProvider = (providerName: string) => {
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
 const fetchCollectorCount = async () => {
     try {
-        const { total_count } = await SpaceConnector.clientV2.inventoryV2.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
+        const { total_count } = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
             query: collectorCountApiQueryHelper.data,
         });
         state.hasCollectorList = (total_count ?? 0) > 0;
@@ -124,7 +122,7 @@ onMounted(async () => {
             </template>
             <template #extra>
                 <router-link
-                    :to="{ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME) }"
+                    :to="{ name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
                 >
                     <p-button style-type="tertiary"
                               class="history-button"

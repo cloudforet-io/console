@@ -33,6 +33,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
+    defineComponent,
     computed, reactive,
 } from 'vue';
 
@@ -41,13 +42,13 @@ import { useProxyValue } from '@/hooks';
 import type { PaginationSize } from '@/navigation/pagination/pagination/type';
 import { PAGINATION_SIZE } from '@/navigation/pagination/pagination/type';
 
-export default {
+export default defineComponent({
     name: 'PPagination',
     components: { PIconButton },
     props: {
         thisPage: {
             type: Number,
-            validator(value) {
+            validator(value: number) {
                 return value > 0;
             },
             default: 1,
@@ -63,9 +64,6 @@ export default {
         size: {
             type: String as PropType<PaginationSize>,
             default: PAGINATION_SIZE.md,
-            validator(size: PaginationSize) {
-                return Object.values(PAGINATION_SIZE).includes(size);
-            },
         },
     },
     setup(props, { emit }) {
@@ -170,7 +168,7 @@ export default {
             nextPage,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

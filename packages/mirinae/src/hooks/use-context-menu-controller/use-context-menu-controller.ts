@@ -34,7 +34,7 @@ interface UseContextMenuControllerReturns {
     showMoreMenu: ReturnType<typeof useContextMenuItems>['showMoreMenu'];
 }
 
-interface FocusOnContextMenu { (position?: number): void }
+export interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,

@@ -16,24 +16,27 @@ import { METRIC_TYPE } from '@/schema/inventory/metric/constant';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const router = useRouter();
 const route = useRoute();
-const { getProperRouteLocation } = useProperRouteLocation();
+
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
-
+const appContextStore = useAppContextStore();
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     metricNameList: computed(() => metricExplorerPageGetters.metrics.map((metric) => metric.name)),
 });
 
@@ -113,12 +116,12 @@ const createCustomMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
         await metricExplorerPageStore.loadMetric(state.currentMetricId);
-        await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        await router.replace({
+            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: createdMetric.metric_id,
             },
-        })).catch(() => {});
+        }).catch(() => {});
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
     } finally {

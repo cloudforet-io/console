@@ -59,19 +59,23 @@ export class SpaceConnector {
 
     private static interceptorIds: number[] = []; // [v1 id, v2 id]
 
+    private readonly serviceConfig: Record<string, any> = {};
+
     constructor(
         endpoints: string[],
         tokenApi: TokenAPI,
         apiSettings: CreateAxiosDefaults[],
         devConfig: DevConfig|undefined,
         afterCallApiMap: AfterCallApiMap,
+        serviceConfig: Record<string, any>,
     ) {
         SpaceConnector.mockConfig = devConfig?.mockConfig ?? {};
         SpaceConnector.authConfig = devConfig?.authConfig ?? {};
         SpaceConnector.isDevMode = devConfig?.enabled ?? false;
+        this.serviceConfig = serviceConfig;
         this.tokenApi = tokenApi;
-        this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi, apiSettings[0]);
-        const serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1]);
+        this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi, apiSettings[0], this.serviceConfig);
+        const serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi, apiSettings[1], this.serviceConfig);
         this.serviceApiV2 = serviceApiV2;
         this.afterCallApiMap = afterCallApiMap;
         this._restClient = serviceApiV2.instance;
@@ -89,9 +93,16 @@ export class SpaceConnector {
         }
     }
 
-    static async init(endpoints: string[], tokenApi: TokenAPI, apiSettings: CreateAxiosDefaults[] = [], devConfig: DevConfig = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
+    static async init(
+        endpoints: string[],
+        tokenApi: TokenAPI,
+        apiSettings: CreateAxiosDefaults[] = [],
+        devConfig: DevConfig = {},
+        afterCallApiMap: AfterCallApiMap = {},
+        serviceConfig: Record<string, any> = {},
+    ): Promise<void> {
         if (!SpaceConnector.instance) {
-            SpaceConnector.instance = new SpaceConnector(endpoints, tokenApi, apiSettings, devConfig, afterCallApiMap);
+            SpaceConnector.instance = new SpaceConnector(endpoints, tokenApi, apiSettings, devConfig, afterCallApiMap, serviceConfig);
             await Promise.allSettled([
                 SpaceConnector.instance.loadAPI(1),
                 SpaceConnector.instance.loadAPI(2),

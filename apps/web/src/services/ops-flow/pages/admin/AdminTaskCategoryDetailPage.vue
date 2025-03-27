@@ -19,8 +19,10 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates,import/order
+import {
+    computed, onBeforeMount, onUnmounted, toRef,
 // eslint-disable-next-line import/no-duplicates
-import { computed, onBeforeMount, onUnmounted } from 'vue';
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PHeading, PTab, PSkeleton } from '@cloudforet/mirinae';
@@ -29,7 +31,6 @@ import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useGoBack } from '@/common/composables/go-back';
 
@@ -38,9 +39,9 @@ import TaskStatusForm from '@/services/ops-flow/components/TaskStatusForm.vue';
 import TaskStatusSetDefaultModal from '@/services/ops-flow/components/TaskStatusSetDefaultModal.vue';
 import TaskTypeDeleteModal from '@/services/ops-flow/components/TaskTypeDeleteModal.vue';
 import TaskTypeForm from '@/services/ops-flow/components/TaskTypeForm.vue';
-import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useCategoryQuery } from '@/services/ops-flow/composables/use-current-category';
+import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
-import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -52,17 +53,19 @@ const router = useRouter();
 const route = useRoute();
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
-const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
+/* category */
+const { data: currentCategory, isLoading } = useCategoryQuery({
+    categoryId: toRef(props, 'taskCategoryId'),
+});
 /* header and back button */
-const loading = computed<boolean>(() => taskCategoryStore.getters.loading);
-const headerTitle = computed<string>(() => taskCategoryPageStore.getters.currentCategory?.name ?? 'No Category');
+const headerTitle = computed<string>(() => currentCategory.value?.name ?? 'No Category');
 const {
     setPathFrom,
     handleClickBackButton,
 } = useGoBack({
-    name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME),
+    name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
 });
 
 /* tabs */
@@ -79,20 +82,20 @@ const tabs = computed<TabItem<object>[]>(() => [
     },
 ]);
 const activeTab = computed(() => {
-    if (route.name === makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME)) return 'taskType';
+    if (route.name === ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME) return 'taskType';
     return 'status';
 });
 const handleUpdateActiveTab = (tab: string) => {
     if (tab === 'taskType') {
         router.replace({
-            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME),
+            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME,
             params: {
                 taskCategoryId: props.taskCategoryId,
             },
         });
     } else {
         router.replace({
-            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME),
+            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME,
             params: {
                 taskCategoryId: props.taskCategoryId,
             },
@@ -118,7 +121,7 @@ defineExpose({ setPathFrom });
                    show-back-button
                    @click-back-button="handleClickBackButton"
         >
-            <p-skeleton v-if="loading"
+            <p-skeleton v-if="isLoading"
                         height="1.75rem"
                         width="12rem"
             />

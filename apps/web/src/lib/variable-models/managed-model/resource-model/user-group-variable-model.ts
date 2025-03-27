@@ -1,4 +1,4 @@
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

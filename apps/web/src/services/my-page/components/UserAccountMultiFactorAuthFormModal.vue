@@ -10,8 +10,8 @@ import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
-import type { UserMfa } from '@/schema/identity/user/model';
+import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
+import type { UserMfa } from '@/api-clients/identity/user/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

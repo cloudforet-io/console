@@ -46,15 +46,15 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import type { ButtonProps, ButtonSize } from '@/controls/buttons/button/type';
+import type { ButtonSize, ButtonStyle } from '@/controls/buttons/button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/controls/buttons/button/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import type { SpinnerStyleType } from '@/feedbacks/loading/spinner/type';
+import type { SpinnerSize, SpinnerStyleType } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE, SPINNER_STYLE_TYPE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
 
@@ -64,14 +64,14 @@ const ICON_SIZE: Record<ButtonSize, string> = {
     md: '1.25rem',
     lg: '1.5rem',
 };
-const LOADING_SIZE: Record<ButtonSize, string> = {
+const LOADING_SIZE: Record<ButtonSize, SpinnerSize> = {
     sm: SPINNER_SIZE.xs,
     md: SPINNER_SIZE.sm,
     lg: SPINNER_SIZE.sm,
 };
 const WHITE_SPINNER_TYPES: string[] = [BUTTON_STYLE.primary, BUTTON_STYLE.substitutive, BUTTON_STYLE.highlight, BUTTON_STYLE.positive, BUTTON_STYLE['negative-primary']];
 
-export default defineComponent<ButtonProps>({
+export default defineComponent({
     name: 'PButton',
     components: {
         PI,
@@ -79,18 +79,12 @@ export default defineComponent<ButtonProps>({
     },
     props: {
         styleType: {
-            type: String,
+            type: String as PropType<ButtonStyle>,
             default: BUTTON_STYLE.primary,
-            validator(value: string): boolean {
-                return Object.keys(BUTTON_STYLE).includes(value);
-            },
         },
         size: {
-            type: String,
+            type: String as PropType<ButtonSize>,
             default: BUTTON_SIZE.md,
-            validator(value: string): boolean {
-                return Object.keys(BUTTON_SIZE).includes(value);
-            },
         },
         loading: {
             type: Boolean,
@@ -121,13 +115,13 @@ export default defineComponent<ButtonProps>({
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props, { emit }) {
         const state = reactive({
             component: computed(() => (props.href ? 'a' : 'button')),
             iconSize: computed(() => ICON_SIZE[props.size ?? ''] ?? ICON_SIZE.md),
-            loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
+            loadingIconSize: computed<SpinnerSize>(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
             spinnerStyleType: computed<SpinnerStyleType>(() => {
-                if (WHITE_SPINNER_TYPES.includes(props.styleType)) return SPINNER_STYLE_TYPE.white;
+                if (WHITE_SPINNER_TYPES.includes(props.styleType as string)) return SPINNER_STYLE_TYPE.white;
                 return SPINNER_STYLE_TYPE.gray;
             }),
         });

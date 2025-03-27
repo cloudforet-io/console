@@ -11,9 +11,9 @@ import {
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import type { PostSendParameters } from '@/schema/board/post/api-verbs/send';
 import type { PostModel } from '@/schema/board/post/model';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -29,13 +29,12 @@ import {
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
-import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 const props = defineProps<{
@@ -49,7 +48,6 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -80,10 +78,10 @@ const handleClickEditButton = () => {
         ErrorHandler.handleError(new Error('postId is undefined'));
         return;
     }
-    router.push(getProperRouteLocation({
-        name: INFO_ROUTE.NOTICE.UPDATE._NAME,
+    router.push({
+        name: ADMIN_INFO_ROUTE.NOTICE.UPDATE._NAME,
         params: { postId: props.postId },
-    }));
+    });
 };
 
 const handleDeleteModalOpen = () => {
@@ -95,7 +93,7 @@ const handleDeleteNoticeConfirm = async () => {
         if (!props.postId) throw new Error('postId is undefined');
         await noticeDetailStore.deleteNoticePost(props.postId);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
-        await router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME }));
+        await router.push({ name: ADMIN_INFO_ROUTE.NOTICE._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_DELETE_NOTICE'));
     } finally {

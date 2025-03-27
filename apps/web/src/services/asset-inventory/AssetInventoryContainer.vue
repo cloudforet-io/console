@@ -56,8 +56,8 @@ onUnmounted(() => {
 <template>
     <fragment>
         <vertical-page-layout v-if="state.lsbVisible">
-            <template #sidebar="prop">
-                <asset-inventory-l-s-b :width="prop.width" />
+            <template #sidebar>
+                <asset-inventory-l-s-b />
             </template>
             <template #default>
                 <router-view />

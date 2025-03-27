@@ -11,10 +11,8 @@ import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dro
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -22,8 +20,8 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
-import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import type { WorkspaceDropdownMenuItem, NoticeFormType } from '@/services/info/types/notice-type';
 
 interface Props {
@@ -49,7 +47,7 @@ const state = reactive({
     proxySelectedItems: useProxyValue('selectedItems', props, emit),
     searchText: '',
     menuItems: [] as WorkspaceDropdownMenuItem[],
-    isMainListPage: computed<boolean>(() => route.name === makeAdminRouteName(INFO_ROUTE.NOTICE._NAME)),
+    isMainListPage: computed<boolean>(() => route.name === ADMIN_INFO_ROUTE.NOTICE._NAME),
 });
 
 const handleSelectedItem = (value: WorkspaceDropdownMenuItem[]) => {
@@ -175,7 +173,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                     <template #button>
                         <p-button style-type="substitutive"
                                   icon-left="ic_plus_bold"
-                                  @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
+                                  @click="router.push({ name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME })"
                         >
                             {{ $t('INFO.NOTICE.FORM.CREATE_WORKSPACE') }}
                         </p-button>

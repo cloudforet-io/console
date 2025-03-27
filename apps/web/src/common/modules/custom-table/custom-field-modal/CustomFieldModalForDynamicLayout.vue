@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-import type { UserType } from '@/schema/identity/user/type';
+import type { UserType } from '@/api-clients/identity/user/schema/type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,12 +21,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItemForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItemForDynamicLayout.vue';
 
-import { convertAgentModeOptions } from '@/services/asset-inventory-v1/helpers/agent-mode-helper';
-import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator';
+import { convertAgentModeOptions } from '@/services/service-account/helpers/agent-mode-helper';
+import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
 import type {
     GetSchemaParams,
     ResourceType,
-} from '@/services/asset-inventory-v1/helpers/dynamic-ui-schema-generator/type';
+} from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
 
 const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
 const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');

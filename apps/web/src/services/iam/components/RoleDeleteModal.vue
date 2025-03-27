@@ -8,9 +8,9 @@ import { PDataTable } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleDeleteParameters } from '@/schema/identity/role/api-verbs/delete';
+import type { RoleBindingListParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/list';
+import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import type { RoleDeleteParameters } from '@/api-clients/identity/role/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -1,13 +1,14 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
+import { h, defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 
-import type { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
+import type { DatetimeTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/navigation/link/PLink.vue';
 import { ACTION_ICON } from '@/navigation/link/type';
@@ -16,14 +17,13 @@ import { ACTION_ICON } from '@/navigation/link/type';
 dayjs.extend(utc);
 dayjs.extend(tz);
 
-export default {
+export default defineComponent({
     name: 'PDynamicFieldDatetime',
     components: { PLink },
     props: {
         options: {
-            type: Object,
+            type: Object as PropType<DatetimeOptions>,
             default: () => ({
-                // eslint-disable-next-line camelcase
                 source_type: 'timestamp',
             }),
         },
@@ -32,7 +32,7 @@ export default {
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DatetimeTypeOptions>,
             default: () => ({}),
         },
         extraData: {
@@ -40,11 +40,11 @@ export default {
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },
-    setup(props: DatetimeDynamicFieldProps, { attrs }: SetupContext) {
+    setup(props, { attrs }) {
         let result = '';
         // eslint-disable-next-line vue/no-setup-props-destructure
         const options: DatetimeOptions = props.options;
@@ -82,5 +82,5 @@ export default {
 
         return () => datetimeEl;
     },
-};
+});
 </script>

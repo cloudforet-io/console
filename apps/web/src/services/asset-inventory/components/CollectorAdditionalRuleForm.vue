@@ -358,7 +358,7 @@ const fetchCloudServiceType = async (keyword = '', idx:number):Promise<SelectDro
 };
 const fetchRegion = async (keyword = '', idx:number):Promise<SelectDropdownMenuItem[]> => {
     try {
-        const { results } = await SpaceConnector.clientV2.inventoryV2.region.list<RegionListParameters, ListResponse<RegionModel>>(
+        const { results } = await SpaceConnector.clientV2.inventory.region.list<RegionListParameters, ListResponse<RegionModel>>(
             {
                 query: {
                     keyword,

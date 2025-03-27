@@ -6,17 +6,18 @@ import dayjs from 'dayjs';
 import {
     PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/components/CollectorJobStatusIcon.vue';
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CollectorLink } from '@/services/asset-inventory/types/collector-main-page-type';
 
@@ -32,8 +33,7 @@ interface Props {
     fullMode?: boolean;
 }
 
-const { getProperRouteLocation } = useProperRouteLocation();
-
+const appContextStore = useAppContextStore();
 const props = withDefaults(defineProps<Props>(), {
     recentJobs: undefined,
     historyLink: undefined,
@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userStore = useUserStore();
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
     completedJobs: computed<MinimalJobInfo[]|undefined>(() => {
         if (Array.isArray(props.recentJobs) && props.recentJobs.length > 0) {
@@ -51,6 +52,7 @@ const state = reactive({
         }
         return undefined;
     }),
+    historyJobRouteName: computed(() => (state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME)),
 });
 
 const handleTooltipContent = (job: MinimalJobInfo) => {
@@ -88,9 +90,9 @@ watch(() => props.recentJobs, () => {
             </p>
             <p-link v-if="props.fullMode && props.historyLink"
                     size="sm"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    action-icon="internal-link"
                     highlight
-                    :to="getProperRouteLocation(props.historyLink)"
+                    :to="props.historyLink"
                     class="view-all-link"
             >
                 View All
@@ -110,13 +112,16 @@ watch(() => props.recentJobs, () => {
                                                class="collector-job-status-icon-wrapper"
                                                :status="job.status"
                                                :contents="handleTooltipContent(job)"
-                                               :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} })"
+                                               :to="{
+                                                   name: state.historyJobRouteName,
+                                                   params: { jobId: job.job_id}
+                                               }"
                                                :style-type="props.fullMode ? 'white' : 'gray'"
                     />
                 </div>
                 <collector-job-status-icon v-if="state.completedJobs.length > 0 && !props.fullMode && props.historyLink"
                                            is-arrow
-                                           :to="getProperRouteLocation(props.historyLink)"
+                                           :to="props.historyLink"
                                            class="more-button"
                                            :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
                 />

@@ -1,5 +1,5 @@
-import type { RoleType } from '@/schema/identity/role/type';
-import type { UserModel } from '@/schema/identity/user/model';
+import type { RoleType } from '@/api-clients/identity/role/type';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
 
 type RoleBindingType = {
     type: RoleType;

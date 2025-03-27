@@ -8,8 +8,8 @@ import {
 
 
 import type { Tags, TimeStamp } from '@/api-clients/_common/schema/model';
-import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-verbs/update';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

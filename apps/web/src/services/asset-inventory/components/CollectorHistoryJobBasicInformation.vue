@@ -4,9 +4,9 @@
         <section class="items-container">
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link action-icon="internal-link"
                         new-tab
-                        :to="getProperRouteLocation(state.collector.linkLocation)"
+                        :to="state.collector.linkLocation"
                         class="contents"
                         size="sm"
                 >
@@ -49,19 +49,21 @@ import {
 } from 'vue';
 
 import { PLink, PLazyImg, PPaneLayout } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 
 interface Props {
@@ -70,12 +72,13 @@ interface Props {
 
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
 
 const props = withDefaults(defineProps<Props>(), {
     job: undefined,
 });
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
@@ -89,8 +92,9 @@ const state = reactive({
             id,
             label: storeState.collectors[id]?.label || id,
             linkLocation: {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                 params: {
+                    workspaceId: appContextStore.getters.isAdminMode ? undefined : userWorkspaceStore.getters.currentWorkspaceId,
                     collectorId: id,
                 },
             },
