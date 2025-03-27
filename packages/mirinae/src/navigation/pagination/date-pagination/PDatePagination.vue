@@ -20,10 +20,8 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     reactive, toRefs, computed,
-    defineComponent,
 } from 'vue';
 
 import type { Dayjs } from 'dayjs';
@@ -32,15 +30,16 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
+import type { DatePaginationProps } from '@/navigation/pagination/date-pagination/type';
 
 dayjs.extend(isSameOrAfter);
 
-export default defineComponent({
+export default {
     name: 'PDatePagination',
     components: { PIconButton },
     props: {
         date: {
-            type: Object as PropType<Dayjs>,
+            type: Object,
             default: () => dayjs(),
         },
         type: {
@@ -60,7 +59,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: DatePaginationProps, { emit }) {
         const state = reactive({
             dateText: computed(() => {
                 const weekStart = props.date.startOf('week').format('MM');
@@ -111,7 +110,7 @@ export default defineComponent({
             onClickNext,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">

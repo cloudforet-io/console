@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { watch, computed } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
     PHeadingLayout, PHeading, PButton,
 } from '@cloudforet/mirinae';
 
-import { queryStringToString } from '@/lib/router-query-string';
-
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { useBoardPageStore } from '@/services/ops-flow/stores/board-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -19,18 +19,21 @@ import type { TaskCreatePageQuery } from '@/services/ops-flow/types/task-create-
 
 const route = useRoute();
 
+const { getProperRouteLocation } = useProperRouteLocation();
 
+const boardPageStore = useBoardPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const taskCreatePageLink = computed(() => ({
+const taskCreatePageLink = computed(() => getProperRouteLocation({
     name: OPS_FLOW_ROUTE.BOARD.TASK_CREATE._NAME,
     query: { categoryId: route.query.categoryId } as TaskCreatePageQuery,
 }));
 
-
-const categoryId = computed(() => queryStringToString(route.query.categoryId));
+watch(() => route.query.categoryId, (categoryId) => {
+    boardPageStore.setCurrentCategoryId(categoryId as string);
+}, { immediate: true });
 
 </script>
 
@@ -54,7 +57,7 @@ const categoryId = computed(() => queryStringToString(route.query.categoryId));
                 </router-link>
             </template>
         </p-heading-layout>
-        <board-task-table :category-id="categoryId" />
+        <board-task-table :category-id="boardPageStore.state.currentCategoryId" />
     </div>
 </template>
 

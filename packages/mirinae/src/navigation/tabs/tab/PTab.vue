@@ -48,10 +48,10 @@ const state = reactive({
         if (!props.tabs.length) return undefined;
         if (typeof props.tabs[0] === 'string') return undefined;
         const flattenTabs = props.tabs.reduce((acc, tab) => {
-            if (typeof tab !== 'string' && tab?.tabType === 'folder') {
-                acc.push(...((tab as TabItem)?.subItems as TabItem[] ?? []));
+            if (tab?.tabType === 'folder') {
+                acc.push(...(tab?.subItems ?? []));
             } else {
-                acc.push(tab as TabItem);
+                acc.push(tab);
             }
             return acc;
         }, [] as TabItem[]);
@@ -97,11 +97,9 @@ const handleSelectGroupTab = (tab: TabItem) => {
         state.selectedFolderTab = tab.name;
     }
 };
-const handleSelectGroupTabMenu = (item: MenuItem, idx?: number) => {
-    if (idx !== undefined) {
-        selectTab(item as unknown as TabItem, idx);
-        hideGroupTab();
-    }
+const handleSelectGroupTabMenu = (tab: TabItem, idx: number) => {
+    selectTab(tab, idx);
+    hideGroupTab();
 };
 const handleClickHiddenTabsMenu = () => {
     state.selectedHiddenParentTab = undefined;
@@ -149,7 +147,7 @@ const calculateWidths = () => {
 
     while (i < tabItemsRef.value.length && totalWidth <= ulWidth) {
         const item = tabItemsRef.value[i];
-        const itemWidth = item.clientWidth || ((item as typeof PDivider).$el.clientWidth + 16) || 0;
+        const itemWidth = item.clientWidth || (item.$el.clientWidth + 16) || 0;
 
         totalWidth += itemWidth;
         lastValidTotalWidth += itemWidth;

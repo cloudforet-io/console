@@ -24,7 +24,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     defineComponent, reactive, toRefs,
 } from 'vue';
@@ -37,7 +36,7 @@ import {
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
 
-export default defineComponent({
+export default defineComponent<CollapsibleToggleProps>({
     name: 'PCollapsibleToggle',
     components: { PToggleButton, PI },
     model: {
@@ -51,8 +50,11 @@ export default defineComponent({
             default: true,
         },
         toggleType: {
-            type: String as PropType<CollapsibleToggleProps['type']>,
+            type: String,
             default: COLLAPSIBLE_TOGGLE_TYPE.text,
+            validator(type: any) {
+                return Object.values(COLLAPSIBLE_TOGGLE_TYPE).includes(type);
+            },
         },
     },
     setup(props: CollapsibleToggleProps, { emit }) {

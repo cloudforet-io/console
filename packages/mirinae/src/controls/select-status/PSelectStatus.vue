@@ -13,11 +13,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 import PStatus from '@/data-display/status/PStatus.vue';
 import type { AnimationType } from '@/foundation/icons/config';
+import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useSelect } from '@/hooks/use-select/use-select';
 
@@ -33,7 +33,7 @@ interface Props {
     disableCheckIcon?: boolean;
 }
 
-export default defineComponent({
+export default defineComponent<Props>({
     name: 'PSelectStatus',
     components: { PStatus },
     model: {
@@ -43,15 +43,15 @@ export default defineComponent({
     props: {
         /* select props */
         selected: {
-            type: [Boolean, String, Number, Object, Array] as PropType<any|any[]>,
+            type: [Boolean, String, Number, Object, Array],
             default: undefined,
         },
         value: {
-            type: [Boolean, String, Number, Object, Array] as PropType<any>,
+            type: [Boolean, String, Number, Object, Array],
             default: '',
         },
         predicate: {
-            type: Function as PropType<SelectionPredicate>,
+            type: Function,
             default: undefined,
         },
         multiSelectable: {
@@ -68,8 +68,11 @@ export default defineComponent({
             default: undefined,
         },
         iconAnimation: {
-            type: String as PropType<AnimationType>,
+            type: String,
             default: undefined,
+            validator(animation: any) {
+                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+            },
         },
         disableCheckIcon: {
             type: Boolean,

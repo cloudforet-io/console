@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     defineComponent,
 } from 'vue';
@@ -30,7 +31,12 @@ import PButton from '@/controls/buttons/button/PButton.vue';
 import PCopyButton from '@/controls/buttons/copy-button/PCopyButton.vue';
 import PTextInput from '@/controls/input/text-input/PTextInput.vue';
 
-export default defineComponent({
+interface Props {
+    value?: string;
+    disabled?: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'GenerateIdFormat',
     components: {
         PTextInput,
@@ -55,7 +61,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const handleClickGenerate = () => {
             emit('update:value', uuidV4());
         };

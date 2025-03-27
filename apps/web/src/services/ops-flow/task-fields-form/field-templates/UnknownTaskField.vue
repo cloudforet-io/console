@@ -3,7 +3,7 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import type { TaskFieldFormProps } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
 

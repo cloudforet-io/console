@@ -5,7 +5,7 @@ import {
     PFieldGroup,
 } from '@cloudforet/mirinae';
 
-import type { ParagraphTaskField } from '@/api-clients/opsflow/_types/task-field-type';
+import type { ParagraphTaskField } from '@/schema/opsflow/_types/task-field-type';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';

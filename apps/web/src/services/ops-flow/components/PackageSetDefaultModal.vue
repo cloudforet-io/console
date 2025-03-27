@@ -1,52 +1,36 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
-import { useMutation } from '@tanstack/vue-query';
+import { ref, computed } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { usePackageQuery } from '@/services/ops-flow/composables/use-package-query';
-import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-
 const taskManagementPageStore = useTaskManagementPageStore();
-const { packageAPI } = usePackageApi();
+const packageStore = usePackageStore();
 
-/* package name */
-const { invalidateQueries: invalidatePackagesQuery } = usePackagesQuery();
-const { data: targetPackage, setQueryData: setTargetPackageQueryData } = usePackageQuery({
-    packageId: computed(() => taskManagementPageStore.state.targetPackageId),
-});
-const name = computed(() => targetPackage.value?.name ?? '');
-
-/* set default package */
-const { mutateAsync: setDefaultPackage, isPending } = useMutation({
-    mutationFn: packageAPI.setDefault,
-    onSuccess: (data) => {
-        invalidatePackagesQuery();
-        setTargetPackageQueryData(data);
+const loading = ref<boolean>(false);
+const name = computed(() => taskManagementPageStore.getters.targetPackage?.name ?? '');
+const handleConfirm = async () => {
+    loading.value = true;
+    try {
+        if (!taskManagementPageStore.state.targetPackageId) {
+            throw new Error('[Console Error] Cannot set default package without a target package');
+        }
+        await packageStore.setDefaultPackage(taskManagementPageStore.state.targetPackageId);
         taskManagementPageStore.closeSetDefaultPackageModal();
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_CHANGE_DEFAULT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }), '');
-    },
-    onError: (e) => {
+    } catch (e) {
         ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_CHANGE_DEFAULT_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }));
-    },
-});
-
-/* modal event handlers */
-const handleConfirm = async () => {
-    if (!taskManagementPageStore.state.targetPackageId) {
-        throw new Error('[Console Error] Cannot set default package without a target package');
+    } finally {
+        loading.value = false;
     }
-    await setDefaultPackage({ package_id: taskManagementPageStore.state.targetPackageId });
 };
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeSetDefaultPackageModal();
@@ -59,7 +43,7 @@ const handleClosed = () => {
 <template>
     <p-button-modal :visible="taskManagementPageStore.state.visibleSetDefaultPackageModal"
                     size="sm"
-                    :loading="isPending"
+                    :loading="loading"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"

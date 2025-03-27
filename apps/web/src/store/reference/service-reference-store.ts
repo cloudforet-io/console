@@ -3,7 +3,9 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import APIClientManager from '@/api-clients/api-client-manager';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
@@ -13,6 +15,7 @@ import type {
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,6 +28,7 @@ let lastLoadedTime = 0;
 
 export const useServiceReferenceStore = defineStore('reference-service', () => {
     const userStore = useUserStore();
+    const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
     const state = reactive({
         items: null as ServiceReferenceMap | null,
@@ -59,10 +63,9 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
             },
         };
 
-        const alertManagerClient = APIClientManager.alertManager;
-        if (!alertManagerClient) return;
+        if (!isAlertManagerV2Enabled.value) return;
         try {
-            const { results } = await alertManagerClient.endpoint.service.list(params);
+            const { results } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>(params);
 
             const serviceReferenceMap: ServiceReferenceMap = {};
 

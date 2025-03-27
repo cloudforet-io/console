@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 interface UserWorkspaceStoreState {
     items: WorkspaceModel[];

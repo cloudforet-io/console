@@ -8,12 +8,8 @@
                :field-handler="fieldHandler"
                v-on="$listeners"
     >
-        <template v-for="(_, slot) of $scopedSlots"
-                  #[slot]="scope"
-        >
-            <slot :name="slot"
-                  v-bind="scope"
-            />
+        <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
+            <slot :name="slot" v-bind="scope" />
         </template>
     </component>
 </template>
@@ -23,8 +19,8 @@ import {
     defineComponent,
     onMounted, reactive, toRefs, watch,
 } from 'vue';
+import type { AsyncComponent } from 'vue';
 import type { ImportedComponent } from 'vue/types/options';
-import type { PropType } from 'vue/types/v3-component-props';
 
 import { isEqual } from 'lodash';
 
@@ -32,7 +28,7 @@ import type { DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/ty
 import { dynamicLayoutTypes } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
-const componentMap: Record<DynamicLayoutType, any> = {
+const componentMap: Record<DynamicLayoutType, AsyncComponent> = {
     item: () => ({
         component: import('./templates/item/index.vue') as Promise<ImportedComponent>,
     }),
@@ -81,7 +77,7 @@ export default defineComponent({
             default: () => ({}),
         },
         data: {
-            type: [Object, Array, String] as PropType<any>,
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -99,7 +95,7 @@ export default defineComponent({
     },
     setup(props) {
         const state = reactive({
-            component: null as any,
+            component: null as null|AsyncComponent,
         });
 
         const getComponent = async () => {

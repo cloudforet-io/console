@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
@@ -13,12 +11,9 @@ import type { WidgetConfig } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -30,12 +25,10 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
-import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import type { MetricFilter } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
@@ -47,6 +40,7 @@ interface OverridableWidgetFrameState {
     noData?: ComputedRef<boolean>;
 }
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const convertDashboardVarsToConsoleFilters = (dashboardVars?: DashboardVars): ConsoleFilter[] => {
     if (!dashboardVars) return [];
@@ -81,14 +75,7 @@ const getRecursiveDataTableIds = (prevValue: string[] = [], dataTable: DataTable
     }
     return prevValue.concat(dataTable.data_table_id);
 };
-const getFullDataLocation = (
-    dataTable: DataTableModel,
-    widgetOptions?: WidgetProps['widgetOptions'],
-    dateRange?: DateRange,
-    dashboardVars?: DashboardVars,
-    isAdminMode: boolean,
-    workspaceId?: string,
-): Location|undefined => {
+const getFullDataLocation = (dataTable: DataTableModel, widgetOptions?: WidgetProps['widgetOptions'], dateRange?: DateRange, dashboardVars?: DashboardVars): Location|undefined => {
     const _granularity = (widgetOptions?.granularity?.value as GranularityValue)?.granularity || 'MONTHLY';
     const _groupBy: string[] = dataTable?.options?.group_by?.map((d) => d.key);
     const _costFilters = [
@@ -111,38 +98,35 @@ const getFullDataLocation = (
     };
     if (dataTable?.source_type === DATA_SOURCE_DOMAIN.COST) {
         const _costDataSourceId = dataTable?.options?.[DATA_SOURCE_DOMAIN.COST]?.data_source_id;
-        return {
-            name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        return getProperRouteLocation({
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
-                workspaceId: isAdminMode ? undefined : workspaceId,
                 dataSourceId: _costDataSourceId ?? '',
                 costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
             },
             query: _query,
-        };
+        });
     }
     if (dataTable?.source_type === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
-        return {
-            name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        return getProperRouteLocation({
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
-                workspaceId: isAdminMode ? undefined : workspaceId,
                 dataSourceId: UNIFIED_COST_KEY,
                 costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
             },
             query: _query,
-        };
+        });
     }
     if (dataTable?.source_type === DATA_SOURCE_DOMAIN.ASSET) {
         const _metricId = dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
         if (_metricId) {
-            return {
-                name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            return getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
-                    workspaceId: isAdminMode ? undefined : workspaceId,
                     metricId: _metricId,
                 },
                 query: _query,
-            };
+            });
         }
     }
     return undefined;
@@ -158,13 +142,9 @@ export const useWidgetFrame = (
     } = useWidgetFormQuery({
         widgetId: computed(() => props.widgetId),
     });
-    const appContextStore = useAppContextStore();
-    const userWorkspaceStore = useUserWorkspaceStore();
 
 
     const _state = reactive({
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
         widgetConfig: computed<WidgetConfig|undefined>(() => getWidgetConfig(props.widgetName)),
         showWidgetHeader: computed<boolean>(() => props.widgetOptions?.widgetHeader?.value?.toggleValue || false),
         title: computed(() => {
@@ -202,7 +182,7 @@ export const useWidgetFrame = (
             const _dataTables = dataTableList.value.filter((d) => _dataTableIds.includes(d.data_table_id));
             const _result: FullDataLink[] = [];
             _dataTables.forEach((d) => {
-                const _location = getFullDataLocation(d, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars, _state.isAdminMode, _state.currentWorkspaceId);
+                const _location = getFullDataLocation(d, props.widgetOptions, overrides.dateRange?.value, props.dashboardVars);
                 if (_location) {
                     _result.push({
                         name: d.options?.data_name,

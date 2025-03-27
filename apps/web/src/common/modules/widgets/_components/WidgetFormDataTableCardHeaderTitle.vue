@@ -21,7 +21,7 @@ import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-wi
 import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';

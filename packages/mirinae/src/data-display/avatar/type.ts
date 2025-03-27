@@ -1,6 +1,4 @@
-import * as colors from '@/styles/colors.cjs';
-
-const { indigo } = colors;
+import { indigo } from '@/styles/colors.cjs';
 
 export const AVATAR_SIZE = {
     XS: 'xs',

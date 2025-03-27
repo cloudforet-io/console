@@ -1,9 +1,9 @@
 import type { ComputedRef } from 'vue';
 
-import type { RoleType } from '@/api-clients/identity/role/type';
-import type { GrantScope } from '@/api-clients/identity/token/schema/type';
-import type { UserMfa } from '@/api-clients/identity/user/schema/model';
-import type { AuthType, UserType } from '@/api-clients/identity/user/schema/type';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { GrantScope } from '@/schema/identity/token/type';
+import type { UserMfa } from '@/schema/identity/user/model';
+import type { AuthType, UserType } from '@/schema/identity/user/type';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';

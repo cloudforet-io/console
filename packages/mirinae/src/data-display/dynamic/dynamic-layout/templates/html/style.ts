@@ -1,9 +1,9 @@
 import { forEach, map } from 'lodash';
 
-import colors from '@/styles/colors.cjs';
+import { tailwindColors } from '@/styles/colors.cjs';
 
 
-const styleVariables = map(colors, (c, n) => {
+const styleVariables = map(tailwindColors, (c, n) => {
     if (typeof c !== 'object') return `--${n}: ${c};`;
     let res = '';
     forEach(c, (d, k) => {

@@ -38,19 +38,27 @@
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
-import type { TranslateResult } from 'vue-i18n';
-
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import type { HeadingType } from '@/data-display/heading/config';
 import { HEADING_TYPE } from '@/data-display/heading/config';
 import { commaFormatter } from '@/utils/helpers';
 
-export default defineComponent({
+interface Props {
+    title?: string;
+    headingType?: string;
+    showBackButton?: boolean;
+    useTotalCount?: boolean;
+    useSelectedCount?: boolean;
+    totalCount?: number;
+    selectedCount?: number;
+}
+
+export default defineComponent<Props>({
     name: 'PHeading',
     components: { PIconButton },
     props: {
         title: {
-            type: String as PropType<TranslateResult>,
+            type: String,
             default: 'Page',
         },
         headingType: {

@@ -722,19 +722,19 @@ export const UsingCustomHandlerAndLoading: Story = {
         setup() {
             const state = reactive({
                 loading: false,
-                selected: [] as any[],
+                selected: [],
                 isReady: false,
             });
             const simpleHandler = getHandler();
-            const menuHandler = async (inputText: string, pageStart?: number, pageLimit?: number, filters?: any[], resultRef?: number) => {
+            const menuHandler = async (...args) => {
                 state.loading = true;
-                const res = await simpleHandler(inputText, pageStart, pageLimit, filters, resultRef);
+                const res = await simpleHandler(...args);
                 state.loading = false;
                 return res;
             };
             (async () => {
                 const res = await simpleHandler('', 0, 2);
-                state.selected = res[0].results.map((d: any) => ({ name: d.name }));
+                state.selected = res[0].results.map((d) => ({ name: d.name }));
                 state.isReady = true;
             })();
             return {

@@ -7,12 +7,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import type { NoticeConfigData } from '@/schema/board/post/type';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

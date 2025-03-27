@@ -11,7 +11,9 @@ import {
     PButton, PDataLoader, PDivider, screens,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -25,7 +27,7 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray } from '@/styles/colors';
 
-import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
 import LandingAllWorkspaces from '@/services/landing/components/workspace-landing/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
@@ -76,7 +78,7 @@ const handleSearch = (value: string) => {
 };
 const handleClickButton = () => {
     window.open(router.resolve({
-        name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME,
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace: 'true',
         },

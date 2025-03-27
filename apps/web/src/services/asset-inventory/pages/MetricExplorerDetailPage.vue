@@ -84,7 +84,6 @@ const setQueryOptions = (urlQuery: MetricExplorerPageUrlQuery) => {
         metricExplorerPageStore.setPeriod(_period);
     }
     if (!isEmpty(_filters)) metricExplorerPageStore.setFilters(_filters);
-    metricExplorerPageStore.setRefreshMetricPeriodDropdown(true);
 };
 
 watch(() => route.params, async (params) => {

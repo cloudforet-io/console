@@ -4,14 +4,11 @@ import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';
@@ -24,36 +21,34 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
 import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
-import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
+
+const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
 const route = useRoute();
@@ -62,19 +57,8 @@ const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
-    selectedMenuId: computed(() => {
-        const reversedMatched = clone(route.matched).reverse();
-        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
-        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
-            return '';
-        }
-        return targetMenuId;
-    }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
@@ -84,7 +68,7 @@ const state = reactive({
     metricDeleteModalVisible: false,
     loadingDuplicate: false,
     selectedNameFormModalType: undefined as string|undefined,
-    saveDropdownMenuItems: computed<MenuItem[]>(() => (state.hasReadWriteAccess ? [
+    saveDropdownMenuItems: computed<MenuItem[]>(() => (hasReadWriteAccess.value ? [
         {
             type: 'item',
             name: 'saveAs',
@@ -106,13 +90,13 @@ const state = reactive({
         return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
     }),
     editQueryTitle: computed<TranslateResult>(() => {
-        if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
+        if (!hasReadWriteAccess.value || state.isManagedMetric || state.currentMetricExampleId) {
             return i18n.t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY');
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY');
     }),
     editQueryButtonIcon: computed<string>(() => {
-        if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
+        if (!hasReadWriteAccess.value || state.isManagedMetric || state.currentMetricExampleId) {
             return 'ic_editor-code';
         }
         return 'ic_edit';
@@ -141,22 +125,19 @@ const openNameFormModal = (modalType: string) => {
 };
 const getDuplicatedMetricName = (name: string): string => {
     let _name = name;
+    const _regex = /^(.*?)\s*copy(\s+(\d+))?$/i;
 
     while (state.existingMetricNameList.includes(_name)) {
-        const trimmedName = _name.trim();
-
-        if (trimmedName.endsWith(' copy')) {
-            _name = `${trimmedName} 2`;
-        } else if (trimmedName.match(/ copy \d+$/)) {
-            const lastSpaceIndex = trimmedName.lastIndexOf(' ');
-            const baseName = trimmedName.slice(0, lastSpaceIndex);
-            const number = parseInt(trimmedName.slice(lastSpaceIndex + 1));
-            _name = `${baseName} ${number + 1}`;
+        const match = _regex.exec(_name);
+        if (match) {
+            const baseName = match[1];
+            const numberStr = match[3];
+            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
+            _name = `${baseName} copy ${newNumber}`;
         } else {
             _name = `${_name} copy`;
         }
     }
-
     return _name;
 };
 
@@ -174,10 +155,10 @@ const duplicateMetric = async () => {
             query_options: metricExplorerPageState.metric.query_options,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
-        await router.replace({
-            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: duplicatedMetric.metric_id },
-        }).catch(() => {});
+        }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
     } finally {
@@ -193,14 +174,14 @@ const deleteCustomMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
         const otherMetricId = metricExplorerPageGetters.metrics[0]?.key;
         if (otherMetricId) {
-            await router.replace({
-                name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            await router.replace(getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: { metricId: otherMetricId },
-            }).catch(() => {});
+            }));
         } else {
-            await router.replace({
-                name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
-            }).catch(() => {});
+            await router.replace(getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+            }));
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
@@ -213,10 +194,10 @@ const deleteMetricExample = async () => {
         });
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
-        await router.replace({
-            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: state.currentMetricId },
-        }).catch(() => {});
+        }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
     }
@@ -272,7 +253,7 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    if (!state.hasReadWriteAccess || state.isManagedMetric || state.currentMetricExampleId) {
+    if (!hasReadWriteAccess.value || state.isManagedMetric || state.currentMetricExampleId) {
         metricExplorerPageStore.openMetricQueryFormSidebar('VIEW');
     } else {
         metricExplorerPageStore.openMetricQueryFormSidebar('UPDATE');
@@ -307,12 +288,12 @@ const handleOpenEditQuery = () => {
                         <div v-if="!state.isManagedMetric"
                              class="title-right-extra icon-wrapper"
                         >
-                            <p-icon-button v-if="state.hasReadWriteAccess"
+                            <p-icon-button v-if="hasReadWriteAccess"
                                            name="ic_edit-text"
                                            size="md"
                                            @click.stop="handleClickEditName"
                             />
-                            <p-icon-button v-if="state.hasReadWriteAccess"
+                            <p-icon-button v-if="hasReadWriteAccess"
                                            name="ic_delete"
                                            size="md"
                                            style-type="negative-transparent"
@@ -332,7 +313,7 @@ const handleOpenEditQuery = () => {
                 >
                     {{ state.editQueryTitle }}
                 </p-button>
-                <template v-if="state.hasReadWriteAccess">
+                <template v-if="hasReadWriteAccess">
                     <template v-if="!state.currentMetricExampleId">
                         <p-button v-if="state.isDuplicateEnabled"
                                   style-type="tertiary"

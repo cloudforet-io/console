@@ -6,8 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
-import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,

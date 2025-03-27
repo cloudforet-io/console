@@ -1,7 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
 import adminAdvancedRoutes from '@/services/advanced/routes/admin/routes';
-import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
+import adminAssetInventoryRoutes from '@/services/asset-inventory-v1/routes/admin/routes';
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import adminDashboardsRoutes from '@/services/dashboards/routes/admin/routes';
 import adminIamRoutes from '@/services/iam/routes/admin/routes';

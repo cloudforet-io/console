@@ -1,9 +1,11 @@
 import type { RouteConfig } from 'vue-router';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
 
 const OpsFlowContainer = () => import('@/services/ops-flow/OpsFlowContainer.vue');
 
@@ -14,12 +16,12 @@ const AdminTaskCategoryDetailPageTaskTypeTab = () => import('@/services/ops-flow
 
 const adminOpsFlowRoutes: RouteConfig = {
     path: 'ops-flow',
-    name: ADMIN_OPS_FLOW_ROUTE._NAME,
+    name: makeAdminRouteName(OPS_FLOW_ROUTE._NAME),
     meta: {
         menuId: MENU_ID.OPS_FLOW,
         translationId: MENU_INFO_MAP[MENU_ID.OPS_FLOW].translationId,
     },
-    redirect: () => ({ name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME }),
+    redirect: () => ({ name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME) }),
     component: OpsFlowContainer,
     children: [
         {
@@ -32,25 +34,25 @@ const adminOpsFlowRoutes: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME,
+                    name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT._NAME),
                     component: AdminTaskManagementPage as any,
                 },
                 {
                     path: 'task-category/:taskCategoryId',
-                    name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME,
+                    name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME),
                     props: true,
-                    redirect: { name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME },
+                    redirect: { name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME) },
                     component: AdminTaskCategoryDetailPage as any,
                     children: [
                         {
                             path: 'status',
-                            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME,
+                            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.STATUS._NAME),
                             props: true,
                             component: AdminTaskCategoryDetailPageStatusTab as any,
                         },
                         {
                             path: 'task-type',
-                            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME,
+                            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL.TASK_TYPE._NAME),
                             props: true,
                             component: AdminTaskCategoryDetailPageTaskTypeTab as any,
                         },

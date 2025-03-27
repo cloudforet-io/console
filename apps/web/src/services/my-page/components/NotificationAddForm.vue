@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -15,6 +15,9 @@ import type { ChannelSchedule } from '@/schema/notification/type';
 import type { UserChannelCreateParameters as UserChannelCreateParametersV1 } from '@/schema/notification/user-channel/api-verbs/create';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
@@ -23,7 +26,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationAddFormData from '@/services/my-page/components/NotificationAddFormData.vue';
 import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
 import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
-import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 import type { NotificationAddFormDataPayload, NotificationAddFormTopicPayload, NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
 
 const props = withDefaults(defineProps<{
@@ -37,10 +39,11 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const myPageStore = useMyPageStore();
+const domainStore = useDomainStore();
+
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => myPageStore.state.visibleUserNotification),
     isDataValid: false,
     notificationLevel: 'LV1' as NotificationLevel,
     //
@@ -62,7 +65,7 @@ const state = reactive({
 
 const createUserChannel = async () => {
     try {
-        const fetcher = state.visibleUserNotification
+        const fetcher = isAlertManagerVersionV2
             ? SpaceConnector.clientV2.alertManager.userChannel.create<UserChannelCreateParameters>({
                 protocol_id: props.protocolId,
                 name: state.channelName,
@@ -106,7 +109,7 @@ const createProjectChannel = async () => {
 
 const onClickSave = async () => {
     try {
-        if (!state.visibleUserNotification && props.projectId) await createProjectChannel();
+        if (!isAlertManagerVersionV2 && props.projectId) await createProjectChannel();
         else await createUserChannel();
         router.back();
     } catch (e) {
@@ -118,7 +121,7 @@ const onChangeData = (value: NotificationAddFormDataPayload) => {
     state.channelName = value.channelName;
     state.notificationLevel = value.level;
     state.isDataValid = value.isValid;
-    if (!state.visibleUserNotification) {
+    if (!isAlertManagerVersionV2) {
         state.data = value.data;
     }
     state.schemaForm = value.data;
@@ -152,7 +155,6 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
                 <notification-add-form-data :project-id="props.projectId"
                                             :protocol-type="props.protocolType"
                                             :protocol-id="props.protocolId"
-                                            :visible-user-notification="state.visibleUserNotification"
                                             @change="onChangeData"
                 />
             </p-pane-layout>
@@ -163,12 +165,11 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
                 <h4 class="sub-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
                 </h4>
-                <notification-add-schedule :visible-user-notification="state.visibleUserNotification"
-                                           @changeV1="onChangeScheduleV1"
+                <notification-add-schedule @changeV1="onChangeScheduleV1"
                                            @change="onChangeSchedule"
                 />
             </p-pane-layout>
-            <p-pane-layout v-if="!state.visibleUserNotification"
+            <p-pane-layout v-if="!isAlertManagerVersionV2"
                            class="content-wrapper"
             >
                 <h3 class="content-title">
@@ -187,7 +188,7 @@ const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationA
             >
                 {{ $t('COMMON.TAGS.CANCEL') }}
             </p-button>
-            <p-button v-if="!state.visibleUserNotification"
+            <p-button v-if="!isAlertManagerVersionV2"
                       style-type="primary"
                       class="text-button"
                       :disabled="!state.isDataValid || !state.isScheduleValid || !state.isTopicValid"

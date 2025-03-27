@@ -1,18 +1,22 @@
 import type { Ref } from 'vue';
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { TaskStatusOption } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskStatusOption, TaskStatusOptions } from '@/schema/opsflow/task/type';
 import { getParticle, i18n } from '@/translations';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
 
 import { TASK_STATUS_LABELS } from '@/services/ops-flow/constants/task-status-label-constant';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 
-import { useCategoryStatusOptions } from './use-category-status-options';
-
+const EMPTY_STATUS_OPTIONS = {
+    TODO: [],
+    IN_PROGRESS: [],
+    COMPLETED: [],
+};
 
 interface StatusItem extends SelectDropdownMenuItem {
     color?: string;
@@ -24,6 +28,8 @@ export const useTaskStatusField = ({
     categoryId: Ref<string|undefined>;
     isRequired?: boolean;
 }) => {
+    const taskCategoryStore = useTaskCategoryStore();
+
     const taskStatusValidator = useFieldValidator<StatusItem[]>(
         [],
         isRequired ? (val) => {
@@ -43,29 +49,34 @@ export const useTaskStatusField = ({
         taskStatusValidator.setValue(selected);
     };
 
-    const { categoryStatusOptions } = useCategoryStatusOptions({ categoryId });
-    const allStatusItems = computed<StatusItem[]>(() => {
+    const allStatusItems = ref<StatusItem[]>([]);
+    const getStatusOptions = async (): Promise<TaskStatusOptions> => {
+        if (!categoryId.value) return EMPTY_STATUS_OPTIONS;
+        const category = await taskCategoryStore.get(categoryId.value);
+        return category?.status_options ?? EMPTY_STATUS_OPTIONS;
+    };
+    const loadAllStatusItems = async () => {
+        const statusOptions = await getStatusOptions();
         const items: StatusItem[] = [];
-        if (!categoryStatusOptions.value) return items;
         items.push({ type: 'header', label: TASK_STATUS_LABELS.TODO, name: 'to-do' });
         items.push({ type: 'divider', name: 'todo-div' });
-        categoryStatusOptions.value.TODO.forEach((status) => {
+        statusOptions.TODO.forEach((status) => {
             items.push({ name: status.status_id, label: status.name, color: status.color });
         });
         items.push({ type: 'header', label: TASK_STATUS_LABELS.IN_PROGRESS, name: 'in-progress' });
         items.push({ type: 'divider', name: 'in-progress-div' });
-        categoryStatusOptions.value.IN_PROGRESS.forEach((status) => {
+        statusOptions.IN_PROGRESS.forEach((status) => {
             items.push({ name: status.status_id, label: status.name, color: status.color });
         });
         items.push({ type: 'header', label: TASK_STATUS_LABELS.COMPLETED, name: 'completed' });
         items.push({ type: 'divider', name: 'completed-div' });
-        categoryStatusOptions.value.COMPLETED.forEach((status) => {
+        statusOptions.COMPLETED.forEach((status) => {
             items.push({ name: status.status_id, label: status.name, color: status.color });
         });
         return items;
-    });
-
-    const statusMenuItemsHandler: AutocompleteHandler = (keyword: string) => {
+    };
+    const statusMenuItemsHandler: AutocompleteHandler = async (keyword: string) => {
+        allStatusItems.value = await loadAllStatusItems();
         const filteredItems = allStatusItems.value.filter((item) => getTextHighlightRegex(keyword).test(item.label as string));
         return {
             results: filteredItems,
@@ -79,15 +90,8 @@ export const useTaskStatusField = ({
                 label: status.name,
                 color: status.color,
             }]);
-        } else {
-            setSelectedStatusItems([]);
         }
-        taskStatusValidator.resetValidation();
     };
-
-    // taskStatusDropdownKey is for the dropdown component to re-render when the allStatusItems value changes
-    // This is a workaround for the issue that the dropdown component does not re-render when the allStatusItems value changes
-    const taskStatusDropdownKey = computed<string>(() => `task-status-${allStatusItems.value.map((item) => item.name).join(',')}`);
 
 
     return {
@@ -97,6 +101,5 @@ export const useTaskStatusField = ({
         statusMenuItemsHandler,
         setSelectedStatusItems,
         setInitialStatus,
-        taskStatusDropdownKey,
     };
 };

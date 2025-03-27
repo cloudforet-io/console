@@ -5,13 +5,13 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { UserGroupListItemType } from '@/api-clients/identity/user-group/schema/type';
+import type { UserListPerUserGroupItemType } from '@/schema/identity/user-group/type';
 
 export const useUserGroupUsersPageStore = defineStore('page-user-group-users', () => {
     const state = reactive({
         loading: true,
-        usersPerUserGroup: [] as UserGroupListItemType[],
-        selectedUser: {} as UserGroupListItemType,
+        usersPerUserGroup: [] as UserListPerUserGroupItemType[],
+        selectedUser: {} as UserListPerUserGroupItemType,
         totalCount: 0,
         selectedIndices: [],
         pageStart: 1,
@@ -19,9 +19,9 @@ export const useUserGroupUsersPageStore = defineStore('page-user-group-users', (
         searchFilters: [] as ConsoleFilter[],
     });
     const getters = reactive({
-        selectedUsers: computed((): UserGroupListItemType[] => {
+        selectedUsers: computed((): UserListPerUserGroupItemType[] => {
             if (state.selectedIndices.length === 1 && isEmpty(state.selectedUser)) return [state.selectedUser];
-            const users: UserGroupListItemType[] = [];
+            const users: UserListPerUserGroupItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
                 users.push(state.usersPerUserGroup[d]);
             });
@@ -31,8 +31,8 @@ export const useUserGroupUsersPageStore = defineStore('page-user-group-users', (
     const actions = {
         reset() {
             state.loading = true;
-            state.usersPerUserGroup = [] as UserGroupListItemType[];
-            state.selectedUser = {} as UserGroupListItemType;
+            state.usersPerUserGroup = [] as UserListPerUserGroupItemType[];
+            state.selectedUser = {} as UserListPerUserGroupItemType;
             state.totalCount = 0;
             state.selectedIndices = [];
             state.pageStart = 1;

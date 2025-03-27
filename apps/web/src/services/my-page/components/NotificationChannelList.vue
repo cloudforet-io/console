@@ -27,19 +27,20 @@ import type { UserChannelListParameters as UserChannelListParametersV1 } from '@
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import config from '@/lib/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface EnrichedProtocolItem extends ProtocolModel {
     label: TranslateResult;
@@ -51,7 +52,7 @@ interface EnrichedProtocolItem extends ProtocolModel {
 }
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const myPageStore = useMyPageStore();
+const domainStore = useDomainStore();
 
 const props = withDefaults(defineProps<{
     projectId?: string;
@@ -62,7 +63,6 @@ const props = withDefaults(defineProps<{
 });
 const route = useRoute();
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => myPageStore.state.visibleUserNotification),
     loading: true,
     channelLoading: true,
     userId: computed<string|undefined>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : userStore.state.userId)),
@@ -86,7 +86,7 @@ const createProtocolItem = (d) => {
     return {
         label: d.protocol_type === 'INTERNAL' ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
         link: {
-            name: props.projectId ? PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
+            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
             params: { protocolId: d.protocol_id },
             query,
         },
@@ -100,16 +100,18 @@ const createProtocolItem = (d) => {
 
 const apiQuery = new ApiQueryHelper();
 
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
+
 const listProtocol = async () => {
     try {
         state.loading = true;
-        if (!state.visibleUserNotification && props.projectId) {
+        if (!isAlertManagerVersionV2 && props.projectId) {
             apiQuery.setFilters([])
                 .setSort('protocol_type');
-        } else if (!state.visibleUserNotification) {
+        } else if (!isAlertManagerVersionV2) {
             apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
         }
-        const fetcher = state.visibleUserNotification
+        const fetcher = isAlertManagerVersionV2
             ? SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>
             : SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>;
         const res = await fetcher({
@@ -140,7 +142,7 @@ const listUserChannel = async () => {
     try {
         state.channelLoading = true;
         channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
-        const fetcher = state.visibleUserNotification
+        const fetcher = isAlertManagerVersionV2
             ? SpaceConnector.clientV2.alertManager.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>
             : SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParametersV1, ListResponse<UserChannelModelV1>>;
         const res = await fetcher({
@@ -180,7 +182,7 @@ const listProjectChannel = async () => {
 };
 
 const listChannel = async () => {
-    if (!state.visibleUserNotification && props.projectId) await listProjectChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await listProjectChannel();
     else await listUserChannel();
 };
 
@@ -235,7 +237,7 @@ onActivated(async () => {
                         </router-link>
                     </ul>
                 </div>
-                <div v-if="!state.visibleUserNotification"
+                <div v-if="!isAlertManagerVersionV2"
                      class="associated-member-item-wrapper"
                 >
                     <ul v-for="item in state.associatedMemberProtocol"
@@ -286,7 +288,6 @@ onActivated(async () => {
                             <notification-channel-item :channel-data="item"
                                                        :project-id="props.projectId"
                                                        :manage-disabled="props.manageDisabled"
-                                                       :visible-user-notification="state.visibleUserNotification"
                                                        @change="onChangeChannelItem"
                                                        @confirm="listChannel"
                             />

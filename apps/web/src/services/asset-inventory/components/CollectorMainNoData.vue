@@ -3,19 +3,15 @@ import { useRouter } from 'vue-router/composables';
 
 import { PEmpty, PButton } from '@cloudforet/mirinae';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-
-import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const router = useRouter();
-const appContextStore = useAppContextStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const handleCreate = () => {
-    router.push({
-        name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-    }).catch(() => {});
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }));
 };
 </script>
 

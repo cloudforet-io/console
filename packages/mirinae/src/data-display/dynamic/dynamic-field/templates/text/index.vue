@@ -13,15 +13,13 @@ import { computed, defineComponent } from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
 
-import type { TextTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/text/type';
-import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/navigation/link/PLink.vue';
-import type { LinkProps } from '@/navigation/link/type';
 import { ACTION_ICON } from '@/navigation/link/type';
 import { commaFormatter } from '@/utils/helpers';
 
-export default defineComponent({
+export default defineComponent<TextDynamicFieldProps>({
     name: 'PDynamicFieldText',
     components: { PLink },
     props: {
@@ -34,7 +32,7 @@ export default defineComponent({
             default: null,
         },
         typeOptions: {
-            type: Object as PropType<TextTypeOptions>,
+            type: Object,
             default: () => ({}),
         },
         extraData: {
@@ -42,7 +40,7 @@ export default defineComponent({
             default: () => ({}),
         },
         handler: {
-            type: Function as PropType<DynamicFieldHandler|undefined>,
+            type: Function,
             default: undefined,
         },
     },
@@ -59,11 +57,11 @@ export default defineComponent({
             }
             return `${props.options.prefix ?? ''}${textValue}${props.options.postfix ?? ''}`;
         });
-        const linkProps = computed<LinkProps>(() => {
+        const linkProps = computed(() => {
             if (props.options.link) {
                 return {
                     href: props.options?.link,
-                    text: text.value as string,
+                    text: text.value,
                     actionIcon: text.value ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE,
                     newTab: true,
                 };

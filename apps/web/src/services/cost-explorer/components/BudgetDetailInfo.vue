@@ -7,11 +7,10 @@ import type { Location } from 'vue-router/types/router';
 import {
     PPaneLayout, PLink, PI, PTextButton, PPopover,
 } from '@cloudforet/mirinae';
-
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -19,6 +18,7 @@ import type { WorkspaceReferenceMap } from '@/store/reference/workspace-referenc
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
@@ -29,7 +29,8 @@ import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
 
 const allReferenceStore = useAllReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
@@ -67,10 +68,7 @@ const state = reactive({
         if (state.isProjectTarget) {
             return referenceRouter(
                 state.budgetData?.project_id,
-                {
-                    resource_type: 'identity.Project',
-                    workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
-                },
+                { resource_type: 'identity.Project' },
             );
         }
         // HACK: This is a temporary solution. It should be changed to the proper route.
@@ -141,10 +139,10 @@ watch(() => costTypeRef.value, (costType) => {
                     />
                 </span>
                 <p-link v-if="state.targetLocation"
-                        action-icon="internal-link"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         highlight
-                        :to="state.targetLocation"
+                        :to="getProperRouteLocation(state.targetLocation)"
                 >
                     {{ state.targetLabel.name }}
                 </p-link>

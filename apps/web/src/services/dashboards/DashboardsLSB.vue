@@ -10,7 +10,7 @@ import {
 
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -19,6 +19,7 @@ import { useUserStore } from '@/store/user/user-store';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
@@ -33,7 +34,6 @@ import { gray } from '@/styles/colors';
 
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const appContextStore = useAppContextStore();
@@ -41,6 +41,7 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userStore = useUserStore();
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
@@ -94,30 +95,25 @@ const state = reactive({
         const _private = privateDashboardList.value?.filter((d) => d.version === '1.0') || [];
         return [..._public, ..._private];
     }),
-    deprecatedMenuSet: computed<LSBItem[]>(() => state.deprecatedDashboardItems.map((d) => {
-        const dashboardDetailRouteName = storeState.isAdminMode
-            ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-            : DASHBOARDS_ROUTE.DETAIL._NAME;
-        return {
-            type: MENU_ITEM_TYPE.ITEM,
+    deprecatedMenuSet: computed<LSBItem[]>(() => state.deprecatedDashboardItems.map((d) => ({
+        type: MENU_ITEM_TYPE.ITEM,
+        id: d.dashboard_id,
+        label: d.name,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: d.dashboard_id,
+            },
+        }),
+        icon: d.dashboard_id.startsWith('private') ? {
+            name: 'ic_lock-filled',
+            color: gray[500],
+        } : undefined,
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
             id: d.dashboard_id,
-            label: d.name,
-            to: {
-                name: dashboardDetailRouteName,
-                params: {
-                    dashboardId: d.dashboard_id,
-                },
-            },
-            icon: d.dashboard_id.startsWith('private') ? {
-                name: 'ic_lock-filled',
-                color: gray[500],
-            } : undefined,
-            favoriteOptions: {
-                type: FAVORITE_TYPE.DASHBOARD,
-                id: d.dashboard_id,
-            },
-        };
-    })),
+        },
+    }))),
     adminMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ADMIN'),
@@ -145,7 +141,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.SLOT,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                 id: MENU_ID.DASHBOARDS,
-                to: { name: storeState.isAdminMode ? ADMIN_DASHBOARDS_ROUTE._NAME : DASHBOARDS_ROUTE._NAME },
+                to: getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }),
                 hideFavorite: true,
                 icon: 'ic_dots-4-square',
             },
@@ -188,22 +184,17 @@ const state = reactive({
 
 
 /* Util */
-const getDashboardMenuSet = (dashboardList: (PublicDashboardModel|PrivateDashboardModel)[]) => dashboardList?.map((d) => {
-    const dashboardDetailRouteName = storeState.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-        : DASHBOARDS_ROUTE.DETAIL._NAME;
-    return {
-        type: MENU_ITEM_TYPE.ITEM,
-        id: d.dashboard_id,
-        label: d.name,
-        to: {
-            name: dashboardDetailRouteName,
-            params: {
-                dashboardId: d.dashboard_id,
-            },
+const getDashboardMenuSet = (dashboardList: (PublicDashboardModel|PrivateDashboardModel)[]) => dashboardList?.map((d) => ({
+    type: MENU_ITEM_TYPE.ITEM,
+    id: d.dashboard_id,
+    label: d.name,
+    to: getProperRouteLocation({
+        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+        params: {
+            dashboardId: d.dashboard_id,
         },
-    };
-}) || [];
+    }),
+})) || [];
 const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     const result = [] as LSBMenu[];
     menuItems.forEach((d) => {
@@ -227,12 +218,11 @@ const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 
 /* Event */
 const handleClickAddButton = () => {
-    const dashboardCreateRouteName = storeState.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE.CREATE._NAME
-        : DASHBOARDS_ROUTE.CREATE._NAME;
-    router.push({ name: dashboardCreateRouteName }).catch(() => {});
+    router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }));
 };
 
+// const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], loadDashboard);
+// callApiWithGrantGuard();
 </script>
 
 <template>

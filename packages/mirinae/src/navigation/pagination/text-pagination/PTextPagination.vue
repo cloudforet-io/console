@@ -27,11 +27,19 @@
     </nav>
 </template>
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import { computed, defineComponent, watch } from 'vue';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 
-export default defineComponent({
+interface Props {
+    thisPage?: number;
+    allPage?: number;
+    showPageNumber?: boolean;
+    disableNextPage?: boolean;
+    hasNextPage?: boolean;
+}
+export default defineComponent<Props>({
     name: 'PTextPagination',
     components: { PIconButton },
     props: {
@@ -62,7 +70,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const nextButtonDisabled = computed<boolean>(() => {
             if (props.disableNextPage) return true;
             if (props.allPage !== undefined) {

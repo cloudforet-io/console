@@ -21,9 +21,7 @@
                          color="inherit"
                          class="icon"
                     />
-                    <span class="text"
-                          :style="{lineHeight: props.lineHeight}"
-                    >
+                    <span class="text">
                         <slot v-bind="{...$props}">
                             {{ props.text }}
                         </slot>
@@ -44,12 +42,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 
+import type { Location } from 'vue-router';
+
 import PI from '@/foundation/icons/PI.vue';
 import { ACTION_ICON, LinkSize } from '@/navigation/link/type';
 import type { ActionIcon } from '@/navigation/link/type';
 
-// HACK: Props MUST be defined in the same file as the setup function due to a limitation of Vue 2.x
-// This type is also defined in the type.ts file
+
 interface LinkProps {
     text?: string;
     disabled?: boolean;
@@ -61,19 +60,16 @@ interface LinkProps {
     href?: string;
     to?: Location;
     useAnchorScroll?: boolean;
-    lineHeight?: string;
 }
-
 
 const props = withDefaults(defineProps<LinkProps>(), {
     text: '',
-    size: LinkSize.md,
+    size: undefined,
     iconLeft: undefined,
     actionIcon: 'none',
     href: undefined,
     to: undefined,
     useAnchorScroll: false,
-    lineHeight: undefined,
 });
 
 const linkRef = ref<HTMLElement|null>(null);

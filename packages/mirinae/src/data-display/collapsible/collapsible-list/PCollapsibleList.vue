@@ -33,14 +33,14 @@
                 <p-collapsible-toggle v-if="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.title"
                                       :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
                                       :toggle-type="toggleType"
-                                      @update:isCollapsed="onUpdateCollapsed(idx, $event)"
+                                      @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
                 />
             </p>
             <p-collapsible-panel v-show="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents || proxyUnfoldedIndices.includes(idx)"
                                  :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
                                  :line-clamp="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents ? lineClamp : -1"
                                  :enable-deep-clamp="item.enableDeepClamp"
-                                 @update:isCollapsed="onUpdateCollapsed(idx,$event)"
+                                 @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
             >
                 <slot v-bind="{
                     data: item.data,
@@ -58,7 +58,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs, watch,
@@ -68,13 +67,13 @@ import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsible/collapsible-list/config';
-import type { CollapsibleItem } from '@/data-display/collapsible/collapsible-list/type';
+import type { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsible/collapsible-list/type';
 import PCollapsiblePanel from '@/data-display/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 import { useProxyValue } from '@/hooks';
 
-export default defineComponent({
+export default defineComponent<CollapsibleListProps>({
     name: 'PCollapsibleList',
     components: { PCollapsiblePanel, PCollapsibleToggle },
     model: {
@@ -83,11 +82,11 @@ export default defineComponent({
     },
     props: {
         items: {
-            type: Array as PropType<Array<CollapsibleItem|string>>,
+            type: Array,
             default: () => [],
         },
         unfoldedIndices: {
-            type: Array as PropType<number[]>,
+            type: Array,
             default: () => [],
         },
         lineClamp: {
@@ -99,16 +98,25 @@ export default defineComponent({
             default: false,
         },
         togglePosition: {
-            type: String as PropType<COLLAPSIBLE_LIST_TOGGLE_POSITION>,
+            type: String,
             default: COLLAPSIBLE_LIST_TOGGLE_POSITION.title,
+            validator(position: any) {
+                return Object.values(COLLAPSIBLE_LIST_TOGGLE_POSITION).includes(position);
+            },
         },
         toggleType: {
-            type: String as PropType<COLLAPSIBLE_TOGGLE_TYPE>,
+            type: String,
             default: COLLAPSIBLE_TOGGLE_TYPE.text,
+            validator(type: any) {
+                return Object.values(COLLAPSIBLE_TOGGLE_TYPE).includes(type);
+            },
         },
         theme: {
-            type: String as PropType<COLLAPSIBLE_LIST_THEME>,
+            type: String,
             default: COLLAPSIBLE_LIST_THEME.plain,
+            validator(theme: any) {
+                return Object.values(COLLAPSIBLE_LIST_THEME).includes(theme);
+            },
         },
     },
     setup(props, { emit }) {

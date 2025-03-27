@@ -10,6 +10,8 @@ import {
 
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -19,7 +21,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { gray } from '@/styles/colors';
 
 import BookmarkTree from '@/services/advanced/components/BookmarkTree.vue';
-import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 
 const bookmarkPageStore = useBookmarkPageStore();
@@ -39,7 +41,7 @@ const state = reactive({
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('IAM.BOOKMARK.ALL_BOOKMARK'),
             icon: 'ic_dots-4-square',
-            to: { name: ADMIN_ADVANCED_ROUTE.BOOKMARK._NAME },
+            to: { name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK._NAME) },
             hideFavorite: true,
         },
         {
@@ -65,7 +67,7 @@ const state = reactive({
             id: folder.id,
             icon: { name: 'ic_folder', color: gray[900] },
             to: {
-                name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME,
+                name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
                 params: {
                     group: folder.workspaceId || 'global',
                     folder: folder.name as string || '',

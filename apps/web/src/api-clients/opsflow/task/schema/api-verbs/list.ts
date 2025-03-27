@@ -1,7 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { TaskPriority, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
-
+import type { TaskPriority, TaskStatusType } from '../type';
 
 export interface TaskListParameters {
     query?: Query;

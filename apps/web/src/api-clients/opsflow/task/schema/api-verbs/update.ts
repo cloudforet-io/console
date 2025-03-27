@@ -1,4 +1,4 @@
-import type { TaskPriority } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskPriority } from '../type';
 
 export interface TaskUpdateParameters {
     task_id: string;

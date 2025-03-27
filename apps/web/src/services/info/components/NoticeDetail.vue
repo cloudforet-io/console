@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
-import { useRouter } from 'vue-router/composables';
+
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -13,10 +13,11 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { SpaceRouter } from '@/router';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -26,10 +27,10 @@ import { useUserStore } from '@/store/user/user-store';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
-import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
@@ -44,12 +45,12 @@ const noticeDetailState = noticeDetailStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
-const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
+    timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
 const state = reactive({
     loading: false,
@@ -57,18 +58,16 @@ const state = reactive({
     prevNoticePost: undefined as PostModel | undefined,
     prevPostRoute: computed<Location|undefined>(() => {
         if (!state.prevNoticePost) return undefined;
-        const noticeDetailRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE.DETAIL._NAME : INFO_ROUTE.NOTICE.DETAIL._NAME;
         return {
-            name: noticeDetailRouteName,
+            name: INFO_ROUTE.NOTICE.DETAIL._NAME,
             params: { postId: state.prevNoticePost.post_id },
         };
     }),
     nextNoticePost: undefined as PostModel | undefined,
     nextPostRoute: computed<Location|undefined>(() => {
         if (!state.nextNoticePost) return undefined;
-        const noticeDetailRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE.DETAIL._NAME : INFO_ROUTE.NOTICE.DETAIL._NAME;
         return {
-            name: noticeDetailRouteName,
+            name: INFO_ROUTE.NOTICE.DETAIL._NAME,
             params: { postId: state.nextNoticePost.post_id },
         };
     }),
@@ -130,8 +129,7 @@ const noticeStore = useNoticeStore();
 
 /* Event */
 const handleBackToListButtonClick = () => {
-    const noticeRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE._NAME : INFO_ROUTE.NOTICE._NAME;
-    router.push({ name: noticeRouteName });
+    SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME }));
 };
 
 
@@ -140,10 +138,10 @@ const handleBackToListButtonClick = () => {
 const handlePostClick = (direction: 'next'|'prev') => {
     if (direction === 'next') {
         if (!state.nextPostRoute) return;
-        router.push(state.nextPostRoute).catch(() => {});
+        SpaceRouter.router.push(getProperRouteLocation(state.nextPostRoute));
     } else {
         if (!state.prevPostRoute) return;
-        router.push(state.prevPostRoute).catch(() => {});
+        SpaceRouter.router.push(getProperRouteLocation(state.prevPostRoute));
     }
 };
 

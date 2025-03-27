@@ -6,11 +6,11 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
-import type { PublicConfigGetParameters } from '@/api-clients/config/public-config/schema/api-verbs/get';
-import type { PublicConfigSetParameters } from '@/api-clients/config/public-config/schema/api-verbs/set';
-import { PUBLIC_CONFIG_NAMES } from '@/api-clients/config/public-config/schema/constant';
-import type { PublicConfigModel } from '@/api-clients/config/public-config/schema/model';
-import type { PublicConfigKey } from '@/api-clients/config/public-config/schema/type';
+import type { PublicConfigGetParameters } from '@/schema/config/public-config/api-verbs/get';
+import type { PublicConfigSetParameters } from '@/schema/config/public-config/api-verbs/set';
+import { PUBLIC_CONFIG_NAMES } from '@/schema/config/public-config/constant';
+import type { PublicConfigModel } from '@/schema/config/public-config/model';
+import type { PublicConfigKey } from '@/schema/config/public-config/type';
 
 import { useDomainStore } from '@/store/domain/domain-store';
 

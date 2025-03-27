@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ParagraphTaskFieldOptions } from '@/api-clients/opsflow/_types/task-field-type';
+import type { ParagraphTaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 
@@ -20,9 +20,8 @@ emit('update:is-valid', true);
 
 <template>
     <div>
-        <text-editor :class="{'pointer-events-none': !props.editable}"
-                     :value="props.options.example"
-                     :placeholder="String($t('OPSFLOW.FIELD_GENERATOR.ENTER_DEFAULT_DESCRIPTION'))"
+        <text-editor :value="props.options.example"
+                     :placeholder="$t('OPSFLOW.FIELD_GENERATOR.ENTER_DEFAULT_DESCRIPTION')"
                      contents-type="markdown"
                      @update:value="emit('update:options', { ...props.options, example: $event })"
         />

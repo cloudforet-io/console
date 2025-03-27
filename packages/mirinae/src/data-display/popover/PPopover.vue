@@ -49,7 +49,22 @@ import vClickOutside from 'v-click-outside';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import type { PopoverPlacement, PopoverTrigger } from '@/data-display/popover/type';
-import { POPOVER_TRIGGER } from '@/data-display/popover/type';
+import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
+
+interface PopoverProps {
+    isVisible?: boolean;
+    tag?: string;
+    position?: PopoverPlacement;
+    trigger?: PopoverTrigger;
+    ignoreTargetClick?: boolean;
+    ignoreOutsideClick?: boolean;
+    hidePadding?: boolean;
+    hideCloseButton?: boolean;
+    hideArrow?: boolean;
+    boundary?: string;
+    width?: string;
+    minWidth?: string;
+}
 
 const ARROW_STATIC_SIDES = {
     top: 'bottom',
@@ -58,7 +73,7 @@ const ARROW_STATIC_SIDES = {
     left: 'right',
 };
 
-export default defineComponent({
+export default defineComponent<PopoverProps>({
     name: 'PPopover',
     components: {
         PIconButton,
@@ -81,10 +96,18 @@ export default defineComponent({
         },
         position: {
             type: String as PropType<PopoverPlacement>,
+            validator(value?: PopoverPlacement) {
+                if (value === undefined) return true;
+                return Object.values(POPOVER_PLACEMENT).includes(value);
+            },
             default: undefined,
         },
         trigger: {
             type: String as PropType<PopoverTrigger>,
+            validator(value?: PopoverTrigger) {
+                if (value === undefined) return true;
+                return Object.values(POPOVER_TRIGGER).includes(value);
+            },
             default: POPOVER_TRIGGER.CLICK,
         },
         ignoreTargetClick: {

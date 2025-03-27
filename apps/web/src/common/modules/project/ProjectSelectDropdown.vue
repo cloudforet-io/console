@@ -20,13 +20,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import type { ProjectTreeOptions } from '@/services/project/v-shared/composables/use-project-tree';
-import { useProjectTree } from '@/services/project/v-shared/composables/use-project-tree';
+import type { ProjectTreeOptions } from '@/services/project-v1/composables/use-project-tree';
+import { useProjectTree } from '@/services/project-v1/composables/use-project-tree';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 import type {
     ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
     ProjectTreeNode,
-} from '@/services/project/v-shared/types/project-tree-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+} from '@/services/project-v1/types/project-tree-type';
 
 interface ProjectGroupSelectOptions {
     id: string;
@@ -50,7 +50,7 @@ interface Props {
     isInitSelectedItem?: boolean;
     block?: boolean;
     styleType?: string;
-    appearanceType?: 'stack'|'badge';
+    appearanceType?: 'stack';
     showDeleteAllButton?: boolean;
 }
 
@@ -253,7 +253,7 @@ const refreshProjectTree = async () => {
 
 const handleClickCreateButton = () => {
     window.open(SpaceRouter.router.resolve({
-        name: PROJECT_ROUTE_V1._NAME,
+        name: PROJECT_ROUTE._NAME,
         ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
     }).href);
     state.visibleMenu = false;
@@ -325,7 +325,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
             <template v-if="props.projectGroupSelectOptions && state.selectedItems.length"
                       #dropdown-button
             >
-                <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions?.currentProjectGroupId)"
+                <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
                          badge-type="subtle"
                          style-type="gray200"
                          class="current-badge"

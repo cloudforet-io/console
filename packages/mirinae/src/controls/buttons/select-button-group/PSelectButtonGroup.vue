@@ -20,13 +20,12 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     reactive, computed, toRefs,
 } from 'vue';
 
 import { SELECT_BUTTON_GROUP_THEME } from '@/controls/buttons/select-button-group/config';
-import type { SelectButtonType } from '@/controls/buttons/select-button-group/type';
+import type { SelectButtonGroupProps, SelectButtonType } from '@/controls/buttons/select-button-group/type';
 import PI from '@/foundation/icons/PI.vue';
 
 import { secondary } from '@/styles/colors.cjs';
@@ -38,7 +37,7 @@ export default {
     },
     props: {
         buttons: {
-            type: Array as PropType<Array<string|SelectButtonType>>,
+            type: Array,
             default: () => ([]),
         },
         selected: {
@@ -46,11 +45,14 @@ export default {
             default: '',
         },
         theme: {
-            type: String as PropType<SELECT_BUTTON_GROUP_THEME>,
+            type: String,
             default: SELECT_BUTTON_GROUP_THEME.default,
+            validator(theme) {
+                return Object.keys(SELECT_BUTTON_GROUP_THEME).includes(theme);
+            },
         },
     },
-    setup(props, context) {
+    setup(props: SelectButtonGroupProps, context) {
         const state = reactive({
             formattedButtons: computed(() => {
                 const buttons: SelectButtonType[] = [];

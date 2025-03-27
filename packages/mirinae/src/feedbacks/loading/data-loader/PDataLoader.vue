@@ -65,7 +65,19 @@ import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { getColor } from '@/utils/helpers';
 
-export default defineComponent({
+interface Props {
+    loading: boolean;
+    data?: any;
+    loaderType: LOADER_TYPES;
+    disableEmptyCase: boolean;
+    showDataFromScratch: boolean;
+    minLoadingTime: number;
+    lazyLoadingTime: number;
+    loaderBackdropOpacity: number;
+    loaderBackdropColor: string;
+    disableTransition: boolean;
+}
+export default defineComponent<Props>({
     name: 'PDataLoader',
     components: { PSpinner, PSkeleton },
     props: {
@@ -74,16 +86,22 @@ export default defineComponent({
             default: true,
         },
         data: {
-            type: [Array, Object, Boolean, String, Number] as PropType<any>,
+            type: [Array, Object, Boolean, String, Number],
             default: undefined,
         },
         loaderType: {
             type: String as PropType<LOADER_TYPES>,
             default: LOADER_TYPES.spinner,
+            validator(loaderType: LOADER_TYPES) {
+                return Object.values(LOADER_TYPES).includes(loaderType);
+            },
         },
         spinnerSize: {
             type: String as PropType<SpinnerSize>,
             default: SPINNER_SIZE.xl,
+            validator(spinnerSize: SpinnerSize) {
+                return Object.values(SPINNER_SIZE).includes(spinnerSize);
+            },
         },
         disableEmptyCase: {
             type: Boolean,
@@ -96,10 +114,16 @@ export default defineComponent({
         minLoadingTime: {
             type: Number,
             default: 0,
+            validator(minLoadingTime: number) {
+                return minLoadingTime >= 0;
+            },
         },
         lazyLoadingTime: {
-            type: Number as PropType<number>,
+            type: Number,
             default: 0,
+            validator(lazyLoadingTime: number) {
+                return lazyLoadingTime >= 0;
+            },
         },
         loaderBackdropOpacity: {
             type: Number,

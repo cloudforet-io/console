@@ -31,14 +31,20 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { PropType, SetupContext } from 'vue';
-
-import type { TranslateResult } from 'vue-i18n';
+import type { SetupContext } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 
+interface LabelProps {
+    leftIcon?: string;
+    text?: string;
+    clickable?: boolean;
+    clickStop?: boolean;
+    deletable?: boolean;
+    active?: boolean;
+}
 
-export default defineComponent({
+export default defineComponent<LabelProps>({
     name: 'PLabel',
     components: {
         PI,
@@ -49,7 +55,7 @@ export default defineComponent({
             default: undefined,
         },
         text: {
-            type: String as PropType<TranslateResult>,
+            type: String,
             default: undefined,
         },
         clickable: {
@@ -70,7 +76,7 @@ export default defineComponent({
         },
     },
     setup(props, { emit }: SetupContext) {
-        const handleClickLabel = (e: any) => {
+        const handleClickLabel = (e: Event) => {
             if (props.clickStop) e.stopPropagation();
             if (!props.clickable) return;
             emit('item-click');

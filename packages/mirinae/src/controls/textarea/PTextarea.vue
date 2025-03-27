@@ -1,6 +1,6 @@
 <template>
     <textarea v-model="proxyValue"
-              :placeholder="`${placeholder}`"
+              :placeholder="placeholder"
               :readonly="readonly"
               :autofocus="autofocus"
               :disabled="disabled"
@@ -15,11 +15,8 @@
 import {
     defineComponent, reactive, toRefs,
 } from 'vue';
-import type { PropType } from 'vue';
 
 import { useProxyValue } from '@/hooks';
-
-type ResizeType = 'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline';
 
 export default defineComponent({
     name: 'PTextarea',
@@ -53,7 +50,7 @@ export default defineComponent({
             default: false,
         },
         resize: {
-            type: String as PropType<ResizeType>,
+            type: String,
             default: 'block',
         },
     },

@@ -2,11 +2,10 @@
 import { computed, ref, watch } from 'vue';
 import draggable from 'vuedraggable';
 
-import type { TaskStatusOption, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskStatusOption, TaskStatusType } from '@/schema/opsflow/task/type';
 
 import TaskStatusDraggableItem from '@/services/ops-flow/components/TaskStatusDraggableItem.vue';
 import TaskStatusListFoldButton from '@/services/ops-flow/components/TaskStatusListFoldButton.vue';
-
 
 const props = defineProps<{
     header: string;

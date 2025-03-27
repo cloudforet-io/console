@@ -4,7 +4,7 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PublicWidgetCreateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/create';
@@ -17,7 +17,7 @@ import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/publi
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
 interface UsePublicWidgetApiReturn {
-    publicWidgetGetQueryKey: ComputedRef<QueryKey>;
+    publicWidgetQueryKey: ComputedRef<QueryKey>;
     publicWidgetListQueryKey: ComputedRef<QueryKey>;
     publicWidgetLoadQueryKey: ComputedRef<QueryKey>;
     publicWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
@@ -33,10 +33,10 @@ interface UsePublicWidgetApiReturn {
 }
 
 export const usePublicWidgetApi = (): UsePublicWidgetApiReturn => {
-    const publicWidgetGetQueryKey = useAPIQueryKey('dashboard', 'public-widget', 'get');
-    const publicWidgetListQueryKey = useAPIQueryKey('dashboard', 'public-widget', 'list');
-    const publicWidgetLoadQueryKey = useAPIQueryKey('dashboard', 'public-widget', 'load');
-    const publicWidgetLoadSumQueryKey = useAPIQueryKey('dashboard', 'public-widget', 'load-sum');
+    const publicWidgetQueryKey = useAPIQueryKey('public-widget/get');
+    const publicWidgetListQueryKey = useAPIQueryKey('public-widget/list');
+    const publicWidgetLoadQueryKey = useAPIQueryKey('public-widget/load');
+    const publicWidgetLoadSumQueryKey = useAPIQueryKey('public-widget/load-sum');
 
     const action = {
         async create(params: PublicWidgetCreateParameters) {
@@ -63,7 +63,7 @@ export const usePublicWidgetApi = (): UsePublicWidgetApiReturn => {
     };
 
     return {
-        publicWidgetGetQueryKey,
+        publicWidgetQueryKey,
         publicWidgetListQueryKey,
         publicWidgetLoadQueryKey,
         publicWidgetLoadSumQueryKey,

@@ -27,7 +27,7 @@ import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_com
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
+import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -149,8 +149,8 @@ const { mutateAsync: updateWidgetMutate } = useMutation({
     mutationFn: wigetFetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = state.isPrivate
-            ? widgetKeys.privateWidgetGetQueryKey
-            : widgetKeys.publicWidgetGetQueryKey;
+            ? widgetKeys.privateWidgetQueryKey
+            : widgetKeys.publicWidgetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
@@ -202,7 +202,7 @@ const { mutate: updateDashboard } = useMutation(
     {
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (data) => {
-            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
+            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
             // queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             queryClient.setQueryData(dashboardQueryKey.value, () => data);
         },

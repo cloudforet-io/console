@@ -18,8 +18,7 @@ import { useUserStore } from '@/store/user/user-store';
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import AssetSummaryDailyUpdates from '@/services/workspace-home/components/AssetSummaryDailyUpdates.vue';
 import AssetSummaryProvider from '@/services/workspace-home/components/AssetSummaryProvider.vue';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
@@ -56,14 +55,14 @@ const state = reactive({
         let result;
         if (state.isNoServiceAccounts) {
             result = {
-                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : {},
+                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME } : {},
                 title: i18n.t('HOME.NO_ACCOUNT'),
                 desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
                 buttonText: state.writableServiceAccount ? i18n.t('HOME.NO_ACCOUNT_ADD_NEW') : undefined,
             };
         } else {
             result = {
-                to: state.writableServiceCollector ? { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } : {},
+                to: state.writableServiceCollector ? { name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR.CREATE._NAME } : {},
                 title: i18n.t('HOME.NO_COLLECTOR'),
                 desc: i18n.t('HOME.NO_COLLECTOR_DESC'),
                 buttonText: state.writableServiceCollector ? i18n.t('HOME.NO_COLLECTOR_CREATE_NEW') : undefined,
@@ -106,7 +105,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                 <p-link v-if="state.accessLink"
                         highlight
                         :to="{
-                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                            name: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
                             params: { metricId: METRIC_MANAGED_CREATED_COUNT},
                         }"
                         action-icon="internal-link"

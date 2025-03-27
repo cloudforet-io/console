@@ -7,18 +7,24 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
+
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
+
+const domainStore = useDomainStore();
+
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const props = withDefaults(defineProps<{
     channelData: Partial<NotiChannelItemV1> & Partial<NotiChannelItem>;
     projectId?: string;
     disableEdit?: boolean;
-    visibleUserNotification: boolean;
 }>(), {
     projectId: undefined,
     disableEdit: false,
-    visibleUserNotification: false,
 });
 
 const emit = defineEmits<{(event: 'change'): void;
@@ -31,8 +37,8 @@ const {
     updateUserChannel,
     updateProjectChannel,
 } = useNotificationItem<string>({
-    userChannelId: props.visibleUserNotification ? props.channelData.channel_id : props.channelData.user_channel_id,
-    projectChannelId: props.visibleUserNotification ? '' : props.channelData.project_channel_id,
+    userChannelId: isAlertManagerVersionV2 ? props.channelData.channel_id : props.channelData.user_channel_id,
+    projectChannelId: isAlertManagerVersionV2 ? '' : props.channelData.project_channel_id,
     isEditMode: false,
     dataForEdit: props.channelData.name,
 }, emit);
@@ -50,7 +56,7 @@ const state = reactive({
 });
 
 const saveChangedName = async () => {
-    if (!props.visibleUserNotification && props.projectId) await updateProjectChannel('name', notificationItemState.dataForEdit);
+    if (!isAlertManagerVersionV2 && props.projectId) await updateProjectChannel('name', notificationItemState.dataForEdit);
     else await updateUserChannel('name', notificationItemState.dataForEdit);
 };
 

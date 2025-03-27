@@ -10,13 +10,13 @@ import { i18n as _i18n } from '@/translations';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
-import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const taskCategoryPageStore = useTaskCategoryPageStore();
+const taskCategoryPageGetters = taskCategoryPageStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
 const taskTypeFields = computed<DataTableField[]>(() => [
@@ -40,15 +40,6 @@ const taskTypeFields = computed<DataTableField[]>(() => [
         label: ' ',
     },
 ]);
-
-const { taskTypes, isLoading, refetch } = useTaskTypesQuery({
-    queryKey: computed(() => ({
-        query: {
-            filter: [{ k: 'category_id', v: taskCategoryPageStore.state.currentCategoryId, o: 'eq' }],
-        },
-    })),
-    enabled: computed(() => !!taskCategoryPageStore.state.currentCategoryId),
-});
 </script>
 
 <template>
@@ -61,7 +52,7 @@ const { taskTypes, isLoading, refetch } = useTaskTypesQuery({
             </template>
             <template #extra>
                 <p-icon-button name="ic_refresh"
-                               @click="refetch"
+                               @click="taskCategoryPageStore.listTaskTypes()"
                 />
                 <p-button style-type="substitutive"
                           icon-left="ic_plus_bold"
@@ -87,8 +78,8 @@ const { taskTypes, isLoading, refetch } = useTaskTypesQuery({
                 <br>
             </template>
         </i18n>
-        <p-data-table :loading="isLoading"
-                      :items="taskTypes"
+        <p-data-table :loading="!taskCategoryPageGetters.taskTypes"
+                      :items="taskCategoryPageGetters.taskTypes"
                       :fields="taskTypeFields"
         >
             <template #col-require_project-format="{ value }">

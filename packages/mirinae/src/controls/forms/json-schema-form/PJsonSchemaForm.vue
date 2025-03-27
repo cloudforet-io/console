@@ -64,21 +64,21 @@
                                                 :invalid="invalid"
                                                 :full-width="uniformWidth"
                                                 class="input-form"
-                                                @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                                @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />
                             <p-e-m-key-format v-else-if="schemaProperty.componentName === 'PEMKeyFormat'"
                                               :key="`PEMKeyFormat-${schemaProperty.propertyName}`"
                                               :value="rawFormData[schemaProperty.propertyName]"
                                               :readonly="schemaProperty.disabled"
                                               class="input-form"
-                                              @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                              @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />
                             <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
                                                 :key="`PJsonSchemaForm-${schemaProperty.propertyName}`"
                                                 :form-data="rawFormData[schemaProperty.propertyName]"
                                                 :schema="schemaProperty"
                                                 :is-root="false"
-                                                @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                                @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />
                             <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                                :key="`PSelectDropdown-${schemaProperty.propertyName}`"
@@ -88,7 +88,7 @@
                                                :use-fixed-menu-style="useFixedMenuStyle"
                                                is-fixed-width
                                                class="input-form"
-                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
                                 <template #dropdown-button="item">
                                     <slot name="dropdown-extra"
@@ -110,7 +110,7 @@
                                                is-filterable
                                                is-fixed-width
                                                class="input-form"
-                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
                                 <template #selected-extra="{ items }">
                                     <slot name="dropdown-extra"
@@ -123,7 +123,7 @@
                                              :value="rawFormData[schemaProperty.propertyName]"
                                              :disabled="schemaProperty.disabled"
                                              class="input-form"
-                                             @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                             @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />
                             <template v-else>
                                 <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
@@ -141,8 +141,8 @@
                                               :multi-input="schemaProperty.multiInputMode"
                                               :page-size="10"
                                               class="input-form"
-                                              @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
-                                              @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                              @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                              @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                                 />
                             </template>
                         </div>
@@ -188,16 +188,18 @@ import type {
     JsonSchemaFormProps, ReferenceHandler,
     ValidationMode,
 } from '@/controls/forms/json-schema-form/type';
+import { VALIDATION_MODES } from '@/controls/forms/json-schema-form/type';
 import PTextInput from '@/controls/input/text-input/PTextInput.vue';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import type { SupportLanguage } from '@/translations';
+import { supportLanguages } from '@/translations';
 
 
 const PJsonSchemaForm = () => ({
     // eslint-disable-next-line import/no-self-import
     component: import('./PJsonSchemaForm.vue'),
 });
-export default defineComponent({
+export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
         PEMKeyFormat,
@@ -222,10 +224,16 @@ export default defineComponent({
         language: {
             type: String as PropType<SupportLanguage>,
             default: 'en',
+            validator(lang?: SupportLanguage) {
+                return lang === undefined || supportLanguages.includes(lang);
+            },
         },
         validationMode: {
             type: String as PropType<ValidationMode>,
             default: 'input',
+            validator(mode?: ValidationMode) {
+                return mode === undefined || VALIDATION_MODES.includes(mode);
+            },
         },
         isRoot: {
             type: Boolean,
@@ -275,11 +283,11 @@ export default defineComponent({
             unmounting: false,
         });
 
-        const { localize } = useLocalize(props as JsonSchemaFormProps);
+        const { localize } = useLocalize(props);
         const {
             invalidMessagesMap, validatorErrors, inputOccurredMap, invalidMessages, jsonInputOccurred,
             validateFormData, getPropertyInvalidState, getJsonInputInvalidState, setJsonInputParsingError,
-        } = useValidation(props as JsonSchemaFormProps, {
+        } = useValidation(props, {
             ajv,
             formData: computed(() => (props.isRoot ? state.refinedFormData : props.formData)),
             localize,
@@ -292,10 +300,10 @@ export default defineComponent({
             let refined: any;
 
             if (state.isJsonInputMode) {
-                jsonInputData = initJsonInputDataWithSchema(props.schema, (props as JsonSchemaFormProps).formData);
+                jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
                 if (props.isRoot) refined = initRefinedFormData(props.schema, props.formData, props.isRoot);
             } else {
-                rawFormData = await initRawFormDataWithSchema(props.schema, (props as JsonSchemaFormProps).formData, props.referenceHandler);
+                rawFormData = await initRawFormDataWithSchema(props.schema, props.formData, props.referenceHandler);
                 refined = initRefinedFormData(props.schema, rawFormData, props.isRoot);
             }
 
@@ -390,7 +398,7 @@ export default defineComponent({
                 return;
             }
 
-            if (schema && prevSchema) await updateFormData(schema, prevSchema);
+            await updateFormData(schema, prevSchema);
         });
         const stopWatch = watch(() => state.refinedFormData, (refinedFormData) => {
             emit('update:form-data', refinedFormData);

@@ -13,13 +13,13 @@ import {
     PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

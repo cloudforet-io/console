@@ -13,7 +13,7 @@ import type {
     TaskField,
     TaskFieldOptions,
     TaskFieldType,
-} from '@/api-clients/opsflow/_types/task-field-type';
+} from '@/schema/opsflow/_types/task-field-type';
 import { getParticle, i18n } from '@/translations';
 
 import InfoTooltip from '@/common/components/guidance/InfoTooltip.vue';
@@ -29,10 +29,9 @@ import {
 } from '@/services/ops-flow/task-fields-configuration/stores/use-task-field-metadata-store';
 import TaskFieldGeneratorHeader from '@/services/ops-flow/task-fields-configuration/TaskFieldGeneratorHeader.vue';
 import type {
-    MutableTaskField,
     OptionalMutableTaskField,
 } from '@/services/ops-flow/task-fields-configuration/types/mutable-task-field-type';
-import type { DefaultTaskFieldId, TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
+import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -40,16 +39,14 @@ import {
 const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsyncComponent>>> = {
     DROPDOWN: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-configuration/options-generator-templates/DropdownOptionsGenerator.vue')),
     PARAGRAPH: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-configuration/options-generator-templates/ParagraphOptionsGenerator.vue')),
-    TEXT: defineAsyncComponent(() => import('@/services/ops-flow/task-fields-configuration/options-generator-templates/TextOptionsGenerator.vue')),
 };
 
 const props = defineProps<{
-    field: OptionalMutableTaskField; // _field_id is optional because it is only required for editable case.
+    field: OptionalMutableTaskField;
     allFields: OptionalMutableTaskField[];
-    editable?: boolean;
 }>();
 const emit = defineEmits<{(event: 'delete'): void;
-    (event: 'update:field', value: MutableTaskField): void; // _field_id is required only for editable case.
+    (event: 'update:field', value: TaskField): void;
     (event: 'update:is-valid', value: boolean): void;
 }>();
 
@@ -60,7 +57,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const fieldMetadata = computed<TaskFieldTypeMetadata>(() => taskFieldMetadataStoreGetters.taskFieldTypeMetadataMap[props.field.field_type]);
 const optionsComponent = computed<ReturnType<typeof defineAsyncComponent>|undefined>(() => COMPONENT_MAP[props.field.field_type]);
 
-const isDefaultField = computed(() => Object.values(DEFAULT_FIELD_ID_MAP).includes(props.field.field_id as DefaultTaskFieldId));
+const isDefaultField = computed(() => Object.values(DEFAULT_FIELD_ID_MAP).includes(props.field.field_id));
 
 /* input type */
 const inputTypes = computed<{ name: string; label: string; }[]>(() => [
@@ -71,7 +68,7 @@ const inputType = ref<string>('form');
 const handleChangeInputType = (value: string) => {
     if (value === 'json') {
         const taskField = cloneDeep(field.value);
-        delete taskField._field_id; // remove hidden field id from json so that it can not be modified
+        delete taskField._field_id;
         jsonCode.value = JSON.stringify(taskField);
     } else {
         applyJsonCodeToStates(jsonCode.value);
@@ -89,7 +86,7 @@ const {
         });
     }
     if (props.allFields.some((f) => {
-        const id = f._field_id || f.field_id; // some fields do not have _field_id because they are not editable.
+        const id = f._field_id || f.field_id;
         return id === val && id !== props.field._field_id;
     })) {
         return i18n.t('OPSFLOW.VALIDATION.DUPLICATED', {
@@ -99,7 +96,7 @@ const {
     return true;
 });
 const isFieldIdChanged = computed(() => {
-    if (!props.editable) return true;
+    if (isDefaultField.value) return true;
     return fieldId.value !== props.field._field_id;
 });
 const handleClickUndoFieldId = () => {
@@ -143,7 +140,7 @@ const isPrimary = ref<boolean>(true);
 const isFolded = ref<boolean>(false);
 
 /* validation */
-const isAllValid = computed<boolean>(() => (props.editable ? isFieldIdValid.value : true)
+const isAllValid = computed<boolean>(() => (isDefaultField.value ? isFieldIdValid.value : true)
     && isNameValid.value
     && (optionsComponent.value ? isOptionsValid.value : true));
 
@@ -197,7 +194,7 @@ const handleUpdateJsonCode = (code: string) => {
 
 watch(field, (newField) => {
     if (isEqual(newField, props.field)) return;
-    emit('update:field', newField as MutableTaskField);
+    emit('update:field', newField);
 });
 watch(isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
@@ -231,7 +228,7 @@ onBeforeMount(() => {
             <div class="py-4 pl-8 pr-2 border-gray-150"
                  :class="{ 'border-b': inputType === 'form' }"
             >
-                <div v-if="props.editable"
+                <div v-if="!isDefaultField"
                      class="float-right flex justify-end gap-1 mb-4"
                 >
                     <template v-for="type in inputTypes">
@@ -247,17 +244,17 @@ onBeforeMount(() => {
                     </template>
                 </div>
                 <template v-if="inputType === 'form'">
-                    <p-field-group v-if="props.editable"
+                    <p-field-group v-if="!isDefaultField"
                                    :label="$t('OPSFLOW.FIELD_ID', {field: $t('OPSFLOW.FIELD_GENERATOR.FIELD')})"
                                    :invalid="isFieldIdInvalid"
                                    :invalid-text="fieldIdInvalidText"
                                    required
                     >
                         <template #label-extra>
-                            <info-tooltip :contents="String($t('OPSFLOW.FIELD_GENERATOR.FIELD_ID_EDIT_DESC', {
+                            <info-tooltip :contents="$t('OPSFLOW.FIELD_GENERATOR.FIELD_ID_EDIT_DESC', {
                                               task: taskManagementTemplateStore.templates.task,
                                               tasks: taskManagementTemplateStore.templates.tasks,
-                                          }))"
+                                          })"
                                           size="sm"
                             />
                         </template>
@@ -265,7 +262,7 @@ onBeforeMount(() => {
                             <span>
                                 <p-text-input :value="fieldId"
                                               :invalid="isFieldIdInvalid"
-                                              :readonly="!props.editable"
+                                              :readonly="isDefaultField"
                                               @update:value="setFieldId"
                                 />
                                 <changed-mark v-if="isFieldIdChanged" />
@@ -286,13 +283,12 @@ onBeforeMount(() => {
                         <p-text-input :value="name"
                                       :placeholder="props.field.name || fieldMetadata.name"
                                       :invalid="isNameInvalid"
-                                      :readonly="!props.editable"
+                                      :readonly="isDefaultField"
                                       @update:value="setName"
                         />
                     </p-field-group>
                     <component :is="optionsComponent"
                                :options="options"
-                               :editable="props.editable"
                                @update:options="handleUpdateOptions"
                                @update:is-valid="handleUpdateOptionsValidation"
                     />
@@ -306,7 +302,7 @@ onBeforeMount(() => {
                         <!-- HACK: key is used to force re-render when isRequired changes. This is temporary solution. -->
                         <p-toggle-button :key="String(isRequired)"
                                          :value.sync="isPrimary"
-                                         :disabled="isRequired || !props.editable"
+                                         :disabled="isRequired || isDefaultField"
                                          show-state-text
                                          position="left"
                         />
@@ -328,7 +324,7 @@ onBeforeMount(() => {
             >
                 <p-checkbox :selected="isRequired"
                             :value="true"
-                            :disabled="!props.editable"
+                            :disabled="isDefaultField"
                             @change="handleRequiredChange"
                 >
                     {{ $t('OPSFLOW.FIELD_GENERATOR.FIELD_REQUIRED') }}

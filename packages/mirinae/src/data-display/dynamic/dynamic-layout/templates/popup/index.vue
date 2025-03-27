@@ -29,12 +29,13 @@ import {
 
 import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import type { PopupDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/popup/type';
 import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
 import type { PopupOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 const PButtonModal = () => import('@/feedbacks/modals/button-modal/PButtonModal.vue');
 
-export default defineComponent({
+export default defineComponent<PopupDynamicLayoutProps>({
     name: 'PDynamicLayoutPopup',
     components: {
         PButtonModal,

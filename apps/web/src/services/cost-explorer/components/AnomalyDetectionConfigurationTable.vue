@@ -4,7 +4,8 @@ import { computed, reactive } from 'vue';
 import {
     PToolboxTable, PLink, PLazyImg, PToggleButton, PBadge,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
+import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
@@ -15,7 +16,7 @@ import {
     CONFIG_TEMP_DATA,
     DETECTION_CONFIGURATION_HANDLERS,
 } from '@/services/cost-explorer/constants/anomaly-detection-constant';
-import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -57,7 +58,7 @@ const tableState = reactive({
             <template #col-name-format="{value, item}">
                 <p-link highlight
                         :to="{
-                            name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+                            name: COST_EXPLORER_ROUTE.ANOMALY_DETECTION.CONFIGURATION.DETAIL._NAME,
                             params: { configId: item.config_id}
                         }"
                         class="col-name"
@@ -66,7 +67,7 @@ const tableState = reactive({
                 </p-link>
             </template>
             <template #col-policy-format="{value}">
-                <p-link action-icon="internal-link"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         :to="{}"
                 >
@@ -100,7 +101,7 @@ const tableState = reactive({
             </template>
             <template #col-history_button-format="{item}">
                 <p-link v-if="item.lasted_at"
-                        action-icon="internal-link"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         :to="{}"
                 >

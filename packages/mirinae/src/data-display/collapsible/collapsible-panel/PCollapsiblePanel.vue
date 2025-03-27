@@ -3,7 +3,7 @@
         <div class="panel-contents">
             <div ref="fakeTextRef"
                  class="text fake"
-                 :style="fakeTextStyle"
+                 :style="{'-webkit-line-clamp': lineClamp}"
             >
                 <slot v-if="!enableDeepClamp" />
             </div>
@@ -34,7 +34,7 @@ import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PC
 import { useProxyValue } from '@/hooks';
 
 const PAD = 2;
-export default defineComponent({
+export default defineComponent<CollapsiblePanelProps>({
     name: 'PCollapsiblePanel',
     components: { PCollapsibleToggle },
     model: {
@@ -57,12 +57,11 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props: CollapsiblePanelProps, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
             fakeTextRef: null as null|HTMLElement,
             contentRef: null as null|HTMLElement,
-            fakeTextStyle: computed<Record<string, any>>(() => ({ '-webkit-line-clamp': props.lineClamp })),
         });
 
         const simpleTextClamper = useSimpleTextClamper(PAD, props.lineClamp || 2);

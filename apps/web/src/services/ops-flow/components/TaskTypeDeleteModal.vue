@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { ref, computed, watch } from 'vue';
 
 import { PButtonModal, PIconButton } from '@cloudforet/mirinae';
 
-import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -13,29 +10,22 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedTasks from '@/services/ops-flow/components/AssociatedTasks.vue';
-import { useAssociatedTasksQuery } from '@/services/ops-flow/composables/use-associated-tasks-query';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
+const taskTypeStore = useTaskTypeStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-/* load associated tasks */
-const {
-    tasks, isLoading, refetch,
-} = useAssociatedTasksQuery({
-    queryKey: computed(() => ({ task_type_id: taskCategoryPageState.targetTaskTypeId })),
-    enabled: computed(() => !!taskCategoryPageState.visibleTaskTypeDeleteModal && !!taskCategoryPageState.targetTaskTypeId),
-});
-
-/* UI states */
-const deletable = computed(() => !tasks.value?.length);
+const deletable = computed(() => !taskCategoryPageStore.getters.associatedTasksToType.length);
 const headerTitle = computed(() => {
-    if (isLoading.value) return ' ';
+    if (taskCategoryPageState.loadingAssociatedTasksToType) {
+        return ' ';
+    }
     return deletable.value
         ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
             object: taskManagementTemplateStore.templates.TaskType,
@@ -43,35 +33,21 @@ const headerTitle = computed(() => {
         })
         : _i18n.t('OPSFLOW.DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
-
-/* delete task type */
-const { taskTypeAPI, taskTypeListQueryKey } = useTaskTypeApi();
-const queryClient = useQueryClient();
-const { mutateAsync: deleteTaskType, isPending: isDeleting } = useMutation({
-    mutationFn: async () => {
+const loading = ref<boolean>(false);
+const handleConfirm = async () => {
+    try {
+        loading.value = true;
         if (!taskCategoryPageState.targetTaskTypeId) {
             throw new Error('[Console Error] Cannot delete task type without a target task type');
         }
-        await taskTypeAPI.delete({
-            task_type_id: taskCategoryPageState.targetTaskTypeId,
-        });
-    },
-    onSuccess: () => {
-        // invalidate task type list query
-        queryClient.invalidateQueries({ queryKey: taskTypeListQueryKey.value });
+        await taskTypeStore.delete(taskCategoryPageState.targetTaskTypeId, taskCategoryPageStore.getters.targetTaskType?.category_id);
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
-    },
-    onError: (e) => {
+    } catch (e) {
         ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
-    },
-    onSettled: () => {
+    } finally {
         taskCategoryPageStore.closeDeleteTaskTypeModal();
-    },
-});
-
-/* event handlers */
-const handleConfirm = () => {
-    deleteTaskType();
+        loading.value = false;
+    }
 };
 const handleCloseOrCancel = () => {
     taskCategoryPageStore.closeDeleteTaskTypeModal();
@@ -80,8 +56,22 @@ const handleClosed = () => {
     taskCategoryPageStore.resetTargetTaskTypeId();
 };
 const handleRefresh = () => {
-    refetch();
+    if (!taskCategoryPageState.targetTaskTypeId) {
+        ErrorHandler.handleError(new Error('[Console Error] Cannot delete task type without a target task type'));
+        return;
+    }
+    taskCategoryPageStore.loadAssociatedTasksToType(taskCategoryPageState.targetTaskTypeId, true);
 };
+
+watch(() => taskCategoryPageState.visibleTaskTypeDeleteModal, (visible) => {
+    if (visible) {
+        if (!taskCategoryPageState.targetTaskTypeId) {
+            ErrorHandler.handleError(new Error('[Console Error] Cannot delete task type without a target task type'));
+            return;
+        }
+        taskCategoryPageStore.loadAssociatedTasksToType(taskCategoryPageState.targetTaskTypeId);
+    }
+});
 </script>
 
 <template>
@@ -89,8 +79,8 @@ const handleRefresh = () => {
                     theme-color="alert"
                     :header-title="headerTitle"
                     :size="deletable ? 'sm' : 'md'"
-                    :loading="isDeleting"
-                    :loading-backdrop="isLoading"
+                    :loading="loading"
+                    :loading-backdrop="taskCategoryPageState.loadingAssociatedTasksToType"
                     :disabled="!deletable"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
@@ -111,7 +101,7 @@ const handleRefresh = () => {
                                    @click="handleRefresh"
                     />
                 </div>
-                <associated-tasks :tasks="tasks ?? []" />
+                <associated-tasks :tasks="taskCategoryPageStore.getters.associatedTasksToType" />
             </div>
         </template>
     </p-button-modal>

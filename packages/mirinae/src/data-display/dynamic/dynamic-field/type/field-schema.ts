@@ -46,12 +46,11 @@ export interface ListOptions extends CommonOptions {
     delimiter?: string;
 }
 
-interface StateIcon {
-    image?: string;
-    color?: string;
-}
 export interface StateOptions extends CommonOptions {
-    icon?: StateIcon;
+    icon?: {
+        image?: string;
+        color?: string;
+    };
     text_color?: string;
 }
 
@@ -67,12 +66,13 @@ export interface EnumItem {
     default?: any;
 }
 type EnumValue = EnumItem|string;
-type OldEnumOptions = Record<string, EnumValue>;
-interface NewEnumOptions extends CommonOptions {
+export type EnumOptions = {
+    [data: string]: EnumValue;
+    default?: any;
+} | {
     items?: Record<string, EnumValue>;
     default?: any;
-}
-export type EnumOptions = OldEnumOptions|NewEnumOptions;
+} & CommonOptions;
 
 export interface SizeOptions extends CommonOptions {
     display_unit?: 'BYTES | KB | MB | GB | TB | PB';
@@ -85,28 +85,17 @@ export type DictOptions = CommonOptions;
 export type TextOptions = CommonOptions;
 
 
-export interface DynamicFieldOptions extends CommonOptions {
-    // badge
-    outline_color?: string;
-    shape?: string;
-    background_color?: string;
-    text_color?: string; // + state
-    // datetime
-    source_type?: keyof typeof DATETIME_SOURCE_TYPE;
-    source_format?: string;
-    display_format?: string;
-    // list
-    item?: DynamicField;
-    sub_key?: string; // + more
-    delimiter?: string;
-    // state
-    icon?: StateIcon;
-    // more
-    layout?: DynamicLayout;
-    // enum
-    items?: Record<string, EnumValue>;
-    default?: any;
-}
+export type DynamicFieldOptions =
+    | BadgeOptions
+    | DatetimeOptions
+    | DictOptions
+    | EnumOptions
+    | ListOptions
+    | StateOptions
+    | TextOptions
+    | SizeOptions
+    | MoreOptions;
+
 
 export interface DynamicField {
     key: string;

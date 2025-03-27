@@ -15,36 +15,6 @@ const UserMainPage = () => import('@/services/iam/pages/UserMainPage.vue');
 const UserGroupMainPage = () => import('@/services/iam/pages/UserGroupMainPage.vue');
 const AppMainPage = () => import('@/services/iam/pages/AppMainPage.vue');
 
-export const USER_GROUP_ROUTE = {
-    path: 'user-group',
-    name: IAM_ROUTE.USER_GROUP._NAME,
-    meta: {
-        menuId: MENU_ID.USER_GROUP,
-        translationId: MENU_INFO_MAP[MENU_ID.USER_GROUP].translationId,
-    },
-    component: UserGroupMainPage as any,
-} as const;
-
-export const iamRoutesChildren = [
-    {
-        path: 'user',
-        name: IAM_ROUTE.USER._NAME,
-        meta: {
-            menuId: MENU_ID.USER,
-            translationId: MENU_INFO_MAP[MENU_ID.USER].translationId,
-        },
-        component: UserMainPage as any,
-    },
-    {
-        path: 'app',
-        name: IAM_ROUTE.APP._NAME,
-        meta: {
-            menuId: MENU_ID.APP,
-            translationId: MENU_INFO_MAP[MENU_ID.APP].translationId,
-        },
-        component: AppMainPage as any,
-    },
-];
 
 const iamRoutes: RouteConfig = {
     path: 'iam',
@@ -55,9 +25,37 @@ const iamRoutes: RouteConfig = {
     },
     redirect: (to) => {
         const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId);
     },
     component: IamContainer,
-    children: iamRoutesChildren,
+    children: [
+        {
+            path: 'user',
+            name: IAM_ROUTE.USER._NAME,
+            meta: {
+                menuId: MENU_ID.USER,
+                translationId: MENU_INFO_MAP[MENU_ID.USER].translationId,
+            },
+            component: UserMainPage as any,
+        },
+        {
+            path: 'user-group',
+            name: IAM_ROUTE.USER_GROUP._NAME,
+            meta: {
+                menuId: MENU_ID.USER_GROUP,
+                translationId: MENU_INFO_MAP[MENU_ID.USER_GROUP].translationId,
+            },
+            component: UserGroupMainPage as any,
+        },
+        {
+            path: 'app',
+            name: IAM_ROUTE.APP._NAME,
+            meta: {
+                menuId: MENU_ID.APP,
+                translationId: MENU_INFO_MAP[MENU_ID.APP].translationId,
+            },
+            component: AppMainPage as any,
+        },
+    ],
 };
 export default iamRoutes;

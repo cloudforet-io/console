@@ -37,8 +37,8 @@
                         {{ state.description }}
                     </span>
                     <p-link v-if="state.pluginDetailLink"
-                            :to="state.pluginDetailLink"
-                            action-icon="internal-link"
+                            :to="getProperRouteLocation(state.pluginDetailLink)"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
                             size="sm"
                             highlight
@@ -69,15 +69,14 @@ import { useRouter } from 'vue-router/composables';
 import {
     PLink, PLazyImg, PLabel, PI, PTooltip,
 } from '@cloudforet/mirinae';
-
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory/constants/collector-constant';
 
@@ -93,13 +92,11 @@ const props = withDefaults(defineProps<Props>(), {
     hideLabels: false,
     emphasizeName: false,
 });
-
-const userWorkspaceStore = useUserWorkspaceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
 const state = reactive({
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     icon: computed<string>(() => assetUrlConverter(props.plugin?.tags?.icon ?? '')),
     name: computed<string>(() => props.plugin?.name ?? ''),
     description: computed<string>(() => props.plugin?.tags?.long_description ?? ''),
@@ -109,13 +106,7 @@ const state = reactive({
         const link = props.plugin?.tags?.link ?? '';
         if (!link) return undefined;
         const resolvedResult = router.resolve(link);
-        return {
-            ...resolvedResult.resolved,
-            params: {
-                ...resolvedResult.resolved?.params ?? {},
-                workspaceId: state.currentWorkspaceId,
-            },
-        };
+        return resolvedResult.resolved;
     }),
     repositoryType: computed<string>(() => props.plugin?.repository_info?.repository_type ?? ''),
     repositoryName: computed<string>(() => props.plugin?.repository_info?.name ?? ''),

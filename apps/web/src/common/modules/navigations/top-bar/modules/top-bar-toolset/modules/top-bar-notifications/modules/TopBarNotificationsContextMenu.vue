@@ -15,6 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty, PTextBeautifier,
 } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -314,7 +315,7 @@ onMounted(() => {
                     <div v-if="state.selectedItem.message.link">
                         <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
                         <p-link :href="state.selectedItem.message.link"
-                                action-icon="external-link"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                 class="detail-link"
                         >
                             {{ state.selectedItem.message.link }}

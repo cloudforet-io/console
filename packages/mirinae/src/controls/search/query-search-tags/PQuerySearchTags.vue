@@ -58,13 +58,14 @@ import PButton from '@/controls/buttons/button/PButton.vue';
 import { defaultConverter, defaultValidator } from '@/controls/search/query-search-tags/helper';
 import type {
     QuerySearchTagsFunctions,
+    QuerySearchTagsProps,
     QueryTag, QueryTagConverter, QueryTagValidator,
 } from '@/controls/search/query-search-tags/type';
 import type { QueryItem } from '@/controls/search/query-search/type';
 import PTag from '@/data-display/tags/PTag.vue';
 
 
-export default defineComponent({
+export default defineComponent<QuerySearchTagsProps>({
     name: 'PQuerySearchTags',
     directives: { tooltip: VTooltip },
     components: {

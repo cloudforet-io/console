@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, defineComponent,
 } from 'vue';
@@ -37,7 +36,17 @@ import PI from '@/foundation/icons/PI.vue';
 import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useMultiSelect } from '@/hooks/use-select/use-select';
 
-export default defineComponent({
+interface CheckboxProps {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
+    invalid?: boolean;
+    indeterminate?: boolean;
+}
+
+export default defineComponent<CheckboxProps>({
     name: 'PCheckbox',
     components: { PI },
     model: {
@@ -47,11 +56,11 @@ export default defineComponent({
     props: {
         /* select props */
         value: {
-            type: [Boolean, String, Number, Object, Array] as PropType<any>,
+            type: [Boolean, String, Number, Object, Array],
             default: true,
         },
         selected: {
-            type: [Boolean, String, Number, Object, Array] as PropType<any|any[]>,
+            type: [Boolean, String, Number, Object, Array],
             default: () => ([]),
         },
         disabled: {
@@ -59,7 +68,7 @@ export default defineComponent({
             default: false,
         },
         predicate: {
-            type: Function as PropType<SelectionPredicate>,
+            type: Function,
             default: undefined,
         },
         /* checkbox props */
@@ -72,7 +81,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: CheckboxProps, { emit }) {
         const {
             isSelected,
             getSelected,
@@ -81,6 +90,7 @@ export default defineComponent({
             selected: computed(() => props.selected),
             predicate: computed(() => props.predicate),
             disabled: computed(() => props.disabled),
+            indeterminate: computed(() => props.indeterminate),
         });
 
         const iconName = computed(() => {

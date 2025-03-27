@@ -1,85 +1,69 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
-import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/schema/opsflow/task/type';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useCategoryStatusOptions } from '@/services/ops-flow/composables/use-category-status-options';
-import { useTargetStatusOption } from '@/services/ops-flow/composables/use-target-status-option';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-
 const taskCategoryPageStore = useTaskCategoryPageStore();
+const taskCategoryStore = useTaskCategoryStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-/* category status options */
-const currentCategoryId = computed(() => taskCategoryPageStore.state.currentCategoryId);
-const { categoryStatusOptions } = useCategoryStatusOptions({ categoryId: currentCategoryId });
+const loading = ref<boolean>(false);
+const name = computed(() => taskCategoryPageStore.getters.targetStatusOption?.data?.name ?? '');
 
-/* target status option */
-const targetStatusType = computed(() => taskCategoryPageStore.state.targetStatus?.type);
-const targetStatusId = computed(() => taskCategoryPageStore.state.targetStatus?.statusId);
-const { targetStatusOption } = useTargetStatusOption({ categoryStatusOptions, targetStatusType, targetStatusId });
-const name = computed(() => targetStatusOption.value?.name ?? '');
-
-/* set default status */
-const { taskCategoryAPI, taskCategoryListQueryKey, taskCategoryQueryKey } = useTaskCategoryApi();
-const queryClient = useQueryClient();
-const { mutate: setAsDefaultStatus, isPending } = useMutation({
-    mutationFn: ({ categoryId, statusType, statusId }: { categoryId: string; statusType: TaskStatusType; statusId: string }) => {
-        const newStatusOptions = cloneDeep(categoryStatusOptions.value);
-        const prevDefault = newStatusOptions[statusType].find((p) => p.is_default);
+const setAsDefaultStatus = async (categoryId: string, allStatusOptions: TaskStatusOptions, targetStatusOption: {
+            type: TaskStatusType;
+            data: TaskStatusOption;
+        }) => {
+    try {
+        const newStatusOptions = cloneDeep(allStatusOptions);
+        const { type, data } = targetStatusOption;
+        const prevDefault = newStatusOptions[type].find((p) => p.is_default);
         if (prevDefault) prevDefault.is_default = false;
-        const newDefault = newStatusOptions[statusType].find((p) => p.status_id === statusId);
+        const newDefault = newStatusOptions[type].find((p) => p.status_id === data.status_id);
         if (!newDefault) throw new Error('Status not found');
         newDefault.is_default = true;
 
-        return taskCategoryAPI.update({
+        await taskCategoryStore.update({
             category_id: categoryId,
             status_options: newStatusOptions,
             force: true,
         });
-    },
-    onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
-        queryClient.invalidateQueries({
-            queryKey: [
-                ...taskCategoryQueryKey.value,
-                { category_id: data.category_id },
-            ],
-        });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }), '');
-        taskCategoryPageStore.closeSetDefaultStatusModal();
-    },
-    onError: (e) => {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }));
-    },
-});
-
-/* modal event handlers */
-const handleConfirm = () => {
-    if (!currentCategoryId.value || !targetStatusType.value || !targetStatusId.value) {
-        ErrorHandler.handleError(new Error('[Console Error] Cannot set default status without a target states'));
-        return;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }));
     }
-    setAsDefaultStatus({
-        categoryId: currentCategoryId.value,
-        statusType: targetStatusType.value,
-        statusId: targetStatusId.value,
-    });
+};
+const handleConfirm = async () => {
+    loading.value = true;
+    try {
+        if (!taskCategoryPageStore.state.currentCategoryId) {
+            throw new Error('Category ID is required');
+        }
+        if (!taskCategoryPageStore.getters.targetStatusOption) {
+            throw new Error('[Console Error] Cannot set default status without a target status');
+        }
+        await setAsDefaultStatus(taskCategoryPageStore.state.currentCategoryId, taskCategoryPageStore.getters.statusOptions, taskCategoryPageStore.getters.targetStatusOption);
+        taskCategoryPageStore.closeSetDefaultStatusModal();
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        loading.value = false;
+    }
 };
 const handleCloseOrCancel = () => {
     taskCategoryPageStore.closeSetDefaultStatusModal();
@@ -92,7 +76,7 @@ const handleClosed = () => {
 <template>
     <p-button-modal :visible="taskCategoryPageStore.state.visibleSetDefaultStatusModal"
                     size="sm"
-                    :loading="isPending"
+                    :loading="loading"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"
                     @cancel="handleCloseOrCancel"

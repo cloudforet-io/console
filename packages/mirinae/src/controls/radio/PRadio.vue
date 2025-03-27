@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, defineComponent,
 } from 'vue';
@@ -43,7 +42,16 @@ import PI from '@/foundation/icons/PI.vue';
 import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useSingleSelect } from '@/hooks/use-select/use-select';
 
-export default defineComponent({
+interface Props {
+    value?: any;
+    selected?: any | any[];
+    disabled?: boolean;
+    predicate?: SelectionPredicate;
+    multiSelectable?: boolean;
+    invalid?: boolean;
+    readonly?: boolean;
+}
+export default defineComponent<Props>({
     name: 'PRadio',
     components: { PI },
     model: {
@@ -53,11 +61,11 @@ export default defineComponent({
     props: {
         /* select props */
         value: {
-            type: [Boolean, String, Number, Object, Array] as PropType<any>,
+            type: [Boolean, String, Number, Object, Array],
             default: true,
         },
         selected: {
-            type: [Boolean, String, Number, Object, Array] as PropType<any|any[]>,
+            type: [Boolean, String, Number, Object, Array],
             default: undefined,
         },
         disabled: {
@@ -65,7 +73,7 @@ export default defineComponent({
             default: false,
         },
         predicate: {
-            type: Function as PropType<SelectionPredicate>,
+            type: Function,
             default: undefined,
         },
         /* radio props */
@@ -78,7 +86,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const {
             isSelected,
             getSelected,

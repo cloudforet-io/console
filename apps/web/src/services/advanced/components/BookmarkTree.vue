@@ -6,8 +6,10 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView, PTextButton } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -17,9 +19,9 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
-import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
-import type { TreeNode } from '@/services/project/v-shared/tree/type';
+import type { TreeNode } from '@/services/project-v1/tree/type';
 
 const gnbStore = useGnbStore();
 const bookmarkPageStore = useBookmarkPageStore();
@@ -46,7 +48,7 @@ const state = reactive({
             allPaths.push({
                 name: state.group === 'global' ? i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : workspaceItem?.name || '',
                 to: {
-                    name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
+                    name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                     params: {
                         group: state.group,
                     },
@@ -57,7 +59,7 @@ const state = reactive({
             allPaths.push({
                 name: state.folder,
                 to: {
-                    name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME,
+                    name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
                     params: {
                         group: state.group,
                         folder: state.folder,
@@ -70,13 +72,13 @@ const state = reactive({
             {
                 name: i18n.t('MENU.ADMINISTRATION_ADVANCED'),
                 to: {
-                    name: ADMIN_ADVANCED_ROUTE._NAME,
+                    name: makeAdminRouteName(ADVANCED_ROUTE._NAME),
                 },
             },
             {
                 name: i18n.t('MENU.ADMINISTRATION_BOOKMARK'),
                 to: {
-                    name: ADMIN_ADVANCED_ROUTE.BOOKMARK._NAME,
+                    name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK._NAME),
                 },
             },
             ...allPaths,
@@ -94,7 +96,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                     id: cur,
                     name: cur,
                     to: {
-                        name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
+                        name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                         params: {
                             group: cur,
                         },
@@ -114,7 +116,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                 id: item.id,
                 name: item.name,
                 to: {
-                    name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME,
+                    name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
                     params: {
                         group: item.workspaceId || 'global',
                         folder: item.name,
@@ -133,7 +135,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
                         id: item.workspaceId,
                         name: item.workspaceId,
                         to: {
-                            name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
+                            name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                             params: {
                                 group: item.workspaceId,
                             },
@@ -157,7 +159,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
             id: 'global',
             name: i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK'),
             to: {
-                name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
+                name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
                 params: {
                     group: 'global',
                 },

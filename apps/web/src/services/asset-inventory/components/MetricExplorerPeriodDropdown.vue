@@ -2,12 +2,11 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import { isEmpty, isEqual, range } from 'lodash';
+import { isEqual, range } from 'lodash';
 
-import { PSelectDropdown, PBadge } from '@cloudforet/mirinae';
+import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -32,8 +31,6 @@ import type {
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const route = useRoute();
-
 const state = reactive({
     dailyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const locale = i18n.locale;
@@ -60,14 +57,9 @@ const state = reactive({
             },
             ...(range(12).map((i) => {
                 const start = dayjs.utc().subtract(i, 'month').startOf('month');
-                const end = dayjs.utc().subtract(i, 'month').endOf('month');
                 return {
                     name: start.format('YYYY-MM'),
                     label: dayjs(start).locale(locale).format('MMMM, YYYY'),
-                    period: {
-                        start: start.format('YYYY-MM-DD'),
-                        end: end.format('YYYY-MM-DD'),
-                    },
                 };
             })),
         ];
@@ -116,19 +108,6 @@ const state = reactive({
     }),
     selectedPeriod: METRIC_PERIOD_MENU.LAST_7_DAYS as MetricPeriodMenu,
     customDateModalVisible: false,
-    hasURLQuery: computed(() => !!route.query && !isEmpty(route.query)),
-    showPeriodBadge: computed<boolean>(() => state.selectedPeriod === 'custom'),
-    periodBadgeText: computed<string>(() => {
-        if (!metricExplorerPageState.period) return '';
-        let startDateFormat = 'MMM D';
-        if (metricExplorerPageState.granularity === GRANULARITY.MONTHLY) startDateFormat = 'MMM YYYY';
-        const endDateFormat = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'MMM D, YYYY' : startDateFormat;
-        //
-        const start = dayjs.utc(metricExplorerPageState.period.start);
-        let end = dayjs.utc(metricExplorerPageState.period.end);
-        if (metricExplorerPageState.granularity === GRANULARITY.DAILY) end = dayjs.utc(metricExplorerPageState.period.end).endOf('month');
-        return `${start.format(startDateFormat)} ~ ${end.format(endDateFormat)}`;
-    }),
 });
 
 /* Util */
@@ -137,8 +116,8 @@ const initSelectedPeriod = () => {
     if (metricExplorerPageState.relativePeriod) {
         state.selectedPeriod = getPeriodItemNameByRelativePeriod(metricExplorerPageState.relativePeriod);
     } else if (metricExplorerPageState.granularity === GRANULARITY.DAILY) {
-        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item?.period, metricExplorerPageState.period));
-        state.selectedPeriod = selectedPeriodItem?.name || 'custom';
+        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item.name, metricExplorerPageState.period));
+        state.selectedPeriod = selectedPeriodItem?.name;
     } else {
         state.selectedPeriod = 'custom';
     }
@@ -174,12 +153,12 @@ const handleCustomRangeModalConfirm = (start: string, end: string) => {
 
 /* Watcher */
 watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
-    if (refresh || state.hasURLQuery) initSelectedPeriod();
+    if (refresh) initSelectedPeriod();
 }, { immediate: true });
 </script>
 
 <template>
-    <div class="metric-explorer-period-dropdown flex items-center gap-2">
+    <div>
         <p-select-dropdown :menu="state.periodMenuItems"
                            :selection-label="$t('INVENTORY.METRIC_EXPLORER.PERIOD.PERIOD')"
                            disable-proxy
@@ -188,12 +167,6 @@ watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
                            :selected="state.selectedPeriod"
                            @select="handleSelectPeriod"
         />
-        <p-badge v-if="state.showPeriodBadge"
-                 badge-type="subtle"
-                 style-type="gray200"
-        >
-            {{ state.periodBadgeText }}
-        </p-badge>
         <custom-date-modal
             :visible.sync="state.customDateModalVisible"
             :start="metricExplorerPageState.period?.start"

@@ -12,7 +12,7 @@
     >
         <div class="input-sizer">
             <input type="text"
-                   :placeholder="placeholder ? placeholder : dataType === DATA_TYPE.time ? String($t('COMPONENT.DATETIME_PICKER.SELECT_TIME')) : String($t('COMPONENT.DATETIME_PICKER.SELECT_DATE'))"
+                   :placeholder="placeholder ? placeholder : dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
                    data-input
                    :disabled="disabled"
                    :readonly="readonly"
@@ -29,9 +29,8 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -65,7 +64,7 @@ const FLATPICKR_MODE = Object.freeze({
 } as const);
 type FlatpickrMode = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE];
 
-export default defineComponent({
+export default {
     name: 'PDatetimePicker',
     components: {
         PI,
@@ -76,12 +75,13 @@ export default defineComponent({
     },
     props: {
         selectedDates: {
-            type: Array as PropType<DatetimePickerProps['selectedDates']>,
+            type: Array,
             default: () => ([]),
         },
         styleType: {
-            type: String as PropType<DatetimePickerProps['styleType']>,
+            type: String,
             default: STYLE_TYPE.default,
+            validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
         },
         invalid: {
             type: Boolean,
@@ -96,27 +96,29 @@ export default defineComponent({
             default: false,
         },
         minDate: {
-            type: [String, Date] as PropType<DatetimePickerProps['minDate']>,
+            type: [String, Date],
             default: undefined,
         },
         maxDate: {
-            type: [String, Date] as PropType<DatetimePickerProps['maxDate']>,
+            type: [String, Date],
             default: undefined,
         },
         selectMode: {
-            type: String as PropType<DatetimePickerProps['selectMode']>,
+            type: String,
             default: SELECT_MODE.single,
+            validator: (selectMode: any) => Object.values(SELECT_MODE).includes(selectMode),
         },
         dataType: {
-            type: String as PropType<DatetimePickerProps['dataType']>,
+            type: String,
             default: DATA_TYPE.yearToDate,
+            validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
         },
         placeholder: {
-            type: String as PropType<DatetimePickerProps['placeholder']>,
+            type: String,
             default: undefined,
         },
     },
-    setup(props, { emit }) {
+    setup(props: DatetimePickerProps, { emit }) {
         const state = reactive({
             datePickerRef: null as null | HTMLElement,
             datePicker: null as null | Instance,
@@ -246,7 +248,7 @@ export default defineComponent({
             DATA_TYPE,
         };
     },
-});
+};
 </script>
 <style lang="postcss">
 @import 'flatpickr/dist/flatpickr.css';

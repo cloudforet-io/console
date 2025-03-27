@@ -1,4 +1,4 @@
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 
 export const RECENT_TYPE = {
     SERVICE: 'SERVICE',

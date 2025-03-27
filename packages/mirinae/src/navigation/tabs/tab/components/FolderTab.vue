@@ -1,9 +1,7 @@
 <script setup lang="ts">
 
 
-import {
-    computed, reactive, ref, toRef,
-} from 'vue';
+import { reactive, ref, toRef } from 'vue';
 
 import { onClickOutside } from '@vueuse/core';
 
@@ -31,16 +29,6 @@ const contextMenuRef = ref<HTMLElement | null>(null);
 
 const state = reactive({
     visible: props.visibleSubMenu,
-});
-
-const menuItems = computed<MenuItem[]>(() => {
-    if (!props.tab?.subItems) return [];
-    return props.tab.subItems.map((item) => {
-        if (typeof item === 'string') {
-            return { name: item, label: item };
-        }
-        return item as unknown as MenuItem;
-    });
 });
 
 const handleSelectTab = () => {
@@ -75,10 +63,7 @@ onClickOutside(folderTabRef, () => {
 
 <template>
     <li ref="folderTabRef"
-        :class="{
-            'folder-tab': true,
-            active: props.tab.subItems?.some((subItem) => typeof subItem !== 'string' && activeTab === subItem.name)
-        }"
+        :class="{'folder-tab': true, active: props.tab.subItems?.some((subItem) => activeTab === subItem.name)}"
         role="tab"
         @keydown.enter="handleSelectTab"
         @click="handleSelectTab"
@@ -98,7 +83,7 @@ onClickOutside(folderTabRef, () => {
                         ref="contextMenuRef"
                         class="sub-item-menu"
                         :style="contextMenuStyle"
-                        :menu="menuItems"
+                        :menu="props.tab?.subItems || []"
                         :selected="props.selectedContextMenuItem ? [props.selectedContextMenuItem]: undefined"
                         @select="handleSelectTabMenu"
         />

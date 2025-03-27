@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import type {
-    PropType,
+    PropType, SetupContext,
 } from 'vue';
 import {
     computed, defineComponent, reactive, toRef, toRefs,
@@ -102,9 +102,7 @@ import vClickOutside from 'v-click-outside';
 import { focus as vFocus } from 'vue-focus';
 
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
-import type {
-    KeyItemSet, KeyMenuItem, ValueHandlerMap, ValueMenuItem,
-} from '@/controls/search/query-search/type';
+import type { KeyMenuItem, ValueMenuItem } from '@/controls/search/query-search/type';
 import PSearch from '@/controls/search/search/PSearch.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useQuerySearch } from '@/hooks/use-query-search/use-query-search';
@@ -142,15 +140,16 @@ export default defineComponent({
             default: false,
         },
         keyItemSets: {
-            type: Array as PropType<KeyItemSet[]>,
+            // FIXME:: below any type
+            type: Array as PropType<any>,
             default: () => [],
         },
         valueHandlerMap: {
-            type: Object as PropType<ValueHandlerMap>,
+            type: Object,
             default: () => ({}),
         },
     },
-    setup(props, context) {
+    setup(props, context: SetupContext) {
         const { slots, emit } = context;
         const state = reactive({
             visibleMenu: false,
@@ -191,14 +190,14 @@ export default defineComponent({
                 res[`${name.substring(5)}`] = d;
             }
             return res;
-        }, {} as Record<string, typeof slots[string]>));
+        }, {}));
 
         const searchSlots = computed(() => reduce(slots, (res, d, name) => {
             if (name.startsWith('search-') && !['search-left', 'search-default', 'search-right'].includes(name)) {
                 res[`${name.substring(7)}`] = d;
             }
             return res;
-        }, {} as Record<string, typeof slots[string]>));
+        }, {}));
 
         return {
             ...toRefs(querySearchState),

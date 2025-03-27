@@ -13,27 +13,24 @@
     </span>
 </template>
 <script lang="ts">
-import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
 import { get } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';
 
-import type { StateTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/state/type';
-import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
-import type { StateOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/state/type';
 import PStatus from '@/data-display/status/PStatus.vue';
 import type { StatusProps } from '@/data-display/status/type';
 import PLink from '@/navigation/link/PLink.vue';
 import { getColor } from '@/utils/helpers';
 
 
-export default defineComponent({
+export default defineComponent<StateDynamicFieldProps>({
     name: 'PDynamicFieldState',
     components: { PStatus, PLink },
     props: {
         options: {
-            type: Object as PropType<StateOptions>,
+            type: Object,
             default: () => ({}),
         },
         data: {
@@ -41,7 +38,7 @@ export default defineComponent({
             default: undefined,
         },
         typeOptions: {
-            type: Object as PropType<StateTypeOptions>,
+            type: Object,
             default: () => ({}),
         },
         extraData: {
@@ -49,7 +46,7 @@ export default defineComponent({
             default: () => ({}),
         },
         handler: {
-            type: Function as PropType<DynamicFieldHandler|undefined>,
+            type: Function,
             default: undefined,
         },
     },

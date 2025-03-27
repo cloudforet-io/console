@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
-import { useMutation } from '@tanstack/vue-query';
+import { ref, computed } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -13,36 +10,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssociatedCategories from '@/services/ops-flow/components/AssociatedCategories.vue';
-import { useAssociatedCategoriesToPackage } from '@/services/ops-flow/composables/use-associated-categories-to-package';
-import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-
 const taskManagementPageStore = useTaskManagementPageStore();
+const packageStore = usePackageStore();
 
-/* associated categories */
-const { associatedCategoriesToPackage } = useAssociatedCategoriesToPackage({
-    packageId: computed(() => taskManagementPageStore.state.targetPackageId),
-});
-
-/* delete package */
-const { invalidateQueries: invalidatePackagesQuery } = usePackagesQuery();
-const { packageAPI } = usePackageApi();
-const { mutateAsync: deletePackage, isPending: isDeleting } = useMutation({
-    mutationFn: packageAPI.delete,
-    onSuccess: () => {
-        invalidatePackagesQuery();
-        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string, '');
-    },
-    onError: (e) => {
-        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string);
-    },
-    onSettled: () => {
-        taskManagementPageStore.closeDeletePackageModal();
-    },
-});
-
-const deletable = computed(() => !associatedCategoriesToPackage.value.length);
+const deletable = computed(() => !taskManagementPageStore.getters.associatedCategoriesToPackage.length);
 const headerTitle = computed(() => (deletable.value
     ? _i18n.t('OPSFLOW.DELETE_TARGET_CONFIRMATION', {
         object: _i18n.t('OPSFLOW.PACKAGE'),
@@ -50,19 +24,25 @@ const headerTitle = computed(() => (deletable.value
     })
     : _i18n.t('OPSFLOW.DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') })));
 
-
-const handleConfirm = () => {
-    if (!taskManagementPageStore.state.targetPackageId) {
-        ErrorHandler.handleError(new Error('[Console Error] Cannot delete package without a target package'));
-        return;
+const loading = ref<boolean>(false);
+const handleConfirm = async () => {
+    loading.value = true;
+    try {
+        if (!taskManagementPageStore.state.targetPackageId) {
+            throw new Error('[Console Error] Cannot delete package without a target package');
+        }
+        await packageStore.delete(taskManagementPageStore.state.targetPackageId);
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string, '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_DELETE_TARGET', { target: _i18n.t('OPSFLOW.PACKAGE') }) as string);
+    } finally {
+        taskManagementPageStore.closeDeletePackageModal();
+        loading.value = false;
     }
-    deletePackage({ package_id: taskManagementPageStore.state.targetPackageId });
 };
-
 const handleCloseOrCancel = () => {
     taskManagementPageStore.closeDeletePackageModal();
 };
-
 const handleClosed = () => {
     taskManagementPageStore.resetTargetPackageId();
 };
@@ -73,7 +53,7 @@ const handleClosed = () => {
                     theme-color="alert"
                     :header-title="headerTitle"
                     :size="deletable ? 'sm' : 'md'"
-                    :loading="isDeleting"
+                    :loading="loading"
                     :disabled="!deletable"
                     @confirm="handleConfirm"
                     @close="handleCloseOrCancel"

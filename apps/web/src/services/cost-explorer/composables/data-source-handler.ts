@@ -2,10 +2,11 @@ import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
-import type { KeyItem, ValueHandler, KeyDataType } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { KeyItem } from '@cloudforet/mirinae/src/controls/search/query-search/type';
+import type { ValueHandler, KeyDataType } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { DATASOURCE_STATE_COLOR } from '@/services/cost-explorer/constants/datasource-constant';
 

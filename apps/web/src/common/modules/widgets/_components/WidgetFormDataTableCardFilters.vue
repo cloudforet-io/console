@@ -49,7 +49,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableSourceType, DataTableQueryFilter } from '@/common/modules/widgets/types/widget-model';
 
-import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 

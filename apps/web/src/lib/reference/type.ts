@@ -29,5 +29,4 @@ export interface Reference {
     resource_type: ResourceType;
     reference_key?: string;
     workspace_id?: string;
-    isAdminMode?: boolean;
 }

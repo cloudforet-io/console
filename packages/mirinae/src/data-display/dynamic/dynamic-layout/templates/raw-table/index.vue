@@ -29,6 +29,7 @@ import {
 } from 'vue';
 
 import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
 import PDynamicLayoutTable from '@/data-display/dynamic/dynamic-layout/templates/table/index.vue';
 import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
 import type { RawTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -36,7 +37,7 @@ import { getValueByPath } from '@/data-display/dynamic/helper';
 import { getSortingData } from '@/utils';
 
 
-export default defineComponent({
+export default defineComponent<RawTableDynamicLayoutProps>({
     name: 'PDynamicLayoutRawTable',
     components: {
         PDynamicLayoutTable,

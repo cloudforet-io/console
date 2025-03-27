@@ -4,7 +4,7 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PublicDashboardChangeFolderParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/change-folder';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
@@ -17,7 +17,7 @@ import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/pu
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 
 interface UsePublicDashboardApiReturn {
-    publicDashboardGetQueryKey: ComputedRef<QueryKey>;
+    publicDashboardQueryKey: ComputedRef<QueryKey>;
     publicDashboardListQueryKey: ComputedRef<QueryKey>;
     publicDashboardAPI: {
         create: (params: PublicDashboardCreateParameters) => Promise<PublicDashboardModel>;
@@ -32,8 +32,8 @@ interface UsePublicDashboardApiReturn {
 }
 
 export const usePublicDashboardApi = (): UsePublicDashboardApiReturn => {
-    const publicDashboardGetQueryKey = useAPIQueryKey('dashboard', 'public-dashboard', 'get');
-    const publicDashboardListQueryKey = useAPIQueryKey('dashboard', 'public-dashboard', 'list');
+    const publicDashboardQueryKey = useAPIQueryKey('public-dashboard/get');
+    const publicDashboardListQueryKey = useAPIQueryKey('public-dashboard/list');
 
     const actions = {
         async create(params: PublicDashboardCreateParameters) {
@@ -63,7 +63,7 @@ export const usePublicDashboardApi = (): UsePublicDashboardApiReturn => {
     };
 
     return {
-        publicDashboardGetQueryKey,
+        publicDashboardQueryKey,
         publicDashboardListQueryKey,
         publicDashboardAPI: actions,
     };

@@ -4,7 +4,7 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateWidgetCreateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/create';
@@ -17,7 +17,7 @@ import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/priv
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 
 interface UsePrivateWidgetApiReturn {
-    privateWidgetGetQueryKey: ComputedRef<QueryKey>;
+    privateWidgetQueryKey: ComputedRef<QueryKey>;
     privateWidgetListQueryKey: ComputedRef<QueryKey>;
     privateWidgetLoadQueryKey: ComputedRef<QueryKey>;
     privateWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
@@ -33,10 +33,10 @@ interface UsePrivateWidgetApiReturn {
 }
 
 export const usePrivateWidgetApi = (): UsePrivateWidgetApiReturn => {
-    const privateWidgetGetQueryKey = useAPIQueryKey('dashboard', 'private-widget', 'get');
-    const privateWidgetListQueryKey = useAPIQueryKey('dashboard', 'private-widget', 'list');
-    const privateWidgetLoadQueryKey = useAPIQueryKey('dashboard', 'private-widget', 'load');
-    const privateWidgetLoadSumQueryKey = useAPIQueryKey('dashboard', 'private-widget', 'load-sum');
+    const privateWidgetQueryKey = useAPIQueryKey('private-widget/get');
+    const privateWidgetListQueryKey = useAPIQueryKey('private-widget/list');
+    const privateWidgetLoadQueryKey = useAPIQueryKey('private-widget/load');
+    const privateWidgetLoadSumQueryKey = useAPIQueryKey('private-widget/load-sum');
 
     const action = {
         async create(params: PrivateWidgetCreateParameters) {
@@ -63,7 +63,7 @@ export const usePrivateWidgetApi = (): UsePrivateWidgetApiReturn => {
     };
 
     return {
-        privateWidgetGetQueryKey,
+        privateWidgetQueryKey,
         privateWidgetListQueryKey,
         privateWidgetLoadQueryKey,
         privateWidgetLoadSumQueryKey,

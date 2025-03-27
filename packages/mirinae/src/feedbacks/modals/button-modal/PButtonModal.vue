@@ -5,12 +5,11 @@
                     @after-leave="onModalLeave"
         >
             <div class="modal-mask"
-                 :class="{
-                     'no-backdrop':!backdrop,
+                 :class="[{'no-backdrop':!backdrop}, {
                      'absolute': !!absolute,
                      'loading-backdrop': loadingBackdrop
-                 }"
-                 :style="absolute ? {'top': `${absolute}rem`, 'left': `${absolute}rem`} : {}"
+                 }]"
+                 :style="absolute ? [{'top': `${absolute}rem`}, {'left': `${absolute}rem`}] : {}"
             >
                 <p-spinner v-if="loadingBackdrop"
                            size="xl"
@@ -26,7 +25,7 @@
                 >
                     <article class="modal-content"
                              :class="[`modal-${themeColor}`, {'no-footer': hideFooter}]"
-                             :style="absolute ? {maxHeight: `calc(100vh - 4rem - ${absolute}rem`} : {}"
+                             :style="absolute ? {'max-height': `calc(100vh - 4rem - ${absolute}rem`} : {}"
                     >
                         <h3 class="header">
                             <slot v-if="!hideHeader"
@@ -125,15 +124,16 @@ import PButton from '@/controls/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/controls/buttons/button/type';
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import type { ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
-import type { ModalSizeType } from '@/feedbacks/modals/type';
+import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
+import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
+import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
 
 
 
-export default defineComponent({
+export default defineComponent<ButtonModalProps>({
     name: 'PButtonModal',
     components: {
         PSpinner,
@@ -151,8 +151,9 @@ export default defineComponent({
             default: false,
         },
         size: {
-            type: String as PropType<ModalSizeType>,
+            type: String,
             default: 'md',
+            validator: (value: string) => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,
@@ -163,8 +164,11 @@ export default defineComponent({
             default: undefined,
         },
         themeColor: {
-            type: String as PropType<ModalThemeColor>,
+            type: String,
             default: 'primary',
+            validator(themeColor: any) {
+                return THEME_COLORS.includes(themeColor);
+            },
         },
         headerTitle: {
             type: String as PropType<string|TranslateResult>,

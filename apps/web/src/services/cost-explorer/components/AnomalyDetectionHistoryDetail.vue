@@ -2,7 +2,7 @@
 import {
     PLink,
 } from '@cloudforet/mirinae';
-
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import AnomalyDetectionHistoryDetailTrend
     from '@/services/cost-explorer/components/AnomalyDetectionHistoryDetailTrend.vue';
@@ -14,7 +14,7 @@ import AnomalyDetectionHistoryDetailTrend
             <p>
                 <strong>{{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CONFIG.TITLE') }}: </strong>
                 <p-link :to="{}"
-                        action-icon="internal-link"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         class="col-name"
                 >

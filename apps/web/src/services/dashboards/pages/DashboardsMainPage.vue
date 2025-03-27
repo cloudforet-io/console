@@ -14,18 +14,17 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
+import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type {
     HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
-import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DashboardListParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { SpaceRouter } from '@/router';
-
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -34,6 +33,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
@@ -44,7 +44,6 @@ import {
     getDashboardTreeData,
     isPublicControlButtonDisabled,
 } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
@@ -55,6 +54,7 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 const queryTagsHelper = useQueryTags({
@@ -236,10 +236,7 @@ const fetchSearchedDashboard = async (dashboardType: 'PUBLIC' | 'PRIVATE'): Prom
 };
 
 /* Event */
-const handleCreateDashboard = () => {
-    const dashboardCreateRouteName = storeState.isAdminMode ? ADMIN_DASHBOARDS_ROUTE.CREATE._NAME : DASHBOARDS_ROUTE.CREATE._NAME;
-    router.push({ name: dashboardCreateRouteName }).catch(() => {});
-};
+const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
 const handleCreateFolder = () => {
     dashboardPageControlStore.setFolderFormModalType('CREATE');
     dashboardPageControlStore.setFolderFormModalVisible(true);

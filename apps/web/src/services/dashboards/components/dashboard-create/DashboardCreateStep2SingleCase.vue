@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -18,6 +17,7 @@ import type {
     PrivateDashboardCreateParameters,
 } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -26,6 +26,7 @@ import { useUserStore } from '@/store/user/user-store';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
@@ -33,7 +34,6 @@ import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboa
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 
@@ -44,7 +44,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 }>();
 
-const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
@@ -147,13 +147,10 @@ const { mutate: createDashboard } = useMutation(
         },
         onSettled(data) {
             if (data?.dashboard_id) {
-                const dashboardDetailRouteName = storeState.isAdminMode
-                    ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-                    : DASHBOARDS_ROUTE.DETAIL._NAME;
-                router.push({
-                    name: dashboardDetailRouteName,
+                SpaceRouter.router.push(getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: { dashboardId: data.dashboard_id },
-                }).catch(() => {});
+                }));
             }
         },
     },

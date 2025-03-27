@@ -1,6 +1,5 @@
-import type { TaskPriority, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
-import type { FileModel } from '@/schema/file-manager/model';
-
+import type { FileModel } from '../../../../schema/file-manager/model';
+import type { TaskPriority, TaskStatusType } from './type';
 
 export interface TaskModel {
     task_id: string;

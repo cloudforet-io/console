@@ -18,13 +18,14 @@ import { useProxyValue } from '@/hooks';
 
 
 
-
-const props = withDefaults(defineProps<{
+interface Props {
     treeData: TreeNode[];
     treeDisplayMap?: TreeDisplayMap;
     selectedId?: string;
     useDefaultIndent?: boolean;
-}>(), {
+}
+
+const props = withDefaults(defineProps<Props>(), {
     treeDisplayMap: () => ({}),
     selectedId: undefined,
 });

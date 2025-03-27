@@ -15,20 +15,20 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance,
+    computed, getCurrentInstance,
     reactive, toRefs,
 } from 'vue';
-import type { PropType } from 'vue';
 import type Vue from 'vue';
 
-import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import type { MarkdownOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type {
+    MarkdownDynamicLayoutProps,
+} from '@/data-display/dynamic/dynamic-layout/templates/markdown/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 
 
-export default defineComponent({
+export default {
     name: 'PDynamicLayoutMarkdown',
     components: {
         PMarkdown,
@@ -40,7 +40,7 @@ export default defineComponent({
             required: true,
         },
         options: {
-            type: Object as PropType<MarkdownOptions>,
+            type: Object,
             default: () => ({}),
         },
         data: {
@@ -48,15 +48,15 @@ export default defineComponent({
             default: undefined,
         },
         fetchOptions: {
-            type: Object as PropType<DynamicLayoutFetchOptions>,
+            type: Object,
             default: undefined,
         },
         typeOptions: {
-            type: Object as PropType<DynamicLayoutTypeOptions>,
+            type: Object,
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props: MarkdownDynamicLayoutProps) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
@@ -73,5 +73,5 @@ export default defineComponent({
             ...toRefs(state),
         };
     },
-});
+};
 </script>

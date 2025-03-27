@@ -1,17 +1,11 @@
 <template>
-    <p-card class="p-list-card"
-            :header="header"
-            :style-type="styleType"
+    <p-card class="p-list-card" :header="header" :style-type="styleType"
             :class="{'no-data': items.length === 0, hoverable}"
     >
-        <template v-if="$scopedSlots.header"
-                  #header
-        >
+        <template v-if="$scopedSlots.header" #header>
             <slot name="header" />
         </template>
-        <p-data-loader :data="items"
-                       :loading="loading"
-                       spinner-size="lg"
+        <p-data-loader :data="items" :loading="loading" spinner-size="lg"
                        :disable-empty-case="disableEmptyCase"
         >
             <template #loader>
@@ -21,13 +15,10 @@
                 <slot name="no-data" />
             </template>
             <ul>
-                <li v-for="(item, index) in items"
-                    :key="`${contextKey}-${index}`"
+                <li v-for="(item, index) in items" :key="`${contextKey}-${index}`"
                     @click="$emit('click', index)"
                 >
-                    <slot name="item"
-                          v-bind="{item, index}"
-                    >
+                    <slot name="item" v-bind="{item, index}">
                         {{ item }}
                     </slot>
                 </li>
@@ -38,7 +29,6 @@
 
 <script lang="ts">
 
-import type { PropType } from 'vue';
 import {
     defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -48,8 +38,14 @@ import PCard from '@/data-display/cards/card/PCard.vue';
 import type { CardProps } from '@/data-display/cards/card/type';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
+interface Props extends CardProps {
+    items: any[];
+    loading?: boolean;
+    disableEmptyCase?: boolean;
+    hoverable?: boolean;
+}
 
-export default defineComponent({
+export default defineComponent<Props>({
     name: 'PListCard',
     components: { PDataLoader, PCard },
     props: {
@@ -59,8 +55,11 @@ export default defineComponent({
             default: '',
         },
         styleType: {
-            type: String as PropType<CardProps['styleType']>,
+            type: String,
             default: CARD_STYLE_TYPE.gray100,
+            validator(styleType: any) {
+                return Object.values(CARD_STYLE_TYPE).includes(styleType);
+            },
         },
         /* list card props */
         items: {
@@ -80,7 +79,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props) {
+    setup(props: Props) {
         const state = reactive({
             contextKey: Math.floor(Math.random() * Date.now()),
         });

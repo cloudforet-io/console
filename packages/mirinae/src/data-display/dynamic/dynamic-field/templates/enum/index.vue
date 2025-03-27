@@ -14,12 +14,12 @@ import {
 } from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import type { EnumTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/enum/type';
+import type { EnumTypeOptions, EnumDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/enum/type';
 import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { EnumItem, EnumOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
-export default defineComponent({
+export default defineComponent<EnumDynamicFieldProps>({
     name: 'PDynamicFieldEnum',
     components: { PDynamicField },
     props: {

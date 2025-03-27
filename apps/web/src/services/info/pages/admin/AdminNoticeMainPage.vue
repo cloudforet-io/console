@@ -6,12 +6,14 @@ import {
     PButton, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import NoticeList from '@/services/info/components/NoticeList.vue';
-import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 const router = useRouter();
 
@@ -24,7 +26,7 @@ const storeState = reactive({
 });
 
 const handleCreateNotice = () => {
-    router.push({ name: ADMIN_INFO_ROUTE.NOTICE.CREATE._NAME });
+    router.push({ name: makeAdminRouteName(INFO_ROUTE.NOTICE.CREATE._NAME) });
 };
 </script>
 

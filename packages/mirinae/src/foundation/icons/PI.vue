@@ -17,8 +17,21 @@ import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
 import type { AnimationType } from '@/foundation/icons/config';
+import { ANIMATION_TYPE } from '@/foundation/icons/config';
 /* https://www.npmjs.com/package/vue-svgicon */
-export default defineComponent({
+interface Props {
+    name: string;
+    dir?: string;
+    fill?: boolean;
+    width: string;
+    height: string;
+    scale?: string;
+    color?: string;
+    original?: boolean;
+    title?: string;
+    animation?: AnimationType;
+}
+export default defineComponent<Props>({
     name: 'PI',
     props: {
         name: {
@@ -60,6 +73,9 @@ export default defineComponent({
         animation: {
             type: String as PropType<AnimationType|undefined>,
             default: undefined,
+            validator(animation: AnimationType|undefined) {
+                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+            },
         },
     },
 });

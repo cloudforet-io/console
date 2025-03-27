@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useUserStore } from '@/store/user/user-store';
 

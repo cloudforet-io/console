@@ -4,9 +4,9 @@ import { computed, reactive, watch } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupCreateParameters } from '@/api-clients/identity/user-group/schema/api-verbs/create';
-import type { UserGroupUpdateParameters } from '@/api-clients/identity/user-group/schema/api-verbs/update';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import type { UserGroupCreateParameters } from '@/schema/identity/user-group/api-verbs/create';
+import type { UserGroupUpdateParameters } from '@/schema/identity/user-group/api-verbs/update';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 
 import type { PrivateDashboardDeleteParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/delete';
 import type { PublicDashboardDeleteParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/delete';
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -20,7 +20,6 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const recentStore = useRecentStore();
@@ -36,11 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void,
 }>();
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
-const appContextStore = useAppContextStore();
-const router = useRouter();
 /* Query */
 const {
     api,
@@ -49,7 +47,6 @@ const {
 } = useDashboardQuery();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
@@ -96,10 +93,7 @@ const { mutate: deleteDashboard, isPending: loading } = useMutation(
                 });
             }
             state.proxyVisible = false;
-            const dashboardRouteName = storeState.isAdminMode
-                ? ADMIN_DASHBOARDS_ROUTE._NAME
-                : DASHBOARDS_ROUTE._NAME;
-            await router.replace({ name: dashboardRouteName }).catch(() => {});
+            await SpaceRouter.router.replace(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
         },
         onError(error) {
             ErrorHandler.handleRequestError(error, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));

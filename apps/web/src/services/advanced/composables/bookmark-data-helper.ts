@@ -1,5 +1,6 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import type { QueryItem, ValueItem, ValueHandler } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import type { QueryItem, ValueItem } from '@cloudforet/mirinae/src/controls/search/query-search/type';
+import type { ValueHandler } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { i18n } from '@/translations';
 

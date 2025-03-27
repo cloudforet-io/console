@@ -15,9 +15,7 @@ export default class ServiceAPI {
 
     tokenApi: TokenAPI;
 
-    serviceConfig: Record<string, any> = {};
-
-    constructor(baseURL: string, tokenApi: TokenAPI, settings: CreateAxiosDefaults = {}, serviceConfig: Record<string, any> = {}) {
+    constructor(baseURL: string, tokenApi: TokenAPI, settings: CreateAxiosDefaults = {}) {
         this.instance = axios.create({
             ...settings,
             headers: {
@@ -26,7 +24,6 @@ export default class ServiceAPI {
             baseURL,
         });
         this.tokenApi = tokenApi;
-        this.serviceConfig = serviceConfig;
         tokenApi.loadToken();
         this.setAxiosInterceptors();
     }
@@ -57,13 +54,6 @@ export default class ServiceAPI {
             const token = this.tokenApi.getAccessToken();
             if (!auth && token) request.headers.Authorization = `Bearer ${token}`;
 
-            // Check if the service is enabled
-            const serviceName = ServiceAPI.extractServiceNameFromEndpoint(request.url || '');
-            const serviceInfo = this.serviceConfig[serviceName];
-            if (serviceInfo && serviceInfo.ENABLED === false) {
-                throw new Error(`[ServiceAPI] ${serviceName} service is disabled.`);
-            }
-
             return request;
         });
 
@@ -72,11 +62,5 @@ export default class ServiceAPI {
             (response: AxiosResponse) => response,
             this.handleResponseError,
         );
-    }
-
-    private static extractServiceNameFromEndpoint(url: string): string {
-        const service = url.split('/')[1];
-        if (service) return service.replace(/-/g, '_').toUpperCase();
-        return '';
     }
 }

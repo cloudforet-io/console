@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive, watch } from 'vue';
 
 import { jwtDecode } from 'jwt-decode';
@@ -11,18 +9,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { isInstanceOfAPIError } from '@cloudforet/core-lib/space-connector/error';
 
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-verbs/get';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
-import type { RoleType } from '@/api-clients/identity/role/type';
-import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
-import type { TokenIssueParameters } from '@/api-clients/identity/token/schema/api-verbs/issue';
+import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
+import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type {
     TokenGrantModel,
     TokenIssueModel,
-} from '@/api-clients/identity/token/schema/model';
-import type { UserProfileUpdateParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/update';
-import type { UserModel, UserMfa } from '@/api-clients/identity/user/schema/model';
+} from '@/schema/identity/token/model';
+import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
+import type { UserModel, UserMfa } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -152,7 +150,7 @@ export const useUserStore = defineStore('user-store', () => {
         pageAccessPermissionList: computed<MenuId[]>(() => {
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions, getters.domainId);
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
             const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
 
@@ -172,7 +170,7 @@ export const useUserStore = defineStore('user-store', () => {
 
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions, getters.domainId);
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 
             const isAllReadOnly = checkAllMenuReadonly(roleBasePagePermissions);

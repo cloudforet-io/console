@@ -41,13 +41,12 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent,
+    computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import type { TextButtonSize, TextButtonStyle } from '@/controls/buttons/text-button/type';
+import type { TextButtonSize, TextButtonStyle, TextButtonProps } from '@/controls/buttons/text-button/type';
 import { TEXT_BUTTON_SIZE, TEXT_BUTTON_STYLE } from '@/controls/buttons/text-button/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
 
@@ -57,23 +56,29 @@ const ICON_WIDTH: Record<TextButtonSize, string> = {
     md: '1rem',
     lg: '1.25rem',
 };
-const LOADING_SIZE: Record<TextButtonSize, SpinnerSize> = {
+const LOADING_SIZE: Record<TextButtonSize, string> = {
     sm: SPINNER_SIZE.xs,
     md: SPINNER_SIZE.sm,
     lg: SPINNER_SIZE.sm,
 };
 
-export default defineComponent({
+export default defineComponent<TextButtonProps>({
     name: 'PTextButton',
     components: { PI, PSpinner },
     props: {
         styleType: {
             type: String as PropType<TextButtonStyle>,
             default: TEXT_BUTTON_STYLE.default,
+            validator(value: TextButtonStyle): boolean {
+                return Object.values(TEXT_BUTTON_STYLE).includes(value);
+            },
         },
         size: {
             type: String as PropType<TextButtonSize>,
             default: TEXT_BUTTON_SIZE.md,
+            validator(value: TextButtonSize): boolean {
+                return Object.values(TEXT_BUTTON_SIZE).includes(value);
+            },
         },
         iconLeft: {
             type: String,
@@ -97,12 +102,13 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const iconSize = computed(() => ICON_WIDTH[props.size ?? ''] ?? ICON_WIDTH.md);
-        const loadingIconSize = computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md);
+        const state = reactive({
+            iconSize: computed(() => ICON_WIDTH[props.size ?? ''] ?? ICON_WIDTH.md),
+            loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
+        });
 
         return {
-            iconSize,
-            loadingIconSize,
+            ...toRefs(state),
         };
     },
 });

@@ -6,7 +6,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

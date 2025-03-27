@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import type { Component } from 'vue';
 
 import categoryBy from '@/common/modules/widgets/_widget-fields/category-by/WidgetFieldCategoryBy.vue';

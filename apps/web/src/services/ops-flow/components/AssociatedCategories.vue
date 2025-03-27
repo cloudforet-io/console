@@ -6,14 +6,10 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 
 import { i18n } from '@/translations';
 
-import { useAssociatedCategoriesToPackage } from '@/services/ops-flow/composables/use-associated-categories-to-package';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
 
-
 const taskManagementPageStore = useTaskManagementPageStore();
-const { associatedCategoriesToPackage } = useAssociatedCategoriesToPackage({
-    packageId: computed(() => taskManagementPageStore.state.targetPackageId),
-});
+
 const fields = computed<DataTableField[]>(() => [
     {
         name: 'name',
@@ -36,7 +32,7 @@ const fields = computed<DataTableField[]>(() => [
             {{ $t('OPSFLOW.TARGET_LIST', {target: $t('OPSFLOW.CATEGORY')}) }}
         </p-field-title>
         <p-data-table :fields="fields"
-                      :items="associatedCategoriesToPackage"
+                      :items="taskManagementPageStore.getters.associatedCategoriesToPackage"
         />
     </div>
 </template>

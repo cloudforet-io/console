@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router/composables';
 import {
     PIconButton, PPopover, PLink, PEmpty, PTooltip, PSkeleton, PSelectDropdown, PButton, PI,
 } from '@cloudforet/mirinae';
+import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
@@ -149,7 +150,7 @@ watch(() => state.etcMenuVisible, (_etcMenuVisible) => {
                 <p-popover v-if="props.fullDataLinkList.length > 1"
                            position="bottom-end"
                            :is-visible.sync="state.popperVisible"
-                           trigger="click"
+                           :trigger="POPOVER_TRIGGER.CLICK"
                 >
                     <p-icon-button style-type="tertiary"
                                    size="sm"

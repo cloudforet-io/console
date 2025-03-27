@@ -11,7 +11,7 @@
                  :class="{[size]: true, 'fixed-size': isFixedSize}"
             >
                 <div class="inner"
-                     :style="{overflowY: disableScroll ? 'unset' : 'auto'}"
+                     :style="{'overflow-y': disableScroll ? 'unset' : 'auto'}"
                 >
                     <p class="title"
                        :class="{'mb-4': !!title || !!$scopedSlots.title}"
@@ -39,13 +39,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
-import type { SidebarProps } from '@/layouts/sidebar/type';
 import {
     STYLE_TYPE as SIDEBAR_STYLE_TYPE,
     SIZE as SIDEBAR_SIZE,
@@ -69,12 +67,14 @@ export default defineComponent({
             default: '',
         },
         styleType: {
-            type: String as PropType<SidebarProps['styleType']>,
+            type: String,
             default: SIDEBAR_STYLE_TYPE.primary,
+            validator: (value) => Object.keys(SIDEBAR_STYLE_TYPE).includes(value as string),
         },
         size: {
-            type: String as PropType<SidebarProps['size']>,
+            type: String,
             default: SIDEBAR_SIZE.md,
+            validator: (value) => Object.keys(SIDEBAR_SIZE).includes(value as string),
         },
         isFixedSize: {
             type: Boolean,

@@ -4,7 +4,7 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PrivateDashboardChangeFolderParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/change-folder';
 import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
@@ -15,7 +15,7 @@ import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/p
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 
 interface UsePrivateDashboardApiReturn {
-    privateDashboardGetQueryKey: ComputedRef<QueryKey>;
+    privateDashboardQueryKey: ComputedRef<QueryKey>;
     privateDashboardListQueryKey: ComputedRef<QueryKey>;
     privateDashboardAPI: {
         create: (params: PrivateDashboardCreateParameters) => Promise<PrivateDashboardModel>;
@@ -29,8 +29,8 @@ interface UsePrivateDashboardApiReturn {
 
 
 export const usePrivateDashboardApi = (): UsePrivateDashboardApiReturn => {
-    const privateDashboardGetQueryKey = useAPIQueryKey('dashboard', 'private-dashboard', 'get');
-    const privateDashboardListQueryKey = useAPIQueryKey('dashboard', 'private-dashboard', 'list');
+    const privateDashboardQueryKey = useAPIQueryKey('private-dashboard/get');
+    const privateDashboardListQueryKey = useAPIQueryKey('private-dashboard/list');
 
     const actions = {
         async create(params: PrivateDashboardCreateParameters) {
@@ -54,7 +54,7 @@ export const usePrivateDashboardApi = (): UsePrivateDashboardApiReturn => {
     };
 
     return {
-        privateDashboardGetQueryKey,
+        privateDashboardQueryKey,
         privateDashboardListQueryKey,
         privateDashboardAPI: actions,
     };

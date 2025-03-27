@@ -55,7 +55,7 @@ export interface DynamicLayoutFieldExtraData extends DynamicField {
     index: number;
 }
 
-export type DynamicLayoutFieldHandler<T = any> = DynamicFieldHandler<
+export type DynamicLayoutFieldHandler<T = undefined> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicLayoutFieldExtraData & T

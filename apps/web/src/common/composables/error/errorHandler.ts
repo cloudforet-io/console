@@ -68,20 +68,11 @@ export default class ErrorHandler {
         };
     }
 
-    static handleRequestError(error: unknown, errorMessage: TranslateResult, toast = false) {
+    static handleRequestError(error: unknown, errorMessage: TranslateResult) {
         if (!isInstanceOfAuthorizationError(error)) {
-            if (isInstanceOfBadRequestError(error) && errorMessage) {
-                showErrorMessage(errorMessage, error);
-                this.handleError(error);
-                return;
-            }
-            if (isInstanceOfAPIError(error)) {
-                showErrorMessage('Something is Wrong! Please contact the administrator.', error);
-                this.handleError(error);
-                return;
-            }
+            if (isInstanceOfBadRequestError(error) && errorMessage) showErrorMessage(errorMessage, error);
+            else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
         }
-        if (toast) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
         this.handleError(error);
     }
 }

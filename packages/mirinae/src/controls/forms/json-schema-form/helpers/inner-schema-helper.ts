@@ -121,7 +121,7 @@ export const getSchemaProperties = (schema?: JsonSchema, referenceHandler?: Refe
                 multiInputMode: getMultiInputMode(schemaProperty),
                 useAutoComplete: getUseAutoComplete(schemaProperty),
                 appearanceType: getAppearanceType(schemaProperty),
-                referenceHandler: referenceHandler ? getReferenceHandler(k, schemaProperty, referenceHandler) : undefined,
+                referenceHandler: getReferenceHandler(k, schemaProperty, referenceHandler),
             };
             return refined;
         }).sort((a, b) => {

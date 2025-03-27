@@ -19,9 +19,10 @@ import {
     useContextMenuController,
     PSelectButtonGroup,
 } from '@cloudforet/mirinae';
-import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { ValueItem } from '@cloudforet/mirinae/src/controls/search/query-search/type';
 
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -100,7 +101,7 @@ const moreState = reactive({
         ...i,
         name: i.id,
         label: i.name,
-        type: 'item',
+        type: CONTEXT_MENU_TYPE.item,
     }))),
     selectedItems: [] as MoreMenuItem[],
 });

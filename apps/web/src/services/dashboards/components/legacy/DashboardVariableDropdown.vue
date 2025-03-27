@@ -16,7 +16,7 @@ import type {
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { DashboardVariableSchemaProperty, DashboardVariables } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ReferenceMap } from '@/store/reference/type';

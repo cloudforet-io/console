@@ -80,7 +80,7 @@ watch(() => props.src, (src, before) => {
                  :style="{
                      height: state.isRectangle ? 'auto' : height,
                      width,
-                     maxHeight: height,
+                     'max-height': height,
                  }"
                  :src="props.src || ''"
                  :alt="alt"

@@ -12,27 +12,28 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
     LSBItem, LSBMenu,
 } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
+import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory-v1/components/CloudServiceLSBDropdownMenuItem.vue';
 import {
     CLOUD_SERVICE_FILTER_KEY,
-    CLOUD_SERVICE_GLOBAL_FILTER_KEY, UNIDENTIFIED_PROVIDER,
-} from '@/services/asset-inventory/constants/cloud-service-constant';
-import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+    CLOUD_SERVICE_GLOBAL_FILTER_KEY,
+} from '@/services/asset-inventory-v1/constants/cloud-service-constant';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory-v1/stores/cloud-service-detail-page-store';
+import { useCloudServicePageStore } from '@/services/asset-inventory-v1/stores/cloud-service-page-store';
+import type { CloudServiceDetailPageParams } from '@/services/asset-inventory-v1/types/cloud-service-detail-page-type';
 
 const PROJECT_MENU_ID = 'project';
 const SERVICE_ACCOUNT_MENU_ID = 'service-account';
@@ -40,8 +41,8 @@ const PROVIDER_MENU_ID = 'provider';
 const CATEGORY_MENU_ID = 'category';
 const REGION_MENU_ID = 'region';
 
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
-const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
@@ -53,48 +54,31 @@ const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentGrantInfo: computed(() => userStore.state.currentGrantInfo),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
-        || route.name === ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
+    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME
+        || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME)),
     detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
         if (state.isCloudServiceDetailPage) return route.params as unknown as CloudServiceDetailPageParams;
         return undefined;
     }),
     cloudServiceMainMenuSet: computed<LSBItem[]>(() => ([
         {
-            type: MENU_ITEM_TYPE.TOP_TITLE,
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.PROVIDER'),
-        },
-        {
-            type: MENU_ITEM_TYPE.SLOT,
             id: PROVIDER_MENU_ID,
         },
         {
-            type: MENU_ITEM_TYPE.DIVIDER,
-        },
-        {
-            type: MENU_ITEM_TYPE.SLOT,
-            id: UNIDENTIFIED_PROVIDER,
-        },
-        {
-            type: MENU_ITEM_TYPE.TOP_TITLE,
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY'),
-        },
-        {
-            type: MENU_ITEM_TYPE.SLOT,
             id: CATEGORY_MENU_ID,
         },
         {
-            type: MENU_ITEM_TYPE.TOP_TITLE,
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.REGION'),
-        },
-        {
-            type: MENU_ITEM_TYPE.SLOT,
             id: REGION_MENU_ID,
         },
     ])),
@@ -102,14 +86,11 @@ const state = reactive({
         const selectedItem = cloudServiceDetailPageState.cloudServiceTypeList[0];
         const results: LSBItem[] = [
             {
-                type: MENU_ITEM_TYPE.DIVIDER,
-            },
-            {
                 type: MENU_ITEM_TYPE.BUTTON_TITLE,
                 label: state.detailPageParams.group,
                 id: selectedItem?.group,
                 isBackLink: true,
-                to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME }),
                 titleIcon: get(selectedItem, ['tags', 'spaceone:icon'], ''),
             },
         ];
@@ -118,29 +99,20 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.ITEM,
                 label: d.name,
                 id: d.cloud_service_type_key,
-                to: {
-                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: { ...state.detailPageParams, name: d.name },
-                },
+                to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } }),
             });
         });
         return results;
     }),
     menuSet: computed<LSBMenu[]>(() => [
         {
-            type: MENU_ITEM_TYPE.TOP_TITLE,
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.PROJECT'),
-        },
-        {
-            type: MENU_ITEM_TYPE.SLOT,
             id: PROJECT_MENU_ID,
         },
         {
-            type: MENU_ITEM_TYPE.TOP_TITLE,
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
             label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_ACCOUNT'),
-        },
-        {
-            type: MENU_ITEM_TYPE.SLOT,
             id: SERVICE_ACCOUNT_MENU_ID,
         },
         ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
@@ -155,7 +127,6 @@ const providerState = reactive({
         })),
     ]),
     selectedItem: computed(() => {
-        if (UNIDENTIFIED_PROVIDER === cloudServicePageState.selectedProvider) return UNIDENTIFIED_PROVIDER;
         const item = storeState.providers[cloudServicePageState.selectedProvider];
         if (item) {
             return storeState.providers[cloudServicePageState.selectedProvider].key;
@@ -169,16 +140,15 @@ const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) =
 };
 
 const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
-    await router.replace({
-        name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+    await router.replace(getProperRouteLocation({
+        name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: params.provider,
             group: params.group,
             name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
         },
         query: route.query,
-    }).catch(() => {
-    });
+    }));
     await cloudServiceDetailPageStore.setSelectedCloudServiceType();
 };
 const handleSelectProvider = (selected: string) => {
@@ -198,23 +168,23 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
 <template>
     <l-s-b :menu-set="state.menuSet"
            class="cloud-service-l-s-b"
-           :class="{'is-admin-mode': storeState.isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
+           :class="{'is-admin-mode': isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
     >
-        <template #slot-project>
+        <template #collapsible-contents-project>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     is-global-filter
                                                     :type="CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
-        <template #slot-service-account>
+        <template #collapsible-contents-service-account>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     is-global-filter
                                                     :type="CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
-        <template #slot-provider>
+        <template #collapsible-contents-provider>
             <p-radio-group direction="vertical"
                            class="provider-radio-group"
             >
@@ -236,23 +206,13 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
                 </p-radio>
             </p-radio-group>
         </template>
-        <template #slot-Unidentified>
-            <p-radio :key="UNIDENTIFIED_PROVIDER"
-                     class="provider-item mb-3 mx-1"
-                     :value="UNIDENTIFIED_PROVIDER"
-                     :selected="providerState.selectedItem"
-                     @change="handleSelectProvider"
-            >
-                Unidentified assets
-            </p-radio>
-        </template>
-        <template #slot-category>
+        <template #collapsible-contents-category>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     :type="CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
-        <template #slot-region>
+        <template #collapsible-contents-region>
             <cloud-service-l-s-b-dropdown-menu-item class="collapsible-item"
                                                     :type="CLOUD_SERVICE_FILTER_KEY.REGION"
                                                     :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.REGION')"
@@ -280,11 +240,6 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
     }
     &:deep(.l-s-b-collapsible-menu-item) {
         margin-top: 0.5rem;
-    }
-
-    .collapsible-item {
-        width: 100%;
-        margin: 0 0.375rem 0.75rem 0.375rem;
     }
 }
 </style>

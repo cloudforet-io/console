@@ -16,20 +16,18 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
-import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import type { RawOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 
 
-export default defineComponent({
+export default {
     name: 'PDynamicLayoutRaw',
     components: {
         PHeading,
@@ -41,7 +39,7 @@ export default defineComponent({
             required: true,
         },
         options: {
-            type: Object as PropType<RawOptions>,
+            type: Object,
             default: () => ({}),
         },
         data: {
@@ -49,15 +47,15 @@ export default defineComponent({
             default: undefined,
         },
         fetchOptions: {
-            type: Object as PropType<DynamicLayoutFetchOptions>,
+            type: Object,
             default: undefined,
         },
         typeOptions: {
-            type: Object as PropType<DynamicLayoutTypeOptions>,
+            type: Object,
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props: RawDynamicLayoutProps) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
@@ -78,7 +76,7 @@ export default defineComponent({
             ...toRefs(state),
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">

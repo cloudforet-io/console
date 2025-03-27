@@ -1,6 +1,6 @@
 import { computed, reactive, watch } from 'vue';
 
-import type { GrantScope } from '@/api-clients/identity/token/schema/type';
+import type { GrantScope } from '@/schema/identity/token/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { GrantInfo } from '@/store/user/type';

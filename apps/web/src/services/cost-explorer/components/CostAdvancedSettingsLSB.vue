@@ -4,17 +4,19 @@ import { useRouter } from 'vue-router/composables';
 
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import type { LSBItem } from '@/common/modules/navigations/lsb/type';
 
-import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const router = useRouter();
 
-const containerName = ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME;
+const containerName = makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME);
 
 const state = reactive({
     childrenRoute: computed(() => router.getRoutes().filter((r) => r.name?.includes(containerName) && (r.name !== containerName))),

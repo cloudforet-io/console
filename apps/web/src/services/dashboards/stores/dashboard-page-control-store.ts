@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
+import type { QueryTag } from '@cloudforet/mirinae/src/controls/search/query-search-tags/type';
 
 export const useDashboardPageControlStore = defineStore('page-dashboard-control', () => {
     const state = reactive({

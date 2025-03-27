@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { cloneDeep, isEmpty, isEqual } from 'lodash';
 
 import { isObjectEqual } from '@cloudforet/utils';

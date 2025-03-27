@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, nextTick, computed } from 'vue';
+import { reactive, nextTick } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -17,6 +17,9 @@ import type { UserChannelDisableParameters as UserChannelDisableParametersV1 } f
 import type { UserChannelEnableParameters as UserChannelEnableParametersV1 } from '@/schema/notification/user-channel/api-verbs/enable';
 import { i18n } from '@/translations';
 
+import { useDomainStore } from '@/store/domain/domain-store';
+
+import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -43,12 +46,13 @@ const props = withDefaults(defineProps<{
     channelData: Partial<NotiChannelItemV1> & Partial<NotiChannelItem>;
     projectId?: string;
     manageDisabled?: boolean;
-    visibleUserNotification: boolean;
 }>(), {
     projectId: undefined,
     manageDisabled: false,
-    visibleUserNotification: false,
 });
+
+const domainStore = useDomainStore();
+const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const emit = defineEmits<{(event: 'change'): void;
     (event: 'confirm'): void;
@@ -57,7 +61,7 @@ const emit = defineEmits<{(event: 'change'): void;
 type EditTarget = 'name' | 'data' | 'notification_level' | 'schedule' | 'topic';
 const state = reactive({
     isActivated: props.channelData.state === STATE_TYPE.ENABLED,
-    userChannelId: computed<string>(() => (props.visibleUserNotification ? props.channelData.channel_id : props.channelData.user_channel_id)),
+    userChannelId: isAlertManagerVersionV2 ? props.channelData.channel_id : props.channelData.user_channel_id,
     projectChannelId: props.channelData.project_channel_id,
     editTarget: undefined as EditTarget | undefined,
     scheduleData: props.channelData.schedule,
@@ -83,7 +87,7 @@ const enableProjectChannel = async () => {
 const enableUserChannel = async () => {
     try {
         if (!state.userChannelId) throw new Error('User channel id is not defined');
-        const fetcher = props.visibleUserNotification
+        const fetcher = isAlertManagerVersionV2
             ? SpaceConnector.clientV2.alertManager.userChannel.enable<UserChannelEnableParameters>({
                 channel_id: state.userChannelId,
             })
@@ -99,7 +103,7 @@ const enableUserChannel = async () => {
 };
 
 const enableChannel = async () => {
-    if (!props.visibleUserNotification && props.projectId) await enableProjectChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await enableProjectChannel();
     else await enableUserChannel();
 };
 
@@ -120,7 +124,7 @@ const disableProjectChannel = async () => {
 const disableUserChannel = async () => {
     try {
         if (!state.userChannelId) throw new Error('User channel id is not defined');
-        const fetcher = props.visibleUserNotification
+        const fetcher = isAlertManagerVersionV2
             ? SpaceConnector.clientV2.alertManager.userChannel.disable<UserChannelDisableParameters>({
                 channel_id: state.userChannelId,
             }) : SpaceConnector.clientV2.notification.userChannel.disable<UserChannelDisableParametersV1>({
@@ -136,7 +140,7 @@ const disableUserChannel = async () => {
 };
 
 const disableChannel = async () => {
-    if (!props.visibleUserNotification && props.projectId) await disableProjectChannel();
+    if (!isAlertManagerVersionV2 && props.projectId) await disableProjectChannel();
     else await disableUserChannel();
 };
 
@@ -177,7 +181,7 @@ const deleteProjectChannel = async () => {
 const deleteUserChannel = async () => {
     try {
         if (!state.userChannelId) throw new Error('User channel id is not defined');
-        const fetcher = props.visibleUserNotification
+        const fetcher = isAlertManagerVersionV2
             ? SpaceConnector.clientV2.alertManager.userChannel.delete<UserChannelDisableParameters>({
                 channel_id: state.userChannelId,
             }) : SpaceConnector.clientV2.notification.userChannel.delete<UserChannelDeleteParametersV1>({
@@ -194,11 +198,10 @@ const deleteUserChannel = async () => {
 };
 
 const deleteChannelConfirm = async () => {
-    if (!props.visibleUserNotification && props.projectId) {
-        await deleteProjectChannel();
-        return;
+    if (!isAlertManagerVersionV2 && props.projectId) await deleteProjectChannel();
+    if (isAlertManagerVersionV2) {
+        await deleteUserChannel();
     }
-    await deleteUserChannel();
 };
 
 const onEdit = (value?: EditTarget) => {
@@ -229,7 +232,6 @@ const onEdit = (value?: EditTarget) => {
             <notification-channel-item-name :channel-data="props.channelData"
                                             :project-id="props.projectId"
                                             :disable-edit="(state.editTarget && state.editTarget !== 'name') || props.manageDisabled"
-                                            :visible-user-notification="props.visibleUserNotification"
                                             @change="onChange"
                                             @edit="onEdit"
             />
@@ -237,7 +239,6 @@ const onEdit = (value?: EditTarget) => {
             <notification-channel-item-data :channel-data="props.channelData"
                                             :project-id="props.projectId"
                                             :disable-edit="(state.editTarget && state.editTarget !== 'data') || props.manageDisabled"
-                                            :visible-user-notification="props.visibleUserNotification"
                                             @change="onChange"
                                             @edit="onEdit"
             />
@@ -252,19 +253,18 @@ const onEdit = (value?: EditTarget) => {
             <notification-channel-item-schedule :channel-data="props.channelData"
                                                 :project-id="props.projectId"
                                                 :disable-edit="(state.editTarget && state.editTarget !== 'schedule') || props.manageDisabled"
-                                                :visible-user-notification="props.visibleUserNotification"
                                                 @change="onChange"
                                                 @edit="onEdit"
             />
             <p-divider />
-            <notification-channel-item-topic v-if="!props.visibleUserNotification"
+            <notification-channel-item-topic v-if="!isAlertManagerVersionV2"
                                              :channel-data="props.channelData"
                                              :project-id="props.projectId"
                                              :disable-edit="(state.editTarget && state.editTarget !== 'topic') || props.manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
-            <p-divider v-if="!props.visibleUserNotification" />
+            <p-divider v-if="!isAlertManagerVersionV2" />
         </ul>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"

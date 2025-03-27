@@ -9,7 +9,6 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,6 +16,7 @@ import {
     PHeading, PPagination, PLazyImg, PLink,
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
@@ -28,6 +28,7 @@ import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
@@ -48,15 +49,12 @@ import {
     statusTextColorFormatter,
     statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
-import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
 
 
 const COLLECTOR_DETAIL_ROUTE = ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME;
-const ADMIN_COLLECTOR_DETAIL_ROUTE = ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME;
 const WORKSPACE_HOME_ROUTE = ROOT_ROUTE.WORKSPACE._NAME;
-const ADMIN_HOME_ROUTE = ROOT_ROUTE.ADMIN._NAME;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
@@ -147,7 +145,7 @@ const getQuery = () => {
 /* Components */
 const handleSelect = (item) => {
     SpaceRouter.router.push({
-        name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME),
         params: { jobId: item.job_id },
     }).catch(() => {});
 };
@@ -175,7 +173,7 @@ const handleChangePagination = () => {
 const getJobs = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({ query: getQuery() });
+        const res = await SpaceConnector.clientV2.inventoryV2.job.list<JobListParameters, ListResponse<JobModel>>({ query: getQuery() });
         state.totalCount = res.total_count ?? 0;
         state.items = (res.results ?? []).map((job) => {
             const collector = storeState.collectors[job.collector_id];
@@ -220,7 +218,7 @@ const getLocation = ({ workspaceId, collectorId, target }: {workspaceId:string, 
     if (collectorId) routeParams.collectorId = collectorId;
     if (!isAdminCenter) routeParams.workspaceId = workspaceId;
     return ({
-        name: target,
+        name: isAdminCenter ? makeAdminRouteName(target) : target,
         params: routeParams,
     });
 };
@@ -288,7 +286,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     <p-link v-else
                             :to="getLocation({
                                 workspaceId: value,
-                                target: value === '*' ? ADMIN_HOME_ROUTE : WORKSPACE_HOME_ROUTE,
+                                target: WORKSPACE_HOME_ROUTE,
                             })"
                             action-icon="internal-link"
                             new-tab
@@ -299,7 +297,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     <p-link :to="getLocation({
                                 workspaceId: item.workspace_id,
                                 collectorId: item.collector_id,
-                                target: item.workspace_id === '*' ? ADMIN_COLLECTOR_DETAIL_ROUTE : COLLECTOR_DETAIL_ROUTE,
+                                target: COLLECTOR_DETAIL_ROUTE,
                             })"
                             action-icon="internal-link"
                             new-tab
@@ -351,7 +349,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
             </div>
         </div>
         <no-collector-modal :visible.sync="state.modalVisible"
-                            @confirm="$router.push({ name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
+                            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
         />
     </div>
 </template>

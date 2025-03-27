@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { isEmpty } from 'lodash';
@@ -9,18 +7,18 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
-import type { UserGroupListParameters } from '@/api-clients/identity/user-group/schema/api-verbs/list';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
-import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-verbs/get';
-import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
-import type { UserModel } from '@/api-clients/identity/user/schema/model';
-import type { FindWorkspaceUserParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/find';
-import type { WorkspaceUserGetParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/get';
-import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
-import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { UserGroupListParameters } from '@/schema/identity/user-group/api-verbs/list';
+import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
+import type { UserModel } from '@/schema/identity/user/model';
+import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
+import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

@@ -11,10 +11,12 @@ import { at } from 'lodash';
 import {
     PHeading, PButton, PContextMenu, PI, PIconButton, PStatus, PHeadingLayout,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
@@ -26,7 +28,7 @@ import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
@@ -88,7 +90,7 @@ const handleClickCreateButton = () => {
 };
 const handleClickGoBackButton = () => {
     router.push({
-        name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
+        name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
         params: {
             group: state.group,
         },
@@ -105,7 +107,7 @@ const handleClickWorkspaceButton = () => {
         return;
     }
     window.open(router.resolve({
-        name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME,
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
     }).href, '_blank');
 };
 const handleClickDeleteButton = () => {

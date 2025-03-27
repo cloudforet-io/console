@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -16,7 +15,8 @@ import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/p
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { SpaceRouter } from '@/router';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -28,11 +28,11 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
@@ -59,7 +59,7 @@ const {
     queryClient,
 } = useDashboardQuery();
 
-const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
@@ -183,13 +183,10 @@ const { mutate, isPending: dashboardCloneLoading } = useMutation(
         onSettled(data) {
             state.proxyVisible = false;
             if (data?.dashboard_id) {
-                const dashboardDetailRouteName = storeState.isAdminMode
-                    ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-                    : DASHBOARDS_ROUTE.DETAIL._NAME;
-                router.push({
-                    name: dashboardDetailRouteName,
+                SpaceRouter.router.push(getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: { dashboardId: data.dashboard_id },
-                }).catch(() => {});
+                }));
             }
         },
     },

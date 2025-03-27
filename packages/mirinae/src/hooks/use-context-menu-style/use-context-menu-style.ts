@@ -10,7 +10,7 @@ import {
 import { throttle } from 'lodash';
 
 // HACK: This is the type definition of the context menu. Only defined exposed methods. This is to prevent type error due to vue2-vue3 incompatibility.
-export interface ISimpleContextMenu {
+interface ContextMenu {
     focus: (position?: number) => void;
 }
 export interface UseContextMenuStyleOptions {
@@ -22,7 +22,7 @@ export interface UseContextMenuStyleOptions {
 
     visibleMenu?: Ref<boolean|undefined>;
     targetRef: Ref<Vue|HTMLElement|null>;
-    menuRef: Ref<ISimpleContextMenu|HTMLElement|null>;
+    menuRef: Ref<ContextMenu|HTMLElement|null>;
 
      /* Required for context menu style */
     position?: Ref<'left'|'right'|undefined>|'left'|'right';

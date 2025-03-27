@@ -28,7 +28,7 @@ const opsFlowRoutes: RouteConfig = {
         menuId: MENU_ID.OPS_FLOW,
         translationId: MENU_INFO_MAP[MENU_ID.OPS_FLOW].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId),
     component: OpsFlowContainer,
     children: [
         {

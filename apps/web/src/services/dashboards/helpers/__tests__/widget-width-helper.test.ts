@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect } from 'vitest';
 
 import type { WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
-    WIDGET_CONTAINER_MIN_WIDTH,
+    WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_CRITERIA,
 } from '@/services/dashboards/constants/widget-container-config';
 import { widgetWidthAssigner } from '@/services/dashboards/helpers/widget-width-helper';
 
@@ -28,79 +28,65 @@ describe(`Widget test with ${MANUAL_WIDGET_SELECT} in ${_MANUAL_CONTAINER_WIDTH}
 
 
 /**
- * For automatic every tests - with reduced test cases to avoid memory issues
+ * For automatic every tests
  * */
 
-// Generate a sample of widget combinations instead of all permutations
-function generateWidgetSamples(widgetSizes: WidgetSize[], count: number, length: number): Array<Array<WidgetSize>> {
-    const samples: Array<Array<WidgetSize>> = [];
+// Selecting all collections of widgets
+function permutation(arr, selectNum) {
+    const result: Array<string> = [];
+    if (selectNum === 1) return arr.map((v) => [v]);
 
-    // Add some predefined combinations
-    samples.push(Array(length).fill('sm'));
-    samples.push(Array(length).fill('md'));
-    samples.push(Array(length).fill('lg'));
-    samples.push(Array(length).fill('xl'));
-    samples.push(Array(length).fill('full'));
-
-    // Add some mixed combinations
-    samples.push(['sm', 'md', 'lg']);
-    samples.push(['md', 'lg', 'xl']);
-    samples.push(['sm', 'lg', 'full']);
-    samples.push(['sm', 'md', 'xl']);
-    samples.push(['md', 'xl', 'full']);
-
-    // Add some random combinations
-    for (let i = samples.length; i < count; i++) {
-        const sample: WidgetSize[] = [];
-        for (let j = 0; j < length; j++) {
-            const randomIndex = Math.floor(Math.random() * widgetSizes.length);
-            sample.push(widgetSizes[randomIndex]);
-        }
-        samples.push(sample);
-    }
-
-    return samples;
+    arr.forEach((v, idx, arr2) => {
+        const fixed = v;
+        const restArr = arr2;
+        const permutationArr = permutation(restArr, selectNum - 1);
+        const combineFix: Array<string> = permutationArr.map((v2) => [fixed, ...v2]);
+        result.push(...combineFix);
+    });
+    return result;
 }
 
-// Reduced widget amount to avoid memory issues
-const _SELECT_WIDGET_AMOUNT = 3;
-// Generate a smaller sample of widget combinations
-const widgetSizes: WidgetSize[] = ['sm', 'md', 'lg', 'xl', 'full'];
-const widgetCases: Array<Array<WidgetSize>> = generateWidgetSamples(widgetSizes, 20, _SELECT_WIDGET_AMOUNT);
+// if AMOUNT is more than 10, call stack boom
+// for more specific test, please scale up the AMOUNT.
+const _SELECT_WIDGET_AMOUNT = 4;
+// e.g) [['sm', 'sm', 'md'], ['sm', 'sm', 'lg'] ...]
+const widgetCases: Array<Array<WidgetSize>> = permutation(['sm', 'md', 'lg', 'xl', 'full'], _SELECT_WIDGET_AMOUNT);
+const widgetCasesLength = widgetCases.length;
 
-describe('Widget samples test', () => {
-    it('Should generate the expected number of widget samples', () => {
-        expect(widgetCases.length).toBe(20);
+describe('Select widgets as permutation', () => {
+    it('Count of selected widgets would be (5 ** _SELECT_WIDGET_AMOUNT)', () => {
+        expect(widgetCases.length).toBe(5 ** _SELECT_WIDGET_AMOUNT);
     });
 });
 
-describe('Assign width for widget samples', () => {
-    describe('Widget assignment tests', () => {
-        // Test a subset of container widths to reduce test time
-        const containerWidths = [WIDGET_CONTAINER_MIN_WIDTH, 1000, WIDGET_CONTAINER_MAX_WIDTH];
+describe('Assign width for permutation selected widgets', () => {
+    let assignedWidgetCasesCount = 0;
+    let rowWidgetWidthSum = 0;
 
-        // Test each widget case with each container width
-        widgetCases.forEach((widgetCase, caseIndex) => {
-            containerWidths.forEach((containerWidth) => {
-                it(`Case ${caseIndex} with containerWidth=${containerWidth}: Widget count should be preserved and row widths should be valid`, () => {
-                    let assignedWidgetCount = 0;
-                    const originalWidgetCount = widgetCase.length;
-                    const selectedCase = [...widgetCase];
+    it('Count of widgets should not be changed after assigning its width', () => {
+        for (let caseCount = 0; caseCount < widgetCasesLength; caseCount += 1) {
+            for (let containerWidth = WIDGET_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_CONTAINER_MAX_WIDTH; containerWidth += WIDGET_WIDTH_CRITERIA) {
+                assignedWidgetCasesCount = 0;
+                const selectedCase = [...widgetCases[caseCount]];
 
-                    const result = widgetWidthAssigner(selectedCase, containerWidth);
-
-                    // Check widget count is preserved
-                    result.forEach((row) => {
-                        assignedWidgetCount += row.length;
-
-                        // Check each row's width sum is not greater than container width
-                        const rowWidthSum = row.reduce((sum, width) => sum + width, 0);
-                        expect(rowWidthSum).toBeLessThanOrEqual(containerWidth);
+                // eslint-disable-next-line no-loop-func
+                widgetWidthAssigner(selectedCase, containerWidth).forEach((row) => {
+                    assignedWidgetCasesCount += row.length;
+                    row.forEach((element) => {
+                        rowWidgetWidthSum += element;
                     });
-
-                    expect(assignedWidgetCount).toBe(originalWidgetCount);
                 });
-            });
-        });
+
+                // eslint-disable-next-line no-loop-func
+                it(`Output in containerWidth = ${containerWidth} would be ${assignedWidgetCasesCount}`, () => {
+                    expect(assignedWidgetCasesCount).toBe(widgetCases[caseCount]);
+                });
+
+                // eslint-disable-next-line no-loop-func
+                it('Each row sum of widgets should not bigger than containerWidth', () => {
+                    expect(rowWidgetWidthSum).lessThanOrEqual(containerWidth);
+                });
+            }
+        }
     });
 });

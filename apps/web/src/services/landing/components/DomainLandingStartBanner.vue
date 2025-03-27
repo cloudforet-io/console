@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { screens, PTextButton } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';

@@ -9,6 +9,7 @@ import { cloneDeep } from 'lodash';
 import {
     PIconButton, PI, PFieldGroup, PSelectButton, PTextInput, PButton, PTextarea, PButtonModal, PToggleButton, PLink, PFieldTitle,
 } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
@@ -262,7 +263,7 @@ watch(() => state.invalid, (_invalid) => {
                                 <template #label-extra>
                                     <div class="condition-form-extra justify-between inline-flex">
                                         <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.query.html"
-                                                action-icon="external-link"
+                                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                                 highlight
                                                 class="external-link"
                                         >
@@ -287,7 +288,7 @@ watch(() => state.invalid, (_invalid) => {
                             >
                                 <template #label-extra>
                                     <p-link href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"
-                                            action-icon="external-link"
+                                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                             highlight
                                             class="external-link"
                                     >

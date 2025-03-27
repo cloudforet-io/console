@@ -1,4 +1,4 @@
-import type { TabItem as BaseTabItem } from '@/hooks/use-tab/type';
+import type { TabItem as BaseTabItem } from '@/hooks/use-tab/use-tab';
 
 
 export const TAB_MENU_TYPE = {

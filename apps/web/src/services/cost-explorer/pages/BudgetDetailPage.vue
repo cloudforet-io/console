@@ -3,11 +3,17 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import { PLink, PScopedNotification } from '@cloudforet/mirinae';
+import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
+
+import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -17,7 +23,7 @@ import BudgetDetailNotifications
     from '@/services/cost-explorer/components/BudgetDetailNotifications.vue';
 import BudgetDetailSummary
     from '@/services/cost-explorer/components/BudgetDetailSummary.vue';
-import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
@@ -28,20 +34,21 @@ const props = withDefaults(defineProps<Props>(), {
     budgetId: '',
 });
 
+const domainStore = useDomainStore();
 const userStore = useUserStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    visibleBudgetNotification: computed<boolean>(() => budgetPageState.visibleBudgetNotification),
     isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
     adminModeLink: computed<Location>(() => ({
-        name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
+        name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
         params: {
             budgetId: state.budgetData?.budget_id,
         },
     })),
+    isAlertManagerVersionV2: computed<boolean>(() => (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId)),
 });
 
 (async () => {
@@ -72,7 +79,7 @@ const state = reactive({
                           #right
                 >
                     <p-link class="notification-link"
-                            action-icon="internal-link"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
                             highlight
                             new-tab
                             :to="state.adminModeLink"
@@ -89,7 +96,7 @@ const state = reactive({
                 :budget-loading="state.loading"
                 class="summary"
             />
-            <budget-detail-notifications v-if="state.visibleBudgetNotification && !state.isWorkspaceTarget"
+            <budget-detail-notifications v-if="!state.isAlertManagerVersionV2 && !state.isWorkspaceTarget"
                                          class="alert"
                                          :currency="state.budgetData?.currency"
             />

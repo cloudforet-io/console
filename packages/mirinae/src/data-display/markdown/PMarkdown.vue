@@ -12,11 +12,12 @@ import { computed, defineComponent } from 'vue';
 import { render } from 'ejs';
 import { get } from 'lodash';
 
+import type { MarkdownProps } from '@/data-display/markdown/type';
 import { useMarkdown } from '@/hooks/use-markdown/use-markdown';
 
 const DEFAULT_LANGUAGE = 'en';
 
-export default defineComponent({
+export default defineComponent<MarkdownProps>({
     name: 'PMarkdown',
     props: {
         markdown: {

@@ -4,7 +4,7 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
+import { useAPIQueryKey } from '@/api-clients/_common/composables/use-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DataTableLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
@@ -17,7 +17,7 @@ import type { DataTableTransformParameters } from '@/api-clients/dashboard/publi
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 
 interface UsePrivateDataTableApiReturn {
-    privateDataTableGetQueryKey: ComputedRef<QueryKey>;
+    privateDataTableQueryKey: ComputedRef<QueryKey>;
     privateDataTableListQueryKey: ComputedRef<QueryKey>;
     privateDataTableLoadQueryKey: ComputedRef<QueryKey>;
     privateDataTableAPI: {
@@ -32,9 +32,9 @@ interface UsePrivateDataTableApiReturn {
 }
 
 export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
-    const privateDataTableGetQueryKey = useAPIQueryKey('dashboard', 'private-data-table', 'get');
-    const privateDataTableListQueryKey = useAPIQueryKey('dashboard', 'private-dashboard', 'list');
-    const privateDataTableLoadQueryKey = useAPIQueryKey('dashboard', 'private-dashboard', 'list');
+    const privateDataTableQueryKey = useAPIQueryKey('private-data-table/get');
+    const privateDataTableListQueryKey = useAPIQueryKey('private-data-table/list');
+    const privateDataTableLoadQueryKey = useAPIQueryKey('private-data-table/load');
 
     const action = {
         async add(params: DataTableAddParameters) {
@@ -61,7 +61,7 @@ export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
     };
 
     return {
-        privateDataTableGetQueryKey,
+        privateDataTableQueryKey,
         privateDataTableListQueryKey,
         privateDataTableLoadQueryKey,
         privateDataTableAPI: action,

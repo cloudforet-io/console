@@ -19,9 +19,8 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import type { TranslateResult } from 'vue-i18n';
-
 import type {
+    TextHighlightingProps,
     TextHighlightingStyleType,
 } from '@/data-display/text-highlighting/type';
 import {
@@ -34,12 +33,12 @@ interface TextItem {
     matched: boolean;
 }
 
-export default defineComponent({
+export default defineComponent<TextHighlightingProps>({
     name: 'PTextHighlighting',
     components: {},
     props: {
         text: {
-            type: String as PropType<TranslateResult>,
+            type: String,
             default: '',
         },
         term: {
@@ -49,12 +48,16 @@ export default defineComponent({
         styleType: {
             type: String as PropType<TextHighlightingStyleType>,
             default: TEXT_HIGHLIGHTING_STYLE_TYPE[0],
+            validator(styleType: TextHighlightingStyleType) {
+                return TEXT_HIGHLIGHTING_STYLE_TYPE.includes(styleType);
+            },
         },
     },
     setup(props) {
         const state = reactive({
             regex: computed(() => getTextHighlightRegex(props.term)),
-            textList: computed<TextItem[]>(() => getTextList(props.text as string)),
+            // eslint-disable-next-line no-use-before-define
+            textList: computed<TextItem[]>(() => getTextList(props.text)),
         });
 
         const getFirstMatchedString = (str: string): string => {

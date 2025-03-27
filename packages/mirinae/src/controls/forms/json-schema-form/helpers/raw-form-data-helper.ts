@@ -80,33 +80,30 @@ export const updateRawFormDataWithSchema = async (
     schema?: JsonSchema,
     prevSchema?: JsonSchema,
     formData?: object,
-    inputOccurredMap?: Record<string, boolean|undefined>,
+    inputOccurredMap?: Record<string, boolean>,
     referenceHandler?: ReferenceHandler,
-): Promise<[object, Record<string, boolean|undefined>]> => {
+): Promise<[object, Record<string, boolean>]> => {
     const { properties } = schema ?? {};
     const { properties: prevProperties } = prevSchema ?? {};
 
     const result = { ...formData };
     const newInputOccurredMap = { ...inputOccurredMap };
 
-    if (properties) {
-        for (const key of Object.keys(properties)) {
-            const property = properties[key];
-            if (isPropertyUpdated(key, property, prevProperties)) {
-                result[key] = await getRawValueForFormInput(key, property, undefined, referenceHandler);
-                newInputOccurredMap[key] = false;
-            }
+    for (const key of Object.keys(properties)) {
+        const property = properties[key];
+        if (isPropertyUpdated(key, property, prevProperties)) {
+            result[key] = await getRawValueForFormInput(key, property, undefined, referenceHandler);
+            newInputOccurredMap[key] = false;
         }
-
-        // remove properties that are not in the new schema
-        Object.keys(result).forEach((key) => {
-            if (!properties[key]) {
-                delete result[key];
-                delete newInputOccurredMap[key];
-            }
-        });
     }
 
+    // remove properties that are not in the new schema
+    Object.keys(result).forEach((key) => {
+        if (!properties[key]) {
+            delete result[key];
+            delete newInputOccurredMap[key];
+        }
+    });
 
     return [result, newInputOccurredMap];
 };

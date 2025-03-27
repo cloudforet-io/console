@@ -11,4 +11,13 @@ export const IAM_ROUTE = {
     APP: {
         _NAME: `${MENU_ID.IAM}.${MENU_ID.APP}`,
     },
+    ROLE: {
+        _NAME: `${MENU_ID.IAM}.${MENU_ID.ROLE}`,
+        CREATE: {
+            _NAME: `${MENU_ID.IAM}.${MENU_ID.ROLE}.create`,
+        },
+        EDIT: {
+            _NAME: `${MENU_ID.IAM}.${MENU_ID.ROLE}.edit`,
+        },
+    },
 } as const;

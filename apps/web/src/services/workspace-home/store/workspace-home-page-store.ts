@@ -11,15 +11,15 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
-import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
-import type { AppModel } from '@/api-clients/identity/app/schema/model';
-import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
-import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
+import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
+import type { AppModel } from '@/schema/identity/app/model';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -36,7 +36,7 @@ import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/ty
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
+import type { MetricDataAnalyzeResult } from '@/services/asset-inventory-v1/types/asset-analysis-type';
 import { convertFormKeys } from '@/services/workspace-home/composables/use-workspace-home';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type {

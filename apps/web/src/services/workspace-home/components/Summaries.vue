@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { MENU_ID } from '@/lib/menu/config';
-
-import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
-
 import AccountSummary from '@/services/workspace-home/components/AccountSummary.vue';
 import AssetSummary from '@/services/workspace-home/components/AssetSummary.vue';
 import CostSummary from '@/services/workspace-home/components/CostSummary.vue';
-
-const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 </script>
 
 <template>
     <div class="summaries-wrapper">
         <div class="summaries">
-            <asset-summary v-if="visibleContents"
-                           class="box-wrapper"
-            />
+            <asset-summary class="box-wrapper" />
             <account-summary class="box-wrapper" />
         </div>
         <cost-summary class="box-wrapper cost" />

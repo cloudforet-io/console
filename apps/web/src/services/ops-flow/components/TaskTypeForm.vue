@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { nextTick, watch, computed } from 'vue';
+import {
+    ref, nextTick, watch, computed,
+} from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 import { getParticle, i18n as _i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFormValidator } from '@/common/composables/form-validator';
+import { useFieldValidator, useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { useTaskTypeFormMutations } from '@/services/ops-flow/composables/use-task-type-form-mutations';
-import { useTaskTypeQuery } from '@/services/ops-flow/composables/use-task-type-query';
-import type { Scope } from '@/services/ops-flow/composables/use-task-type-scope-field';
-import { useTaskTypeScopeField } from '@/services/ops-flow/composables/use-task-type-scope-field';
-import { useTaskTypesQuery } from '@/services/ops-flow/composables/use-task-types-query';
 import { useTaskCategoryPageStore } from '@/services/ops-flow/stores/admin/task-category-page-store';
+import { useTaskTypeStore } from '@/services/ops-flow/stores/task-type-store';
 import {
     useTaskFieldsConfiguration,
 } from '@/services/ops-flow/task-fields-configuration/composables/use-task-fields-configuration';
@@ -27,33 +28,31 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-
-/* task management template store */
-const taskManagementTemplateStore = useTaskManagementTemplateStore();
-
-/* task category page store */
 const taskCategoryPageStore = useTaskCategoryPageStore();
 const taskCategoryPageState = taskCategoryPageStore.state;
-const targetTaskTypeId = computed(() => taskCategoryPageState.targetTaskTypeId);
-const currentCategoryId = computed(() => taskCategoryPageState.currentCategoryId);
-const visibleForm = computed(() => taskCategoryPageState.visibleTaskTypeForm);
+const taskCategoryPageGetters = taskCategoryPageStore.getters;
+const taskTypeStore = useTaskTypeStore();
+const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-/* task type */
-const { taskType } = useTaskTypeQuery({
-    queryKey: computed(() => ({ task_type_id: targetTaskTypeId.value as string })),
-    enabled: computed(() => visibleForm.value && !!targetTaskTypeId.value),
-});
-
-/* form title */
 const title = computed(() => {
-    if (taskType.value) {
+    if (taskCategoryPageGetters.targetTaskType) {
         return _i18n.t('OPSFLOW.EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
     }
     return _i18n.t('OPSFLOW.ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType });
 });
 
-/* scope field */
-const { scope, setScope, scopeValidator } = useTaskTypeScopeField();
+/* scope */
+type Scope = 'PROJECT'|'WORKSPACE';
+const scopeValidator = useFieldValidator<Scope>('PROJECT', (val) => {
+    if (!val) {
+        return _i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
+            topic: _i18n.t('OPSFLOW.SCOPE'),
+            particle: getParticle(_i18n.t('OPSFLOW.SCOPE') as string, 'topic'),
+        });
+    }
+    return true;
+});
+const { value: scope, setValue: setScope } = scopeValidator;
 const handleChangeScope = (val: Scope) => {
     setScope(val);
 };
@@ -69,18 +68,7 @@ const {
     setInitialFields,
 } = useTaskFieldsConfiguration();
 
-
-/* task types */
-const { taskTypes } = useTaskTypesQuery({
-    queryKey: computed(() => ({
-        query: {
-            filter: [{ k: 'category_id', v: currentCategoryId.value, o: 'eq' }],
-        },
-    })),
-    enabled: computed(() => visibleForm.value && !!currentCategoryId.value),
-});
-
-/* form */
+/* form validation */
 const {
     forms: { name, description, assigneePool },
     invalidState,
@@ -109,49 +97,14 @@ const {
                 length: 50,
             });
         }
-        if (!taskTypes.value) return true;
-        const isDuplicated = taskTypes.value.some((tt) => tt.name === value && tt.task_type_id !== taskType.value?.task_type_id);
+        if (!taskCategoryPageGetters.taskTypes) return true;
+        const isDuplicated = taskCategoryPageGetters.taskTypes.some((taskType) => taskType.name === value && taskType.task_type_id !== taskCategoryPageGetters.targetTaskType?.task_type_id);
         if (isDuplicated) return _i18n.t('OPSFLOW.VALIDATION.DUPLICATED', { topic: _i18n.t('OPSFLOW.NAME') });
         return true;
     },
 });
 
-
-/* task type mutations */
-const { createTaskType, updateTaskType, isPending } = useTaskTypeFormMutations();
-
-/* modal event handlers */
-const handleConfirm = async () => {
-    if (!isAllValid.value) return;
-    try {
-        if (!currentCategoryId.value) throw new Error('Category ID is not set');
-        if (taskType.value) {
-            await updateTaskType({
-                target: taskType.value,
-                form: {
-                    name: name.value,
-                    description: description.value,
-                    assigneePool: assigneePool.value,
-                },
-                fields: fields.value,
-            });
-        } else {
-            await createTaskType({
-                categoryId: currentCategoryId.value,
-                form: {
-                    name: name.value,
-                    scope: scope.value,
-                    description: description.value,
-                    assigneePool: assigneePool.value,
-                },
-                fields: fields.value,
-            });
-        }
-        taskCategoryPageStore.closeTaskTypeForm();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
+const loading = ref(false);
 const handleCancelOrClose = () => {
     initForm();
     taskCategoryPageStore.closeTaskTypeForm();
@@ -160,8 +113,83 @@ const handleClosed = () => {
     taskCategoryPageStore.resetTargetTaskTypeId();
 };
 
-/* form initialization */
-watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
+const updateTaskTypeFields = async (taskTypeId: string) => {
+    await taskTypeStore.updateFields({
+        task_type_id: taskTypeId,
+        fields: fields.value.map((f) => ({ ...f, _field_id: undefined })),
+        force: true,
+    });
+};
+
+const createTaskType = async (categoryId: string) => {
+    try {
+        await taskTypeStore.create({
+            name: name.value,
+            require_project: scope.value === 'PROJECT',
+            assignee_pool: assigneePool.value,
+            description: description.value,
+            category_id: categoryId,
+            fields: fields.value.map((f) => ({ ...f, _field_id: undefined })),
+        });
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_ADD_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
+    }
+};
+
+const updateTaskType = async (target: TaskTypeModel) => {
+    try {
+        const promises: Promise<any>[] = [];
+        if (target.name !== name.value
+            || target.description !== description.value
+            || !isEqual(target.assignee_pool, assigneePool.value)
+        ) {
+            promises.push(taskTypeStore.update({
+                task_type_id: target.task_type_id,
+                name: name.value,
+                description: description.value,
+                assignee_pool: assigneePool.value,
+            }));
+        }
+        if (!isEqual(fields.value, target.fields)) {
+            promises.push(updateTaskTypeFields(target.task_type_id));
+        }
+        const result = await Promise.allSettled(promises);
+        const errorMessages: string[] = [];
+        result.forEach((res) => {
+            if (res.status === 'rejected') {
+                errorMessages.push(res.reason.message);
+            }
+        });
+        if (errorMessages.length) {
+            throw new Error(errorMessages.join('\n'));
+        }
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, _i18n.t('OPSFLOW.ALT_E_EDIT_TARGET', { target: taskManagementTemplateStore.templates.TaskType }));
+    }
+};
+
+let initialTaskType: TaskTypeModel|undefined;
+const handleConfirm = async () => {
+    if (!isAllValid.value) return;
+    try {
+        if (!taskCategoryPageState.currentCategoryId) throw new Error('Category ID is not set');
+        loading.value = true;
+        if (initialTaskType) {
+            await updateTaskType(initialTaskType);
+        } else {
+            await createTaskType(taskCategoryPageState.currentCategoryId);
+        }
+        taskCategoryPageStore.closeTaskTypeForm();
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        loading.value = false;
+    }
+};
+
+watch([() => taskCategoryPageState.visibleTaskTypeForm, () => taskCategoryPageGetters.targetTaskType], async ([visible, target], [prevVisible]) => {
     if (!visible) {
         if (!prevVisible) return; // prevent initial call
         await nextTick(); // wait for closing animation
@@ -172,11 +200,12 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
             assigneePool: [],
         });
         setInitialFields([]);
+        initialTaskType = undefined;
         resetValidations();
         return;
     }
-    if (tt) {
-        const target = cloneDeep(tt);
+    if (target) {
+        initialTaskType = cloneDeep(target);
         setForm({
             name: target.name,
             scope: target.require_project ? 'PROJECT' : 'WORKSPACE',
@@ -191,7 +220,7 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
 
 <template>
     <p-overlay-layout :title="title"
-                      :visible="visibleForm"
+                      :visible="taskCategoryPageState.visibleTaskTypeForm"
                       size="lg"
                       @close="handleCancelOrClose"
                       @closed="handleClosed"
@@ -200,7 +229,7 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
             <div class="p-6 w-full">
                 <p-field-group :label="$t('OPSFLOW.NAME')"
                                required
-                               :invalid="!isPending && invalidState.name"
+                               :invalid="!loading && invalidState.name"
                                :invalid-text="invalidTexts.name"
                 >
                     <template #default="{ invalid }">
@@ -211,7 +240,7 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
                         />
                     </template>
                 </p-field-group>
-                <p-field-group v-if="!taskType"
+                <p-field-group v-if="!taskCategoryPageGetters.targetTaskType"
                                :label="$t('OPSFLOW.SCOPE')"
                                required
                 >
@@ -241,10 +270,10 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
                 </p-field-group>
                 <p-field-group :label="$t('OPSFLOW.DESCRIPTION')">
                     <p-textarea :value="description"
-                                :placeholder="String($t('OPSFLOW.DESCRIBE_FIELD', {
+                                :placeholder="$t('OPSFLOW.DESCRIBE_FIELD', {
                                     field: taskManagementTemplateStore.templates.taskType ,
                                     particle: getParticle(taskManagementTemplateStore.templates.taskType , 'object')
-                                }))"
+                                })"
                                 @update:value="setForm('description', $event)"
                     />
                 </p-field-group>
@@ -252,9 +281,9 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
                                required
                 >
                     <task-fields-configuration class="mt-2"
-                                               :require-project="scope === 'PROJECT'"
+                                               :scope="scope"
                                                :fields="fields"
-                                               :origin-fields="taskType?.fields"
+                                               :origin-fields="taskCategoryPageGetters.targetTaskType?.fields"
                                                @update:fields="setFields"
                                                @add-field="addField"
                                                @remove-field="removeField"
@@ -266,13 +295,13 @@ watch([visibleForm, taskType], async ([visible, tt], [prevVisible]) => {
         <template #footer>
             <div class="py-3 px-6 flex flex-wrap gap-1 justify-end">
                 <p-button style-type="transparent"
-                          :disabled="isPending"
+                          :disabled="loading"
                           @click="handleCancelOrClose"
                 >
                     {{ $t('COMMON.BUTTONS.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
-                          :loading="isPending"
+                          :loading="loading"
                           :disabled="!isAllValid"
                           @click="handleConfirm"
                 >

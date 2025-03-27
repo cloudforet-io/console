@@ -18,16 +18,14 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import DOMPurify from 'dompurify';
 
-import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import type { HtmlOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 
@@ -41,7 +39,7 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
         node.setAttribute('rel', 'noopener');
     }
 });
-export default defineComponent({
+export default {
     name: 'PDynamicLayoutHtml',
     components: { PHeading },
     props: {
@@ -50,7 +48,7 @@ export default defineComponent({
             required: true,
         },
         options: {
-            type: Object as PropType<HtmlOptions>,
+            type: Object,
             default: () => ({}),
         },
         data: {
@@ -58,15 +56,15 @@ export default defineComponent({
             default: undefined,
         },
         fetchOptions: {
-            type: Object as PropType<DynamicLayoutFetchOptions>,
+            type: Object,
             default: undefined,
         },
         typeOptions: {
-            type: Object as PropType<DynamicLayoutTypeOptions>,
+            type: Object,
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props: HtmlDynamicLayoutProps) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
@@ -96,7 +94,7 @@ export default defineComponent({
             onLoadIFrame,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">

@@ -15,7 +15,7 @@ import type { PrivateFolderCreateParameters } from '@/api-clients/dashboard/priv
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

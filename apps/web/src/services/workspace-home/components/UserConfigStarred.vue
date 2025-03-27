@@ -5,6 +5,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PFieldTitle, PSelectDropdown, PI, PPagination, PLink, screens,
 } from '@cloudforet/mirinae';
+import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
@@ -41,31 +42,31 @@ const state = reactive({
 const dropdownState = reactive({
     dropdownMenuList: computed<SelectDropdownMenuItem[]>(() => {
         const results: SelectDropdownMenuItem[] = [{
-            name: 'All', label: i18n.t('HOME.CONFIG_STARRED_ALL'), type: 'item',
+            name: 'All', label: i18n.t('HOME.CONFIG_STARRED_ALL'), type: CONTEXT_MENU_TYPE.item,
         }];
         if (favoriteGetters.menuItems.length) {
             results.push({
-                name: FAVORITE_TYPE.MENU, label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: 'item',
+                name: FAVORITE_TYPE.MENU, label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: CONTEXT_MENU_TYPE.item,
             });
         }
         if (favoriteGetters.dashboardItems.length) {
             results.push({
-                name: FAVORITE_TYPE.DASHBOARD, label: i18n.t('MENU.DASHBOARDS'), type: 'item',
+                name: FAVORITE_TYPE.DASHBOARD, label: i18n.t('MENU.DASHBOARDS'), type: CONTEXT_MENU_TYPE.item,
             });
         }
         if (favoriteGetters.projectItems.length) {
             results.push({
-                name: FAVORITE_TYPE.PROJECT, label: i18n.t('MENU.PROJECT'), type: 'item',
+                name: FAVORITE_TYPE.PROJECT, label: i18n.t('MENU.PROJECT'), type: CONTEXT_MENU_TYPE.item,
             });
         }
         if (favoriteGetters.costAnalysisItems.length) {
             results.push({
-                name: FAVORITE_TYPE.COST_ANALYSIS, label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: 'item',
+                name: FAVORITE_TYPE.COST_ANALYSIS, label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: CONTEXT_MENU_TYPE.item,
             });
         }
         if (favoriteGetters.serviceItems.length) {
             results.push({
-                name: FAVORITE_TYPE.SERVICE, label: i18n.t('MENU.ALERT_MANAGER_SERVICE'), type: 'item',
+                name: FAVORITE_TYPE.SERVICE, label: i18n.t('MENU.ALERT_MANAGER_SERVICE'), type: CONTEXT_MENU_TYPE.item,
             });
         }
         return results;

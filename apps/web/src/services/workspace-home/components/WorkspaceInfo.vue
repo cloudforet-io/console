@@ -10,8 +10,10 @@ import {
     PButton, PHeading, PI, PTextButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -20,13 +22,14 @@ import { useUserStore } from '@/store/user/user-store';
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
-import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
@@ -55,6 +58,7 @@ const userStore = useUserStore();
 
 const router = useRouter();
 
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
@@ -89,7 +93,7 @@ const actionWorkspace = (type: string, workspaceId: string) => {
         speed: 1,
     });
     router.push({
-        name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME,
+        name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME),
         query: {
             modalType: type,
             selectedWorkspaceId: workspaceId,
@@ -97,7 +101,7 @@ const actionWorkspace = (type: string, workspaceId: string) => {
     });
 };
 const routerToCreateApp = (isOpenModal: boolean) => {
-    router.push({ name: IAM_ROUTE.APP._NAME }).catch(() => {});
+    router.push(getProperRouteLocation({ name: IAM_ROUTE.APP._NAME }));
     if (isOpenModal) {
         appPageStore.$patch((_state) => {
             _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
@@ -108,7 +112,7 @@ const routerToCreateApp = (isOpenModal: boolean) => {
     }
 };
 const routerToWorkspaceUser = (isOpenModal: boolean) => {
-    router.push({ name: IAM_ROUTE.USER._NAME }).catch(() => {});
+    router.push(getProperRouteLocation({ name: IAM_ROUTE.USER._NAME }));
     if (isOpenModal) {
         userPageStore.$patch((_state) => {
             _state.state.modal.type = USER_MODAL_TYPE.INVITE;

@@ -7,10 +7,10 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PFieldTitle, PI, PBoardItem,
 } from '@cloudforet/mirinae';
-import type { IconSet } from '@cloudforet/mirinae/types/data-display/board-item/type';
+import type { IconSet } from '@cloudforet/mirinae/src/data-display/board-item/type';
 
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

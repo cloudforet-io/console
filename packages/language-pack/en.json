@@ -4370,6 +4370,7 @@
 		"ASSET_INVENTORY_METRIC_EXPLORER": "Metric Explorer",
 		"ASSET_INVENTORY_SECURITY": "Security",
 		"ASSET_INVENTORY_SERVER": "Server",
+		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"CONSOLE_HOME": "Console Home",
 		"COST_EXPLORER": "Cost Explorer",
 		"COST_EXPLORER_ANOMALY_DETECTION": "Anomaly Detection",
@@ -4395,7 +4396,6 @@
 		"OPS_FLOW": "OpsFlow",
 		"PROJECT": "Project",
 		"PROVIDER": "Provider",
-		"SERVICE_ACCOUNT": "Service Account",
 		"TASK_BOARD": "{task} Board",
 		"TASK_MANAGEMENT": "Task Management",
 		"WORKSPACE_HOME": "Home"

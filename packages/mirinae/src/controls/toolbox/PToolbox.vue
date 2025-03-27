@@ -101,7 +101,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, defineComponent, nextTick, reactive, toRefs,
 } from 'vue';
@@ -109,24 +108,21 @@ import {
 import { groupBy } from 'lodash';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
+import type { MenuItem } from '@/controls/context-menu/type';
 import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';
-import type { SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';
 import { defaultConverter } from '@/controls/search/query-search-tags/helper';
 import PQuerySearchTags from '@/controls/search/query-search-tags/PQuerySearchTags.vue';
 import type { QueryTag } from '@/controls/search/query-search-tags/type';
 import PQuerySearch from '@/controls/search/query-search/PQuerySearch.vue';
-import type {
-    KeyItemSet, QueryItem, ValueHandlerMap, ValueSet,
-} from '@/controls/search/query-search/type';
+import type { QueryItem, ValueSet } from '@/controls/search/query-search/type';
 import PSearch from '@/controls/search/search/PSearch.vue';
-import type { SearchType } from '@/controls/toolbox/config';
 import { SEARCH_TYPES } from '@/controls/toolbox/config';
 import type { ToolboxOptions, ToolboxProps } from '@/controls/toolbox/type';
 import { useProxyValue } from '@/hooks/use-proxy-state/use-proxy-state';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 
 
-export default defineComponent({
+export default defineComponent<ToolboxProps>({
     name: 'PToolbox',
     components: {
         PSelectDropdown,
@@ -174,8 +170,11 @@ export default defineComponent({
             default: true,
         },
         searchType: {
-            type: String as PropType<SearchType>,
+            type: String,
             default: SEARCH_TYPES.plain,
+            validator(searchType) {
+                return Object.values(SEARCH_TYPES).includes(searchType as any);
+            },
         },
         thisPage: {
             type: Number,
@@ -201,23 +200,23 @@ export default defineComponent({
             default: '',
         },
         pageSizeOptions: {
-            type: Array as PropType<number[]>,
+            type: Array,
             default: () => [24, 36, 48],
         },
         sortByOptions: {
-            type: Array as PropType<SelectDropdownMenuItem[]>,
-            default: () => [],
+            type: Array,
+            default: () => [] as MenuItem[],
         },
         keyItemSets: {
-            type: Array as PropType<KeyItemSet[]>,
+            type: Array,
             default: () => [],
         },
         valueHandlerMap: {
-            type: Object as PropType<ValueHandlerMap>,
+            type: Object,
             default: () => ({}),
         },
         queryTags: {
-            type: Array as PropType<QueryTag[]>,
+            type: Array,
             default: () => [],
         },
         searchText: {
@@ -246,10 +245,10 @@ export default defineComponent({
                 }
                 return undefined;
             }),
-            pageMenu: computed<SelectDropdownMenuItem[]>(() => {
+            pageMenu: computed(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
                 return props.pageSizeOptions.map((d) => ({
-                    name: `${d}`, label: `${d}`, type: 'item',
+                    name: d, label: d, type: 'item',
                 }));
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy]?.[0]?.label : proxyState.sortBy)),

@@ -61,7 +61,7 @@
             <template v-for="(_, slot) of $scopedSlots"
                       #[slot]="scope"
             >
-                <slot v-if="typeof slot === 'string' && !slot.startsWith('col-')"
+                <slot v-if="!slot.startsWith('col-')"
                       :name="slot"
                       v-bind="scope"
                 />
@@ -80,15 +80,17 @@ import {
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
+    TableDynamicLayoutProps,
+} from '@/data-display/dynamic/dynamic-layout/templates/table/type';
 import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
 import type { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
-import type { DataTableField } from '@/data-display/tables/data-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import type { ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
 
-export default defineComponent({
+export default defineComponent<TableDynamicLayoutProps>({
     name: 'PDynamicLayoutTable',
     components: {
         PDynamicField,
@@ -105,7 +107,7 @@ export default defineComponent({
             default: () => ({}),
         },
         data: {
-            type: [Object, Array, String] as PropType<any>,
+            type: [Object, Array, String],
             default: undefined,
         },
         fetchOptions: {
@@ -127,13 +129,14 @@ export default defineComponent({
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             /** table */
-            fields: computed<DataTableField[]>(() => {
+            fields: computed(() => {
                 if (!props.options.fields) return [];
 
                 return props.options.fields.map((ds) => ({
                     name: ds.key,
                     label: ds.name,
                     sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
+                    // eslint-disable-next-line camelcase
                     sortKey: ds.options?.sort_key,
                     width: ds.options?.width,
                 }));

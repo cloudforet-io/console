@@ -1,23 +1,21 @@
 <script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
 import type { BadgeProps } from '@/data-display/badge/type';
 import { BADGE_SHAPE } from '@/data-display/badge/type';
-import type { BadgeTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
-import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/navigation/link/PLink.vue';
 import { ACTION_ICON } from '@/navigation/link/type';
 import { commaFormatter, getColor } from '@/utils/helpers';
 
-export default defineComponent({
+export default {
     name: 'PDynamicFieldBadge',
     components: { PBadge },
     props: {
         options: {
-            type: Object as PropType<BadgeOptions>,
+            type: Object,
             default: () => ({}),
         },
         data: {
@@ -25,7 +23,7 @@ export default defineComponent({
             default: undefined,
         },
         typeOptions: {
-            type: Object as PropType<BadgeTypeOptions>,
+            type: Object,
             default: () => ({}),
         },
         extraData: {
@@ -33,11 +31,11 @@ export default defineComponent({
             default: () => ({}),
         },
         handler: {
-            type: Function as PropType<DynamicFieldHandler|undefined>,
+            type: Function,
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props: BadgeDynamicFieldProps) {
         // eslint-disable-next-line vue/no-setup-props-destructure
         const options: BadgeOptions = props.options;
 
@@ -54,7 +52,7 @@ export default defineComponent({
             badgeProps.textColor = getColor(options.text_color);
         }
 
-        let badgeEl: any = props.data ?? props.options.default;
+        let badgeEl = props.data ?? props.options.default;
         if (badgeEl === undefined || badgeEl === null) return () => undefined;
         if (typeof badgeEl === 'number') badgeEl = commaFormatter(badgeEl);
         badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
@@ -67,7 +65,7 @@ export default defineComponent({
 
         return () => h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
     },
-});
+};
 </script>
 
 <style lang="postcss">

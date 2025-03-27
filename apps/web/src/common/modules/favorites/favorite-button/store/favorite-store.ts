@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive, watch } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -8,10 +6,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigDeleteParameters } from '@/api-clients/config/user-config/schema/api-verbs/delete';
-import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
-import type { UserConfigSetParameters } from '@/api-clients/config/user-config/schema/api-verbs/set';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
+import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';

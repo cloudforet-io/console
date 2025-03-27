@@ -8,16 +8,13 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
+import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory-v1/types/cloud-service-page-type';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
@@ -26,9 +23,9 @@ import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-ty
 
 
 export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseWidgetState>, dateRange: ComputedRef<DateRange>, overrides: OverridableWidgetState = {}) => {
+    const { getProperRouteLocation } = useProperRouteLocation();
     const assetQueryHelper = new QueryHelper();
     const budgetQueryHelper = new QueryHelper();
-    const appContextStore = useAppContextStore();
 
     const localState = reactive({
         assetWidgetLocation: computed<Location | undefined>(() => {
@@ -42,16 +39,15 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const query: CloudServiceDetailPageUrlQuery = {
                 filters: assetQueryHelper.setFilters(consoleFilters).rawQueryStrings,
             };
-            const cloudServiceDetailRouteName = appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
-            return {
-                name: cloudServiceDetailRouteName,
+            return getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: cloudServiceQuerySet.data?.provider,
                     group: cloudServiceQuerySet.data?.cloud_service_group,
                     name: cloudServiceQuerySet.data?.cloud_service_type,
                 },
                 query,
-            };
+            });
         }),
         budgetWidgetLocation: computed<Location | undefined>(() => {
             if (Object.hasOwn(overrides, 'budgetWidgetLocation')) return isRef(overrides.budgetWidgetLocation) ? overrides.budgetWidgetLocation.value : overrides.budgetWidgetLocation;
@@ -60,14 +56,13 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const dataSourceId = baseState.options.cost_data_source;
             if (dataSourceId) budgetQueryHelper.addFilter({ k: 'data_source_id', v: [dataSourceId], o: '=' });
             if (baseState.options.filters?.provider) budgetQueryHelper.addFilter(...baseState.options.filters.provider);
-            const adminBudgetRouteName = appContextStore.getters.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET._NAME : COST_EXPLORER_ROUTE.BUDGET._NAME;
-            return {
-                name: adminBudgetRouteName,
+            return getProperRouteLocation({
+                name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                 params: {},
                 query: {
                     filters: budgetQueryHelper.rawQueryStrings,
                 },
-            };
+            });
         }),
         costWidgetLocation: computed<Location | undefined>(() => {
             if (Object.hasOwn(overrides, 'costWidgetLocation')) return isRef(overrides.costWidgetLocation) ? overrides.costWidgetLocation.value : overrides.costWidgetLocation;
@@ -75,9 +70,8 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const dataField: string[] = [];
             if (baseState.dataField) dataField.push(baseState.dataField);
             if (baseState.secondaryDataField) dataField.push(baseState.secondaryDataField);
-            const costQuerySetRouteName = appContextStore.getters.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME;
-            return {
-                name: costQuerySetRouteName,
+            return getProperRouteLocation({
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
                     dataSourceId: baseState.options.cost_data_source ?? '',
                     costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
@@ -88,7 +82,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
                     period: objectToQueryString(dateRange.value),
                     filters: arrayToQueryString(getWidgetLocationFilters(baseState.options.filters)),
                 },
-            };
+            });
         }),
     });
 

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import type { NavigationGuardNext, Route, RouteConfig } from 'vue-router';
+import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
 import { clone } from 'lodash';
@@ -7,8 +7,8 @@ import { clone } from 'lodash';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
-import type { GrantScope } from '@/api-clients/identity/token/schema/type';
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
+import type { GrantScope } from '@/schema/identity/token/type';
 
 import { ERROR_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import {
@@ -93,11 +93,6 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
-            /* Redirection to proper route */
-            const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
-            const redirected = SpaceRouter.handleWorkspaceRouteRedirection(to, currentWorkspaceId, next);
-            if (redirected) return;
-
             const { rol: prevRole, wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
             const routeScope = getRouteScope(to);
 
@@ -173,25 +168,5 @@ export class SpaceRouter {
         });
 
         return SpaceRouter.router;
-    }
-
-
-    static handleWorkspaceRouteRedirection(to: Route, currentWorkspaceId: string|undefined, next: NavigationGuardNext): boolean {
-        const targetRouteScope = getRouteScope(to);
-        const needsWorkspaceId = targetRouteScope === ROUTE_SCOPE.WORKSPACE && !to.params.workspaceId && currentWorkspaceId;
-
-        if (to.name && needsWorkspaceId) {
-            next({
-                ...to,
-                name: to.name,
-                params: {
-                    ...to.params,
-                    workspaceId: currentWorkspaceId,
-                },
-            });
-            return true;
-        }
-
-        return false;
     }
 }

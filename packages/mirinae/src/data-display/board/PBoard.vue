@@ -15,8 +15,7 @@
                           :left-icon="board.leftIcon"
                           :icon-button-sets="board.iconButtonSets"
                           :rounded="board.rounded"
-                          :selected="selectedItem"
-                          :update:selected="handleUpdateSelected"
+                          :selected.sync="selectedItem"
                           @click.stop="handleClickBoardItem(board, index)"
             >
                 <template #left-content>
@@ -48,22 +47,24 @@
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
+
 
 import PBoardItem from '@/data-display/board-item/PBoardItem.vue';
 import { BOARD_STYLE_TYPE } from '@/data-display/board/type';
-import type {
-    BoardSet, BoardStyleType, StyleOptions,
-} from '@/data-display/board/type';
+import type { BoardProps, BoardSet, StyleOptions } from '@/data-display/board/type';
 
 
-export default defineComponent({
+export default defineComponent<BoardProps>({
     name: 'PBoard',
     components: { PBoardItem },
     props: {
         styleType: {
-            type: String as PropType<BoardStyleType>,
+            type: String,
             default: BOARD_STYLE_TYPE.list,
+            validator(styleType: any) {
+                return Object.values(BOARD_STYLE_TYPE).includes(styleType);
+            },
         },
         styleOptions: {
             type: Object as PropType<StyleOptions>,
@@ -86,7 +87,7 @@ export default defineComponent({
             default: undefined,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             boardList: computed<BoardSet[]>(() => props.boardSets),
             styleVariableByOptions: computed(() => {
@@ -102,9 +103,6 @@ export default defineComponent({
         });
 
 
-        const handleUpdateSelected = (value: string) => {
-            emit('update:selected-item', value);
-        };
         const handleClickBoardItem = (item: BoardSet, index: number) => {
             emit('item-click', item, index);
         };
@@ -112,7 +110,6 @@ export default defineComponent({
         return {
             ...toRefs(state),
             handleClickBoardItem,
-            handleUpdateSelected,
         };
     },
 });

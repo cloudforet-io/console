@@ -4,9 +4,8 @@ import draggable from 'vuedraggable';
 
 import { PI } from '@cloudforet/mirinae';
 
-
-import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
-import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import type { TaskField } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskTypeModel } from '@/schema/opsflow/task-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -17,9 +16,8 @@ import TaskFieldGenerator from '@/services/ops-flow/task-fields-configuration/Ta
 import type { MutableTaskField } from '@/services/ops-flow/task-fields-configuration/types/mutable-task-field-type';
 import type { TaskFieldTypeMetadata } from '@/services/ops-flow/task-fields-configuration/types/task-field-type-metadata-type';
 
-
 const props = defineProps<{
-    requireProject: TaskTypeModel['require_project'];
+    scope: TaskTypeModel['scope'];
     fields: MutableTaskField[];
     originFields?: TaskField[];
 }>();
@@ -32,8 +30,14 @@ const taskFieldMetadataStore = useTaskFieldMetadataStore();
 const taskFieldMetadataStoreGetters = taskFieldMetadataStore.getters;
 
 const defaultFields = computed<TaskField[]>(() => {
-    if (props.requireProject) return taskFieldMetadataStoreGetters.projectScopeDefaultFields;
-    return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    switch (props.scope) {
+    case 'WORKSPACE':
+        return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    case 'PROJECT':
+        return taskFieldMetadataStoreGetters.projectScopeDefaultFields;
+    default:
+        return taskFieldMetadataStoreGetters.workspaceScopeDefaultFields;
+    }
 });
 const draggableFields = computed<MutableTaskField[]>({
     get() {
@@ -102,7 +106,6 @@ const handleFieldDeleteConfirm = () => {
                             <task-field-generator class="flex-grow"
                                                   :field="field"
                                                   :all-fields="draggableFields"
-                                                  editable
                                                   @delete="handleFieldDelete(field, idx)"
                                                   @update:field="draggableFields[idx] = $event"
                                                   @update:is-valid="emit('update-field-validation', field._field_id, $event)"

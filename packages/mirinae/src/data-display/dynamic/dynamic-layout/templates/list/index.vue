@@ -31,20 +31,21 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import { map, replace } from 'lodash';
 
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import type { DynamicLayoutFetchOptions, DynamicLayoutFieldHandler, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout, ListOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type {
+    ListDynamicLayoutProps,
+} from '@/data-display/dynamic/dynamic-layout/templates/list/type';
+import type { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import { makeByPassListeners } from '@/utils/composition-helpers';
 
-export default defineComponent({
+export default {
     name: 'PDynamicLayoutList',
     components: { PDynamicLayout },
     props: {
@@ -53,7 +54,7 @@ export default defineComponent({
             required: true,
         },
         options: {
-            type: Object as PropType<ListOptions>,
+            type: Object,
             default: () => ({}),
         },
         data: {
@@ -61,19 +62,19 @@ export default defineComponent({
             default: undefined,
         },
         fetchOptions: {
-            type: Object as PropType<DynamicLayoutFetchOptions>,
+            type: Object,
             default: undefined,
         },
         typeOptions: {
-            type: Object as PropType<DynamicLayoutTypeOptions>,
+            type: Object,
             default: undefined,
         },
         fieldHandler: {
-            type: Function as PropType<DynamicLayoutFieldHandler>,
+            type: Function,
             default: undefined,
         },
     },
-    setup(props, { slots, listeners }) {
+    setup(props: ListDynamicLayoutProps, { slots, listeners }) {
         const state = reactive({
             layouts: computed<DynamicLayout[]>(() => props.options.layouts || []),
             rootData: computed(() => {
@@ -103,5 +104,5 @@ export default defineComponent({
             },
         };
     },
-});
+};
 </script>

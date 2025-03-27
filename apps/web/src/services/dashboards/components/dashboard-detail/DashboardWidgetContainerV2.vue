@@ -187,7 +187,7 @@ const { mutateAsync: updateDashboard } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: async (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
             await queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
     },

@@ -23,6 +23,7 @@ interface KeyItemSet {
     items: KeyItem[];
 }
 type KeyMap = Record<string, KeyItem>;
+type ReferenceStore = Record<string, ComputedRef<ReferenceMap>>;
 const datetimeOperatorToOriginMap: Partial<Record<ConsoleFilterOperator, OperatorType>> = {
     '>t': '>',
     '>=t': '>=',
@@ -33,7 +34,7 @@ const datetimeOperatorToOriginMap: Partial<Record<ConsoleFilterOperator, Operato
 const filterToQueryTag = (
     filter: { k?: string; v: ConsoleFilterValue; o?: ConsoleFilterOperator },
     keyMap: KeyMap,
-    referenceStore?: Record<string, ComputedRef<ReferenceMap>>|ReturnType<typeof useAllReferenceStore>['getters'],
+    referenceStore?: ReferenceStore,
 ): QueryTag | null => {
     if (filter.k === undefined || filter.k === null) {
         /* no key case */

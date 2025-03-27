@@ -2,7 +2,7 @@
 import {
     PBoard, PI,
 } from '@cloudforet/mirinae';
-import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
+import type { BoardSet } from '@cloudforet/mirinae/src/data-display/board/type';
 
 import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 

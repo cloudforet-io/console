@@ -1,65 +1,66 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { reactive, computed, onMounted } from 'vue';
 
 import {
     PPaneLayout, PHeadingLayout, PHeading, PButton, PDataTable, PBadge, PIconButton, PLink,
 } from '@cloudforet/mirinae';
-import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
 
 import { getParticle, i18n as _i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';
 
-import { useAvailableCategories } from '@/services/ops-flow/composables/use-available-categories';
-import { usePackagesQuery } from '@/services/ops-flow/composables/use-packages-query';
-import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
+import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
+import { usePackageStore } from '@/services/ops-flow/stores/admin/package-store';
 import { useTaskManagementPageStore } from '@/services/ops-flow/stores/admin/task-management-page-store';
+import { useTaskCategoryStore } from '@/services/ops-flow/stores/task-category-store';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-
 const taskManagementPageStore = useTaskManagementPageStore();
+const taskCategoryStore = useTaskCategoryStore();
+const packageStore = usePackageStore();
+
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-/* packages */
-const { packages } = usePackagesQuery();
-const packageMap = computed(() => {
-    if (!packages.value) return {};
-    return packages.value.reduce((acc, cur) => {
-        acc[cur.package_id] = cur;
-        return acc;
-    }, {} as Record<string, any>);
+const state = reactive({
+    categoryFields: computed<DataTableField[]>(() => [
+        {
+            name: 'name',
+            label: _i18n.t('OPSFLOW.NAME') as string,
+            width: '30%',
+        },
+        {
+            name: 'package',
+            label: _i18n.t('OPSFLOW.PACKAGE') as string,
+            width: '25%',
+            sortable: true,
+        },
+        {
+            name: 'description',
+            label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
+            width: '45%',
+        },
+        {
+            name: 'buttons',
+            label: ' ',
+        },
+    ]),
+    packageMap: computed(() => {
+        if (!packageStore.getters.packages) return {};
+        return packageStore.getters.packages.reduce((acc, cur) => {
+            acc[cur.package_id] = cur;
+            return acc;
+        }, {} as Record<string, any>);
+    }),
 });
 
-/* task categories */
-const { availableCategories, isLoading, refetch } = useAvailableCategories();
-
-/* table fields */
-const categoryFields = computed<DataTableField[]>(() => [
-    {
-        name: 'name',
-        label: _i18n.t('OPSFLOW.NAME') as string,
-        width: '30%',
-    },
-    {
-        name: 'package',
-        label: _i18n.t('OPSFLOW.PACKAGE') as string,
-        width: '25%',
-        sortable: true,
-    },
-    {
-        name: 'description',
-        label: _i18n.t('OPSFLOW.DESCRIPTION') as string,
-        width: '45%',
-    },
-    {
-        name: 'buttons',
-        label: ' ',
-    },
-]);
-
+onMounted(() => {
+    if (!taskCategoryStore.state.loading) taskCategoryStore.list();
+});
 
 </script>
 
@@ -73,7 +74,7 @@ const categoryFields = computed<DataTableField[]>(() => [
             </template>
             <template #extra>
                 <p-icon-button name="ic_refresh"
-                               @click="refetch"
+                               @click="taskCategoryStore.list(true)"
                 />
                 <p-button icon-left="ic_plus_bold"
                           size="md"
@@ -92,14 +93,14 @@ const categoryFields = computed<DataTableField[]>(() => [
                 tasksObjectParticle: getParticle(taskManagementTemplateStore.templates.tasks, 'object'),
             }) }}
         </p>
-        <p-data-table :loading="isLoading"
-                      :items="availableCategories"
-                      :fields="categoryFields"
+        <p-data-table :loading="taskCategoryStore.getters.loading"
+                      :items="taskCategoryStore.getters.taskCategories"
+                      :fields="state.categoryFields"
         >
             <template #col-name-format="{ item }">
                 <p-link :text="item.name"
                         :to="{
-                            name: ADMIN_OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME,
+                            name: makeAdminRouteName(OPS_FLOW_ROUTE.TASK_MANAGEMENT.TASK_CATEGORY.DETAIL._NAME),
                             params: { taskCategoryId: item.category_id }
                         }"
                         highlight
@@ -111,7 +112,7 @@ const categoryFields = computed<DataTableField[]>(() => [
                          style-type="gray200"
                          size="md"
                 >
-                    {{ packageMap[item.package_id] ? packageMap[item.package_id].name : item.package_id }}
+                    {{ state.packageMap[item.package_id] ? state.packageMap[item.package_id].name : item.package_id }}
                 </p-badge>
             </template>
             <template #col-buttons-format="{ item }">

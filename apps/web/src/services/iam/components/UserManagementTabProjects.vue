@@ -8,20 +8,19 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectListParameters } from '@/api-clients/identity/project/schema/api-verbs/list';
-import type { ProjectRemoveUsersParameters } from '@/api-clients/identity/project/schema/api-verbs/remove-users';
-import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
-
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
 
 interface TableItem {
     project_id?: string;
@@ -40,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-const userWorkspaceStore = useUserWorkspaceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     loading: false,
@@ -137,7 +136,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-name-format="{item}">
                 <span class="project-name-wrapper">
-                    <router-link :to="{ name: PROJECT_ROUTE_V1.DETAIL._NAME, params: { id: item.project_id, workspaceId: userWorkspaceStore.getters.currentWorkspaceId } }"
+                    <router-link :to="getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id } })"
                                  target="_blank"
                     >
                         <span>{{ item.name }}</span>
