@@ -25,35 +25,6 @@
         "SKIP_TOKEN_CHECK": false,
         "API_KEY": "api-key"
     }
-  },
-  "SERVICES": {
-      "DASHBOARDS": {
-        "ENABLED": true,
-        "VERSION": "V1"
-      },
-      "PROJECT": {
-        "ENABLED": true,
-        "VERSION": "V1"
-      },
-      "SERVICE_ACCOUNT": {
-        "ENABLED": true,
-        "VERSION": "V1"
-      },
-      "ASSET_INVENTORY": {
-        "ENABLED": true,
-        "VERSION": "V1"
-      },
-      "COST_ANALYSIS": {
-        "ENABLED": true,
-        "VERSION": "V1"
-      },
-      "OPS_FLOW": {
-        "ENABLED": true,
-        "VERSION": "V1"
-      },
-      "ALERT_MANAGER": {
-        "ENABLED": true,
-        "VERSION": "V2"
-      }
-    }
+  }
+  "ADVANCED_SERVICE": {}
 }
