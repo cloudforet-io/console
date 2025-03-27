@@ -1,16 +1,97 @@
 <script setup lang="ts">
-import { PHeading } from '@cloudforet/mirinae';
+import type { ComputedRef } from 'vue';
+import { computed, onUnmounted, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import BudgetCreateForm from '@/services/cost-explorer/components/BudgetCreateForm.vue';
+import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
+
+
+
+import { i18n } from '@/translations';
+
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
+
+import BudgetCreateStep1 from '@/services/cost-explorer/components/BudgetCreateStep1.vue';
+import BudgetCreateStep2 from '@/services/cost-explorer/components/BudgetCreateStep2.vue';
+import BudgetCreateStep3 from '@/services/cost-explorer/components/BudgetCreateStep3.vue';
+
+import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
+
+interface BudgetCreateState {
+    steps: ComputedRef<{
+        step: number;
+        title: TranslateResult | string;
+        description: TranslateResult | string;
+    }[]>;
+    closeConfirmModalVisible: boolean;
+}
+
+
+const budgetCreatePageStore = useBudgetCreatePageStore();
+const budgetCreatePageState = budgetCreatePageStore.state;
+
+const state = reactive<BudgetCreateState>({
+    steps: computed(() => [
+        {
+            step: 1,
+            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET'),
+            description: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.STEP1_DESC'),
+        },
+        {
+            step: 2,
+            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET'),
+            description: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.STEP2_DESCRIPTION'),
+        },
+        {
+            step: 3,
+            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SET_BUDGET_ALERTS'),
+            description: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.STEP3_DESCRIPTION'),
+        },
+    ]),
+    closeConfirmModalVisible: false,
+});
+
+const handleClickSecondPage = () => {
+    budgetCreatePageStore.setCurrentStep(2);
+};
+
+const handleClickThirdPage = () => {
+    budgetCreatePageState.currentStep = 3;
+};
+
+const handleClickClose = () => {
+    state.closeConfirmModalVisible = true;
+};
+
+onUnmounted(() => {
+    budgetCreatePageStore.reset();
+});
 </script>
 
 <template>
-    <div>
-        <p-heading class="mb-6"
-                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')"
-                   show-back-button
-                   @click-back-button="$router.go(-1)"
+    <div class="budget-create-page">
+        <p-centered-layout-header :title="state.steps[budgetCreatePageState.currentStep - 1].title"
+                                  :description="state.steps[budgetCreatePageState.currentStep - 1].description"
+                                  :total-steps="state.steps.length"
+                                  :current-step="budgetCreatePageState.currentStep"
+                                  show-step
+                                  show-close-button
+                                  @close="handleClickClose"
         />
-        <budget-create-form />
+        <budget-create-step1 v-if="budgetCreatePageState.currentStep === 1"
+                             @click-next="handleClickSecondPage"
+        />
+        <budget-create-step2 v-else-if="budgetCreatePageState.currentStep === 2"
+                             @click-next="handleClickThirdPage"
+        />
+        <budget-create-step3 v-else-if="budgetCreatePageState.currentStep === 3" />
+        <confirm-back-modal :visible.sync="state.closeConfirmModalVisible" />
     </div>
 </template>
+
+<style scoped lang="postcss">
+.budget-create-page {
+    margin: 0 auto;
+    padding: 137px 130px;
+}
+</style>
