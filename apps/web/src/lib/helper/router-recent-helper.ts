@@ -12,6 +12,7 @@ import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constan
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface RecentConfig {
     itemType: RecentType;
@@ -63,7 +64,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         return { itemType: RECENT_TYPE.PROJECT, workspaceId, itemId: projectId };
     }
 
-    if (to.name === ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME) {
+    if (to.name === SERVICE_ACCOUNT_ROUTE.DETAIL._NAME) {
         const serviceAccountId = to?.params?.serviceAccountId;
         const isTrustedAccount = serviceAccountId.startsWith('ta');
         if (!serviceAccountId) return undefined;

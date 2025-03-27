@@ -3,12 +3,8 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
+import APIClientManager from '@/api-clients/api-client-manager';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
-import type { WebhookListParameters as WebhookListParametersV1 } from '@/schema/monitoring/webhook/api-verbs/list';
 import type { WebhookModel as WebhookModelV1 } from '@/schema/monitoring/webhook/model';
 
 import type {
@@ -16,7 +12,6 @@ import type {
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,8 +27,6 @@ export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
     const state = reactive({
         items: null as WebhookReferenceMap | null,
     });
-
-    const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
 
     const getters = reactive({
         webhookItems: asyncComputed<WebhookReferenceMap>(async () => {
@@ -59,12 +52,10 @@ export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
         ) return;
 
         const referenceMap: WebhookReferenceMap = {};
+        const alertManagerClient = APIClientManager.alertManager;
+        if (!alertManagerClient) return;
         try {
-            const fetcher = isAlertManagerV2Enabled.value
-                ? SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>
-                : SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParametersV1, ListResponse<WebhookModelV1>>;
-
-            const response = await fetcher({
+            const response = await alertManagerClient.endpoint.webhook.list({
                 query: {
                     only: ['webhook_id', 'name', 'plugin_info'],
                 },

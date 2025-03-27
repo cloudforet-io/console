@@ -22,9 +22,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useIsAlertManagerV2Enabled } from '@/lib/config/composables/use-is-alert-manager-v2-enabled';
+import { MENU_ID } from '@/lib/menu/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -53,15 +54,16 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const userStore = useUserStore();
 
+const { visibleContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
+
 /* Query */
 const {
     publicDashboardList,
     publicFolderList,
 } = useDashboardQuery();
 
-const isAlertManagerV2Enabled = useIsAlertManagerV2Enabled();
-
 const storeState = reactive({
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && projectDetailPageState.visibleAlertTab),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     language: computed<string|undefined>(() => userStore.state.language),
@@ -107,7 +109,7 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
         },
-        ...(isAlertManagerV2Enabled.value ? [] : [
+        ...(!storeState.visibleAlertTab ? [] : [
             {
                 name: PROJECT_ROUTE_V1.DETAIL.TAB.ALERT._NAME,
                 label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),

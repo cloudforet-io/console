@@ -5,6 +5,9 @@ export const ADMIN_IAM_ROUTE = {
     USER: {
         _NAME: `admin.${MENU_ID.IAM}.${MENU_ID.USER}`,
     },
+    USER_GROUP: {
+        _NAME: `admin.${MENU_ID.IAM}.${MENU_ID.USER_GROUP}`,
+    },
     APP: {
         _NAME: `admin.${MENU_ID.IAM}.${MENU_ID.APP}`,
     },
@@ -18,3 +21,4 @@ export const ADMIN_IAM_ROUTE = {
         },
     },
 } as const;
+

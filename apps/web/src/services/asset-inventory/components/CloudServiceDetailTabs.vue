@@ -10,20 +10,16 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 
-
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
-import { useDisplayStore } from '@/store/display/display-store';
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import config from '@/lib/config';
 import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
 
-
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
@@ -42,6 +38,7 @@ import CloudServiceLogTab
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/components/CloudServiceTagsPanel.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import {
     useTaskManagementTemplateStore,
@@ -60,17 +57,21 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const domainStore = useDomainStore();
-const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const displayStore = useDisplayStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
 const router = useRouter();
 
+const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
+
 /* Tabs */
+const state = reactive({
+    visibleAlertTab: computed(() => cloudServiceDetailPageState.visibleAlertTab),
+});
 const singleItemTabState = reactive({
     tabs: computed(() => {
         const defaultTabs = [
@@ -85,10 +86,10 @@ const singleItemTabState = reactive({
                 { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
             );
         }
-        if (isAlertManagerVersionV2) {
+        if (state.visibleAlertTab) {
             defaultTabs.push({ name: 'alerts', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS') });
         }
-        if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
+        if (visibleContents.value) {
             defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
         }
         return defaultTabs;
@@ -102,7 +103,7 @@ const multiItemTabState = reactive({
             { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
             { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
         ];
-        if (displayStore.getters.availableAdvancedServices[MENU_ID.OPS_FLOW]) {
+        if (visibleContents.value) {
             defaultTabs.push({ name: 'task', label: taskManagementTemplateStore.templates.Task });
         }
         return defaultTabs;
