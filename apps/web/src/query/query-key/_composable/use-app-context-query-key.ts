@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -23,18 +23,16 @@ export const useQueryKeyAppContext = () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
 
-    const _state = reactive({
-        isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-        workspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
-    });
+    const _isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+    const _workspaceId = computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId);
 
     return computed(() => {
-        const state: QueryKeyState = _state.isAdminMode
+        const state: QueryKeyState = _isAdminMode.value
             ? { isAdminMode: true }
             : {
                 isAdminMode: false,
                 // workspaceId: _state.workspaceId!
-                workspaceId: _state.workspaceId ?? '',
+                workspaceId: _workspaceId.value ?? '',
             };
 
         return state.isAdminMode
