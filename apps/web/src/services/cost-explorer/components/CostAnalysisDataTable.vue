@@ -643,14 +643,14 @@ watch(
             >
                 <span v-if="colIndex === 0">Total</span>
                 <span v-else-if="tableState.showFormattedData && field.name !== 'usage_unit'
-                    && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
-                        && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
+                    && (!tableState.groupByFields.map(item => lowerCase(item.name)).includes(lowerCase(field.name)))
+                    && (!tableState.groupByFields.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
                 >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
                 </span>
                 <span v-else-if="!tableState.showFormattedData && field.name !== 'usage_unit'
-                    && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
-                        && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
+                    && (!tableState.groupByFields.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
+                        && !tableState.groupByFields.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
                 >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {minimumFractionDigits: 2}) : 0 }}
                 </span>

@@ -23,7 +23,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAdvancedMenuDisplay } from '@/store/display/composables/useAdvancedMenuDisplay';
+import { useAdvancedMenuDisplay } from '@/store/display/composables/use-advanced-menu-display';
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,

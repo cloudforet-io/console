@@ -38,7 +38,7 @@ jobs:
         env:
           NODE_ENV: "production"
         run: |
-          npm run build -- --filter=storybook --output-logs=new-only
+          npm run build -- --filter=mirinae-storybook --output-logs=new-only
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

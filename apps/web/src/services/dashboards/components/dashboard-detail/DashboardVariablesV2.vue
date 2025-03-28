@@ -87,14 +87,13 @@ const handleResetVariables = () => {
     dashboardDetailStore.setVars(_originVars);
 };
 
-const handleUpdateVars = (val: DashboardVars) => {
-    state.tempVars = val;
-    dashboardDetailStore.setVars(val);
-};
-
 watch(() => dashboard.value?.vars, (_vars) => {
     state.tempVars = { ..._vars };
 }, { immediate: true });
+
+watch([() => state.tempVars, dashboard], ([_tempVars]) => {
+    dashboardDetailStore.setVars(_tempVars);
+}, { deep: true });
 </script>
 
 <template>
@@ -104,8 +103,7 @@ watch(() => dashboard.value?.vars, (_vars) => {
         <template v-for="(property, idx) in state.globalVariables">
             <div :key="`${property.name}-${idx}`">
                 <dashboard-global-variable-filter :variable="property"
-                                                  :vars="state.tempVars"
-                                                  @update:vars="handleUpdateVars"
+                                                  :vars.sync="state.tempVars"
                 />
                 <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(property.key)" />
             </div>
