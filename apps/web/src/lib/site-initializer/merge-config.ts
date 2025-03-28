@@ -10,8 +10,8 @@ export const mergeConfig = async (config, domainId: string): Promise<GlobalServi
     const baseConfig = config.get('SERVICES') || {};
 
     const { data: overrideConfigData } = await SpaceConnector.clientV2.config.publicConfig.get<PublicConfigGetParameters, PublicConfigModel>({
-        name: PUBLIC_CONFIG_NAMES.OVERRIDE_SERVICE_SETTING as string,
-        domainId,
+        name: PUBLIC_CONFIG_NAMES.OVERRIDE_SERVICE_SETTING,
+        domain_id: domainId,
     });
     const overrideConfig = overrideConfigData.SERVICES || {};
 
