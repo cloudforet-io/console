@@ -242,10 +242,10 @@ const queryResults = useQueries({
     ],
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || state.dataTableLoading);
+const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || queryResults.value?.[1].isFetching || state.dataTableLoading);
 const errorMessage = computed<string>(() => {
     if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
-    return queryResults.value?.[0].error?.message as string;
+    return queryResults.value?.[0].error?.message as string || queryResults.value?.[1].error?.message as string;
 });
 
 

@@ -1799,6 +1799,7 @@
 				"LINE_TO_ZERO": "Line to Zero",
 				"MISSING_VALUE": "Missing Value"
 			},
+			"NO_DATA_TABLE_ERROR_MESSAGE": "Please check the data source or review the widget settings.",
 			"NO_DATA_TO_DISPLAY": "No Data to Display",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "less than previous day",
