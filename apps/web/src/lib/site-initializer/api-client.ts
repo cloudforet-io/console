@@ -2,7 +2,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
-import APIClientManager from '@/api-clients/api-client-manager';
 import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
 import type { TokenGrantModel } from '@/api-clients/identity/token/schema/model';
 
@@ -434,7 +433,6 @@ export const initApiClient = async (config) => {
         getAfterCallApiMap(),
         serviceConfig,
     );
-    await APIClientManager.initialize();
     const existingRefreshToken = SpaceConnector.getRefreshToken();
 
     if (!existingRefreshToken) return;
