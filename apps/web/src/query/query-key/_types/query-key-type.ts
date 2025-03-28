@@ -1,6 +1,12 @@
 import type { API_DOC } from '@/api-clients/_common/constants/api-doc-constant';
 
 
+export type QueryKeyArray = unknown[];
+
+export type QueryScope = 'service' | 'reference';
+
+
+
 /**
  * Extracts all possible keys for `{service-name}`, `{resource-name}`, and `{verb}`
  */
