@@ -23,6 +23,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAdvancedMenuDisplay } from '@/store/display/composables/useAdvancedMenuDisplay';
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
@@ -107,6 +108,7 @@ export const useDisplayStore = defineStore('display-store', () => {
         gnbNotificationLastReadTime: '',
     });
 
+    const advancedMenuDisplay = useAdvancedMenuDisplay();
     const getters = reactive<DisplayStoreGetters>({
         hasUncheckedNotifications: computed<boolean>(() => !!(state.uncheckedNotificationCount && state.uncheckedNotificationCount > 0)),
         isHandbookVisible: computed<boolean>(() => state.visibleSidebar && (state.sidebarType === SIDEBAR_TYPE.handbook)),
@@ -328,6 +330,8 @@ export const useDisplayStore = defineStore('display-store', () => {
             });
         }
 
+        // advanced service menu display
+        _allGnbMenuList = advancedMenuDisplay.refineGNBMenuList(_allGnbMenuList);
         return _allGnbMenuList;
     };
 
