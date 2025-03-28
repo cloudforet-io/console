@@ -19,7 +19,7 @@
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,vue,pcss,scss}\"",
     "format": "npm run eslint:fix && npm run stylelint:fix",
     "postcss": "node build/reset-css.js",
-    "api-doc": "node ./cli/api-doc-gen.js && npx eslint ./src/api-clients/_common/constants/api-doc.ts --fix"
+    "api-doc": "node ./cli/api-doc-gen.js && npx eslint ./src/api-clients/_common/constants/api-doc-constant.ts --fix"
   },
   "main": "dist/cloudforet-component.common.js",
   "dependencies": {
