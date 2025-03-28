@@ -1877,6 +1877,7 @@
 				"LINE_TO_ZERO": "0として表示",
 				"MISSING_VALUE": "欠損値の処理方式"
 			},
+			"NO_DATA_TABLE_ERROR_MESSAGE": "データソースを確認するか、ウィジェットの設定を見直してください。",
 			"NO_DATA_TO_DISPLAY": "データがありません",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "前日よりも少ない",

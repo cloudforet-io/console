@@ -1,33 +1,22 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import config from '@/lib/config';
 import type { ApiClientsSchemaType } from '@/lib/config/global-config/api-client-schema';
 import { ApiClientEndpoint } from '@/lib/config/global-config/api-client-schema';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
 
-interface ServiceConfig {
-    ENABLED: boolean;
-    VERSION: string;
-}
-
-interface GlobalConfig {
-    SERVICES: {
-        [key: string]: ServiceConfig;
-    };
-}
 
 class APIClientManager {
     // eslint-disable-next-line no-undef
     [key: string]: any;
 
-    private config: GlobalConfig['SERVICES'] | null = null;
+    private config: GlobalServiceConfig = {} as GlobalServiceConfig;
 
     private apiClientsSchema: ApiClientsSchemaType = {} as ApiClientsSchemaType;
 
-    async initialize() {
-        await config.init();
-        this.config = config.get('SERVICES') || {};
-        this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientEndpoint));
+    async initialize(mergedConfig) {
+        this.config = mergedConfig;
 
+        this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientEndpoint));
         this.defineDynamicServices();
     }
 

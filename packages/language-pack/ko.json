@@ -1877,6 +1877,7 @@
 				"LINE_TO_ZERO": "0으로 표시",
 				"MISSING_VALUE": "없는 값 처리 방식"
 			},
+			"NO_DATA_TABLE_ERROR_MESSAGE": "데이터 소스를 확인하거나 위젯 설정을 검토해 주세요.",
 			"NO_DATA_TO_DISPLAY": "데이터가 없습니다.",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "전일 대비 하락",

@@ -104,27 +104,31 @@ const state = reactive({
         });
 
         const rootNodes: TreeNode<ProjectDataType>[] = [];
-        const setDepth = (node, depth) => {
+        Object.values(nodes).forEach((node) => {
+            const parentGroupId = node.data?.parentGroupId;
+            if (!parentGroupId) {
+                rootNodes.push(node);
+            } else {
+                const parentNode = nodes[parentGroupId];
+                if (parentNode) {
+                    parentNode.children = parentNode.children || [];
+                    parentNode.children.push(node);
+                }
+            }
+        });
+
+        const visited = new Set();
+        const setDepth = (node: TreeNode<ProjectDataType>, depth: number) => {
+            if (visited.has(node.id)) return;
+            visited.add(node.id);
+
             node.depth = depth;
             if (!node.children) return;
             node.children.forEach((child) => {
                 setDepth(child, depth + 1);
             });
         };
-        Object.values(nodes).forEach((node) => {
-            const parentGroupId = node.data?.parentGroupId;
-            if (!parentGroupId) {
-                rootNodes.push(node);
-                setDepth(node, 0);
-            } else {
-                const parentNode = nodes[parentGroupId];
-                if (parentNode) {
-                    parentNode.children = parentNode.children || [];
-                    parentNode.children.push(node);
-                    setDepth(node, parentNode.depth + 1);
-                }
-            }
-        });
+        rootNodes.forEach((node) => setDepth(node, 0));
 
         return rootNodes;
     }),
