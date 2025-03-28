@@ -4,7 +4,6 @@ import { isEmpty } from 'lodash';
 
 import { useMenuStore } from '@/store/menu/menu-store';
 
-import config from '@/lib/config';
 import { FeatureSchemaManager } from '@/lib/config/global-config/feature-schema-manager';
 import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/type';
 import type { Menu } from '@/lib/menu/config';
@@ -24,14 +23,15 @@ import ServiceAccountConfigurator from '@/services/service-account/configurator'
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
+
 class ServiceConfigurator {
     private config: GlobalServiceConfig = {} as GlobalServiceConfig;
 
     private featureSchema: FeatureSchemaType = {} as FeatureSchemaType;
 
-    async initialize() {
-        await config.init();
-        this.config = config.get('SERVICES') || {};
+    async initialize(mergedConfig) {
+        this.config = mergedConfig;
+
         const featureSchemaManager = new FeatureSchemaManager(this.config);
         const featureSchema = await featureSchemaManager.applyGlobalConfig();
 

@@ -2,6 +2,7 @@ import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import APIClientManager from '@/api-clients/api-client-manager';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
@@ -25,6 +26,7 @@ import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
+import { mergeConfig } from '@/lib/site-initializer/merge-config';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
@@ -83,10 +85,12 @@ const init = async () => {
     /* Init SpaceONE Console */
     try {
         await config.init();
-        await ServiceConfigurator.initialize();
         await initApiClient(config);
         const domainId = await initDomain(config);
         const userId = await initUserAndAuth(config);
+        const mergedConfig = await mergeConfig(config, domainId);
+        await ServiceConfigurator.initialize(mergedConfig);
+        await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
         initModeSetting();
         await initWorkspace(userId);
