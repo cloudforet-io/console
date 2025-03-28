@@ -7,7 +7,7 @@ import {
     PFieldGroup, POverlayLayout, PTextInput, PButton, PDivider,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 

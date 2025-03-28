@@ -28,6 +28,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent,
 } from 'vue';
@@ -36,17 +37,7 @@ import PI from '@/foundation/icons/PI.vue';
 import type { SelectionPredicate } from '@/hooks/use-select/use-select';
 import { useMultiSelect } from '@/hooks/use-select/use-select';
 
-interface CheckboxProps {
-    value?: any;
-    selected?: any | any[];
-    disabled?: boolean;
-    predicate?: SelectionPredicate;
-    multiSelectable?: boolean;
-    invalid?: boolean;
-    indeterminate?: boolean;
-}
-
-export default defineComponent<CheckboxProps>({
+export default defineComponent({
     name: 'PCheckbox',
     components: { PI },
     model: {
@@ -56,11 +47,11 @@ export default defineComponent<CheckboxProps>({
     props: {
         /* select props */
         value: {
-            type: [Boolean, String, Number, Object, Array],
+            type: [Boolean, String, Number, Object, Array] as PropType<any>,
             default: true,
         },
         selected: {
-            type: [Boolean, String, Number, Object, Array],
+            type: [Boolean, String, Number, Object, Array] as PropType<any|any[]>,
             default: () => ([]),
         },
         disabled: {
@@ -68,7 +59,7 @@ export default defineComponent<CheckboxProps>({
             default: false,
         },
         predicate: {
-            type: Function,
+            type: Function as PropType<SelectionPredicate>,
             default: undefined,
         },
         /* checkbox props */
@@ -81,7 +72,7 @@ export default defineComponent<CheckboxProps>({
             default: false,
         },
     },
-    setup(props: CheckboxProps, { emit }) {
+    setup(props, { emit }) {
         const {
             isSelected,
             getSelected,
@@ -90,7 +81,6 @@ export default defineComponent<CheckboxProps>({
             selected: computed(() => props.selected),
             predicate: computed(() => props.predicate),
             disabled: computed(() => props.disabled),
-            indeterminate: computed(() => props.indeterminate),
         });
 
         const iconName = computed(() => {

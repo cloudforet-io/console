@@ -9,18 +9,18 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PBadge, PSelectDropdown, PI, PTooltip, PSelectStatus, PStatus,
 } from '@cloudforet/mirinae';
-import type { DefinitionField } from '@cloudforet/mirinae/src/data-display/tables/definition-table/type';
 import type {
     AutocompleteHandler, SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
+import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/api-clients/cost-analysis/data-source-account/schema/model';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

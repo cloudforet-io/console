@@ -25,8 +25,8 @@ import { red } from '@/styles/colors';
 import {
     ALERT_SEVERITY_COLORS,
     ALERT_SEVERITY_LABELS,
-} from '@/services/alert-manager-v1/constants/alert-constant';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+} from '@/services/alert-manager/v1/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const router = useRouter();

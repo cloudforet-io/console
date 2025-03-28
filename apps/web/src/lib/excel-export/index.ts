@@ -1,7 +1,6 @@
 import { forEach } from 'lodash';
 
-import type { DynamicFieldOptions, ListOptions } from '@cloudforet/mirinae/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldOptions, ListOptions, DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 
 interface ExcelDataField {

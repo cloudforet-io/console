@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { throttle } from 'lodash';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';

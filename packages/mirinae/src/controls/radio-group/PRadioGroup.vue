@@ -15,12 +15,8 @@ import {
 import type { Direction } from '@/controls/radio-group/type';
 import { DIRECTION } from '@/controls/radio-group/type';
 
-interface RadioGroupProps {
-    direction?: Direction;
-}
-export default defineComponent<RadioGroupProps>({
+export default defineComponent({
     name: 'PRadioGroup',
-    components: { },
     props: {
         direction: {
             type: String as PropType<Direction>,

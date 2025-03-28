@@ -1,5 +1,6 @@
 export const CARD_STYLE_TYPE = {
     gray100: 'gray100',
+    gray200: 'gray200',
     yellow100: 'yellow100',
     yellow500: 'yellow500',
     indigo400: 'indigo400',

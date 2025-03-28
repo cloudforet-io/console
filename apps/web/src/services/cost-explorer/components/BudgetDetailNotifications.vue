@@ -4,10 +4,11 @@ import { computed, reactive } from 'vue';
 import {
     PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@cloudforet/mirinae';
-import { ACTION_ICON } from '@cloudforet/mirinae/src/navigation/link/type';
+
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 
@@ -16,14 +17,13 @@ import getRandomId from '@/lib/random-id-generator';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetDetailNotificationsChannelTable
     from '@/services/cost-explorer/components/BudgetDetailNotificationsChannelTable.vue';
 import BudgetDetailNotificationsConditionSettingModal
     from '@/services/cost-explorer/components/BudgetDetailNotificationsConditionSettingModal.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {
@@ -35,10 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
     currency: CURRENCY.USD,
 });
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     hasBudgetAlert: computed(() => {
@@ -145,16 +145,17 @@ const handleBudgetNotifications = () => {
                                 <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
                                 <p-link v-if="state.budgetTargetId"
                                         class="link-text"
-                                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        action-icon="internal-link"
                                         new-tab
                                         size="md"
                                         :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                                        :to="getProperRouteLocation({
-                                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                                        :to="{
+                                            name: PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS._NAME,
                                             params: {
+                                                workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                                                 id: state.budgetTargetId
                                             }
-                                        })"
+                                        }"
                                         highlight
                                 />
                             </div>

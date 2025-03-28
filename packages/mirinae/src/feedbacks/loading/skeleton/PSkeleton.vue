@@ -1,5 +1,5 @@
 <script lang="ts">
-import { h } from 'vue';
+import { h, defineComponent } from 'vue';
 import type { SetupContext } from 'vue';
 
 import { getBindClass } from '@/utils/functional-helpers';
@@ -19,7 +19,7 @@ const isEmptyVNode = (nodes) => {
     return typeof firstNode.tag === 'undefined' && !str;
 };
 
-export default {
+export default defineComponent({
     name: 'PSkeleton',
     props: {
         loading: {
@@ -64,7 +64,7 @@ export default {
         if (showLoading) {
             if (width) style.width = width;
             if (height) style.height = height;
-            style.opacity = opacity;
+            style.opacity = `${opacity}`;
 
             if (animation) {
                 style.backgroundImage = `linear-gradient(90deg, ${gray[200]}, ${gray[100]}, ${gray[200]})`;
@@ -89,7 +89,7 @@ export default {
             },
         }, slotNodes);
     },
-};
+});
 </script>
 
 <style lang="postcss">

@@ -1,30 +1,24 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core';
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import {
-    debounce,
-} from 'lodash';
+import { isEmpty, startCase, toLower } from 'lodash';
 
 import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@cloudforet/mirinae';
-import { POPOVER_TRIGGER } from '@cloudforet/mirinae/src/data-display/popover/type';
 
-
-import type { NamespaceGroupModel } from '@/schema/inventory-v2/namespace-group/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
+import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
+import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -41,15 +35,8 @@ import { gray, yellow } from '@/styles/colors';
 import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
-import {
-    useMetricExplorerLSBStore,
-} from '@/services/asset-inventory/stores/metric-explorer-l-s-b-store';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
-
-interface props {
-  width : number
-}
-const props = defineProps<props>();
 
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
@@ -59,29 +46,24 @@ const route = useRoute();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
-
-const metricExplorerLSBStore = useMetricExplorerLSBStore();
-const metricExplorerLSBState = metricExplorerLSBStore.state;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
+    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
+    providers: computed(() => allReferenceStore.getters.provider),
     favoriteItems: computed(() => [
         ...favoriteGetters.metricItems,
         ...favoriteGetters.metricExampleItems,
     ]),
-    // selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    // new
-    namespaceGroupList: computed<NamespaceGroupModel[]>(() => metricExplorerLSBState.namespaceGroupList),
-    namespaceMenuLoading: computed<boolean>(() => metricExplorerLSBState.loading),
-    namespaceLoadingMap: computed<Record<string, boolean>>(() => metricExplorerLSBState.namespaceLoadingMap),
-    currentMetricList: computed<MetricModel[]>(() => metricExplorerLSBState.metricList),
 });
 
 const state = reactive({
@@ -89,6 +71,7 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     currentMetricIdByUrl: computed(() => route.params.metricId),
     isDetailPage: computed(() => !!state.currentMetricIdByUrl),
+    currentMetrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
     menuSet: computed(() => {
         const baseMenuSet = storeState.isAdminMode ? [] : [
             {
@@ -100,7 +83,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        if (!metricExplorerLSBState.selectedNamespaceId) return [...baseMenuSet, state.namespaceMenu];
+        if (!metricExplorerPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
@@ -112,12 +95,12 @@ const state = reactive({
                 name: metric.key.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
                 color: gray[500],
             },
-            to: getProperRouteLocation({
+            to: {
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     metricId: metric.key,
                 },
-            }),
+            },
             favoriteOptions: {
                 type: FAVORITE_TYPE.METRIC,
                 id: metric.key,
@@ -128,13 +111,13 @@ const state = reactive({
             id: example.example_id,
             label: example.name,
             icon: 'ic_example-filled',
-            to: getProperRouteLocation({
+            to: {
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                 params: {
                     metricId: example.metric_id,
                     metricExampleId: example.example_id,
                 },
-            }),
+            },
             favoriteOptions: {
                 type: FAVORITE_TYPE.METRIC_EXAMPLE,
                 id: example.example_id,
@@ -170,44 +153,28 @@ const state = reactive({
 
 const namespaceState = reactive({
     inputValue: '',
-    namespaceGroupLSBItem: computed<LSBCollapsibleItem[]>(() => {
-        const namespaceGroupList = storeState.namespaceGroupList;
-        if (!namespaceGroupList.length) return [];
-        return namespaceGroupList.map((namespaceGroup) => ({
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: namespaceGroup.name,
-            icon: namespaceGroup.icon,
-            subItems: [],
-            id: namespaceGroup.namespace_group_id,
-            initialCollapsed: true,
-        }));
+    collapsed: true,
+    selectedMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
+    namespaces: computed<NamespaceReferenceItem[]>(() => Object.values(storeState.namespaces)),
+    namespacesFilteredByInput: computed(() => {
+        const keyword = namespaceState.inputValue.toLowerCase();
+        if (!keyword) return namespaceState.namespaces;
+        return namespaceState.namespaces.filter((namespace) => namespace.name.toLowerCase().includes(keyword));
     }),
-    namespaceLSBItems: computed<LSBCollapsibleItem<any>[]>(() => namespaceState.namespaceGroupLSBItem.map((groupItem) => {
-        const namespaceItems = metricExplorerLSBState.namespaceMap[groupItem.id];
-        if (namespaceItems) {
-            return {
-                ...groupItem,
-                subItems: namespaceItems.map((namespace) => ({
-                    label: namespace.name,
-                    name: namespace.namespace_id,
-                })),
-            };
-        }
-        return groupItem;
-    })),
-    namespaceLSBItemsByKeywordSearch: computed<LSBCollapsibleItem<any>[]>(() => namespaceState.namespaceGroupLSBItem.map((groupItem) => {
-        const namespaceItemsByKeywordSearch = metricExplorerLSBState.namespaceMapByKeywordSearch[groupItem.id];
-        if (namespaceItemsByKeywordSearch) {
-            return {
-                ...groupItem,
-                initialCollapsed: false,
-                subItems: namespaceItemsByKeywordSearch.map((namespace) => ({
-                    label: namespace.name,
-                    name: namespace.namespace_id,
-                })),
-            };
-        } return groupItem;
-    }).filter((item) => item.subItems.length)),
+    namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
+        if (isEmpty(storeState.providers)) return [];
+        return [
+            ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+        ];
+    }),
+    namespaceItemsByKeyword: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
+        if (isEmpty(storeState.providers)) return [];
+        return [
+            ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+        ];
+    }),
 });
 
 const guidePopoverState = reactive({
@@ -217,13 +184,63 @@ const guidePopoverState = reactive({
 
 
 /* Helper */
+const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+    const commonNamespaces = namespaces.filter((namespace) => namespace.data.group === 'common').map((namespace) => ({
+        label: namespace.name,
+        name: namespace.key,
+        category: namespace.data.category,
+        group: namespace.data.group || 'common',
+        resourceType: namespace.data.resource_type,
+        icon: 'COMMON',
+    }));
+    if (commonNamespaces.length === 0) return [];
+    return [{
+        type: MENU_ITEM_TYPE.COLLAPSIBLE,
+        label: i18n.t('INVENTORY.METRIC_EXPLORER.COMMON'),
+        icon: 'COMMON',
+        subItems: commonNamespaces,
+    }];
+};
+const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+    const namespaceMap = {};
+    namespaces.filter((namespace) => namespace.data.group !== 'common').forEach((namespace) => {
+        const group = namespace.data.group || '';
+        const providerData = storeState.providers[group];
+        if (namespaceMap[group]) {
+            namespaceMap[group].subItems.push({
+                label: namespace.name,
+                name: namespace.key,
+                group: namespace.data.group,
+                category: namespace.data.category,
+                icon: namespace.data.icon,
+            });
+        } else {
+            const label = providerData ? providerData.label : customSnakeToTitleCase(group);
+            const icon = providerData ? providerData.icon : undefined;
+            namespaceMap[group] = {
+                type: MENU_ITEM_TYPE.COLLAPSIBLE,
+                label,
+                icon,
+                initialCollapsed: true,
+                subItems: [{
+                    label: namespace.name,
+                    name: namespace.key,
+                    group: namespace.data.group,
+                    category: namespace.data.category,
+                    icon: namespace.data.icon,
+                }],
+            };
+        }
+    });
+    return Object.values(namespaceMap);
+};
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
     if (!storeState.selectedNamespace) return false;
     return storeState.selectedNamespace.name === namespace.name
         && storeState.selectedNamespace.group === namespace.group;
 };
 
-// const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
+const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
@@ -231,8 +248,7 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
-    const namespaceId = namespace.name;
-    metricExplorerLSBStore.setSelectedNamespaceId(namespaceId);
+    metricExplorerPageStore.setSelectedNamespace(namespace);
 };
 const handleConfirmMetricGuide = () => {
     if (guidePopoverState.noMore) {
@@ -242,39 +258,32 @@ const handleConfirmMetricGuide = () => {
     guidePopoverState.noMore = false;
 };
 
-// v2 event
-const handleToggleNamespaceGroup = (collapsed: boolean, item: LSBCollapsibleItem) => {
-    if (!collapsed && item.id) {
-        const namespaceGroupId = item.id;
-        metricExplorerLSBStore.loadNamespaceListByNamespaceGroupId(namespaceGroupId);
-    }
-};
+watch(() => route.params, async () => {
+    state.loading = true;
+    await allReferenceStore.load('metric');
+    if (state.currentMetricIdByUrl) {
+        const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
+        metricExplorerPageStore.setSelectedNamespace({
+            label: targetNamespace?.name,
+            name: namespaceState.selectedMetric?.data.namespace_id,
+            group: targetNamespace?.data.group,
+            category: targetNamespace.data.category,
+            icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
+            resourceType: targetNamespace.data.resource_type,
+        });
+    } else metricExplorerPageStore.setSelectedNamespace(undefined);
+    state.loading = false;
+}, { immediate: true });
 
 // Whether to show metric-select-guide popover
-watch(() => metricExplorerLSBState.selectedNamespaceId, (selectedNamespaceId) => {
-    if (selectedNamespaceId
+watch(() => storeState.selectedNamespace, (selectedNamespace) => {
+    if (selectedNamespace
         && state.isDetailPage
-        && !storeState.currentMetricList.map((metric) => metric.metric_id).includes(state.currentMetricIdByUrl)
+        && !state.currentMetrics.map((metric) => metric.key).includes(state.currentMetricIdByUrl)
         && !assetInventorySettingsStore.getNotShowMetricSelectGuidePopover
     ) {
         guidePopoverState.metricGuideVisible = true;
     } else guidePopoverState.metricGuideVisible = false;
-});
-
-watch(() => namespaceState.inputValue, (inputValue) => {
-    debounce(() => {
-        metricExplorerLSBStore.loadNamespaceListByKeywordSearch(inputValue);
-    }, 300)();
-});
-
-watch(() => metricExplorerLSBState.selectedNamespaceId, async (selectedNamespaceId) => {
-    if (selectedNamespaceId) {
-        await metricExplorerLSBStore.loadMetricList(selectedNamespaceId);
-    }
-}, { immediate: true });
-
-onMounted(() => {
-    metricExplorerLSBStore.loadNamespaceGroupList();
 });
 
 </script>
@@ -282,18 +291,16 @@ onMounted(() => {
 <template>
     <div class="metric-explorer-l-s-b">
         <p-popover class="metric-select-guide-popover"
-                   :is-visible.sync="guidePopoverState.metricGuideVisible"
+                   :is-visible="guidePopoverState.metricGuideVisible"
                    position="right"
                    ignore-outside-click
                    ignore-target-click
                    boundary=".metric-explorer-l-s-b"
-                   :trigger="POPOVER_TRIGGER.NONE"
-                   min-width="21.5rem"
+                   trigger="none"
                    :style="{ left: `${lsbWidth}px`}"
         >
             <l-s-b ref="lsbRef"
                    :menu-set="state.menuSet"
-                   :style="{ width: `${props.width}px` }"
             >
                 <template #collapsible-contents-starred>
                     <div v-if="state.starredMenuSet.length > 0">
@@ -323,7 +330,7 @@ onMounted(() => {
                     </span>
                 </template>
                 <template #slot-namespace>
-                    <p-data-loader :loading="storeState.namespaceMenuLoading"
+                    <p-data-loader :loading="state.loading"
                                    :loader-backdrop-opacity="0.5"
                                    :loader-backdrop-color="gray[100]"
                                    class="namespace-data-loader"
@@ -337,54 +344,47 @@ onMounted(() => {
                                       :value="namespaceState.inputValue"
                                       @update:value="handleSearchNamespace"
                             />
-                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceLSBItems"
+                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
                                                          v-show="!namespaceState.inputValue"
                                                          :key="`namespace-${idx}`"
                                                          class="category-menu-item"
                                                          :item="item"
                                                          is-sub-item
                                                          :override-collapsed="item.initialCollapsed"
-                                                         @change-collapesd="handleToggleNamespaceGroup"
                             >
                                 <template #left-image>
-                                    <p-lazy-img class="title-image"
+                                    <img v-if="item.icon === 'COMMON'"
+                                         class="title-image"
+                                         src="@/assets/images/img_common-asset@2x.png"
+                                         alt="common-namespace-image"
+                                    >
+                                    <p-lazy-img v-else
+                                                class="title-image"
                                                 :src="item.icon"
                                                 width="1rem"
                                                 height="1rem"
                                     />
                                 </template>
                                 <template #collapsible-contents="{ item: _item }">
-                                    <p-data-loader :loading="storeState.namespaceLoadingMap[item.id]"
-                                                   :loader-backdrop-opacity="0.5"
-                                                   :loader-backdrop-color="gray[100]"
+                                    <div v-for="(_menu, _idx) in _item.subItems"
+                                         :key="`${_menu.label}-${_idx}`"
+                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                         @click="handleClickNamespace(_menu)"
                                     >
-                                        <div v-for="(_menu, _idx) in _item.subItems"
-                                             :key="`${_menu.label}-${_idx}`"
-                                             :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                             @click="handleClickNamespace(_menu)"
-                                        >
-                                            <span class="text">
-                                                {{ _menu?.label || '' }}
-                                            </span>
-                                        </div>
-                                    </p-data-loader>
+                                        <span class="text">
+                                            {{ _menu?.label || '' }}
+                                        </span>
+                                    </div>
                                 </template>
                             </l-s-b-collapsible-menu-item>
-                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceLSBItemsByKeywordSearch"
+                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
                                                          v-show="namespaceState.inputValue"
                                                          :key="`namespace-search-${idx}`"
                                                          class="category-menu-item category-menu-item-by-keyword"
                                                          :item="item"
                                                          is-sub-item
-                                                         :override-collapsed="item.initialCollapsed"
+                                                         :override-collapsed="namespaceState.collapsed"
                             >
-                                <template #left-image>
-                                    <p-lazy-img class="title-image"
-                                                :src="item.icon"
-                                                width="1rem"
-                                                height="1rem"
-                                    />
-                                </template>
                                 <template #collapsible-contents="{ item: _item }">
                                     <div v-for="(_menu, _idx) in _item.subItems"
                                          :key="`${_menu.label}-${_idx}`"
@@ -398,7 +398,7 @@ onMounted(() => {
                                     </div>
                                 </template>
                             </l-s-b-collapsible-menu-item>
-                            <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceLSBItemsByKeywordSearch.length"
+                            <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
                                      class="keyword-search-empty"
                             >
                                 <span>
@@ -409,10 +409,11 @@ onMounted(() => {
                     </p-data-loader>
                 </template>
                 <template #slot-metric>
-                    <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage" />
+                    <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
+                                                  :metrics="state.currentMetrics"
+                    />
                 </template>
             </l-s-b>
-
             <template #content>
                 <div class="metric-select-guide-content">
                     <p class="title">

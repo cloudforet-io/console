@@ -7,8 +7,11 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project-v1/routes/route-constant';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { ADMIN_SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/admin/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -99,52 +102,52 @@ const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, que
 
 type RouterMap = Record<ResourceType, { name: string; formatter: LinkFormatter}>;
 
-const routerMap: RouterMap = {
+const routerMap = (isAdminMode?: boolean): RouterMap => ({
     'inventory.Server':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVER._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
             formatter: serverLinkFormatter,
         },
     'identity.Project':
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
             formatter: projectLinkFormatter,
         },
     'identity.ProjectGroup':
         {
-            name: PROJECT_ROUTE._NAME,
+            name: PROJECT_ROUTE_V1._NAME,
             formatter: projectGroupLinkFormatter,
         },
     'inventory.Collector':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'identity.TrustedAccount':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME,
+            name: isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.SEARCH._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            name: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE.TYPE_SEARCH._NAME,
+            name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
         },
-};
+});
 
 export const referenceRouter = (data: string, reference: Reference, query?: Location['query']): Location => {
-    if (routerMap[reference.resource_type]) {
-        const { name, formatter } = routerMap[reference.resource_type];
+    if (routerMap(reference.isAdminMode)[reference.resource_type]) {
+        const { name, formatter } = routerMap(reference.isAdminMode)[reference.resource_type];
         const location = formatter(name, data, reference, query);
         if (reference.workspace_id) {
             location.params = {

@@ -42,3 +42,5 @@ export const CLOUD_SERVICE_GLOBAL_FILTER_KEY = {
     PROJECT: 'project_id',
     SERVICE_ACCOUNT: 'service_account_id',
 } as const;
+
+export const UNIDENTIFIED_PROVIDER = 'Unidentified';

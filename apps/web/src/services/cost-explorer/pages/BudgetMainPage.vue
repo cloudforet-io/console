@@ -5,8 +5,8 @@ import {
     PHeading, PDivider, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { SpaceRouter } from '@/router';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { useUserStore } from '@/store/user/user-store';
 

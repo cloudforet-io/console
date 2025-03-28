@@ -7,9 +7,9 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupAddUsersParameters } from '@/schema/identity/user-group/api-verbs/add-users';
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
-import type { MembersType } from '@/schema/identity/user-group/type';
+import type { UserGroupAddUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/add-users';
+import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import type { MembersType } from '@/api-clients/identity/user-group/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

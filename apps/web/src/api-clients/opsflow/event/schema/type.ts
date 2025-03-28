@@ -1,4 +1,4 @@
-import type { TaskStatusType } from '../../task/schema/type';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
 export type EventType = 'CREATED'|'UPDATED'|'CHANGE_STATUS'|'COMMENTED';
 export interface UpdatedDatum {

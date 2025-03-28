@@ -10,10 +10,9 @@ import { sortBy } from 'lodash';
 import {
     PSelectDropdown, PTooltip, PI, PButton, PTextHighlighting, PEmpty,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -86,12 +85,12 @@ const selectWorkspace = (name: string): void => {
 };
 const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
     const result = menuItems.length > 0 ? [
-        { type: CONTEXT_MENU_TYPE.header, name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${storeState.workspaceList.length})` },
+        { type: 'header', name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${storeState.workspaceList.length})` },
     ] : [] as MenuItem[];
     menuItems.forEach((d) => {
         result.push({
             ...d,
-            type: CONTEXT_MENU_TYPE.item,
+            type: 'item',
             name: d.workspace_id || '',
             label: d.name as string,
         });
@@ -101,14 +100,14 @@ const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
 const filterStarredItems = (menuItems: FavoriteItem[] = []): MenuItem[] => {
     if (storeState.favoriteItems.length === 0) return [];
     const result: MenuItem[] = [
-        { type: CONTEXT_MENU_TYPE.header, name: 'starred_header', label: i18n.t('COMMON.STARRED') },
+        { type: 'header', name: 'starred_header', label: i18n.t('COMMON.STARRED') },
     ];
     menuItems.forEach((d) => {
         const item = storeState.workspaceList.find((w) => w.workspace_id === d.itemId);
         if (item) {
             result.push({
                 ...item,
-                type: CONTEXT_MENU_TYPE.item,
+                type: 'item',
                 name: d.itemId || '',
                 label: d.label as string,
             });

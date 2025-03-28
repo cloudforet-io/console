@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import type { RecentConfig } from '@/common/modules/navigations/type';
 

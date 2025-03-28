@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { PSelectDropdown } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import { PSelectDropdown, PButton } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
@@ -14,10 +14,9 @@ import type {
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
@@ -28,7 +27,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 
 const router = useRouter();
 
@@ -139,7 +138,7 @@ watch(() => workspaceState.selectedItems, (selectedItems) => {
                 <template #button>
                     <p-button style-type="substitutive"
                               icon-left="ic_plus_bold"
-                              @click="router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACES._NAME) })"
+                              @click="router.push({ name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME })"
                     >
                         {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
                     </p-button>

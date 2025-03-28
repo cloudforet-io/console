@@ -3,6 +3,7 @@ import {
     computed,
     onUnmounted, reactive, ref, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -12,7 +13,6 @@ import {
 
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -20,7 +20,6 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -36,6 +35,7 @@ import DashboardVariables from '@/services/dashboards/components/legacy/Dashboar
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -50,9 +50,9 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const { breadcrumbs } = useBreadcrumbs();
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+const router = useRouter();
 
 /* Query */
 const {
@@ -103,7 +103,7 @@ const { mutate: updateDashboard, isPending: dashboardUpdateLoading } = useMutati
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
                 if (!oldDashboard) return _dashboard;
                 return {
@@ -145,7 +145,8 @@ watch(widgetList, (_widgetList) => {
 watch(isError, (error) => {
     if (error) {
         ErrorHandler.handleError(error);
-        SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
+        const dashboardRouteName = state.isAdminMode ? ADMIN_DASHBOARDS_ROUTE._NAME : DASHBOARDS_ROUTE._NAME;
+        router.push({ name: dashboardRouteName });
     }
 });
 

@@ -1,4 +1,4 @@
-import type { AuthType } from '@/schema/identity/user/type';
+import type { AuthType } from '@/api-clients/identity/user/schema/type';
 
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';

@@ -33,8 +33,8 @@ export const useAssetInventorySettingsStore = defineStore('asset-inventory-setti
         setNotShowMetricSelectGuidePopover(noMore: boolean) {
             this.notShowMetricSelectGuidePopover = noMore;
         },
-        initState() {
-            const localStorageItem = initServiceSettingsStore<AssetInventorySettingsStore>('assetInventory');
+        initState(userId?: string) {
+            const localStorageItem = initServiceSettingsStore<AssetInventorySettingsStore>('assetInventory', userId);
             this.cloudServiceTableHeight = localStorageItem?.cloudServiceTableHeight ?? TABLE_MIN_HEIGHT;
             this.cloudServiceTablePageLimit = localStorageItem?.cloudServiceTablePageLimit ?? DEFAULT_TABLE_PAGE_LIMIT;
             this.notShowMetricSelectGuidePopover = localStorageItem?.notShowMetricSelectGuidePopover ?? false;

@@ -1,5 +1,6 @@
-import type { ResourceGroupType } from '../../../_common/schema/type';
-import type { CommentType, MentionTargets, MentionSource } from './type';
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
+import type { CommentType, MentionSource, MentionTargets } from '@/api-clients/opsflow/comment/schema/type';
+
 
 export interface CommentModel {
     comment_id: string;

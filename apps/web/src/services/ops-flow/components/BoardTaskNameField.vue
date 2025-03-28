@@ -25,9 +25,11 @@ const props = defineProps<{
                         taskId: props.taskId,
                     },
                 }"
+                class="leading-lg"
                 :highlight="!props.linkNewTab"
                 :action-icon="props.linkNewTab ? 'internal-link' : 'none'"
                 :new-tab="props.linkNewTab"
+                line-height="1.25"
         />
     </p-collapsible-panel>
 </template>

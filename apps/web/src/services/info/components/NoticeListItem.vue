@@ -8,8 +8,8 @@ import dayjs from 'dayjs';
 
 import { PI, PSkeleton, PBadge } from '@cloudforet/mirinae';
 
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import type { PostModel } from '@/schema/board/post/model';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -18,9 +18,11 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import CostVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-variable-model';
 import MetricDataVariableModel from '@/lib/variable-models/managed-model/resource-model/metric-data-variable-model';
 
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import {
     useCostDataSourceFilterMenuItems,
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
@@ -29,9 +31,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
 } from '@/services/dashboards/constants/dashboard-global-variable-preset';
-
-
-
 
 const SELECTION_TYPE = {
     MULTI_SELECT: 'multi',
@@ -54,6 +53,9 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
 
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
+
+const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
@@ -95,11 +97,16 @@ const state = reactive({
             },
         };
     }),
-    sourceFromMenuItems: computed<MenuItem[]>(() => [
-        { name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') },
-        { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
-        ...DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
-    ]),
+    sourceFromMenuItems: computed<MenuItem[]>(() => {
+        const defaultMenuItems = [
+            { name: 'cost', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.COST') },
+            ...DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
+        ];
+        if (visibleContents.value) {
+            defaultMenuItems.unshift({ name: 'asset', label: i18n.t('DASHBOARDS.DETAIL.VARIABLES.ASSET') });
+        }
+        return defaultMenuItems;
+    }),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
             const _labelsInfo = storeState.metrics[state.selectedMetricId]?.data?.labels_info || [];
@@ -269,6 +276,9 @@ watch(() => state.isAllValid, (isValid) => {
 }, { immediate: true });
 watch(() => props.originalData, (originalData) => {
     if (originalData) initExistingVariable(originalData);
+}, { immediate: true });
+watch(() => visibleContents.value, (value) => {
+    state.selectedSourceFrom = value ? 'asset' : 'cost';
 }, { immediate: true });
 </script>
 

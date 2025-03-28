@@ -1,7 +1,8 @@
-import type { TaskFieldOptions } from '@/schema/opsflow/_types/task-field-type';
+import type { TaskFieldOptions } from '@/api-clients/opsflow/_types/task-field-type';
 
 export interface OptionsGeneratorProps<Options extends TaskFieldOptions> {
     options: Options;
+    editable?: boolean;
 }
 
 export interface OptionsGeneratorEmit<Options extends TaskFieldOptions> {

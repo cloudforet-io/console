@@ -28,7 +28,7 @@ const myPageRoutes: RouteConfig = {
     },
     redirect: (to) => {
         const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap, userStore.getters.domainId);
+        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
     },
     component: MyPageContainer,
     children: [

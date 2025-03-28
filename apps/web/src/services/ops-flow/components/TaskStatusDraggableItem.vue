@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { PI, PBadge } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { TaskStatusType } from '@/schema/opsflow/task/type';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 import { i18n } from '@/translations';
 
 import ActionMenuButton from '@/common/components/buttons/ActionMenuButton.vue';

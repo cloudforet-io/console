@@ -1,4 +1,4 @@
-import type { AppModel } from '@/schema/identity/app/model';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

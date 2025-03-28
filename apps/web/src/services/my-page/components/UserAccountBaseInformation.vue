@@ -9,9 +9,9 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
-import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
+import type { UserProfileUpdateParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { languages, timezoneList } from '@/store/user/constant';

@@ -8,13 +8,13 @@ import type { SupportLanguage } from '@/translations';
 export const LOCALIZE_LOADERS: Record<SupportLanguage, () => Promise<Localize>> = {
     en: async () => { const module = await import('ajv-i18n/localize/en'); return module.default; },
     ko: async () => { const module = await import('ajv-i18n/localize/ko'); return module.default; },
-    jp: async () => { const module = await import('ajv-i18n/localize/ja'); return module.default; },
+    ja: async () => { const module = await import('ajv-i18n/localize/ja'); return module.default; },
 };
 
 const localizeMap: Record<SupportLanguage, any|boolean> = {
     en: undefined,
     ko: undefined,
-    jp: undefined,
+    ja: undefined,
 };
 
 

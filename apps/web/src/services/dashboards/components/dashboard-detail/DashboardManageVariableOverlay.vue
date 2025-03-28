@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
@@ -8,7 +9,7 @@ import { cloneDeep } from 'lodash';
 import {
     PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable, PScopedNotification,
 } from '@cloudforet/mirinae';
-import type { DataTableField } from '@cloudforet/mirinae/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { getClonedName } from '@cloudforet/utils';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
@@ -16,16 +17,15 @@ import type {
     DashboardGlobalVariableSchemaProperties,
     DashboardModel,
 } from '@/api-clients/dashboard/_types/dashboard-type';
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
@@ -36,8 +36,10 @@ import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
+import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 
@@ -56,6 +58,8 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
+const appContextStore = useAppContextStore();
+const router = useRouter();
 
 /* Query */
 const {
@@ -68,8 +72,9 @@ const {
     dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
 
-const { getProperRouteLocation } = useProperRouteLocation();
+
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     selectedVariableKey: undefined as string|undefined,
     modalType: 'CREATE' as 'CREATE'|'UPDATE',
     formModalVisible: false,
@@ -187,7 +192,7 @@ const { mutate } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (_dashboard: DashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
                 if (!oldDashboard) return oldDashboard;
                 return {
@@ -235,10 +240,13 @@ const handleToggleUse = (variableKey: string, val: boolean) => {
     updateUseDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey, val);
 };
 const handleCloseOverlay = () => {
-    SpaceRouter.router.replace(getProperRouteLocation({
-        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    const dashboardDetailRouteName = state.isAdminMode
+        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+        : DASHBOARDS_ROUTE.DETAIL._NAME;
+    router.replace({
+        name: dashboardDetailRouteName,
         params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-    }));
+    }).catch(() => {});
 };
 const handleConfirmDelete = () => {
     if (!dashboardDetailState.dashboardId || !state.selectedVariableKey) return;

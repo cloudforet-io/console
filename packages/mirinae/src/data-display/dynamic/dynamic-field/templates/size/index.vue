@@ -1,10 +1,11 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
+import { h, defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
 import bytes from 'bytes';
 
-import type { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
+import type { SizeTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/size/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/navigation/link/PLink.vue';
 import { ACTION_ICON } from '@/navigation/link/type';
@@ -19,12 +20,12 @@ const unitMap: Record<string, bytes.Unit> = {
 };
 const UNIT_SEPARATOR = ' ';
 
-export default {
+export default defineComponent({
     name: 'PDynamicFieldSize',
     components: { PLink },
     props: {
         options: {
-            type: Object,
+            type: Object as PropType<SizeOptions>,
             default: () => ({}),
         },
         data: {
@@ -32,7 +33,7 @@ export default {
             default: null,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<SizeTypeOptions>,
             default: () => ({}),
         },
         extraData: {
@@ -40,11 +41,11 @@ export default {
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },
-    setup(props: SizeDynamicFieldProps, { attrs }: SetupContext) {
+    setup(props, { attrs }) {
         let value: number|null;
 
         // eslint-disable-next-line vue/no-setup-props-destructure
@@ -84,5 +85,5 @@ export default {
 
         return () => sizeEl;
     },
-};
+});
 </script>

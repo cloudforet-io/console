@@ -8,11 +8,12 @@ import {
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { OtherTaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
-import type { OtherTaskField } from '@/schema/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
@@ -27,7 +28,6 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 import DataSelector from '@/common/components/select/DataSelector.vue';
 import type { DataSelectorItem } from '@/common/components/select/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
@@ -45,7 +45,7 @@ const {
 } = useTaskFieldValidation(props, emit);
 
 const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
-
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const cloudServiceTypeReferenceMap = computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems);
 const cloudServiceTypeItems = computed<CloudServiceTypeItem[]>(() => Object.values(cloudServiceTypeReferenceMap.value));
@@ -113,7 +113,6 @@ const handleUpdateSelected = (stepIdx: number, selected: CloudDataSelectorItem[]
     }
 };
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 interface RelatedAssetInfo {
     provider: string; group: string; type: string; icon?: string;
@@ -217,9 +216,10 @@ onMounted(async () => {
                             new-tab
                             highlight
                             action-icon="internal-link"
-                            :to="getProperRouteLocation({
+                            :to="{
                                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                                 params: {
+                                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                                     provider: asset.provider,
                                     group: asset.cloud_service_group,
                                     name: asset.cloud_service_type,
@@ -227,7 +227,7 @@ onMounted(async () => {
                                 query: {
                                     filters: [JSON.stringify([asset.cloud_service_id, 'cloud_service_id'])],
                                 },
-                            })"
+                            }"
                     >
                         <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.reference.resource_id }})</span>
                     </p-link>

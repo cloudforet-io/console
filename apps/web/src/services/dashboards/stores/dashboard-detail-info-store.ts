@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { cloneDeep, isEmpty, isEqual } from 'lodash';
@@ -17,7 +19,7 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

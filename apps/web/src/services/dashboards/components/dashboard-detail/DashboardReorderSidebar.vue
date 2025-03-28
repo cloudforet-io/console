@@ -75,7 +75,7 @@ const { mutate: updateDashboard } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardQueryKey : keys.publicDashboardQueryKey;
+            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
             queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
         onSettled: () => {

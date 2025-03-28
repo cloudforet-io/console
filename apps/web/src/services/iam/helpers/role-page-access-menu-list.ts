@@ -1,11 +1,11 @@
-import type { RoleType } from '@/schema/identity/role/type';
+import type { RoleType } from '@/api-clients/identity/role/type';
+
+import { useMenuStore } from '@/store/menu/menu-store';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
-import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_LIST, MENU_LIST_FOR_ALERT_MANAGER_V2 } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { PageAccessMenuItem } from '@/services/iam/types/role-type';
@@ -30,11 +30,11 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
     return results;
 };
 
-export const getPageAccessMenuListByRoleType = (roleType: RoleType, domainId: string): PageAccessMenuItem[] => {
+export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessMenuItem[] => {
+    const menuStore = useMenuStore();
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
-    const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
-    const menuListByVersion = (isAlertManagerVersionV2 ? MENU_LIST_FOR_ALERT_MANAGER_V2 : MENU_LIST);
+    const menuListByVersion = menuStore.state.menuList;
     menuListByVersion.forEach((menu) => {
         if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {
             if (menu.id === MENU_ID.WORKSPACE_HOME) return;

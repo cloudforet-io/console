@@ -161,7 +161,7 @@ export const useDeepTextClamper = (lineClamp : number):TextClamper => {
             webkitLineClamp: element.style.webkitLineClamp,
             overflow: element.style.overflow,
         };
-        element.style.display = '-webkit-box';
+        element.style.display = '-webkit-inline-box';
         element.style.webkitBoxOrient = 'vertical';
         element.style.webkitLineClamp = `${lineLimit}`;
         element.style.overflow = 'hidden';
@@ -195,7 +195,7 @@ export const useSimpleTextClamper = (PAD: number, lineClamp: number): TextClampe
     };
 
     const applyClampStyle = (element: HTMLElement) => {
-        element.style.display = '-webkit-box';
+        element.style.display = '-webkit-inline-box';
         element.style.webkitBoxOrient = 'vertical';
         element.style.webkitLineClamp = `${lineClamp}`;
         element.style.overflow = 'hidden';

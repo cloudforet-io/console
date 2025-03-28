@@ -6,9 +6,9 @@ import {
     PButtonModal, PLink, PDataTable, PStatus, PFieldTitle, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { WorkspaceGroupUser } from '@/schema/identity/workspace-group-user/model';
-import type { WorkspaceGroupRemoveUsersParameters } from '@/schema/identity/workspace-group/api-verbs/remove-users';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { WorkspaceGroupUser } from '@/api-clients/identity/workspace-group-user/schema/model';
+import type { WorkspaceGroupRemoveUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/remove-users';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

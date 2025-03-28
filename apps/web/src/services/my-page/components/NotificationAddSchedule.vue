@@ -13,10 +13,7 @@ import {
 import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/schema/notification/type';
 import { i18n } from '@/translations';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import config from '@/lib/config';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
@@ -36,10 +33,12 @@ const props = withDefaults(defineProps<{
     isScheduledValid?: boolean;
     isScheduled?: boolean;
     schedule?: Partial<ChannelSchedule> & Partial<ScheduleSettingFormType>;
+    visibleUserNotification: boolean;
 }>(), {
     isScheduledValid: true,
     isScheduled: false,
     schedule: undefined,
+    visibleUserNotification: false,
 });
 
 const emit = defineEmits<{(event: 'changeV1', payload: NotificationAddFormSchedulePayload): void;
@@ -48,10 +47,7 @@ const emit = defineEmits<{(event: 'changeV1', payload: NotificationAddFormSchedu
 
 
 const userStore = useUserStore();
-const domainStore = useDomainStore();
 const timezone = computed<string|undefined>(() => userStore.state.timezone);
-
-const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainStore.state.domainId);
 
 /* constants */
 const WEEK_DAYS = [
@@ -126,7 +122,7 @@ const state = reactive({
 });
 
 const emitChange = () => {
-    if (!isAlertManagerVersionV2) {
+    if (!props.visibleUserNotification) {
         if (state.proxyIsScheduled) {
             emit('changeV1', {
                 schedule: {
@@ -185,7 +181,7 @@ onMounted(() => {
 
 <template>
     <div>
-        <div v-if="!isAlertManagerVersionV2">
+        <div v-if="!props.visibleUserNotification">
             <p-radio-group>
                 <p-radio v-for="(item, i) in state.scheduleMode"
                          :key="i"

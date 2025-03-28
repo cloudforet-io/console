@@ -5,8 +5,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
-import { alertManagerV1IntegralRoutes } from '@/router/alert-manager-v1-integral-routes';
-import { ERROR_ROUTE } from '@/router/constant';
+import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
 
@@ -31,10 +30,7 @@ import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
 
-
-const initConfig = async () => {
-    await config.init();
-};
+import ServiceConfigurator from '@/services/configurator';
 
 const initQueryHelper = () => {
     const userStore = useUserStore(pinia);
@@ -46,12 +42,29 @@ const initRouter = (domainId?: string) => {
     const userStore = useUserStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
     const afterGrantedCallback = () => allReferenceStore.flush();
+
+    const adminChildren = integralRoutes[0].children?.find(
+        (route) => route.name === ROOT_ROUTE.ADMIN._NAME,
+    )?.children;
+
+    const workspaceChildren = integralRoutes[0].children?.find(
+        (route) => route.name === ROOT_ROUTE.WORKSPACE._NAME,
+    )?.children;
+
+    if (adminChildren) {
+        const dynamicAdminRoutes = ServiceConfigurator.getRoutes('admin');
+        adminChildren.push(...dynamicAdminRoutes);
+    }
+
+    if (workspaceChildren) {
+        const dynamicWorkspaceRoutes = ServiceConfigurator.getRoutes('workspace');
+        workspaceChildren.push(...dynamicWorkspaceRoutes);
+    }
+
     if (!domainId) {
         SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
     } else {
-        const isAlertManagerVersionV2 = (config.get('ADVANCED_SERVICE')?.alert_manager_v2 ?? []).includes(domainId);
-        const routes = isAlertManagerVersionV2 ? integralRoutes : alertManagerV1IntegralRoutes;
-        SpaceRouter.init(routes, afterGrantedCallback, userStore);
+        SpaceRouter.init(integralRoutes, afterGrantedCallback, userStore);
     }
     isRouterInitialized = true;
 };
@@ -69,7 +82,8 @@ const removeInitializer = () => {
 const init = async () => {
     /* Init SpaceONE Console */
     try {
-        await initConfig();
+        await config.init();
+        await ServiceConfigurator.initialize();
         await initApiClient(config);
         const domainId = await initDomain(config);
         const userId = await initUserAndAuth(config);

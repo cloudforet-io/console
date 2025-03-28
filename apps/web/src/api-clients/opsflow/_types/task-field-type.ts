@@ -17,7 +17,8 @@ export interface TaskFieldOptions { // union of all task field options
 }
 
 /* task field options by type */
-interface TextTaskFieldOptions {
+export interface TextTaskFieldOptions {
+    description?: string;
     example?: string;
     max_length?: number;
 }

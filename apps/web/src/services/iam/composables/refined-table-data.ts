@@ -2,13 +2,13 @@ import dayjs from 'dayjs';
 
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
 import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
 import { APP_STATE_COLOR } from '@/services/iam/constants/app-constant';

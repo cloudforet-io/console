@@ -6,8 +6,8 @@ import {
     PButtonModal, PLink, PStatus, PDataTable,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/schema/identity/workspace/api-verbs/change-workspace-group';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -22,8 +22,8 @@ import { sortTableItems } from '@/common/utils/table-sort';
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 
@@ -73,7 +73,7 @@ const getUserRouteLocationByWorkspaceId = (item) => ({
 });
 
 const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
-    name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+    name: SERVICE_ACCOUNT_ROUTE._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },

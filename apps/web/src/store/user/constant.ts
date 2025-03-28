@@ -1,6 +1,6 @@
 import { timeZonesNames } from '@vvo/tzdb';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 
 

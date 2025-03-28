@@ -4,8 +4,8 @@ import { reactive } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupRemoveUsersParameters } from '@/schema/identity/user-group/api-verbs/remove-users';
-import type { UserGroupModel } from '@/schema/identity/user-group/model';
+import type { UserGroupRemoveUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/remove-users';
+import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

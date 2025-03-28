@@ -7,7 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { BudgetUsageAnalyzeResult } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -20,11 +20,11 @@ import type { WorkspaceReferenceMap } from '@/store/reference/workspace-referenc
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
@@ -37,7 +37,6 @@ const props = withDefaults(defineProps<Props>(), {
     budgetUsage: () => ({} as BudgetUsageAnalyzeResult),
 });
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -51,12 +50,12 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });
 const state = reactive({
-    linkLocation: computed<Location>(() => (getProperRouteLocation({
-        name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
+    linkLocation: computed<Location>(() => ({
+        name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME : COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
         params: {
             budgetId: props.budgetUsage.budget_id,
         },
-    }))),
+    })),
     isProjectTarget: computed(() => props.budgetUsage.resource_group === 'PROJECT'),
     targetLabelList: computed<string[]>(() => {
         const targetId = state.isProjectTarget ? props.budgetUsage.project_id : props.budgetUsage.workspace_id;

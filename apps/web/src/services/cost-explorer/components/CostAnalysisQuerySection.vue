@@ -5,6 +5,7 @@ import {
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -14,7 +15,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -23,7 +23,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
@@ -35,6 +34,7 @@ import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-const
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_ID_LIST,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
@@ -51,9 +51,9 @@ const rightPartRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
-const { getProperRouteLocation } = useProperRouteLocation();
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
+const router = useRouter();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -134,13 +134,13 @@ const handleClickSaveAsButton = () => {
 const handleUpdateQuery = async (updatedQueryId: string) => {
     await costAnalysisPageStore.listCostQueryList();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
-    await SpaceRouter.router.push(getProperRouteLocation({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+    await router.push({
+        name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
             costQuerySetId: updatedQueryId,
         },
-    }));
+    }).catch(() => {});
 };
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;

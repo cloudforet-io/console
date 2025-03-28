@@ -38,7 +38,6 @@ export interface DisplayStoreGetters {
     hasUncheckedNotifications: ComputedRef<boolean>;
     isHandbookVisible: ComputedRef<boolean>;
     sidebarProps: ComputedRef<Partial<SidebarProps>>;
-    availableAdvancedServices: ComputedRef<Record<string, boolean>>;
 }
 
 export interface SidebarProps {

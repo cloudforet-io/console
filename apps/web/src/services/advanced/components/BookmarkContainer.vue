@@ -4,9 +4,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -17,7 +15,7 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 
 const bookmarkStore = useBookmarkStore();
@@ -50,7 +48,7 @@ const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
     if (isEdit && name) {
         if (!storeState.isTableItem) {
             await router.push({
-                name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME),
+                name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.FOLDER._NAME,
                 params: {
                     group: route.params.group,
                     folder: name,
@@ -66,7 +64,7 @@ const handleCreateLink = (selectedFolder?: BookmarkItem) => {
     if (route.params.folder) {
         if (!selectedFolder) {
             router.push({
-                name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
                 params: {
                     group: route.params.group,
                 },
@@ -80,7 +78,7 @@ const handleConfirmDelete = (isFolder?: boolean) => {
     if (route.params.folder) {
         if (isFolder && !storeState.isTableItem) {
             router.push({
-                name: makeAdminRouteName(ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME),
+                name: ADMIN_ADVANCED_ROUTE.BOOKMARK.DETAIL.GROUP._NAME,
                 params: {
                     group: route.params.group,
                 },

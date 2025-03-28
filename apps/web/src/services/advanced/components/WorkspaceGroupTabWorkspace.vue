@@ -11,7 +11,7 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -28,8 +28,8 @@ import { gray } from '@/styles/colors';
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
@@ -86,7 +86,7 @@ const getUserRouteLocationByWorkspaceId = (item) => ({
 });
 
 const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
-    name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
+    name: SERVICE_ACCOUNT_ROUTE._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },

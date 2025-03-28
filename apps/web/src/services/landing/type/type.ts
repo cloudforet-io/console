@@ -1,6 +1,6 @@
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import type { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 

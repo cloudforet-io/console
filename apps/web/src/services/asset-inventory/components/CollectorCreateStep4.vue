@@ -52,6 +52,7 @@
 <script lang="ts" setup>
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -60,7 +61,6 @@ import {
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import { SpaceRouter } from '@/router';
 import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
 import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
@@ -73,9 +73,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorScheduleForm from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     useCollectorFormStore,
@@ -85,8 +85,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const appContextStore = useAppContextStore();
-const { getProperRouteLocation } = useProperRouteLocation();
-
+const router = useRouter();
 const emit = defineEmits([
     'update:currentStep',
 ]);
@@ -141,7 +140,7 @@ const handleClickCreateButton = async () => {
             exclude_service_accounts: collectorFormState.serviceAccounts,
         };
         Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-        const res:CollectorModel = await SpaceConnector.clientV2.inventoryV2.collector.create<CollectorCreateParameters, CollectorModel>(params);
+        const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
@@ -166,7 +165,7 @@ const handleConfirmCreateCollector = async () => {
         state.collectLoading = true;
         // After the collector created, if the user clicks the collect button, the collector will be executed.
         if (state.createdCollectorId) {
-            await SpaceConnector.clientV2.inventoryV2.collector.collect<CollectorCollectParameters, JobModel>({
+            await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
                 collector_id: state.createdCollectorId,
             });
         } else {
@@ -184,12 +183,12 @@ const handleConfirmCreateCollector = async () => {
 const goToCollectorDetailPage = () => {
     state.visibleCreateCompleteModal = false;
     if (state.createdCollectorId) {
-        SpaceRouter.router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+        router.push({
+            name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
             params: {
                 collectorId: state.createdCollectorId,
             },
-        }));
+        }).catch(() => {});
     }
 };
 

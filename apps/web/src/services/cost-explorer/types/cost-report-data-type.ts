@@ -1,5 +1,5 @@
 import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
-import type { RoleType } from '@/schema/identity/role/type';
+import type { RoleType } from '@/api-clients/identity/role/type';
 
 export type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;

@@ -17,10 +17,10 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { ContentsType, ResourceGroupType } from '@/api-clients/_common/schema/type';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { SpaceRouter } from '@/router';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -34,10 +34,10 @@ import { useEditorContentTransformer } from '@/common/composables/editor-content
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 
 import NoticeWorkspaceDropdown from '@/services/info/components/NoticeWorkspaceDropdown.vue';
-import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 import type { NoticeFormType, WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
 
@@ -122,7 +122,6 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     },
 }));
 
-const { getProperRouteLocation } = useProperRouteLocation();
 
 
 const handleConfirm = () => {
@@ -147,7 +146,7 @@ const handleCreateNotice = async () => {
             workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
-        await SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME, query: {} }));
+        await SpaceRouter.router.push({ name: ADMIN_INFO_ROUTE.NOTICE._NAME, query: {} });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
     }

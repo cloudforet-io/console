@@ -5,7 +5,7 @@ import {
     PDoubleCheckModal,
 } from '@cloudforet/mirinae';
 
-import type { AppModel } from '@/schema/identity/app/model';
+import type { AppModel } from '@/api-clients/identity/app/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

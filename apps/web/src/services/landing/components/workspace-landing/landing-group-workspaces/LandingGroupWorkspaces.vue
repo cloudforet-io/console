@@ -10,13 +10,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserProfileGetWorkspacesParameters } from '@/schema/identity/user-profile/api-verbs/get-workspaces';
-import type { MyWorkspaceModel } from '@/schema/identity/user-profile/model';
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { UserProfileGetWorkspacesParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/get-workspaces';
+import type { MyWorkspaceModel } from '@/api-clients/identity/user-profile/schema/model';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -24,7 +22,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
-import { ADVANCED_ROUTE } from '@/services/advanced/routes/route-constant';
+import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupManageOverlay.vue';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
@@ -146,7 +144,7 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
                                    style-type="tertiary"
                                    size="sm"
                                    class="ml-1"
-                                   @click="() => { router.push({ name: makeAdminRouteName(ADVANCED_ROUTE.WORKSPACE_GROUP._NAME)})}"
+                                   @click="() => { router.push({ name: ADMIN_ADVANCED_ROUTE.WORKSPACE_GROUP._NAME})}"
                     />
                 </template>
             </p-button-tab>

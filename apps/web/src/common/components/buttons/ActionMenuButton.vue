@@ -3,13 +3,11 @@ import { onClickOutside } from '@vueuse/core';
 import { ref, computed } from 'vue';
 
 import { PIconButton, PContextMenu, useContextMenuStyle } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 
-interface ActionMenuItem extends MenuItem {
-    name: string;
-}
+import type { ActionMenuItem } from './type';
+
 
 type SupportMenu = 'edit' | 'delete';
 const props = withDefaults(defineProps<{

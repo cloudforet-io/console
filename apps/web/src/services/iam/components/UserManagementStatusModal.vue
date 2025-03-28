@@ -10,10 +10,10 @@ import {
     PStatus, PButtonModal, PDataTable, PBadge,
 } from '@cloudforet/mirinae';
 
-import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
-import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
-import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
+import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
+import type { UserDeleteParameters } from '@/api-clients/identity/user/schema/api-verbs/delete';
+import type { UserDisableParameters } from '@/api-clients/identity/user/schema/api-verbs/disable';
+import type { UserEnableParameters } from '@/api-clients/identity/user/schema/api-verbs/enable';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

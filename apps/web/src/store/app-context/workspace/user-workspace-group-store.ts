@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { WorkspaceGroupModel } from '@/schema/identity/workspace-group/model';
+import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

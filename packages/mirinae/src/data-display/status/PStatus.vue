@@ -1,6 +1,6 @@
 <template>
     <span class="p-status"
-          :class="{[theme]: !!theme}"
+          :class="[theme]"
           v-on="$listeners"
     >
         <template v-if="theme">
@@ -41,40 +41,39 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
-import { themes } from '@/data-display/status/config';
-import type { StatusProps } from '@/data-display/status/type';
-import { ANIMATION_TYPE } from '@/foundation/icons/config';
+import type { TranslateResult } from 'vue-i18n';
+
+import type { StatusTheme } from '@/data-display/status/type';
+import type { AnimationType } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import { getColor } from '@/utils/helpers';
 
-export default defineComponent<StatusProps>({
+export default defineComponent({
     name: 'PStatus',
     components: { PI },
     props: {
         icon: {
-            type: String,
+            type: String as PropType<string|null|undefined>,
             default: null,
         },
         text: {
-            type: String,
+            type: String as PropType<TranslateResult|null|undefined>,
             default: null,
         },
         textColor: {
-            type: String,
+            type: String as PropType<string|null>,
             default: null,
         },
         iconColor: {
-            type: String,
+            type: String as PropType<string|null>,
             default: null,
         },
         theme: {
-            type: String,
+            type: String as PropType<StatusTheme|null>,
             default: null,
-            validator(theme: string|null) {
-                return theme === null || themes.includes(theme);
-            },
         },
         disableIcon: {
             type: Boolean,
@@ -85,14 +84,11 @@ export default defineComponent<StatusProps>({
             default: 1,
         },
         iconAnimation: {
-            type: String,
+            type: String as PropType<AnimationType>,
             default: undefined,
-            validator(animation: any) {
-                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-            },
         },
     },
-    setup(props: StatusProps) {
+    setup(props) {
         const labelColor = computed(() => getColor(props.textColor));
         const circleColor = computed(() => getColor(props.iconColor));
         const realIconColor = computed(() => getColor(props.iconColor));

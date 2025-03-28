@@ -41,14 +41,14 @@ const handleBackToWorkspace = () => {
         return;
     }
     if (state.beforeWorkspace === 'landing') {
-        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME }).catch(() => {});
         return;
     }
     if (state.beforeWorkspace) {
         router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: state.beforeWorkspace } });
         return;
     }
-    router.push({ name: ROOT_ROUTE._NAME });
+    router.push({ name: ROOT_ROUTE._NAME }).catch(() => {});
 };
 </script>
 

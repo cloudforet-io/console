@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import {
     ERROR_ROUTE, EXTERNAL_PAGES, ROOT_ROUTE, ROUTE_SCOPE,
@@ -20,6 +20,7 @@ import { getLastAccessedWorkspaceId, setCurrentAccessedWorkspaceId } from '@/lib
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { ADMIN_WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/admin/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const makeAdminRouteName = (routeName: string): string => {
@@ -100,7 +101,7 @@ export const processRouteIntegrityCheck = (to: Route, next: NavigationGuardNext)
     }
     if (isNonePathRoute) {
         if (prevRole === 'DOMAIN_ADMIN') {
-            next({ name: makeAdminRouteName(to.name as string) });
+            next({ name: ADMIN_WORKSPACE_HOME_ROUTE._NAME });
             return false;
         }
 

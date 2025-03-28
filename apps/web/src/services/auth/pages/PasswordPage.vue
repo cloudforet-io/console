@@ -97,9 +97,9 @@ import { jwtDecode } from 'jwt-decode';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PDataLoader, PIconButton } from '@cloudforet/mirinae';
 
+import type { UserProfileResetPasswordParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/reset-password';
+import type { UserProfileUpdatePasswordParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/update-password';
 import { SpaceRouter } from '@/router';
-import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';
-import type { UserProfileUpdatePasswordParameters } from '@/schema/identity/user-profile/api-verbs/update-password';
 import { i18n } from '@/translations';
 
 import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
