@@ -49,7 +49,7 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
             users: [],
             service_account_manager: '',
         },
-        currency: undefined,
+        currency: 'KRW',
         time_unit: 'fixedTerm',
         startMonth: [],
         endMonth: [],
