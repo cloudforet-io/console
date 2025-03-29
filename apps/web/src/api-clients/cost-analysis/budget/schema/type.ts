@@ -1,4 +1,4 @@
-export type BudgetTimeUnit = 'MONTHLY' | 'FIXED_TERM';
+export type BudgetTimeUnit = 'MONTHLY' | 'TOTAL';
 type BudgetNotificationUnit = 'PERCENT';
 type BudgetNotificationState = 'ENABLED' | 'DISABLED';
 

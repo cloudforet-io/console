@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PSelectDropdown, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -24,27 +31,27 @@ const state = reactive({
         { name: 'serviceAccount', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SERVICE_ACCOUNT') },
     ],
     selectedScope: 0,
-    serviceAccountList: computed(() => Object.values(serviceAccount.value)),
-    refinedServiceAccountList: computed(() => state.serviceAccountList.map((service_account) => ({
-        name: service_account.key,
-        label: service_account.name,
+    serviceAccountList: [] as string[],
+    refinedServiceAccountList: computed<SelectDropdownMenuItem[]>(() => state.serviceAccountList.map((serviceAccountId: string) => ({
+        name: serviceAccountId,
+        label: serviceAccount.value[serviceAccountId].label,
     }))),
     selectedServiceAccount: '',
 });
 
+watch(() => budgetCreatePageState.project, async () => {
+    const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+        project_id: budgetCreatePageState.project,
+    });
+    state.serviceAccountList = results?.map((result) => result.service_account_id) ?? [];
+}, { deep: true, immediate: true });
+
 watch(() => budgetCreatePageState.scope, () => {
-    state.isSelectable = budgetCreatePageState.scope.type === 1;
-    if (budgetCreatePageState.scope.type === 0) {
+    state.isSelectable = budgetCreatePageState.scope.type === 'serviceAccount';
+    if (budgetCreatePageState.scope.type === 'project') {
         budgetCreatePageState.scope.serviceAccount = '';
     }
 }, { deep: true, immediate: true });
-
-// watch([() => state.selectedScope, () => state.selectedServiceAccount], () => {
-//     budgetCreatePageStore.$patch((_state) => {
-//         _state.state.scope.type = state.selectedScope;
-//         _state.state.scope.serviceAccount = state.selectedServiceAccount;
-//     });
-// }, { immediate: true });
 </script>
 
 <template>
@@ -55,8 +62,9 @@ watch(() => budgetCreatePageState.scope, () => {
             <p-radio v-for="(scope, idx) in state.scopeList"
                      :key="`budget-scope-${idx}`"
                      v-model="budgetCreatePageState.scope.type"
-                     :value="idx"
+                     :value="scope.name"
                      class="mb-1"
+                     :disabled="budgetCreatePageState.project === ''"
             >
                 <span class="radio-item">
                     {{ scope.label }}

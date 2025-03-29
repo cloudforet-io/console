@@ -52,6 +52,7 @@ const props = withDefaults(defineProps<{
      showCategoryTitle?: boolean;
      placeholder?: string;
      excludedSelectedIds?: string[];
+     size?: 'sm'|'md';
 }>(), {
     selectedId: undefined,
     selectedIds: undefined,
@@ -71,6 +72,7 @@ const props = withDefaults(defineProps<{
     showCategoryTitle: true,
     placeholder: 'Select',
     excludedSelectedIds: undefined,
+    size: 'md',
 });
 
 const emit = defineEmits<{(event: 'update:selected-id', value?: string): void;
@@ -283,6 +285,7 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
                        :style-type="props.styleType"
                        :placeholder="props.placeholder"
                        :block="props.block"
+                       :size="props.size"
                        @update:selected="handleUpdateSelectedUserItems"
     >
         <template v-if="props.appearanceType === 'stack'"

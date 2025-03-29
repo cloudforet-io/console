@@ -1,31 +1,40 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import type { ComputedRef } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
-    PFieldGroup, PCheckboxGroup, PCheckbox, PSelectDropdown, PLink,
+    PFieldGroup, PCheckboxGroup, PCheckbox, PButton, PPopover,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
+
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 
 interface BudgetCreateManagerSelectState {
     budgetManagerList: SelectDropdownMenuItem[];
-    selectedBudgetManagerList: string[];
+    excludedSelectedIds: ComputedRef<string[]>;
 }
 
 interface Props {
-    scope: string;
+    serviceAccountList: string[];
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    scope: '',
-});
+const props = defineProps<Props>();
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
+
+const userReferenceStore = useUserReferenceStore();
+
+const userReferenceItems = computed(() => userReferenceStore.state.items);
 
 const state = reactive<BudgetCreateManagerSelectState>({
     budgetManagerList: [
@@ -34,9 +43,15 @@ const state = reactive<BudgetCreateManagerSelectState>({
         { name: 'serviceAccountManagers', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SERVICE_ACCOUNT_MANAGERS') },
         { name: 'others', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.OTHERS') },
     ],
-    selectedBudgetManagerList: [],
+    excludedSelectedIds: computed(() => {
+        if (userReferenceItems.value && budgetCreatePageState.selectedBudgetManagerList.includes('workspaceOwners')) {
+            const workspaceOwnerIds = Object.values(userReferenceItems.value)
+                .filter((user) => user.data.roleInfo?.role_type === ROLE_TYPE.WORKSPACE_OWNER).map((user) => user.key);
+            return [...workspaceOwnerIds, ...props.serviceAccountList];
+        }
+        return [];
+    }),
 });
-
 watch(() => budgetCreatePageState.selectedBudgetManagerList, () => {
     budgetCreatePageStore.$patch((_state) => {
         if (budgetCreatePageState.selectedBudgetManagerList.includes('workspaceOwners')) {
@@ -53,17 +68,16 @@ watch(() => budgetCreatePageState.selectedBudgetManagerList, () => {
             _state.state.recipients.role_types = _state.state.recipients.role_types.filter((role_type) => role_type !== ROLE_TYPE.WORKSPACE_MEMBER);
         }
         _state.state.recipients.role_types = [...new Set(_state.state.recipients.role_types)];
-        // _state.state.selectedBudgetManagerList = state.selectedBudgetManagerList;
     });
 }, { deep: true, immediate: true });
 
-// watch(() => budgetCreatePageState.recipients, () => {
+watch([() => props.serviceAccountList, () => budgetCreatePageState.selectedBudgetManagerList], () => {
+    budgetCreatePageState.recipients.service_account_manager = props.serviceAccountList;
+});
 
-// })
-
-// watch(() => budgetCreatePageState.selectedBudgetManagerList, () => {
-//     state.selectedBudgetManagerList = budgetCreatePageState.selectedBudgetManagerList;
-// }, { deep: true, immediate: true });
+const handleUpdateSelectedIds = (selectedIds: string[]) => {
+    budgetCreatePageState.recipients.users = selectedIds;
+};
 </script>
 
 <template>
@@ -76,21 +90,43 @@ watch(() => budgetCreatePageState.selectedBudgetManagerList, () => {
                         :key="`budget-manager-${idx}`"
                         v-model="budgetCreatePageState.selectedBudgetManagerList"
                         :value="budgetManager.name"
-                        :disabled="(props.scope === 'serviceAccount' && (budgetManager.name === 'projectMember' || budgetManager.name === 'serviceAccountManagers'))"
+                        :disabled="(budgetCreatePageState.scope.type === 'serviceAccount'
+                            && (budgetManager.name === 'projectMember' || budgetManager.name === 'serviceAccountManagers'))"
             >
                 <span>{{ budgetManager.label }}</span>
-                <p-link v-if="budgetManager.name === 'serviceAccountManagers'"
-                        highlight
-                        class="ml-2"
-                        :disabled="(props.scope === 'serviceAccount')"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SHOW_THE_LIST') }}
-                </p-link>
-                <p-select-dropdown v-if="budgetManager.name === 'others'"
-                                   size="sm"
-                                   class="ml-2"
-                />
+                <p-popover>
+                    <template #content>
+                        <p class="flex flex-col gap-2">
+                            <span v-for="(serviceAccount, i) in props.serviceAccountList"
+                                  :key="`service-account-${i}`"
+                            >
+                                {{ serviceAccount }}
+                            </span>
+                        </p>
+                    </template>
+                    <p-button v-if="budgetManager.name === 'serviceAccountManagers'"
+                              highlight
+                              class="ml-2"
+                              size="sm"
+                              style-type="tertiary"
+                              :disabled="(budgetCreatePageState.scope.type === 'serviceAccount') || props.serviceAccountList.length === 0"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SHOW_THE_LIST') }}
+                    </p-button>
+                </p-popover>
             </p-checkbox>
+            <user-select-dropdown v-if="budgetCreatePageState.selectedBudgetManagerList.includes('others')"
+                                  :excluded-selected-ids="state.excludedSelectedIds"
+                                  selection-type="multiple"
+                                  appearance-type="badge"
+                                  @update:selected-ids="handleUpdateSelectedIds"
+            />
         </p-checkbox-group>
     </p-field-group>
 </template>
+
+<style scoped lang="postcss">
+.user-select-dropdown {
+    width: 20em;
+}
+</style>
