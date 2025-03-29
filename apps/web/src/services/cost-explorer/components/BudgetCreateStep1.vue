@@ -1,13 +1,23 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, watchEffect,
+} from 'vue';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput, PButton,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
+import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
+import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
@@ -20,37 +30,35 @@ const budgetCreatePageState = budgetCreatePageStore.state;
 const allReferenceStore = useAllReferenceStore();
 
 interface BudgetCreateStep1State {
-    projectId: string;
     scope: Record<string, any>;
     isContinueAble: boolean;
     name: string;
     projectList: any[];
     selectedProject: string;
+    serviceAccountList: string[];
+    budgetNames: string[];
 }
 
 const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
 
 const state = reactive<BudgetCreateStep1State>({
-    projectId: '',
     scope: {},
     isContinueAble: false,
     name: '',
     projectList: [],
     selectedProject: '',
+    serviceAccountList: [],
+    budgetNames: [],
 });
 
-const emit = defineEmits<{(e: 'click-next'): void }>();
+const emit = defineEmits<{(e: 'click-next'): void, (e: 'click-cancel'): void }>();
 
-watch(() => state.name, () => {
-    // console.log(state.name);
-    // budgetCreatePageStore.setName(state.name);
-}, { deep: true, immediate: true });
 
 watch(() => budgetCreatePageState, () => {
-    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 0
+    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project'
     && budgetCreatePageState.recipients.role_types.length > 0) {
         state.isContinueAble = true;
-    } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 1
+    } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
         && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.recipients.role_types.length > 0
     ) {
         state.isContinueAble = true;
@@ -81,6 +89,52 @@ const handleProjectId = (projectIds: string[]) => {
 const handleNext = () => {
     emit('click-next');
 };
+
+const handleCancel = () => {
+    emit('click-cancel');
+};
+
+const getServiceAccountIncludedinProjectInfo = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+            query: {
+                filter: [
+                    {
+                        k: 'project_id',
+                        v: budgetCreatePageState.project,
+                        o: 'eq',
+                    },
+                    {
+                        k: 'service_account_mgr_id',
+                        v: '',
+                        o: 'not',
+                    },
+                ],
+            },
+        });
+        state.serviceAccountList = results?.filter((result: any) => result.service_account_mgr_id)
+            .map((info:any) => info.service_account_mgr_id) ?? [];
+    } catch (error) {
+        ErrorHandler.handleError(error);
+    }
+};
+
+watch(() => budgetCreatePageState.project, async () => {
+    await getServiceAccountIncludedinProjectInfo();
+}, { deep: true, immediate: true });
+
+const fetchBudgetNames = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>();
+        state.budgetNames = results?.map((result) => result.name) ?? [];
+    } catch (error) {
+        ErrorHandler.handleError(error);
+    }
+};
+
+watchEffect(async () => {
+    await fetchBudgetNames();
+});
 </script>
 
 <template>
@@ -88,8 +142,11 @@ const handleNext = () => {
         <div class="contents-container">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
                            required
+                           invalid-text="Name is required or already exists"
+                           :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
             >
                 <p-text-input block
+                              :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
                               :value="budgetCreatePageState.name"
                               @update:value="handleUpdateName"
                 />
@@ -102,13 +159,13 @@ const handleNext = () => {
                     @update:selected-project-ids="handleProjectId"
                 />
             </p-field-group>
-            <budget-create-scope-select :project-id="state.projectId"
-                                        @update:scope="handleUpdateScope"
-            />
-            <budget-create-manager-select :scope="state.scope" />
+            <budget-create-scope-select />
+            <budget-create-manager-select :service-account-list="state.serviceAccountList" />
         </div>
         <div class="mt-8 flex justify-end gap-4">
-            <p-button style-type="transparent">
+            <p-button style-type="transparent"
+                      @click="handleCancel"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.CANCEL') }}
             </p-button>
             <p-button icon-right="ic_arrow-right"

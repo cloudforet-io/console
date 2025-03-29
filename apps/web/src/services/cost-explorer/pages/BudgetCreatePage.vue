@@ -2,6 +2,7 @@
 import type { ComputedRef } from 'vue';
 import { computed, onUnmounted, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import { PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
@@ -15,6 +16,7 @@ import BudgetCreateStep1 from '@/services/cost-explorer/components/BudgetCreateS
 import BudgetCreateStep2 from '@/services/cost-explorer/components/BudgetCreateStep2.vue';
 import BudgetCreateStep3 from '@/services/cost-explorer/components/BudgetCreateStep3.vue';
 
+import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 
 interface BudgetCreateState {
@@ -25,6 +27,8 @@ interface BudgetCreateState {
     }[]>;
     closeConfirmModalVisible: boolean;
 }
+
+const router = useRouter();
 
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
@@ -59,8 +63,15 @@ const handleClickThirdPage = () => {
     budgetCreatePageState.currentStep = 3;
 };
 
-const handleClickClose = () => {
+const openCancelModal = () => {
     state.closeConfirmModalVisible = true;
+};
+
+const handleClickClose = () => {
+    budgetCreatePageStore.reset();
+    router.push({
+        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+    });
 };
 
 onUnmounted(() => {
@@ -76,16 +87,21 @@ onUnmounted(() => {
                                   :current-step="budgetCreatePageState.currentStep"
                                   show-step
                                   show-close-button
-                                  @close="handleClickClose"
+                                  @close="openCancelModal"
         />
         <budget-create-step1 v-if="budgetCreatePageState.currentStep === 1"
                              @click-next="handleClickSecondPage"
+                             @click-cancel="openCancelModal"
         />
         <budget-create-step2 v-else-if="budgetCreatePageState.currentStep === 2"
                              @click-next="handleClickThirdPage"
         />
         <budget-create-step3 v-else-if="budgetCreatePageState.currentStep === 3" />
-        <confirm-back-modal :visible.sync="state.closeConfirmModalVisible" />
+        <confirm-back-modal :visible.sync="state.closeConfirmModalVisible"
+                            @cancel="state.closeConfirmModalVisible = false"
+                            @close="state.closeConfirmModalVisible = false"
+                            @confirm="handleClickClose"
+        />
     </div>
 </template>
 

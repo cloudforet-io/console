@@ -12,21 +12,25 @@ interface BudgetCreatePageState {
     name: string;
     project: string;
     scope: {
-        type: number;
+        type: string;
         serviceAccount: string|undefined;
     };
     selectedBudgetManagerList: string[];
     recipients: BudgetNotificationRecipients;
-    currency: Currency | undefined;
+    currency: Currency;
     time_unit: 'fixedTerm' | 'monthly';
-    startMonth: string,
-    endMonth: string,
+    startMonth: string[],
+    endMonth: string[],
     temp: string;
     limit: number;
     planned_limits: {
         date: string;
         limit: number;
     }[] | undefined;
+    state: 'ENABLED' | 'DISABLED';
+    thresholds: {
+        value: number;
+    }[];
 }
 
 export const useBudgetCreatePageStore = defineStore('page-budget-create', () => {
@@ -36,7 +40,7 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
         name: '',
         project: '',
         scope: {
-            type: 0,
+            type: 'project',
             serviceAccount: '',
         },
         selectedBudgetManagerList: [],
@@ -47,11 +51,13 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
         },
         currency: undefined,
         time_unit: 'fixedTerm',
-        startMonth: '',
-        endMonth: '',
+        startMonth: [],
+        endMonth: [],
         temp: '',
         limit: 0,
         planned_limits: [],
+        state: 'ENABLED',
+        thresholds: [],
     });
     const setName = (name: string) => {
         state.name = name;
@@ -68,10 +74,10 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
     const setCurrency = (currency: any) => {
         state.currency = currency;
     };
-    const setStart = (startMonth: string) => {
+    const setStart = (startMonth: []) => {
         state.startMonth = startMonth;
     };
-    const setEnd = (endMonth: string) => {
+    const setEnd = (endMonth: []) => {
         state.endMonth = endMonth;
     };
     const setTimeUnit = (time_unit) => {
@@ -82,6 +88,9 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
     };
     const setTemp = (t) => { state.temp = t; };
     const setLimit = (limit: number) => { state.limit = limit; };
+    const setThresholds = (thresholds: { value: number }) => {
+        state.thresholds.push(thresholds);
+    };
     const mutations = {
         setName,
         setCurrentStep,
@@ -94,20 +103,32 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
         setTemp,
         setLimit,
         setPlannedLimits,
+        setThresholds,
     };
 
     const reset = () => {
         state.name = '';
         state.currentStep = 1;
         state.project = '';
-        // state.scope = {
-        //     type: '',
-        //     serviceAccount: '',
-        // },
-        // recipients = {
-        //     role_types: [],
-        //     users: [],
-        // };
+        state.scope = {
+            type: 'project',
+            serviceAccount: '',
+        };
+        state.selectedBudgetManagerList = [];
+        state.recipients = {
+            role_types: [],
+            users: [],
+            service_account_manager: '',
+        };
+        state.currency = undefined;
+        state.time_unit = 'fixedTerm';
+        state.startMonth = [];
+        state.endMonth = [];
+        state.temp = '';
+        state.limit = 0;
+        state.planned_limits = [];
+        state.state = 'ENABLED';
+        state.thresholds = [];
     };
 
     const getters = reactive({ });

@@ -44,31 +44,30 @@ const state = reactive({
         { name: 'enterManually', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ENTER_MANUALLY') },
     ],
     selectedMonthlyBudgetAllocation: '',
-    isContineAble: false,
-    tempArr: Array(12),
-    dateList: Array.from({ length: 12 }, (_, i) => dayjs(`${dayjs.utc().year()}-01-01`).add(i, 'month').format('MMM YYYY')),
+    isContinueAble: false,
+    dateList: Array(12).fill(''),
     budgetEachDate: Array(12).fill(''),
     budgetAmount: undefined as number | undefined,
     budgetAppliedSameAmount: undefined,
+    initialAmount: undefined,
+    monthlyGrowthRate: undefined,
+    analyzedCostData: undefined,
 });
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
 
 watch(() => state, () => {
     budgetCreatePageStore.setCurrency(state.selectedCurrency);
-    budgetCreatePageStore.setStart(state.startMonth[0]);
-    budgetCreatePageStore.setEnd(state.endMonth[0]);
     budgetCreatePageStore.setTimeUnit(state.selectedBudgetCycle);
     if (state.selectedBudgetCycle === 'fixedTerm' && state.budgetAmount) budgetCreatePageStore.setLimit(state.budgetAmount);
 }, { deep: true, immediate: true });
 
 watch(() => state, () => {
+    const planned_limits: any = [];
+    const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
+    const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
+    let currentDate = startDate;
     if (state.selectedMonthlyBudgetAllocation === 'applySameAmount') {
-        const planned_limits: any = [];
-        const startDate = dayjs.utc(budgetCreatePageState.startMonth);
-        const endDate = dayjs.utc(budgetCreatePageState.endMonth);
-        let currentDate = startDate;
-
         while (currentDate.isSameOrBefore(endDate, 'month')) {
             planned_limits.push({
                 date: currentDate.format('YYYY-MM'),
@@ -77,9 +76,67 @@ watch(() => state, () => {
             currentDate = currentDate.add(1, 'month');
         }
         budgetCreatePageStore.setPlannedLimits(planned_limits);
+    } else if (state.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage') {
+        let currentAmount = state.initialAmount ?? 0;
+        while (currentDate.isSameOrBefore(endDate, 'month')) {
+            planned_limits.push({
+                date: currentDate.format('YYYY-MM'),
+                limit: Math.round(currentAmount),
+            });
+            currentAmount *= (1 + ((state.monthlyGrowthRate ?? 0) / 100));
+            currentDate = currentDate.add(1, 'month');
+        }
+        budgetCreatePageStore.setPlannedLimits(planned_limits);
+    } else if (state.selectedMonthlyBudgetAllocation === 'enterManually') {
+        const monthDiff = endDate.diff(startDate, 'month');
+        const monthIndices = Array.from({ length: monthDiff + 1 }, (_, i) => i);
+
+        monthIndices.forEach((i) => {
+            planned_limits.push({
+                date: currentDate.format('YYYY-MM'),
+                limit: Number(Object.values(state.budgetEachDate[i])) || 0,
+            });
+            currentDate = currentDate.add(1, 'month');
+        });
+        budgetCreatePageStore.setPlannedLimits(planned_limits);
     }
 }, { deep: true, immediate: true });
 
+watch(() => [budgetCreatePageState.startMonth, budgetCreatePageState.endMonth], () => {
+    if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
+        const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
+        const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
+        const monthDiff = endDate.diff(startDate, 'month');
+
+        state.dateList = Array.from(
+            { length: monthDiff + 1 },
+            (_, i) => startDate.add(i, 'month').format('MMM YYYY'),
+        );
+        state.budgetEachDate = Array(monthDiff + 1).fill('');
+    }
+}, { immediate: true });
+
+watch([() => state, () => budgetCreatePageState], () => {
+    if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
+        if (budgetCreatePageState.time_unit === 'fixedTerm' && budgetCreatePageState.limit !== 0) {
+            state.isContinueAble = true;
+        } if (budgetCreatePageState.time_unit === 'monthly') {
+            if (state.selectedMonthlyBudgetAllocation === 'applySameAmount'
+            && state.budgetAppliedSameAmount !== undefined) {
+                state.isContinueAble = true;
+            } else if (state.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage'
+            && state.initialAmount && state.monthlyGrowthRate) {
+                state.isContinueAble = true;
+            } else if (state.budgetEachDate.every((date) => date !== '')) {
+                state.isContinueAble = true;
+            }
+            if (budgetCreatePageState.planned_limits
+            && budgetCreatePageState.planned_limits.length > 0) {
+                // state.isContinueAble = true;
+            }
+        }
+    }
+}, { deep: true, immediate: true });
 
 const handlePrevious = () => {
     budgetCreatePageStore.setCurrentStep(1);
@@ -95,6 +152,14 @@ const handleUpdatgeBudgetEachDate = (value: string, index: number) => {
 
 const handleUpdateBudgetAppliedSameAmount = (value) => {
     state.budgetAppliedSameAmount = value;
+};
+
+const handleUpdateInitialAmount = (value) => {
+    state.initialAmount = value;
+};
+
+const handleUpdateMonthlyGrowthRate = (value) => {
+    state.monthlyGrowthRate = value;
 };
 </script>
 
@@ -142,7 +207,7 @@ const handleUpdateBudgetAppliedSameAmount = (value) => {
                                    required
                     >
                         <p-datetime-picker data-type="yearToMonth"
-                                           :selected-dates.sync="state.startMonth"
+                                           :selected-dates.sync="budgetCreatePageState.startMonth"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
                                            :max-date="dayjs.utc().format('YYYY-MM')"
                         />
@@ -151,17 +216,19 @@ const handleUpdateBudgetAppliedSameAmount = (value) => {
                                    required
                     >
                         <p-datetime-picker data-type="yearToMonth"
-                                           :selected-dates.sync="state.endMonth"
+                                           :selected-dates.sync="budgetCreatePageState.endMonth"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
                                            :max-date="dayjs.utc().format('YYYY-MM')"
-                                           :min-date="state.startMonth.length > 0 ? dayjs.utc(state.startMonth[0]).format('YYYY-MM') : dayjs.utc().format('YYYY-MM')"
+                                           :min-date="budgetCreatePageState.startMonth.length > 0
+                                               ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : dayjs.utc().format('YYYY-MM')"
                         />
                     </p-field-group>
                 </div>
                 <div class="flex">
                     <p-field-group
                         :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
-                        :help-text="state.startMonth.length === 0 || state.endMonth.length === 0 ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
+                        :help-text="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0
+                            ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
                         required
                     >
                         <p-radio-group direction="vertical">
@@ -231,7 +298,9 @@ const handleUpdateBudgetAppliedSameAmount = (value) => {
                                                style-type="secondary"
                                                required
                                 >
-                                    <p-text-input>
+                                    <p-text-input :value="state.initialAmount"
+                                                  @update:value="handleUpdateInitialAmount"
+                                    >
                                         <template #input-right>
                                             ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
                                         </template>
@@ -241,7 +310,9 @@ const handleUpdateBudgetAppliedSameAmount = (value) => {
                                                style-type="secondary"
                                                required
                                 >
-                                    <p-text-input>
+                                    <p-text-input :value="state.monthlyGrowthRate"
+                                                  @update:value="handleUpdateMonthlyGrowthRate"
+                                    >
                                         <template #input-right>
                                             %
                                         </template>
@@ -279,7 +350,9 @@ const handleUpdateBudgetAppliedSameAmount = (value) => {
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PREVIOUS') }}
             </p-button>
-            <p-button @click="emit('click-next')">
+            <p-button :disabled="!state.isContinueAble"
+                      @click="emit('click-next')"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.CONTINUE') }}
             </p-button>
         </div>
@@ -291,10 +364,6 @@ const handleUpdateBudgetAppliedSameAmount = (value) => {
 :deep(.p-select-dropdown) {
     width: 15rem;
 }
-
-/* :deep(.p-text-input) {
-    width: 94px;
-} */
 
 .allocation-layout {
     min-width: 500px;
