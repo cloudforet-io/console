@@ -25,6 +25,7 @@ const projectFilteredByKeyword = computed(() => {
     return projectItems.filter((project) => getTextHighlightRegex(props.keyword).test(project.name));
 });
 const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupOrProjectId === curr.params.projectGroupOrProjectId;
+
 </script>
 
 <template>
