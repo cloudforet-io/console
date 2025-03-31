@@ -3,23 +3,16 @@ import {
     computed, onMounted, onUnmounted, reactive, ref, toRef, watch,
 } from 'vue';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { ProjectGroupCreateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/create';
-import type { ProjectGroupUpdateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/update';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { i18n } from '@/translations';
-
-import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useProjectGroupMutations } from '@/services/project/v-shared/composables/mutations/use-project-group-mutations';
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import { useProjectGroupNames } from '@/services/project/v-shared/composables/use-project-group-names';
 
@@ -29,27 +22,20 @@ interface Props {
     updateMode: boolean;
     parentGroupId?: string;
 }
-
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', isCreating: boolean, projectGroup?: ProjectGroupModel): void;
 }>();
 
-
-const projectGroupReferenceStore = useProjectGroupReferenceStore();
-const storeState = reactive({
-    projectGroups: computed(() => projectGroupReferenceStore.getters.projectGroupItems),
-});
+/* project group */
 const { data: projectGroup } = useProjectGroupQuery({
     projectGroupId: toRef(props, 'projectGroupId'),
 });
 
+/* modal active state */
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    loading: false,
 });
-
-/* hasMounted */
 const hasMounted = ref(false);
 onMounted(() => {
     hasMounted.value = true;
@@ -81,65 +67,46 @@ const {
         return true;
     },
 });
-
-
-/* Api */
-const createProjectGroup = async (params: ProjectGroupCreateParameters): Promise<ProjectGroupModel|undefined> => {
-    try {
-        const result = await SpaceConnector.clientV2.identity.projectGroup.create<ProjectGroupCreateParameters, ProjectGroupModel>(params);
-        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
-        return result;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
-        return undefined;
-    }
-};
-const updateProjectGroup = async (params: ProjectGroupUpdateParameters): Promise<ProjectGroupModel|undefined> => {
-    try {
-        const result = await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters, ProjectGroupModel>(params);
-        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
-        return result;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
-        return undefined;
-    }
-};
-
-/* Event */
-const confirm = async () => {
-    if (state.loading) return;
-    if (!projectGroupName.value) return;
-    if (!isAllValid.value) return;
-
-    state.loading = true;
-    const updateParams: ProjectGroupUpdateParameters = {
-        name: projectGroupName.value,
-        project_group_id: props.projectGroupId as string,
-    };
-
-    const createParams: ProjectGroupCreateParameters = {
-        name: projectGroupName.value,
-        parent_group_id: props.parentGroupId,
-    };
-
-    let result: ProjectGroupModel|undefined;
-
-    if (!props.updateMode) result = await createProjectGroup({ ...createParams } as ProjectGroupCreateParameters);
-    else result = await updateProjectGroup({ ...updateParams });
-
-    emit('confirm', !props.updateMode, result);
-    state.loading = false;
-    state.proxyVisible = false;
-};
-
 watch(() => props.projectGroupId, async (after) => {
     if (after && props.updateMode) {
-        setForm('projectGroupName', storeState.projectGroups[after].name);
+        setForm('projectGroupName', projectGroup.value?.name);
     } else {
         initForm();
     }
 }, { immediate: true });
 
+
+/* mutations */
+const { createProjectGroup, updateProjectGroup, isProcessing } = useProjectGroupMutations();
+
+/* Event */
+const confirm = async () => {
+    if (isProcessing.value) return;
+    if (!projectGroupName.value) return;
+    if (!isAllValid.value) return;
+
+    let result: ProjectGroupModel|undefined;
+
+    if (props.updateMode) {
+        if (!props.projectGroupId) {
+            ErrorHandler.handleRequestError(new Error('projectGroupId is required'), 'projectGroupId is required', true);
+            return;
+        }
+        const hasChanged = projectGroup.value?.name !== projectGroupName.value;
+        result = hasChanged ? await updateProjectGroup({
+            name: projectGroupName.value,
+            project_group_id: props.projectGroupId,
+        }) : projectGroup.value;
+    } else {
+        result = await createProjectGroup({
+            name: projectGroupName.value,
+            parent_group_id: props.parentGroupId,
+        });
+    }
+
+    emit('confirm', !props.updateMode, result);
+    state.proxyVisible = false;
+};
 
 </script>
 
@@ -150,7 +117,7 @@ watch(() => props.projectGroupId, async (after) => {
                     fade
                     backdrop
                     :visible.sync="state.proxyVisible"
-                    :disabled="state.loading || !isAllValid || projectGroup?.name === projectGroupName"
+                    :disabled="isProcessing || !isAllValid || projectGroup?.name === projectGroupName"
                     @confirm="confirm"
     >
         <template #body>
