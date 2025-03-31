@@ -28,9 +28,10 @@
 </template>
 
 <script lang="ts" setup>
+import type { TranslateResult } from 'vue-i18n';
 
 interface FieldTitleProps {
-    label?: string;
+    label?: TranslateResult;
     description?: string;
     size?: 'sm' | 'md' | 'lg';
     fontWeight?: 'regular' | 'bold';
