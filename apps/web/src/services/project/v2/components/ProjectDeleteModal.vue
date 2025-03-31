@@ -16,26 +16,24 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 
 interface Props {
-    visible: boolean;
-    targetId: string;
-    isProject?: boolean;
     skipRedirect?: boolean;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm'): void;
+const emit = defineEmits<{(e: 'confirm'): void;
 }>();
+
+const projectPageModelStore = useProjectPageModalStore();
 
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -44,10 +42,9 @@ const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 
 const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    title: computed(() => (props.isProject ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE'))),
-    content: computed(() => (props.isProject ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT'))),
+    title: computed(() => (projectPageModelStore.state.targetProjectId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE'))),
+    content: computed(() => (projectPageModelStore.state.targetProjectId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT'))),
     loading: false,
 });
 
@@ -55,20 +52,25 @@ const handleConfirmDelete = async () => {
     if (state.loading) return;
     state.loading = true;
     try {
-        if (props.isProject) {
-            await deleteProject();
+        if (projectPageModelStore.state.targetProjectId) {
+            await deleteProject(projectPageModelStore.state.targetProjectId);
+        } else if (projectPageModelStore.state.targetProjectGroupId) {
+            await deleteProjectGroup(projectPageModelStore.state.targetProjectGroupId);
         } else {
-            await deleteProjectGroup();
+            throw new Error('No project or project group id');
         }
         emit('confirm');
     } catch (e) {
-        if (props.isProject) ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
-        else ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
+        if (projectPageModelStore.state.targetProjectId) ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
+        else if (projectPageModelStore.state.targetProjectGroupId) {
+            ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
+        } else {
+            ErrorHandler.handleRequestError(e, 'Failed to delete project or project group', true);
+        }
     } finally {
         state.loading = false;
-        state.proxyVisible = false;
+        projectPageModelStore.closeDeleteModal();
         if (!props.skipRedirect) {
-            // TODO: Check route
             await router.replace({
                 name: PROJECT_ROUTE_V2._NAME,
             });
@@ -76,36 +78,36 @@ const handleConfirmDelete = async () => {
     }
 };
 
-const deleteProject = async () => {
+const deleteProject = async (projectId: string) => {
     await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
-        project_id: props.targetId as string,
+        project_id: projectId,
     });
     await recentStore.deleteRecent({
         type: RECENT_TYPE.PROJECT,
-        itemId: props.targetId,
+        itemId: projectId,
     });
     showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
-    const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === props.targetId);
+    const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectId);
     if (isFavoriteItem) {
         await favoriteStore.deleteFavorite({
             itemType: FAVORITE_TYPE.PROJECT,
             workspaceId: state.currentWorkspaceId || '',
-            itemId: props.targetId as string,
+            itemId: projectId,
         });
     }
 };
 
-const deleteProjectGroup = async () => {
+const deleteProjectGroup = async (projectGroupId: string) => {
     await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
-        project_group_id: props.targetId,
+        project_group_id: projectGroupId,
     });
     showSuccessMessage(_i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
-    const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === props.targetId);
+    const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === projectGroupId);
     if (isFavoriteItem) {
         await favoriteStore.deleteFavorite({
             itemType: FAVORITE_TYPE.PROJECT_GROUP,
             workspaceId: state.currentWorkspaceId || '',
-            itemId: props.targetId,
+            itemId: projectGroupId,
         });
     }
 };
@@ -114,14 +116,17 @@ const deleteProjectGroup = async () => {
 
 <template>
     <delete-modal :header-title="state.title"
-                  :visible.sync="state.proxyVisible"
+                  :visible="projectPageModelStore.state.deleteModalVisible"
                   :loading="state.loading"
+                  @close="projectPageModelStore.closeDeleteModal"
+                  @cancel="projectPageModelStore.closeDeleteModal"
+                  @closed="projectPageModelStore.resetTarget"
                   @confirm="handleConfirmDelete"
     >
         <p>
             {{ state.content }}
         </p>
-        <i18n v-if="!props.isProject"
+        <i18n v-if="!projectPageModelStore.state.targetProjectId"
               path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC"
               tag="p"
               class="desc"
