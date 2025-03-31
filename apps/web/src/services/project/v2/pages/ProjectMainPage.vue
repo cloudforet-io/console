@@ -79,7 +79,7 @@ onUnmounted(() => {
 <template>
     <div class="page-wrapper">
         <project-header :project-id="projectId"
-                        :project-group-id="projectId"
+                        :project-group-id="projectGroupId"
         />
         <project-and-group-list-panel />
         <project-group-member-management-modal v-if="projectGroupId && state.projectGroupMemberManagementModalVisible"

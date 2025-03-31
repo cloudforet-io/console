@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getTextHighlightRegex, PTextInput, PEmpty } from '@cloudforet/mirinae';
+import {
+    getTextHighlightRegex, PTextInput, PEmpty, PTextHighlighting,
+} from '@cloudforet/mirinae';
+import type { TreeNodeRoutePredicate } from '@cloudforet/mirinae/types/data-display/tree/new-tree/type';
 
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
@@ -21,6 +24,7 @@ const projectFilteredByKeyword = computed(() => {
     const projectItems = Object.values(projectReferenceStore.getters.projectItems);
     return projectItems.filter((project) => getTextHighlightRegex(props.keyword).test(project.name));
 });
+const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupOrProjectId === curr.params.projectGroupOrProjectId;
 </script>
 
 <template>
@@ -40,12 +44,17 @@ const projectFilteredByKeyword = computed(() => {
                                 to: {
                                     name: PROJECT_ROUTE_V2._NAME,
                                     params: { projectGroupOrProjectId: project.key }
-                                }
+                                },
+                                predicate
                             }"
                             :favorite-options="{ type: FAVORITE_TYPE.PROJECT, id: project.key }"
                             display-type="list"
                             icon="ic_project-filled"
-                />
+                >
+                    <p-text-highlighting :text="project.name"
+                                         :term="props.keyword"
+                    />
+                </l-s-b-item>
             </template>
             <p-empty v-else
                      class="text-paragraph-md whitespace-pre mt-3"

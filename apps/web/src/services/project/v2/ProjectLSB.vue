@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, ref } from 'vue';
+import type Vue from 'vue';
+import {
+    computed, nextTick, ref, watch,
+} from 'vue';
 
 import {
     PButton, PContextMenu, useContextMenuController,
@@ -25,6 +28,9 @@ import { useProjectStarredTree } from '@/services/project/v2/composables/use-pro
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
+const props = defineProps<{
+    selectedPaths?: string[];
+}>();
 
 /* starred */
 const favoriteStore = useFavoriteStore();
@@ -71,6 +77,31 @@ const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupO
 /* search */
 const projectKeyword = ref<string>('');
 
+/* auto scroll */
+const treeRef = ref<Vue | null>(null);
+
+watch([() => props.selectedPaths, treeRef], ([paths, treeComponent]) => {
+    if (!paths?.length || !treeComponent?.$el) return;
+
+    nextTick(() => {
+        const selectedNode = treeComponent.$el.querySelector(`[data-node-id="${paths[paths.length - 1]}"]`);
+        if (selectedNode) {
+            const rect = selectedNode.getBoundingClientRect();
+            const isVisible = (
+                rect.top >= 0
+                && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+            );
+
+            if (!isVisible) {
+                selectedNode.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
+            }
+        }
+    });
+});
+
 </script>
 
 <template>
@@ -116,36 +147,10 @@ const projectKeyword = ref<string>('');
         <project-l-s-b-search :keyword="projectKeyword"
                               @update:keyword="projectKeyword = $event"
         />
-        <project-l-s-b-tree v-if="!projectKeyword.length" />
+        <project-l-s-b-tree v-if="!projectKeyword.length"
+                            ref="treeRef"
+                            :selected-paths="props.selectedPaths"
+        />
     </l-s-b-container>
 </template>
 
-<style scoped lang="postcss">
-.project-l-s-b {
-    .create-button-wrapper {
-        @apply relative inline-block;
-
-        .create-context-menu {
-            @apply absolute;
-            top: 100%;
-            right: 0;
-            z-index: 10;
-            width: max-content;
-        }
-    }
-
-    .project-search {
-        @apply w-full;
-        margin-bottom: 0.5rem;
-    }
-    .search-result-text {
-        @apply overflow-hidden whitespace-nowrap;
-        text-overflow: ellipsis;
-    }
-    .search-empty {
-        @apply text-paragraph-md;
-        white-space: pre;
-        margin-top: 0.75rem;
-    }
-}
-</style>
