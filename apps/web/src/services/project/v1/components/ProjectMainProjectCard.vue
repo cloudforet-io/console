@@ -19,9 +19,9 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { peacock } from '@/styles/colors';
 
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 interface Props {

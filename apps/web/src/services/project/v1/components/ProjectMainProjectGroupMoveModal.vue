@@ -17,9 +17,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import type { ProjectTreeNodeData } from '@/services/project/v-shared/types/project-tree-type';
 
 
 interface Props {
