@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PTreeNode } from '@cloudforet/mirinae';
+import { PTreeNode, PEmpty } from '@cloudforet/mirinae';
 
 import LSBItem from '@/common/modules/navigations/new-lsb/LSBItem.vue';
 import type { LSBItemProps } from '@/common/modules/navigations/new-lsb/type';
@@ -26,16 +26,21 @@ const props = defineProps<{
         </template>
         <span class="font-bold">{{ $t('COMMON.STARRED') }}</span>
         <template #children>
-            <l-s-b-item v-for="item in props.items"
-                        :id="item.id"
-                        :key="item.id"
-                        :name="item.name"
-                        display-type="tree"
-                        :icon="item.icon"
-                        :link="item.link"
-                        :favorite-options="item.favoriteOptions"
-                        favorite-visibility="hovered-only"
-            />
+            <template v-if="props.items.length > 0">
+                <l-s-b-item v-for="item in props.items"
+                            :id="item.id"
+                            :key="item.id"
+                            :name="item.name"
+                            display-type="tree"
+                            :icon="item.icon"
+                            :link="item.link"
+                            :favorite-options="item.favoriteOptions"
+                            favorite-visibility="hovered-only"
+                />
+            </template>
+            <p-empty v-else>
+                {{ $t('COMMON.STARRED_NO_DATA') }}
+            </p-empty>
         </template>
     </p-tree-node>
 </template>
