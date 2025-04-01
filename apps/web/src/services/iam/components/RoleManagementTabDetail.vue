@@ -141,7 +141,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
     await getRoleDetailData(selectedRoleId);
     state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type);
 
-    const pageAccessPermissionMap = getPageAccessMapFromRawData(state.pageAccess);
+    const pageAccessPermissionMap = getPageAccessMapFromRawData(state.pageAccess, true);
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {
         if (!itemId) return;
