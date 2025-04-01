@@ -1,9 +1,8 @@
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import { useMenuStore } from '@/store/menu/menu-store';
-
 import { PAGE_ACCESS } from '@/lib/access-control/config';
-import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
+import { getDefaultPageAccessPermissionList, getEnabledMenus } from '@/lib/access-control/page-access-helper';
+import config from '@/lib/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -14,7 +13,7 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
     if (!subMenuList) return [];
     let results: PageAccessMenuItem[] = [];
     subMenuList.forEach((subMenu) => {
-        if (!subMenu.needPermissionByRole || !defaultMenuIds.includes(subMenu.id)) return;
+        if (!defaultMenuIds.includes(subMenu.id)) return;
 
         const menuInfo = MENU_INFO_MAP[subMenu.id];
         if (subMenu.subMenuList?.length) {
@@ -31,12 +30,12 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
 };
 
 export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessMenuItem[] => {
-    const menuStore = useMenuStore();
+    const globalConfig = config.get('SERVICES') || {};
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
-    const menuListByVersion = menuStore.state.menuList;
+    const menuListByVersion = getEnabledMenus(globalConfig);
     menuListByVersion.forEach((menu) => {
-        if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {
+        if (defaultMenuIdsByRoleType.includes(menu.id)) {
             if (menu.id === MENU_ID.WORKSPACE_HOME) return;
             const menuInfo = MENU_INFO_MAP[menu.id];
             results.push({
