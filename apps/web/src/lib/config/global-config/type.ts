@@ -3,7 +3,7 @@ import type { MenuId } from '@/lib/menu/config';
 
 export type GlobalServiceConfig = Record<string, { ENABLED: boolean; VERSION: string }>;
 
-type FeatureKeyType = typeof FEATURES[keyof typeof FEATURES];
+export type FeatureKeyType = typeof FEATURES[keyof typeof FEATURES];
 
 type MenuConfig = Partial<Record<MenuId, boolean>>;
 export type FeatureVersionSettingsType = {
