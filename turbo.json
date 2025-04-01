@@ -2,6 +2,7 @@
   "globalDependencies": [
     "turbo.json", "package.json", "package-lock.json"
   ],
+  "globalEnv": ["VITE_VERCEL_EDGE_CONFIG"],
   "tasks": {
     "@cloudforet/utils#build": {
       "outputs": ["./dist/**"],
