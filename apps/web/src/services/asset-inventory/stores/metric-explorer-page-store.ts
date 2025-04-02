@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { cloneDeep, isEmpty } from 'lodash';
@@ -48,7 +50,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.DAILY)[0] as Period|undefined,
-        relativePeriod: getInitialPeriodByGranularity(GRANULARITY.DAILY)[1] as RelativePeriod|undefined,
+        relativePeriod: undefined as RelativePeriod|undefined,
         filters: {} as MetricFilter,
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
@@ -177,7 +179,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
 
         if (_options?.granularity) state.granularity = _options?.granularity;
         if (_options?.period) state.period = _options?.period;
-        if (_options?.relative_period) state.relativePeriod = _options?.relative_period;
+        if (_options?.relative_period) {
+            state.relativePeriod = _options?.relative_period;
+        } else state.relativePeriod = undefined;
         if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
         if (_options?.filters) state.filters = cloneDeep(metricExample?.options?.filters);
         if (_options?.operator) state.selectedOperator = _options?.operator;

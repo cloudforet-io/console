@@ -46,8 +46,6 @@ import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -65,7 +63,8 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 
 type CostAnalyzeRawData = {
@@ -409,11 +408,11 @@ const handleClickRowData = (fieldName: string, value: string) => {
 
     if (storeState.isAdminMode) return;
     if (fieldName === GROUP_BY.PROJECT) {
-        _routeName = PROJECT_ROUTE.DETAIL._NAME;
+        _routeName = PROJECT_ROUTE_V1.DETAIL._NAME;
         _params = { id: value, workspaceId: storeState.currentWorkspaceId };
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
-        _routeName = ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT.DETAIL._NAME;
+        _routeName = SERVICE_ACCOUNT_ROUTE.DETAIL._NAME;
         _params = { serviceAccountId: value, workspaceId: storeState.currentWorkspaceId };
     }
 
@@ -644,14 +643,14 @@ watch(
             >
                 <span v-if="colIndex === 0">Total</span>
                 <span v-else-if="tableState.showFormattedData && field.name !== 'usage_unit'
-                    && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
-                        && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
+                    && (!tableState.groupByFields.map(item => lowerCase(item.name)).includes(lowerCase(field.name)))
+                    && (!tableState.groupByFields.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
                 >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {notation: 'compact'}) : 0 }}
                 </span>
                 <span v-else-if="!tableState.showFormattedData && field.name !== 'usage_unit'
-                    && (!state.visibleGroupByItems.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
-                        && !state.visibleGroupByItems.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
+                    && (!tableState.groupByFields.map(item => lowerCase(item.name)).includes(lowerCase(field.name))
+                        && !tableState.groupByFields.map(item => lowerCase(item.label)).includes(lowerCase(field.name)))"
                 >
                     {{ Array.isArray(values) && values.length > 0 ? numberFormatter(reduce(values), {minimumFractionDigits: 2}) : 0 }}
                 </span>

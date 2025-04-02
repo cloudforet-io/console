@@ -10,7 +10,6 @@ import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-
 const getAfterCallApiMap = () => ({
     '/inventory/cloud-service-type/create': (data) => {
         useAllReferenceStore(pinia);
@@ -425,12 +424,14 @@ export const initApiClient = async (config) => {
         mockConfig: getMockConfig(config),
         authConfig: getAuthConfig(config),
     };
+    const serviceConfig = config.get('SERVICES') || {};
     await SpaceConnector.init(
         endpoints,
         tokenApi,
         apiSettings,
         devConfig,
         getAfterCallApiMap(),
+        serviceConfig,
     );
     const existingRefreshToken = SpaceConnector.getRefreshToken();
 

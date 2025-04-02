@@ -2,9 +2,9 @@ import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
-import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager-v1/routes/route-constant';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager/v1/routes/route-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -14,7 +14,8 @@ import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import { ADMIN_OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/admin/route-constant';
 import { OPS_FLOW_ROUTE } from '@/services/ops-flow/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
@@ -33,50 +34,50 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.PROJECT]: {
         menuId: MENU_ID.PROJECT,
-        routeName: PROJECT_ROUTE._NAME,
+        routeName: PROJECT_ROUTE_V1._NAME,
         translationId: 'MENU.PROJECT',
         icon: 'ic_service_project',
     },
     [MENU_ID.ASSET_INVENTORY]: {
         menuId: MENU_ID.ASSET_INVENTORY,
-        routeName: ASSET_INVENTORY_ROUTE_V1._NAME,
+        routeName: ASSET_INVENTORY_ROUTE._NAME,
         translationId: 'MENU.ASSET_INVENTORY',
         icon: 'ic_service_asset-inventory',
     },
     [MENU_ID.CLOUD_SERVICE]: {
         menuId: MENU_ID.CLOUD_SERVICE,
-        routeName: ASSET_INVENTORY_ROUTE_V1.CLOUD_SERVICE._NAME,
+        routeName: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         translationId: 'MENU.ASSET_INVENTORY_CLOUD_SERVICE',
         icon: 'ic_service_cloud-service',
     },
     [MENU_ID.SERVER]: {
         menuId: MENU_ID.SERVER,
-        routeName: ASSET_INVENTORY_ROUTE_V1.SERVER._NAME,
+        routeName: ASSET_INVENTORY_ROUTE.SERVER._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SERVER',
         icon: 'ic_service_server',
     },
     [MENU_ID.SECURITY]: {
         menuId: MENU_ID.SECURITY,
-        routeName: ASSET_INVENTORY_ROUTE_V1.SECURITY._NAME,
+        routeName: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SECURITY',
         icon: 'ic_service_security',
     },
     [MENU_ID.METRIC_EXPLORER]: {
         menuId: MENU_ID.METRIC_EXPLORER,
-        routeName: ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER._NAME,
+        routeName: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
         translationId: 'MENU.ASSET_INVENTORY_METRIC_EXPLORER',
         icon: 'ic_service_metric-explorer',
     },
     [MENU_ID.COLLECTOR]: {
         menuId: MENU_ID.COLLECTOR,
-        routeName: ASSET_INVENTORY_ROUTE_V1.COLLECTOR._NAME,
+        routeName: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
         translationId: 'MENU.ASSET_INVENTORY_COLLECTOR',
         icon: 'ic_service_collector',
     },
     [MENU_ID.SERVICE_ACCOUNT]: {
         menuId: MENU_ID.SERVICE_ACCOUNT,
-        routeName: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME,
-        translationId: 'MENU.ASSET_INVENTORY_SERVICE_ACCOUNT',
+        routeName: SERVICE_ACCOUNT_ROUTE._NAME,
+        translationId: 'MENU.SERVICE_ACCOUNT',
         icon: 'ic_service_service-account',
     },
     [MENU_ID.COST_EXPLORER]: {

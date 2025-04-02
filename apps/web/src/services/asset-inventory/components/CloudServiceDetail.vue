@@ -46,7 +46,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface Props {
     cloudServiceId: string;
@@ -143,7 +143,7 @@ const handleClickLinkButton = async (type: string, id: string) => {
         }
     } else {
         window.open(router.resolve({
-            name: PROJECT_ROUTE.DETAIL._NAME,
+            name: PROJECT_ROUTE_V1.DETAIL._NAME,
             params: { id, workspaceId: state.data.workspace_id },
         }).href, '_blank');
     }

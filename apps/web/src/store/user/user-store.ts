@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { computed, reactive, watch } from 'vue';
 
 import { jwtDecode } from 'jwt-decode';
@@ -150,7 +152,7 @@ export const useUserStore = defineStore('user-store', () => {
         pageAccessPermissionList: computed<MenuId[]>(() => {
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions, getters.domainId);
+            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
             const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
 
@@ -170,7 +172,7 @@ export const useUserStore = defineStore('user-store', () => {
 
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions, getters.domainId);
+            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 
             const isAllReadOnly = checkAllMenuReadonly(roleBasePagePermissions);

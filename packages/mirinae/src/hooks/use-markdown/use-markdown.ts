@@ -39,7 +39,7 @@ export const useMarkdown = ({
             console.error('[Mirinae] Markdown parsing error: ', e);
         }
         if (inlineCodeClass) {
-            doc = doc.replace(/(<pre>.*?<\/pre>)|(<code)/gs, (match, codeBlock, inlineCode) => {
+            doc = doc.replace(/(<pre>[\s\S]*?<\/pre>)|(<code)/g, (match, codeBlock, inlineCode) => {
                 if (inlineCode) {
                     return `<code class="${inlineCodeClass}"`; // Apply class to inline code only
                 }

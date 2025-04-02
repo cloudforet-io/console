@@ -57,3 +57,13 @@ export type BadgeType = typeof BADGE_TYPE[keyof typeof BADGE_TYPE];
 export type BadgeStyleType = typeof BADGE_STYLE_TYPE[keyof typeof BADGE_STYLE_TYPE];
 export type BadgeShape = typeof BADGE_SHAPE[keyof typeof BADGE_SHAPE];
 export type BadgeFontWeight = typeof BADGE_FONT_WEIGHT[keyof typeof BADGE_FONT_WEIGHT];
+export interface BadgeProps {
+    badgeType?: BadgeType;
+    styleType?: BadgeStyleType;
+    textColor?: string;
+    backgroundColor?: string;
+    outlineColor?: string;
+    shape?: BadgeShape;
+    fontWeight?: BadgeFontWeight;
+    defaultSlot?: string;
+}

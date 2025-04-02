@@ -7,8 +7,8 @@ import { flatMapDeep, uniq } from 'lodash';
 import {
     PEmpty, PSearch, PFieldTitle, PButton,
 } from '@cloudforet/mirinae';
-import type { TreeNode } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';

@@ -7,8 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PLazyImg, PI, PEmpty, PCheckbox, PBoardItem, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/src/controls/context-menu/type';
-import { CONTEXT_MENU_TYPE } from '@cloudforet/mirinae/src/controls/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
@@ -81,7 +80,7 @@ const state = reactive({
                     name: 'add',
                     label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
                 },
-                { type: CONTEXT_MENU_TYPE.divider },
+                { type: 'divider' },
                 ...defaultSets,
             ];
         }

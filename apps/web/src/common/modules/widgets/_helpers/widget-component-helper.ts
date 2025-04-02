@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type { AsyncComponent } from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

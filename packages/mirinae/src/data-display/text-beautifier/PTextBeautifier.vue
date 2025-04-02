@@ -1,9 +1,14 @@
 <template>
-    <component :is="tag" class="p-text-beautifier">
+    <component :is="tag"
+               class="p-text-beautifier"
+    >
         <template v-if="matchList.length > 0">
             {{ matchList[0].index > 0 ? stringValue.substring(0, matchList[0].index) : '' }}
             <template v-for="({ lastIndex, text, url}, matchIndex) in matchList">
-                <a :key="matchIndex" :href="url" target="_blank">
+                <a :key="matchIndex"
+                   :href="url"
+                   target="_blank"
+                >
                     {{ text }}
                 </a>
                 {{ stringValue.substring(lastIndex, matchList[matchIndex + 1] ? matchList[matchIndex + 1].index : undefined) }}
@@ -16,6 +21,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
@@ -23,17 +29,14 @@ import {
 
 import linkifyIt from 'linkify-it';
 
-interface TextBeautifierProps {
-    value: any
-}
 
 const linkify = linkifyIt();
 
-export default defineComponent<TextBeautifierProps>({
+export default defineComponent({
     name: 'PTextBeautifier',
     props: {
         value: {
-            type: [String, Number, Boolean, Array, Object],
+            type: [String, Number, Boolean, Array, Object] as PropType<any>,
             default: '',
         },
         tag: {

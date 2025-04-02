@@ -6,7 +6,7 @@ import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant'
 import { NUMBER_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { NumberFormatInfo } from '@/common/modules/widgets/_widget-fields/number-format/type';
 
-import { SIZE_UNITS } from '@/services/asset-inventory-v1/constants/asset-analysis-constant';
+import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 
 
 export const sortWidgetTableFields = (fields: string[]): string[] => {

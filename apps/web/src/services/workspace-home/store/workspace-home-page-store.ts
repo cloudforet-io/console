@@ -36,7 +36,7 @@ import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/ty
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory-v1/types/asset-analysis-type';
+import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import { convertFormKeys } from '@/services/workspace-home/composables/use-workspace-home';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type {

@@ -1,6 +1,6 @@
 import type { JobStatus } from '@/schema/inventory/job/type';
 
-import type { JobTaskError } from '@/services/asset-inventory-v1/types/collector-history-job-type';
+import type { JobTaskError } from '@/services/asset-inventory/types/collector-history-job-type';
 
 
 export interface JobTaskModel {

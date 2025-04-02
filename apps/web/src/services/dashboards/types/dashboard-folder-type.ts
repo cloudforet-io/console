@@ -1,4 +1,4 @@
-import type { TreeData } from '@cloudforet/mirinae/src/data-display/tree/tree-view/type';
+import type { TreeData } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 
 export interface DashboardTreeDataType extends TreeData {

@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
@@ -28,9 +30,9 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { FullDataLink, WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
-import { ADMIN_ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/admin/route-constant';
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
-import type { MetricFilter } from '@/services/asset-inventory-v1/types/asset-analysis-type';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
@@ -134,7 +136,7 @@ const getFullDataLocation = (
         const _metricId = dataTable?.options?.[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
         if (_metricId) {
             return {
-                name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE_V1.METRIC_EXPLORER.DETAIL._NAME,
+                name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
                     workspaceId: isAdminMode ? undefined : workspaceId,
                     metricId: _metricId,

@@ -31,7 +31,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE_V1 } from '@/services/asset-inventory-v1/routes/route-constant';
+import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -60,7 +60,7 @@ const state = reactive({
         let result;
         if (isEmpty(storeState.serviceAccount)) {
             result = {
-                to: state.writableServiceAccount ? { name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME } : {},
+                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : {},
                 title: i18n.t('HOME.NO_ACCOUNT'),
                 desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
                 buttonText: state.writableServiceAccount ? i18n.t('HOME.NO_ACCOUNT_ADD_NEW') : undefined,
@@ -269,7 +269,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([
                 >
                     <p-divider class="divider" />
                     <p-link highlight
-                            :to="{ name: ASSET_INVENTORY_ROUTE_V1.SERVICE_ACCOUNT._NAME }"
+                            :to="{ name: SERVICE_ACCOUNT_ROUTE._NAME }"
                             action-icon="internal-link"
                             class="link"
                     >

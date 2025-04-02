@@ -5,7 +5,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
-import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
+import { CLOUD_SERVICE_FILTER_KEY, UNIDENTIFIED_PROVIDER } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
 
 export const useCloudServicePageStore = defineStore('page-cloud-service', {
@@ -42,7 +42,8 @@ export const useCloudServicePageStore = defineStore('page-cloud-service', {
             const providers: ProviderReferenceMap = allReferenceStore.getters.provider;
 
             const providerReference = providers[provider];
-            if (!providerReference) {
+
+            if (!providerReference && provider !== UNIDENTIFIED_PROVIDER) {
                 this.selectedProvider = 'all';
                 return;
             }

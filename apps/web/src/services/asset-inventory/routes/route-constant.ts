@@ -1,6 +1,6 @@
 import { MENU_ID } from '@/lib/menu/config';
 
-export const ASSET_INVENTORY_ROUTE = {
+export const ASSET_INVENTORY_ROUTE = Object.freeze({
     _NAME: MENU_ID.ASSET_INVENTORY,
     CLOUD_SERVICE: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,
@@ -8,6 +8,13 @@ export const ASSET_INVENTORY_ROUTE = {
         TYPE_SEARCH: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.type_search` },
         NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.no_resource` },
         DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.detail` },
+    },
+    SERVER: {
+        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
+    },
+    SECURITY: {
+        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}`,
+        DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}.detail` },
     },
     COLLECTOR: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}`,
@@ -22,13 +29,6 @@ export const ASSET_INVENTORY_ROUTE = {
             JOB: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}.history.job` },
         },
     },
-    SERVICE_ACCOUNT: {
-        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}`,
-        DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}.detail` },
-        SEARCH: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}.search` },
-        ADD: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}.add` },
-        NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}.no_resource` },
-    },
     METRIC_EXPLORER: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.METRIC_EXPLORER}`,
         DETAIL: {
@@ -38,4 +38,4 @@ export const ASSET_INVENTORY_ROUTE = {
             },
         },
     },
-} as const;
+});

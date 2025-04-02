@@ -8,7 +8,7 @@ export interface DefinitionProps {
     formatter?: (data: any, props: DefinitionProps) => any;
     block?: boolean;
     copyValue?: string|number;
-    copyValueFormatter?: (data: any, props: DefinitionProps) => string|number;
+    copyValueFormatter?: (data: any, props: Readonly<Partial<DefinitionProps>>) => string|number;
     autoKeyWidth?: boolean;
     customKeyWidth?: string;
 }

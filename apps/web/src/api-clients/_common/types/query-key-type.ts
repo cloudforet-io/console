@@ -1,4 +1,4 @@
-import type { API_DOC } from '@/api-clients/_common/constants/api-doc';
+import type { API_DOC } from '@/api-clients/_common/constants/api-doc-constant';
 
 
 /**

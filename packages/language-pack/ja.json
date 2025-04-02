@@ -1821,6 +1821,7 @@
 				"LINE_TO_ZERO": "0として表示",
 				"MISSING_VALUE": "欠損値の処理方式"
 			},
+			"NO_DATA_TABLE_ERROR_MESSAGE": "データソースを確認するか、ウィジェットの設定を見直してください。",
 			"NO_DATA_TO_DISPLAY": "データがありません",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "前日よりも少ない",
@@ -4391,7 +4392,6 @@
 		"ASSET_INVENTORY_METRIC_EXPLORER": "メトリック探索",
 		"ASSET_INVENTORY_SECURITY": "セキュリティ",
 		"ASSET_INVENTORY_SERVER": "サーバ",
-		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"CONSOLE_HOME": "コンソールホーム",
 		"COST_EXPLORER": "費用管理",
 		"COST_EXPLORER_ANOMALY_DETECTION": "異常コスト検知",
@@ -4417,6 +4417,7 @@
 		"OPS_FLOW": "",
 		"PROJECT": "プロジェクト",
 		"PROVIDER": "プロバイダー",
+		"SERVICE_ACCOUNT": "サービスアカウント",
 		"TASK_BOARD": "",
 		"TASK_MANAGEMENT": "",
 		"WORKSPACE_HOME": "ホーム"

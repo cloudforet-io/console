@@ -26,15 +26,14 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
-import type { ProgressBarProps } from '@/data-display/progress-bar/type';
 
-
-export default defineComponent<ProgressBarProps>({
+export default defineComponent({
     name: 'PProgressBar',
     props: {
         percentage: {
@@ -54,11 +53,8 @@ export default defineComponent<ProgressBarProps>({
             default: undefined,
         },
         size: {
-            type: String,
+            type: String as PropType<PROGRESS_BAR_SIZE>,
             default: PROGRESS_BAR_SIZE.md,
-            validator(size: any) {
-                return Object.values(PROGRESS_BAR_SIZE).includes(size);
-            },
         },
         disableAnimation: {
             type: Boolean,

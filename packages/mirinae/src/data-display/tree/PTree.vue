@@ -94,6 +94,7 @@
 
 <script lang="ts">
 /* eslint-disable no-await-in-loop */
+import type { PropType } from 'vue';
 import {
     defineComponent, computed, onMounted, reactive, toRefs, watch,
 } from 'vue';
@@ -125,21 +126,7 @@ import type { WalkTreeDataCallback } from './he-tree-vue/tree-data';
 import { walkTreeData, cloneTreeData } from './he-tree-vue/tree-data';
 
 
-interface Props {
-    toggleOptions: ToggleOptions;
-    selectOptions: SelectOptions;
-    editOptions: EditOptions;
-    dragOptions: DragOptions;
-    dataGetter: DataGetter;
-    dataSetter: DataSetter;
-    dataFetcher?: DataFetcher;
-    fetchOnInit?: boolean;
-    getClassNames: GetClassNames;
-}
-
-
-
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PTree',
     components: {
         PSpinner,
@@ -150,31 +137,31 @@ export default defineComponent<Props>({
     directives: { focus },
     props: {
         toggleOptions: {
-            type: Object,
+            type: Object as PropType<ToggleOptions>,
             default: () => ({}),
         },
         selectOptions: {
-            type: Object,
+            type: Object as PropType<SelectOptions>,
             default: () => ({}),
         },
         editOptions: {
-            type: Object,
+            type: Object as PropType<EditOptions>,
             default: () => ({}),
         },
         dragOptions: {
-            type: Object,
+            type: Object as PropType<DragOptions>,
             default: () => ({}),
         },
         dataGetter: {
-            type: Function,
-            default: (node) => node.data,
+            type: Function as PropType<DataGetter>,
+            default: (node: TreeNode) => node.data,
         },
         dataSetter: {
-            type: Function,
-            default: (d, node) => { node.data = d; },
+            type: Function as PropType<DataSetter>,
+            default: (d: string, node: TreeNode) => { node.data = d; },
         },
         dataFetcher: {
-            type: Function,
+            type: Function as PropType<DataFetcher|undefined>,
             default: undefined,
         },
         fetchOnInit: {
@@ -182,11 +169,11 @@ export default defineComponent<Props>({
             default: false,
         },
         getClassNames: {
-            type: Function,
+            type: Function as PropType<GetClassNames>,
             default: () => ({}),
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             treeRef: null as null|any,
             treeData: [] as TreeNode[],
@@ -411,7 +398,7 @@ export default defineComponent<Props>({
             await onNodeFoldedChange(node, path, node.$folded);
         };
 
-        const onClickNode = (node: TreeNode, path: number[], e: Store) => {
+        const onClickNode = (node: TreeNode, path: number[], e: any) => {
             emit('click-node', node, path, e);
 
             if (getSelectState(path)) startEdit(node);

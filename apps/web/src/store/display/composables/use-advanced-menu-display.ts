@@ -1,28 +1,23 @@
-import { computed } from 'vue';
-
 import type { DisplayMenu } from '@/store/display/type';
-import { useDomainStore } from '@/store/domain/domain-store';
 
-import config from '@/lib/config';
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
+
+import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-const ADVANCED_SERVICE_NAMES: string[] = [MENU_ID.OPS_FLOW];
+const ADVANCED_SERVICE_NAMES: MenuId[] = [MENU_ID.OPS_FLOW];
 export const useAdvancedMenuDisplay = () => {
-    const domainStore = useDomainStore();
     const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-    const isMenuDisplayable = (menuId: string, domainId: string): boolean => {
+    const isMenuDisplayable = (menuId: MenuId): boolean => {
         if (!ADVANCED_SERVICE_NAMES.includes(menuId)) return true;
-        const advanceService: Record<string, string[]>|undefined = config.get('ADVANCED_SERVICE');
-        return !!advanceService?.[menuId]?.includes(domainId);
+        const { visibleContents } = useContentsAccessibility(menuId);
+        return !!visibleContents;
     };
-    const availableAdvancedServices = computed(() => ({
-        [MENU_ID.OPS_FLOW]: isMenuDisplayable(MENU_ID.OPS_FLOW, domainStore.state.domainId),
-    }));
 
     const refineOpsflowSubMenu = (menu: DisplayMenu): DisplayMenu[]|undefined => {
         const sub = menu.subMenuList;
@@ -49,7 +44,7 @@ export const useAdvancedMenuDisplay = () => {
         return refined;
     };
 
-    const refineGNBMenuList = (allGNBMenuList: DisplayMenu[]): DisplayMenu[] => allGNBMenuList.filter((menu) => isMenuDisplayable(menu.id, domainStore.state.domainId)).map((menu) => {
+    const refineGNBMenuList = (allGNBMenuList: DisplayMenu[]): DisplayMenu[] => allGNBMenuList.filter((menu) => isMenuDisplayable(menu.id)).map((menu) => {
         if (menu.id === MENU_ID.OPS_FLOW) {
             return {
                 ...menu,
@@ -59,7 +54,6 @@ export const useAdvancedMenuDisplay = () => {
         return menu;
     });
     return {
-        availableAdvancedServices,
         refineGNBMenuList,
     };
 };

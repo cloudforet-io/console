@@ -149,7 +149,7 @@ jobs:
           github_token: ${{ secrets.PAT_TOKEN }}
           branch: ${{ github.ref }}
 
-      - name: Trigger dispatch_master_to_develop.yaml workflow
+      - name: Trigger dispatch_master_to_develop workflow
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
