@@ -13,9 +13,17 @@ import {
     WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
     WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
+import config from '@/lib/config';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
 import type { Menu, MenuId } from '@/lib/menu/config';
 
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
+
+import {
+    ALERT_V1_WORKSPACE_PAGE_ACCESS_MENU_LIST,
+    ALERT_V2_WORKSPACE_PAGE_ACCESS_MENU_LIST, DEFAULT_WORKSPACE_PAGE_ACCESS_MENU_LIST,
+} from '@/services/iam/constants/role-constant';
+import type { PageAccessMenuByConfig } from '@/services/iam/types/role-type';
 
 export const getDefaultPageAccessPermissionList = (roleType?: RoleType): MenuId[] => {
     if (roleType === 'SYSTEM_ADMIN') return SYSTEM_USER_DEFAULT_PERMISSIONS;
@@ -38,10 +46,11 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[]): PageAccessMap => {
+export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], isRolePage?: boolean): PageAccessMap => {
+    const globalConfig = config.get('SERVICES') || {};
     const menuStore = useMenuStore();
     const result: PageAccessMap = {};
-    const menuListByVersion = menuStore.state.menuList;
+    const menuListByVersion = !isRolePage ? menuStore.state.menuList : getEnabledMenus(globalConfig);
     const flattenedMenuList = flattenMenu(menuListByVersion);
     const setPermissions = (id: string, read = true, write = true, access = true) => {
         result[id] = { read, write, access };
@@ -113,3 +122,29 @@ export const checkAllMenuReadonly = (permissions: string[]) => permissions.every
     const accessType = item.split('.*')[0].split(':')[1];
     return accessType === PAGE_ACCESS.READONLY;
 });
+
+export const getEnabledMenus = (globalServiceConfig: GlobalServiceConfig): Menu[] => {
+    const versionMenuMap = {
+        V1: ALERT_V1_WORKSPACE_PAGE_ACCESS_MENU_LIST,
+        V2: ALERT_V2_WORKSPACE_PAGE_ACCESS_MENU_LIST,
+    };
+
+    const getAllMenus = (version: string): PageAccessMenuByConfig[] => [
+        ...DEFAULT_WORKSPACE_PAGE_ACCESS_MENU_LIST,
+        ...versionMenuMap[version],
+    ];
+
+    return Object.entries(globalServiceConfig)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .filter(([_, cfg]) => cfg.ENABLED)
+        .flatMap(([configKey, cfg]) => {
+            const targetMenus = getAllMenus(cfg.VERSION);
+            const matchedMenu = targetMenus
+                .filter((menuItem) => menuItem.key === configKey);
+
+            return matchedMenu.map((i) => ({
+                id: i.id,
+                subMenuList: (i.subMenuList || [{ id: i.id }]) as Menu[],
+            }));
+        });
+};
