@@ -3,20 +3,26 @@ import {
     computed, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useProjectGroupMutations } from '@/services/project/v-shared/composables/mutations/use-project-group-mutations';
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import { useProjectGroupNames } from '@/services/project/v-shared/composables/use-project-group-names';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const props = defineProps<{
     targetParentGroupId?: string;
+}>();
+const emit = defineEmits<{(e: 'created', projectGroupId: string): void;
 }>();
 
 const projectPageModalStore = useProjectPageModalStore();
@@ -26,7 +32,7 @@ const targetId = computed(() => projectPageModalStore.state.targetId);
 const updateMode = computed(() => projectPageModalStore.state.targetId !== undefined);
 
 /* project group */
-const { data: projectGroup } = useProjectGroupQuery({
+const { data: projectGroup, setQueryData } = useProjectGroupQuery({
     projectGroupId: targetId,
     enabled: visible,
 });
@@ -66,10 +72,38 @@ watch([visible, projectGroup], async ([v, pg]) => {
 
 
 /* mutations */
-const { createProjectGroup, updateProjectGroup, isProcessing } = useProjectGroupMutations();
+const { projectGroupAPI, projectGroupListQueryKey } = useProjectGroupApi();
+const queryClient = useQueryClient();
+
+const { mutateAsync: createProjectGroup, isPending: isCreating } = useMutation({
+    mutationFn: projectGroupAPI.create,
+    onSuccess: (data) => {
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
+        queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+        emit('created', data.project_group_id);
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
+    },
+});
+
+const { mutateAsync: updateProjectGroup, isPending: isUpdating } = useMutation({
+    mutationFn: projectGroupAPI.update,
+    onSuccess: (data) => {
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
+        setQueryData(data);
+        queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+    },
+});
+
+const isProcessing = computed(() => isCreating.value || isUpdating.value);
+
 
 /* Event */
-const confirm = async () => {
+const handleConfirm = async () => {
     if (isProcessing.value) return;
     if (!projectGroupName.value) return;
     if (!isAllValid.value) return;
@@ -81,13 +115,13 @@ const confirm = async () => {
         }
         const hasChanged = projectGroup.value?.name !== projectGroupName.value;
         if (hasChanged) {
-            updateProjectGroup({
+            await updateProjectGroup({
                 name: projectGroupName.value,
                 project_group_id: targetId.value,
             });
         }
     } else {
-        createProjectGroup({
+        await createProjectGroup({
             name: projectGroupName.value,
             parent_group_id: props.targetParentGroupId,
         });
@@ -104,11 +138,12 @@ const confirm = async () => {
                     fade
                     backdrop
                     :visible="visible"
+                    :loading="isProcessing"
                     :disabled="isProcessing || !isAllValid || projectGroup?.name === projectGroupName"
                     @close="projectPageModalStore.closeFormModal"
                     @cancel="projectPageModalStore.closeFormModal"
                     @closed="projectPageModalStore.resetTarget"
-                    @confirm="confirm"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
@@ -121,7 +156,7 @@ const confirm = async () => {
                                   class="block w-full"
                                   :invalid="invalid"
                                   :placeholder="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER')"
-                                  @keydown.enter="confirm"
+                                  @keydown.enter="handleConfirm"
                                   @update:value="setForm('projectGroupName', $event)"
                     />
                 </template>

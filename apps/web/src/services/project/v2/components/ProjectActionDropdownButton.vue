@@ -24,11 +24,11 @@ const actionItems = computed<SelectDropdownMenuItem[]>(() => [
         label: i18n.t('PROJECT.DETAIL.MOVE'),
         icon: 'ic_move',
     },
-    {
+    ...(props.projectId ? [{
         name: 'tags',
         label: i18n.t('PROJECT.DETAIL.TAGS'),
         icon: 'ic_label',
-    },
+    }] : []),
     { type: 'divider', name: 'divider' },
     {
         name: 'delete',
@@ -44,9 +44,9 @@ const handleSelectItem = (selectedItem: SelectDropdownMenuItem|string|number) =>
     if (typeof selected === 'object') selected = (selectedItem as SelectDropdownMenuItem).name;
     if (selected === 'rename') {
         if (props.projectId) {
-            projectPageModalStore.openProjectRenameModal(props.projectId);
+            projectPageModalStore.openEditProjectFormModal(props.projectId);
         } else if (props.projectGroupId) {
-            projectPageModalStore.openProjectGroupRenameModal(props.projectGroupId);
+            projectPageModalStore.openEditProjectGroupFormModal(props.projectGroupId);
         }
     } else if (selected === 'move') {
         if (props.projectId) {

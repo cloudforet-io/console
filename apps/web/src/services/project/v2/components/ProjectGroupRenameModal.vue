@@ -3,18 +3,22 @@ import {
     computed, onMounted, onUnmounted, ref, watch,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useProjectGroupMutations } from '@/services/project/v-shared/composables/mutations/use-project-group-mutations';
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import { useProjectGroupNames } from '@/services/project/v-shared/composables/use-project-group-names';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+
 
 const projectPageModalStore = useProjectPageModalStore();
 const visible = computed(() => !!projectPageModalStore.state.renameModalVisible && projectPageModalStore.state.targetType === 'projectGroup');
@@ -24,10 +28,9 @@ const updateMode = computed(() => projectPageModalStore.state.targetId !== undef
 const projectGroupId = computed(() => (projectPageModalStore.state.targetType === 'projectGroup'
     ? projectPageModalStore.state.targetId
     : undefined));
-const { data: projectGroup, setQueryData, invalidateAllQueries } = useProjectGroupQuery({
+const { data: projectGroup, setQueryData } = useProjectGroupQuery({
     projectGroupId,
 });
-const parentGroupId = computed(() => (projectGroup.value?.parent_group_id ? projectGroup.value.parent_group_id : undefined));
 
 /* modal active state */
 const hasMounted = ref(false);
@@ -73,33 +76,37 @@ watch(visible, async (v) => {
 
 
 /* mutations */
-const { createProjectGroup, updateProjectGroup, isProcessing } = useProjectGroupMutations();
+const { projectGroupAPI } = useProjectGroupApi();
+
+
+const { mutateAsync: updateProjectGroup, isPending } = useMutation({
+    mutationFn: projectGroupAPI.update,
+    onSuccess: (data) => {
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
+        setQueryData(data);
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+    },
+});
+
 
 /* Event */
 const confirm = async () => {
-    if (isProcessing.value) return;
+    if (isPending.value) return;
     if (!projectGroupName.value) return;
     if (!isAllValid.value) return;
 
-    let result: ProjectGroupModel|undefined;
-
-    if (updateMode.value) {
-        if (!projectGroupId.value) {
-            ErrorHandler.handleRequestError(new Error('projectGroupId is required'), 'projectGroupId is required', true);
-            return;
-        }
-        const hasChanged = projectGroup.value?.name !== projectGroupName.value;
-        result = hasChanged ? await updateProjectGroup({
+    if (!projectGroupId.value) {
+        ErrorHandler.handleRequestError(new Error('projectGroupId is required'), 'projectGroupId is required', true);
+        return;
+    }
+    const hasChanged = projectGroup.value?.name !== projectGroupName.value;
+    if (hasChanged) {
+        updateProjectGroup({
             name: projectGroupName.value,
             project_group_id: projectGroupId.value,
-        }) : projectGroup.value;
-        if (result) setQueryData(result);
-    } else {
-        result = await createProjectGroup({
-            name: projectGroupName.value,
-            parent_group_id: parentGroupId.value,
         });
-        invalidateAllQueries();
     }
     projectPageModalStore.closeRenameModal();
 };
@@ -113,7 +120,7 @@ const confirm = async () => {
                     fade
                     backdrop
                     :visible="visible"
-                    :disabled="isProcessing || !isAllValid || projectGroup?.name === projectGroupName"
+                    :disabled="isPending || !isAllValid || projectGroup?.name === projectGroupName"
                     @close="projectPageModalStore.closeRenameModal()"
                     @cancel="projectPageModalStore.closeRenameModal()"
                     @closed="projectPageModalStore.resetTarget()"

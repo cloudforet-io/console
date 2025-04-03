@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -10,6 +9,7 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { i18n } from '@/translations';
 
@@ -23,7 +23,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { gray, indigo } from '@/styles/colors';
 
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
-import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 
@@ -36,6 +35,9 @@ const targetId = computed(() => projectPageModalStore.state.targetId);
 const props = defineProps<{
     targetParentGroupId?: string;
 }>();
+const emit = defineEmits<{(e: 'created', projectGroupId: string): void;
+}>();
+
 const projectStore = useProjectReferenceStore();
 const state = reactive({
     projectNames: computed(() => Object.values(projectStore.getters.projectItems).filter((item) => item.key !== targetId.value).map((p) => p.name)),
@@ -62,7 +64,7 @@ const {
     invalidState,
     invalidTexts,
     setForm, isAllValid,
-    initForm,
+    initForm, resetValidations,
 } = useFormValidator({
     projectName: undefined as string|undefined,
 }, {
@@ -73,7 +75,7 @@ const {
         return true;
     },
 });
-const { data: project, setQueryData: setProjectQueryData, invalidateAllQueries } = useProjectQuery({
+const { data: project, setQueryData, invalidateAllQueries } = useProjectQuery({
     projectId: targetId,
     enabled: visible,
 });
@@ -86,11 +88,11 @@ watch([visible, project], ([v, prj]) => {
     if (prj) {
         setForm('projectName', prj.name);
         state.selectedAccess = prj.project_type ?? 'PRIVATE';
+        resetValidations();
     }
-});
+}, { immediate: true });
 
 /* mutations */
-const router = useRouter();
 const { projectAPI } = useProjectApi();
 const { mutate: createProject, isPending: isCreatingProject } = useMutation({
     mutationFn: ({ projectType, groupId, name }: { projectType: ProjectType, groupId?: string; name: string }) => projectAPI.create({
@@ -100,14 +102,8 @@ const { mutate: createProject, isPending: isCreatingProject } = useMutation({
     }),
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
-        projectStore.sync(data);
         invalidateAllQueries();
-        router.replace({
-            name: PROJECT_ROUTE_V2._NAME,
-            params: {
-                projectGroupOrProjectId: data.project_id,
-            },
-        });
+        emit('created', data.project_id);
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
@@ -115,14 +111,14 @@ const { mutate: createProject, isPending: isCreatingProject } = useMutation({
 });
 
 
-const { mutate: updateProject, isPending: isUpdatingProject } = useMutation({
+const { mutateAsync: updateProject, isPending: isUpdatingProject } = useMutation({
     mutationFn: ({ projectId, name }: { projectId: string; name: string }) => projectAPI.update({
         project_id: projectId,
         name,
     }),
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
-        setProjectQueryData(data);
+        setQueryData(data);
         projectStore.sync(data);
     },
     onError: (e) => {
@@ -130,14 +126,14 @@ const { mutate: updateProject, isPending: isUpdatingProject } = useMutation({
     },
 });
 
-const { mutate: updateProjectType, isPending: isUpdatingProjectType } = useMutation({
+const { mutateAsync: updateProjectType, isPending: isUpdatingProjectType } = useMutation({
     mutationFn: ({ projectId, projectType }: { projectId: string; projectType: ProjectType }) => projectAPI.updateProjectType({
         project_id: projectId,
         project_type: projectType,
     }),
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
-        setProjectQueryData(data);
+        setQueryData(data);
         projectStore.sync(data);
     },
     onError: (e) => {
@@ -152,17 +148,23 @@ const confirm = async () => {
     if (!isAllValid.value) return;
 
     const name = projectName.value?.trim() as string; // always exist
-    if (targetId.value) { // update project
-        updateProject({
-            projectId: targetId.value,
-            name,
-        });
-        updateProjectType({
-            projectId: targetId.value,
-            projectType: state.selectedAccess,
-        });
-    } else { // create project
-        createProject({
+    if (targetId.value) {
+        const promises: Promise<ProjectModel>[] = [];
+        if (name !== project.value?.name) {
+            promises.push(updateProject({
+                projectId: targetId.value,
+                name,
+            }));
+        }
+        if (state.selectedAccess !== project.value?.project_type) {
+            promises.push(updateProjectType({
+                projectId: targetId.value,
+                projectType: state.selectedAccess,
+            }));
+        }
+        await Promise.allSettled(promises);
+    } else {
+        await createProject({
             name,
             projectType: state.selectedAccess,
             groupId: props.targetParentGroupId,
@@ -170,8 +172,8 @@ const confirm = async () => {
     }
     projectPageModalStore.closeFormModal();
 };
-const handleSelectAccess = (selectedAccess: ProjectType) => {
-    state.selectedAccess = selectedAccess;
+const handleSelectAccess = (selectedAccess) => {
+    state.selectedAccess = selectedAccess as ProjectType;
 };
 
 
