@@ -17,8 +17,8 @@ import type { ServiceAccountListParameters } from '@/api-clients/identity/servic
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import { useProjectGroupReferenceStore, type ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import { useProjectReferenceStore, type ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -27,10 +27,39 @@ import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';
 import ProjectGroupCard from '@/services/project/v2/components/ProjectGroupCard.vue';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
+const props = defineProps<{
+    targetId?: string;
+    targetType?: 'project' | 'projectGroup';
+}>();
 
+/* ui */
 const isCollapsed = ref(false);
 
+/* modal */
 const projectPageModalStore = useProjectPageModalStore();
+
+/* project */
+const projectReferenceStore = useProjectReferenceStore();
+const allProjects = computed(() => Object.values(projectReferenceStore.getters.projectItems));
+const projects = computed(() => {
+    if (props.targetType === 'projectGroup') {
+        if (props.targetId) return allProjects.value.filter((d) => d.data.groupInfo?.id === props.targetId);
+        return allProjects.value;
+    }
+    return [];
+});
+
+
+/* project group */
+const projectGroupReferenceStore = useProjectGroupReferenceStore();
+const allProjectGroups = computed(() => Object.values(projectGroupReferenceStore.getters.projectGroupItems));
+const projectGroups = computed(() => {
+    if (props.targetType === 'projectGroup') {
+        if (props.targetId) return allProjectGroups.value.filter((d) => d.data.parentGroupInfo?.id === props.targetId);
+        return allProjectGroups.value;
+    }
+    return [];
+});
 
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
@@ -63,10 +92,6 @@ const state = reactive({
         return allProjectList.filter((project) => project.parentId === state.currentProjectGroupId);
     }),
     filteredCardList: computed<ProjectCardItemType[]>(() => [...state.currentProjectGroupList, ...state.currentProjectList]),
-    paginatedCardList: computed(() => ({
-        projectGroup: state.filteredCardList.filter((item) => item.type === 'projectGroup'),
-        project: state.filteredCardList.filter((item) => item.type === 'project'),
-    })),
 });
 
 /* Util */
@@ -125,29 +150,33 @@ onMounted(async () => {
             </div>
         </div>
         <div v-show="!isCollapsed">
-            <div v-if="state.paginatedCardList.projectGroup.length"
+            <div v-if="projectGroups.length"
                  class="pt-6 pb-10"
             >
                 <p-field-title class="title"
                                :label="$t('PROJECT.LANDING.PROJECT_GROUP')"
                 />
                 <div class="card-contents">
-                    <project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
+                    <project-group-card v-for="(pg, idx) in projectGroups"
                                         :key="`project-group-${idx}`"
-                                        :item="projectGroup"
+                                        :project-group-id="pg.key"
+                                        :name="pg.name"
                     />
                 </div>
             </div>
 
-            <div v-if="state.paginatedCardList.project.length">
+            <div v-if="projects.length">
                 <p-field-title class="title"
                                :label="$t('PROJECT.LANDING.PROJECT')"
                 />
                 <div class="card-contents">
-                    <project-card v-for="(project, idx) in state.paginatedCardList.project"
+                    <project-card v-for="(p, idx) in projects"
                                   :key="`project-${idx}`"
-                                  :item="project"
-                                  :service-account-provider-list="getDistinctProviders(project.id)"
+                                  :project-id="p.key"
+                                  :group-name="p.data.groupInfo?.name"
+                                  :name="p.name"
+                                  :project-type="p.data.projectType"
+                                  :service-account-provider-list="getDistinctProviders(p.key)"
                     />
                 </div>
             </div>

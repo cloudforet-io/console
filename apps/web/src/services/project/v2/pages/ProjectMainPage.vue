@@ -84,7 +84,10 @@ const handleCreated = (id: string) => {
         <project-header :project-id="projectId"
                         :project-group-id="projectGroupId"
         />
-        <project-and-group-list-panel class="mt-4" />
+        <project-and-group-list-panel class="mt-4"
+                                      :target-id="props.projectGroupOrProjectId"
+                                      :target-type="projectGroupId ? 'projectGroup' : 'project'"
+        />
 
         <template v-if="isModalLoadReady">
             <keep-alive>

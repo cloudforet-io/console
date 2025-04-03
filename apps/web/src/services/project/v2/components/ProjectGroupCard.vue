@@ -1,11 +1,9 @@
 <script setup lang="ts">
 
-import { computed, reactive } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PTextHighlighting, PSelectDropdown } from '@cloudforet/mirinae';
-
-import { i18n } from '@/translations';
+import { PI, PTextHighlighting } from '@cloudforet/mirinae';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -13,79 +11,39 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
 
-import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
+import ProjectActionDropdownButton from '@/services/project/v2/components/ProjectActionDropdownButton.vue';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
-interface Props {
-    item: ProjectCardItemType;
+
+const props = defineProps<{
     searchKeyword?: string;
-}
+    projectGroupId: string;
+    name: string;
+}>();
 
-const props = defineProps<Props>();
-const router = useRouter();
 
+/* favorite */
 const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
+const isStarred = computed(() => favoriteStore.getters.projectGroupItems.some((item) => item.itemId === props.projectGroupId));
 
-const storeState = reactive({
-    favoriteItems: computed(() => favoriteGetters.projectGroupItems),
-});
-
-const state = reactive({
-    isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === props.item.id)),
-    toolsetMenuItems: [
-        {
-            type: 'item',
-            name: 'rename',
-            label: i18n.t('Rename'),
-            icon: 'ic_settings',
-        },
-        {
-            type: 'item',
-            name: 'move',
-            label: i18n.t('Move'),
-            icon: 'ic_move',
-        },
-        { type: 'divider', name: 'divider' },
-        {
-            type: 'item',
-            name: 'delete',
-            label: i18n.t('Delete'),
-            icon: 'ic_delete',
-        },
-    ],
-    toolsetMenuVisible: false,
-});
-
-// TODO: change the route
+/* project group select */
+const router = useRouter();
 const handleSelectProjectGroup = () => {
-    router.push({
+    router.replace({
         name: PROJECT_ROUTE_V2._NAME,
         params: {
-            projectGroupId: props.item.id as string,
+            projectGroupOrProjectId: props.projectGroupId,
         },
     }).catch(() => {});
 };
 
-const handleSelectItem = () => {
-    // projectPageStore.setCurrentSelectedProjectGroupId(props.item.id);
-    // if (selected.name === 'rename') {
-    //     projectPageStore.setProjectGroupFormUpdateMode(true);
-    //     projectPageStore.setProjectGroupFormVisible(true);
-    // }
-    // if (selected.name === 'move') {
-    //     projectPageStore.setProjectGroupMoveModalVisible(true);
-    // }
-    // if (selected.name === 'delete') {
-    //     projectPageStore.setProjectDeleteModalVisible(true);
-    // }
-};
-
+/* action menu */
+const visibleActionMenu = ref(false);
 
 </script>
 
 <template>
-    <div class="project-main-project-group-card"
+    <div class="flex items-center justify-between bg-gray-100 rounded-lg cursor-pointer project-main-project-group-card"
          @click="handleSelectProjectGroup"
     >
         <div class="project-group-item">
@@ -95,25 +53,17 @@ const handleSelectItem = () => {
                  height="1rem"
             />
             <p-text-highlighting class="project-group-name"
-                                 :text="props.item.name"
+                                 :text="props.name"
                                  :term="props.searchKeyword"
             />
         </div>
         <div class="toolset-group">
-            <p-select-dropdown class="toolset-button"
-                               style-type="tertiary-icon-button"
-                               button-icon="ic_ellipsis-horizontal"
-                               size="sm"
-                               :visible-menu.sync="state.toolsetMenuVisible"
-                               :menu="state.toolsetMenuItems"
-                               :selected="[]"
-                               use-fixed-menu-style
-                               reset-selection-on-menu-close
-                               @select="handleSelectItem"
+            <project-action-dropdown-button :project-group-id="props.projectGroupId"
+                                            @update:visible="visibleActionMenu = $event"
             />
-            <favorite-button :item-id="props.item.id"
+            <favorite-button :item-id="props.projectGroupId"
                              :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
-                             :class="{'favorite-button': true, 'starred': state.isStarred }"
+                             :class="{'favorite-button': true, 'starred': isStarred }"
             />
         </div>
     </div>
@@ -121,7 +71,6 @@ const handleSelectItem = () => {
 
 <style scoped lang="postcss">
 .project-main-project-group-card {
-    @apply flex items-center justify-between bg-gray-100 rounded-lg cursor-pointer;
     height: 3rem;
     padding: 0.75rem;
 
@@ -162,16 +111,4 @@ const handleSelectItem = () => {
         @apply bg-blue-200;
     }
 }
-
-/* custom design-system component - p-select-dropdown */
-:deep(.p-select-dropdown) {
-    .dropdown-button-component {
-        @apply rounded-full;
-
-        &.opened {
-            @apply rounded-full;
-        }
-    }
-}
-
 </style>
