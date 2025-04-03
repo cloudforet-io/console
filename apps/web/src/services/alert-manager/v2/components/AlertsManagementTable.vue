@@ -21,6 +21,7 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -64,6 +65,7 @@ const route = useRoute();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
+    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
@@ -193,14 +195,36 @@ const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
     state.fields = fields;
 };
 const handleExportToExcel = async () => {
+    // TODO: File manager changes need to be applied.
+    // const alertsExcelExportParams: ExportParameter = {
+    //     file_name: FILE_NAME_PREFIX.alert,
+    //     options: [
+    //         {
+    //             name: 'Alert List',
+    //             query_type: QueryType.SEARCH,
+    //             search_query: {
+    //                 ...alertListApiQueryHelper.data,
+    //                 fields: ALERT_EXCEL_FIELDS,
+    //             },
+    //         },
+    //     ],
+    //     timezone: storeState.timezone,
+    // };
+    // return SpaceConnector.clientV2.alertManager.alert.export(alertsExcelExportParams);
+    const data = state.refinedAlertList.map((i) => ({
+        service_name: storeState.serviceList[i.service_id].data.name,
+        title: i.title,
+        description: i.description,
+        status: i.status,
+        urgency: i.urgency,
+        labels: i.labels,
+        triggered_by: i.triggered_by,
+        created_at: i.created_at,
+    }));
     await downloadExcel({
-        url: '/alert-manager/alert/list',
-        param: {
-            query: { ...alertListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
-        },
+        data,
         fields: ALERT_EXCEL_FIELDS,
         file_name_prefix: FILE_NAME_PREFIX.alert,
-        timezone: storeState.timezone,
     });
 };
 
