@@ -31,6 +31,7 @@ import {
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { isEqual } from 'lodash';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {
@@ -172,12 +173,6 @@ const queryClient = useQueryClient();
 const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = useMutation<TaskModel, APIError>({
     mutationFn: async () => {
         if (!task.value) throw new Error('Origin task is not defined');
-        if (task.value.description !== taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.description]) {
-            await taskAPI.updateDescription({
-                task_id: task.value.task_id,
-                description: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.description],
-            });
-        }
         const res = await taskAPI.update({
             task_id: task.value.task_id,
             name: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.title],
@@ -198,10 +193,48 @@ const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = us
     },
 });
 
+/* update task description */
+const { isSuccess: isSuccessUpdateDescription, mutateAsync: updateDescriptionMutation, isPending: isUpdatingDescription } = useMutation<TaskModel, APIError>({
+    mutationFn: async () => {
+        if (!task.value) throw new Error('Origin task is not defined');
+        const res = await taskAPI.updateDescription({
+            task_id: task.value.task_id,
+            description: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.description],
+        });
+        return res;
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: taskDetailQueryKey.value });
+        showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }), '');
+        refetchEvents();
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, _i18n.t('OPSFLOW.ALT_E_UPDATE_TARGET', { target: taskManagementTemplateStore.templates.task }));
+    },
+});
+
+
+
+
 /* form button handling */
 const handleSaveChanges = async () => {
     if (!taskContentFormStore.getters.isAllValid) return;
-    await updateTaskMutation();
+
+    const currentDescription = taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.description];
+    const isDescriptionChanged = task.value?.description !== currentDescription;
+    if (isDescriptionChanged) {
+        await updateDescriptionMutation();
+    }
+
+    const isDataChanged = !isEqual(task.value?.data, taskContentFormStore.getters.data);
+    const otherFields = Object.entries(taskContentFormStore.getters.defaultData).filter(([k]) => k !== DEFAULT_FIELD_ID_MAP.description);
+    const isOtherFieldsChanged = otherFields.some(([k, v]) => {
+        if (k === DEFAULT_FIELD_ID_MAP.description) return false;
+        return task.value?.[k] !== v;
+    });
+    if (isDataChanged || isOtherFieldsChanged) {
+        await updateTaskMutation();
+    }
 };
 
 /* confirm leave modal */
@@ -211,7 +244,7 @@ const {
     confirmRouteLeave,
     stopRouteLeave,
 } = useConfirmRouteLeave({
-    passConfirmation: computed(() => !taskContentFormStore.getters.hasUnsavedChanges || isSuccess.value),
+    passConfirmation: computed(() => !taskContentFormStore.getters.hasUnsavedChanges || isSuccess.value || isSuccessUpdateDescription.value),
 });
 onBeforeRouteLeave(handleBeforeRouteLeave);
 
@@ -272,13 +305,13 @@ defineExpose({ setPathFrom });
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
-                              :disabled="isUpdating"
+                              :disabled="isUpdating || isUpdatingDescription"
                               @click="goBack()"
                     >
                         {{ $t('COMMON.BUTTONS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :loading="isUpdating"
+                              :loading="isUpdating || isUpdatingDescription"
                               :disabled="!taskContentFormStore.getters.hasUnsavedChanges || !taskContentFormStore.getters.isAllValid"
                               @click="handleSaveChanges"
                     >
