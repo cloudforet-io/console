@@ -1,6 +1,6 @@
 {
   "name": "cloudforet-console",
-  "version": "2.0.0-dev339",
+  "version": "2.0.0-dev340",
   "private": true,
   "workspaces": [
     "apps/*",
