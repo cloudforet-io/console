@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal, PRadio, PRadioGroup } from '@cloudforet/mirinae';
 
-
-import type { ProjectGroupChangeParentGroupParameters } from '@/api-clients/identity/project-group/schema/api-verbs/change-parent-group';
-import type { ProjectChangeProjectGroupParameters } from '@/api-clients/identity/project/schema/api-verbs/change-project-group';
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
+import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,11 +21,10 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
-const emit = defineEmits(['moved']);
-
 const projectPageModalStore = useProjectPageModalStore();
-const isProject = computed(() => !!projectPageModalStore.state.targetId);
-const targetId = computed(() => projectPageModalStore.state.targetId || projectPageModalStore.state.targetId);
+const visible = computed(() => projectPageModalStore.state.moveModalVisible && !!projectPageModalStore.state.targetId);
+const isProject = computed(() => projectPageModalStore.state.targetType === 'project');
+const targetId = computed(() => projectPageModalStore.state.targetId);
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -65,28 +64,41 @@ const getIsValid = (_isProject: boolean, selectProjectGroup: boolean, selectedPr
     return true;
 };
 
-/* Api */
-const changeProjectGroup = async () => {
-    try {
+/* mutations */
+const { projectAPI, projectListQueryKey, projectQueryKey } = useProjectApi();
+const { projectGroupAPI, projectGroupListQueryKey, projectGroupQueryKey } = useProjectGroupApi();
+const queryClient = useQueryClient();
+
+const { mutateAsync: changeProjectGroup } = useMutation({
+    mutationFn: async () => {
         if (!targetId.value) throw new Error('No target id');
         const _projectGroupId = state.selectProjectGroup ? state.selectedProjectGroupIdList[0] : null;
         if (isProject.value) {
-            await SpaceConnector.clientV2.identity.project.changeProjectGroup<ProjectChangeProjectGroupParameters>({
+            await projectAPI.changeProjectGroup({
                 project_id: targetId.value,
                 project_group_id: _projectGroupId,
             });
         } else {
-            await SpaceConnector.clientV2.identity.projectGroup.changeParentGroup<ProjectGroupChangeParentGroupParameters>({
+            await projectGroupAPI.changeParentGroup({
                 project_group_id: targetId.value,
                 parent_group_id: _projectGroupId,
             });
         }
+    },
+    onSuccess: () => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
-        emit('moved');
-    } catch (e) {
+        if (isProject.value) {
+            queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: [...projectQueryKey.value, targetId.value] });
+        } else {
+            queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: [...projectGroupQueryKey.value, targetId.value] });
+        }
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
-    }
-};
+    },
+});
 
 /* Event */
 const handleChangeSelectProjectGroup = (value: boolean) => {
@@ -97,6 +109,7 @@ const handleSelectProjectGroup = (projectGroupTreeNodeData: ProjectTreeNodeData[
 };
 const handleConfirm = async () => {
     await changeProjectGroup();
+    projectPageModalStore.closeMoveModal();
 };
 
 /* Watch */
@@ -113,9 +126,10 @@ watch(() => state.originParentGroupId, (_id?: string) => {
                     fade
                     backdrop
                     :disabled="!state.isValid"
-                    :visible="projectPageModalStore.state.moveModalVisible"
+                    :visible="visible"
                     @close="projectPageModalStore.closeMoveModal()"
                     @cancel="projectPageModalStore.closeMoveModal()"
+                    @closed="projectPageModalStore.resetTarget()"
                     @confirm="handleConfirm"
     >
         <template #body>

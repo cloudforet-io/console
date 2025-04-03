@@ -4,10 +4,10 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
 
-import type { ProjectGroupDeleteParameters } from '@/api-clients/identity/project-group/schema/api-verbs/delete';
-import type { ProjectDeleteParameters } from '@/api-clients/identity/project/schema/api-verbs/delete';
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
+import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -30,10 +30,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'confirm'): void;
-}>();
 
-const projectPageModelStore = useProjectPageModalStore();
+const projectPageModalStore = useProjectPageModalStore();
+const visible = computed(() => projectPageModalStore.state.deleteModalVisible && !!projectPageModalStore.state.targetId);
+const isProject = computed(() => projectPageModalStore.state.targetType === 'project');
 
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -43,8 +43,8 @@ const recentStore = useRecentStore();
 
 const state = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    title: computed(() => (projectPageModelStore.state.targetId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE'))),
-    content: computed(() => (projectPageModelStore.state.targetId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT'))),
+    title: computed(() => (isProject.value ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE'))),
+    content: computed(() => (isProject.value ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT'))),
     loading: false,
 });
 
@@ -52,22 +52,22 @@ const handleConfirmDelete = async () => {
     if (state.loading) return;
     state.loading = true;
     try {
-        if (!projectPageModelStore.state.targetId) throw new Error('No project or project group id');
-        if (projectPageModelStore.state.targetType === 'project') {
-            await deleteProject(projectPageModelStore.state.targetId);
+        if (!projectPageModalStore.state.targetId) throw new Error('No project or project group id');
+        if (projectPageModalStore.state.targetType === 'project') {
+            await deleteProject(projectPageModalStore.state.targetId);
         } else {
-            await deleteProjectGroup(projectPageModelStore.state.targetId);
+            await deleteProjectGroup(projectPageModalStore.state.targetId);
         }
-        emit('confirm');
     } catch (e) {
-        if (projectPageModelStore.state.targetType === 'projectGroup') {
+        if (projectPageModalStore.state.targetType === 'projectGroup') {
             ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), true);
         } else {
             ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), true);
         }
     } finally {
         state.loading = false;
-        projectPageModelStore.closeDeleteModal();
+        projectPageModalStore.closeDeleteModal();
+        console.debug('skipRedirect', props.skipRedirect);
         if (!props.skipRedirect) {
             await router.replace({
                 name: PROJECT_ROUTE_V2._NAME,
@@ -76,10 +76,14 @@ const handleConfirmDelete = async () => {
     }
 };
 
+const queryClient = useQueryClient();
+const { projectAPI, projectListQueryKey, projectQueryKey } = useProjectApi();
 const deleteProject = async (projectId: string) => {
-    await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
+    await projectAPI.delete({
         project_id: projectId,
     });
+    queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
+    queryClient.removeQueries({ queryKey: [...projectQueryKey.value, projectId] });
     await recentStore.deleteRecent({
         type: RECENT_TYPE.PROJECT,
         itemId: projectId,
@@ -94,11 +98,13 @@ const deleteProject = async (projectId: string) => {
         });
     }
 };
-
+const { projectGroupAPI, projectGroupListQueryKey, projectGroupQueryKey } = useProjectGroupApi();
 const deleteProjectGroup = async (projectGroupId: string) => {
-    await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
+    await projectGroupAPI.delete({
         project_group_id: projectGroupId,
     });
+    queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+    queryClient.removeQueries({ queryKey: [...projectGroupQueryKey.value, projectGroupId] });
     showSuccessMessage(_i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
     const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === projectGroupId);
     if (isFavoriteItem) {
@@ -114,17 +120,17 @@ const deleteProjectGroup = async (projectGroupId: string) => {
 
 <template>
     <delete-modal :header-title="state.title"
-                  :visible="projectPageModelStore.state.deleteModalVisible"
+                  :visible="visible"
                   :loading="state.loading"
-                  @close="projectPageModelStore.closeDeleteModal"
-                  @cancel="projectPageModelStore.closeDeleteModal"
-                  @closed="projectPageModelStore.resetTarget"
+                  @close="projectPageModalStore.closeDeleteModal"
+                  @cancel="projectPageModalStore.closeDeleteModal"
+                  @closed="projectPageModalStore.resetTarget"
                   @confirm="handleConfirmDelete"
     >
         <p>
             {{ state.content }}
         </p>
-        <i18n v-if="!projectPageModelStore.state.targetId"
+        <i18n v-if="!isProject"
               path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC"
               tag="p"
               class="desc"

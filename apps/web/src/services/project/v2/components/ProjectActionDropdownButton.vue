@@ -15,14 +15,19 @@ const props = defineProps<{
 
 const actionItems = computed<SelectDropdownMenuItem[]>(() => [
     {
-        name: 'update',
-        label: i18n.t('PROJECT.DETAIL.UPDATE'),
-        icon: 'ic_settings',
+        name: 'rename',
+        label: i18n.t('PROJECT.DETAIL.RENAME'),
+        icon: 'ic_edit-text',
     },
     {
         name: 'move',
         label: i18n.t('PROJECT.DETAIL.MOVE'),
         icon: 'ic_move',
+    },
+    {
+        name: 'tags',
+        label: i18n.t('PROJECT.DETAIL.TAGS'),
+        icon: 'ic_label',
     },
     { type: 'divider', name: 'divider' },
     {
@@ -34,13 +39,34 @@ const actionItems = computed<SelectDropdownMenuItem[]>(() => [
 
 const projectPageModalStore = useProjectPageModalStore();
 
-const handleSelectItem = (selected: SelectDropdownMenuItem|string|number) => {
-    if (typeof selected === 'string' || typeof selected === 'number') return;
-    const id = props.projectId || props.projectGroupId;
-    if (!id) return;
-    if (selected.name === 'update') projectPageModalStore.openEditProjectFormModal(id);
-    else if (selected.name === 'move') projectPageModalStore.openProjectMoveModal(id);
-    else if (selected.name === 'delete') projectPageModalStore.openProjectDeleteModal(id);
+const handleSelectItem = (selectedItem: SelectDropdownMenuItem|string|number) => {
+    let selected: string = selectedItem as string;
+    if (typeof selected === 'object') selected = (selectedItem as SelectDropdownMenuItem).name;
+    if (selected === 'rename') {
+        if (props.projectId) {
+            projectPageModalStore.openProjectRenameModal(props.projectId);
+        } else if (props.projectGroupId) {
+            projectPageModalStore.openProjectGroupRenameModal(props.projectGroupId);
+        }
+    } else if (selected === 'move') {
+        if (props.projectId) {
+            projectPageModalStore.openProjectMoveModal(props.projectId);
+        } else if (props.projectGroupId) {
+            projectPageModalStore.openProjectGroupMoveModal(props.projectGroupId);
+        }
+    } else if (selected === 'tags') {
+        if (props.projectId) {
+            projectPageModalStore.openProjectManageTagsModal(props.projectId);
+        } else if (props.projectGroupId) {
+            projectPageModalStore.openProjectGroupManageTagsModal(props.projectGroupId);
+        }
+    } else if (selected === 'delete') {
+        if (props.projectId) {
+            projectPageModalStore.openProjectDeleteModal(props.projectId);
+        } else if (props.projectGroupId) {
+            projectPageModalStore.openProjectGroupDeleteModal(props.projectGroupId);
+        }
+    }
 };
 </script>
 
@@ -52,16 +78,3 @@ const handleSelectItem = (selected: SelectDropdownMenuItem|string|number) => {
                        @select="handleSelectItem"
     />
 </template>
-
-<style scoped lang="postcss">
-/* custom design-system component - p-select-dropdown */
-:deep(.p-select-dropdown) {
-    .dropdown-button-component {
-        @apply rounded-full;
-
-        &.opened {
-            @apply rounded-full;
-        }
-    }
-}
-</style>

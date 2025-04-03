@@ -12,7 +12,7 @@ export const useProjectQuery = ({
   projectId: Ref<string|undefined>;
 enabled?: Ref<boolean>|boolean;
 }) => {
-    const { projectAPI, projectQueryKey } = useProjectApi();
+    const { projectAPI, projectQueryKey, projectListQueryKey } = useProjectApi();
     const projectQuery = useQuery({
         queryKey: computed(() => [...projectQueryKey.value, projectId.value]),
         queryFn: () => projectAPI.get({ project_id: projectId.value as string }),
@@ -35,7 +35,11 @@ enabled?: Ref<boolean>|boolean;
         queryClient.setQueryData([...projectQueryKey.value, projectId.value], newData);
     };
 
+    const invalidateAllQueries = () => {
+        queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
+    };
+
     return {
-        ...projectQuery, invalidateQuery, setQueryData,
+        ...projectQuery, invalidateQuery, setQueryData, invalidateAllQueries,
     };
 };

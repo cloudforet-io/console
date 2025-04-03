@@ -5276,6 +5276,7 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",
 			"PROJECT_ID": "프로젝트 아이디: ",
 			"PROJECT_MEMBER_LABEL": "레이블",
+			"RENAME": "이름 수정",
 			"REPORT_CANCEL": "취소",
 			"REPORT_DESC": "SpaceONE은 프로젝트를 바탕으로 한 월간 보고서를 제공합니다. 곧 더 많은 콘텐츠를 제공할 예정입니다. ",
 			"REPORT_DOWNLOAD_FILE_DESC": "*제공하는 파일 형식 (PDF, PPTX, CSV)",
