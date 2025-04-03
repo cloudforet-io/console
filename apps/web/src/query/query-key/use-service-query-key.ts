@@ -51,7 +51,7 @@ type UseServiceQueryKeyResult<T extends object = object> = {
     withSuffix: (arg: ContextKeyType) => QueryKeyArray;
 };
 
-export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
+export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
     service: S,
     resource: R,
     verb: V,
