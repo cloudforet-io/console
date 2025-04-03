@@ -113,9 +113,15 @@ const handleConfirm = async () => {
 };
 
 /* Watch */
-watch(() => state.originParentGroupId, (_id?: string) => {
-    if (_id) state.selectedProjectGroupIdList = [_id];
-    else state.selectProjectGroup = false;
+watch([visible, () => state.originParentGroupId], ([v, _id]) => {
+    if (!v) return;
+    if (_id) {
+        state.selectedProjectGroupIdList = [_id];
+        state.selectProjectGroup = true;
+    } else {
+        state.selectedProjectGroupIdList = [];
+        state.selectProjectGroup = false;
+    }
 }, { immediate: true });
 </script>
 

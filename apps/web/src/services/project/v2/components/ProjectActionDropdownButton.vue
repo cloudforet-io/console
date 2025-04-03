@@ -75,6 +75,7 @@ const handleSelectItem = (selectedItem: SelectDropdownMenuItem|string|number) =>
                        button-icon="ic_ellipsis-horizontal"
                        size="sm"
                        :menu="actionItems"
+                       reset-selection-on-menu-close
                        @select="handleSelectItem"
     />
 </template>
