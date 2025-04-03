@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -9,6 +9,7 @@ import {
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -32,7 +33,7 @@ const projectType = computed<ProjectType|undefined>(() => project.value?.project
 
 /* members */
 const { data: workspaceUsers, error } = useWorkspaceUsersQuery({
-    enabled: computed(() => projectType.value === 'PUBLIC' && projectPageModalStore.state.manageMemberModalVisible),
+    enabled: computed(() => visible.value && projectType.value === 'PUBLIC'),
 });
 const possibleUserIds = computed<string[]>(() => {
     if (projectType.value === 'PUBLIC') {
@@ -56,31 +57,46 @@ const {
 
 /* remove project user */
 const { projectAPI } = useProjectApi();
-const { mutateAsync: removeProjectUsers } = useMutation({
-    mutationFn: projectAPI.removeUsers,
+const { mutateAsync: removeProjectUser } = useMutation({
+    mutationFn: ({ projectId, userId }: {projectId: string; userId: string}) => projectAPI.removeUsers({
+        project_id: projectId,
+        users: [userId],
+    }),
+    onSuccess: (data) => {
+        setQueryData(data);
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'), true);
+    },
 });
-const handleRemoveProjectUser = async (userId: string) => {
-    try {
-        if (!projectPageModalStore.state.targetId) throw new Error('Project ID is not defined');
-        const updated = await removeProjectUsers({
-            project_id: projectPageModalStore.state.targetId,
-            users: [userId],
-        });
-        setQueryData(updated);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, 'Project ID is not defined', true);
-    }
+const handleRemoveProjectUser = async (projectId: string, userId: string) => {
+    removeProjectUser({
+        projectId,
+        userId,
+    });
 };
 
 /* modal handling */
 const handleCloseMemberModal = () => {
     projectPageModalStore.closeManageMemberModal();
 };
+const triggerInvite = ref(false);
 const handleClickInvite = () => {
     const projectId = projectPageModalStore.state.targetId as string;
+    triggerInvite.value = true;
     projectPageModalStore.closeManageMemberModal();
     projectPageModalStore.openProjectInviteMemberModal(projectId);
 };
+const handleClosedMemberModal = () => {
+    if (!triggerInvite.value) {
+        projectPageModalStore.resetTarget();
+    }
+};
+watch(visible, () => (v) => {
+    if (v) {
+        triggerInvite.value = false;
+    }
+});
 </script>
 
 <template>
@@ -90,11 +106,13 @@ const handleClickInvite = () => {
                     hide-footer-close-button
                     @close="projectPageModalStore.closeManageMemberModal"
                     @cancel="projectPageModalStore.closeManageMemberModal"
-                    @closed="projectPageModalStore.resetTarget"
+                    @closed="handleClosedMemberModal"
                     @confirm="handleCloseMemberModal"
     >
         <template #body>
-            <div class="member-contents-wrapper">
+            <div v-if="projectPageModalStore.state.targetId"
+                 class="member-contents-wrapper"
+            >
                 <div class="member-contents">
                     <div class="contents-header">
                         <span>{{ $t('PROJECT.DETAIL.INVITE_MEMBER_DESC') }}</span>
@@ -125,7 +143,7 @@ const handleClickInvite = () => {
                                     <span>{{ getUserRole(userId) }}</span>
                                     <p-icon-button name="ic_delete"
                                                    size="sm"
-                                                   @click="handleRemoveProjectUser(userId)"
+                                                   @click="handleRemoveProjectUser(projectPageModalStore.state.targetId, userId)"
                                     />
                                 </div>
                             </div>
