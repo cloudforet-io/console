@@ -4839,6 +4839,7 @@
 			"UPDATED": "Updated",
 			"VIEW_ALL_TASKS": "View All {tasks}"
 		},
+		"TASK_ID": "Task ID",
 		"TASK_MANAGEMENT": {
 			"ALT_E_DISABLE_LANDING": "Failed to disable landing page",
 			"ALT_E_ENABLE_LANDING": "Failed to enable landing page",
