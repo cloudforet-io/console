@@ -1,8 +1,9 @@
 import { computed, type Ref } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 
 export const useProjectGroupQuery = ({
     projectGroupId,
@@ -12,8 +13,9 @@ export const useProjectGroupQuery = ({
   enabled?: Ref<boolean>;
 }) => {
     const { projectGroupAPI, projectGroupQueryKey } = useProjectGroupApi();
-    const { data, isLoading, error } = useQuery({
-        queryKey: computed(() => [...projectGroupQueryKey.value, projectGroupId.value]),
+    const queryKey = computed(() => [...projectGroupQueryKey.value, projectGroupId.value]);
+    const projectGroupQuery = useQuery({
+        queryKey,
         queryFn: () => projectGroupAPI.get({ project_group_id: projectGroupId.value as string }),
         enabled: computed(() => {
             if (!projectGroupId.value) return false;
@@ -23,7 +25,17 @@ export const useProjectGroupQuery = ({
         gcTime: 1000 * 60 * 1, // 1 minutes
     });
 
+    const queryClient = useQueryClient();
+    const setQueryData = (newData: ProjectGroupModel) => {
+        queryClient.setQueryData(queryKey.value, newData);
+    };
+    const invalidateQuery = () => {
+        queryClient.invalidateQueries({ queryKey: queryKey.value });
+    };
+
     return {
-        data, isLoading, error,
+        ...projectGroupQuery,
+        setQueryData,
+        invalidateQuery,
     };
 };

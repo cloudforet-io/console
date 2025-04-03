@@ -43,8 +43,8 @@ const recentStore = useRecentStore();
 
 const state = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    title: computed(() => (projectPageModelStore.state.targetProjectId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE'))),
-    content: computed(() => (projectPageModelStore.state.targetProjectId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT'))),
+    title: computed(() => (projectPageModelStore.state.targetId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_TITLE') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE'))),
+    content: computed(() => (projectPageModelStore.state.targetId ? _i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT') : _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT'))),
     loading: false,
 });
 
@@ -52,20 +52,18 @@ const handleConfirmDelete = async () => {
     if (state.loading) return;
     state.loading = true;
     try {
-        if (projectPageModelStore.state.targetProjectId) {
-            await deleteProject(projectPageModelStore.state.targetProjectId);
-        } else if (projectPageModelStore.state.targetProjectGroupId) {
-            await deleteProjectGroup(projectPageModelStore.state.targetProjectGroupId);
+        if (!projectPageModelStore.state.targetId) throw new Error('No project or project group id');
+        if (projectPageModelStore.state.targetType === 'project') {
+            await deleteProject(projectPageModelStore.state.targetId);
         } else {
-            throw new Error('No project or project group id');
+            await deleteProjectGroup(projectPageModelStore.state.targetId);
         }
         emit('confirm');
     } catch (e) {
-        if (projectPageModelStore.state.targetProjectId) ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
-        else if (projectPageModelStore.state.targetProjectGroupId) {
-            ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
+        if (projectPageModelStore.state.targetType === 'projectGroup') {
+            ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), true);
         } else {
-            ErrorHandler.handleRequestError(e, 'Failed to delete project or project group', true);
+            ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), true);
         }
     } finally {
         state.loading = false;
@@ -126,7 +124,7 @@ const deleteProjectGroup = async (projectGroupId: string) => {
         <p>
             {{ state.content }}
         </p>
-        <i18n v-if="!projectPageModelStore.state.targetProjectId"
+        <i18n v-if="!projectPageModelStore.state.targetId"
               path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC"
               tag="p"
               class="desc"

@@ -54,7 +54,7 @@ const workspaceUserList = computed(() => workspaceUsers.value || []);
 
 /* project users */
 const { data: project } = useProjectQuery({
-    projectId: computed(() => projectPageModalStore.state.targetProjectId),
+    projectId: computed(() => projectPageModalStore.state.targetId),
     enabled: computed(() => projectPageModalStore.state.inviteMemberModalVisible),
 });
 const projectUserList = computed(() => project.value?.users || []);
@@ -85,7 +85,7 @@ const {
 const { projectAPI } = useProjectApi();
 const { mutateAsync: addMember } = useMutation({
     mutationFn: () => {
-        const projectId = projectPageModalStore.state.targetProjectId;
+        const projectId = projectPageModalStore.state.targetId;
         if (!projectId) throw new Error('Project ID is not defined');
         return projectAPI.addUsers({
             project_id: projectId,

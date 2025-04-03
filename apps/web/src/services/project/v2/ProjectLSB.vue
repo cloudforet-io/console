@@ -64,9 +64,9 @@ const { visibleMenu, toggleContextMenu, hideContextMenu } = useContextMenuContro
 });
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        projectPageModalStore.openCreateProjectFormModal('project');
+        projectPageModalStore.openCreateProjectFormModal();
     } else if (item.name === 'projectGroup') {
-        projectPageModalStore.openCreateProjectFormModal('projectGroup');
+        projectPageModalStore.openCreateProjectGroupFormModal();
     }
     hideContextMenu();
 };
@@ -127,13 +127,14 @@ watch([() => props.selectedPaths, treeRef], ([paths, treeComponent]) => {
                           size="sm"
                           style-type="tertiary"
                           class="cursor-pointer"
-                          @click="toggleContextMenu"
+                          @click.stop.prevent="toggleContextMenu"
                 >
                     {{ $t('COMMON.BUTTONS.CREATE') }}
                 </p-button>
                 <p-context-menu v-show="visibleMenu"
                                 ref="contextMenuRef"
                                 v-on-click-outside="hideContextMenu"
+                                class="z-10"
                                 no-select-indication
                                 :menu="createDropdownMenuItems"
                                 @select="handleSelectCreateMenu"
