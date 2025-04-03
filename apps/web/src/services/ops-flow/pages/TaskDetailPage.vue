@@ -172,9 +172,17 @@ const queryClient = useQueryClient();
 const { isSuccess, mutateAsync: updateTaskMutation, isPending: isUpdating } = useMutation<TaskModel, APIError>({
     mutationFn: async () => {
         if (!task.value) throw new Error('Origin task is not defined');
+        if (task.value.description !== taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.description]) {
+            await taskAPI.updateDescription({
+                task_id: task.value.task_id,
+                description: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.description],
+            });
+        }
         const res = await taskAPI.update({
             task_id: task.value.task_id,
             name: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.title],
+            project_id: taskContentFormStore.getters.defaultData[DEFAULT_FIELD_ID_MAP.project],
+            data: taskContentFormStore.getters.data,
         });
         return res;
     },
@@ -260,7 +268,7 @@ defineExpose({ setPathFrom });
                         <task-progress-tab :task-id="props.taskId" />
                     </template>
                 </p-tab>
-                <div v-if="activeTab === 'content' && taskContentFormStore.getters.isEditable"
+                <div v-if="activeTab === 'content' && taskContentFormStore.getters.isEditable && task?.status_type === 'TODO'"
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"
@@ -292,4 +300,3 @@ defineExpose({ setPathFrom });
         <task-delete-modal @deleted="goBack()" />
     </div>
 </template>
-

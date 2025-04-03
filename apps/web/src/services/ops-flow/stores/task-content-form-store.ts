@@ -8,8 +8,6 @@ import { APIError } from '@cloudforet/core-lib/space-connector/error';
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
-import { useUserStore } from '@/store/user/user-store';
-
 import { useCategoryQuery } from '@/services/ops-flow/composables/use-current-category';
 import { useCurrentTaskType } from '@/services/ops-flow/composables/use-current-task-type';
 import { useTaskFieldsForm } from '@/services/ops-flow/composables/use-task-fields-form';
@@ -44,8 +42,6 @@ interface UseTaskContentFormStoreGetters {
     isArchivedTask: boolean;
 }
 export const useTaskContentFormStore = defineStore('task-content-form', () => {
-    const userStore = useUserStore();
-
     const state = reactive<UseTaskContentFormStoreState>({
         // base form
         currentCategoryId: undefined,
@@ -101,8 +97,7 @@ export const useTaskContentFormStore = defineStore('task-content-form', () => {
         isEditable: computed<boolean>(() => {
             if (state.mode === 'create' || state.mode === 'create-minimal') return true;
             if (isArchivedTask.value) return false;
-            if (userStore.getters.isDomainAdmin) return true;
-            return false;
+            return true;
         }),
         references: computed<References>(() => {
             const projectRequired = currentTaskType.value?.require_project;

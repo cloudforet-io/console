@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import {
-    computed,
-    defineAsyncComponent, onUnmounted,
+    computed, defineAsyncComponent, onUnmounted,
 } from 'vue';
 
 import type { TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
+import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
 import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
-import { DEFAULT_FIELD_ID_MAP } from '@/services/ops-flow/task-fields-configuration/constants/default-field-constant';
 
 
 const COMPONENT_MAP: Partial<Record<TaskFieldType, ReturnType<typeof defineAsyncComponent>>> = {
@@ -35,7 +34,10 @@ const { data: originTask } = useTaskQuery({
 });
 
 /* fields for rendering */
-const isEditableFieldInViewMode = (fieldId: string) => fieldId === DEFAULT_FIELD_ID_MAP.title;
+const isFieldReadonly = (taskStatus?: TaskStatusType) => {
+    if (taskContentFormState.mode !== 'view') return false;
+    return !(taskContentFormGetters.isEditable && taskStatus === 'TODO');
+};
 
 /* fields form */
 onUnmounted(() => {
@@ -51,7 +53,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormGetters.defaultData[field.field_id]"
-                   :readonly="taskContentFormState.mode === 'view' ? !(taskContentFormGetters.isEditable && isEditableFieldInViewMode(field.field_id)) : false"
+                   :readonly="isFieldReadonly(originTask?.status_type)"
                    :files="originTask?.files"
                    :references="taskContentFormGetters.references"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
@@ -64,7 +66,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormGetters.data[field.field_id]"
-                   :readonly="taskContentFormState.mode === 'view'"
+                   :readonly="isFieldReadonly(originTask?.status_type)"
                    :files="originTask?.files"
                    :references="taskContentFormGetters.references"
                    @update:value="taskContentFormStore.setFieldData(field.field_id, $event)"
