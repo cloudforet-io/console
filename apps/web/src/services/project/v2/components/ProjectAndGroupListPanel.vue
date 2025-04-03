@@ -1,13 +1,15 @@
 <script setup lang="ts">
 
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, ref,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { uniq } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldTitle, PEmpty, PPaneLayout,
+    PFieldTitle, PEmpty, PPaneLayout, PI, PButton,
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -21,9 +23,14 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
-import ProjectMainProjectCard from '@/services/project/v2/components/ProjectMainProjectCard.vue';
-import ProjectMainProjectGroupCard from '@/services/project/v2/components/ProjectMainProjectGroupCard.vue';
+import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';
+import ProjectGroupCard from '@/services/project/v2/components/ProjectGroupCard.vue';
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
+
+const isCollapsed = ref(false);
+
+const projectPageModalStore = useProjectPageModalStore();
 
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
@@ -87,33 +94,60 @@ onMounted(async () => {
 </script>
 
 <template>
-    <p-pane-layout class="project-main">
-        <div class="project-contents">
+    <p-pane-layout class="p-4">
+        <div class="flex justify-between items-center flex-wrap">
+            <div class="flex items-center gap-[2px]">
+                <p-i :name="isCollapsed ? 'ic_chevron-right' : 'ic_chevron-down'"
+                     width="1.5rem"
+                     height="1.5rem"
+                     class="cursor-pointer"
+                     @click="isCollapsed = !isCollapsed"
+                />
+                <div class="text-label-lg font-medium">
+                    {{ $t('PROJECT.LADING.GROUPS_AND_PROJECTS') }}
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <p-button icon-left="ic_plus"
+                          style-type="tertiary"
+                          size="md"
+                          @click="projectPageModalStore.openCreateProjectGroupFormModal()"
+                >
+                    {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
+                </p-button>
+                <p-button icon-left="ic_plus"
+                          style-type="primary"
+                          size="md"
+                          @click="projectPageModalStore.openCreateProjectFormModal()"
+                >
+                    {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                </p-button>
+            </div>
+        </div>
+        <div v-show="!isCollapsed">
             <div v-if="state.paginatedCardList.projectGroup.length"
-                 class="contents-wrapper"
+                 class="pt-6 pb-10"
             >
-                <p-field-title class="content-title"
+                <p-field-title class="title"
                                :label="$t('PROJECT.LANDING.PROJECT_GROUP')"
                 />
                 <div class="card-contents">
-                    <project-main-project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
-                                                     :key="`project-group-${idx}`"
-                                                     :item="projectGroup"
+                    <project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
+                                        :key="`project-group-${idx}`"
+                                        :item="projectGroup"
                     />
                 </div>
             </div>
 
-            <div v-if="state.paginatedCardList.project.length"
-                 class="contents-wrapper"
-            >
-                <p-field-title class="content-title"
+            <div v-if="state.paginatedCardList.project.length">
+                <p-field-title class="title"
                                :label="$t('PROJECT.LANDING.PROJECT')"
                 />
                 <div class="card-contents">
-                    <project-main-project-card v-for="(project, idx) in state.paginatedCardList.project"
-                                               :key="`project-${idx}`"
-                                               :item="project"
-                                               :service-account-provider-list="getDistinctProviders(project.id)"
+                    <project-card v-for="(project, idx) in state.paginatedCardList.project"
+                                  :key="`project-${idx}`"
+                                  :item="project"
+                                  :service-account-provider-list="getDistinctProviders(project.id)"
                     />
                 </div>
             </div>
@@ -131,28 +165,18 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="postcss">
-.project-main {
-    padding: 1.5rem 1rem 2.5rem;
-
-    .project-contents {
-        .contents-wrapper {
-            margin-bottom: 1.5rem;
-
-            .content-title {
-                margin-bottom: 0.5rem;
-            }
-        }
-    }
-    .card-contents {
-        @apply grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
-    }
-    .empty-contents {
-        margin-top: 4rem;
-        .empty-text {
-            width: 20rem;
-        }
+.title {
+    @apply mb-3;
+}
+.card-contents {
+    @apply grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+}
+.empty-contents {
+    margin-top: 4rem;
+    .empty-text {
+        width: 20rem;
     }
 }
 </style>
