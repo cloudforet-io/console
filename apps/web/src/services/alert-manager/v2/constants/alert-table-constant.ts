@@ -37,8 +37,9 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
-    { key: 'service_id', name: 'Service' },
+    { key: 'service_name', name: 'Service' },
     { key: 'title', name: 'Title' },
+    { key: 'description', name: 'Description' },
     { key: 'status', name: 'Status' },
     { key: 'urgency', name: 'Urgency' },
     { key: 'labels', name: 'Labels' },

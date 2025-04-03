@@ -91,7 +91,7 @@ const handleUpdateEditor = (value: string) => {
 };
 const setPageAccessPermissionsData = () => {
     if (!props.initialPageAccess) return;
-    const pageAccessPermissionMap = getPageAccessMapFromRawData(props.initialPageAccess);
+    const pageAccessPermissionMap = getPageAccessMapFromRawData(props.initialPageAccess, true);
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
         if (!itemId) return;

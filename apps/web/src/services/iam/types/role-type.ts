@@ -2,6 +2,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { RoleType } from '@/api-clients/identity/role/type';
 
+import type { FeatureKeyType } from '@/lib/config/global-config/type';
+import type { MenuId } from '@/lib/menu/config';
+
 export interface RoleFormData {
     name?: string;
     role_type?: RoleType;
@@ -17,6 +20,11 @@ export interface TableItem {
     page_access?: string;
     accessible_menu_list?: PageAccessMenuItem[];
     isInValid?: boolean
+}
+export interface PageAccessMenuByConfig {
+    id: MenuId,
+    key?: FeatureKeyType,
+    subMenuList?: PageAccessMenuItem[];
 }
 export interface PageAccessMenuItem {
     id: string;
