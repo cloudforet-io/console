@@ -9,7 +9,6 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         moveModalVisible: false,
         inviteMemberModalVisible: false,
         manageTagsModalVisible: false,
-        renameModalVisible: false,
         projectFormModalVisible: false,
         targetId: '' as string|undefined,
         targetType: undefined as 'project'|'projectGroup'|undefined,
@@ -85,20 +84,6 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         },
         closeManageTagsModal() {
             state.manageTagsModalVisible = false;
-        },
-        // rename
-        openProjectRenameModal(targetProjectId: string) {
-            state.targetId = targetProjectId;
-            state.targetType = 'project';
-            state.renameModalVisible = true;
-        },
-        openProjectGroupRenameModal(targetProjectGroupId: string) {
-            state.targetId = targetProjectGroupId;
-            state.targetType = 'projectGroup';
-            state.renameModalVisible = true;
-        },
-        closeRenameModal() {
-            state.renameModalVisible = false;
         },
         // form
         openCreateProjectGroupFormModal() {
