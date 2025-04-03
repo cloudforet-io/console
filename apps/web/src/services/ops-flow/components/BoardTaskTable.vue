@@ -79,6 +79,7 @@ const handleUpdateFilters = (values: TaskFilters) => {
     if (values.project.length) _taskFilterHelper.addFilter({ k: 'project_id', v: values.project, o: '=' });
     if (values.createdBy.length) _taskFilterHelper.addFilter({ k: 'created_by', v: values.createdBy, o: '=' });
     if (values.assignee.length) _taskFilterHelper.addFilter({ k: 'assignee', v: values.assignee, o: '=' });
+    if (values.taskId.length) _taskFilterHelper.addFilter({ k: 'task_id', v: values.taskId, o: '=' });
     taskFilters.value = _taskFilterHelper.filters;
 };
 const _taskListQueryHelper = new ApiQueryHelper();
@@ -158,6 +159,10 @@ watch(data, (d) => {
 
 /* table fields */
 const fields = computed<DataTableField[] >(() => [
+    {
+        name: 'task_id',
+        label: i18n.t('OPSFLOW.TASK_ID') as string,
+    },
     {
         name: 'name',
         label: i18n.t('OPSFLOW.TITLE') as string,

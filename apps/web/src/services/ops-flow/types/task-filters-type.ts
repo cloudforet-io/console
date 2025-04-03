@@ -4,4 +4,5 @@ export interface TaskFilters {
     project: string[];
     createdBy: string[];
     assignee: string[];
+    taskId: string[];
 }

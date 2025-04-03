@@ -11,6 +11,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useTaskIdsField } from '@/services/ops-flow/composables/use-task-ids-field';
 import { useTaskStatusField } from '@/services/ops-flow/composables/use-task-status-field';
 import { useTaskTypeField } from '@/services/ops-flow/composables/use-task-type-field';
 import {
@@ -25,6 +26,20 @@ const emit = defineEmits<{(event: 'update', value: TaskFilters): void;
 }>();
 
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+
+/* task id */
+const {
+    selectedTaskIdItems,
+    taskIdMenuItemsHandler,
+    setSelectedTaskIdItems,
+    taskIdsDropdownKey,
+} = useTaskIdsField({
+    categoryId: toRef(props, 'categoryId'),
+    isRequired: true,
+});
+const handleUpdateSelectedTaskIdItems = (items: SelectDropdownMenuItem[]) => {
+    setSelectedTaskIdItems(items);
+};
 
 /* task type */
 const {
@@ -74,6 +89,7 @@ const handleUpdateAssignee = (userIds: string[]) => {
 
 /* event */
 const taskFilters = computed<TaskFilters>(() => ({
+    taskId: selectedTaskIdItems.value.map((d) => d.name),
     taskType: selectedTaskTypeItems.value.map((d) => d.name),
     status: selectedStatusItems.value.map((d) => d.name),
     project: selectedProjectIds.value,
@@ -89,6 +105,21 @@ watch(taskFilters, (newValue, oldValue) => {
 
 <template>
     <div class="flex flex-wrap gap-4">
+        <div v-if="props.categoryId">
+            <p-select-dropdown :key="taskIdsDropdownKey"
+                               :selected="selectedTaskIdItems"
+                               :handler="taskIdMenuItemsHandler"
+                               :selection-label="String($t('OPSFLOW.TASK_ID'))"
+                               appearance-type="badge"
+                               style-type="rounded"
+                               multi-selectable
+                               show-select-marker
+                               show-delete-all-button
+                               is-filterable
+                               menu-width="12rem"
+                               @update:selected="handleUpdateSelectedTaskIdItems"
+            />
+        </div>
         <p-select-dropdown v-if="props.categoryId"
                            :key="taskTypesDropdownKey"
                            :selected="selectedTaskTypeItems"
