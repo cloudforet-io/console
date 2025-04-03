@@ -44,6 +44,7 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'labels', name: 'Labels' },
     { key: 'triggered_by', name: 'Triggered by' },
     { key: 'created_at', name: 'Created' },
+    { key: 'description', name: 'Description' },
 ];
 
 export const ALERT_CHANNEL_TABLE_FIELDS: DataTableFieldType[] = [

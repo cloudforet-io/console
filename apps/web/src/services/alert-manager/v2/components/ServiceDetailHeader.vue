@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PHeadingLayout, PSelectDropdown, PI, PTooltip, PButton,
@@ -27,6 +27,7 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
+const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -34,6 +35,7 @@ const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
+    isSettingMode: computed<boolean>(() => route.query?.mode !== 'eventRule'),
     menuItems: computed<MenuItem[]>(() => [
         {
             icon: 'ic_settings',
