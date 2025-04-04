@@ -44,7 +44,7 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'urgency', name: 'Urgency' },
     { key: 'labels', name: 'Labels' },
     { key: 'triggered_by', name: 'Triggered by', reference: { reference_key: 'webhook_id', resource_type: 'alert_manager.Webhook' } },
-    { key: 'created_at', name: 'Created' },
+    { key: 'created_at', name: 'Created', type: 'datetime' },
 ];
 
 export const ALERT_CHANNEL_TABLE_FIELDS: DataTableFieldType[] = [
