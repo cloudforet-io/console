@@ -13,6 +13,7 @@ export const getButtonArgs = (): Args => ({
     block: false,
     iconLeft: null,
     iconRight: null,
+    active: false,
     default: 'button',
     handleClick: "() => console.log('click')",
 });
@@ -163,6 +164,21 @@ export const getButtonArgTypes = (): ArgTypes => ({
         },
         control: 'select',
         options: [null, ...Object.keys(icon.icons)],
+    },
+    active: {
+        name: 'active',
+        type: { name: 'boolean' },
+        description: 'Active state when true',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: 'boolean',
     },
     // slots
     default: {

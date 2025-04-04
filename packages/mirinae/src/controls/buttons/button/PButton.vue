@@ -8,8 +8,9 @@
                    'loading': !!loading,
                    'block': !!block,
                    'disabled': !!disabled,
-                   readonly
-               } "
+                   readonly,
+                   active
+               }"
                v-on="{
                    ...$listeners,
                    click: (event) => {
@@ -114,6 +115,10 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        active: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -149,14 +154,16 @@ export default defineComponent({
         border-color: $border-color;
         &:not(.readonly):not(.disabled):hover {
             background-color: $hover-color;
-            &:active {
+        }
+        &:not(.readonly):not(.disabled) {
+            &:active, &.active {
                 background-color: $active-color;
             }
         }
         &.disabled {
             @apply bg-gray-200 text-gray-400 border-transparent;
             cursor: not-allowed;
-            &:hover, &:active, &:focus {
+            &:hover, &:active, &.active, &:focus {
                 @apply bg-gray-200;
             }
         }
@@ -255,17 +262,17 @@ export default defineComponent({
             @apply text-blue-600;
         }
         &.disabled {
-            &:hover, &:active, &:focus {
+            &:hover, &:active, &.active, &:focus {
                 @apply bg-gray-200 text-gray-400 border-transparent;
             }
         }
     }
     &.negative-secondary {
-        &:hover, &:active {
+        &:hover, &:active, &.active {
             @apply text-red-500 border-red-200;
         }
         &.disabled {
-            &:hover, &:active, &:focus {
+            &:hover, &:active, &.active, &:focus {
                 @apply bg-gray-200 text-gray-400 border-transparent;
             }
         }
@@ -275,11 +282,11 @@ export default defineComponent({
         &:hover {
             @apply bg-red-400 border-red-400 text-white;
         }
-        &:active {
+        &:active, &.active {
             @apply text-white;
         }
         &.disabled {
-            &:hover, &:active, &:focus {
+            &:hover, &:active, &.active, &:focus {
                 @apply bg-gray-200 text-gray-400 border-transparent;
             }
         }

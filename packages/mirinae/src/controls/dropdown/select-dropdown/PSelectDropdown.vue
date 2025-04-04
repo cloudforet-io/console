@@ -276,6 +276,12 @@ watch(() => props.disabled, (disabled) => {
     if (disabled) hideMenu();
 });
 
+/* style type */
+const styleType = computed(() => {
+    if (slots['dropdown-icon-button']) return 'icon-button';
+    return props.styleType;
+});
+
 /* init */
 (() => {
     if (!props.multiSelectable) return;
@@ -320,7 +326,7 @@ defineExpose({ reloadMenu });
     <div ref="containerRef"
          :class="{
              'p-select-dropdown': true,
-             [props.styleType]: true,
+             [styleType]: true,
              [props.size]: true,
              'is-fixed-width': props.isFixedWidth,
              'is-filterable': props.isFilterable,
@@ -359,7 +365,7 @@ defineExpose({ reloadMenu });
                 <slot name="dropdown-left-area" />
             </template>
         </dropdown-button>
-        <p-context-menu v-if="props.readonly ? state.selectedItems.length > 0 && state.proxyVisibleMenu : state.proxyVisibleMenu"
+        <p-context-menu v-if="props.readonly ? (state.selectedItems.length > 0 && state.proxyVisibleMenu) : state.proxyVisibleMenu"
                         ref="menuRef"
                         :class="{
                             'dropdown-context-menu': true,
