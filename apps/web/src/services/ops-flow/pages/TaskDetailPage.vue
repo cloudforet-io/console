@@ -301,7 +301,7 @@ defineExpose({ setPathFrom });
                         <task-progress-tab :task-id="props.taskId" />
                     </template>
                 </p-tab>
-                <div v-if="activeTab === 'content' && taskContentFormStore.getters.isEditable && task?.status_type === 'TODO'"
+                <div v-if="activeTab === 'content' && taskContentFormStore.getters.isEditable"
                      class="py-3 flex flex-wrap gap-1 justify-end"
                 >
                     <p-button style-type="transparent"

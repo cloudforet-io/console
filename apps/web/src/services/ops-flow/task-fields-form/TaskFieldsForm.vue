@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import type { TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
-import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
 
 import { useTaskQuery } from '@/services/ops-flow/composables/use-task-query';
 import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content-form-store';
@@ -33,12 +32,6 @@ const { data: originTask } = useTaskQuery({
     taskId: computed(() => taskContentFormState.currentTaskId),
 });
 
-/* fields for rendering */
-const isFieldReadonly = (taskStatus?: TaskStatusType) => {
-    if (taskContentFormState.mode !== 'view') return false;
-    return !(taskContentFormGetters.isEditable && taskStatus === 'TODO');
-};
-
 /* fields form */
 onUnmounted(() => {
     taskContentFormStore.resetFieldsForm();
@@ -53,7 +46,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormGetters.defaultData[field.field_id]"
-                   :readonly="isFieldReadonly(originTask?.status_type)"
+                   :readonly="!taskContentFormGetters.isEditable"
                    :files="originTask?.files"
                    :references="taskContentFormGetters.references"
                    @update:value="taskContentFormStore.setDefaultFieldData(field.field_id, $event)"
@@ -66,7 +59,7 @@ onUnmounted(() => {
                    :key="field.field_id"
                    :field="field"
                    :value="taskContentFormGetters.data[field.field_id]"
-                   :readonly="isFieldReadonly(originTask?.status_type)"
+                   :readonly="!taskContentFormGetters.isEditable"
                    :files="originTask?.files"
                    :references="taskContentFormGetters.references"
                    @update:value="taskContentFormStore.setFieldData(field.field_id, $event)"
