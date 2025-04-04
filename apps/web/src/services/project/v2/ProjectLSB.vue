@@ -2,7 +2,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import type Vue from 'vue';
 import {
-    computed, nextTick, ref, watch,
+    computed, nextTick, onMounted, ref, watch,
 } from 'vue';
 
 import {
@@ -102,6 +102,14 @@ watch([() => props.selectedPaths, treeRef], ([paths, treeComponent]) => {
     });
 });
 
+/* init */
+const mounted = ref(false);
+onMounted(() => {
+    nextTick(() => {
+        mounted.value = true;
+    });
+});
+
 </script>
 
 <template>
@@ -148,7 +156,7 @@ watch([() => props.selectedPaths, treeRef], ([paths, treeComponent]) => {
         <project-l-s-b-search :keyword="projectKeyword"
                               @update:keyword="projectKeyword = $event"
         />
-        <project-l-s-b-tree v-if="!projectKeyword.length"
+        <project-l-s-b-tree v-if="mounted && !projectKeyword.length"
                             ref="treeRef"
                             :selected-paths="props.selectedPaths"
         />

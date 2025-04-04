@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PI, PTextHighlighting,
+    PI, PTextHighlighting, PTooltip, useTextEllipsis,
 } from '@cloudforet/mirinae';
 
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
@@ -50,47 +50,65 @@ const handleSelectProject = () => {
 
 /* action menu */
 const visibleActionMenu = ref(false);
+
+/* text ellipsis */
+const textEl = ref<HTMLElement|null>(null);
+const { isEllipsis } = useTextEllipsis({ textEl });
 </script>
 
 <template>
-    <div class="flex flex-col justify-between rounded-lg cursor-pointer h-26 pt-3 px-3 pb-4 group/card"
-         :class="[visibleActionMenu ? 'bg-blue-200' : 'bg-gray-100 hover:bg-gray-150']"
+    <div class="flex flex-col justify-between rounded-lg cursor-pointer p-3 group/prj-card bg-gray-100 hover:bg-gray-150"
+         :class="{ '!bg-blue-200': visibleActionMenu }"
          @click="handleSelectProject"
     >
-        <div>
-            <div class="flex items-center justify-between">
-                <div class="flex gap-1 items-center text-paragraph-md text-gray-900 mb-1 group-hover/card:font-medium">
+        <div class="h-6 mb-2 flex items-center justify-between">
+            <p-tooltip :contents="isEllipsis ? props.name : ''"
+                       class="flex overflow-hidden"
+                       position="bottom"
+            >
+                <div ref="textEl"
+                     class=" overflow-hidden whitespace-nowrap text-ellipsis"
+                >
                     <p-i name="ic_project-filled"
+                         class="mr-1"
                          width="1rem"
                          height="1rem"
                     />
-                    <p-text-highlighting :text="props.name"
+                    <p-text-highlighting class="!text-paragraph-md !font-medium"
+                                         :text="props.name"
                                          :term="props.searchKeyword"
                     />
                 </div>
+            </p-tooltip>
 
-                <div class="flex gap-1 items-center">
+            <div class="flex gap-1 items-center">
+                <div class="hidden group-hover/prj-card:block"
+                     :class="{'!block': visibleActionMenu || isStarred }"
+                >
                     <project-action-dropdown-button :project-id="props.projectId"
+                                                    usage-type="list"
                                                     @update:visible="visibleActionMenu = $event"
                     />
-                    <div :class="['hidden', (isStarred || visibleActionMenu) ? '!block' : 'group-hover/card:block']">
-                        <favorite-button :item-id="props.projectId"
-                                         :favorite-type="FAVORITE_TYPE.PROJECT"
-                        />
-                    </div>
+                </div>
+                <div class="hidden group-hover/prj-card:block"
+                     :class="{'!block': visibleActionMenu || isStarred }"
+                >
+                    <favorite-button :item-id="props.projectId"
+                                     :favorite-type="FAVORITE_TYPE.PROJECT"
+                    />
                 </div>
             </div>
         </div>
-        <div class="flex justify-between items-center">
+        <div class="h-6 flex justify-between items-center">
             <div v-if="props.serviceAccountProviderList.length > 0"
                  class="flex-shrink inline-flex items-center truncate hover:text-secondary hover:font-bold"
             >
-                <div class="truncate min-w-0 h-5">
+                <div class="truncate min-w-0 h-4">
                     <template v-for="(provider, index) in props.serviceAccountProviderList">
                         <router-link v-if="index < 5"
                                      :key="index"
                                      :to="{name: SERVICE_ACCOUNT_ROUTE._NAME,query: { provider: getProvider(provider) ? provider : null },}"
-                                     class="flex-shrink-0 inline-block w-5 h-5 bg-no-repeat bg-[length:100%] bg-center hover:opacity-50 mr-[0.37rem]"
+                                     class="flex-shrink-0 inline-block w-4 h-4 bg-no-repeat bg-[length:100%] bg-center hover:opacity-50 mr-[0.37rem]"
                                      :style="{backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`}"
                                      @click.native.stop.prevent
                         />

@@ -32,7 +32,7 @@ const targetId = computed(() => projectPageModalStore.state.targetId);
 const updateMode = computed(() => projectPageModalStore.state.targetId !== undefined);
 
 /* project group */
-const { data: projectGroup, setQueryData } = useProjectGroupQuery({
+const { data: projectGroup, isLoading, setQueryData } = useProjectGroupQuery({
     projectGroupId: targetId,
     enabled: visible,
 });
@@ -50,7 +50,7 @@ const {
     invalidState,
     invalidTexts,
     setForm, isAllValid,
-    initForm,
+    initForm, resetValidations,
 } = useFormValidator({
     projectGroupName: undefined as string|undefined,
 }, {
@@ -65,6 +65,7 @@ watch([visible, projectGroup], async ([v, pg]) => {
     if (!v) return;
     if (updateMode.value) {
         setForm('projectGroupName', pg?.name);
+        resetValidations();
     } else {
         initForm();
     }
@@ -137,6 +138,7 @@ const handleConfirm = async () => {
                     size="sm"
                     fade
                     backdrop
+                    :loading-backdrop="isLoading"
                     :visible="visible"
                     :loading="isProcessing"
                     :disabled="isProcessing || !isAllValid || projectGroup?.name === projectGroupName"

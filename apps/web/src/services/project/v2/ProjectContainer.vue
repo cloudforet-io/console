@@ -2,11 +2,7 @@
 import { computed, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-
 import { i18n } from '@/translations';
-
-import { useProjectGroupReferenceStore, type ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -21,17 +17,16 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import ProjectLSB from '@/services/project/v2/ProjectLSB.vue';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 
-/* project and project group */
-const projectReferenceStore = useProjectReferenceStore();
-const projectMap = computed(() => projectReferenceStore.getters.projectItems);
-const projectGroupReferenceStore = useProjectGroupReferenceStore();
-const projectGroupMap = computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems);
+/* project list store */
+const projectListStore = useProjectListStore();
+const projectMap = computed(() => projectListStore.projectMap);
+const projectGroupMap = computed(() => projectListStore.projectGroupMap);
 
 /* routed project or project group */
 const route = useRoute();
 const { projectGroupId, projectId } = useProjectOrGroupId(computed(() => route.params.projectGroupOrProjectId));
-
 
 /* selected paths */
 const parentIds = computed<string[]>(() => {
