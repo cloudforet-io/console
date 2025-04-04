@@ -1,9 +1,10 @@
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, ref } from 'vue';
 
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
+import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
 import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';
 import { menuItems } from '@/controls/context-menu/mock';
@@ -603,6 +604,46 @@ export const ButtonIconType: Story = {
         setup() {
             return {
                 menuItems,
+            };
+        },
+    }),
+    decorators: [() => ({
+        template: '<story style="height: 300px" />',
+    })],
+};
+
+export const CustomIconButton: Story = {
+    render: () => ({
+        components: {
+            PSelectDropdown,
+            PIconButton,
+        },
+        template: `
+            <div class="h-full w-full overflow p-8">
+                <p-select-dropdown :menu="menuItems"
+                                 reset-selection-on-menu-close
+                                 menu-width="max-content"
+                                 @update:visible-menu="handleUpdateVisible"
+                >
+                    <template #dropdown-icon-button>
+                        <p-icon-button name="ic_ellipsis-horizontal"
+                                     :activated="visibleMenu"
+                                     size="sm"
+                                     style-type="tertiary"
+                        />
+                    </template>
+                </p-select-dropdown>
+            </div>
+        `,
+        setup() {
+            const visibleMenu = ref(false);
+            const handleUpdateVisible = (v) => {
+                visibleMenu.value = v;
+            };
+            return {
+                menuItems,
+                visibleMenu,
+                handleUpdateVisible,
             };
         },
     }),

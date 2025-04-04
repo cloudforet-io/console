@@ -558,6 +558,15 @@ const extraArgTypes: ArgTypes = {
             type: { summary: null },
         },
     },
+    dropdownIconButton: {
+        name: 'dropdown-icon-button',
+        description: 'This is a slot for custom icon button in the dropdown button.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
     noDataArea: {
         name: 'no-data-area',
         description: 'This is a slot for the left area of the dropdown button.',
