@@ -6,7 +6,7 @@ import { useElementSize } from '@vueuse/core';
 interface UseTreeNodeTextEllipsisOptions {
   textEl: Ref<HTMLElement | null>;
 }
-export const useTreeNodeTextEllipsis = ({ textEl }: UseTreeNodeTextEllipsisOptions) => {
+export const useTextEllipsis = ({ textEl }: UseTreeNodeTextEllipsisOptions) => {
     const textElSize = useElementSize(textEl);
     const isEllipsis = computed(() => {
         const scrollWidth = textEl.value?.scrollWidth;

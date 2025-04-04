@@ -6,13 +6,13 @@ import type { TranslateResult } from 'vue-i18n';
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import { useTreeNodeIcon } from '@/data-display/tree/new-tree/composables/use-tree-node-icon';
 import { useTreeNodeSelect } from '@/data-display/tree/new-tree/composables/use-tree-node-select';
-import { useTreeNodeTextEllipsis } from '@/data-display/tree/new-tree/composables/use-tree-node-text-ellipsis';
 import { useTreeNodeToggle } from '@/data-display/tree/new-tree/composables/use-tree-node-toggle';
 import type {
     TreeNodeDisplayType, TreeNodeIcon, TreeNodeLink,
 } from '@/data-display/tree/new-tree/type';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { useTextEllipsis } from '@/hooks/use-text-ellipsis/use-text-ellipsis';
 
 // CAUTION: Props should be defined here due to the limitation of `script setup` of Vue 2.7.
 const props = withDefaults(defineProps<{
@@ -54,7 +54,7 @@ const isHovered = computed(() => hoveredItem.value && hoveredItem.value === prop
 
 /* text ellipsis */
 const textEl = ref<HTMLElement | null>(null);
-const { isEllipsis } = useTreeNodeTextEllipsis({ textEl });
+const { isEllipsis } = useTextEllipsis({ textEl });
 
 /* route */
 const {
