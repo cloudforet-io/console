@@ -169,7 +169,6 @@ const adminAssetInventoryRoute: RouteConfig = {
                 },
                 {
                     path: ':metricId',
-                    name: ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                     meta: { label: ({ params }) => params.metricId, lsbVisible: true },
                     props: true,
                     component: { template: '<router-view />' },

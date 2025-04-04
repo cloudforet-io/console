@@ -21,6 +21,8 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { AppReferenceMap } from '@/store/reference/app-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -64,6 +66,8 @@ const route = useRoute();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
+    app: computed<AppReferenceMap>(() => allReferenceGetters.app),
+    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
@@ -146,6 +150,9 @@ const labelMenuItemsHandler = (): AutocompleteHandler => async (inputText: strin
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
         return storeState.webhook[id]?.label || id;
+    }
+    if (id.includes('app')) {
+        return storeState.app[id]?.label || id;
     }
     return id;
 };

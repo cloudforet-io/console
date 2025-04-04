@@ -26,7 +26,7 @@ export const ADMIN_ASSET_INVENTORY_ROUTE = Object.freeze({
         },
         HISTORY: {
             _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}.history`,
-            JOB: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}.history.job` },
+            JOB: { _NAME: `admin.${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}.history.job` },
         },
     },
     METRIC_EXPLORER: {

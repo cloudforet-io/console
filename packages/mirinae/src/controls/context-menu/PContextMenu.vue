@@ -230,7 +230,6 @@ defineExpose({
                     </p-button>
                 </div>
                 <div v-if="props.searchable"
-                     v-show="props.menu.length > 0"
                      class="search-wrapper"
                 >
                     <p-search :value="state.proxySearchText"

@@ -49,7 +49,6 @@ const adminAdvancedRoutes: RouteConfig = {
         },
         {
             path: 'bookmark',
-            name: ADMIN_ADVANCED_ROUTE.BOOKMARK._NAME,
             meta: {
                 lsbVisible: true,
                 menuId: MENU_ID.BOOKMARK,

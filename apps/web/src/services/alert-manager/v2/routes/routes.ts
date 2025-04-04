@@ -52,7 +52,6 @@ const alertManagerRoute: RouteConfig = {
                 },
                 {
                     path: ':serviceId',
-                    name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                     props: true,
                     component: { template: '<router-view />' },
                     children: [
