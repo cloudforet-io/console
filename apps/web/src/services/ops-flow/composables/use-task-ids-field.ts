@@ -27,9 +27,10 @@ export const useTaskIdsField = ({
         [],
         isRequired ? (val) => {
             if (val.length === 0) {
+                const taskIdLabel = i18n.t('OPSFLOW.FIELD_ID', { field: taskManagementTemplateStore.templates.task }) as string;
                 return i18n.t('OPSFLOW.VALIDATION.REQUIRED', {
-                    topic: taskManagementTemplateStore.templates.taskId,
-                    particle: getParticle(taskManagementTemplateStore.templates.taskId as string, 'topic'),
+                    topic: taskIdLabel,
+                    particle: getParticle(taskIdLabel, 'topic'),
                 });
             }
             return true;
