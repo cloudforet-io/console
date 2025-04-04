@@ -109,7 +109,7 @@ watch(taskFilters, (newValue, oldValue) => {
             <p-select-dropdown :key="taskIdsDropdownKey"
                                :selected="selectedTaskIdItems"
                                :handler="taskIdMenuItemsHandler"
-                               :selection-label="String($t('OPSFLOW.TASK_ID'))"
+                               :selection-label="String($t('OPSFLOW.FIELD_ID', { field: taskManagementTemplateStore.templates.task }))"
                                appearance-type="badge"
                                style-type="rounded"
                                multi-selectable

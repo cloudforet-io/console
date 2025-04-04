@@ -161,7 +161,7 @@ watch(data, (d) => {
 const fields = computed<DataTableField[] >(() => [
     {
         name: 'task_id',
-        label: i18n.t('OPSFLOW.TASK_ID') as string,
+        label: i18n.t('OPSFLOW.FIELD_ID', { field: taskManagementTemplateStore.templates.task }) as string,
     },
     {
         name: 'name',
