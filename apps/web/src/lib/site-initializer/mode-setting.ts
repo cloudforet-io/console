@@ -1,6 +1,8 @@
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { pinia } from '@/store/pinia';
 
+import ServiceConfigurator from '@/services/configurator';
+
 export const initModeSetting = () => {
     // NOTE: this is to use pinia store outside vue component
     useAppContextStore(pinia);
@@ -12,4 +14,5 @@ export const initModeSetting = () => {
     if (modePath === 'admin') {
         appContextStore.enterAdminMode();
     }
+    ServiceConfigurator.getMenuList(modePath);
 };
