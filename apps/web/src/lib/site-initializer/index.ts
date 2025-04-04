@@ -92,7 +92,7 @@ const init = async () => {
         await ServiceConfigurator.initialize(mergedConfig);
         await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
-        initModeSetting();
+        await initModeSetting();
         await initWorkspace(userId);
         initRouter(domainId);
         // prefetchResources();

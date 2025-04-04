@@ -40,7 +40,7 @@ class ServiceConfigurator {
         this.featureSchema = featureSchema;
     }
 
-    getRoutes(mode: 'admin' | 'workspace'): RouteConfig[] {
+    getRoutes(mode: string): RouteConfig[] {
         const baseRoutes = mode === 'admin'
             ? [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes]
             : [workspaceHomeRoute, infoRoutes];
@@ -61,7 +61,7 @@ class ServiceConfigurator {
         return baseRoutes;
     }
 
-    getMenuList(mode: 'admin' | 'workspace'): Menu[] {
+    getMenuList(mode: string): Menu[] {
         const menuStore = useMenuStore();
 
         const menuList: Menu[] = mode === 'admin' ? [] : DEFAULT_MENU_LIST;
