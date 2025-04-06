@@ -8,9 +8,13 @@ import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-que
 import type { WidgetModel, WidgetUpdateParams } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateDataTableApi } from '@/api-clients/dashboard/private-data-table/composables/use-private-data-table-api';
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
+import type { PrivateWidgetGetParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/get';
 import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
+import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
+import type { PublicWidgetGetParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/get';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
@@ -31,14 +35,8 @@ interface UseWidgetFormQueryReturn {
     keys: {
         publicWidgetGetQueryKey: ComputedRef<QueryKey>;
         privateWidgetGetQueryKey: ComputedRef<QueryKey>;
-        publicWidgetLoadQueryKey: ComputedRef<QueryKey>;
-        privateWidgetLoadQueryKey: ComputedRef<QueryKey>;
-        publicWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
-        privateWidgetLoadSumQueryKey: ComputedRef<QueryKey>;
         publicDataTableListQueryKey: ComputedRef<QueryKey>;
         privateDataTableListQueryKey: ComputedRef<QueryKey>;
-        publicDataTableLoadQueryKey: ComputedRef<QueryKey>;
-        privateDataTableLoadQueryKey: ComputedRef<QueryKey>;
     };
     api: {
         publicWidgetAPI: ReturnType<typeof usePublicWidgetApi>['publicWidgetAPI'];
@@ -59,70 +57,60 @@ export const useWidgetFormQuery = ({
 }: UseWidgetFormQueryOptions): UseWidgetFormQueryReturn => {
     const {
         publicWidgetAPI,
-        publicWidgetGetQueryKey,
-        publicWidgetLoadQueryKey,
-        publicWidgetLoadSumQueryKey,
     } = usePublicWidgetApi();
     const {
         privateWidgetAPI,
-        privateWidgetGetQueryKey,
-        privateWidgetLoadQueryKey,
-        privateWidgetLoadSumQueryKey,
     } = usePrivateWidgetApi();
     const {
         publicDataTableAPI,
-        publicDataTableListQueryKey,
-        publicDataTableLoadQueryKey,
     } = usePublicDataTableApi();
     const {
         privateDataTableAPI,
-        privateDataTableListQueryKey,
-        privateDataTableLoadQueryKey,
     } = usePrivateDataTableApi();
     const queryClient = useQueryClient();
 
     const isPrivate = computed(() => !!widgetId?.value?.startsWith('private'));
 
     /* Query Keys */
-    const _publicWidgetGetQueryKey = computed(() => [
-        ...publicWidgetGetQueryKey.value,
-        widgetId?.value,
-    ]);
-    const _privateWidgetGetQueryKey = computed(() => [
-        ...privateWidgetGetQueryKey.value,
-        widgetId?.value,
-    ]);
-    const _publicDataTableListQueryKey = computed(() => [
-        ...publicDataTableListQueryKey.value,
-        widgetId?.value,
-    ]);
-    const _privateDataTableListQueryKey = computed(() => [
-        ...privateDataTableListQueryKey.value,
-        widgetId?.value,
-    ]);
+    const { key: publicWidgetGetQueryKey, params: publicWidgetGetParams } = useServiceQueryKey('dashboard', 'public-widget', 'get', {
+        contextKey: widgetId,
+        params: computed<PublicWidgetGetParameters>(() => ({
+            widget_id: widgetId?.value as string,
+        })),
+    });
+    const { key: privateWidgetGetQueryKey, params: privateWidgetGetParams } = useServiceQueryKey('dashboard', 'private-widget', 'get', {
+        contextKey: widgetId,
+        params: computed<PrivateWidgetGetParameters>(() => ({
+            widget_id: widgetId?.value as string,
+        })),
+    });
+    const { key: publicDataTableListQueryKey, params: publicDataTableListParams } = useServiceQueryKey('dashboard', 'public-data-table', 'list', {
+        params: computed<DataTableListParameters>(() => ({
+            widget_id: widgetId?.value as string,
+        })),
+    });
+    const { key: privateDataTableListQueryKey, params: privateDataTableListParams } = useServiceQueryKey('dashboard', 'private-data-table', 'list', {
+        params: computed<DataTableListParameters>(() => ({
+            widget_id: widgetId?.value as string,
+        })),
+    });
 
     /* Querys */
     const publicWidgetQuery = useScopedQuery({
-        queryKey: _publicWidgetGetQueryKey,
-        queryFn: () => publicWidgetAPI.get({
-            widget_id: widgetId?.value as string,
-        }),
+        queryKey: publicWidgetGetQueryKey,
+        queryFn: () => publicWidgetAPI.get(publicWidgetGetParams.value),
         enabled: computed(() => !!widgetId?.value && !isPrivate.value && !preventLoad),
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateWidgetQuery = useScopedQuery({
-        queryKey: _privateWidgetGetQueryKey,
-        queryFn: () => privateWidgetAPI.get({
-            widget_id: widgetId?.value as string,
-        }),
+        queryKey: privateWidgetGetQueryKey,
+        queryFn: () => privateWidgetAPI.get(privateWidgetGetParams.value),
         enabled: computed(() => !!widgetId?.value && isPrivate.value && !preventLoad),
         staleTime: STALE_TIME,
     }, ['WORKSPACE']);
     const publicDataTableListQuery = useScopedQuery({
-        queryKey: _publicDataTableListQueryKey,
-        queryFn: () => publicDataTableAPI.list({
-            widget_id: widgetId?.value as string,
-        }),
+        queryKey: publicDataTableListQueryKey,
+        queryFn: () => publicDataTableAPI.list(publicDataTableListParams.value),
         select: (data) => data?.results || [],
         enabled: computed(() => !!widgetId?.value && !isPrivate.value && !preventLoad),
         initialData: DEFAULT_LIST_DATA,
@@ -130,10 +118,8 @@ export const useWidgetFormQuery = ({
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateDataTableListQuery = useScopedQuery({
-        queryKey: _privateDataTableListQueryKey,
-        queryFn: () => privateDataTableAPI.list({
-            widget_id: widgetId?.value as string,
-        }),
+        queryKey: privateDataTableListQueryKey,
+        queryFn: () => privateDataTableAPI.list(privateDataTableListParams.value),
         select: (data) => data?.results || [],
         enabled: computed(() => !!widgetId?.value && isPrivate.value && !preventLoad),
         initialData: DEFAULT_LIST_DATA,
@@ -175,16 +161,10 @@ export const useWidgetFormQuery = ({
             privateDataTableAPI,
         },
         keys: {
-            publicWidgetGetQueryKey: _publicWidgetGetQueryKey,
-            privateWidgetGetQueryKey: _privateWidgetGetQueryKey,
-            publicDataTableListQueryKey: _publicDataTableListQueryKey,
-            privateDataTableListQueryKey: _privateDataTableListQueryKey,
-            publicWidgetLoadQueryKey: computed(() => publicWidgetLoadQueryKey.value),
-            privateWidgetLoadQueryKey: computed(() => privateWidgetLoadQueryKey.value),
-            publicWidgetLoadSumQueryKey: computed(() => publicWidgetLoadSumQueryKey.value),
-            privateWidgetLoadSumQueryKey: computed(() => privateWidgetLoadSumQueryKey.value),
-            publicDataTableLoadQueryKey: computed(() => publicDataTableLoadQueryKey.value),
-            privateDataTableLoadQueryKey: computed(() => privateDataTableLoadQueryKey.value),
+            publicWidgetGetQueryKey,
+            privateWidgetGetQueryKey,
+            publicDataTableListQueryKey,
+            privateDataTableListQueryKey,
         },
         fetcher: {
             updateDataTableFn,
