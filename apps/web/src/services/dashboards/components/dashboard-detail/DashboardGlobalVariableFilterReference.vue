@@ -2,6 +2,7 @@
 
 
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     cloneDeep, flattenDeep, isEqual, xor,
@@ -37,7 +38,6 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     variable: DashboardGlobalVariable;
@@ -49,10 +49,10 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const storeState = reactive({

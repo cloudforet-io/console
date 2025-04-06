@@ -3,6 +3,7 @@ import type { ComponentPublicInstance, AsyncComponent } from 'vue';
 import {
     reactive, ref, watch, computed, onBeforeUnmount,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
@@ -68,6 +69,9 @@ type RefinedWidgetInfo = WidgetModel & {
     component: AsyncComponent|null;
 };
 
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
@@ -89,10 +93,10 @@ const {
     fetcher,
     queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 /* State */
@@ -193,7 +197,7 @@ const { mutateAsync: updateDashboard } = useMutation(
     },
 );
 const deleteWidgetFn = (params: PrivateWidgetDeleteParameters|PublicWidgetDeleteParameters) => {
-    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const isPrivate = dashboardId.value?.startsWith('private');
     const _fetcher = isPrivate
         ? api.privateWidgetAPI.delete
         : api.publicWidgetAPI.delete;
@@ -225,7 +229,7 @@ const { mutateAsync: deleteWidget } = useMutation(
 const { mutate: updateWidgetSize } = useMutation({
     mutationFn: fetcher.updateWidgetFn,
     onSuccess: (_, variables) => {
-        const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+        const isPrivate = dashboardId.value?.startsWith('private');
         const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
         queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
             const _updatedWidgetList = (oldData.results ?? []).map((widget) => {
@@ -318,7 +322,7 @@ const handleOpenWidgetOverlay = (widget: RefinedWidgetInfo, overlayType: WidgetO
     widgetGenerateStore.setShowOverlay(true);
 };
 const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
-    if (!dashboardDetailState.dashboardId) return;
+    if (!dashboardId.value) return;
     const isPrivate = widget.widget_id.startsWith('private');
     const widgetCreateFetcher = isPrivate
         ? api.privateWidgetAPI.create
@@ -332,7 +336,7 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
     const refinedDataTables = getRefinedDataTables(dataTableList);
     try {
         const createdWidget = await widgetCreateFetcher({
-            dashboard_id: dashboardDetailState.dashboardId,
+            dashboard_id: dashboardId.value,
             widget_type: widget.widget_type,
             size: widget.size,
             options: {
@@ -370,7 +374,7 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             });
         }
         await updateDashboard({
-            dashboard_id: dashboardDetailState.dashboardId || '',
+            dashboard_id: dashboardId.value || '',
             layouts: _layouts,
         });
 
@@ -406,7 +410,7 @@ const handleDeleteModalConfirm = async () => {
         : undefined;
 
     await updateDashboard({
-        dashboard_id: dashboardDetailState.dashboardId || '',
+        dashboard_id: dashboardId.value || '',
         layouts: changedLayouts,
     });
     // 2. delete widget
@@ -532,7 +536,7 @@ onBeforeUnmount(() => {
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
                                :dashboard-vars="dashboardDetailGetters.refinedVars"
-                               :dashboard-id="dashboardDetailState.dashboardId"
+                               :dashboard-id="dashboardId"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
                                :disable-manage-buttons="!isManageable"
                                :all-reference-type-info="state.allReferenceTypeInfo"

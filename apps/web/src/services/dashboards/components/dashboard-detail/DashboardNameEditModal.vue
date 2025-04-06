@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
@@ -39,8 +39,8 @@ const {
     publicDashboardList,
     privateDashboardList,
     keys,
-    queryClient,
 } = useDashboardQuery();
+const queryClient = useQueryClient();
 const {
     fetcher,
     keys: dashboardDetailKeys,

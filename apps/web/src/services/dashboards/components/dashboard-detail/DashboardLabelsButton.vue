@@ -14,7 +14,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
@@ -24,8 +23,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const labelPopoverRef = ref<HTMLElement|null>(null);
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 /* Query */
 const {
     dashboard,
@@ -33,10 +30,10 @@ const {
     keys,
     queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId: computed(() => props.dashboardId),
 });
 const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId: computed(() => props.dashboardId),
 });
 const state = reactive({
     visible: false,

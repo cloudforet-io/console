@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
@@ -33,6 +34,8 @@ const props = withDefaults(defineProps<Props>(), {
 const { i18nDayjs } = useI18nDayjs();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
@@ -41,10 +44,10 @@ const {
     keys,
     queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
@@ -114,7 +117,7 @@ const handleSelectMonthMenuItem = (selected: string) => {
 
     if (isManageable.value && !props.widgetMode) {
         mutate({
-            dashboard_id: dashboardDetailState.dashboardId,
+            dashboard_id: dashboardId.value,
             options: {
                 ...(dashboard.value?.options || {}),
                 date_range: state.selectedDateRange,

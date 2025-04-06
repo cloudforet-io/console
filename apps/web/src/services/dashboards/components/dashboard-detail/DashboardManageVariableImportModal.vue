@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
@@ -25,35 +26,39 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
 
 
 interface Props {
     visible: boolean;
 }
 const appContextStore = useAppContextStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+
+
 /* Query */
 const {
     publicDashboardList,
     privateDashboardList,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
+
 const {
     dashboard,
     fetcher,
     keys,
     queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const storeState = reactive({
@@ -62,7 +67,7 @@ const storeState = reactive({
 
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    currentDashboardId: computed<string>(() => dashboardDetailState.dashboardId || ''),
+    currentDashboardId: computed<string>(() => dashboardId.value || ''),
     currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboard.value?.vars_schema?.properties ?? {})),
     keyword: '',
     selectedDashboardId: '' as string|undefined,

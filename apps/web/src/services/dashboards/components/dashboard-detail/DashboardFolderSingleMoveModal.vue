@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
@@ -27,6 +27,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -48,13 +49,15 @@ const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 
 /* Query */
+const queryClient = useQueryClient();
+const {
+    keys,
+    api,
+} = useDashboardQuery();
 const {
     publicFolderList,
     privateFolderList,
-    keys,
-    api,
-    queryClient,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

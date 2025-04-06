@@ -5,6 +5,7 @@ import {
     computed,
     reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldGroup, PIconButton, PLabel, PTextInput,
@@ -15,7 +16,6 @@ import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
@@ -41,11 +41,10 @@ const {
     },
 });
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const state = reactive({

@@ -39,12 +39,14 @@ const emit = defineEmits<{(e: 'update', val: { vars?: DashboardVars }): void;
 }>();
 
 const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

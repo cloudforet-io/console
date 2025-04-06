@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -27,7 +28,6 @@ import DashboardVariablesFormDynamic
 import DashboardVariablesFormManual
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormManual.vue';
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 type ManualVariableData = Omit<ManualVariable, 'management'|'key'|'name'|'method'>;
 type DynamicVariableData = Omit<DashboardGlobalVariable, 'management'|'key'|'name'|'method'>;
@@ -49,8 +49,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const userStore = useUserStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
@@ -59,7 +59,7 @@ const {
     keys,
     queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const state = reactive({
@@ -175,9 +175,9 @@ const resetState = () => {
 };
 
 /* Api */
-const createDashboardVarsSchema = (dashboardId: string) => {
+const createDashboardVarsSchema = (_dashboardId: string) => {
     mutate({
-        dashboard_id: dashboardId,
+        dashboard_id: _dashboardId,
         vars_schema: {
             properties: {
                 ...state.dashboardVarsSchemaProperties,
@@ -190,7 +190,7 @@ const createDashboardVarsSchema = (dashboardId: string) => {
         },
     });
 };
-const updateDashboardVarsSchema = (dashboardId: string) => {
+const updateDashboardVarsSchema = (_dashboardId: string) => {
     const _originalKey = state.targetVariable?.key;
     if (!_originalKey) return;
     const _newVarsSchemaProperties = cloneDeep(state.dashboardVarsSchemaProperties);
@@ -203,7 +203,7 @@ const updateDashboardVarsSchema = (dashboardId: string) => {
     const _vars = cloneDeep(dashboard.value?.vars || {});
     delete _vars[_originalKey];
     mutate({
-        dashboard_id: dashboardId,
+        dashboard_id: _dashboardId,
         vars_schema: {
             properties: _newVarsSchemaProperties,
         },
@@ -238,11 +238,11 @@ const { mutate, isPending: loading } = useMutation(
 
 /* Event */
 const handleConfirm = async () => {
-    if (!dashboardDetailState.dashboardId) return;
+    if (!dashboardId.value) return;
     if (props.modalType === 'CREATE') {
-        createDashboardVarsSchema(dashboardDetailState.dashboardId);
+        createDashboardVarsSchema(dashboardId.value);
     } else {
-        updateDashboardVarsSchema(dashboardDetailState.dashboardId);
+        updateDashboardVarsSchema(dashboardId.value);
     }
 };
 const handleClickClose = () => {

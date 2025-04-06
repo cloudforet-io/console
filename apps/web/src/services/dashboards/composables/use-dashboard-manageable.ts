@@ -26,7 +26,9 @@ export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOp
         isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
 
-    const { dashboard } = useDashboardDetailQuery({ dashboardId });
+    const { dashboard } = useDashboardDetailQuery({
+        dashboardId: computed(() => dashboardId.value),
+    });
 
     const isManageable = computed(() => {
         if (storeState.isAdminMode) return true;

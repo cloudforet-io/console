@@ -3,6 +3,7 @@ import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
     computed, onBeforeMount, onBeforeUnmount, reactive, toRef,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { cloneDeep } from 'lodash';
 
@@ -57,9 +58,10 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormGetters = widgetFormStore.getters;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
-
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const state = reactive({

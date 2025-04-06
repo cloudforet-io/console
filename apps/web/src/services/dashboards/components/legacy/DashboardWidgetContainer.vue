@@ -3,6 +3,7 @@ import type { ComponentPublicInstance } from 'vue';
 import {
     reactive, ref, watch, computed, onBeforeUnmount, nextTick,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { debounce } from 'lodash';
 
@@ -33,8 +34,10 @@ type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();

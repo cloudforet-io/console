@@ -43,10 +43,10 @@ const dashboardDetailState = dashboardDetailStore.state;
 const {
     dashboard, keys, fetcher, queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId: computed(() => props.dashboardId),
 });
 const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId: computed(() => props.dashboardId),
 });
 
 const state = reactive({
@@ -105,7 +105,7 @@ const handleSelectRefreshIntervalOption = (option) => {
 
     if (isManageable.value) {
         mutate({
-            dashboard_id: dashboardDetailState.dashboardId,
+            dashboard_id: props.dashboardId,
             options: {
                 ...(dashboard.value?.options || {}),
                 refresh_interval_option: option,

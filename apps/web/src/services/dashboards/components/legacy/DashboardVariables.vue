@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { isEqual, xor } from 'lodash';
 
@@ -25,12 +26,14 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update', val: { variables?: DashboardVariables, variables_schema?: DashboardVariablesSchema }): void;
 }>();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 

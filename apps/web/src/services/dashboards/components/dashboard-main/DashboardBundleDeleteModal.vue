@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { PDataTable, PI } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -18,6 +20,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -58,12 +61,16 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const {
     publicDashboardList,
     privateDashboardList,
+    api: dashboardApi,
+    keys: dashboardKeys,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-    api,
-    keys,
-    queryClient,
-} = useDashboardQuery();
+    api: folderApi,
+    keys: folderKeys,
+} = useDashboardFolderQuery();
+const queryClient = useQueryClient();
 
 const queryState = reactive({
     publicDashboardItems: computed(() => {
@@ -108,8 +115,8 @@ const state = reactive({
 /* Api */
 const deleteFolder = async (folderId: string): Promise<boolean> => {
     const fetcher = folderId.startsWith('private')
-        ? api.privateFolderAPI.delete
-        : api.publicFolderAPI.delete;
+        ? folderApi.privateFolderAPI.delete
+        : folderApi.publicFolderAPI.delete;
     try {
         await fetcher({ folder_id: folderId });
         return true;
@@ -119,8 +126,8 @@ const deleteFolder = async (folderId: string): Promise<boolean> => {
 };
 const deleteDashboard = async (dashboardId: string): Promise<boolean> => {
     const fetcher = dashboardId.startsWith('private')
-        ? api.privateDashboardAPI.delete
-        : api.publicDashboardAPI.delete;
+        ? dashboardApi.privateDashboardAPI.delete
+        : dashboardApi.publicDashboardAPI.delete;
     try {
         await fetcher({ dashboard_id: dashboardId });
         const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === dashboardId);
@@ -155,10 +162,10 @@ const handleDeleteConfirm = async () => {
     } else {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
-    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.publicFolderListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.privateFolderListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: dashboardKeys.privateDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: folderKeys.privateFolderListQueryKey.value });
     dashboardPageControlStore.reset();
     state.loading = false;
     state.proxyVisible = false;
