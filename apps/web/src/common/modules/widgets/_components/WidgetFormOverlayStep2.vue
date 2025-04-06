@@ -23,8 +23,9 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -74,11 +75,16 @@ const {
 });
 const {
     widget,
-    dataTableList,
     keys: widgetKeys,
     fetcher: wigetFetcher,
     widgetLoading,
-} = useWidgetFormQuery({
+} = useWidgetQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
+const {
+    dataTableList,
+} = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

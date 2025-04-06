@@ -2,7 +2,7 @@
 
 import { computed, reactive } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -18,7 +18,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -50,8 +50,7 @@ const {
     widget,
     fetcher: widgetFetcher,
     keys: widgetKeys,
-    queryClient,
-} = useWidgetFormQuery({
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const {
@@ -61,6 +60,7 @@ const {
 } = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const queryClient = useQueryClient();
 
 
 const storeState = reactive({

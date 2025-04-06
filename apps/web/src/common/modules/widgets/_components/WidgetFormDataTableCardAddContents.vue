@@ -40,7 +40,7 @@ import {
     useDataTableCascadeUpdate,
 } from '@/common/modules/widgets/_composables/use-data-table-cascade-update';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
@@ -75,7 +75,7 @@ const {
     widget,
     keys: widgetKeys,
     fetcher: widgetFetcher,
-} = useWidgetFormQuery({
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const {

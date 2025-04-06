@@ -34,7 +34,7 @@ import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components
 import WidgetFormUnifiedCostDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormUnifiedCostDataSourcePopper.vue';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
@@ -63,7 +63,7 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 /* Query */
 const {
     api: widgetApi,
-} = useWidgetFormQuery({
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const {

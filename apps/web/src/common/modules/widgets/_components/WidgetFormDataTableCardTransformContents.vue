@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
     cloneDeep, intersection, isEmpty, isEqual,
 } from 'lodash';
@@ -45,7 +45,8 @@ import WidgetFormDataTableCardTransformValueMapping
 import {
     useDataTableCascadeUpdate,
 } from '@/common/modules/widgets/_composables/use-data-table-cascade-update';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_TABLE_TYPE, DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -89,14 +90,22 @@ const {
 });
 const {
     widget,
-    dataTableList,
-    api,
-    keys,
-    fetcher,
-    queryClient,
-} = useWidgetFormQuery({
+    keys: widgetKeys,
+    fetcher: widgetFetcher,
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const {
+    api,
+    keys: dataTableKeys,
+    fetcher: dataTableFetcher,
+    dataTableList,
+} = useWidgetDataTableListQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const queryClient = useQueryClient();
+
+
 const {
     cascadeUpdateDataTable,
 } = useDataTableCascadeUpdate({
@@ -205,7 +214,7 @@ const { withSuffix: publicWidgetLoadSumQueryKey } = useServiceQueryKey('dashboar
 
 /* APIs */
 const syncDataTableList = async (data: DataTableModel, unsavedId?: string) => {
-    const dataTableListQueryKey = state.isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+    const dataTableListQueryKey = state.isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
     await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
         if (oldData.results) {
             return {
@@ -238,7 +247,7 @@ const invalidateLoadQueries = async (data: DataTableModel) => {
     }
 };
 const { mutateAsync: updateDataTableMutation } = useMutation({
-    mutationFn: fetcher.updateDataTableFn,
+    mutationFn: dataTableFetcher.updateDataTableFn,
     onSuccess: async (data) => {
         await syncDataTableList(data);
         await queryClient.invalidateQueries({ queryKey: state.isPrivate ? privateDataTableGetQueryKey(data.data_table_id) : publicDataTableGetQueryKey(data.data_table_id) });
@@ -253,11 +262,11 @@ const { mutateAsync: updateDataTableMutation } = useMutation({
     },
 });
 const { mutateAsync: updateWidget } = useMutation({
-    mutationFn: fetcher.updateWidgetFn,
+    mutationFn: widgetFetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? keys.privateWidgetGetQueryKey
-            : keys.publicWidgetGetQueryKey;
+            ? widgetKeys.privateWidgetGetQueryKey
+            : widgetKeys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
@@ -458,7 +467,7 @@ const clearDataTableInvalidStatus = async (dataTableId: string) => {
     delete _allDataTableInvalidMap[dataTableId];
     widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
 
-    const dataTableListQueryKey = state.isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+    const dataTableListQueryKey = state.isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
     await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
         if (oldData.results) {
             return {
