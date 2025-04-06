@@ -3,9 +3,7 @@ import { computed } from 'vue';
 
 import { useElementSize } from '@vueuse/core';
 
-interface UseTextEllipsisOptions {
-  textEl: Ref<HTMLElement | null>;
-}
+import type { UseTextEllipsisOptions, UseTextEllipsisReturn } from './type';
 export const useTextEllipsis = ({ textEl }: UseTextEllipsisOptions) => {
     const textElSize = useElementSize(textEl);
     const isEllipsis = computed(() => {
