@@ -17,6 +17,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
     DATA_TABLE_TYPE,
@@ -47,13 +48,20 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     widget,
-    dataTableList,
-    fetcher,
-    keys,
+    fetcher: widgetFetcher,
+    keys: widgetKeys,
     queryClient,
 } = useWidgetFormQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const {
+    dataTableList,
+    keys: dataTableKeys,
+    fetcher: dataTableFetcher,
+} = useWidgetDataTableListQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+
 
 const storeState = reactive({
     currentDataTable: computed(() => dataTableList.value.find((dataTable) => dataTable.data_table_id === props.dataTableId)),
@@ -79,7 +87,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
     const _widgetOptions = cloneDeep(widget.value?.options);
     const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value?.widget_type, storeState.currentDataTable);
     await updateWidget({
-        widget_id: widgetGenerateState.widgetId,
+        widget_id: widgetGenerateState.widgetId as string,
         state: 'INACTIVE',
         options: sanitizedOptions,
     });
@@ -121,11 +129,11 @@ const handleClickNameConfirm = async () => {
 
 /* Api */
 const { mutateAsync: updateWidget } = useMutation({
-    mutationFn: fetcher.updateWidgetFn,
+    mutationFn: widgetFetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? keys.privateWidgetQueryKey
-            : keys.publicWidgetQueryKey;
+            ? widgetKeys.privateWidgetGetQueryKey
+            : widgetKeys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
@@ -134,7 +142,7 @@ const { mutateAsync: updateWidget } = useMutation({
     },
 });
 const { mutate: updateDataTable } = useMutation({
-    mutationFn: fetcher.updateDataTableFn,
+    mutationFn: dataTableFetcher.updateDataTableFn,
     onSuccess: async (data) => {
         await syncDataTableList(data);
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
@@ -147,7 +155,7 @@ const { mutate: updateDataTable } = useMutation({
 });
 const syncDataTableList = async (data: DataTableModel) => {
     const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
-    const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+    const dataTableListQueryKey = _isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
     await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
         if (oldData.results) {
             return {

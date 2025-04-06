@@ -4,6 +4,7 @@ import { onClickOutside } from '@vueuse/core/index';
 import {
     computed, onMounted, reactive, ref,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { isArray } from 'lodash';
 
@@ -27,7 +28,6 @@ import { blue, gray } from '@/styles/colors';
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
@@ -39,16 +39,15 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 const emit = defineEmits<{(e: 'delete'): void;
     (e: 'update:selected-filter', filter: DataTableQueryFilterForDropdown): void;
 }>();
 const operatorButtonRef = ref<HTMLElement | null>(null);
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const state = reactive({
     visibleMenu: false,

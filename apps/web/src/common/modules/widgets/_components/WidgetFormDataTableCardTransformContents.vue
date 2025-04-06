@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import {
@@ -14,6 +15,7 @@ import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data
 import type { DataTableDeleteParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/delete';
 import type { DataTableTransformParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/transform';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -45,7 +47,7 @@ import {
 } from '@/common/modules/widgets/_composables/use-data-table-cascade-update';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import {
-    DATA_TABLE_TYPE, type DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
+    DATA_TABLE_TYPE, DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -60,7 +62,6 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
@@ -75,16 +76,16 @@ interface Props {
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const props = defineProps<Props>();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 /* Querys */
 const {
     dashboard,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const {
     widget,
@@ -191,6 +192,17 @@ const getAggregateFunctionMap = () => {
     }, {} as AggregateFunction);
 };
 
+
+/* Query Keys */
+const { withSuffix: privateDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'get');
+const { withSuffix: publicDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'get');
+const { withSuffix: privateDataTableLoadQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'load');
+const { withSuffix: publicDataTableLoadQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'load');
+const { withSuffix: privateWidgetLoadQueryKey } = useServiceQueryKey('dashboard', 'private-widget', 'load');
+const { withSuffix: publicWidgetLoadQueryKey } = useServiceQueryKey('dashboard', 'public-widget', 'load');
+const { withSuffix: privateWidgetLoadSumQueryKey } = useServiceQueryKey('dashboard', 'private-widget', 'load-sum');
+const { withSuffix: publicWidgetLoadSumQueryKey } = useServiceQueryKey('dashboard', 'public-widget', 'load-sum');
+
 /* APIs */
 const syncDataTableList = async (data: DataTableModel, unsavedId?: string) => {
     const dataTableListQueryKey = state.isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
@@ -210,31 +222,26 @@ const syncDataTableList = async (data: DataTableModel, unsavedId?: string) => {
     });
 };
 const invalidateLoadQueries = async (data: DataTableModel) => {
-    await queryClient.invalidateQueries({
-        queryKey: [
-            ...(state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
-            data.data_table_id,
-        ],
-    });
-    await queryClient.invalidateQueries({
-        queryKey: [
-            ...(state.isPrivate ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-            dashboardDetailState.dashboardId,
-            widgetGenerateState.widgetId,
-        ],
-    });
-    await queryClient.invalidateQueries({
-        queryKey: [
-            ...(state.isPrivate ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
-            dashboardDetailState.dashboardId,
-            widgetGenerateState.widgetId,
-        ],
-    });
+    if (!widgetGenerateState.widgetId) return;
+    if (data.data_table_id.startsWith('private')) {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: privateDataTableLoadQueryKey(state.dataTableId) }),
+            queryClient.invalidateQueries({ queryKey: privateWidgetLoadQueryKey(widgetGenerateState.widgetId) }),
+            queryClient.invalidateQueries({ queryKey: privateWidgetLoadSumQueryKey(widgetGenerateState.widgetId) }),
+        ]);
+    } else {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: publicDataTableLoadQueryKey(state.dataTableId) }),
+            queryClient.invalidateQueries({ queryKey: publicWidgetLoadQueryKey(widgetGenerateState.widgetId) }),
+            queryClient.invalidateQueries({ queryKey: publicWidgetLoadSumQueryKey(widgetGenerateState.widgetId) }),
+        ]);
+    }
 };
 const { mutateAsync: updateDataTableMutation } = useMutation({
     mutationFn: fetcher.updateDataTableFn,
     onSuccess: async (data) => {
         await syncDataTableList(data);
+        await queryClient.invalidateQueries({ queryKey: state.isPrivate ? privateDataTableGetQueryKey(data.data_table_id) : publicDataTableGetQueryKey(data.data_table_id) });
         await invalidateLoadQueries(data);
 
         setFailStatus(false);
@@ -421,6 +428,9 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    if (!widgetGenerateState.widgetId) {
+        throw new Error('Widget ID is required');
+    }
     state.loading = true;
     const result = await updateDataTable();
     if (result) {

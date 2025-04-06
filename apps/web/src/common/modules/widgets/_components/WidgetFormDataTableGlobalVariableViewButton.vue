@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { computed, reactive } from 'vue';
-
+import { useRoute } from 'vue-router/composables';
 
 import { PButton, PPopover, PCopyButton } from '@cloudforet/mirinae';
 
@@ -9,13 +9,12 @@ import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/das
 
 import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 
 const state = reactive({

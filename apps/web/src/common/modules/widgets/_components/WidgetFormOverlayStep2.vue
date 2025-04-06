@@ -2,6 +2,7 @@
 import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep, isEqual } from 'lodash';
@@ -54,6 +55,8 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -67,7 +70,7 @@ const {
     fetcher,
     queryClient,
 } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const {
     widget,
@@ -192,7 +195,7 @@ const updateWidget = async () => {
             });
         }
         updateDashboard({
-            dashboard_id: dashboardDetailState.dashboardId,
+            dashboard_id: dashboardId.value,
             layouts: _layouts,
         });
     }
@@ -203,7 +206,6 @@ const { mutate: updateDashboard } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: (data) => {
             const dashboardQueryKey = state.isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
-            // queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
             queryClient.setQueryData(dashboardQueryKey.value, () => data);
         },
     },
@@ -240,22 +242,6 @@ const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
-// const loadOverlayWidget = async () => {
-//     await queryClient.invalidateQueries({
-//         queryKey: [
-//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadQueryKey.value : widgetKeys.publicWidgetLoadQueryKey.value),
-//             dashboardDetailState.dashboardId,
-//             widgetGenerateState.widgetId,
-//         ],
-//     });
-//     await queryClient.invalidateQueries({
-//         queryKey: [
-//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadSumQueryKey.value : widgetKeys.publicWidgetLoadSumQueryKey.value),
-//             dashboardDetailState.dashboardId,
-//             widgetGenerateState.widgetId,
-//         ],
-//     });
-// };
 
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
@@ -364,7 +350,7 @@ onUnmounted(() => {
                            :data-tables="dataTableList"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
-                           :dashboard-id="dashboardDetailState.dashboardId"
+                           :dashboard-id="dashboardId"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"
