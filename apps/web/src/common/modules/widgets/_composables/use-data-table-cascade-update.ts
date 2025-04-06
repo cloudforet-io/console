@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
@@ -39,12 +40,14 @@ export const useDataTableCascadeUpdate = ({ widgetId }: UseDataTableCascadeUpdat
         dataTableReferenceMap: computed<Record<string, DataTableReference>>(() => createDataTableReferenceMap(dataTableList.value)),
     });
 
+    const { withSuffix: privateDataTableLoadWithSuffix } = useServiceQueryKey('dashboard', 'private-data-table', 'load');
+    const { withSuffix: publicDataTableLoadWithSuffix } = useServiceQueryKey('dashboard', 'public-data-table', 'load');
+    const { withSuffix: privateDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'get');
+    const { withSuffix: publicDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'get');
+
     const _invalidateLoadQueries = async (data: DataTableModel) => {
         await queryClient.invalidateQueries({
-            queryKey: [
-                ...(_state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
-                data.data_table_id,
-            ],
+            queryKey: _state.isPrivate ? privateDataTableLoadWithSuffix(data.data_table_id) : publicDataTableLoadWithSuffix(data.data_table_id),
         });
     };
 
@@ -82,6 +85,7 @@ export const useDataTableCascadeUpdate = ({ widgetId }: UseDataTableCascadeUpdat
                     }
                     return oldData;
                 });
+                await queryClient.invalidateQueries({ queryKey: _state.isPrivate ? privateDataTableGetQueryKey(result.data_table_id) : publicDataTableGetQueryKey(result.data_table_id) });
 
                 await _invalidateLoadQueries(result);
                 await cascadeUpdateDataTable(childId);
