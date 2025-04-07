@@ -30,4 +30,5 @@ export interface ButtonProps {
     block?: boolean;
     iconLeft?: string;
     iconRight?: string;
+    active?: boolean;
 }
