@@ -1,9 +1,9 @@
-import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import { useElementSize } from '@vueuse/core';
 
-import type { UseTextEllipsisOptions, UseTextEllipsisReturn } from './type';
+import type { UseTextEllipsisOptions } from './type';
+
 export const useTextEllipsis = ({ textEl }: UseTextEllipsisOptions) => {
     const textElSize = useElementSize(textEl);
     const isEllipsis = computed(() => {
