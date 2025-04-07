@@ -12,7 +12,7 @@ export const useProjectGroupQuery = ({
   projectGroupId: Ref<string|undefined>;
   enabled?: Ref<boolean>;
 }) => {
-    const { projectGroupAPI, projectGroupQueryKey } = useProjectGroupApi();
+    const { projectGroupAPI, projectGroupListQueryKey, projectGroupQueryKey } = useProjectGroupApi();
     const queryKey = computed(() => [...projectGroupQueryKey.value, projectGroupId.value]);
     const projectGroupQuery = useQuery({
         queryKey,
@@ -32,10 +32,14 @@ export const useProjectGroupQuery = ({
     const invalidateQuery = () => {
         queryClient.invalidateQueries({ queryKey: queryKey.value });
     };
+    const invalidateAllQueries = () => {
+        queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+    };
 
     return {
         ...projectGroupQuery,
         setQueryData,
         invalidateQuery,
+        invalidateAllQueries,
     };
 };

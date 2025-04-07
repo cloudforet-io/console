@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, ref,
+    computed, ref, watch,
 } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
+import { cloneDeep } from 'lodash';
 
 import {
     PButtonModal,
@@ -11,7 +12,10 @@ import {
 
 
 import type { Tags } from '@/api-clients/_common/schema/model';
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -20,41 +24,70 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { Tag } from '@/common/modules/tags/type';
 
 import ProjectTagsInputGroup from '@/services/project/v-shared/components/ProjectTagsInputGroup.vue';
+import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 
 const projectPageModalStore = useProjectPageModalStore();
+const visible = computed(() => projectPageModalStore.state.manageTagsModalVisible && !!projectPageModalStore.state.targetId);
+const isProject = computed(() => projectPageModalStore.state.targetType === 'project');
+const targetId = computed(() => projectPageModalStore.state.targetId);
 
 /* project */
-const { data: project, isLoading, setQueryData: setProjectQueryData } = useProjectQuery({
-    projectId: computed(() => projectPageModalStore.state.targetId),
-    enabled: computed(() => projectPageModalStore.state.manageTagsModalVisible),
+const { data: project, isLoading: projectLoading, setQueryData: setProjectQueryData } = useProjectQuery({
+    projectId: targetId,
+    enabled: computed(() => visible.value && isProject.value),
 });
-const tags = computed(() => project.value?.tags || {});
+
+/* project group */
+const { data: projectGroup, isLoading: projectGroupLoading, setQueryData: setProjectGroupQueryData } = useProjectGroupQuery({
+    projectGroupId: targetId,
+    enabled: computed(() => visible.value && !isProject.value),
+});
+
+/* merged states */
+const isLoading = computed(() => {
+    if (isProject.value) return projectLoading.value;
+    return projectGroupLoading.value;
+});
+const tags = computed(() => {
+    if (isProject.value) {
+        return project.value?.tags ?? {};
+    }
+    return projectGroup.value?.tags ?? {};
+});
 
 
 /* Form */
 const newTags = ref<Tags>({});
 const isTagsValid = ref(false);
-onMounted(() => {
-    newTags.value = { ...tags.value };
+watch([visible, tags], ([v, t]) => {
+    if (!v) return;
+    newTags.value = cloneDeep(t);
 });
 
 /* Mutation */
 const { projectAPI } = useProjectApi();
+const { projectGroupAPI } = useProjectGroupApi();
 const { mutate: updateTags, isPending: isUpdating } = useMutation({
-    mutationFn: (_newTags: Tag) => {
+    mutationFn: (_newTags: Tag): Promise<ProjectGroupModel|ProjectModel> => {
         if (!projectPageModalStore.state.targetId) throw new Error('Project ID is not defined');
-        return projectAPI.update({
-            project_id: projectPageModalStore.state.targetId,
+        if (isProject.value) {
+            return projectAPI.update({
+                project_id: projectPageModalStore.state.targetId,
+                tags: _newTags,
+            });
+        }
+        return projectGroupAPI.update({
+            project_group_id: projectPageModalStore.state.targetId,
             tags: _newTags,
         });
     },
     onSuccess: (data) => {
-        setProjectQueryData(data);
+        if (isProject.value) setProjectQueryData(data);
+        else setProjectGroupQueryData(data as ProjectGroupModel);
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
-        projectPageModalStore.closeManageTagsModal();
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
@@ -65,9 +98,10 @@ const { mutate: updateTags, isPending: isUpdating } = useMutation({
 const handleUpdateTags = (_tags: Tags) => {
     newTags.value = _tags;
 };
-const handleSaveTags = () => {
+const handleSaveTags = async () => {
     if (!isTagsValid.value) return;
-    updateTags(newTags.value);
+    await updateTags(newTags.value);
+    projectPageModalStore.closeManageTagsModal();
 };
 </script>
 
@@ -79,11 +113,12 @@ const handleSaveTags = () => {
         :fade="true"
         :backdrop="true"
         size="sm"
-        :visible="projectPageModalStore.state.manageTagsModalVisible"
+        :visible="visible"
         :disabled="!isTagsValid"
         :loading="isUpdating"
         @close="projectPageModalStore.closeManageTagsModal()"
         @cancel="projectPageModalStore.closeManageTagsModal()"
+        @closed="projectPageModalStore.resetTarget()"
         @confirm="handleSaveTags"
     >
         <template #body>
