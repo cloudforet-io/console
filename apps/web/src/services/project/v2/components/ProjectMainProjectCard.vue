@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router/composables';
 import {
     PI, PTextHighlighting, PSelectDropdown,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -19,7 +18,6 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { peacock } from '@/styles/colors';
 
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
@@ -35,7 +33,6 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-const projectPageStore = useProjectPageStore();
 
 
 const router = useRouter();
@@ -88,17 +85,17 @@ const handleSelectProject = () => {
     }).catch(() => {});
 };
 
-const handleSelectItem = (selected: MenuItem) => {
-    projectPageStore.setCurrentSelectedProjectId(props.item.id);
-    if (selected.name === 'update') {
-        projectPageStore.setProjectFormModalVisible(true);
-    }
-    if (selected.name === 'move') {
-        projectPageStore.setProjectGroupMoveModalVisible(true);
-    }
-    if (selected.name === 'delete') {
-        projectPageStore.setProjectDeleteModalVisible(true);
-    }
+const handleSelectItem = () => {
+    // projectPageStore.setCurrentSelectedProjectId(props.item.id);
+    // if (selected.name === 'update') {
+    //     projectPageStore.setProjectFormModalVisible(true);
+    // }
+    // if (selected.name === 'move') {
+    //     projectPageStore.setProjectGroupMoveModalVisible(true);
+    // }
+    // if (selected.name === 'delete') {
+    //     projectPageStore.setProjectDeleteModalVisible(true);
+    // }
 };
 
 </script>

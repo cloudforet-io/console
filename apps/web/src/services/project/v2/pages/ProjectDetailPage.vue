@@ -4,24 +4,15 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
-
 import {
     PDataLoader,
 } from '@cloudforet/mirinae';
-import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import { useUserStore } from '@/store/user/user-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -36,16 +27,17 @@ import ProjectTabs from '@/services/project/v2/components/ProjectTabs.vue';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface Props {
-    id?: string;
+    projectGroupId?: string;
+    projectId?: string;
 }
 const props = defineProps<Props>();
+
+
+
 const route = useRoute();
 
 const gnbStore = useGnbStore();
-const allReferenceStore = useAllReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
-const userStore = useUserStore();
 
 /* Query */
 const {
@@ -55,34 +47,14 @@ const {
     publicFolderList,
 } = useDashboardFolderQuery();
 
-const storeState = reactive({
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    language: computed<string|undefined>(() => userStore.state.language),
-});
 const state = reactive({
     // TODO: need to be updated by real data
     item: computed<ProjectModel|undefined>(() => undefined),
-    projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
-    projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
-    pageNavigation: computed<Route[]>(() => {
-        const results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE_V2._NAME } },
-        ];
-        if (!isEmpty(state.projectGroupInfo)) {
-            results.push({
-                name: state.projectGroupInfo.name,
-                to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
-            });
-        }
-        results.push({ name: state.item?.name });
-        return results;
-    }),
     projectGroupMoveModalVisible: false,
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.PROJECT,
         // TODO: need to be updated by real data
-        id: '',
+        projectId: '',
     })),
 });
 const singleItemTabState = reactive({
@@ -165,9 +137,6 @@ watch(() => route.name, (routeName) => {
 // ], ([id, globalGrantLoading]) => {
 //     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 // }, { immediate: true });
-watch([() => singleItemTabState.activeTab, () => state.item], () => {
-    gnbStore.setBreadcrumbs(state.pageNavigation);
-});
 // TODO: check if it is needed
 // watch(() => projectDetailPageState.projectId, (projectId) => {
 //     gnbStore.setId(projectId);
