@@ -2,8 +2,9 @@
 import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEqual } from 'lodash';
 
 import {
@@ -22,8 +23,9 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import { useWidgetOptionsComplexValidation } from '@/common/modules/widgets/_composables/use-widget-options-complex-validation';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/widget-display-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -35,7 +37,8 @@ import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -54,6 +57,8 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -62,20 +67,29 @@ const storeState = reactive({
 /* Query */
 const {
     dashboard,
+    keys: dashboardKeys,
+    fetcher: dashboardFetcher,
+} = useDashboardGetQuery({
+    dashboardId,
+});
+const {
     widgetList,
-    keys,
-    fetcher,
-    queryClient,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+} = useDashboardWidgetListQuery({
+    dashboardId,
 });
 const {
     widget,
-    dataTableList,
     keys: widgetKeys,
     fetcher: wigetFetcher,
     widgetLoading,
-} = useWidgetFormQuery({
+} = useWidgetQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const queryClient = useQueryClient();
+
+const {
+    dataTableList,
+} = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
@@ -192,7 +206,7 @@ const updateWidget = async () => {
             });
         }
         updateDashboard({
-            dashboard_id: dashboardDetailState.dashboardId,
+            dashboard_id: dashboardId.value,
             layouts: _layouts,
         });
     }
@@ -200,10 +214,9 @@ const updateWidget = async () => {
 
 const { mutate: updateDashboard } = useMutation(
     {
-        mutationFn: fetcher.updateDashboardFn,
+        mutationFn: dashboardFetcher.updateDashboardFn,
         onSuccess: (data) => {
-            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
-            // queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
+            const dashboardQueryKey = state.isPrivate ? dashboardKeys.privateDashboardGetQueryKey : dashboardKeys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, () => data);
         },
     },
@@ -240,22 +253,6 @@ const reset = () => {
     dashboardDetailStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
-// const loadOverlayWidget = async () => {
-//     await queryClient.invalidateQueries({
-//         queryKey: [
-//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadQueryKey.value : widgetKeys.publicWidgetLoadQueryKey.value),
-//             dashboardDetailState.dashboardId,
-//             widgetGenerateState.widgetId,
-//         ],
-//     });
-//     await queryClient.invalidateQueries({
-//         queryKey: [
-//             ...(state.isPrivate ? widgetKeys.privateWidgetLoadSumQueryKey.value : widgetKeys.publicWidgetLoadSumQueryKey.value),
-//             dashboardDetailState.dashboardId,
-//             widgetGenerateState.widgetId,
-//         ],
-//     });
-// };
 
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
@@ -364,7 +361,7 @@ onUnmounted(() => {
                            :data-tables="dataTableList"
                            :dashboard-options="dashboardDetailState.options"
                            :dashboard-vars="dashboardDetailGetters.refinedVars"
-                           :dashboard-id="dashboardDetailState.dashboardId"
+                           :dashboard-id="dashboardId"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading
                            mode="overlay"

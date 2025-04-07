@@ -2,8 +2,9 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
 
@@ -18,7 +19,7 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateCustomModal.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -33,18 +34,20 @@ const props = withDefaults(defineProps<Props>(), {
 const { i18nDayjs } = useI18nDayjs();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+} = useDashboardGetQuery({
+    dashboardId,
 });
+const queryClient = useQueryClient();
 const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+    dashboardId,
 });
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
@@ -114,7 +117,7 @@ const handleSelectMonthMenuItem = (selected: string) => {
 
     if (isManageable.value && !props.widgetMode) {
         mutate({
-            dashboard_id: dashboardDetailState.dashboardId,
+            dashboard_id: dashboardId.value,
             options: {
                 ...(dashboard.value?.options || {}),
                 date_range: state.selectedDateRange,

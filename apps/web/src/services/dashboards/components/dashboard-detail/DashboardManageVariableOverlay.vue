@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -31,14 +31,13 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 
@@ -55,22 +54,22 @@ interface Props {
     visible: boolean;
 }
 const props = defineProps<Props>();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 const appContextStore = useAppContextStore();
 const router = useRouter();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
     dashboard,
     keys,
     fetcher,
-    queryClient,
     isLoading,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+} = useDashboardGetQuery({
+    dashboardId,
 });
+const queryClient = useQueryClient();
 
 
 const state = reactive({
@@ -136,27 +135,27 @@ const isPresetVarsSchemaProperty = (key: string): boolean => {
 };
 
 /* Api */
-const deleteDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
+const deleteDashboardVarsSchema = async (_dashboardId: string, variableKey: string) => {
     const _varsSchemaProperties = cloneDeep(state.dashboardVarsSchemaProperties);
     delete _varsSchemaProperties[variableKey];
     const _vars = cloneDeep(dashboard.value?.vars || {});
     delete _vars[variableKey];
     mutate({
-        dashboard_id: dashboardId,
+        dashboard_id: _dashboardId,
         vars_schema: {
             properties: _varsSchemaProperties,
         },
         vars: _vars,
     });
 };
-const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string) => {
+const cloneDashboardVarsSchema = async (_dashboardId: string, variableKey: string) => {
     const _clonedProperty = cloneDeep(state.dashboardVarsSchemaProperties[variableKey]);
     const _varsNameList: string[] = Object.values(state.dashboardVarsSchemaProperties).map((d) => d.name);
     const _varsKeyList: string[] = Object.values(state.dashboardVarsSchemaProperties).map((d) => d.key);
     _clonedProperty.key = getClonedName(_varsKeyList, _clonedProperty.key, 'clone_');
     _clonedProperty.name = getClonedName(_varsNameList, _clonedProperty.name);
     mutate({
-        dashboard_id: dashboardId,
+        dashboard_id: _dashboardId,
         vars_schema: {
             properties: {
                 ...state.dashboardVarsSchemaProperties,
@@ -169,11 +168,11 @@ const cloneDashboardVarsSchema = async (dashboardId: string, variableKey: string
         },
     });
 };
-const updateUseDashboardVarsSchema = (dashboardId: string, variableKey: string, use: boolean) => {
+const updateUseDashboardVarsSchema = (_dashboardId: string, variableKey: string, use: boolean) => {
     const _vars = cloneDeep(dashboard.value?.vars || {});
     delete _vars[variableKey];
     mutate({
-        dashboard_id: dashboardId,
+        dashboard_id: _dashboardId,
         vars_schema: {
             properties: {
                 ...state.dashboardVarsSchemaProperties,
@@ -230,14 +229,14 @@ const handleClickEditButton = (variableKey: string) => {
     state.formModalVisible = true;
 };
 const handleClickCloneButton = (variableKey: string) => {
-    if (!dashboardDetailState.dashboardId) return;
+    if (!dashboardId.value) return;
     state.actionType = 'CLONE';
-    cloneDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey);
+    cloneDashboardVarsSchema(dashboardId.value, variableKey);
 };
 const handleToggleUse = (variableKey: string, val: boolean) => {
-    if (!dashboardDetailState.dashboardId) return;
+    if (!dashboardId.value) return;
     state.actionType = 'UPDATE';
-    updateUseDashboardVarsSchema(dashboardDetailState.dashboardId, variableKey, val);
+    updateUseDashboardVarsSchema(dashboardId.value, variableKey, val);
 };
 const handleCloseOverlay = () => {
     const dashboardDetailRouteName = state.isAdminMode
@@ -245,13 +244,13 @@ const handleCloseOverlay = () => {
         : DASHBOARDS_ROUTE.DETAIL._NAME;
     router.replace({
         name: dashboardDetailRouteName,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+        params: { dashboardId: dashboardId.value ?? '' },
     }).catch(() => {});
 };
 const handleConfirmDelete = () => {
-    if (!dashboardDetailState.dashboardId || !state.selectedVariableKey) return;
+    if (!dashboardId.value || !state.selectedVariableKey) return;
     state.actionType = 'DELETE';
-    deleteDashboardVarsSchema(dashboardDetailState.dashboardId, state.selectedVariableKey);
+    deleteDashboardVarsSchema(dashboardId.value, state.selectedVariableKey);
 };
 </script>
 

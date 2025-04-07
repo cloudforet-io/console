@@ -7,7 +7,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 interface UseDashboardManageableOptions {
     dashboardId: ComputedRef<string|undefined>;
@@ -26,7 +26,9 @@ export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOp
         isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
 
-    const { dashboard } = useDashboardDetailQuery({ dashboardId });
+    const { dashboard } = useDashboardGetQuery({
+        dashboardId: computed(() => dashboardId.value),
+    });
 
     const isManageable = computed(() => {
         if (storeState.isAdminMode) return true;

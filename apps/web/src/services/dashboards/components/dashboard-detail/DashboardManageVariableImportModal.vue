@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -24,37 +25,41 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
 
 
 interface Props {
     visible: boolean;
 }
 const appContextStore = useAppContextStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+
+
 /* Query */
 const {
     publicDashboardList,
     privateDashboardList,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
+
 const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+} = useDashboardGetQuery({
+    dashboardId,
 });
+const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -62,7 +67,7 @@ const storeState = reactive({
 
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
-    currentDashboardId: computed<string>(() => dashboardDetailState.dashboardId || ''),
+    currentDashboardId: computed<string>(() => dashboardId.value || ''),
     currentDashboardVariables: computed<DashboardGlobalVariable[]>(() => Object.values(dashboard.value?.vars_schema?.properties ?? {})),
     keyword: '',
     selectedDashboardId: '' as string|undefined,
@@ -168,7 +173,7 @@ watch(() => state.selectedDashboardId, () => {
         <template #body>
             <div class="import-contents">
                 <div class="left-dashboard-variable-tree-contents">
-                    <l-s-b-collapsible-menu-item v-if="state.publicDashboardItems.length || publicFolderItems.length"
+                    <l-s-b-collapsible-menu-item v-if="state.publicDashboardItems.length || state.publicFolderItems.length"
                                                  class="category-menu-item mt-1"
                                                  :item="{
                                                      type: 'collapsible',
@@ -186,7 +191,7 @@ watch(() => state.selectedDashboardId, () => {
                             />
                         </template>
                     </l-s-b-collapsible-menu-item>
-                    <l-s-b-collapsible-menu-item v-if="state.privateDashboardItems.length || privateFolderItems.length"
+                    <l-s-b-collapsible-menu-item v-if="state.privateDashboardItems.length || state.privateFolderItems.length"
                                                  class="category-menu-item mt-1"
                                                  :item="{
                                                      type: 'collapsible',

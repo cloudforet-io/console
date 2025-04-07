@@ -10,7 +10,7 @@ export type DataTableState = 'AVAILABLE' | 'UNAVAILABLE';
 
 export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 export type DataTableOperator = typeof DATA_TABLE_OPERATOR[keyof typeof DATA_TABLE_OPERATOR];
-export type DataTableDataType = keyof typeof DATA_TABLE_TYPE;
+export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
 export type AdditionalLabels = Record<string, string>;
 export interface DataTableGroupByInfo {
     key:string;

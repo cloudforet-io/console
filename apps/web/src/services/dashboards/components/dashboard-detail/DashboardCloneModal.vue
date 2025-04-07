@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
@@ -56,8 +56,8 @@ const {
     privateDashboardList,
     keys,
     api,
-    queryClient,
 } = useDashboardQuery();
+const queryClient = useQueryClient();
 
 const router = useRouter();
 const appContextStore = useAppContextStore();

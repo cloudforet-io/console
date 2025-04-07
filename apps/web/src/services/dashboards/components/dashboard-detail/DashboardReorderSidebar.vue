@@ -3,9 +3,10 @@ import {
     computed,
     onUnmounted, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 import draggable from 'vuedraggable';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PI, PButton,
@@ -21,25 +22,28 @@ import { useDisplayStore } from '@/store/display/display-store';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 const displayStore = useDisplayStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
     dashboard,
-    widgetList,
     keys,
     fetcher,
-    queryClient,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+} = useDashboardGetQuery({
+    dashboardId,
 });
+const {
+    widgetList,
+} = useDashboardWidgetListQuery({
+    dashboardId,
+});
+const queryClient = useQueryClient();
 const state = reactive({
     widgetList: computed<WidgetModel[]>(() => {
         const results: WidgetModel[] = [];
@@ -61,7 +65,7 @@ const handleChangeWidgetOrder = () => {
     const _widgetIdList = state.widgetList.map((w) => w.widget_id);
     const _updatedLayouts = [{ widgets: _widgetIdList }];
     updateDashboard({
-        dashboard_id: dashboardDetailState.dashboardId || '',
+        dashboard_id: dashboardId.value || '',
         layouts: _updatedLayouts,
     });
 };
@@ -84,7 +88,7 @@ const { mutate: updateDashboard } = useMutation(
     },
 );
 
-watch(() => dashboardDetailState.dashboardId, (after, before) => {
+watch(() => dashboardId.value, (after, before) => {
     if (after !== before) {
         displayStore.setVisibleSidebar(false);
     }

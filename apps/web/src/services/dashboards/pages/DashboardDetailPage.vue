@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PDivider, PI,
@@ -33,8 +33,9 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2 from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -57,15 +58,23 @@ const router = useRouter();
 /* Query */
 const {
     dashboard,
-    widgetList,
-    isError,
-    isLoading,
-    keys,
-    fetcher,
-    queryClient,
-} = useDashboardDetailQuery({
+    isError: dashboardError,
+    isLoading: dashboardLoading,
+    keys: dashboardKeys,
+    fetcher: dashboardFetcher,
+} = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
+const {
+    widgetList,
+    isLoading: widgetLoading,
+    isError: widgetError,
+    keys: widgetListKeys,
+} = useDashboardWidgetListQuery({
+    dashboardId: computed(() => props.dashboardId),
+});
+
+const queryClient = useQueryClient();
 const { isManageable } = useDashboardManageable({
     dashboardId: computed(() => props.dashboardId),
 });
@@ -83,7 +92,7 @@ const state = reactive({
 const handleRefresh = async () => {
     if (dashboard.value?.version !== '1.0') {
         const isPrivate = props.dashboardId.startsWith('private');
-        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        const widgetListQueryKey = isPrivate ? widgetListKeys.privateWidgetListQueryKey : widgetListKeys.publicWidgetListQueryKey;
         await queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -100,10 +109,10 @@ const handleUpdateDashboardVariables = (params) => {
 
 const { mutate: updateDashboard, isPending: dashboardUpdateLoading } = useMutation(
     {
-        mutationFn: fetcher.updateDashboardFn,
+        mutationFn: dashboardFetcher.updateDashboardFn,
         onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
+            const dashboardQueryKey = isPrivate ? dashboardKeys.privateDashboardGetQueryKey : dashboardKeys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, (oldDashboard) => {
                 if (!oldDashboard) return _dashboard;
                 return {
@@ -142,9 +151,9 @@ watch(widgetList, (_widgetList) => {
         dashboardDetailStore.setDashboardWidgets(_widgetList);
     }
 });
-watch(isError, (error) => {
-    if (error) {
-        ErrorHandler.handleError(error);
+watch([dashboardError, widgetError], ([_dashboardError, _widgetError]) => {
+    if (_dashboardError || _widgetError) {
+        ErrorHandler.handleError(_dashboardError || _widgetError);
         const dashboardRouteName = state.isAdminMode ? ADMIN_DASHBOARDS_ROUTE._NAME : DASHBOARDS_ROUTE._NAME;
         router.push({ name: dashboardRouteName });
     }
@@ -192,7 +201,7 @@ onUnmounted(() => {
                 </div>
                 <div class="right-part">
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="isLoading || dashboardUpdateLoading"
+                                                :loading="dashboardLoading || widgetLoading || dashboardUpdateLoading"
                                                 @refresh="handleRefresh"
                     />
                 </div>

@@ -8,9 +8,6 @@ import { cloneDeep } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
@@ -21,8 +18,6 @@ import type {
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { DashboardListParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { SpaceRouter } from '@/router';
 
@@ -32,14 +27,15 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardSearchQuery } from '@/services/dashboards/composables/use-dashboard-search-query';
 import {
     getDashboardTreeData,
     isPublicControlButtonDisabled,
@@ -70,10 +66,13 @@ const queryTagsHelper = useQueryTags({
 const {
     publicDashboardList,
     privateDashboardList,
+    isLoading: isDashboardLoading,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-    isLoading,
-} = useDashboardQuery();
+    isLoading: isFolderLoading,
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
@@ -128,14 +127,14 @@ const state = reactive({
     }),
 
     refinedPublicTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (state.isSearching.PUBLIC) return [];
+        if (publicDashboardSearching.value) return [];
         if (!state.searchFilters.length) return state.publicDashboardTreeData;
-        return getSearchedTreeData(state.publicDashboardTreeData, state.searchedDashboardIdList);
+        return getSearchedTreeData(state.publicDashboardTreeData, dashboardIdList.value);
     }),
     refinedPrivateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (state.isSearching.PRIVATE) return [];
+        if (privateDashboardSearching.value) return [];
         if (!state.searchFilters.length) return state.privateDashboardTreeData;
-        return getSearchedTreeData(state.privateDashboardTreeData, state.searchedDashboardIdList);
+        return getSearchedTreeData(state.privateDashboardTreeData, dashboardIdList.value);
     }),
     isDashboardExist: computed<boolean>(() => {
         if (state.isAdminMode) {
@@ -153,14 +152,7 @@ const state = reactive({
         public: false,
         private: false,
     } as Record<string, boolean>,
-
-    // search
-    isSearching: {
-        PUBLIC: false,
-        PRIVATE: false,
-    },
     searchFilters: [] as ConsoleFilter[],
-    searchedDashboardIdList: new Set<string>(),
 });
 
 const queryState = reactive({
@@ -197,42 +189,6 @@ const getSearchedTreeData = (treeData: TreeNode<DashboardTreeDataType>[], search
         }
     });
     return _results;
-};
-const searchedDashboards = async () => {
-    if (storeState.isAdminMode) {
-        await fetchSearchedDashboard('PUBLIC');
-    } else if (storeState.isWorkspaceOwner) {
-        await fetchSearchedDashboard('PRIVATE');
-        await fetchSearchedDashboard('PUBLIC');
-    } else {
-        await fetchSearchedDashboard('PRIVATE');
-    }
-};
-
-/* Api */
-const searchApiQueryHelper = new ApiQueryHelper();
-const privateDashboardFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.privateDashboard.list);
-const publicDashboardFetcher = getCancellableFetcher(SpaceConnector.clientV2.dashboard.publicDashboard.list);
-const fetchSearchedDashboard = async (dashboardType: 'PUBLIC' | 'PRIVATE'): Promise<void> => {
-    try {
-        state.isSearching[dashboardType] = true;
-        state.searchedDashboardIdList.clear();
-        searchApiQueryHelper.setFilters(state.searchFilters);
-        const fetcher = dashboardType === 'PRIVATE' ? privateDashboardFetcher : publicDashboardFetcher;
-        const { status, response } = await fetcher<DashboardListParams, ListResponse<DashboardModel>>({
-            query: {
-                only: ['dashboard_id'],
-                ...searchApiQueryHelper.data,
-            },
-        });
-        if (status === 'succeed') {
-            response.results?.map((d) => d.dashboard_id).forEach((id) => state.searchedDashboardIdList.add(id));
-            state.isSearching[dashboardType] = false;
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.isSearching[dashboardType] = false;
-    }
 };
 
 /* Event */
@@ -304,22 +260,23 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
     await init();
 })();
 
+const {
+    dashboardIdList,
+    publicDashboardSearching,
+    privateDashboardSearching,
+} = useDashboardSearchQuery({
+    searchFilters: computed(() => state.searchFilters),
+});
+
 watch(() => dashboardPageControlState.searchQueryTags, async (queryTags: QueryTag[]) => {
     queryTagsHelper.setQueryTags(queryTags || []);
     dashboardPageControlStore.resetSelectedIdMap();
     state.searchFilters = queryTagsHelper.filters.value;
-    if (!state.searchFilters.length) {
-        state.searchedDashboardIdList.clear();
-        state.isSearching = false;
-        return;
-    }
-    await searchedDashboards();
 }, { immediate: true });
 
 onUnmounted(() => {
     if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
     state.searchFilters = [];
-    state.searchedDashboardIdList.clear();
 });
 </script>
 
@@ -357,7 +314,7 @@ onUnmounted(() => {
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="isLoading"
+        <p-data-loader :loading="isDashboardLoading || isFolderLoading"
                        :data="state.isDashboardExist"
                        class="dashboard-list-wrapper"
         >

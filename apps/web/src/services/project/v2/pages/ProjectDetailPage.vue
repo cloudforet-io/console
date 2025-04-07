@@ -29,6 +29,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
 import ProjectTabs from '@/services/project/v2/components/ProjectTabs.vue';
@@ -49,9 +50,10 @@ const userStore = useUserStore();
 /* Query */
 const {
     publicDashboardList,
-    publicFolderList,
 } = useDashboardQuery();
-
+const {
+    publicFolderList,
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
