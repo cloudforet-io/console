@@ -13,6 +13,9 @@ const props = defineProps<{
     projectGroupId?: string;
 }>();
 
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
+}>();
+
 const actionItems = computed<SelectDropdownMenuItem[]>(() => [
     {
         name: 'rename',
@@ -76,6 +79,7 @@ const handleSelectItem = (selectedItem: SelectDropdownMenuItem|string|number) =>
                        size="sm"
                        :menu="actionItems"
                        reset-selection-on-menu-close
+                       @update:visible-menu="emit('update:visible', $event)"
                        @select="handleSelectItem"
     />
 </template>
