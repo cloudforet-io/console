@@ -2,7 +2,6 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -21,21 +20,15 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 
-interface Props {
-    skipRedirect?: boolean;
-}
-
-const props = defineProps<Props>();
+const emit = defineEmits(['deleted']);
 
 const projectPageModalStore = useProjectPageModalStore();
 const visible = computed(() => projectPageModalStore.state.deleteModalVisible && !!projectPageModalStore.state.targetId);
 const isProject = computed(() => projectPageModalStore.state.targetType === 'project');
 
-const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -58,6 +51,7 @@ const handleConfirmDelete = async () => {
         } else {
             await deleteProjectGroup(projectPageModalStore.state.targetId);
         }
+        emit('deleted');
     } catch (e) {
         if (projectPageModalStore.state.targetType === 'projectGroup') {
             ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: _i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), true);
@@ -67,12 +61,6 @@ const handleConfirmDelete = async () => {
     } finally {
         state.loading = false;
         projectPageModalStore.closeDeleteModal();
-        console.debug('skipRedirect', props.skipRedirect);
-        if (!props.skipRedirect) {
-            await router.replace({
-                name: PROJECT_ROUTE_V2._NAME,
-            });
-        }
     }
 };
 

@@ -2,23 +2,33 @@
 import {
     computed,
     toRef,
+    onMounted,
+    ref,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import ProjectAndGroupListPanel from '@/services/project/v2/components/ProjectAndGroupListPanel.vue';
-import ProjectDeleteModal from '@/services/project/v2/components/ProjectDeleteModal.vue';
-import ProjectFormModal from '@/services/project/v2/components/ProjectFormModal.vue';
-import ProjectGroupFormModal from '@/services/project/v2/components/ProjectGroupFormModal.vue';
-import ProjectGroupMemberManagementModal from '@/services/project/v2/components/ProjectGroupMemberManagementModal.vue';
-import ProjectGroupRenameModal from '@/services/project/v2/components/ProjectGroupRenameModal.vue';
 import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
-import ProjectMemberInviteModal from '@/services/project/v2/components/ProjectMemberInviteModal.vue';
-import ProjectMemberManagementModal from '@/services/project/v2/components/ProjectMemberManagementModal.vue';
-import ProjectMoveModal from '@/services/project/v2/components/ProjectMoveModal.vue';
-import ProjectTagsModal from '@/services/project/v2/components/ProjectTagsModal.vue';
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+
+
+/* modals */
+const isModalLoadReady = ref(false);
+onMounted(() => {
+    isModalLoadReady.value = true;
+});
+const ProjectGroupMemberManagementModal = () => import('@/services/project/v2/components/ProjectGroupMemberManagementModal.vue');
+const ProjectMemberManagementModal = () => import('@/services/project/v2/components/ProjectMemberManagementModal.vue');
+const ProjectDeleteModal = () => import('@/services/project/v2/components/ProjectDeleteModal.vue');
+const ProjectMoveModal = () => import('@/services/project/v2/components/ProjectMoveModal.vue');
+const ProjectMemberInviteModal = () => import('@/services/project/v2/components/ProjectMemberInviteModal.vue');
+const ProjectTagsModal = () => import('@/services/project/v2/components/ProjectTagsModal.vue');
+const ProjectFormModal = () => import('@/services/project/v2/components/ProjectFormModal.vue');
+const ProjectGroupFormModal = () => import('@/services/project/v2/components/ProjectGroupFormModal.vue');
 
 const props = defineProps<{
     projectGroupOrProjectId?: string;
@@ -46,6 +56,27 @@ const targetParentGroupId = computed<string|undefined>(() => {
     return undefined;
 });
 
+/* after deleted */
+const router = useRouter();
+const handleDeleted = () => {
+    const id = projectPageModelStore.state.targetId;
+    if (id && (id === projectGroupId.value || id === projectId.value)) {
+        router.replace({
+            name: PROJECT_ROUTE_V2._NAME,
+        });
+    }
+};
+
+/* after created */
+const handleCreated = (id: string) => {
+    router.replace({
+        name: PROJECT_ROUTE_V2._NAME,
+        params: {
+            projectGroupOrProjectId: id,
+        },
+    });
+};
+
 </script>
 
 <template>
@@ -54,16 +85,26 @@ const targetParentGroupId = computed<string|undefined>(() => {
                         :project-group-id="projectGroupId"
         />
         <project-and-group-list-panel />
-        <project-group-member-management-modal />
-        <project-member-management-modal />
-        <project-delete-modal :skip-redirect="!!projectPageModelStore.state.targetId &&
-            (projectPageModelStore.state.targetId === projectGroupId || projectPageModelStore.state.targetId === projectId)"
-        />
-        <project-move-modal />
-        <project-member-invite-modal :project-id="projectId" />
-        <project-tags-modal />
-        <project-form-modal :target-parent-group-id="targetParentGroupId" />
-        <project-group-form-modal :target-parent-group-id="targetParentGroupId" />
-        <project-group-rename-modal />
+
+        <template v-if="isModalLoadReady">
+            <keep-alive>
+                <project-group-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'projectGroup'" />
+                <project-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'project'" />
+                <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
+                                      @deleted="handleDeleted"
+                />
+                <project-move-modal v-if="projectPageModelStore.state.moveModalVisible" />
+                <project-member-invite-modal v-if="projectPageModelStore.state.inviteMemberModalVisible" />
+                <project-tags-modal v-if="projectPageModelStore.state.manageTagsModalVisible" />
+                <project-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'project'"
+                                    :target-parent-group-id="targetParentGroupId"
+                                    @created="handleCreated"
+                />
+                <project-group-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'projectGroup'"
+                                          :target-parent-group-id="targetParentGroupId"
+                                          @created="handleCreated"
+                />
+            </keep-alive>
+        </template>
     </div>
 </template>

@@ -1,20 +1,30 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, onUnmounted, reactive, ref, toRef, watch,
+    onMounted, onUnmounted, reactive, ref, toRef, watch, computed,
 } from 'vue';
+
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useProjectGroupMutations } from '@/services/project/v-shared/composables/mutations/use-project-group-mutations';
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import { useProjectGroupNames } from '@/services/project/v-shared/composables/use-project-group-names';
+
+
+/* mutations */
+
+
+
 
 interface Props {
     visible: boolean;
@@ -76,8 +86,33 @@ watch(() => props.projectGroupId, async (after) => {
 }, { immediate: true });
 
 
-/* mutations */
-const { createProjectGroup, updateProjectGroup, isProcessing } = useProjectGroupMutations();
+const { projectGroupAPI, projectGroupQueryKey, projectGroupListQueryKey } = useProjectGroupApi();
+const queryClient = useQueryClient();
+const { mutateAsync: createProjectGroup, isPending: isCreating } = useMutation({
+    mutationFn: projectGroupAPI.create,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
+        queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
+    },
+});
+
+const { mutateAsync: updateProjectGroup, isPending: isUpdating } = useMutation({
+    mutationFn: projectGroupAPI.update,
+    onSuccess: (data) => {
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
+        queryClient.invalidateQueries({ queryKey: [...projectGroupQueryKey.value, data.project_group_id] });
+        queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+    },
+});
+const isProcessing = computed(() => isCreating.value || isUpdating.value);
+
+
 
 /* Event */
 const confirm = async () => {
