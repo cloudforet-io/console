@@ -65,10 +65,7 @@ export const useDashboardSearchQuery = ({ searchFilters }: UseDashboardSearchQue
     /* Querys */
     const publicDashboardIdListQuery = useScopedQuery<ListResponse<PublicDashboardModel>, unknown, string[]>({
         queryKey: publicDashboardListQueryKey,
-        queryFn: () => {
-            console.debug('searchQuery', searchQuery.value, publicDashboardListParams.value);
-            return publicDashboardAPI.list(publicDashboardListParams.value);
-        },
+        queryFn: () => publicDashboardAPI.list(publicDashboardListParams.value),
         select: (data) => data?.results?.map((item) => item.dashboard_id) ?? [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
