@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import {
-    computed, toRef, watch,
+    computed, ref, toRef, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { PI, PSkeleton } from '@cloudforet/mirinae';
+import {
+    PI, PSkeleton, PHeading, PHeadingLayout, PButton,
+} from '@cloudforet/mirinae';
 
-import type { ProjectType } from '@/api-clients/identity/project/schema/type';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray, peacock } from '@/styles/colors';
-
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import ProjectActionDropdownButton from '@/services/project/v2/components/ProjectActionDropdownButton.vue';
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
-import { useWorkspaceUsersQuery } from '@/services/project/v2/composables/queries/use-workspace-users-query';
+import { useProjectIcons } from '@/services/project/v2/composables/use-project-icons';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
@@ -27,249 +28,115 @@ const props = defineProps<{
     projectGroupId?: string;
 }>();
 
-const appContextStore = useAppContextStore();
+
 const projectPageModalStore = useProjectPageModalStore();
+
+/* project and project group query control */
+const appContextStore = useAppContextStore();
+const enabled = computed(() => !appContextStore.getters.globalGrantLoading);
 
 /* project */
 const { data: project, error: projectError, isLoading: loadingProject } = useProjectQuery({
     projectId: toRef(props, 'projectId'),
-    enabled: computed(() => !appContextStore.getters.globalGrantLoading),
+    enabled,
 });
-watch(projectError, () => {
-    ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE_V2._NAME }));
-});
-const projectType = computed<ProjectType|undefined>(() => project.value?.project_type);
 
 /* project group */
 const { data: projectGroup, error: projectGroupError, isLoading: loadingProjectGroup } = useProjectGroupQuery({
     projectGroupId: toRef(props, 'projectGroupId'),
-    enabled: computed(() => !appContextStore.getters.globalGrantLoading),
+    enabled,
 });
 
+/* errors */
+watch([projectError, projectGroupError], ([prjErr, pgErr]) => {
+    if (prjErr || pgErr) ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE_V2._NAME }));
+});
 
-/* members */
-const { data: workspaceUsers } = useWorkspaceUsersQuery();
-const memberCount = computed(() => {
-    if (project.value && projectType.value === 'PRIVATE') {
-        return project.value.users?.length ?? 0;
+/* title and members count */
+const hasProjectOrGroupId = computed(() => !!(props.projectId || props.projectGroupId));
+// Using ref instead of computed for title and membersCount to show the previously selected value in the UI while loading new data.
+// This prevents UI flickering during data loading.
+const title = ref<TranslateResult|undefined>(undefined);
+const membersCount = ref<number|undefined>(undefined);
+watch([project, projectGroup, hasProjectOrGroupId], ([prj, pg, exist]) => {
+    if (!exist) {
+        title.value = i18n.t('PROJECT.LANDING.ALL_PROJECTS');
+        membersCount.value = undefined;
+        return;
     }
-    // if(projectGroup.value) return projectGroup.value.users?.length ?? 0;
-    return workspaceUsers.value?.length ?? 0;
-});
-
-/* tags */
-const tagsCount = computed(() => {
-    if (project.value?.tags) return Object.keys(project.value.tags).length ?? 0;
-    if (projectGroup.value?.tags) return Object.keys(projectGroup.value.tags).length ?? 0;
-    return 0;
-});
-
-/* Event */
-// const handleConfirmInvite = () => {
-//     fetchUserList();
-// };
-
-// const handleConfirmProjectForm = (_, data: ProjectModel) => {
-//     setProjectQueryData(data);
-// };
-
-
-// const handleRefreshTree = () => {
-//     projectTreeStore.refreshProjectTree();
-// };
-
-
-/* Watchers */
-// watch(projectId, (pid) => {
-//     gnbStore.setId(pid);
-// }, { immediate: true });
+    if (prj && !pg) {
+        title.value = prj.name;
+        if (prj.project_type === 'PRIVATE') {
+            membersCount.value = prj.users?.length ?? 0;
+        } else {
+            membersCount.value = undefined;
+        }
+        return;
+    }
+    if (!prj && pg) {
+        title.value = pg.name;
+        membersCount.value = pg.users?.length ?? 0;
+    }
+}, { immediate: true });
 
 /* Event Handlers */
-const handleClickMember = () => {
-    if (!props.projectId) return;
-    projectPageModalStore.openProjectManageMemberModal(props.projectId);
+const handleClickMembers = () => {
+    if (props.projectId) projectPageModalStore.openProjectManageMemberModal(props.projectId);
+    else if (props.projectGroupId) projectPageModalStore.openProjectGroupManageMemberModal(props.projectGroupId);
 };
-const handleClickTags = () => {
-    if (!props.projectId) return;
-    projectPageModalStore.openProjectManageTagsModal(props.projectId);
-};
+
+/* icon */
+const { projectGroupIcon, projectIcon } = useProjectIcons();
+const showIcon = computed(() => loadingProject || loadingProjectGroup || projectError || projectGroupError || project || projectGroup);
+const iconName = computed(() => (project.value ? projectIcon : projectGroupIcon.iconName));
+const iconColor = computed(() => (project ? undefined : projectGroupIcon.iconColor));
 
 </script>
 
 <template>
-    <div class="project-header">
-        <div class="header-container">
-            <div class="header-icon-wrapper tablet">
-                <p-i name="ic_document-filled"
-                     width="1.5rem"
-                     height="1.5rem"
-                     :color="peacock[600]"
-                />
-            </div>
-            <div class="header-contents">
-                <div class="title-wrapper">
-                    <p-skeleton v-if="loadingProject || loadingProjectGroup"
-                                class="skeleton"
+    <p-heading-layout>
+        <template #heading>
+            <p-heading>
+                <template #title-left-extra>
+                    <div v-show="showIcon"
+                         class="inline-flex items-center justify-center border-2 border-white w-14 h-14 rounded-2xl bg-white/50 cursor-pointer"
+                    >
+                        <p-i :name="iconName"
+                             width="1.5rem"
+                             height="1.5rem"
+                             :color="iconColor"
+                        />
+                    </div>
+                </template>
+                <template #default>
+                    <template v-if="projectError || projectGroupError">
+                        No Project
+                    </template>
+                    <template v-else-if="title">
+                        {{ title }}
+                    </template>
+                    <p-skeleton v-else
                                 width="200px"
                                 height="24px"
                     />
-                    <span v-else-if="projectError || projectGroupError"
-                          class="error"
+                </template>
+                <template #title-right-extra>
+                    <div v-if="hasProjectOrGroupId"
+                         class="inline-flex flex-wrap gap-2"
                     >
-                        Failed to load project
-                    </span>
-                    <span v-else-if="project || projectGroup"
-                          class="title"
-                    >
-                        {{ project ? project.name : projectGroup?.name }}
-                    </span>
-                    <project-action-dropdown-button v-if="props.projectId || props.projectGroupId"
-                                                    :project-id="props.projectId"
-                                                    :project-group-id="props.projectGroupId"
-                    />
-                </div>
-                <div class="header-sub-contents">
-                    <div class="description">
-                        <template v-if="projectType === 'PRIVATE'">
-                            <div class="info-item invite-only">
-                                <p-i name="ic_lock-filled"
-                                     width="0.625rem"
-                                     height="0.625rem"
-                                     color="inherit"
-                                />
-                                <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
-                            </div>
-                            <p-i name="ic_dot"
-                                 width="0.125rem"
-                                 height="0.125rem"
-                                 :color="gray[400]"
-                            />
-                            <div class="info-item"
-                                 @click="handleClickMember"
-                            >
-                                <template v-if="projectType === 'PRIVATE' && memberCount === 0">
-                                    <p-i class="info-icon"
-                                         name="ic_plus"
-                                         width="0.75rem"
-                                         height="0.75rem"
-                                         color="inherit"
-                                    />
-                                    <span>{{ $t('PROJECT.DETAIL.ADD_MEMBERS') }}</span>
-                                </template>
-                                <template v-else>
-                                    <p-i class="info-icon"
-                                         name="ic_member"
-                                         width="0.75rem"
-                                         height="0.75rem"
-                                         color="inherit"
-                                    />
-                                    <span>{{ memberCount }}{{ $t('PROJECT.DETAIL.MEMBERS') }}</span>
-                                </template>
-                            </div>
-                            <p-i name="ic_dot"
-                                 width="0.125rem"
-                                 height="0.125rem"
-                                 :color="gray[400]"
-                            />
-                        </template>
-                        <p-i name="ic_dot"
-                             width="0.125rem"
-                             height="0.125rem"
-                             :color="gray[400]"
-                        />
-                        <div class="info-item"
-                             @click="handleClickTags"
+                        <p-button v-if="membersCount !== undefined"
+                                  style-type="tertiary"
+                                  size="sm"
+                                  @click="handleClickMembers"
                         >
-                            <p-i class="info-icon"
-                                 name="ic_label"
-                                 width="0.75rem"
-                                 height="0.75rem"
-                                 color="inherit"
-                            />
-                            <span>{{ tagsCount }}{{ $t('PROJECT.DETAIL.TAGS') }}</span>
-                        </div>
+                            {{ $t('PROJECT.DETAIL.MEMBERS') }} ({{ membersCount }})
+                        </p-button>
+                        <project-action-dropdown-button :project-id="props.projectId"
+                                                        :project-group-id="props.projectGroupId"
+                        />
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                </template>
+            </p-heading>
+        </template>
+    </p-heading-layout>
 </template>
-
-<style scoped lang="postcss">
-.project-header {
-
-    .header-container {
-        @apply flex gap-3;
-        .header-icon-wrapper {
-            @apply flex items-center justify-center border-2 border-white;
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 0.75rem;
-            background-color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            &.tablet {
-                display: flex;
-            }
-            &.mobile {
-                display: none;
-            }
-        }
-        .header-contents {
-            .title-wrapper {
-                @apply flex items-center gap-2;
-                padding-bottom: 0.375rem;
-                .title {
-                    @apply text-display-md font-bold text-gray-900;
-                }
-            }
-            .header-sub-contents {
-                .description {
-                    @apply flex items-center gap-2;
-                    .info-item {
-                        @apply flex items-center text-label-sm text-gray-700 cursor-pointer;
-                        gap: 0.15625rem;
-                        .info-icon {
-                            min-width: 0.75rem;
-                        }
-                        &.invite-only {
-                            @apply text-gray-900 cursor-auto;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    .quick-link-wrapper {
-        @apply flex items-center gap-4 bg-white border border-gray-200 rounded-lg;
-        width: 100%;
-        height: 2.75rem;
-        padding: 0.75rem 1rem;
-        margin-top: 1.5rem;
-
-        .field-title {
-            @apply text-label-md font-bold text-gray-600;
-        }
-    }
-}
-
-@screen mobile {
-    .project-header {
-        .header-container {
-            .header-icon-wrapper {
-                @apply bg-transparent;
-                align-items: flex-start;
-                cursor: default;
-                border: none;
-                padding-top: 0.25rem;
-                &.tablet {
-                    display: none;
-                }
-                &.mobile {
-                    display: flex;
-                }
-            }
-        }
-    }
-}
-</style>

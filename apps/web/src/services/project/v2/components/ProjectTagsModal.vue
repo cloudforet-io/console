@@ -28,7 +28,7 @@ const projectPageModalStore = useProjectPageModalStore();
 
 /* project */
 const { data: project, isLoading, setQueryData: setProjectQueryData } = useProjectQuery({
-    projectId: computed(() => projectPageModalStore.state.targetProjectId),
+    projectId: computed(() => projectPageModalStore.state.targetId),
     enabled: computed(() => projectPageModalStore.state.manageTagsModalVisible),
 });
 const tags = computed(() => project.value?.tags || {});
@@ -45,9 +45,9 @@ onMounted(() => {
 const { projectAPI } = useProjectApi();
 const { mutate: updateTags, isPending: isUpdating } = useMutation({
     mutationFn: (_newTags: Tag) => {
-        if (!projectPageModalStore.state.targetProjectId) throw new Error('Project ID is not defined');
+        if (!projectPageModalStore.state.targetId) throw new Error('Project ID is not defined');
         return projectAPI.update({
-            project_id: projectPageModalStore.state.targetProjectId,
+            project_id: projectPageModalStore.state.targetId,
             tags: _newTags,
         });
     },

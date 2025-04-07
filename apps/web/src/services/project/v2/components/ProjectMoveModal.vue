@@ -24,8 +24,8 @@ import { useProjectPageModalStore } from '@/services/project/v2/stores/project-p
 const emit = defineEmits(['moved']);
 
 const projectPageModalStore = useProjectPageModalStore();
-const isProject = computed(() => !!projectPageModalStore.state.targetProjectId);
-const targetId = computed(() => projectPageModalStore.state.targetProjectId || projectPageModalStore.state.targetProjectGroupId);
+const isProject = computed(() => !!projectPageModalStore.state.targetId);
+const targetId = computed(() => projectPageModalStore.state.targetId || projectPageModalStore.state.targetId);
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({

@@ -13,7 +13,7 @@ export const useProjectQuery = ({
 enabled?: Ref<boolean>|boolean;
 }) => {
     const { projectAPI, projectQueryKey } = useProjectApi();
-    const { data, isLoading, error } = useQuery({
+    const projectQuery = useQuery({
         queryKey: computed(() => [...projectQueryKey.value, projectId.value]),
         queryFn: () => projectAPI.get({ project_id: projectId.value as string }),
         enabled: computed(() => {
@@ -36,6 +36,6 @@ enabled?: Ref<boolean>|boolean;
     };
 
     return {
-        data, isLoading, error, invalidateQuery, setQueryData,
+        ...projectQuery, invalidateQuery, setQueryData,
     };
 };

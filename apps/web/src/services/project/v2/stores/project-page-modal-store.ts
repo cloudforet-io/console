@@ -10,19 +10,20 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         inviteMemberModalVisible: false,
         manageTagsModalVisible: false,
         projectFormModalVisible: false,
-        targetProjectId: '' as string|undefined,
-        targetProjectGroupId: '' as string|undefined,
+        targetId: '' as string|undefined,
         targetType: undefined as 'project'|'projectGroup'|undefined,
     });
 
     const actions = {
         // manage member
         openProjectGroupManageMemberModal(targetProjectGroupId: string) {
-            state.targetProjectGroupId = targetProjectGroupId;
+            state.targetId = targetProjectGroupId;
+            state.targetType = 'projectGroup';
             state.manageMemberModalVisible = true;
         },
         openProjectManageMemberModal(targetProjectId: string) {
-            state.targetProjectId = targetProjectId;
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
             state.manageMemberModalVisible = true;
         },
         closeManageMemberModal() {
@@ -30,11 +31,13 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         },
         // delete project
         openProjectGroupDeleteModal(targetProjectGroupId: string) {
-            state.targetProjectGroupId = targetProjectGroupId;
+            state.targetId = targetProjectGroupId;
+            state.targetType = 'projectGroup';
             state.deleteModalVisible = true;
         },
         openProjectDeleteModal(targetProjectId: string) {
-            state.targetProjectId = targetProjectId;
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
             state.deleteModalVisible = true;
         },
         closeDeleteModal() {
@@ -42,11 +45,13 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         },
         // move project
         openProjectGroupMoveModal(targetProjectGroupId: string) {
-            state.targetProjectGroupId = targetProjectGroupId;
+            state.targetId = targetProjectGroupId;
+            state.targetType = 'projectGroup';
             state.moveModalVisible = true;
         },
         openProjectMoveModal(targetProjectId: string) {
-            state.targetProjectId = targetProjectId;
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
             state.moveModalVisible = true;
         },
         closeMoveModal() {
@@ -54,11 +59,13 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         },
         // invite member
         openProjectGroupInviteMemberModal(targetProjectGroupId: string) {
-            state.targetProjectGroupId = targetProjectGroupId;
+            state.targetId = targetProjectGroupId;
+            state.targetType = 'projectGroup';
             state.inviteMemberModalVisible = true;
         },
         openProjectInviteMemberModal(targetProjectId: string) {
-            state.targetProjectId = targetProjectId;
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
             state.inviteMemberModalVisible = true;
         },
         closeInviteMemberModal() {
@@ -66,33 +73,46 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         },
         // manage tags
         openProjectGroupManageTagsModal(targetProjectGroupId: string) {
-            state.targetProjectGroupId = targetProjectGroupId;
+            state.targetId = targetProjectGroupId;
+            state.targetType = 'projectGroup';
             state.manageTagsModalVisible = true;
         },
         openProjectManageTagsModal(targetProjectId: string) {
-            state.targetProjectId = targetProjectId;
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
             state.manageTagsModalVisible = true;
         },
         closeManageTagsModal() {
             state.manageTagsModalVisible = false;
         },
         // form
-        openCreateProjectFormModal(targetType: 'project'|'projectGroup', targetProjectGroupId?: string) {
-            state.targetType = targetType;
-            state.targetProjectGroupId = targetProjectGroupId;
+        openCreateProjectGroupFormModal() {
+            state.targetId = undefined;
+            state.targetType = 'projectGroup';
+            state.projectFormModalVisible = true;
+        },
+        openCreateProjectFormModal() {
+            state.targetId = undefined;
+            state.targetType = 'project';
+            state.projectFormModalVisible = true;
+        },
+        openEditProjectGroupFormModal(targetProjectGroupId: string) {
+            state.targetId = targetProjectGroupId;
+            state.targetType = 'projectGroup';
             state.projectFormModalVisible = true;
         },
         openEditProjectFormModal(targetProjectId: string) {
-            state.targetProjectId = targetProjectId;
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
             state.projectFormModalVisible = true;
         },
-        closeProjectFormModal() {
+        closeFormModal() {
             state.projectFormModalVisible = false;
         },
         // overal
         resetTarget() {
-            state.targetProjectId = '';
-            state.targetProjectGroupId = '';
+            state.targetId = undefined;
+            state.targetType = undefined;
         },
     };
 

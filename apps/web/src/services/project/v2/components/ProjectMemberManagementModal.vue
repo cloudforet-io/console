@@ -19,11 +19,14 @@ import { useProjectPageModalStore } from '@/services/project/v2/stores/project-p
 
 
 const projectPageModalStore = useProjectPageModalStore();
+const visible = computed(() => !!projectPageModalStore.state.manageMemberModalVisible
+    && projectPageModalStore.state.targetType === 'project'
+    && !!projectPageModalStore.state.targetId);
 
 /* project */
 const { data: project, setQueryData } = useProjectQuery({
-    projectId: computed(() => projectPageModalStore.state.targetProjectId),
-    enabled: computed(() => !!projectPageModalStore.state.manageMemberModalVisible),
+    projectId: computed(() => projectPageModalStore.state.targetId),
+    enabled: visible,
 });
 const projectType = computed<ProjectType|undefined>(() => project.value?.project_type);
 
@@ -58,9 +61,9 @@ const { mutateAsync: removeProjectUsers } = useMutation({
 });
 const handleRemoveProjectUser = async (userId: string) => {
     try {
-        if (!projectPageModalStore.state.targetProjectId) throw new Error('Project ID is not defined');
+        if (!projectPageModalStore.state.targetId) throw new Error('Project ID is not defined');
         const updated = await removeProjectUsers({
-            project_id: projectPageModalStore.state.targetProjectId,
+            project_id: projectPageModalStore.state.targetId,
             users: [userId],
         });
         setQueryData(updated);
@@ -74,7 +77,7 @@ const handleCloseMemberModal = () => {
     projectPageModalStore.closeManageMemberModal();
 };
 const handleClickInvite = () => {
-    const projectId = projectPageModalStore.state.targetProjectId as string;
+    const projectId = projectPageModalStore.state.targetId as string;
     projectPageModalStore.closeManageMemberModal();
     projectPageModalStore.openProjectInviteMemberModal(projectId);
 };
@@ -82,11 +85,12 @@ const handleClickInvite = () => {
 
 <template>
     <p-button-modal :header-title="$t('PROJECT.DETAIL.MEMBER_TITLE')"
-                    :visible="projectPageModalStore.state.manageMemberModalVisible && !!projectPageModalStore.state.targetProjectId"
+                    :visible="visible"
                     size="md"
                     hide-footer-close-button
-                    @close="projectPageModalStore.closeManageMemberModal()"
-                    @cancel="projectPageModalStore.closeManageMemberModal()"
+                    @close="projectPageModalStore.closeManageMemberModal"
+                    @cancel="projectPageModalStore.closeManageMemberModal"
+                    @closed="projectPageModalStore.resetTarget"
                     @confirm="handleCloseMemberModal"
     >
         <template #body>

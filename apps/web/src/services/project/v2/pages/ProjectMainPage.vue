@@ -11,11 +11,12 @@ import { i18n } from '@/translations';
 import { indigo, peacock } from '@/styles/colors';
 
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
-import ProjectGroupMemberManagementModal from '@/services/project/v1/components/ProjectGroupMemberManagementModal.vue';
 import ProjectAndGroupListPanel from '@/services/project/v2/components/ProjectAndGroupListPanel.vue';
 import ProjectDeleteModal from '@/services/project/v2/components/ProjectDeleteModal.vue';
+import ProjectGroupMemberManagementModal from '@/services/project/v2/components/ProjectGroupMemberManagementModal.vue';
 import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
 import ProjectMemberInviteModal from '@/services/project/v2/components/ProjectMemberInviteModal.vue';
+import ProjectMemberManagementModal from '@/services/project/v2/components/ProjectMemberManagementModal.vue';
 import ProjectMoveModal from '@/services/project/v2/components/ProjectMoveModal.vue';
 import ProjectTagsModal from '@/services/project/v2/components/ProjectTagsModal.vue';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
@@ -82,12 +83,10 @@ onUnmounted(() => {
                         :project-group-id="projectGroupId"
         />
         <project-and-group-list-panel />
-        <project-group-member-management-modal v-if="projectGroupId && state.projectGroupMemberManagementModalVisible"
-                                               :visible.sync="state.projectGroupMemberManagementModalVisible"
-                                               :project-group-id="projectGroupId"
-        />
-        <project-delete-modal :skip-redirect="!!(projectPageModelStore.state.targetProjectGroupId && projectPageModelStore.state.targetProjectGroupId === projectGroupId)
-                                  || !!(projectPageModelStore.state.targetProjectId && projectPageModelStore.state.targetProjectId === projectId)"
+        <project-group-member-management-modal />
+        <project-member-management-modal />
+        <project-delete-modal :skip-redirect="!!projectPageModelStore.state.targetId &&
+                                  (projectPageModelStore.state.targetId === projectGroupId || projectPageModelStore.state.targetId === projectId)"
                               @confirm="handleRefreshTree"
         />
         <project-move-modal @moved="handleMoved" />
