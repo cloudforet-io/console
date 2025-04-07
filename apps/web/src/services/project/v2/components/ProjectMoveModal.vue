@@ -9,9 +9,6 @@ import { useProjectGroupApi } from '@/api-clients/identity/project-group/composa
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -19,6 +16,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const projectPageModalStore = useProjectPageModalStore();
@@ -26,24 +24,20 @@ const visible = computed(() => projectPageModalStore.state.moveModalVisible && !
 const isProject = computed(() => projectPageModalStore.state.targetType === 'project');
 const targetId = computed(() => projectPageModalStore.state.targetId);
 
-const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-});
+const projectListStore = useProjectListStore();
 const state = reactive({
     originParentGroupId: computed<string|undefined>(() => {
         if (!targetId.value) return undefined;
-        if (isProject.value) return storeState.projects[targetId.value]?.data.groupInfo?.id;
-        return storeState.projectGroups[targetId.value]?.data.parentGroupInfo?.id;
+        if (isProject.value) return projectListStore.projectMap[targetId.value]?.data.groupInfo?.id;
+        return projectListStore.projectGroupMap[targetId.value]?.data.parentGroupInfo?.id;
     }),
     selectedProjectGroupIdList: [] as string[],
     selectProjectGroup: true as boolean,
     isValid: computed<boolean>(() => getIsValid(isProject.value, state.selectProjectGroup, state.selectedProjectGroupIdList, state.originParentGroupId)),
     targetName: computed<string>(() => {
         if (!targetId.value) return '';
-        if (isProject.value) return storeState.projects[targetId.value]?.name;
-        return storeState.projectGroups[targetId.value]?.name;
+        if (isProject.value) return projectListStore.projectMap[targetId.value]?.name;
+        return projectListStore.projectGroupMap[targetId.value]?.name;
     }),
     projectGroupSelectOptions: computed(() => ({
         id: targetId.value,

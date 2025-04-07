@@ -18,25 +18,13 @@ import {
 import { PTreeNode } from '@cloudforet/mirinae';
 import type { TreeNodeIcon, TreeNodeRoutePredicate } from '@cloudforet/mirinae/types/data-display/tree/new-tree/type';
 
-import type { ProjectGroupReferenceItem } from '@/store/reference/project-group-reference-store';
-import { useProjectGroupReferenceStore, type ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
-import { useProjectReferenceStore, type ProjectReferenceMap } from '@/store/reference/project-reference-store';
-
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
 
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-
-
-interface ProjectData extends ProjectReferenceItem {
-    type: 'PROJECT';
-}
-interface ProjectGroupData extends ProjectGroupReferenceItem {
-    type: 'PROJECT_GROUP';
-}
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 
 const props = withDefaults(defineProps<{
     parentGroupId?: string;
@@ -48,34 +36,9 @@ const props = withDefaults(defineProps<{
     selectedPaths: () => [],
 });
 
-
 /* items */
-const projectGroupReferenceStore = useProjectGroupReferenceStore();
-const projectReferenceStore = useProjectReferenceStore();
-const projectGroupMap = computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems);
-const projectGroups = computed<ProjectGroupReferenceItem[]>(() => Object.values(projectGroupMap.value));
-const projectMap = computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems);
-const projects = computed<ProjectReferenceItem[]>(() => Object.values(projectMap.value));
-const items = computed<Array<ProjectData|ProjectGroupData>>(() => {
-    const _items: Array<ProjectData|ProjectGroupData> = [];
-    projectGroups.value.forEach((group) => {
-        const parentId = group.data.parentGroupInfo?.id;
-        if (parentId !== props.parentGroupId) return;
-        _items.push({
-            ...group,
-            type: 'PROJECT_GROUP',
-        });
-    });
-    projects.value.forEach((project) => {
-        const groupId = project.data.groupInfo?.id;
-        if (groupId !== props.parentGroupId) return;
-        _items.push({
-            ...project,
-            type: 'PROJECT',
-        });
-    });
-    return _items;
-});
+const projectListStore = useProjectListStore();
+const items = computed(() => projectListStore.getItemsByParentGroupId(props.parentGroupId));
 
 /* icons */
 const projectGroupIcon: TreeNodeIcon = { iconName: 'ic_folder-filled', iconColor: indigo[500] };

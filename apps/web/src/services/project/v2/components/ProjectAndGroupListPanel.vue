@@ -1,30 +1,22 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive, ref,
+    computed, ref,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
+import { useQuery } from '@tanstack/vue-query';
 import { uniq } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PEmpty, PPaneLayout, PI, PButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
-import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useProjectGroupReferenceStore, type ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import { useProjectReferenceStore, type ProjectReferenceMap } from '@/store/reference/project-reference-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type { ProjectCardItemType } from '@/services/project/v-shared/types/project-type';
 import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';
 import ProjectGroupCard from '@/services/project/v2/components/ProjectGroupCard.vue';
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const props = defineProps<{
@@ -38,83 +30,43 @@ const isCollapsed = ref(false);
 /* modal */
 const projectPageModalStore = useProjectPageModalStore();
 
-/* project */
-const projectReferenceStore = useProjectReferenceStore();
-const allProjects = computed(() => Object.values(projectReferenceStore.getters.projectItems));
+/* project list store */
+const projectListStore = useProjectListStore();
+
+/* filtered data */
 const projects = computed(() => {
-    if (props.targetType === 'projectGroup') {
-        if (props.targetId) return allProjects.value.filter((d) => d.data.groupInfo?.id === props.targetId);
-        return allProjects.value;
+    if (props.targetType === 'projectGroup' && props.targetId) {
+        return projectListStore.getProjectsByGroupId(props.targetId);
+    }
+    if (!props.targetType && !props.targetId) {
+        return projectListStore.projects;
     }
     return [];
 });
 
-
-/* project group */
-const projectGroupReferenceStore = useProjectGroupReferenceStore();
-const allProjectGroups = computed(() => Object.values(projectGroupReferenceStore.getters.projectGroupItems));
 const projectGroups = computed(() => {
-    if (props.targetType === 'projectGroup') {
-        if (props.targetId) return allProjectGroups.value.filter((d) => d.data.parentGroupInfo?.id === props.targetId);
-        return allProjectGroups.value;
+    if (props.targetType === 'projectGroup' && props.targetId) {
+        return projectListStore.getProjectGroupsByParentId(props.targetId);
+    }
+    if (!props.targetType && !props.targetId) {
+        return projectListStore.projectGroups;
     }
     return [];
 });
 
-const route = useRoute();
-const allReferenceStore = useAllReferenceStore();
-
-const storeState = reactive({
-    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-});
-
-const state = reactive({
-    currentProjectGroupId: computed(() => route.params.projectGroupId),
-    serviceAccountList: [] as ServiceAccountModel[],
-    currentProjectGroupList: computed<ProjectCardItemType[]>(() => {
-        const allProjectGroupList: ProjectCardItemType[] = Object.values(storeState.projectGroup).map((d) => ({
-            type: 'projectGroup',
-            id: d.key,
-            name: d.name,
-            parentId: d.data.parentGroupInfo?.id as string|undefined,
-        }));
-        return allProjectGroupList.filter((projectGroup) => projectGroup.parentId === state.currentProjectGroupId);
-    }),
-    currentProjectList: computed<ProjectCardItemType[]>(() => {
-        const allProjectList: ProjectCardItemType[] = Object.values(storeState.project).map((d) => ({
-            type: 'project',
-            id: d.key,
-            name: d.name,
-            parentId: d.data.groupInfo?.id,
-            projectType: d.data.projectType,
-        }));
-        return allProjectList.filter((project) => project.parentId === state.currentProjectGroupId);
-    }),
-    filteredCardList: computed<ProjectCardItemType[]>(() => [...state.currentProjectGroupList, ...state.currentProjectList]),
-});
-
-/* Util */
-const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
-
-const listServiceAccount = async () => {
-    try {
-        const params: ServiceAccountListParameters = {
-            query: {
-                only: ['provider', 'project_id'],
-            },
-        };
-        const response = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>(params);
-        state.serviceAccountList = response.results || [];
-    } catch (e) {
-        state.serviceAccountList = [];
-        ErrorHandler.handleError(e);
-    }
+/* service accounts */
+const { serviceAccountAPI, serviceAccountListQueryKey } = useServiceAccountApi();
+const serviceAccountListParams: ServiceAccountListParameters = {
+    query: {
+        only: ['provider', 'project_id'],
+    },
 };
-
-onMounted(async () => {
-    await listServiceAccount();
+const { data: serviceAccountList } = useQuery({
+    queryKey: computed(() => [...serviceAccountListQueryKey.value, serviceAccountListParams]),
+    queryFn: () => serviceAccountAPI.list(serviceAccountListParams),
+    select: (data) => data.results ?? [],
 });
+const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccountList.value?.filter((d) => d.project_id === projectId).map((d) => d.provider));
 
 </script>
 
@@ -149,29 +101,38 @@ onMounted(async () => {
                 </p-button>
             </div>
         </div>
-        <div v-show="!isCollapsed">
+        <div v-show="!isCollapsed"
+             class="pt-6"
+        >
             <div v-if="projectGroups.length"
-                 class="pt-6 pb-10"
+                 :class="{ 'pb-10' : !!projects.length }"
             >
-                <p-field-title class="title"
+                <p-field-title class="mb-3"
                                :label="$t('PROJECT.LANDING.PROJECT_GROUP')"
-                />
+                >
+                    <template #right>
+                        ({{ projectGroups.length }})
+                    </template>
+                </p-field-title>
                 <div class="card-contents">
-                    <project-group-card v-for="(pg, idx) in projectGroups"
-                                        :key="`project-group-${idx}`"
+                    <project-group-card v-for="(pg) in projectGroups"
+                                        :key="pg.key"
                                         :project-group-id="pg.key"
                                         :name="pg.name"
                     />
                 </div>
             </div>
-
             <div v-if="projects.length">
-                <p-field-title class="title"
+                <p-field-title class="mb-3"
                                :label="$t('PROJECT.LANDING.PROJECT')"
-                />
+                >
+                    <template #right>
+                        ({{ projects.length }})
+                    </template>
+                </p-field-title>
                 <div class="card-contents">
-                    <project-card v-for="(p, idx) in projects"
-                                  :key="`project-${idx}`"
+                    <project-card v-for="(p) in projects"
+                                  :key="p.key"
                                   :project-id="p.key"
                                   :group-name="p.data.groupInfo?.name"
                                   :name="p.name"
@@ -180,12 +141,11 @@ onMounted(async () => {
                     />
                 </div>
             </div>
-
-            <p-empty v-if="!state.filteredCardList.length"
+            <p-empty v-if="!projects.length && !projectGroups.length"
                      show-image
-                     class="empty-contents"
+                     class="my-16"
             >
-                <div class="empty-text">
+                <div>
                     <p>{{ $t('PROJECT.LANDING.EMPTY_TEXT') }}</p>
                 </div>
             </p-empty>
@@ -194,18 +154,9 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="postcss">
-.title {
-    @apply mb-3;
-}
 .card-contents {
     @apply grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
-}
-.empty-contents {
-    margin-top: 4rem;
-    .empty-text {
-        width: 20rem;
-    }
 }
 </style>

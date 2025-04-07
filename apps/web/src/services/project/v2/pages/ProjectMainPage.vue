@@ -7,6 +7,8 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { nextTick } from 'process';
+
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import ProjectAndGroupListPanel from '@/services/project/v2/components/ProjectAndGroupListPanel.vue';
 import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
@@ -77,6 +79,14 @@ const handleCreated = (id: string) => {
     });
 };
 
+/* mounted */
+const mounted = ref(false);
+onMounted(() => {
+    nextTick(() => {
+        mounted.value = true;
+    });
+});
+
 </script>
 
 <template>
@@ -84,30 +94,32 @@ const handleCreated = (id: string) => {
         <project-header :project-id="projectId"
                         :project-group-id="projectGroupId"
         />
-        <project-and-group-list-panel class="mt-4"
-                                      :target-id="props.projectGroupOrProjectId"
-                                      :target-type="projectGroupId ? 'projectGroup' : 'project'"
-        />
+        <keep-alive>
+            <project-and-group-list-panel v-if="mounted"
+                                          :key="props.projectGroupOrProjectId ?? 'all'"
+                                          class="mt-4"
+                                          :target-id="props.projectGroupOrProjectId"
+                                          :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
+            />
+        </keep-alive>
 
         <template v-if="isModalLoadReady">
-            <keep-alive>
-                <project-group-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'projectGroup'" />
-                <project-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'project'" />
-                <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
-                                      @deleted="handleDeleted"
-                />
-                <project-move-modal v-if="projectPageModelStore.state.moveModalVisible" />
-                <project-member-invite-modal v-if="projectPageModelStore.state.inviteMemberModalVisible" />
-                <project-tags-modal v-if="projectPageModelStore.state.manageTagsModalVisible" />
-                <project-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'project'"
-                                    :target-parent-group-id="targetParentGroupId"
-                                    @created="handleCreated"
-                />
-                <project-group-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'projectGroup'"
-                                          :target-parent-group-id="targetParentGroupId"
-                                          @created="handleCreated"
-                />
-            </keep-alive>
+            <project-group-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'projectGroup'" />
+            <project-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'project'" />
+            <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
+                                  @deleted="handleDeleted"
+            />
+            <project-move-modal v-if="projectPageModelStore.state.moveModalVisible" />
+            <project-member-invite-modal v-if="projectPageModelStore.state.inviteMemberModalVisible" />
+            <project-tags-modal v-if="projectPageModelStore.state.manageTagsModalVisible" />
+            <project-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'project'"
+                                :target-parent-group-id="targetParentGroupId"
+                                @created="handleCreated"
+            />
+            <project-group-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'projectGroup'"
+                                      :target-parent-group-id="targetParentGroupId"
+                                      @created="handleCreated"
+            />
         </template>
     </div>
 </template>

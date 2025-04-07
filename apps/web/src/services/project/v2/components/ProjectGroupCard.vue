@@ -3,7 +3,10 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI, PTextHighlighting } from '@cloudforet/mirinae';
+import {
+    PI, PTextHighlighting, PTooltip, useTextEllipsis,
+} from '@cloudforet/mirinae';
+
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -13,6 +16,7 @@ import { indigo } from '@/styles/colors';
 
 import ProjectActionDropdownButton from '@/services/project/v2/components/ProjectActionDropdownButton.vue';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 
 
 const props = defineProps<{
@@ -21,6 +25,10 @@ const props = defineProps<{
     name: string;
 }>();
 
+/* projects and groups */
+const projectListStore = useProjectListStore();
+const projects = computed(() => projectListStore.getProjectsByGroupId(props.projectGroupId));
+const projectGroups = computed(() => projectListStore.getProjectGroupsByParentId(props.projectGroupId));
 
 /* favorite */
 const favoriteStore = useFavoriteStore();
@@ -40,75 +48,57 @@ const handleSelectProjectGroup = () => {
 /* action menu */
 const visibleActionMenu = ref(false);
 
+/* text ellipsis */
+const textEl = ref<HTMLElement|null>(null);
+const { isEllipsis } = useTextEllipsis({ textEl });
 </script>
 
 <template>
-    <div class="flex items-center justify-between bg-gray-100 rounded-lg cursor-pointer project-main-project-group-card"
+    <div class="bg-gray-100 cursor-pointer p-3 hover:bg-gray-150 rounded-lg group/pg-card"
+         :class="{ '!bg-blue-200': visibleActionMenu }"
          @click="handleSelectProjectGroup"
     >
-        <div class="project-group-item">
-            <p-i name="ic_folder-filled"
-                 :color="indigo[500]"
-                 width="1rem"
-                 height="1rem"
-            />
-            <p-text-highlighting class="project-group-name"
-                                 :text="props.name"
-                                 :term="props.searchKeyword"
-            />
+        <div class="flex items-center justify-between rounded-t-lg h-6">
+            <p-tooltip :contents="isEllipsis ? props.name : ''"
+                       class="flex overflow-hidden"
+                       position="bottom"
+            >
+                <div ref="textEl"
+                     class="overflow-hidden whitespace-nowrap text-ellipsis"
+                >
+                    <p-i name="ic_folder-filled"
+                         :color="indigo[500]"
+                         class="mr-1"
+                         width="1rem"
+                         height="1rem"
+                    />
+                    <p-text-highlighting class="!text-label-md !font-medium"
+                                         :text="props.name"
+                                         :term="props.searchKeyword"
+                    />
+                </div>
+            </p-tooltip>
+            <div class="flex gap-1 items-center">
+                <div class="hidden group-hover/pg-card:block"
+                     :class="{'!block': visibleActionMenu }"
+                >
+                    <project-action-dropdown-button :project-group-id="props.projectGroupId"
+                                                    usage-type="list"
+                                                    @update:visible="visibleActionMenu = $event"
+                    />
+                </div>
+                <div class="hidden group-hover/pg-card:block"
+                     :class="{'!block': visibleActionMenu || isStarred }"
+                >
+                    <favorite-button :item-id="props.projectGroupId"
+                                     :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
+                    />
+                </div>
+            </div>
         </div>
-        <div class="toolset-group">
-            <project-action-dropdown-button :project-group-id="props.projectGroupId"
-                                            @update:visible="visibleActionMenu = $event"
-            />
-            <favorite-button :item-id="props.projectGroupId"
-                             :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
-                             :class="{'favorite-button': true, 'starred': isStarred }"
-            />
+        <div class="mt-2 rounded-b-lg text-label-sm text-gray-600">
+            {{ projectGroups.length }} {{ $t('PROJECT.LANDING.PROJECT_GROUPS') }} ⋅
+            {{ projects.length }} {{ $t('PROJECT.LANDING.PROJECTS') }}
         </div>
     </div>
 </template>
-
-<style scoped lang="postcss">
-.project-main-project-group-card {
-    height: 3rem;
-    padding: 0.75rem;
-
-    .project-group-item {
-        @apply flex gap-1;
-
-        .project-group-name {
-            @apply text-label-md text-gray-900;
-        }
-    }
-
-    .favorite-button {
-        display: none;
-
-        &.starred {
-            display: block;
-        }
-    }
-    .toolset-button {
-        display: none;
-    }
-
-    .toolset-group {
-        @apply flex gap-1 items-center;
-    }
-
-    &:hover {
-        @apply bg-gray-150;
-
-        .toolset-button {
-            display: block;
-        }
-        .favorite-button {
-            display: block;
-        }
-    }
-    &.toolset-active {
-        @apply bg-blue-200;
-    }
-}
-</style>

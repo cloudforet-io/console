@@ -1,20 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
-import { PSelectDropdown } from '@cloudforet/mirinae';
+import { PSelectDropdown, PIconButton } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     projectId?: string;
     projectGroupId?: string;
-}>();
+    usageType?: 'header'|'list';
+}>(), {
+    projectId: undefined,
+    projectGroupId: undefined,
+    usageType: 'header',
+});
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
+const visibleMenu = ref(false);
+const handleUpdateVisibleMenu = (visible: boolean) => {
+    visibleMenu.value = visible;
+    emit('update:visible', visible);
+};
 
 const actionItems = computed<SelectDropdownMenuItem[]>(() => [
     {
@@ -79,7 +89,19 @@ const handleSelectItem = (selectedItem: SelectDropdownMenuItem|string|number) =>
                        size="sm"
                        :menu="actionItems"
                        reset-selection-on-menu-close
-                       @update:visible-menu="emit('update:visible', $event)"
+                       menu-width="max-content"
+                       menu-position="right"
+                       @update:visible-menu="handleUpdateVisibleMenu"
                        @select="handleSelectItem"
-    />
+    >
+        <template v-if="props.usageType === 'list'"
+                  #dropdown-icon-button
+        >
+            <p-icon-button name="ic_ellipsis-horizontal"
+                           :activated="visibleMenu"
+                           size="sm"
+                           style-type="tertiary"
+            />
+        </template>
+    </p-select-dropdown>
 </template>

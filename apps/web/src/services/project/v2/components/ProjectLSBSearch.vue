@@ -6,12 +6,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { TreeNodeRoutePredicate } from '@cloudforet/mirinae/types/data-display/tree/new-tree/type';
 
-import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
-
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSBItem from '@/common/modules/navigations/new-lsb/LSBItem.vue';
 
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 
 const props = defineProps<{
     keyword?: string;
@@ -19,11 +18,8 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:keyword', value: string): void;
 }>();
 
-const projectReferenceStore = useProjectReferenceStore();
-const projectFilteredByKeyword = computed(() => {
-    const projectItems = Object.values(projectReferenceStore.getters.projectItems);
-    return projectItems.filter((project) => getTextHighlightRegex(props.keyword).test(project.name));
-});
+const projectListStore = useProjectListStore();
+const projectFilteredByKeyword = computed(() => projectListStore.projects.filter((project) => getTextHighlightRegex(props.keyword).test(project.name)));
 const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupOrProjectId === curr.params.projectGroupOrProjectId;
 </script>
 

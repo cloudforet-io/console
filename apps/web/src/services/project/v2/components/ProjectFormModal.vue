@@ -13,7 +13,6 @@ import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { i18n } from '@/translations';
 
-import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -23,6 +22,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { gray, indigo } from '@/styles/colors';
 
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 
@@ -38,9 +38,9 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'created', projectGroupId: string): void;
 }>();
 
-const projectStore = useProjectReferenceStore();
+const projectListStore = useProjectListStore();
 const state = reactive({
-    projectNames: computed(() => Object.values(projectStore.getters.projectItems).filter((item) => item.key !== targetId.value).map((p) => p.name)),
+    projectNames: computed(() => projectListStore.projects.filter((item) => item.key !== targetId.value).map((p) => p.name)),
     accessMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'PRIVATE',
@@ -75,7 +75,9 @@ const {
         return true;
     },
 });
-const { data: project, setQueryData, invalidateAllQueries } = useProjectQuery({
+const {
+    data: project, isLoading, setQueryData, invalidateAllQueries,
+} = useProjectQuery({
     projectId: targetId,
     enabled: visible,
 });
@@ -119,7 +121,6 @@ const { mutateAsync: updateProject, isPending: isUpdatingProject } = useMutation
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
         setQueryData(data);
-        projectStore.sync(data);
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
@@ -134,7 +135,6 @@ const { mutateAsync: updateProjectType, isPending: isUpdatingProjectType } = use
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
         setQueryData(data);
-        projectStore.sync(data);
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));
@@ -186,6 +186,7 @@ const handleSelectAccess = (selectedAccess) => {
                     size="sm"
                     fade
                     backdrop
+                    :loading-backdrop="isLoading"
                     :visible="visible"
                     :disabled="isProcessing || !isAllValid"
                     @close="projectPageModalStore.closeFormModal"
