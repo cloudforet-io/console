@@ -23,6 +23,7 @@ const isModalLoadReady = ref(false);
 onMounted(() => {
     isModalLoadReady.value = true;
 });
+const ProjectDetailTab = () => import('@/services/project/v2/components/ProjectDetailTab.vue');
 const ProjectGroupMemberManagementModal = () => import('@/services/project/v2/components/ProjectGroupMemberManagementModal.vue');
 const ProjectMemberManagementModal = () => import('@/services/project/v2/components/ProjectMemberManagementModal.vue');
 const ProjectDeleteModal = () => import('@/services/project/v2/components/ProjectDeleteModal.vue');
@@ -34,6 +35,7 @@ const ProjectGroupFormModal = () => import('@/services/project/v2/components/Pro
 
 const props = defineProps<{
     projectGroupOrProjectId?: string;
+    dashboardId?: string;
 }>();
 
 /* project or group */
@@ -102,6 +104,11 @@ onMounted(() => {
                                           :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
             />
         </keep-alive>
+        <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
+                            class="mt-6"
+                            :project-id="props.projectGroupOrProjectId"
+                            :dashboard-id="props.dashboardId"
+        />
 
         <template v-if="isModalLoadReady">
             <project-group-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'projectGroup'" />

@@ -9,6 +9,7 @@ const ProjectContainer = () => import('@/services/project/v2/ProjectContainer.vu
 
 const ProjectMainPage = () => import('@/services/project/v2/pages/ProjectMainPage.vue');
 
+
 const projectRoutes: RouteConfig = {
     path: 'project',
     meta: {
@@ -18,7 +19,7 @@ const projectRoutes: RouteConfig = {
     component: ProjectContainer,
     children: [
         {
-            path: ':projectGroupOrProjectId?',
+            path: ':projectGroupOrProjectId?/:dashboardId?',
             name: PROJECT_ROUTE_V2._NAME,
             meta: {
                 menuId: MENU_ID.PROJECT,
