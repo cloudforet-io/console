@@ -79,7 +79,7 @@ const drawChart = () => {
         const _cost = _data?.cost || 0;
         _accumulatedValue += _cost;
         _accumulatedData.push({
-            value: _accumulatedValue,
+            value: state.limitProperty === 'total_limit' ? _accumulatedValue : _cost,
             itemStyle: {
                 color: _limit < _accumulatedValue ? red[400] : indigo[600],
             },
