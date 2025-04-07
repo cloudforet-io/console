@@ -84,7 +84,6 @@ export const useDashboardSearchQuery = ({ searchFilters }: UseDashboardSearchQue
 
     watch(searchFilters, (_searchFilters) => {
         searchApiQueryHelper.setFilters(_searchFilters);
-        console.debug('searchFilters', searchApiQueryHelper.data, _searchFilters);
         searchQuery.value = searchApiQueryHelper.data;
     }, { immediate: true });
 
