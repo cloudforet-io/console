@@ -40,7 +40,7 @@ import { gray, white } from '@/styles/colors';
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 
 
@@ -72,7 +72,7 @@ const {
 } = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 

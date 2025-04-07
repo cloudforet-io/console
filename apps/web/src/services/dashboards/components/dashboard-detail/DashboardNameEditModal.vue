@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -44,7 +44,7 @@ const queryClient = useQueryClient();
 const {
     fetcher,
     keys: dashboardDetailKeys,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
 const route = useRoute();

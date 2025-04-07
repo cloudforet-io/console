@@ -62,7 +62,7 @@ import type {
     JoinOptions, ValueMappingOptions, ConcatOptions, AggregateOptions, AggregateFunction,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 
 
@@ -85,7 +85,7 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Querys */
 const {
     dashboard,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId,
 });
 const {

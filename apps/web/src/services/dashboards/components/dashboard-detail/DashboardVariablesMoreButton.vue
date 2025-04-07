@@ -6,7 +6,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
     cloneDeep, debounce,
 } from 'lodash';
@@ -27,7 +27,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
@@ -53,10 +53,10 @@ const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId,
 });
+const queryClient = useQueryClient();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     targetRef: null as HTMLElement | null,

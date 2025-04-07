@@ -11,7 +11,7 @@ import type { DashboardVariables, DashboardVariablesSchema } from '@/api-clients
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 
 import DashboardVariableDropdown from '@/services/dashboards/components/legacy/DashboardVariableDropdown.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -32,7 +32,7 @@ const dashboardId = computed(() => route.params.dashboardId);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();

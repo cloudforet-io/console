@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
 
@@ -19,7 +19,7 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateCustomModal.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -42,10 +42,10 @@ const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId,
 });
+const queryClient = useQueryClient();
 const { isManageable } = useDashboardManageable({
     dashboardId,
 });

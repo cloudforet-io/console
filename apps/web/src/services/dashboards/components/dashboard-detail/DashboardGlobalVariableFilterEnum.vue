@@ -21,7 +21,7 @@ import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-typ
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 
 interface Props {
@@ -37,7 +37,7 @@ const dashboardId = computed(() => route.params.dashboardId);
 
 
 
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 

@@ -19,8 +19,8 @@ import { gray } from '@/styles/colors';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -47,7 +47,7 @@ const {
 } = useDashboardFolderQuery();
 
 
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
 const { isManageable } = useDashboardManageable({

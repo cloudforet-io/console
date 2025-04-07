@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -31,7 +31,7 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
@@ -65,11 +65,11 @@ const {
     dashboard,
     keys,
     fetcher,
-    queryClient,
     isLoading,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId,
 });
+const queryClient = useQueryClient();
 
 
 const state = reactive({

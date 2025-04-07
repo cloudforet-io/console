@@ -37,7 +37,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 interface Props {
     variable: DashboardGlobalVariable;
@@ -51,7 +51,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 

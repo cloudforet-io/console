@@ -26,7 +26,7 @@ import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/t
 
 import { blue, gray } from '@/styles/colors';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 
 
@@ -46,7 +46,7 @@ const emit = defineEmits<{(e: 'delete'): void;
 }>();
 const operatorButtonRef = ref<HTMLElement | null>(null);
 
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 const state = reactive({

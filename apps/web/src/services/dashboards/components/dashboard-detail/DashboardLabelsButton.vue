@@ -2,7 +2,7 @@
 import { onClickOutside } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
@@ -12,7 +12,7 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 
 
@@ -28,13 +28,13 @@ const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
 const { isManageable } = useDashboardManageable({
     dashboardId: computed(() => props.dashboardId),
 });
+const queryClient = useQueryClient();
 const state = reactive({
     visible: false,
     dashboardLabels: computed<string[]>(() => dashboard.value?.labels || []),

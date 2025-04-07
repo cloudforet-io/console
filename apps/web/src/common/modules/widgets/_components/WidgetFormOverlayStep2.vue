@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEqual } from 'lodash';
 
 import {
@@ -37,7 +37,8 @@ import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -66,11 +67,14 @@ const storeState = reactive({
 /* Query */
 const {
     dashboard,
+    keys: dashboardKeys,
+    fetcher: dashboardFetcher,
+} = useDashboardGetQuery({
+    dashboardId,
+});
+const {
     widgetList,
-    keys,
-    fetcher,
-    queryClient,
-} = useDashboardDetailQuery({
+} = useDashboardWidgetListQuery({
     dashboardId,
 });
 const {
@@ -81,6 +85,7 @@ const {
 } = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const queryClient = useQueryClient();
 
 const {
     dataTableList,
@@ -209,9 +214,9 @@ const updateWidget = async () => {
 
 const { mutate: updateDashboard } = useMutation(
     {
-        mutationFn: fetcher.updateDashboardFn,
+        mutationFn: dashboardFetcher.updateDashboardFn,
         onSuccess: (data) => {
-            const dashboardQueryKey = state.isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
+            const dashboardQueryKey = state.isPrivate ? dashboardKeys.privateDashboardGetQueryKey : dashboardKeys.publicDashboardGetQueryKey;
             queryClient.setQueryData(dashboardQueryKey.value, () => data);
         },
     },

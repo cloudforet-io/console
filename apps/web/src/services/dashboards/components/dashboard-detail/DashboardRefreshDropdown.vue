@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PIconButton, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
@@ -16,7 +16,7 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -41,10 +41,11 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 /* Query */
 const {
-    dashboard, keys, fetcher, queryClient,
-} = useDashboardDetailQuery({
+    dashboard, keys, fetcher,
+} = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
+const queryClient = useQueryClient();
 const { isManageable } = useDashboardManageable({
     dashboardId: computed(() => props.dashboardId),
 });

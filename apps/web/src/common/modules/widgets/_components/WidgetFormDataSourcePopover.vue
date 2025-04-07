@@ -47,7 +47,8 @@ import type {
     DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions, DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -77,8 +78,12 @@ const queryClient = useQueryClient();
 
 const {
     dashboard,
-    keys,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
+    dashboardId,
+});
+const {
+    keys: widgetKeys,
+} = useDashboardWidgetListQuery({
     dashboardId,
 });
 
@@ -209,7 +214,7 @@ const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutatio
     mutationFn: widgetCreateFn,
     onSuccess: (data) => {
         const _isPrivate = dashboardId.value?.startsWith('private');
-        const widgetListQueryKey = _isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        const widgetListQueryKey = _isPrivate ? widgetKeys.privateWidgetListQueryKey : widgetKeys.publicWidgetListQueryKey;
         queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => (oldData.results?.length ? {
             ...oldData, results: [...oldData.results, data],
         } : {

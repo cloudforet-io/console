@@ -15,7 +15,7 @@ import WidgetFullModeModal from '@/services/dashboards/components/legacy/WidgetF
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import type { ReformedWidgetInfo } from '@/services/dashboards/composables/use-reformed-widget-info-list';
 import {
     useReformedWidgetInfoList,
@@ -36,7 +36,7 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 

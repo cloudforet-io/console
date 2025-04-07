@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import {
@@ -27,7 +27,7 @@ import DashboardVariablesFormDynamic
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormDynamic.vue';
 import DashboardVariablesFormManual
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormManual.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 type ManualVariableData = Omit<ManualVariable, 'management'|'key'|'name'|'method'>;
 type DynamicVariableData = Omit<DashboardGlobalVariable, 'management'|'key'|'name'|'method'>;
@@ -57,10 +57,10 @@ const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId,
 });
+const queryClient = useQueryClient();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),

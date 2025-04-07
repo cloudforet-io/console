@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import {
@@ -50,7 +50,7 @@ import DashboardReorderSidebar from '@/services/dashboards/components/dashboard-
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -58,6 +58,8 @@ import {
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
+
+import { useDashboardWidgetListQuery } from '../../composables/use-dashboard-widget-list-query';
 
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
@@ -86,15 +88,22 @@ const { privateDataTableAPI } = usePrivateDataTableApi();
 /* Query */
 const {
     dashboard,
-    widgetList,
-    keys,
-    api,
-    isLoading,
+    keys: dashboardKeys,
+    isLoading: dashboardLoading,
     fetcher,
-    queryClient,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId,
 });
+const {
+    keys: widgetListKeys,
+    api: widgetApi,
+    fetcher: widgetFetcher,
+    isLoading: widgetLoading,
+    widgetList,
+} = useDashboardWidgetListQuery({
+    dashboardId,
+});
+const queryClient = useQueryClient();
 const { isManageable } = useDashboardManageable({
     dashboardId,
 });
@@ -191,7 +200,7 @@ const { mutateAsync: updateDashboard } = useMutation(
         mutationFn: fetcher.updateDashboardFn,
         onSuccess: async (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
             const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
+            const dashboardQueryKey = isPrivate ? dashboardKeys.privateDashboardGetQueryKey : dashboardKeys.publicDashboardGetQueryKey;
             await queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
         },
     },
@@ -199,8 +208,8 @@ const { mutateAsync: updateDashboard } = useMutation(
 const deleteWidgetFn = (params: PrivateWidgetDeleteParameters|PublicWidgetDeleteParameters) => {
     const isPrivate = dashboardId.value?.startsWith('private');
     const _fetcher = isPrivate
-        ? api.privateWidgetAPI.delete
-        : api.publicWidgetAPI.delete;
+        ? widgetApi.privateWidgetAPI.delete
+        : widgetApi.publicWidgetAPI.delete;
     return _fetcher(params);
 };
 const { mutateAsync: deleteWidget } = useMutation(
@@ -212,7 +221,7 @@ const { mutateAsync: deleteWidget } = useMutation(
             state.mountedWidgetMap = { ...state.mountedWidgetMap };
 
             const isPrivate = variables.widget_id?.startsWith('private');
-            const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+            const widgetListQueryKey = isPrivate ? widgetListKeys.privateWidgetListQueryKey : widgetListKeys.publicWidgetListQueryKey;
             queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
         },
         onError: (e) => {
@@ -227,10 +236,10 @@ const { mutateAsync: deleteWidget } = useMutation(
 );
 
 const { mutate: updateWidgetSize } = useMutation({
-    mutationFn: fetcher.updateWidgetFn,
+    mutationFn: widgetFetcher.updateWidgetFn,
     onSuccess: (_, variables) => {
         const isPrivate = dashboardId.value?.startsWith('private');
-        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        const widgetListQueryKey = isPrivate ? widgetListKeys.privateWidgetListQueryKey : widgetListKeys.publicWidgetListQueryKey;
         queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
             const _updatedWidgetList = (oldData.results ?? []).map((widget) => {
                 if (widget.widget_id === variables.widget_id) {
@@ -325,11 +334,11 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
     if (!dashboardId.value) return;
     const isPrivate = widget.widget_id.startsWith('private');
     const widgetCreateFetcher = isPrivate
-        ? api.privateWidgetAPI.create
-        : api.publicWidgetAPI.create;
+        ? widgetApi.privateWidgetAPI.create
+        : widgetApi.publicWidgetAPI.create;
     const widgetUpdateFetcher = isPrivate
-        ? api.privateWidgetAPI.update
-        : api.publicWidgetAPI.update;
+        ? widgetApi.privateWidgetAPI.update
+        : widgetApi.publicWidgetAPI.update;
 
     const dataTableList = await listWidgetDataTables(widget.widget_id);
     const dataTableIndex = dataTableList.findIndex((d) => d.data_table_id === widget.data_table_id);
@@ -353,7 +362,7 @@ const handleCloneWidget = async (widget: RefinedWidgetInfo) => {
             widget_id: createdWidget.widget_id,
             state: 'ACTIVE',
         });
-        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        const widgetListQueryKey = isPrivate ? widgetListKeys.privateWidgetListQueryKey : widgetListKeys.publicWidgetListQueryKey;
         await queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => ({
             ...oldData,
             results: [...(oldData.results || []), completedWidget],
@@ -431,7 +440,7 @@ watch(() => widgetGenerateState.showOverlay, async (showOverlay) => {
 
         // fetch widget list
         const isPrivate = dashboard.value?.dashboard_id?.startsWith('private');
-        const widgetListQueryKey = isPrivate ? keys.privateWidgetListQueryKey : keys.publicWidgetListQueryKey;
+        const widgetListQueryKey = isPrivate ? widgetListKeys.privateWidgetListQueryKey : widgetListKeys.publicWidgetListQueryKey;
         await queryClient.invalidateQueries({ queryKey: widgetListQueryKey.value });
 
         state.remountWidgetId = undefined;
@@ -514,7 +523,7 @@ onBeforeUnmount(() => {
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <p-data-loader :loading="isLoading"
+        <p-data-loader :loading="dashboardLoading || widgetLoading"
                        :data="state.refinedWidgetInfoList"
                        loader-backdrop-color="gray.100"
                        disable-empty-case
@@ -551,7 +560,7 @@ onBeforeUnmount(() => {
                 </template>
             </div>
         </p-data-loader>
-        <div v-if="!isLoading && !state.refinedWidgetInfoList?.length"
+        <div v-if="!(dashboardLoading || widgetLoading) && !state.refinedWidgetInfoList?.length"
              class="no-data-wrapper"
         >
             <p-empty show-image

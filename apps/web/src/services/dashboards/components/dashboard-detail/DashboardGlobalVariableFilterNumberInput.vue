@@ -22,7 +22,7 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 interface Props {
     variable: DashboardGlobalVariable;
@@ -34,7 +34,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
-const { dashboard } = useDashboardDetailQuery({
+const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
 
