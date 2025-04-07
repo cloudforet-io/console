@@ -96,21 +96,21 @@ const _extractQueryKey = (input: unknown): QueryKeyArray => toValue(input as Com
 
 const _warnedKeys = new Set<string>();
 
-function _warnMissingRequiredScopes(scopes: GrantScope[]) {
+const _warnMissingRequiredScopes = (scopes: GrantScope[]) => {
     if (import.meta.env.DEV && (!scopes || scopes.length === 0)) {
         console.warn('[useScopedQuery] `requiredScopes` is missing or empty.', {
             suggestion: 'Pass at least one valid scope like [\'DOMAIN\'], [\'WORKSPACE\'], etc.',
         });
     }
-}
+};
 
-function _warnInvalidScopeOnce(params: {
+const _warnInvalidScopeOnce = (params: {
     queryKey: QueryKeyArray;
     enabled: boolean;
     currentScope: GrantScope | undefined;
     requiredScopes: GrantScope[];
     isAppReady: boolean;
-}) {
+}) => {
     if (!import.meta.env.DEV) return;
 
     const {
@@ -133,4 +133,4 @@ function _warnInvalidScopeOnce(params: {
         currentScope,
         requiredScopes,
     });
-}
+};
