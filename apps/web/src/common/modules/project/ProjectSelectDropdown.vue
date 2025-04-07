@@ -52,6 +52,7 @@ interface Props {
     styleType?: string;
     appearanceType?: 'stack'|'badge';
     showDeleteAllButton?: boolean;
+    showDropdownLeftArea?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -72,6 +73,7 @@ const props = withDefaults(defineProps<Props>(), {
     styleType: undefined,
     appearanceType: undefined,
     showDeleteAllButton: undefined,
+    showDropdownLeftArea: false,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -319,6 +321,14 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
+            <template v-if="props.showDropdownLeftArea"
+                      #dropdown-left-area
+            >
+                <p-i name="ic_project"
+                     width="1rem"
+                     height="1rem"
+                />
+            </template>
             <template #menu-no-data-format>
                 <div />
             </template>
