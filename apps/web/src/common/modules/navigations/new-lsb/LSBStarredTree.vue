@@ -26,7 +26,9 @@ const props = defineProps<{
         </template>
         <span class="font-bold">{{ $t('COMMON.STARRED') }}</span>
         <template #children>
-            <template v-if="props.items.length > 0">
+            <div v-if="props.items.length > 0"
+                 class="max-h-[21rem] overflow-x-auto"
+            >
                 <l-s-b-item v-for="item in props.items"
                             :id="item.id"
                             :key="item.id"
@@ -37,7 +39,7 @@ const props = defineProps<{
                             :favorite-options="item.favoriteOptions"
                             favorite-visibility="hovered-only"
                 />
-            </template>
+            </div>
             <p-empty v-else>
                 {{ $t('COMMON.STARRED_NO_DATA') }}
             </p-empty>

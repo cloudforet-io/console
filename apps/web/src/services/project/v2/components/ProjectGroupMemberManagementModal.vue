@@ -12,7 +12,6 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
-import type { ProjectGroupAddUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/add-users';
 import type { ProjectGroupRemoveUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/remove-users';
 import { i18n } from '@/translations';
 
@@ -38,11 +37,9 @@ const readonlyMode = computed<boolean>(() => userStore.state.currentRoleInfo?.ro
 
 /* project group users */
 const { projectGroupAPI } = useProjectGroupApi();
-const { data: projectGroup, isLoading, invalidateQuery: invalidateProjectGroupQuery } = useProjectGroupQuery({
+const { data: projectGroup, isLoading, invalidateQuery } = useProjectGroupQuery({
     projectGroupId: computed(() => projectPageModalStore.state.targetId),
-    enabled: computed(() => projectPageModalStore.state.manageMemberModalVisible
-    && projectPageModalStore.state.targetType === 'projectGroup'
-    && !!projectPageModalStore.state.targetId),
+    enabled: visible,
 });
 const projectGroupUserIdList = computed<string[]>(() => projectGroup.value?.users ?? []);
 
@@ -71,7 +68,7 @@ watch([visible, projectGroupUserIdList], async ([v, list]) => {
     if (v && list) {
         selectedUserIdList.value = cloneDeep(list);
     }
-});
+}, { immediate: true });
 const handleUpdateSelected = (items?: SelectDropdownMenuItem[]) => {
     if (!items?.length) return;
     const _selected = items[0];
@@ -92,11 +89,10 @@ const { getRoleImage, getRoleName } = useRoleFormatters();
 /* member mutations */
 const addMember = async (userIds: string[]) => {
     if (!projectPageModalStore.state.targetId) throw new Error('Project Group ID is not defined');
-    const params: ProjectGroupAddUsersParameters = {
+    await projectGroupAPI.addUsers({
         project_group_id: projectPageModalStore.state.targetId,
         users: userIds,
-    };
-    await projectGroupAPI.addUsers(params);
+    });
 };
 const removeMember = async (userIds: string[]) => {
     if (!projectPageModalStore.state.targetId) throw new Error('Project Group ID is not defined');
@@ -106,21 +102,21 @@ const removeMember = async (userIds: string[]) => {
     };
     await projectGroupAPI.removeUsers(params);
 };
-const { mutate: addAndRemoveMember } = useMutation({
+const { mutateAsync: addAndRemoveMember } = useMutation({
     mutationFn: () => {
         const _addedUserIds = difference(selectedUserIdList.value, projectGroupUserIdList.value ?? []);
         const _removedUserIds = difference(projectGroupUserIdList.value, selectedUserIdList.value);
         const promises: Promise<void>[] = [];
         if (_addedUserIds.length) promises.push(addMember(_addedUserIds));
         if (_removedUserIds.length) promises.push(removeMember(_removedUserIds));
-        return Promise.all(promises);
+        return Promise.allSettled(promises);
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP_MEMBER'), true);
     },
     onSuccess: (d) => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP_MEMBER'), '');
-        if (d.length > 0) invalidateProjectGroupQuery();
+        if (d.length > 0) invalidateQuery();
     },
 });
 

@@ -141,7 +141,7 @@ const slotProps = computed(() => ({
                          color="inherit transparent"
                          class="toggle-button"
                          :class="{ 'is-collapsed': !isExpanded }"
-                         @click="isExpanded = !isExpanded"
+                         @click.prevent="isExpanded = !isExpanded"
                     />
                 </div>
                 <div class="node-inner-container">
