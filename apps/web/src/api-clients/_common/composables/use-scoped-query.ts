@@ -68,8 +68,9 @@ export const useScopedQuery = <TQueryFnData = unknown, TError = unknown, TData =
         isValidScope: computed(() => requiredScopes.includes(_state.currentGrantScope)),
     });
 
-    const queryEnabled = computed<boolean>(() => {
+    const queryEnabled = computed<boolean|undefined>(() => {
         const _inheritedEnabled = options?.enabled as MaybeRef<boolean> | undefined;
+        if (_inheritedEnabled === undefined) return undefined;
         if (_inheritedEnabled !== undefined && !toValue(_inheritedEnabled)) return false;
         return _state.isValidScope && !_state.isLoading;
     });
