@@ -32,8 +32,8 @@ const projectGroupMap = computed<ProjectGroupReferenceMap>(() => projectGroupRef
 const route = useRoute();
 const { projectGroupId, projectId } = useProjectOrGroupId(computed(() => route.params.projectGroupOrProjectId));
 
-/* breadcrumbs */
-const gnbStore = useGnbStore();
+
+/* selected paths */
 const parentIds = computed<string[]>(() => {
     const pids: string[] = [];
     let currentGroupId: string|undefined;
@@ -45,6 +45,14 @@ const parentIds = computed<string[]>(() => {
     }
     return pids;
 });
+const selectedPaths = computed<string[]>(() => {
+    const paths = parentIds.value.slice();
+    if (projectId.value) paths.push(projectId.value);
+    return paths;
+});
+
+/* breadcrumbs */
+const gnbStore = useGnbStore();
 const projectGroupBreadcrumbs = computed<Breadcrumb[]>(() => {
     const breadcrumbs: Breadcrumb[] = [
         { name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE_V2._NAME } },
@@ -102,7 +110,7 @@ onUnmounted(() => {
     <fragment>
         <vertical-page-layout v-if="route.meta?.lsbVisible">
             <template #sidebar>
-                <project-l-s-b />
+                <project-l-s-b :selected-paths="selectedPaths" />
             </template>
             <template #default>
                 <router-view />

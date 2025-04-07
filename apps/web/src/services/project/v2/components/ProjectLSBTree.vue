@@ -10,6 +10,8 @@ export default defineComponent({
 /* eslint-disable import/first */
 import {
     computed,
+    ref,
+    watch,
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 
@@ -39,11 +41,11 @@ interface ProjectGroupData extends ProjectGroupReferenceItem {
 const props = withDefaults(defineProps<{
     parentGroupId?: string;
     depth?: number;
-    // selectedId?: string;
+    selectedPaths?: string[];
 }>(), {
     parentGroupId: undefined,
     depth: 0,
-    // selectedId: undefined,
+    selectedPaths: () => [],
 });
 
 
@@ -82,6 +84,25 @@ const projectIcon: TreeNodeIcon = 'ic_project-filled';
 /* link */
 const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupOrProjectId === curr.params.projectGroupOrProjectId;
 
+/* expanded */
+const expandedMap = ref<Record<string, boolean>>({});
+const getExpanded = (key: string) => props.selectedPaths.includes(key) && props.depth < props.selectedPaths.length - 1;
+watch(items, (nodes) => {
+    const map = {};
+    nodes.forEach((node) => {
+        map[node.key] = expandedMap.value[node.key] ?? getExpanded(node.key);
+    });
+    expandedMap.value = map;
+});
+watch(() => props.selectedPaths, (paths) => {
+    const map = { ...expandedMap.value };
+    paths.forEach((path, index) => {
+        if (index < paths.length - 1) {
+            map[path] = true;
+        }
+    });
+    expandedMap.value = map;
+}, { immediate: true });
 </script>
 
 <template>
@@ -89,6 +110,7 @@ const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupO
         <p-tree-node v-for="item in items"
                      :id="item.key"
                      :key="item.key"
+                     :data-node-id="item.key"
                      :name="item.name"
                      :depth="props.depth"
                      :selectable="true"
@@ -104,6 +126,8 @@ const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupO
                      :icon="item.type === 'PROJECT_GROUP' ? projectGroupIcon : projectIcon"
                      display-type="tree"
                      :has-children="item.type === 'PROJECT_GROUP'"
+                     :expanded="expandedMap[item.key]"
+                     @update:expanded="expandedMap[item.key] = $event"
         >
             <template #action="{ id, hasChildren }">
                 <favorite-button :item-id="id"
@@ -115,6 +139,7 @@ const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupO
             <template #children="node">
                 <project-l-s-b-tree :parent-group-id="node.id"
                                     :depth="node.depth + 1"
+                                    :selected-paths="props.selectedPaths"
                 />
             </template>
         </p-tree-node>
