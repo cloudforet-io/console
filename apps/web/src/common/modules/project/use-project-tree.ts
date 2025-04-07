@@ -11,7 +11,7 @@ import type { ProjectGroupModel } from '@/api-clients/identity/project-group/sch
 import type { ProjectListParameters } from '@/api-clients/identity/project/schema/api-verbs/list';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
-import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/v-shared/types/project-tree-type';
+import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 
 
 type ProjectGroupListResponse = ListResponse<ProjectGroupModel>;

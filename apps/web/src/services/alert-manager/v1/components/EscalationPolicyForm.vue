@@ -22,13 +22,13 @@ import { useUserStore } from '@/store/user/user-store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import EscalationPolicyFormRulesInput from '@/services/alert-manager/v1/components/EscalationPolicyFormRulesInput.vue';
 import { ACTION } from '@/services/alert-manager/v1/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/v1/stores/escalation-policy-form-store';
 import type { ActionMode } from '@/services/alert-manager/v1/types/alert-type';
-import type { ProjectTreeNodeData } from '@/services/project/v-shared/types/project-tree-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = withDefaults(defineProps<{

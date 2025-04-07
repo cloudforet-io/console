@@ -19,11 +19,10 @@ import { useUserStore } from '@/store/user/user-store';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useProjectTree } from '@/services/project/v-shared/composables/use-project-tree';
 import type {
     ProjectGroupTreeItem, ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectTreeRoot,
-} from '@/services/project/v-shared/types/project-tree-type';
+} from '@/common/modules/project/project-tree-type';
+import { useProjectTree } from '@/common/modules/project/use-project-tree';
 
 
 const projectTreeHelper = useProjectTree();

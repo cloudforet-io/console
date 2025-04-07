@@ -3,7 +3,8 @@ import { nextTick, reactive } from 'vue';
 import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { TreeDisplayMap } from '@/services/project/v-shared/tree/type';
+import type { TreeDisplayMap } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
+
 
 export const useProjectTreeStore = defineStore('project-tree', () => {
     const state = reactive({

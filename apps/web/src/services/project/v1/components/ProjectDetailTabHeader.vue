@@ -51,14 +51,14 @@ import { gray, peacock } from '@/styles/colors';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import ProjectFormModal from '@/services/project/v-shared/components/ProjectFormModal.vue';
-import ProjectMainProjectGroupMoveModal from '@/services/project/v-shared/components/ProjectMainProjectGroupMoveModal.vue';
-import ProjectMemberInviteModal from '@/services/project/v-shared/components/ProjectMemberInviteModal.vue';
-import ProjectTagsModal from '@/services/project/v-shared/components/ProjectTagsModal.vue';
-import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
+import ProjectFormModal from '@/services/project/v1/components/ProjectFormModal.vue';
 import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMainDeleteModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/v1/components/ProjectMainProjectGroupMoveModal.vue';
+import ProjectMemberInviteModal from '@/services/project/v1/components/ProjectMemberInviteModal.vue';
+import ProjectTagsModal from '@/services/project/v1/components/ProjectTagsModal.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 

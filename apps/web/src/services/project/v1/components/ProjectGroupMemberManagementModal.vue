@@ -28,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
+import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 
 
 interface Props {
