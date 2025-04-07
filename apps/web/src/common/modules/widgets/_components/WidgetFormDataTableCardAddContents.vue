@@ -3,7 +3,7 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
     cloneDeep, isArray, isEqual, uniq,
 } from 'lodash';
@@ -17,6 +17,7 @@ import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data
 import type { DataTableDeleteParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/delete';
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -38,7 +39,8 @@ import WidgetFormDataTableCardSourceForm
 import {
     useDataTableCascadeUpdate,
 } from '@/common/modules/widgets/_composables/use-data-table-cascade-update';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
@@ -53,7 +55,6 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface Props {
     selected: boolean;
@@ -68,20 +69,24 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 
 /* Query */
 const {
     widget,
-    dataTableList,
-    keys,
-    api,
-    fetcher,
-    queryClient,
-} = useWidgetFormQuery({
+    keys: widgetKeys,
+    fetcher: widgetFetcher,
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const {
+    dataTableList,
+    keys: dataTableKeys,
+    api: dataTableApi,
+    fetcher: dataTableFetcher,
+} = useWidgetDataTableListQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const queryClient = useQueryClient();
 const {
     cascadeUpdateDataTable,
 } = useDataTableCascadeUpdate({
@@ -230,33 +235,37 @@ const modalState = reactive({
     referenceDataTableName: '',
 });
 
+/* Query Keys */
+const { withSuffix: privateDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'get');
+const { withSuffix: publicDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'get');
+const { withSuffix: privateDataTableLoadQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'load');
+const { withSuffix: publicDataTableLoadQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'load');
+const { withSuffix: privateWidgetLoadQueryKey } = useServiceQueryKey('dashboard', 'private-widget', 'load');
+const { withSuffix: publicWidgetLoadQueryKey } = useServiceQueryKey('dashboard', 'public-widget', 'load');
+const { withSuffix: privateWidgetLoadSumQueryKey } = useServiceQueryKey('dashboard', 'private-widget', 'load-sum');
+const { withSuffix: publicWidgetLoadSumQueryKey } = useServiceQueryKey('dashboard', 'public-widget', 'load-sum');
+
 /* APIs */
 const invalidateLoadQueries = async (data: DataTableModel) => {
-    await queryClient.invalidateQueries({
-        queryKey: [
-            ...(state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
-            data.data_table_id,
-        ],
-    });
-    await queryClient.invalidateQueries({
-        queryKey: [
-            ...(state.isPrivate ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-            dashboardDetailState.dashboardId,
-            widgetGenerateState.widgetId,
-        ],
-    });
-    await queryClient.invalidateQueries({
-        queryKey: [
-            ...(state.isPrivate ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
-            dashboardDetailState.dashboardId,
-            widgetGenerateState.widgetId,
-        ],
-    });
+    if (!widgetGenerateState.widgetId) return;
+    if (data.data_table_id.startsWith('private')) {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: privateDataTableLoadQueryKey(state.dataTableId) }),
+            queryClient.invalidateQueries({ queryKey: privateWidgetLoadQueryKey(widgetGenerateState.widgetId) }),
+            queryClient.invalidateQueries({ queryKey: privateWidgetLoadSumQueryKey(widgetGenerateState.widgetId) }),
+        ]);
+    } else {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: publicDataTableLoadQueryKey(state.dataTableId) }),
+            queryClient.invalidateQueries({ queryKey: publicWidgetLoadQueryKey(widgetGenerateState.widgetId) }),
+            queryClient.invalidateQueries({ queryKey: publicWidgetLoadSumQueryKey(widgetGenerateState.widgetId) }),
+        ]);
+    }
 };
 const { mutateAsync: updateDataTableMutation } = useMutation({
-    mutationFn: fetcher.updateDataTableFn,
+    mutationFn: dataTableFetcher.updateDataTableFn,
     onSuccess: async (data) => {
-        const dataTableListQueryKey = state.isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+        const dataTableListQueryKey = state.isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
         await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
             if (oldData.results) {
                 return {
@@ -271,6 +280,7 @@ const { mutateAsync: updateDataTableMutation } = useMutation({
             }
             return oldData;
         });
+        await queryClient.invalidateQueries({ queryKey: state.isPrivate ? privateDataTableGetQueryKey(state.dataTableId) : publicDataTableGetQueryKey(state.dataTableId) });
         await invalidateLoadQueries(data);
 
         setInitialDataTableForm();
@@ -284,11 +294,11 @@ const { mutateAsync: updateDataTableMutation } = useMutation({
     },
 });
 const { mutateAsync: updateWidget } = useMutation({
-    mutationFn: fetcher.updateWidgetFn,
+    mutationFn: widgetFetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? keys.privateWidgetGetQueryKey
-            : keys.publicWidgetGetQueryKey;
+            ? widgetKeys.privateWidgetGetQueryKey
+            : widgetKeys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
@@ -363,8 +373,8 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
 };
 const deleteDataTableFn = (params: DataTableDeleteParameters): Promise<void> => {
     if (params.data_table_id.startsWith('private')) {
-        return api.privateDataTableAPI.delete(params);
-    } return api.publicDataTableAPI.delete(params);
+        return dataTableApi.privateDataTableAPI.delete(params);
+    } return dataTableApi.publicDataTableAPI.delete(params);
 };
 const { mutateAsync: deleteDataTable } = useMutation({
     mutationFn: deleteDataTableFn,
@@ -376,7 +386,7 @@ const { mutateAsync: deleteDataTable } = useMutation({
         widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
 
         const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
-        const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+        const dataTableListQueryKey = _isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
         await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
             if (oldData.results) {
                 return {
@@ -441,6 +451,9 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    if (!widgetGenerateState.widgetId) {
+        throw new Error('Widget ID is required');
+    }
     state.loading = true;
     const result = await updateDataTable();
     if (result) {

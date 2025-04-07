@@ -4,6 +4,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { cloneDeep, isEqual } from 'lodash';
 
@@ -21,8 +22,7 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 interface Props {
     variable: DashboardGlobalVariable;
@@ -32,10 +32,10 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+const { dashboard } = useDashboardGetQuery({
+    dashboardId,
 });
 
 const state = reactive({

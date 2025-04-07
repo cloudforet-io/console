@@ -2,6 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -41,6 +42,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
@@ -92,12 +94,15 @@ const { publicWidgetAPI } = usePublicWidgetApi();
 const {
     publicDashboardList,
     privateDashboardList,
+    api,
+    keys: dashboardKeys,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-    api,
-    keys,
-    queryClient,
-} = useDashboardQuery();
+    keys: folderKeys,
+} = useDashboardFolderQuery();
+const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -421,10 +426,10 @@ const handleCloneConfirm = async () => {
         const _failedCount = _results.filter((r) => r.status !== 'fulfilled').length;
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
-    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.publicFolderListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.privateFolderListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: dashboardKeys.privateDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: folderKeys.privateFolderListQueryKey.value });
     dashboardPageControlStore.reset();
     state.proxyVisible = false;
     state.loading = false;

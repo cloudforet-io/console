@@ -47,11 +47,11 @@ type ContextKeyType = string|unknown[]|object;
 
 type UseServiceQueryKeyResult<T extends object = object> = {
     key: ComputedRef<QueryKeyArray>;
-    params: T extends undefined ? undefined : Readonly<T>;
+    params: ComputedRef<T>;
     withSuffix: (arg: ContextKeyType) => QueryKeyArray;
 };
 
-export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
+export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
     service: S,
     resource: R,
     verb: V,
@@ -83,7 +83,6 @@ export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceNam
 
     const queryKey = computed(() => {
         const resolvedParams = toValue(params);
-
         return [
             ...queryKeyAppContext.value,
             service, resource, verb,
@@ -101,9 +100,10 @@ export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceNam
     const suffixCache = new WeakMap<object, QueryKeyArray>();
     return {
         key: queryKey,
-        params: params
-            ? Object.freeze(toValue(params)) as Readonly<T>
-            : undefined,
+        params: computed(() => {
+            const resolvedParams = toValue(params);
+            return resolvedParams;
+        }),
         withSuffix: (arg) => {
             if (typeof arg === 'object' && arg !== null) {
                 const cached = suffixCache.get(arg);

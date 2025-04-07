@@ -4,6 +4,7 @@
         :class="{ activated, [size]: true, loading, [shape]: true }"
         :style-type="styleType"
         :disabled="disabled || loading"
+        :active="activated"
         v-on="$listeners"
     >
         <p-spinner v-if="loading"

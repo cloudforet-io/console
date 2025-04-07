@@ -200,36 +200,14 @@ const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
     state.fields = fields;
 };
 const handleExportToExcel = async () => {
-    // TODO: File manager changes need to be applied.
-    // const alertsExcelExportParams: ExportParameter = {
-    //     file_name: FILE_NAME_PREFIX.alert,
-    //     options: [
-    //         {
-    //             name: 'Alert List',
-    //             query_type: QueryType.SEARCH,
-    //             search_query: {
-    //                 ...alertListApiQueryHelper.data,
-    //                 fields: ALERT_EXCEL_FIELDS,
-    //             },
-    //         },
-    //     ],
-    //     timezone: storeState.timezone,
-    // };
-    // return SpaceConnector.clientV2.alertManager.alert.export(alertsExcelExportParams);
-    const data = state.refinedAlertList.map((i) => ({
-        service_name: storeState.serviceList[i.service_id].data.name,
-        title: i.title,
-        description: i.description,
-        status: i.status,
-        urgency: i.urgency,
-        labels: i.labels,
-        triggered_by: getCreatedByNames(i.triggered_by),
-        created_at: i.created_at,
-    }));
     await downloadExcel({
-        data,
+        url: '/alert-manager/alert/list',
+        param: {
+            query: { ...alertListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
+        },
         fields: ALERT_EXCEL_FIELDS,
         file_name_prefix: FILE_NAME_PREFIX.alert,
+        timezone: storeState.timezone,
     });
 };
 

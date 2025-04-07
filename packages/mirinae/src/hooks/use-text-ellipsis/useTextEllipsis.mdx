@@ -1,0 +1,49 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks';
+import * as UseTextEllipsisStories from './use-text-ellipsis.stories';
+
+<Meta of={UseTextEllipsisStories} />
+
+# useTextEllipsis
+
+A hook that checks if text content is ellipsized based on element size.
+
+## Features
+
+- Detects if text content is ellipsized by comparing scroll width and element width
+- Returns a reactive boolean indicating ellipsis state
+- Uses Vue's ref and computed for reactivity
+
+## Usage
+
+```vue
+<template>
+  <p ref="textEl" class="whitespace-nowrap overflow-hidden text-ellipsis">
+    Long text content...
+  </p>
+  <p>Is Ellipsized: {{ isEllipsis }}</p>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useTextEllipsis } from '@cloudforet/mirinae';
+
+const textEl = ref<HTMLElement | null>(null);
+const { isEllipsis } = useTextEllipsis({ textEl });
+</script>
+```
+
+## Props
+
+| Name   | Type                | Required | Default | Description                    |
+|--------|---------------------|----------|---------|--------------------------------|
+| textEl | `Ref<HTMLElement>` | Yes      | -       | Reference to the text element  |
+
+## Return Value
+
+| Name        | Type           | Description                           |
+|-------------|----------------|---------------------------------------|
+| isEllipsis  | `Ref<boolean>` | Whether the text content is ellipsized |
+
+## Example
+
+<Canvas of={UseTextEllipsisStories.Default} /> 

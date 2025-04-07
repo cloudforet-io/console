@@ -19,7 +19,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import {
     createDataTableReferenceMap,
     getDataTableReferenceMapExecutionOrder,
@@ -40,7 +40,7 @@ const scrollContainerRef = ref<HTMLElement|null>(null);
 /* Query */
 const {
     dataTableList,
-} = useWidgetFormQuery({
+} = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

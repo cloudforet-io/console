@@ -6,6 +6,8 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { PSkeleton } from '@cloudforet/mirinae';
 
 
@@ -19,7 +21,8 @@ import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-det
 import DashboardWidgetContainerV2
     from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
@@ -40,17 +43,23 @@ const router = useRouter();
 /* Query */
 const {
     dashboard,
-    widgetList,
-    isError,
-    isLoading,
-    keys,
-    queryClient,
-} = useDashboardDetailQuery({
+    isError: dashboardError,
+    isLoading: dashboardLoading,
+} = useDashboardGetQuery({
     dashboardId: computed(() => route.params.dashboardId),
 });
+const {
+    widgetList,
+    isLoading: widgetLoading,
+    isError: widgetError,
+    keys: widgetListKeys,
+} = useDashboardWidgetListQuery({
+    dashboardId: computed(() => route.params.dashboardId),
+});
+const queryClient = useQueryClient();
 
 const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: keys.publicWidgetListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: widgetListKeys.publicWidgetListQueryKey.value });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
@@ -69,9 +78,9 @@ watch(widgetList, (_widgetList) => {
         dashboardDetailStore.setDashboardWidgets(_widgetList);
     }
 });
-watch(isError, (error) => {
-    if (error) {
-        ErrorHandler.handleError(error);
+watch([dashboardError, widgetError], ([_dashboardError, _widgetError]) => {
+    if (_dashboardError || _widgetError) {
+        ErrorHandler.handleError(_dashboardError || _widgetError);
         router.push({ name: PROJECT_ROUTE_V1.DETAIL._NAME });
     }
 });
@@ -105,18 +114,18 @@ onUnmounted(() => {
                 <div class="toolset">
                     <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="isLoading"
+                                                :loading="dashboardLoading || widgetLoading"
                                                 disable-interval
                                                 @refresh="handleRefresh"
                     />
                 </div>
-                <div v-if="!isLoading"
+                <div v-if="!dashboardLoading && !widgetLoading"
                      class="selectors"
                 >
                     <dashboard-variables-v2 class="variable-selector-wrapper"
                                             is-project-dashboard
                                             disable-save-button
-                                            :loading="isLoading"
+                                            :loading="dashboardLoading || widgetLoading"
                     />
                 </div>
                 <dashboard-widget-container-v2 ref="widgetContainerRef" />

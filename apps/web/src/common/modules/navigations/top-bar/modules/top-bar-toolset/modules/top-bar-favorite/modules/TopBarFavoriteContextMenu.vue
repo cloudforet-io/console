@@ -89,6 +89,7 @@ const {
 const router = useRouter();
 const route = useRoute();
 
+const dashboardList = computed(() => [...publicDashboardList.value, ...privateDashboardList.value]);
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
@@ -203,7 +204,7 @@ const state = reactive({
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...publicDashboardList.value, ...privateDashboardList.value],
+            dashboardList.value,
         );
     }),
     favoriteMetricItems: computed<ReferenceData[]>(() => {

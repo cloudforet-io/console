@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -39,12 +39,12 @@ const {
     publicDashboardList,
     privateDashboardList,
     keys,
-    queryClient,
 } = useDashboardQuery();
+const queryClient = useQueryClient();
 const {
     fetcher,
     keys: dashboardDetailKeys,
-} = useDashboardDetailQuery({
+} = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
 const route = useRoute();

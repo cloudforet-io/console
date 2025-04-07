@@ -78,7 +78,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
 <template>
     <div :class="{
         'dropdown-button-component': true,
-        [props.styleType]: true,
+        [props.styleType]: !$scopedSlots['icon-button'],
         [props.appearanceType]: true,
         [props.size]: true,
         invalid: props.invalid,
@@ -91,7 +91,16 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         'has-items': props.readonly && displayBadgeValueOnDropdownButton,
     }"
     >
-        <span v-if="CHEVRON_ICON_STYLES.includes(props.styleType)"
+        <span v-if="$scopedSlots['icon-button']"
+              @click.stop="emit('click-dropdown-button')"
+              @keydown.down="emit('enter-key')"
+        >
+            <slot
+                name="icon-button"
+                v-bind="props.selectedItems"
+            />
+        </span>
+        <span v-else-if="CHEVRON_ICON_STYLES.includes(props.styleType)"
               class="dropdown-icon-button-wrapper"
               @click.stop="emit('click-dropdown-button')"
         >

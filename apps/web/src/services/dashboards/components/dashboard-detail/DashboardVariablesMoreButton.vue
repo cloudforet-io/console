@@ -4,9 +4,9 @@ import {
     computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
     cloneDeep, debounce,
 } from 'lodash';
@@ -27,12 +27,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface VariableMenuItem extends MenuItem {
     use?: boolean;
@@ -44,21 +43,20 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const appContextStore = useAppContextStore();
 const router = useRouter();
-
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
     dashboard,
     fetcher,
     keys,
-    queryClient,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+} = useDashboardGetQuery({
+    dashboardId,
 });
+const queryClient = useQueryClient();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     targetRef: null as HTMLElement | null,
@@ -101,7 +99,7 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 /* Api */
-const toggleUseDashboardVarsSchema = debounce((dashboardId: string, variableKey: string) => {
+const toggleUseDashboardVarsSchema = debounce((_dashboardId: string, variableKey: string) => {
     const _dashboardVarsSchemaProperties: Record<string, DashboardGlobalVariable> = cloneDeep(state.dashboardVarsSchemaProperties);
     const _use = !_dashboardVarsSchemaProperties[variableKey].use;
     const _vars = cloneDeep(dashboard.value?.vars || {});
@@ -109,7 +107,7 @@ const toggleUseDashboardVarsSchema = debounce((dashboardId: string, variableKey:
         delete _vars[variableKey];
     }
     mutate({
-        dashboard_id: dashboardId,
+        dashboard_id: _dashboardId,
         vars_schema: {
             properties: {
                 ..._dashboardVarsSchemaProperties,
@@ -157,7 +155,7 @@ const handleOpenOverlay = () => {
         : DASHBOARDS_ROUTE.DETAIL._NAME;
     router.push({
         name: dashboardDetailRouteName,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+        params: { dashboardId: dashboardId.value ?? '' },
         hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
     }).catch(() => {});
 };
@@ -166,8 +164,8 @@ const handleClickButton = () => {
     else focusOnContextMenu();
 };
 const handleSelectVariable = (item: VariableMenuItem) => { // idx, isSelected
-    if (!dashboardDetailState.dashboardId || !item.name || loading.value) return;
-    toggleUseDashboardVarsSchema(dashboardDetailState.dashboardId, item.name);
+    if (!dashboardId.value || !item.name || loading.value) return;
+    toggleUseDashboardVarsSchema(dashboardId.value, item.name);
 };
 const handleUpdateSearchText = debounce((text: string) => {
     state.searchText = text;
