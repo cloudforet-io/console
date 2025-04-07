@@ -1,10 +1,10 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import { usePrivateDataTableApi } from '@/api-clients/dashboard/private-data-table/composables/use-private-data-table-api';
 import type { DataTableGetParameters } from '@/api-clients/dashboard/private-data-table/schema/api-verbs/get';
 import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 

@@ -7,15 +7,16 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 
 const DEFAULT_LIST_DATA = { results: [] };
 const STALE_TIME = 1000 * 60 * 5;
