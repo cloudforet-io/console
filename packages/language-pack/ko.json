@@ -5369,6 +5369,9 @@
 			"TITLE_INFO_MESSAGE": "이벤트 규칙은 오름차순으로 실행됩니다.",
 			"URGENCY": "긴급도"
 		},
+		"LADING": {
+			"GROUPS_AND_PROJECTS": "프로젝트 그룹과 프로젝트"
+		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "선택한 그룹 삭제 ",
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",

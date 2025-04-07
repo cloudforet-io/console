@@ -5369,6 +5369,9 @@
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
 			"URGENCY": "Urgency"
 		},
+		"LADING": {
+			"GROUPS_AND_PROJECTS": "Project Groups and Projects"
+		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
