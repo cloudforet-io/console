@@ -282,7 +282,7 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
             </div>
         </div>
         <div class="tab-pane">
-            <slot />
+            <slot v-bind="currentTabItem" />
             <keep-alive>
                 <slot v-if="keepAliveTabNames.includes(activeTab)"
                       :name="activeTab"
