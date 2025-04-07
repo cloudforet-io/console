@@ -1066,6 +1066,7 @@
 			"ADD": "追加",
 			"CANCEL": "キャンセル",
 			"CONFIRM": "確認",
+			"CREATE": "生成",
 			"DELETE": "削除",
 			"DONE": "完了",
 			"DOWNLOAD": "ダウンロード",
@@ -5275,6 +5276,7 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
 			"PROJECT_ID": "プロジェクトID：",
 			"PROJECT_MEMBER_LABEL": "ラベル",
+			"RENAME": "",
 			"REPORT_CANCEL": "キャンセル",
 			"REPORT_DESC": "SpaceONEは、プロジェクトベースの月次レポートを提供します。今後提供するコンテンツを追加する予定です",
 			"REPORT_DOWNLOAD_FILE_DESC": "*提供するファイル形式（PDF、PPTX、CSV）",
@@ -5367,6 +5369,9 @@
 			"TITLE_INFO_MESSAGE": "イベントルールは昇順で実行されます。",
 			"URGENCY": "緊急度"
 		},
+		"LADING": {
+			"GROUPS_AND_PROJECTS": ""
+		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "選択したグループ削除",
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
@@ -5439,6 +5444,7 @@
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
 			"PROJECT": "プロジェクト",
+			"PROJECTS": "プロジェクト",
 			"PROJECT_GROUP": "プロジェクトグループ",
 			"PROJECT_GROUPS": "プロジェクトグループ",
 			"PROJECT_GROUP_MEMBER": "プロジェクトグループメンバー",

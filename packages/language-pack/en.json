@@ -1066,6 +1066,7 @@
 			"ADD": "Add",
 			"CANCEL": "Cancel",
 			"CONFIRM": "Confirm",
+			"CREATE": "Create",
 			"DELETE": "Delete",
 			"DONE": "Done",
 			"DOWNLOAD": "Download",
@@ -5275,6 +5276,7 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
 			"PROJECT_ID": "Project ID:",
 			"PROJECT_MEMBER_LABEL": "Labels",
+			"RENAME": "Rename",
 			"REPORT_CANCEL": "Cancel",
 			"REPORT_DESC": "SpaceONE offers monthly report based on this project. We will update more content soon.",
 			"REPORT_DOWNLOAD_FILE_DESC": "* Only PDF, PPTX formats are avilable.",
@@ -5367,6 +5369,9 @@
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
 			"URGENCY": "Urgency"
 		},
+		"LADING": {
+			"GROUPS_AND_PROJECTS": "Project Groups and Projects"
+		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
@@ -5439,6 +5444,7 @@
 			"PLACE_HOLDER_PROJECT": "Project",
 			"PLACE_HOLDER_SHOW_MORE": "more",
 			"PROJECT": "Project",
+			"PROJECTS": "Projects",
 			"PROJECT_GROUP": "Project Group",
 			"PROJECT_GROUPS": "Project Groups",
 			"PROJECT_GROUP_MEMBER": "Project Group Member",

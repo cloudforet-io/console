@@ -29,10 +29,10 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
 import ProjectMainTree from '@/services/project/v1/components/ProjectMainTree.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
