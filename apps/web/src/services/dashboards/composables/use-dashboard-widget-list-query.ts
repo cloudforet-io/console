@@ -3,7 +3,6 @@ import { computed } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import type { WidgetModel, WidgetUpdateParams } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PrivateWidgetListParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/list';
@@ -13,6 +12,7 @@ import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/compos
 import type { PublicWidgetListParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/list';
 import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 const DEFAULT_LIST_DATA = { results: [] };
