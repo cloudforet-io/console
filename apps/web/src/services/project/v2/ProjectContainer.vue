@@ -33,7 +33,7 @@ const state = reactive({
 });
 
 /* Event */
-const handleUpdateProjectFormModalVisible = (visible: boolean) => {
+const handleUpdateProjectFormModalVisible = (visible?: boolean) => {
     projectPageStore.setProjectFormModalVisible(visible);
     if (projectPageState.currentSelectedProjectId && !visible) {
         projectPageStore.setCurrentSelectedProjectId(undefined);
@@ -51,16 +51,16 @@ const refreshProejctTree = () => {
     projectTreeStore.refreshProjectTree();
 };
 
-const handleConfirmProjectFormModal = (isCreating: boolean, result: ProjectModel) => {
+const handleConfirmProjectFormModal = (isCreating: boolean, result?: ProjectModel) => {
     refreshProejctTree();
-    if (isCreating && !result.project_group_id && !state.isProjectRootPage) {
+    if (isCreating && !result?.project_group_id && !state.isProjectRootPage) {
         // TODO: check route
         router.push({ name: PROJECT_ROUTE_V2._NAME });
     }
 };
-const handleConfirmProjectGroupFormModal = (isCreating: boolean, result: ProjectGroupModel) => {
+const handleConfirmProjectGroupFormModal = (isCreating: boolean, result?: ProjectGroupModel) => {
     refreshProejctTree();
-    if (isCreating && !result.parent_group_id && !state.isProjectRootPage) {
+    if (isCreating && !result?.parent_group_id && !state.isProjectRootPage) {
         // TODO: check route
         router.push({ name: PROJECT_ROUTE_V2._NAME });
     }
@@ -75,7 +75,7 @@ onUnmounted(() => {
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lsbVisible">
+        <vertical-page-layout v-if="route.meta?.lsbVisible">
             <template #sidebar>
                 <project-l-s-b />
             </template>
@@ -83,7 +83,7 @@ onUnmounted(() => {
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-else-if="$route.meta.centeredLayout"
+        <centered-page-layout v-else-if="route.meta?.centeredLayout"
                               has-nav-bar
         >
             <router-view />
