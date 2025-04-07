@@ -255,7 +255,7 @@ onDeactivated(() => {
                 />
             </div>
         </template>
-        <template #col-service_account_id-format="{ value }">
+        <template #col-service_account_id-format="{ value, item }">
             <p-link v-if="storeState.serviceAccounts[value]"
                     action-icon="internal-link"
                     new-tab
