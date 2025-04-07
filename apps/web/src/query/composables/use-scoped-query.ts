@@ -94,8 +94,8 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
 
 const _extractQueryKey = (input: unknown): QueryKeyArray => toValue(input as ComputedRef<QueryKeyArray>);
 
-const _warnedKeys = new Set<string>();
 
+// Warns if `requiredScopes` array is missing or empty during development
 const _warnMissingRequiredScopes = (scopes: GrantScope[]) => {
     if (import.meta.env.DEV && (!scopes || scopes.length === 0)) {
         console.warn('[useScopedQuery] `requiredScopes` is missing or empty.', {
@@ -104,6 +104,8 @@ const _warnMissingRequiredScopes = (scopes: GrantScope[]) => {
     }
 };
 
+// Logs a warning once per queryKey when the current scope is invalid for this query
+const _warnedKeys = new Set<string>();
 const _warnInvalidScopeOnce = (params: {
     queryKey: QueryKeyArray;
     enabled: boolean;
