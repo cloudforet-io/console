@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {
-    reactive, computed,
-} from 'vue';
+import { computed } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
 
@@ -25,11 +23,11 @@ import { useProjectPageModalStore } from '@/services/project/v2/stores/project-p
 
 
 const projectPageModalStore = useProjectPageModalStore();
+const visible = computed(() => !!projectPageModalStore.state.inviteMemberModalVisible
+        && projectPageModalStore.state.targetType === 'project'
+        && !!projectPageModalStore.state.targetId);
 
-
-const state = reactive({
-    searchText: '',
-});
+/* selected users */
 const {
     forms: {
         selectedUserItems,
@@ -45,17 +43,20 @@ const {
         return true;
     },
 });
+const handleUpdateSelected = (selected: number|string|SelectDropdownMenuItem[]) => {
+    setForm('selectedUserItems', selected as SelectDropdownMenuItem[]);
+};
 
 /* workspace users */
 const { data: workspaceUsers } = useWorkspaceUsersQuery({
-    enabled: computed(() => projectPageModalStore.state.inviteMemberModalVisible),
+    enabled: visible,
 });
 const workspaceUserList = computed(() => workspaceUsers.value || []);
 
 /* project users */
-const { data: project } = useProjectQuery({
+const { data: project, setQueryData: setProjectQueryData } = useProjectQuery({
     projectId: computed(() => projectPageModalStore.state.targetId),
-    enabled: computed(() => projectPageModalStore.state.inviteMemberModalVisible),
+    enabled: visible,
 });
 const projectUserList = computed(() => project.value?.users || []);
 
@@ -81,24 +82,29 @@ const {
     getUserIcon, getUserLabel,
 } = useUserInfo();
 
-/* Api */
+/* mutation */
 const { projectAPI } = useProjectApi();
 const { mutateAsync: addMember } = useMutation({
-    mutationFn: () => {
-        const projectId = projectPageModalStore.state.targetId;
+    mutationFn: ({ projectId, users }: {projectId: string; users: string[]}) => {
         if (!projectId) throw new Error('Project ID is not defined');
         return projectAPI.addUsers({
             project_id: projectId,
-            users: selectedUserItems.value.map((d) => d.name),
+            users,
         });
     },
-    onSuccess: () => showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), ''),
+    onSuccess: (data) => {
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '');
+        setProjectQueryData(data);
+    },
     onError: (e) => ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'), true),
 });
 
 /* Event */
 const handleConfirm = async () => {
-    await addMember();
+    await addMember({
+        projectId: projectPageModalStore.state.targetId as string,
+        users: selectedUserItems.value.map((d) => d.name),
+    });
     projectPageModalStore.closeInviteMemberModal();
 };
 
@@ -116,6 +122,7 @@ const handleConfirm = async () => {
         :disabled="!isAllValid"
         @close="projectPageModalStore.closeInviteMemberModal()"
         @cancel="projectPageModalStore.closeInviteMemberModal()"
+        @closed="projectPageModalStore.resetTarget()"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -129,7 +136,6 @@ const handleConfirm = async () => {
                         <p-select-dropdown
                             :menu="userMenuItems"
                             :selected="selectedUserItems"
-                            :search-text.sync="state.searchText"
                             parent-id="project-member-invite"
                             multi-selectable
                             appearance-type="stack"
@@ -138,7 +144,7 @@ const handleConfirm = async () => {
                             show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="setForm('selectedUserItems', $event)"
+                            @update:selected="handleUpdateSelected"
                         >
                             <template #menu-item--format="{item}">
                                 <p-lazy-img :src="getUserIcon(item.name)"
