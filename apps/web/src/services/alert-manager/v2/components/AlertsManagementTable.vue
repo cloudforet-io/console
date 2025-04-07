@@ -88,6 +88,7 @@ const state = reactive({
             ? calculateTime(alert?.resolved_at, storeState.timezone) || '0m'
             : calculateTime(alert?.created_at, storeState.timezone) || '0m',
         created_at: iso8601Formatter(alert.created_at, storeState.timezone),
+        resolved_at: iso8601Formatter(alert.resolved_at, storeState.timezone) || '-',
     }))),
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
