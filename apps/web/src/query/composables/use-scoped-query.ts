@@ -64,7 +64,7 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
     const currentGrantScope = computed<GrantScope | undefined>(
         () => userStore.state.currentGrantInfo?.scope,
     );
-    const isAppReady = computed(() => appContextStore.getters.globalGrantLoading);
+    const isAppReady = computed(() => !appContextStore.getters.globalGrantLoading);
 
     const isValidScope = computed(() => currentGrantScope.value !== undefined
         && requiredScopes.includes(currentGrantScope.value));

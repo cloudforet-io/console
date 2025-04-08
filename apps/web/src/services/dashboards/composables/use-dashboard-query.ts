@@ -7,7 +7,6 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
@@ -68,7 +67,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
     });
 
     /* Querys */
-    const publicDashboardListQuery = useScopedQuery<ListResponse<PublicDashboardModel>, unknown, PublicDashboardModel[]>({
+    const publicDashboardListQuery = useScopedQuery({
         queryKey: publicDashboardListQueryKey,
         queryFn: () => publicDashboardAPI.list(publicDashboardListParams.value),
         select: (data) => data?.results ?? [],
@@ -77,7 +76,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         staleTime: STALE_TIME,
         enabled: computed(() => !!_state.publicDashboardListApiQuery?.filter),
     }, ['DOMAIN', 'WORKSPACE']);
-    const privateDashboardListQuery = useScopedQuery<ListResponse<PrivateDashboardModel>, unknown, PrivateDashboardModel[]>({
+    const privateDashboardListQuery = useScopedQuery({
         queryKey: privateDashboardListQueryKey,
         queryFn: () => privateDashboardAPI.list(privateDashboardListParams.value),
         select: (data) => data?.results || [],
