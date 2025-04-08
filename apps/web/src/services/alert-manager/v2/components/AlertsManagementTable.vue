@@ -115,22 +115,22 @@ const filterState = reactive({
     periodMenuItems: computed<AlertPeriodItemType[]>(() => [
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_1_MONTH,
-            relativePeriod: { unit: 'month', value: 1 },
+            relativePeriod: { value: 1 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_1_MONTHS'),
         },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_3_MONTHS,
-            relativePeriod: { unit: 'month', value: 2 },
+            relativePeriod: { value: 2 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_3_MONTHS'),
         },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_6_MONTHS,
-            relativePeriod: { unit: 'month', value: 5 },
+            relativePeriod: { value: 5 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_6_MONTHS'),
         },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_12_MONTHS,
-            relativePeriod: { unit: 'month', value: 11 },
+            relativePeriod: { value: 11 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_12_MONTHS'),
         },
         {
