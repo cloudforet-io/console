@@ -37,7 +37,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 interface Props {
     variable: DashboardGlobalVariable;

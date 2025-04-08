@@ -18,7 +18,7 @@ import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-typ
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 interface Props {
     variable: DashboardGlobalVariable;

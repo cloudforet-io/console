@@ -15,15 +15,15 @@ import WidgetFullModeModal from '@/services/dashboards/components/legacy/WidgetF
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import type { ReformedWidgetInfo } from '@/services/dashboards/composables/use-reformed-widget-info-list';
 import {
     useReformedWidgetInfoList,
 } from '@/services/dashboards/composables/use-reformed-widget-info-list';
 import { getDashboardWidgetInfoList } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_types/widget-type';

@@ -22,7 +22,7 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 interface Props {
     variable: DashboardGlobalVariable;

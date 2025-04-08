@@ -13,17 +13,17 @@ import { PSkeleton } from '@cloudforet/mirinae';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
-import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
-import DashboardToolsetDateDropdown
-    from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
-import DashboardWidgetContainerV2
-    from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import DashboardLabelsButton from '@/services/dashboards/shared/components/DashboardLabelsButton.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/shared/components/DashboardRefreshDropdown.vue';
+import DashboardToolsetDateDropdown
+    from '@/services/dashboards/shared/components/DashboardToolsetDateDropdown.vue';
+import DashboardVariablesV2 from '@/services/dashboards/shared/components/DashboardVariablesV2.vue';
+import DashboardWidgetContainerV2
+    from '@/services/dashboards/shared/components/DashboardWidgetContainerV2.vue';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 

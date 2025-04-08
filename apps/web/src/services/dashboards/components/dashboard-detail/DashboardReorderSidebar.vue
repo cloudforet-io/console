@@ -22,8 +22,8 @@ import { useDisplayStore } from '@/store/display/display-store';
 import { WIDGET_COMPONENT_ICON_MAP } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 const displayStore = useDisplayStore();

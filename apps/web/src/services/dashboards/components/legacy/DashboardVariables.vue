@@ -11,9 +11,9 @@ import type { DashboardVariables, DashboardVariablesSchema } from '@/api-clients
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 
 import DashboardVariableDropdown from '@/services/dashboards/components/legacy/DashboardVariableDropdown.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {

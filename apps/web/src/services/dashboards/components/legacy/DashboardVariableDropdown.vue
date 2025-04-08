@@ -28,7 +28,7 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 
 
 interface Props {

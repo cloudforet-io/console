@@ -12,8 +12,8 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardLabels from '@/services/dashboards/components/dashboard-detail/DashboardLabels.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 
 

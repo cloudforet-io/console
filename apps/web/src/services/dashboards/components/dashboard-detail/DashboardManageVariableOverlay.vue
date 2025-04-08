@@ -31,13 +31,13 @@ import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
     from '@/services/dashboards/components/dashboard-detail/DashboardVariablesFormModal.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 
 
