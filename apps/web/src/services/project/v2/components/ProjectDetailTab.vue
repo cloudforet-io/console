@@ -128,11 +128,14 @@ const handleUpdateActiveTab = (tab: string) => {
             <template #default>
                 <div>
                     <keep-alive>
-                        <div v-if="activeTab === 'overview'">
+                        <div v-if="activeTab === 'overview'"
+                             :key="`${props.projectId}-overview`"
+                        >
                             Overview will be implemented later.
                         </div>
                         <project-dashboard v-else
                                            :id="props.projectId"
+                                           :key="`${props.projectId}-${activeTab}`"
                                            :dashboard-id="activeTab"
                         />
                     </keep-alive>

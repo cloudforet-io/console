@@ -10,7 +10,6 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { PSkeleton } from '@cloudforet/mirinae';
 
-
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
