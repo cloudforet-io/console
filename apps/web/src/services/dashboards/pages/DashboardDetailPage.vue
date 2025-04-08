@@ -30,7 +30,6 @@ import DashboardToolsetScope from '@/services/dashboards/components/dashboard-de
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
-import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import DashboardRefreshDropdown from '@/services/dashboards/shared/components/DashboardRefreshDropdown.vue';
@@ -38,6 +37,7 @@ import DashboardToolsetDateDropdown from '@/services/dashboards/shared/component
 import DashboardVariablesV2 from '@/services/dashboards/shared/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2 from '@/services/dashboards/shared/components/DashboardWidgetContainerV2.vue';
 import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/shared/composables/use-dashboard-widget-list-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 
 interface Props {

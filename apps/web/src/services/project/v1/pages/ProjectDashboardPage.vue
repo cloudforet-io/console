@@ -14,7 +14,6 @@ import { PSkeleton } from '@cloudforet/mirinae';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
 import DashboardLabelsButton from '@/services/dashboards/shared/components/DashboardLabelsButton.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/shared/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
@@ -23,6 +22,7 @@ import DashboardVariablesV2 from '@/services/dashboards/shared/components/Dashbo
 import DashboardWidgetContainerV2
     from '@/services/dashboards/shared/components/DashboardWidgetContainerV2.vue';
 import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/shared/composables/use-dashboard-widget-list-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 

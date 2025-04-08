@@ -59,7 +59,7 @@ import {
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
-import { useDashboardWidgetListQuery } from '../../composables/use-dashboard-widget-list-query';
+import { useDashboardWidgetListQuery } from '../composables/use-dashboard-widget-list-query';
 
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
