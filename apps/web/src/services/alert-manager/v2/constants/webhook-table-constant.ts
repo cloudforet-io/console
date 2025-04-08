@@ -27,9 +27,9 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
 ];
 
 export const WEBHOOK_DEFINITION_FIELDS: DataTableFieldType[] = [
-    { name: 'name', label: 'Name' },
-    { name: 'plugin_info.plugin_id', label: 'Plugin' },
-    { name: 'state', label: 'State' },
+    { name: 'name', label: 'Name', disableCopy: true },
+    { name: 'plugin_info.plugin_id', label: 'Plugin', disableCopy: true },
+    { name: 'state', label: 'State', disableCopy: true },
     { name: 'plugin_info.version', label: 'Version' },
     { name: 'webhook_id', label: 'Webhook ID' },
     { name: 'webhook_url', label: 'Webhook URL' },
