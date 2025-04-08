@@ -112,7 +112,6 @@ const tabs = computed<TabItem[]>(() => {
 const tabNamesKey = computed(() => tabs.value.map((tab) => tab.name).join(','));
 
 const handleUpdateActiveTab = (tab: string) => {
-    console.debug('handleUpdateActiveTab', tab);
     activeTab.value = tab;
     emit('update:dashboard-id', tab === 'overview' ? undefined : tab);
 };

@@ -106,7 +106,7 @@ onUnmounted(() => {
                     <beta-mark />
                 </div>
                 <dashboard-labels-button class="ml-4"
-                                         dashboard-id="props.dashboardId"
+                                         :dashboard-id="props.dashboardId"
                 />
             </div>
             <div class="bg-gray-100 rounded-lg pt-4 px-2 pb-2 mx-4">
