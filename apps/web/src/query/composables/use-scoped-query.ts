@@ -33,7 +33,7 @@
 import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/core';
 import type { ComputedRef } from 'vue';
-import { computed } from 'vue';
+import { computed, getCurrentInstance } from 'vue';
 
 import {
     useQuery, type UseQueryOptions, type UseQueryReturnType,
@@ -104,8 +104,17 @@ const _warnMissingRequiredScopes = (scopes: GrantScope[]) => {
     }
 };
 
-// Logs a warning once per queryKey when the current scope is invalid for this query
-const _warnedKeys = new Set<string>();
+/**
+ * Logs a warning when a query is not executed due to invalid scope,
+ * but only once per queryKey during development.
+ *
+ * Conditions to trigger warning:
+ * - `enabled` is true
+ * - app is ready (not loading)
+ * - currentScope is defined
+ * - currentScope NOT included in requiredScopes
+ */
+const _warnedKeysPerInstance = new WeakMap<object, Set<string>>();
 const _warnInvalidScopeOnce = (params: {
     queryKey: QueryKeyArray;
     enabled: boolean;
@@ -115,20 +124,39 @@ const _warnInvalidScopeOnce = (params: {
 }) => {
     if (!import.meta.env.DEV) return;
 
+    // Get the current Vue component instance (used to scope the warning cache)
+    const instance = getCurrentInstance();
+    if (!instance) return;
+
     const {
         queryKey, enabled, currentScope, requiredScopes, isAppReady,
     } = params;
-    if (!enabled || !isAppReady || !currentScope) return;
 
-    if (requiredScopes.includes(currentScope)) return;
+    if (!isAppReady || !currentScope) return;
 
-    const key = Array.isArray(queryKey)
-        ? queryKey.join(':')
-        : String(queryKey);
+    const isValidScope = requiredScopes.includes(currentScope);
 
-    if (_warnedKeys.has(key)) return;
+    if (!enabled && isValidScope) return;
 
-    _warnedKeys.add(key);
+    if (isValidScope) return;
+
+    // Safely serialize the queryKey (even if it contains objects)
+    const key = (() => {
+        try {
+            return JSON.stringify(queryKey);
+        } catch {
+            return Array.isArray(queryKey) ? queryKey.join(':') : String(queryKey);
+        }
+    })();
+
+    // Cache per component instance to prevent duplicate logs
+    let keySet = _warnedKeysPerInstance.get(instance);
+    if (!keySet) {
+        keySet = new Set();
+        _warnedKeysPerInstance.set(instance, keySet);
+    }
+    if (keySet.has(key)) return;
+    keySet.add(key);
 
     console.warn('[useScopedQuery] Query not executed due to invalid grant scope.', {
         queryKey,
