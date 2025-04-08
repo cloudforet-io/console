@@ -89,6 +89,26 @@ onMounted(() => {
     });
 });
 
+/* dashboard id update */
+const handleUpdateDashboardId = (id?: string) => {
+    if (!props.projectGroupOrProjectId) return;
+    if (!id) {
+        router.replace({
+            params: {
+                projectGroupOrProjectId: props.projectGroupOrProjectId,
+                dashboardId: '',
+            },
+        });
+    } else {
+        router.replace({
+            params: {
+                projectGroupOrProjectId: props.projectGroupOrProjectId,
+                dashboardId: id,
+            },
+        });
+    }
+};
+
 </script>
 
 <template>
@@ -108,6 +128,7 @@ onMounted(() => {
                             class="mt-6"
                             :project-id="props.projectGroupOrProjectId"
                             :dashboard-id="props.dashboardId"
+                            @update:dashboard-id="handleUpdateDashboardId"
         />
 
         <template v-if="isModalLoadReady">
