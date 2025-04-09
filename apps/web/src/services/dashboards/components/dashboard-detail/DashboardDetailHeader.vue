@@ -16,13 +16,13 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { gray } from '@/styles/colors';
 
+import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
+import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import DashboardLabelsButton from '@/services/dashboards/shared/components/DashboardLabelsButton.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 

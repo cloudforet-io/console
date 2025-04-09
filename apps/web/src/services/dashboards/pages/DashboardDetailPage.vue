@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
     computed,
-    onUnmounted, reactive, watch,
+    onUnmounted, watch,
 } from 'vue';
 
 import {
@@ -13,9 +13,10 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import DashboardDetailBody from '@/services/dashboards/components/dashboard-detail/DashboardDetailBody.vue';
+import DashboardDetailBody from '@/services/dashboard-shared/dashboard-detail/DashboardDetailBody.vue';
 import DashboardDetailHeader from '@/services/dashboards/components/dashboard-detail/DashboardDetailHeader.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
+import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 interface Props {
     dashboardId: string;
@@ -27,18 +28,21 @@ const { breadcrumbs } = useBreadcrumbs();
 
 /* Query */
 const {
-    dashboard,
-} = useDashboardGetQuery({
-    dashboardId: computed(() => props.dashboardId),
-});
+    publicDashboardList,
+    privateDashboardList,
+} = useDashboardQuery();
+const {
+    publicFolderList,
+    privateFolderList,
+} = useDashboardFolderQuery();
 
-const state = reactive({
-    favoriteOptions: computed<FavoriteOptions>(() => ({
-        type: FAVORITE_TYPE.DASHBOARD,
-        id: props.dashboardId,
-    })),
-    isDeprecatedDashboard: computed(() => dashboard.value?.version === '1.0'),
-});
+const dashboardItems = computed(() => [...publicDashboardList.value, ...privateDashboardList.value]);
+const folderItems = computed(() => [...publicFolderList.value, ...privateFolderList.value]);
+const isDeprecatedDashboard = computed<boolean>(() => dashboardItems.value.find((d) => d.dashboard_id === props.dashboardId)?.version === '1.0');
+const favoriteOptions = computed<FavoriteOptions>(() => ({
+    type: FAVORITE_TYPE.DASHBOARD,
+    id: props.dashboardId,
+}));
 
 watch(() => props.dashboardId, async (dashboardId) => {
     // Set Dashboard Detail Custom breadcrumbs
@@ -47,8 +51,8 @@ watch(() => props.dashboardId, async (dashboardId) => {
     }
 }, { immediate: true });
 
-watch(() => state.favoriteOptions, (favoriteOptions) => {
-    gnbStore.setFavoriteItemId(favoriteOptions);
+watch(favoriteOptions, (_favoriteOptions) => {
+    gnbStore.setFavoriteItemId(_favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -58,8 +62,7 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
-        <portal-target name="dashboard-detail-page" />
-        <div v-if="state.isDeprecatedDashboard"
+        <div v-if="isDeprecatedDashboard"
              class="deprecated-banner"
         >
             <p-i name="ic_limit-filled"
@@ -78,7 +81,10 @@ onUnmounted(() => {
         </div>
         <dashboard-detail-header :dashboard-id="props.dashboardId" />
         <p-divider class="divider" />
-        <dashboard-detail-body :dashboard-id="props.dashboardId" />
+        <dashboard-detail-body :dashboard-id="props.dashboardId"
+                               :dashboard-items="dashboardItems"
+                               :folder-items="folderItems"
+        />
     </div>
 </template>
 

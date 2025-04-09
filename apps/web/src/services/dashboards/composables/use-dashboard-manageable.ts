@@ -7,7 +7,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 
 interface UseDashboardManageableOptions {
     dashboardId: ComputedRef<string|undefined>;

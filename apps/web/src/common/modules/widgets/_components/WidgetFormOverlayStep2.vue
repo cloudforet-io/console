@@ -35,11 +35,11 @@ import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-valu
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
-import DashboardToolsetDateDropdown from '@/services/dashboards/shared/components/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2 from '@/services/dashboards/shared/components/DashboardVariablesV2.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
-import { useDashboardWidgetListQuery } from '@/services/dashboards/shared/composables/use-dashboard-widget-list-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
+import DashboardToolsetDateDropdown from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
+import DashboardVariablesV2 from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesV2.vue';
+import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
@@ -318,6 +318,7 @@ onUnmounted(() => {
                         />
                         <dashboard-variables-v2 disable-save-button
                                                 widget-mode
+                                                :dashboard-id="dashboardId"
                                                 :is-project-dashboard="!!dashboard?.project_id"
                         />
                     </div>
