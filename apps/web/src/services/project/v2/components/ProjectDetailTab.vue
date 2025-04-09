@@ -2,19 +2,18 @@
 import {
     computed, nextTick, onBeforeUnmount, onMounted, ref, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PTab } from '@cloudforet/mirinae';
+import { PTab, PSelectDropdown } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
-import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
-import type { PublicDashboardListParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/list';
-import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
-import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/list';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import ProjectDashboard from '@/services/project/v2/components/ProjectDashboard.vue';
 import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vue';
+import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
+import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 
 const props = defineProps<{
@@ -23,7 +22,7 @@ const props = defineProps<{
     dashboardId?: string,
 }>();
 const emit = defineEmits<{(e: 'update:dashboard-id', value?: string): void;}>();
-
+const router = useRouter();
 
 const activeTab = ref('overview');
 watch(() => props.dashboardId, (did) => {
@@ -44,62 +43,38 @@ onBeforeUnmount(() => {
     mounted.value = false;
 });
 
-/* dashboard tabs */
-const { publicDashboardAPI } = usePublicDashboardApi();
-const { publicFolderAPI } = usePublicFolderApi();
-const { key: dashboardListQueryKey, params: dashboardListParams } = useServiceQueryKey('dashboard', 'public-dashboard', 'list', {
-    params: computed<PublicDashboardListParameters>(() => ({
-        // project_id: props.id,
-        query: {
-            filter: [
-                { k: 'shared', v: true, o: 'eq' },
-                { k: 'version', v: '1.0', o: 'not' },
-                { k: 'scope', v: 'PROJECT', o: 'eq' },
-            ],
-        },
-    })),
+/* Query */
+const {
+    dashboardList,
+    dashboardSharedList,
+} = useProjectDashboardQuery({
+    projectGroupId: computed(() => props.projectGroupId),
+    projectId: computed(() => props.projectId),
 });
-const { data: dashboardList } = useScopedQuery({
-    queryKey: dashboardListQueryKey,
-    queryFn: () => publicDashboardAPI.list(dashboardListParams.value),
-    select: (data) => data?.results ?? [],
-    enabled: mounted,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 5, // 5 minutes
-}, ['WORKSPACE']);
-const { key: dashboardFolderListQueryKey, params: dashboardFolderListParams } = useServiceQueryKey('dashboard', 'public-folder', 'list', {
-    params: computed<PublicFolderListParameters>(() => ({
-        // project_id: props.id,
-        query: {
-            filter: [
-                { k: 'shared', v: true, o: 'eq' },
-                { k: 'scope', v: 'PROJECT', o: 'eq' },
-            ],
-        },
-    })),
+const {
+    dashboardFolderList,
+    dashboardFolderSharedList,
+} = useProjectDashboardFolderQuery({
+    projectGroupId: computed(() => props.projectGroupId),
+    projectId: computed(() => props.projectId),
 });
-const { data: dashboardFolderList } = useScopedQuery({
-    queryKey: dashboardFolderListQueryKey,
-    queryFn: () => publicFolderAPI.list(dashboardFolderListParams.value),
-    select: (data) => data?.results || [],
-    enabled: mounted,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 5, // 5 minutes
-}, ['WORKSPACE']);
+
+const dashboardItems = computed<Array<DashboardModel>>(() => [...dashboardSharedList.value, ...dashboardList.value]);
+const dashboardFolderItems = computed<Array<DashboardFolderModel>>(() => [...dashboardFolderSharedList.value, ...dashboardFolderList.value]);
 
 const tabs = computed<TabItem[]>(() => {
-    const folderTabs = dashboardFolderList.value?.map((folder) => ({
+    const folderTabs = dashboardFolderItems.value?.map((folder) => ({
         name: folder.folder_id,
         label: folder.name,
         tabType: 'folder',
         icon: 'ic_folder',
-        subItems: dashboardList.value?.filter((dashboard) => dashboard.folder_id === folder.folder_id).map((dashboard) => ({
+        subItems: dashboardItems.value?.filter((dashboard) => dashboard.folder_id === folder.folder_id).map((dashboard) => ({
             name: dashboard.dashboard_id,
             label: dashboard.name,
             icon: 'ic_service_dashboard',
         })),
     })) ?? [];
-    const dashboardTabs = dashboardList.value?.filter((dashboard) => !dashboard.folder_id).map((dashboard) => ({
+    const dashboardTabs = dashboardItems.value?.filter((dashboard) => !dashboard.folder_id).map((dashboard) => ({
         name: dashboard.dashboard_id,
         label: dashboard.name,
         icon: 'ic_service_dashboard',
@@ -116,6 +91,32 @@ const tabNamesKey = computed(() => tabs.value.map((tab) => tab.name).join(','));
 const handleUpdateActiveTab = (tab: string) => {
     activeTab.value = tab;
     emit('update:dashboard-id', tab === 'overview' ? undefined : tab);
+};
+
+const projectDashboardCreateMenuItems = computed(() => [
+    {
+        label: 'Create Dashboard',
+        name: 'dashboard',
+        icon: 'ic_plus',
+    },
+    {
+        label: 'Create Folder',
+        name: 'folder',
+        icon: 'ic_plus',
+    },
+]);
+
+const handleCreateProjectDashboard = (item: string) => {
+    if (item === 'dashboard') {
+        router.push({
+            name: PROJECT_ROUTE_V2.DASHBOARD_CREATE._NAME,
+            params: {
+                projectGroupOrProjectId: props.projectGroupId ?? props.projectId,
+            },
+        });
+    } else if (item === 'folder') {
+        console.log('create folder');
+    }
 };
 
 </script>
@@ -141,6 +142,15 @@ const handleUpdateActiveTab = (tab: string) => {
                         />
                     </keep-alive>
                 </div>
+            </template>
+            <template #header-right-contents>
+                <p-select-dropdown style-type="tertiary-icon-button"
+                                   button-icon="ic_plus"
+                                   size="sm"
+                                   menu-position="right"
+                                   :menu="projectDashboardCreateMenuItems"
+                                   @select="handleCreateProjectDashboard"
+                />
             </template>
         </p-tab>
     </div>
