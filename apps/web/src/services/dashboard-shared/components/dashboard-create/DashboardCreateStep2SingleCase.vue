@@ -13,14 +13,18 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import type {
+    DashboardCreateParams, DashboardFolderModel, DashboardModel, DashboardType,
+} from '@/api-clients/dashboard/_types/dashboard-type';
+import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type {
     PrivateDashboardCreateParameters,
 } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
+import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -28,60 +32,45 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
-import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import DashboardCreateScopeForm from '@/services/dashboard-shared/components/dashboard-create/DashboardCreateScopeForm.vue';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
+import { useDashboardCreatePageStore } from '@/services/dashboard-shared/stores/dashboard-create-page-store';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface Props {
     isValid: boolean;
+    dashboardItems: Array<DashboardModel>;
+    folderItems: Array<DashboardFolderModel>;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void
 }>();
 
 const router = useRouter();
-const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const userStore = useUserStore();
-
-/* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-    keys,
-    api,
-} = useDashboardQuery();
-const {
-    publicFolderList,
-    privateFolderList,
-} = useDashboardFolderQuery();
-const queryClient = useQueryClient();
+    entryPoint, projectGroupOrProjectId, projectContextType,
+} = useDashboardRouteContext();
 
 const getDashboardNameList = (dashboardType: DashboardType) => {
     if (dashboardType === 'PRIVATE') {
-        return (privateDashboardList.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
+        return props.dashboardItems.filter((i) => i.dashboard_id.startsWith('private')).map((item) => item.name);
     }
-    return publicDashboardList.value.filter((i) => i.version !== '1.0').map((item) => item.name);
+    return props.dashboardItems.filter((i) => i.dashboard_id.startsWith('public')).map((item) => item.name);
 };
 
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
 const state = reactive({
     proxyIsValid: useProxyValue('isValid', props, emit),
-    publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderList.value;
-        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateFolderItems: computed(() => privateFolderList.value),
+    publicFolderItems: computed(() => props.folderItems.filter((i) => i.folder_id.startsWith('public'))),
+    privateFolderItems: computed(() => props.folderItems.filter((i) => i.folder_id.startsWith('private'))),
     dashboardNameList: computed<string[]>(() => getDashboardNameList(dashboardCreatePageGetters.dashboardType)),
     labels: [] as InputItem[],
     folderMenuItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -129,11 +118,17 @@ const {
 });
 
 /* Api */
+const queryClient = useQueryClient();
+const { publicDashboardAPI } = usePublicDashboardApi();
+const { privateDashboardAPI } = usePrivateDashboardApi();
+const { key: publicDashboardListQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'list');
+const { key: privateDashboardListQueryKey } = useServiceQueryKey('dashboard', 'private-dashboard', 'list');
+
 const createDashboardFn = (params: DashboardCreateParams): Promise<DashboardModel> => {
     if (dashboardCreatePageState.dashboardScope === 'PRIVATE') {
-        return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
+        return privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
     }
-    return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
+    return publicDashboardAPI.create(params as PublicDashboardCreateParameters);
 };
 
 const { mutate: createDashboard } = useMutation(
@@ -142,7 +137,7 @@ const { mutate: createDashboard } = useMutation(
         onSuccess: (dashboard: DashboardModel) => {
             dashboardCreatePageStore.setDashboardCreated(true);
             const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+            const dashboardListQueryKey = isPrivate ? privateDashboardListQueryKey : publicDashboardListQueryKey;
             queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
         },
         onError: (e) => {
@@ -150,13 +145,27 @@ const { mutate: createDashboard } = useMutation(
         },
         onSettled(data) {
             if (data?.dashboard_id) {
-                const dashboardDetailRouteName = storeState.isAdminMode
-                    ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-                    : DASHBOARDS_ROUTE.DETAIL._NAME;
-                router.push({
-                    name: dashboardDetailRouteName,
-                    params: { dashboardId: data.dashboard_id },
-                }).catch(() => {});
+                if (entryPoint.value === 'ADMIN') {
+                    router.push({
+                        name: ADMIN_DASHBOARDS_ROUTE._NAME,
+                        params: { dashboardId: data.dashboard_id },
+                    }).catch(() => {});
+                } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+                    router.push({
+                        name: PROJECT_ROUTE_V2._NAME,
+                        params: {
+                            projectGroupOrProjectId: projectGroupOrProjectId.value,
+                            dashboardId: data.dashboard_id,
+                        },
+                    }).catch(() => {});
+                } else if (entryPoint.value === 'WORKSPACE') {
+                    router.push({
+                        name: DASHBOARDS_ROUTE._NAME,
+                        params: { dashboardId: data.dashboard_id },
+                    }).catch(() => {});
+                } else {
+                    console.error('Invalid entry point');
+                }
             }
         },
     },
@@ -172,11 +181,19 @@ const handleConfirm = async () => {
         folder_id: state.selectedFolderId,
         vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
     };
-    if (storeState.isAdminMode) {
+
+    if (entryPoint.value === 'ADMIN') {
         (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+    } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT') {
+        (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
+        (_dashboardParams as PublicDashboardCreateParameters).project_id = projectGroupOrProjectId.value;
+    } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT_GROUP') {
+        (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+        (_dashboardParams as PublicDashboardCreateParameters).project_group_id = projectGroupOrProjectId.value;
     } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
         (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
     }
+
     createDashboard(_dashboardParams as DashboardCreateParams);
 };
 
@@ -225,7 +242,7 @@ defineExpose({
                               block
                 />
             </p-field-group>
-            <dashboard-create-scope-form v-if="!storeState.isAdminMode" />
+            <dashboard-create-scope-form v-if="entryPoint !== 'ADMIN' && entryPoint !== 'PROJECT'" />
             <p-field-group :label="$t('DASHBOARDS.ALL_DASHBOARDS.LOCATION')"
                            required
                            class="mt-4"

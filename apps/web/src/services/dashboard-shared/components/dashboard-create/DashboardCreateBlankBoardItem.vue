@@ -4,8 +4,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type';
 
-import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
-
+import { useDashboardCreatePageStore } from '@/services/dashboard-shared/stores/dashboard-create-page-store';
 
 interface Props {
     templateSets: BoardSet[];

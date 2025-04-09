@@ -14,49 +14,31 @@ import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-ty
 import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-
-import DashboardCreateBlankBoardItem from '@/services/dashboards/components/dashboard-create/DashboardCreateBlankBoardItem.vue';
-import type { FilterLabelItem } from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
-import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
+import DashboardCreateBlankBoardItem from '@/services/dashboard-shared/components/dashboard-create/DashboardCreateBlankBoardItem.vue';
+import type { FilterLabelItem } from '@/services/dashboard-shared/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
+import DashboardCreateStep1SearchFilter from '@/services/dashboard-shared/components/dashboard-create/DashboardCreateStep1SearchFilter.vue';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
+import { useDashboardCreatePageStore } from '@/services/dashboard-shared/stores/dashboard-create-page-store';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
+interface Props {
+    dashboardItems: Array<DashboardModel>;
+}
 
-
+const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'click-next'): void }>();
 const router = useRouter();
 
 
-const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
-
-/* Query */
-const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
-
-const queryState = reactive({
-    publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
-        if (storeState.isAdminMode) return _v2DashboardItems;
-        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
-    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
-});
-
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
+const { entryPoint, projectGroupOrProjectId } = useDashboardRouteContext();
 
 const state = reactive({
     templates: [] as DashboardTemplateModel[],
@@ -83,7 +65,7 @@ const state = reactive({
     }),
     allExistingLabels: computed<string[]>(() => {
         const _ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
-        const _existingTemplates = getFilteredTemplates(queryState.allDashboardItems, '', [], []);
+        const _existingTemplates = getFilteredTemplates(props.dashboardItems, '', [], []);
 
         const _ootbLabels = flatMapDeep(_ootbTemplates.map((d) => d.labels ?? []));
         const _existingLabels = flatMapDeep(_existingTemplates.map((d) => d.labels ?? []));
@@ -121,10 +103,22 @@ const handleSelectProvider = (providers: FilterLabelItem[]) => {
     filterState.selectedProviders = providers.map((d) => d.label.toLowerCase());
 };
 const handleClickCancel = () => {
-    const dashboardRouteName = storeState.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE._NAME
-        : DASHBOARDS_ROUTE._NAME;
-    router.push({ name: dashboardRouteName }).catch(() => {});
+    if (entryPoint.value === 'ADMIN') {
+        router.push({ name: ADMIN_DASHBOARDS_ROUTE._NAME }).catch(() => {});
+    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+        router.push({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: projectGroupOrProjectId.value,
+            },
+        }).catch(() => {});
+    } else if (entryPoint.value === 'WORKSPACE') {
+        router.push({
+            name: DASHBOARDS_ROUTE._NAME,
+        }).catch(() => {});
+    } else {
+        console.error('Invalid entry point');
+    }
 };
 
 onMounted(() => {
@@ -134,33 +128,6 @@ onMounted(() => {
 
 <template>
     <div class="dashboard-create-step-1">
-        <!--        <div v-if="storeState.isAdminMode"-->
-        <!--             class="dashboard-type-wrapper"-->
-        <!--        >-->
-        <!--            <p-field-title size="lg"-->
-        <!--                           :label="$t('DASHBOARDS.CREATE.DASHBOARD_TYPE')"-->
-        <!--                           :description="$t('DASHBOARDS.CREATE.DASHBOARD_TYPE_DESC')"-->
-        <!--            />-->
-        <!--            <div class="dashboard-type-select-card-wrapper">-->
-        <!--                <p-select-card class="col-span-6"-->
-        <!--                               :label="i18n.t('DASHBOARDS.CREATE.WORKSPACE_DASHBOARD')"-->
-        <!--                               icon="ic_service_workspaces"-->
-        <!--                               :selected="dashboardCreatePageState.adminDashboardType === 'WORKSPACE'"-->
-        <!--                               @click="dashboardCreatePageStore.setAdminDashboardType('WORKSPACE')"-->
-        <!--                />-->
-        <!--                <p-select-card class="col-span-6"-->
-        <!--                               :label="i18n.t('DASHBOARDS.CREATE.ADMIN_DASHBOARD')"-->
-        <!--                               icon="ic_admin-icon"-->
-        <!--                               :selected="dashboardCreatePageState.adminDashboardType === 'ADMIN'"-->
-        <!--                               @click="dashboardCreatePageStore.setAdminDashboardType('ADMIN')"-->
-        <!--                />-->
-        <!--            </div>-->
-        <!--            <p-divider class="divider" />-->
-        <!--            <p-field-title size="lg"-->
-        <!--                           :label="$t('DASHBOARDS.CREATE.DASHBOARD_TEMPLATE')"-->
-        <!--                           :description="$t('DASHBOARDS.CREATE.DASHBOARD_TEMPLATE_DESC')"-->
-        <!--            />-->
-        <!--        </div>-->
         <div class="contents-container">
             <dashboard-create-step1-search-filter :labels="state.allExistingLabels"
                                                   @select-label="handleSelectLabels"

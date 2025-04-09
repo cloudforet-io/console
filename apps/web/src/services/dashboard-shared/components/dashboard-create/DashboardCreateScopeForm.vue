@@ -18,7 +18,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
+import { useDashboardCreatePageStore } from '@/services/dashboard-shared/stores/dashboard-create-page-store';
 
 
 

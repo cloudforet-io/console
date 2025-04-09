@@ -14,11 +14,13 @@ import { getClonedName } from '@cloudforet/utils';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
+import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -26,57 +28,51 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
+import { useDashboardCreatePageStore } from '@/services/dashboard-shared/stores/dashboard-create-page-store';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
 } from '@/services/dashboards/constants/dashboard-vars-schema-preset';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
+interface Props {
+    dashboardItems: Array<DashboardModel>;
+}
 
+const props = defineProps<Props>();
 
 const TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'private', label: 'Make Private' },
 ];
-const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
 const router = useRouter();
-/* Query */
-const {
-    publicDashboardList,
-    privateDashboardList,
-    keys,
-    api,
-} = useDashboardQuery();
-const queryClient = useQueryClient();
+const { entryPoint, projectContextType, projectGroupOrProjectId } = useDashboardRouteContext();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,
-    publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
-        if (storeState.isAdminMode) return _v2DashboardItems;
-        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
+    publicDashboardItems: computed(() => props.dashboardItems.filter((d) => d.dashboard_id.startsWith('public'))),
+    privateDashboardItems: computed(() => props.dashboardItems.filter((d) => d.dashboard_id.startsWith('private'))),
     bundleCaseType: computed(() => {
         if (!isEmpty(dashboardCreatePageState.selectedOotbIdMap)) return 'TEMPLATE';
         return 'EXISTING';
     }),
     privateMap: {} as Record<string, boolean>,
     tableFields: computed(() => {
-        if (storeState.isAdminMode || storeState.isWorkspaceMember) return TABLE_FIELDS.filter((f) => f.name !== 'private');
+        if (entryPoint.value === 'ADMIN'
+            || entryPoint.value === 'PROJECT'
+            || (entryPoint.value === 'WORKSPACE' && storeState.isWorkspaceMember)) return TABLE_FIELDS.filter((f) => f.name !== 'private');
         if (state.bundleCaseType === 'TEMPLATE') return TABLE_FIELDS.filter((f) => f.name !== 'location');
         return TABLE_FIELDS;
     }),
@@ -102,6 +98,12 @@ const addToNewIdList = (id: string) => {
 };
 
 /* Api */
+const queryClient = useQueryClient();
+const { publicDashboardAPI } = usePublicDashboardApi();
+const { privateDashboardAPI } = usePrivateDashboardApi();
+const { key: publicDashboardListQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'list');
+const { key: privateDashboardListQueryKey } = useServiceQueryKey('dashboard', 'private-dashboard', 'list');
+
 const createBundleOotb = async () => {
     const _promises: Promise<DashboardModel>[] = [];
     const _selectedOotbList = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]);
@@ -117,8 +119,14 @@ const createBundleOotb = async () => {
             tags: { created_by: userStore.state.userId },
             vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
         };
-        if (storeState.isAdminMode) {
+        if (entryPoint.value === 'ADMIN') {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT') {
+            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
+            (_dashboardParams as PublicDashboardCreateParameters).project_id = projectGroupOrProjectId.value;
+        } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT_GROUP') {
+            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+            (_dashboardParams as PublicDashboardCreateParameters).project_group_id = projectGroupOrProjectId.value;
         } else if (!storeState.isWorkspaceMember && !_isPrivate) {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
         }
@@ -127,8 +135,8 @@ const createBundleOotb = async () => {
             _createType = 'PRIVATE';
         }
         const fetcher = _createType === 'PRIVATE'
-            ? api.privateDashboardAPI.create
-            : api.publicDashboardAPI.create;
+            ? privateDashboardAPI.create
+            : publicDashboardAPI.create;
         _promises.push(fetcher(_dashboardParams));
     }));
     const _results = await Promise.allSettled(_promises);
@@ -152,14 +160,25 @@ const handleChangePrivate = (id: string, value: boolean) => {
 const handleConfirm = async () => {
     dashboardCreatePageStore.setLoading(true);
     await createBundleOotb();
-    await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
-    const dashboardRouteName = storeState.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE._NAME
-        : DASHBOARDS_ROUTE._NAME;
-    await router.push({
-        name: dashboardRouteName,
-    }).catch(() => {});
+    await queryClient.invalidateQueries({ queryKey: publicDashboardListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: privateDashboardListQueryKey.value });
+
+    if (entryPoint.value === 'ADMIN') {
+        router.push({ name: ADMIN_DASHBOARDS_ROUTE._NAME }).catch(() => {});
+    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+        router.push({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: projectGroupOrProjectId.value,
+            },
+        }).catch(() => {});
+    } else if (entryPoint.value === 'WORKSPACE') {
+        router.push({
+            name: DASHBOARDS_ROUTE._NAME,
+        }).catch(() => {});
+    } else {
+        console.error('Invalid entry point');
+    }
 };
 
 /* Expose */

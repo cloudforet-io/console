@@ -5,26 +5,29 @@ import {
 
 import { PButton } from '@cloudforet/mirinae';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import DashboardCreateStep2BundleCase
-    from '@/services/dashboards/components/dashboard-create/DashboardCreateStep2BundleCase.vue';
+    from '@/services/dashboard-shared/components/dashboard-create/DashboardCreateStep2BundleCase.vue';
 import DashboardCreateStep2SingleCase
-    from '@/services/dashboards/components/dashboard-create/DashboardCreateStep2SingleCase.vue';
-import { useDashboardCreatePageStore } from '@/services/dashboards/stores/dashboard-create-page-store';
+    from '@/services/dashboard-shared/components/dashboard-create/DashboardCreateStep2SingleCase.vue';
+import { useDashboardCreatePageStore } from '@/services/dashboard-shared/stores/dashboard-create-page-store';
 
+interface Props {
+    dashboardItems: Array<DashboardModel>;
+    folderItems: Array<DashboardFolderModel>;
+}
 
+const props = defineProps<Props>();
 
 const singleCaseRef = ref<HTMLElement|null>(null);
 const bundleCaseRef = ref<HTMLElement|null>(null);
 
-const appContextStore = useAppContextStore();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const state = reactive({
     isSingleCreateValid: false,
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     disableCreateButton: computed<boolean>(() => {
         if (dashboardCreatePageState.createType === 'SINGLE') {
             return !state.isSingleCreateValid;
@@ -52,9 +55,12 @@ const handleCreateDashboard = async () => {
         <dashboard-create-step2-single-case v-if="dashboardCreatePageState.createType === 'SINGLE'"
                                             ref="singleCaseRef"
                                             :is-valid.sync="state.isSingleCreateValid"
+                                            :dashboard-items="props.dashboardItems"
+                                            :folder-items="props.folderItems"
         />
         <dashboard-create-step2-bundle-case v-else
                                             ref="bundleCaseRef"
+                                            :dashboard-items="props.dashboardItems"
         />
         <div class="button-area">
             <p-button style-type="transparent"
