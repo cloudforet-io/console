@@ -14,10 +14,11 @@ export interface BudgetCreateParameters {
     time_unit: BudgetTimeUnit;
     start: string;
     end: string;
-    notifications?: BudgetNotification;
+    notification?: BudgetNotification;
     tags?: Tags;
     resource_group: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
     workspace_id?: string;
     project_id?: string;
     service_account_id?: string;
+    budget_manager_id?: string;
 }
