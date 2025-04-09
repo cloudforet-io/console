@@ -18,6 +18,7 @@ import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/s
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
 
+import type { ALERT_PERIOD_DROPDOWN_MENU } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import type {
     SERVICE_DETAIL_TABS,
     WEBHOOK_DETAIL_TABS,
@@ -33,6 +34,12 @@ export type WebhookModalType = 'UPDATE' | 'ENABLE' | 'DISABLE' | 'DELETE';
 
 export type EventRuleSettingsType = typeof EVENT_RULE_SETTINGS_TYPE[keyof typeof EVENT_RULE_SETTINGS_TYPE];
 
+export type AlertPeriodDropdownMenuType = typeof ALERT_PERIOD_DROPDOWN_MENU[keyof typeof ALERT_PERIOD_DROPDOWN_MENU];
+
+export type Period = {
+    start?: string;
+    end?: string;
+};
 export type AlertFilterType = {
     label: TranslateResult;
     name: string;
@@ -40,6 +47,15 @@ export type AlertFilterType = {
 export type AlertUrgencyRadioType = {
     label: TranslateResult,
     name: AlertUrgencyType
+};
+export type AlertRelativePeriod = {
+    value: number;
+};
+export type AlertPeriodItemType = {
+    name?: AlertPeriodDropdownMenuType;
+    label?: TranslateResult;
+    period?: Period;
+    relativePeriod?: AlertRelativePeriod;
 };
 export type AlertManagementTableHandlerType = {
     keyItemSets: KeyItemSet[],

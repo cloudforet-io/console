@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PI, PFieldGroup, PTextInput, PSelectDropdown,
@@ -29,6 +29,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/dashboard-create/DashboardCreateScopeForm.vue';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
@@ -55,12 +56,14 @@ const userStore = useUserStore();
 const {
     publicDashboardList,
     privateDashboardList,
-    publicFolderList,
-    privateFolderList,
     keys,
     api,
-    queryClient,
 } = useDashboardQuery();
+const {
+    publicFolderList,
+    privateFolderList,
+} = useDashboardFolderQuery();
+const queryClient = useQueryClient();
 
 const getDashboardNameList = (dashboardType: DashboardType) => {
     if (dashboardType === 'PRIVATE') {

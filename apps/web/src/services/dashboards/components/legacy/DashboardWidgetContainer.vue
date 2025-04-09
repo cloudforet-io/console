@@ -3,6 +3,7 @@ import type { ComponentPublicInstance } from 'vue';
 import {
     reactive, ref, watch, computed, onBeforeUnmount, nextTick,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { debounce } from 'lodash';
 
@@ -14,7 +15,7 @@ import WidgetFullModeModal from '@/services/dashboards/components/legacy/WidgetF
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import type { ReformedWidgetInfo } from '@/services/dashboards/composables/use-reformed-widget-info-list';
 import {
     useReformedWidgetInfoList,
@@ -33,8 +34,10 @@ type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
-const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+const { dashboard } = useDashboardGetQuery({
+    dashboardId,
 });
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();

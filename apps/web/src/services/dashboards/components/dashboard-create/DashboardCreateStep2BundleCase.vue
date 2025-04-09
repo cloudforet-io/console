@@ -4,6 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
 import {
@@ -54,8 +55,8 @@ const {
     privateDashboardList,
     keys,
     api,
-    queryClient,
 } = useDashboardQuery();
+const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

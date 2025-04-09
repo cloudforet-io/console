@@ -1,10 +1,5 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
 import type { PublicFolderDeleteParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/delete';
@@ -16,8 +11,6 @@ import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/publi
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 interface UsePublicFolderApiReturn {
-    publicFolderGetQueryKey: ComputedRef<QueryKey>;
-    publicFolderListQueryKey: ComputedRef<QueryKey>;
     publicFolderAPI: {
         create: (params: PublicFolderCreateParameters) => Promise<PublicFolderModel>;
         update: (params: PublicFolderUpdateParameters) => Promise<PublicFolderModel>;
@@ -30,9 +23,6 @@ interface UsePublicFolderApiReturn {
 }
 
 export const usePublicFolderApi = (): UsePublicFolderApiReturn => {
-    const publicFolderGetQueryKey = useAPIQueryKey('dashboard', 'public-folder', 'get');
-    const publicFolderListQueryKey = useAPIQueryKey('dashboard', 'public-folder', 'list');
-
     const action = {
         async create(params: PublicFolderCreateParameters) {
             return SpaceConnector.clientV2.dashboard.publicFolder.create<PublicFolderCreateParameters, PublicFolderModel>(params);
@@ -58,8 +48,6 @@ export const usePublicFolderApi = (): UsePublicFolderApiReturn => {
     };
 
     return {
-        publicFolderGetQueryKey,
-        publicFolderListQueryKey,
         publicFolderAPI: action,
     };
 };

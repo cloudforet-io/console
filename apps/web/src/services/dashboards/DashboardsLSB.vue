@@ -32,6 +32,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { gray } from '@/styles/colors';
 
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -50,9 +51,11 @@ const route = useRoute();
 const {
     publicDashboardList,
     privateDashboardList,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),

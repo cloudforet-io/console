@@ -17,15 +17,16 @@ import type { ReferenceMap } from '@/store/reference/type';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { indigo, peacock } from '@/styles/colors';
-
-import type { ProjectTreeOptions } from '@/services/project/v-shared/composables/use-project-tree';
-import { useProjectTree } from '@/services/project/v-shared/composables/use-project-tree';
 import type {
     ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
     ProjectTreeNode,
-} from '@/services/project/v-shared/types/project-tree-type';
+} from '@/common/modules/project/project-tree-type';
+import type { ProjectTreeOptions } from '@/common/modules/project/use-project-tree';
+import { useProjectTree } from '@/common/modules/project/use-project-tree';
+
+import { indigo, peacock } from '@/styles/colors';
+
+
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface ProjectGroupSelectOptions {

@@ -2,6 +2,7 @@
 
 
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     cloneDeep, flattenDeep, isEqual, xor,
@@ -20,8 +21,7 @@ import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-typ
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 
 interface Props {
@@ -32,11 +32,13 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
 
-const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
+
+
+const { dashboard } = useDashboardGetQuery({
+    dashboardId,
 });
 
 const state = reactive({

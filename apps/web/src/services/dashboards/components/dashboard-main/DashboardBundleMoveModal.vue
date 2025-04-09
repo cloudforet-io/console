@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
 } from '@cloudforet/mirinae';
@@ -20,6 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
@@ -39,12 +42,14 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 
 /* Query */
 const {
-    publicFolderList,
-    privateFolderList,
     api,
     keys,
-    queryClient,
 } = useDashboardQuery();
+const {
+    publicFolderList,
+    privateFolderList,
+} = useDashboardFolderQuery();
+const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

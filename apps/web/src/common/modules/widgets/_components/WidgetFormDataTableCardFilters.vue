@@ -40,7 +40,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFiltersItem
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_QUERY_OPERATOR,
@@ -89,7 +89,7 @@ const appContextStore = useAppContextStore();
 /* Query */
 const {
     dataTableList,
-} = useWidgetFormQuery({
+} = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 

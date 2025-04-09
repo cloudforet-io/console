@@ -34,7 +34,7 @@ This predictable structure allows for precise cache management and query invalid
 ```typescript
 interface UseServiceQueryKeyOptions<T extends object> {
   contextKey?: _MaybeRefOrGetter<ContextKeyType>;  // string | unknown[] | object
-  params?: ComputedRef<T>;
+  params?: _MaybeRefOrGetter<T>;
 }
 ```
 
@@ -43,7 +43,7 @@ interface UseServiceQueryKeyOptions<T extends object> {
 ```typescript
 interface UseServiceQueryKeyResult<T> {
   key: ComputedRef<QueryKeyArray>;    // full query key
-  params?: Readonly<T>;            // parameters
+  params: ComputedRef<T>;            // parameters
   withSuffix: (arg: ContextKeyType) => QueryKeyArray;  // dynamic namespace builder
 }
 ```
@@ -158,7 +158,7 @@ const { key, params } = useServiceQueryKey(
 // ✅ Use params from useServiceQueryKey
 const { data } = useQuery({
     queryKey: key,
-    queryFn: () => publicDataTableAPI.list(params)
+    queryFn: () => publicDataTableAPI.list(params.value)
 });
 
 // ❌ Not Recommended: Creating params separately

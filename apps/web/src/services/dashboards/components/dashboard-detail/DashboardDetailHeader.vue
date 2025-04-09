@@ -19,10 +19,10 @@ import { gray } from '@/styles/colors';
 import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
 import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
+import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
@@ -32,8 +32,6 @@ interface Props {
     templateName?: string;
 }
 const props = defineProps<Props>();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const dashboardPageControlStore = useDashboardPageControlStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
@@ -42,11 +40,14 @@ const userStore = useUserStore();
 const {
     publicDashboardList,
     privateDashboardList,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
 
-const { dashboard } = useDashboardDetailQuery({
+
+const { dashboard } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
 const { isManageable } = useDashboardManageable({
@@ -93,7 +94,7 @@ const state = reactive({
         return 'indigo100';
     }),
     badgeText: computed(() => {
-        if (dashboardDetailState.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
+        if (props.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
             if (storeState.isAdminMode) {
                 if (dashboard.value?.scope === 'PROJECT') {

@@ -77,6 +77,7 @@ const {
 const emit = defineEmits<{(e: 'click-favorite'): void;
 }>();
 
+const dashboardList = computed(() => [...publicDashboardList.value, ...privateDashboardList.value]);
 const storeState = reactive({
     favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
     favoriteWorkspaceMenuList: computed(() => favoriteStoreGetters.workspaceItems),
@@ -125,7 +126,7 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
 const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): ReferenceData|undefined => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([favoriteConfig], [...publicDashboardList.value, ...privateDashboardList.value])[0];
+        return convertDashboardConfigToReferenceData([favoriteConfig], dashboardList.value)[0];
     }
     if (itemType === FAVORITE_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([favoriteConfig], storeState.projects)[0];

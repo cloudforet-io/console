@@ -1,10 +1,5 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DataTableLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
@@ -18,9 +13,6 @@ import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-t
 
 
 interface UsePublicDataTableApiReturn {
-    publicDataTableGetQueryKey: ComputedRef<QueryKey>;
-    publicDataTableListQueryKey: ComputedRef<QueryKey>;
-    publicDataTableLoadQueryKey: ComputedRef<QueryKey>;
     publicDataTableAPI: {
         add: (params: DataTableAddParameters) => Promise<PublicDataTableModel>;
         transform: (params: DataTableTransformParameters) => Promise<PublicDataTableModel>;
@@ -33,10 +25,6 @@ interface UsePublicDataTableApiReturn {
 }
 
 export const usePublicDataTableApi = (): UsePublicDataTableApiReturn => {
-    const publicDataTableGetQueryKey = useAPIQueryKey('dashboard', 'public-data-table', 'get');
-    const publicDataTableListQueryKey = useAPIQueryKey('dashboard', 'public-data-table', 'list');
-    const publicDataTableLoadQueryKey = useAPIQueryKey('dashboard', 'public-data-table', 'load');
-
     const action = {
         async add(params: DataTableAddParameters) {
             return SpaceConnector.clientV2.dashboard.publicDataTable.add<DataTableAddParameters, PublicDataTableModel>(params);
@@ -62,9 +50,6 @@ export const usePublicDataTableApi = (): UsePublicDataTableApiReturn => {
     };
 
     return {
-        publicDataTableGetQueryKey,
-        publicDataTableListQueryKey,
-        publicDataTableLoadQueryKey,
         publicDataTableAPI: action,
     };
 };

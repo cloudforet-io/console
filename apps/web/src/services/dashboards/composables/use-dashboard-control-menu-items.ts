@@ -10,6 +10,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -31,9 +32,11 @@ export const useDashboardControlMenuItems = ({
     const {
         publicDashboardList,
         privateDashboardList,
+    } = useDashboardQuery();
+    const {
         publicFolderList,
         privateFolderList,
-    } = useDashboardQuery();
+    } = useDashboardFolderQuery();
 
     const queryState = reactive({
         publicDashboardItems: computed(() => {

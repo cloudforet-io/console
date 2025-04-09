@@ -25,12 +25,12 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import ProjectGroupMemberManagementModal from '@/services/project/v-shared/components/ProjectGroupMemberManagementModal.vue';
-import ProjectMainProjectGroupMoveModal from '@/services/project/v-shared/components/ProjectMainProjectGroupMoveModal.vue';
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
-import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
+import ProjectGroupMemberManagementModal from '@/services/project/v1/components/ProjectGroupMemberManagementModal.vue';
 import ProjectMain from '@/services/project/v1/components/ProjectMain.vue';
 import ProjectMainDeleteModal from '@/services/project/v1/components/ProjectMainDeleteModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/v1/components/ProjectMainProjectGroupMoveModal.vue';
+import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
+import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 
 
 const gnbStore = useGnbStore();

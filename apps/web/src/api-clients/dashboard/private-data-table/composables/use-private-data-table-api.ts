@@ -1,10 +1,5 @@
-import type { ComputedRef } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DataTableLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
@@ -17,9 +12,6 @@ import type { DataTableTransformParameters } from '@/api-clients/dashboard/publi
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
 
 interface UsePrivateDataTableApiReturn {
-    privateDataTableGetQueryKey: ComputedRef<QueryKey>;
-    privateDataTableListQueryKey: ComputedRef<QueryKey>;
-    privateDataTableLoadQueryKey: ComputedRef<QueryKey>;
     privateDataTableAPI: {
         add: (params: DataTableAddParameters) => Promise<PrivateDataTableModel>;
         transform: (params: DataTableTransformParameters) => Promise<PrivateDataTableModel>;
@@ -32,10 +24,6 @@ interface UsePrivateDataTableApiReturn {
 }
 
 export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
-    const privateDataTableGetQueryKey = useAPIQueryKey('dashboard', 'private-data-table', 'get');
-    const privateDataTableListQueryKey = useAPIQueryKey('dashboard', 'private-dashboard', 'list');
-    const privateDataTableLoadQueryKey = useAPIQueryKey('dashboard', 'private-dashboard', 'list');
-
     const action = {
         async add(params: DataTableAddParameters) {
             return SpaceConnector.clientV2.dashboard.privateDataTable.add<DataTableAddParameters, PrivateDataTableModel>(params);
@@ -61,9 +49,6 @@ export const usePrivateDataTableApi = (): UsePrivateDataTableApiReturn => {
     };
 
     return {
-        privateDataTableGetQueryKey,
-        privateDataTableListQueryKey,
-        privateDataTableLoadQueryKey,
         privateDataTableAPI: action,
     };
 };

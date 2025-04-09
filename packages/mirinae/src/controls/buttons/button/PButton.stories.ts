@@ -45,6 +45,7 @@ const Template: Story = {
                     :block="block"
                     :icon-left="iconLeft"
                     :icon-right="iconRight"
+                    :active="active"
                 >
                     {{$props.default}}
                 </p-button>
@@ -259,6 +260,42 @@ export const Readonly: Story = {
                 </p-button>
             </div>
         `,
+    }),
+    decorators: [() => ({
+        template: '<story style="height: 150px;" />',
+    })],
+};
+
+export const Active: Story = {
+    render: () => ({
+        components: { PButton },
+        template: `
+            <div style="display: flex; flex-direction: column; align-items: center; background-color: white">
+                <div style="display:flex">
+                    <p-button v-for="styleType in buttonStyles.slice(0, 4)" :style-type="styleType" active style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+                <div style="display:flex; margin-top: 20px">
+                    <p-button v-for="styleType in buttonStyles.slice(4, 7)" :style-type="styleType" active style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+                <div style="display:flex; margin-top: 20px">
+                    <p-button v-for="styleType in buttonStyles.slice(7)" :style-type="styleType" active style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+            </div>
+        `,
+        setup() {
+            const state = reactive({
+                buttonStyles: Object.values(BUTTON_STYLE),
+            });
+            return {
+                ...toRefs(state),
+            };
+        },
     }),
     decorators: [() => ({
         template: '<story style="height: 150px;" />',

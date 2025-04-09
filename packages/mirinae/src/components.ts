@@ -29,6 +29,7 @@ export { default as PTooltip } from './data-display/tooltips/PTooltip.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';
 export { default as PTreeView } from './data-display/tree/tree-view/PTreeView.vue';
 export { default as PTreeItem } from './data-display/tree/tree-view/PTreeItem.vue';
+export { default as PTreeNode } from './data-display/tree/new-tree/PTreeNode.vue';
 export { default as PAvatar } from './data-display/avatar/PAvatar.vue';
 
 /* Feedbacks */

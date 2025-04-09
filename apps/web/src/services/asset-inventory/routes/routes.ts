@@ -177,7 +177,6 @@ const assetInventoryRoute: RouteConfig = {
                 },
                 {
                     path: ':metricId',
-                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                     meta: { label: ({ params }) => params.metricId, lsbVisible: true },
                     props: true,
                     component: { template: '<router-view />' },

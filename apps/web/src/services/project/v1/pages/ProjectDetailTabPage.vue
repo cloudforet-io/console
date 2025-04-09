@@ -32,6 +32,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import ProjectAlertTab from '@/services/project/v1/components/ProjectAlertTab.vue';
 import ProjectDetailTab from '@/services/project/v1/components/ProjectDetailTab.vue';
@@ -59,8 +60,10 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
 /* Query */
 const {
     publicDashboardList,
-    publicFolderList,
 } = useDashboardQuery();
+const {
+    publicFolderList,
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     visibleAlertTab: computed<boolean>(() => visibleContents.value && projectDetailPageState.visibleAlertTab),
