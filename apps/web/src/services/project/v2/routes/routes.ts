@@ -19,6 +19,12 @@ const projectRoutes: RouteConfig = {
     component: ProjectContainer,
     children: [
         {
+            path: ':projectGroupOrProjectId/dashboard-create',
+            name: PROJECT_ROUTE_V2.DASHBOARD_CREATE._NAME,
+            props: true,
+            // component: ProjectDashboardCreatePage,
+        },
+        {
             path: ':projectGroupOrProjectId?/:dashboardId?',
             name: PROJECT_ROUTE_V2._NAME,
             meta: {
