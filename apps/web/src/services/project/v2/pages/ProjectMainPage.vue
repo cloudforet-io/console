@@ -128,6 +128,7 @@ const handleUpdateDashboardId = (id?: string) => {
         <project-detail-tab v-if="mounted && projectId"
                             class="mt-6"
                             :project-id="projectId"
+                            :project-group-id="projectGroupId"
                             :dashboard-id="props.dashboardId"
                             @update:dashboard-id="handleUpdateDashboardId"
         />

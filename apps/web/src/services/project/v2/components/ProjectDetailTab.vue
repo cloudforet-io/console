@@ -17,7 +17,7 @@ import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 
 const props = defineProps<{
-    projectId: string,
+    projectId?: string,
     projectGroupId?: string,
     dashboardId?: string,
 }>();
@@ -107,11 +107,16 @@ const projectDashboardCreateMenuItems = computed(() => [
 ]);
 
 const handleCreateProjectDashboard = (item: string) => {
+    const projectGroupOrProjectId = props.projectGroupId ?? props.projectId;
+    if (!projectGroupOrProjectId) {
+        console.warn('projectGroupId or projectId is not selected');
+        return;
+    }
     if (item === 'dashboard') {
         router.push({
             name: PROJECT_ROUTE_V2.DASHBOARD_CREATE._NAME,
             params: {
-                projectGroupOrProjectId: props.projectGroupId ?? props.projectId,
+                projectGroupOrProjectId,
             },
         });
     } else if (item === 'folder') {
@@ -136,8 +141,9 @@ const handleCreateProjectDashboard = (item: string) => {
                                           :project-id="props.projectId"
                         />
                         <project-dashboard v-else
-                                           :id="props.projectId"
                                            :key="`${props.projectId}-${activeTab}`"
+                                           :project-id="props.projectId"
+                                           :project-group-id="props.projectGroupId"
                                            :dashboard-id="activeTab"
                         />
                     </keep-alive>
