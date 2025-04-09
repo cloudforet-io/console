@@ -50,16 +50,16 @@ import DashboardReorderSidebar from '@/services/dashboards/components/dashboard-
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { SharedDataTableInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
-import { useDashboardWidgetListQuery } from '../../composables/use-dashboard-widget-list-query';
+import { useDashboardWidgetListQuery } from '../composables/use-dashboard-widget-list-query';
 
 
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;

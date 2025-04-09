@@ -52,9 +52,9 @@ const handleSelectTab = () => {
     emit('select-tab');
 };
 
-const handleSelectTabMenu = (menu: MenuItem) => {
+const handleSelectTabMenu = (menu: MenuItem, index: number) => {
     state.visible = false;
-    emit('select-tab-menu', menu);
+    emit('select-tab-menu', menu, index);
 };
 
 const {

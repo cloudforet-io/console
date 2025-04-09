@@ -376,6 +376,11 @@ export const API_DOC = {
             'list',
         ],
     },
+    inventory: {
+        'metric-data': [
+            'analyze',
+        ],
+    },
     opsflow: {
         comment: [
             'create',

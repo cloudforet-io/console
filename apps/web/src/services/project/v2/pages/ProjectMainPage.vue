@@ -89,6 +89,27 @@ onMounted(() => {
     });
 });
 
+/* dashboard tab */
+const handleUpdateDashboardId = (id?: string) => {
+    if (!props.projectGroupOrProjectId) return;
+    if (!id) {
+        router.replace({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: props.projectGroupOrProjectId,
+            },
+        });
+    } else {
+        router.replace({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: props.projectGroupOrProjectId,
+                dashboardId: id,
+            },
+        });
+    }
+};
+
 </script>
 
 <template>
@@ -104,10 +125,11 @@ onMounted(() => {
                                           :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
             />
         </keep-alive>
-        <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
+        <project-detail-tab v-if="mounted && projectId"
                             class="mt-6"
-                            :project-id="props.projectGroupOrProjectId"
+                            :project-id="projectId"
                             :dashboard-id="props.dashboardId"
+                            @update:dashboard-id="handleUpdateDashboardId"
         />
 
         <template v-if="isModalLoadReady">

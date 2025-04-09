@@ -35,15 +35,15 @@ import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-valu
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
-import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
-import { useDashboardWidgetListQuery } from '@/services/dashboards/composables/use-dashboard-widget-list-query';
+import DashboardToolsetDateDropdown from '@/services/dashboards/shared/components/DashboardToolsetDateDropdown.vue';
+import DashboardVariablesV2 from '@/services/dashboards/shared/components/DashboardVariablesV2.vue';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboards/shared/composables/use-dashboard-widget-list-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 

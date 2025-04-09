@@ -26,9 +26,9 @@ import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSB
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 
 interface Props {

@@ -21,13 +21,13 @@ import type { WidgetSize } from '@/api-clients/dashboard/_types/widget-type';
 
 import { gray } from '@/styles/colors';
 
-import DashboardToolsetDateDropdown from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/legacy/DashboardVariables.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { getDashboardWidgetInfoList } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
+import DashboardToolsetDateDropdown from '@/services/dashboards/shared/components/DashboardToolsetDateDropdown.vue';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
 import type {

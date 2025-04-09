@@ -20,17 +20,28 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-import AssetSummaryDailyUpdates from '@/services/workspace-home/components/AssetSummaryDailyUpdates.vue';
-import AssetSummaryProvider from '@/services/workspace-home/components/AssetSummaryProvider.vue';
-import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import AssetSummaryDailyUpdates from '@/services/workspace-home/shared/components/AssetSummaryDailyUpdates.vue';
+import AssetSummaryProvider from '@/services/workspace-home/shared/components/AssetSummaryProvider.vue';
+import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
+import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type {
     EmptyData,
-    ProviderReferenceDataMap,
 } from '@/services/workspace-home/types/workspace-home-type';
 
 const METRIC_MANAGED_CREATED_COUNT = 'metric-managed-created-count';
+
+
+const props = withDefaults(defineProps<{
+    projectGroupId?: string;
+    projectId?: string;
+    styleType?: WidgetStyleType;
+}>(), {
+    projectGroupId: undefined,
+    projectId: undefined,
+    styleType: 'default',
+});
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -41,7 +52,6 @@ const userStore = useUserStore();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
-    providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
@@ -74,10 +84,9 @@ const state = reactive({
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
 });
 
-watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async ([currentWorkspaceId]) => {
+watch([() => storeState.currentWorkspaceId], async ([currentWorkspaceId]) => {
     if (!currentWorkspaceId) return;
     state.loading = true;
-    await workspaceHomePageStore.fetchCloudServiceResources();
     await workspaceHomePageStore.fetchDailyUpdatesList();
     state.loading = false;
 }, { immediate: true });
@@ -87,6 +96,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
     <div class="asset-summary">
         <p-field-title :label="$t('HOME.ASSET_SUMMARY_TITLE')"
                        size="lg"
+                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="main-title"
         />
         <div v-if="state.loading"
@@ -98,7 +108,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
             <div v-if="!state.isNoCollectors && !state.isNoServiceAccounts">
                 <div class="content-wrapper">
                     <asset-summary-provider />
-                    <asset-summary-daily-updates />
+                    <asset-summary-daily-updates :style-type="props.styleType" />
                 </div>
                 <p-divider v-if="state.accessLink"
                            class="divider"

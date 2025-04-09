@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import {
+    computed, nextTick, onBeforeUnmount, onMounted, ref, watch,
+} from 'vue';
 
 import { PTab } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
@@ -12,10 +14,12 @@ import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ProjectDashboard from '@/services/project/v2/components/ProjectDashboard.vue';
+import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vue';
 
 
 const props = defineProps<{
     projectId: string,
+    projectGroupId?: string,
     dashboardId?: string,
 }>();
 const emit = defineEmits<{(e: 'update:dashboard-id', value?: string): void;}>();
@@ -27,6 +31,17 @@ watch(() => props.dashboardId, (did) => {
 }, { immediate: true });
 watch(() => props.projectId, () => {
     activeTab.value = 'overview';
+});
+
+/* mounted */
+const mounted = ref(false);
+onMounted(() => {
+    nextTick(() => {
+        mounted.value = true;
+    });
+});
+onBeforeUnmount(() => {
+    mounted.value = false;
 });
 
 /* dashboard tabs */
@@ -48,9 +63,10 @@ const { data: dashboardList } = useScopedQuery({
     queryKey: dashboardListQueryKey,
     queryFn: () => publicDashboardAPI.list(dashboardListParams.value),
     select: (data) => data?.results ?? [],
+    enabled: mounted,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 5, // 5 minutes
-});
+}, ['WORKSPACE']);
 const { key: dashboardFolderListQueryKey, params: dashboardFolderListParams } = useServiceQueryKey('dashboard', 'public-folder', 'list', {
     params: computed<PublicFolderListParameters>(() => ({
         // project_id: props.id,
@@ -66,9 +82,10 @@ const { data: dashboardFolderList } = useScopedQuery({
     queryKey: dashboardFolderListQueryKey,
     queryFn: () => publicFolderAPI.list(dashboardFolderListParams.value),
     select: (data) => data?.results || [],
+    enabled: mounted,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 5, // 5 minutes
-});
+}, ['WORKSPACE']);
 
 const tabs = computed<TabItem[]>(() => {
     const folderTabs = dashboardFolderList.value?.map((folder) => ({
@@ -93,31 +110,37 @@ const tabs = computed<TabItem[]>(() => {
         ...dashboardTabs,
     ];
 });
+// HACK: To trigger render tab on mounted
+const tabNamesKey = computed(() => tabs.value.map((tab) => tab.name).join(','));
 
-const onChangeTab = (tab: string) => {
+const handleUpdateActiveTab = (tab: string) => {
     activeTab.value = tab;
     emit('update:dashboard-id', tab === 'overview' ? undefined : tab);
 };
+
 </script>
 
 <template>
     <div>
-        <p-tab :tabs="tabs"
+        <p-tab :key="`${props.projectId}-${tabNamesKey}`"
+               :tabs="tabs"
                :active-tab="activeTab"
-               @change="onChangeTab"
+               @update:active-tab="handleUpdateActiveTab"
         >
-            <template #default="tab">
-                <keep-alive v-if="tab.name === 'overview'">
-                    <div v-if="activeTab === 'overview'">
-                        Overview will be implemented later.
-                    </div>
-                </keep-alive>
-                <keep-alive v-else-if="tab.name">
-                    <project-dashboard :id="props.projectId"
-                                       :key="`${tab.name}-${props.projectId}`"
-                                       :dashboard-id="tab.name"
-                    />
-                </keep-alive>
+            <template #default>
+                <div>
+                    <keep-alive>
+                        <project-overview v-if="activeTab === 'overview'"
+                                          :project-group-id="props.projectGroupId"
+                                          :project-id="props.projectId"
+                        />
+                        <project-dashboard v-else
+                                           :id="props.projectId"
+                                           :key="`${props.projectId}-${activeTab}`"
+                                           :dashboard-id="activeTab"
+                        />
+                    </keep-alive>
+                </div>
             </template>
         </p-tab>
     </div>

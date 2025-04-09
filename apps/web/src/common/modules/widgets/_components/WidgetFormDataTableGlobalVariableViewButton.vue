@@ -7,8 +7,8 @@ import { PButton, PPopover, PCopyButton } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
+import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
 
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);

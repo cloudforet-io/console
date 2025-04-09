@@ -6,7 +6,6 @@ import {
 import { isEmpty } from 'lodash';
 
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -26,6 +25,7 @@ import Summaries from '@/services/workspace-home/components/Summaries.vue';
 import UserConfigs from '@/services/workspace-home/components/UserConfigs.vue';
 import Welcome from '@/services/workspace-home/components/Welcome.vue';
 import WorkspaceInfo from '@/services/workspace-home/components/WorkspaceInfo.vue';
+import { useCostDataSourceQuery } from '@/services/workspace-home/shared/composables/use-cost-data-source-query';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -36,11 +36,14 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
 
+const { dataSource } = useCostDataSourceQuery({
+    enabled: computed(() => !!userWorkspaceGetters.currentWorkspaceId),
+});
+
 const storeState = reactive({
     getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.state.currentRoleInfo),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
-    dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
@@ -63,7 +66,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     try {
         // base API
         await workspaceHomePageStore.fetchRecentList(currentWorkspaceId);
-        await workspaceHomePageStore.fetchDataSource();
     } finally {
         state.loading = false;
     }
@@ -80,10 +82,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.fetchBookmarkList();
     // configs
     await workspaceHomePageStore.fetchFavoriteList();
-    // summaries
-    if (!state.isWorkspaceMember) {
-        await workspaceHomePageStore.fetchCostReportConfig();
-    }
 }, { immediate: true });
 </script>
 
@@ -98,7 +96,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
             />
             <welcome
                 v-if="!state.loading
-                    && (state.isNoCollectors || state.isNoServiceAccounts || storeState.dataSource.length === 0)"
+                    && (state.isNoCollectors || state.isNoServiceAccounts || (dataSource && dataSource.length === 0))"
             />
             <bookmark />
             <user-configs v-if="storeState.recentList.length !== 0"

@@ -13,14 +13,11 @@ import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/ana
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
-import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
-import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
+import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -58,8 +55,6 @@ interface WorkspaceHomeState {
     recentList: UserConfigModel[];
     favoriteMenuList: FavoriteItem[];
     // summary
-    costReportConfig: CostReportConfigModel|null|undefined;
-    dataSource: CostDataSourceModel[];
     providers: ProviderResourceDataItem[];
     dailyUpdatesListItems: DailyUpdatesListItem;
 }
@@ -85,8 +80,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         recentList: [],
         favoriteMenuList: [],
 
-        costReportConfig: null,
-        dataSource: [],
         providers: [],
         dailyUpdatesListItems: {
             created: [],
@@ -137,7 +130,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
 
     const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
     const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
-    const costReportConfigApiHelper = new ApiQueryHelper().setSort('created_at', true);
     const listCountQueryHelper = new ApiQueryHelper().setCountOnly();
 
     const actions = {
@@ -150,8 +142,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             state.isFileFullMode = false;
             state.recentList = [];
             state.favoriteMenuList = [];
-            state.costReportConfig = null;
-            state.dataSource = [];
             state.providers = [];
             state.dailyUpdatesListItems = {
                 created: [],
@@ -296,31 +286,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 state.appsTotalCount = total_count || undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            }
-        },
-        fetchCostReportConfig: async () => {
-            if (state.costReportConfig !== null) return;
-            try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
-                    query: costReportConfigApiHelper.data,
-                });
-                state.costReportConfig = results?.[0];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.costReportConfig = undefined;
-            }
-        },
-        fetchDataSource: async () => {
-            try {
-                const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
-                    query: {
-                        sort: [{ key: 'workspace_id', desc: false }],
-                    },
-                });
-                state.dataSource = response?.results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dataSource = [];
             }
         },
         fetchCloudServiceResources: async () => {

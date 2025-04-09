@@ -9,7 +9,7 @@ import { sortBy } from 'lodash';
 import { PIconButton } from '@cloudforet/mirinae';
 
 import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
-import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+import { useAssetSummaryProviders } from '@/services/workspace-home/shared/composables/use-asset-summary-providers';
 import {
     DEFAULT_PADDING,
 } from '@/services/workspace-home/types/workspace-home-type';
@@ -22,19 +22,14 @@ const PROVIDER_DEFAULT_WIDTH = 184 + 8;
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const providerEl = ref<null | HTMLElement>(null);
 
-const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageState = workspaceHomePageStore.state;
-
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
-const storeState = reactive({
-    providers: computed<ProviderResourceDataItem[]>(() => workspaceHomePageState.providers),
-});
+const { providers } = useAssetSummaryProviders();
 const state = reactive({
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / PROVIDER_DEFAULT_WIDTH)),
     pageStart: 0,
-    pageMax: computed<number>(() => Math.max(storeState.providers.length - state.visibleCount, 0)),
-    providerList: computed<ProviderResourceDataItem[]>(() => sortBy(storeState.providers, (i) => i.data.order) as ProviderResourceDataItem[]),
+    pageMax: computed<number>(() => Math.max(providers.value.length - state.visibleCount, 0)),
+    providerList: computed<ProviderResourceDataItem[]>(() => sortBy(providers.value, (i) => i.data.order) as ProviderResourceDataItem[]),
 });
 
 const handleClickArrowButton = (increment: number) => {
