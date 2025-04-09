@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, reactive, watch, watchEffect,
 } from 'vue';
@@ -37,6 +38,9 @@ interface BudgetCreateStep1State {
     selectedProject: string;
     serviceAccountList: string[];
     budgetNames: string[];
+    existingProjectIds: string[];
+    projectInvalidText: ComputedRef<string>;
+    projectInvalid: ComputedRef<boolean>;
 }
 
 const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
@@ -49,24 +53,26 @@ const state = reactive<BudgetCreateStep1State>({
     selectedProject: '',
     serviceAccountList: [],
     budgetNames: [],
+    existingProjectIds: [],
+    projectInvalidText: computed<string>(() => {
+        if (state.existingProjectIds.includes(budgetCreatePageState.project)) return '이미 존재하는 프로젝트입니다';
+        return '프로젝트를 선택하세요';
+    }),
+    projectInvalid: computed(() => !state.existingProjectIds.includes(budgetCreatePageState.project) && budgetCreatePageState.project.length > 0),
 });
 
 const emit = defineEmits<{(e: 'click-next'): void, (e: 'click-cancel'): void }>();
 
 
 watch(() => budgetCreatePageState, () => {
-    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project'
-    && budgetCreatePageState.recipients.role_types.length > 0) {
+    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project' && budgetCreatePageState.budgetManager && state.projectInvalid) {
         state.isContinueAble = true;
     } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
-        && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.recipients.role_types.length > 0
+    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.budgetManager && state.projectInvalid
     ) {
         state.isContinueAble = true;
     } else {
         state.isContinueAble = false;
-    }
-    if (budgetCreatePageState.project.length > 0) {
-        // state.selectedProject = budgetCreatePageState.project;
     }
 }, { deep: true, immediate: true });
 
@@ -76,7 +82,6 @@ watch(() => project, () => {
         label: pj.label,
     }));
 }, { deep: true, immediate: true });
-
 
 const handleUpdateName = (value: string) => {
     budgetCreatePageStore.setName(value);
@@ -123,17 +128,18 @@ watch(() => budgetCreatePageState.project, async () => {
     await getServiceAccountIncludedinProjectInfo();
 }, { deep: true, immediate: true });
 
-const fetchBudgetNames = async () => {
+const fetchBudget = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>();
         state.budgetNames = results?.map((result) => result.name) ?? [];
+        state.existingProjectIds = results?.map((result) => result.project_id) ?? [];
     } catch (error) {
         ErrorHandler.handleError(error);
     }
 };
 
 watchEffect(async () => {
-    await fetchBudgetNames();
+    await fetchBudget();
 });
 </script>
 
@@ -142,7 +148,7 @@ watchEffect(async () => {
         <div class="contents-container">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
                            required
-                           invalid-text="Name is required or already exists"
+                           :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.NAME_INVALID_TEXT')"
                            :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
             >
                 <p-text-input block
@@ -151,16 +157,20 @@ watchEffect(async () => {
                               @update:value="handleUpdateName"
                 />
             </p-field-group>
-            <p-field-group label="Project"
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT')"
                            required
+                           :invalid="!state.projectInvalid"
+                           :invalid-text="state.projectInvalidText"
             >
                 <project-select-dropdown
                     show-delete-all-button
+                    :project-group-selectable="false"
+                    hide-create-button
                     @update:selected-project-ids="handleProjectId"
                 />
             </p-field-group>
             <budget-create-scope-select />
-            <budget-create-manager-select :service-account-list="state.serviceAccountList" />
+            <budget-create-manager-select />
         </div>
         <div class="mt-8 flex justify-end gap-4">
             <p-button style-type="transparent"

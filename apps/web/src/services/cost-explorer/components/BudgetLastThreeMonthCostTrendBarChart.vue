@@ -26,21 +26,20 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     data: {},
     xAxisData: computed(() => {
-        const startDate = budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]) : dayjs.utc().subtract(3, 'month');
-        const endDate = budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]) : dayjs.utc().subtract(1, 'month');
+        const startDate = budgetCreatePageState.startMonth.length > 0
+            ? dayjs.utc(budgetCreatePageState.startMonth[0])
+            : dayjs.utc().subtract(3, 'month');
+        const endDate = budgetCreatePageState.endMonth.length > 0
+            ? dayjs.utc(budgetCreatePageState.endMonth[0])
+            : dayjs.utc().subtract(1, 'month');
         const monthDiff = endDate.diff(startDate, 'month');
-        return Array.from({ length: monthDiff + 1 }, (_, i) => startDate.add(i, 'month').format('MMM YYYY'));
+
+        return Array.from({ length: monthDiff + 1 }, (_, i) => startDate.add(i, 'month').format('YYYY-MM'));
     }),
     chart: null as EChartsType | null,
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
         color: '#7F9CF5',
-        title: {
-            text: 'Last Month Cost Trend',
-            show: true,
-            left: 'center',
-            top: '10%',
-        },
         grid: {
             left: '3%',
             right: '3%',
@@ -53,6 +52,7 @@ const state = reactive({
             axisPointer: {
                 type: 'shadow',
             },
+            valueFormatter: (value) => Number(value).toFixed(2),
         },
         legend: {
             show: false,
@@ -70,7 +70,10 @@ const state = reactive({
         yAxis: {
             type: 'value',
             axisLabel: {
-                formatter: (value: number) => `${CURRENCY_SYMBOL[budgetCreatePageState.currency]} ${value}`,
+                formatter: (value: number) => {
+                    const currencySymbol = CURRENCY_SYMBOL[budgetCreatePageState.currency];
+                    return `${currencySymbol} ${value}`;
+                },
             },
         },
         series: state.chartData,
@@ -78,19 +81,19 @@ const state = reactive({
 });
 
 const processData = (results: any[]) => {
-    const groupedByDate = results.reduce((acc, curr) => {
-        const date = curr.date;
-        if (!acc[date]) {
-            acc[date] = [];
-        }
-        acc[date].push(curr.cost_trend);
-        return acc;
-    }, {} as Record<string, number[]>);
+    const allDates = state.xAxisData;
 
-    return Object.entries(groupedByDate).map(([date, costs]: any) => ({
-        date,
-        average_cost: costs.reduce((sum, cost) => sum + cost, 0) / costs.length,
-    }));
+    const processedData = allDates.map((date) => {
+        const matchingResults = results.filter((r) => r.date === date);
+        return {
+            date,
+            average_cost: matchingResults.length > 0
+                ? matchingResults.reduce((sum, curr) => sum + curr.cost_trend, 0) / matchingResults.length
+                : 0,
+        };
+    });
+
+    return processedData;
 };
 
 const fetchBudgetUsageAnalyze = async () => {
@@ -138,7 +141,7 @@ const drawChart = (data: any) => {
 
 watch(() => state.data, () => {
     drawChart(state.data);
-});
+}, { deep: true, immediate: true });
 
 watch(() => budgetCreatePageState, async () => {
     await fetchBudgetUsageAnalyze();

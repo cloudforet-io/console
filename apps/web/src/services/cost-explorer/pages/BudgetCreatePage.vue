@@ -80,7 +80,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="budget-create-page">
+    <div class="budget-create-page"
+         :class="[`step-${budgetCreatePageState.currentStep}`]"
+    >
         <p-centered-layout-header :title="state.steps[budgetCreatePageState.currentStep - 1].title"
                                   :description="state.steps[budgetCreatePageState.currentStep - 1].description"
                                   :total-steps="state.steps.length"
@@ -107,7 +109,15 @@ onUnmounted(() => {
 
 <style scoped lang="postcss">
 .budget-create-page {
-    margin: 0 auto;
-    padding: 137px 130px;
+    margin: 9rem auto;
+    &.step-1 {
+        width: 62.5rem;
+    }
+    &.step-2 {
+        width: 62.5rem;
+    }
+    &.step-3 {
+        width: 62.5rem;
+    }
 }
 </style>
