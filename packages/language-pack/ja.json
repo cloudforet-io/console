@@ -2127,7 +2127,7 @@
 				"FILTER_PROVIDER": "プロバイダー"
 			},
 			"TEMPLATES": "テンプレート",
-			"TITLE": "新規ダッシュボード作成",
+			"TITLE": "新規プロジェクトダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
 			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
 			"VIEW": "ビュー",
@@ -5097,6 +5097,11 @@
 		}
 	},
 	"PROJECT": {
+		"DASHBOARD": {
+			"CREATE": {
+				"TITLE": "新規ダッシュボード作成"
+			}
+		},
 		"DETAIL": {
 			"ACCESS": "アクセス",
 			"ADD": "追加",

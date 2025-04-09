@@ -5097,6 +5097,11 @@
 		}
 	},
 	"PROJECT": {
+		"DASHBOARD": {
+			"CREATE": {
+				"TITLE": "프로젝트 대시보드 생성"
+			}
+		},
 		"DETAIL": {
 			"ACCESS": "접근",
 			"ADD": "추가 ",
