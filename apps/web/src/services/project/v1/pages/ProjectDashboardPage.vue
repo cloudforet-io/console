@@ -13,17 +13,18 @@ import { PSkeleton } from '@cloudforet/mirinae';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import DashboardLabelsButton from '@/services/dashboards/shared/components/DashboardLabelsButton.vue';
-import DashboardRefreshDropdown from '@/services/dashboards/shared/components/DashboardRefreshDropdown.vue';
+import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
+import DashboardRefreshDropdown from '@/services/dashboard-shared/dashboard-detail/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
-    from '@/services/dashboards/shared/components/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2 from '@/services/dashboards/shared/components/DashboardVariablesV2.vue';
+    from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
+import DashboardVariablesV2
+    from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2
-    from '@/services/dashboards/shared/components/DashboardWidgetContainerV2.vue';
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
-import { useDashboardWidgetListQuery } from '@/services/dashboards/shared/composables/use-dashboard-widget-list-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/shared/stores/dashboard-detail-info-store';
+    from '@/services/dashboard-shared/dashboard-detail/components/DashboardWidgetContainerV2.vue';
+import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
+import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
+import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
@@ -126,9 +127,12 @@ onUnmounted(() => {
                                             is-project-dashboard
                                             disable-save-button
                                             :loading="dashboardLoading || widgetLoading"
+                                            :dashboard-id="props.dashboardId"
                     />
                 </div>
-                <dashboard-widget-container-v2 ref="widgetContainerRef" />
+                <dashboard-widget-container-v2 ref="widgetContainerRef"
+                                               :dashboard-id="props.dashboardId"
+                />
             </div>
         </div>
     </div>
