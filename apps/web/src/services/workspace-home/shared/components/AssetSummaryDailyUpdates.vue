@@ -14,6 +14,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 
 import AssetSummaryDailyUpdateItem from '@/services/workspace-home/components/AssetSummaryDailyUpdateItem.vue';
+import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import { DEFAULT_PADDING } from '@/services/workspace-home/types/workspace-home-type';
 import type { CloudServiceData, DailyUpdatesListItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -22,6 +23,17 @@ const DAILY_UPDATE__DEFAULT_WIDTH = 136 + 8;
 
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const dailyUpdateEl = ref<null | HTMLElement>(null);
+
+
+const props = withDefaults(defineProps<{
+    projectGroupId?: string;
+    projectId?: string;
+    styleType?: WidgetStyleType;
+}>(), {
+    projectGroupId: undefined,
+    projectId: undefined,
+    styleType: 'default',
+});
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -76,6 +88,7 @@ const handleClickArrowButton = (increment: number) => {
 <template>
     <div class="daily-update-wrapper">
         <p-field-title :label="$t('HOME.ASSET_SUMMARY_DAILY_UPDATE_TITLE')"
+                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="daily-update-title"
         >
             <template #right>

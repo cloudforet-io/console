@@ -3,9 +3,9 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 
-import AccountSummary from '@/services/workspace-home/components/AccountSummary.vue';
-import AssetSummary from '@/services/workspace-home/components/AssetSummary.vue';
-import CostSummary from '@/services/workspace-home/components/CostSummary.vue';
+import AccountSummary from '@/services/workspace-home/shared/components/AccountSummary.vue';
+import AssetSummary from '@/services/workspace-home/shared/components/AssetSummary.vue';
+import CostSummary from '@/services/workspace-home/shared/components/CostSummary.vue';
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 </script>

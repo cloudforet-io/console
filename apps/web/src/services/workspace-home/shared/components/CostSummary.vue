@@ -11,9 +11,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
-import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { UnifiedCostAnalyzeParameters } from '@/api-clients/cost-analysis/unified-cost/schema/api-verbs/analyze';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
@@ -36,47 +33,60 @@ import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-co
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { UnifiedCostAnalyzeResult } from '@/services/cost-explorer/types/unified-cost-type';
-import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
-import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import { COST_SUMMARY_STATE_TYPE, SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+import CostSummaryChart from '@/services/workspace-home/shared/components/CostSummaryChart.vue';
+import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
+import { useCostDataSourceQuery } from '@/services/workspace-home/shared/composables/use-cost-data-source-query';
+import { useCostReportConfigQuery } from '@/services/workspace-home/shared/composables/use-cost-report-config-query';
+import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
 
+const props = withDefaults(defineProps<{
+    projectGroupId?: string;
+    projectId?: string;
+    styleType?: WidgetStyleType;
+}>(), {
+    projectGroupId: undefined,
+    projectId: undefined,
+    styleType: 'default',
+});
 
-const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageState = workspaceHomePageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
 
 const { width } = useWindowSize();
 
+
+
+const { dataSource } = useCostDataSourceQuery();
 const storeState = reactive({
-    costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageState.costReportConfig),
-    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
-    dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
     getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.state.currentRoleInfo),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+});
+
+const isWorkspaceMember = computed(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER);
+const { costReportConfig } = useCostReportConfigQuery({
+    enabled: computed(() => !isWorkspaceMember.value),
 });
 const state = reactive({
     loading: true,
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.COST_REPORT])),
     isDesktopSize: computed(() => width.value > screens.laptop.max),
-    currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency || CURRENCY.USD),
-    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    currency: computed<Currency|undefined>(() => costReportConfig.value?.currency || CURRENCY.USD),
     chartData: undefined as CostXYChartData[]|undefined,
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;
-        if (storeState.dataSource.length === 0) {
+        if (dataSource.value?.length === 0) {
             result = {
                 to: { name: COST_EXPLORER_ROUTE.LANDING._NAME },
                 title: i18n.t('HOME.ACTIVATION_REQUIRED'),
                 desc: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
                 buttonText: i18n.t('HOME.LEARN_MORE'),
             };
-        } else if (state.isWorkspaceMember && isEmpty(storeState.projects)) {
+        } else if (isWorkspaceMember.value && isEmpty(storeState.projects)) {
             result = {
                 title: i18n.t('HOME.PROJECT_REQUIRED'),
                 desc: i18n.t('HOME.PROJECT_REQUIRED_DESC'),
@@ -145,7 +155,7 @@ const analyzeCostReportData = async () => {
             query: {
                 start: state.period.start,
                 end: state.period.end,
-                group_by: state.isWorkspaceMember ? ['project_id', 'is_confirmed'] : ['is_confirmed'],
+                group_by: isWorkspaceMember.value ? ['project_id', 'is_confirmed'] : ['is_confirmed'],
                 fields: {
                     value_sum: {
                         key: `cost.${state.currency}`,
@@ -154,7 +164,7 @@ const analyzeCostReportData = async () => {
                 },
                 granularity: GRANULARITY.MONTHLY,
                 field_group: ['date'],
-                filter: state.isWorkspaceMember ? [
+                filter: isWorkspaceMember.value ? [
                     { k: 'project_id', v: state.selectedProjects[0], o: 'eq' },
                 ] : undefined,
             },
@@ -177,13 +187,13 @@ watch(() => state.isDesktopSize, async () => {
     await analyzeCostReportData();
 });
 watch(() => storeState.projects, async (projects) => {
-    if (!state.isWorkspaceMember) return;
+    if (!isWorkspaceMember.value) return;
     const project = Object.keys(projects)[0];
     state.selectedProjects = [project];
     await analyzeCostReportData();
 }, { immediate: true });
-watch(() => storeState.costReportConfig, async (costReportConfig) => {
-    if (!costReportConfig) return;
+watch(costReportConfig, async (data) => {
+    if (!data) return;
     await analyzeCostReportData();
 }, { immediate: true });
 </script>
@@ -193,10 +203,11 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
         <div class="heading-wrapper">
             <p-field-title :label="$t('HOME.COST_SUMMARY_TITLE')"
                            size="lg"
+                           :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                            class="main-title"
             />
             <project-select-dropdown
-                v-if="state.isWorkspaceMember && !isEmpty(storeState.projects)"
+                v-if="isWorkspaceMember && !isEmpty(storeState.projects)"
                 class="project-select-dropdown"
                 :selected-project-ids="state.selectedProjects"
                 :use-fixed-menu-style="false"
@@ -255,7 +266,7 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                                         :data="state.chartData"
                     />
                 </div>
-                <div v-if="!state.isWorkspaceMember && state.accessLink">
+                <div v-if="!isWorkspaceMember && state.accessLink">
                     <p-divider class="divider" />
                     <div class="link-footer">
                         <p-link highlight

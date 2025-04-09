@@ -32,10 +32,22 @@ import { MENU_ID } from '@/lib/menu/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
 import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
+import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
+
+const props = withDefaults(defineProps<{
+    projectGroupId?: string;
+    projectId?: string;
+    styleType?: WidgetStyleType;
+}>(), {
+    projectGroupId: undefined,
+    projectId: undefined,
+    styleType: 'default',
+});
+
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -190,6 +202,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([
     <div class="account-summary">
         <p-field-title :label="$t('HOME.ACCOUNT_SUMMARY')"
                        size="lg"
+                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="main-title"
         />
         <div v-if="state.loading"
@@ -226,7 +239,11 @@ watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([
                         </div>
                     </div>
                     <div class="main-content">
-                        <strong class="title">{{ $t('HOME.ACCOUNT_SUMMARY_BY_PROVIDER') }}</strong>
+                        <p-field-title :label="$t('HOME.ACCOUNT_SUMMARY_BY_PROVIDER')"
+                                       size="lg"
+                                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
+                                       class="title"
+                        />
                         <div class="content">
                             <div ref="providerChartContext"
                                  class="chart"

@@ -14,10 +14,12 @@ import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ProjectDashboard from '@/services/project/v2/components/ProjectDashboard.vue';
+import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vue';
 
 
 const props = defineProps<{
     projectId: string,
+    projectGroupId?: string,
     dashboardId?: string,
 }>();
 const emit = defineEmits<{(e: 'update:dashboard-id', value?: string): void;}>();
@@ -128,11 +130,10 @@ const handleUpdateActiveTab = (tab: string) => {
             <template #default>
                 <div>
                     <keep-alive>
-                        <div v-if="activeTab === 'overview'"
-                             :key="`${props.projectId}-overview`"
-                        >
-                            Overview will be implemented later.
-                        </div>
+                        <project-overview v-if="activeTab === 'overview'"
+                                          :project-group-id="props.projectGroupId"
+                                          :project-id="props.projectId"
+                        />
                         <project-dashboard v-else
                                            :id="props.projectId"
                                            :key="`${props.projectId}-${activeTab}`"
