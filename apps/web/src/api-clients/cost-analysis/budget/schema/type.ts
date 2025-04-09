@@ -8,15 +8,13 @@ interface BudgetNotificationPlan {
 }
 
 export interface BudgetNotificationRecipients {
-    role_types: string[];
     users: string[];
-    service_account_manager: string;
 }
 
 export interface BudgetNotification {
     state: BudgetNotificationState;
-    plans: BudgetNotificationPlan[];
-    recipients: BudgetNotificationRecipients;
+    plans?: BudgetNotificationPlan[];
+    recipients?: BudgetNotificationRecipients;
 }
 
 export interface BudgetPlannedLimit {

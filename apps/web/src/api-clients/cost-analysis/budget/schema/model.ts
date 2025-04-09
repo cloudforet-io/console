@@ -16,13 +16,14 @@ export interface BudgetModel {
     time_unit: BudgetTimeUnit;
     start: string;
     end: string;
-    notifications: BudgetNotification;
+    notification: BudgetNotification;
     tags: Tags;
     data_source_id: string;
     resource_group: Extract<ResourceGroupType, 'WORKSPACE' | 'PROJECT'>
     project_id: string;
     workspace_id: string;
     service_account_id: string;
+    budget_manager_id: string;
     domain_id: string;
     created_at: string;
     updated_at: string;
