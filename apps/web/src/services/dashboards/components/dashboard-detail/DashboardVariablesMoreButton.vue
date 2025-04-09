@@ -4,7 +4,7 @@ import {
     computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
@@ -21,32 +21,35 @@ import type {
 } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface VariableMenuItem extends MenuItem {
     use?: boolean;
 }
 interface Props {
+    dashboardId: string;
     isManageable?: boolean;
     disabled?: boolean;
     widgetMode?: boolean;
 }
 
 const props = defineProps<Props>();
-const appContextStore = useAppContextStore();
 const router = useRouter();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
+const dashboardId = computed(() => props.dashboardId);
+const {
+    entryPoint,
+    projectGroupOrProjectId,
+} = useDashboardRouteContext();
 
 /* Query */
 const {
@@ -58,7 +61,6 @@ const {
 });
 const queryClient = useQueryClient();
 const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any | null,
     searchText: '',
@@ -150,14 +152,35 @@ const { mutate, isPending: loading } = useMutation(
 /* Event */
 const handleOpenOverlay = () => {
     hideContextMenu();
-    const dashboardDetailRouteName = state.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-        : DASHBOARDS_ROUTE.DETAIL._NAME;
-    router.push({
-        name: dashboardDetailRouteName,
-        params: { dashboardId: dashboardId.value ?? '' },
-        hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-    }).catch(() => {});
+
+    if (entryPoint.value === 'ADMIN') {
+        router.push({
+            name: ADMIN_DASHBOARDS_ROUTE._NAME,
+            params: {
+                dashboardId: dashboardId.value,
+            },
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        }).catch(() => {});
+    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+        router.push({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: projectGroupOrProjectId.value,
+                dashboardId: dashboardId.value,
+            },
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        }).catch(() => {});
+    } else if (entryPoint.value === 'WORKSPACE') {
+        router.push({
+            name: DASHBOARDS_ROUTE._NAME,
+            params: {
+                dashboardId: dashboardId.value,
+            },
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        }).catch(() => {});
+    } else {
+        console.error('Invalid entry point');
+    }
 };
 const handleClickButton = () => {
     if (visibleMenu.value) hideContextMenu();

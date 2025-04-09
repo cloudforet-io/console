@@ -9,10 +9,10 @@ import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import type { DashboardGlobalVariableSchemaProperties, DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 
+import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
 import DashboardGlobalVariableFilter
     from '@/services/dashboards/components/dashboard-detail/DashboardGlobalVariableFilter.vue';
 import DashboardManageVariableOverlay from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableOverlay.vue';
@@ -44,13 +44,14 @@ const dashboardId = computed(() => route.params.dashboardId);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
-const appContextStore = useAppContextStore();
 const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
+
+const {
+    entryPoint,
+} = useDashboardRouteContext();
+
 const state = reactive({
     showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     dashboardVarsSchemaProperties: computed<DashboardGlobalVariableSchemaProperties>(() => dashboard.value?.vars_schema?.properties ?? {}),
@@ -77,7 +78,7 @@ const state = reactive({
     }),
     showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
     notChanged: computed(() => state.modifiedVariablesSchemaProperties.length === 0),
-    isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared && !storeState.isAdminMode),
+    isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared && entryPoint.value !== 'ADMIN'),
 });
 
 const handleClickSaveButton = () => {
@@ -135,9 +136,12 @@ watch([() => state.tempVars, dashboard], ([_tempVars]) => {
         </p-text-button>
         <dashboard-variables-more-button v-if="!state.isSharedDashboard"
                                          :widget-mode="props.widgetMode"
+                                         :dashboard-id="dashboardId"
         />
         <portal to="dashboard-detail-page">
-            <dashboard-manage-variable-overlay :visible="state.showOverlay" />
+            <dashboard-manage-variable-overlay :visible="state.showOverlay"
+                                               :dashboard-id="dashboardId"
+            />
         </portal>
     </div>
 </template>

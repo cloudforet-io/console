@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -40,6 +39,7 @@ interface Props {
     visible: boolean;
     modalType: 'CREATE'|'UPDATE';
     variableKey?: string;
+    dashboardId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
@@ -47,10 +47,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
+const dashboardId = computed(() => props.dashboardId);
 
 const userStore = useUserStore();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {

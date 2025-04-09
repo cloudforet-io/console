@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
@@ -23,6 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 
+// import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
 import DashboardManageVariableImportModalTree
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModalTree.vue';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
@@ -33,14 +33,16 @@ import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/u
 
 interface Props {
     visible: boolean;
+    dashboardId: string;
 }
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;}>();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
-
+const dashboardId = computed(() => props.dashboardId);
+// const {
+//     entryPoint,
+// } = useDashboardRouteContext();
 
 /* Query */
 const {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
@@ -19,7 +19,6 @@ import type {
 } from '@/api-clients/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,6 +26,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useDashboardRouteContext } from '@/services/dashboard-shared/composables/use-dashboard-route-context';
 import DashboardManageVariableImportModal
     from '@/services/dashboards/components/dashboard-detail/DashboardManageVariableImportModal.vue';
 import DashboardVariablesFormModal
@@ -38,6 +38,7 @@ import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboa
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 
 
@@ -52,13 +53,16 @@ interface GlobalVariableTableItem {
 }
 interface Props {
     visible: boolean;
+    dashboardId: string;
 }
 const props = defineProps<Props>();
 const userStore = useUserStore();
-const appContextStore = useAppContextStore();
 const router = useRouter();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
+const dashboardId = computed(() => props.dashboardId);
+const {
+    entryPoint,
+    projectGroupOrProjectId,
+} = useDashboardRouteContext();
 
 /* Query */
 const {
@@ -73,7 +77,6 @@ const queryClient = useQueryClient();
 
 
 const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     selectedVariableKey: undefined as string|undefined,
     modalType: 'CREATE' as 'CREATE'|'UPDATE',
     formModalVisible: false,
@@ -239,13 +242,31 @@ const handleToggleUse = (variableKey: string, val: boolean) => {
     updateUseDashboardVarsSchema(dashboardId.value, variableKey, val);
 };
 const handleCloseOverlay = () => {
-    const dashboardDetailRouteName = state.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-        : DASHBOARDS_ROUTE.DETAIL._NAME;
-    router.replace({
-        name: dashboardDetailRouteName,
-        params: { dashboardId: dashboardId.value ?? '' },
-    }).catch(() => {});
+    if (entryPoint.value === 'ADMIN') {
+        router.replace({
+            name: ADMIN_DASHBOARDS_ROUTE._NAME,
+            params: {
+                dashboardId: dashboardId.value,
+            },
+        }).catch(() => {});
+    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+        router.replace({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: projectGroupOrProjectId.value,
+                dashboardId: dashboardId.value,
+            },
+        }).catch(() => {});
+    } else if (entryPoint.value === 'WORKSPACE') {
+        router.replace({
+            name: DASHBOARDS_ROUTE._NAME,
+            params: {
+                dashboardId: dashboardId.value,
+            },
+        }).catch(() => {});
+    } else {
+        console.error('Invalid entry point');
+    }
 };
 const handleConfirmDelete = () => {
     if (!dashboardId.value || !state.selectedVariableKey) return;
@@ -327,6 +348,7 @@ const handleConfirmDelete = () => {
         <dashboard-variables-form-modal :modal-type="state.modalType"
                                         :variable-key="state.selectedVariableKey"
                                         :visible.sync="state.formModalVisible"
+                                        :dashboard-id="dashboardId"
         />
         <delete-modal :header-title="$t('DASHBOARDS.DETAIL.VARIABLES.DELETE_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
@@ -344,7 +366,9 @@ const handleConfirmDelete = () => {
                 </p-scoped-notification>
             </template>
         </delete-modal>
-        <dashboard-manage-variable-import-modal :visible.sync="state.importModalVisible" />
+        <dashboard-manage-variable-import-modal :visible.sync="state.importModalVisible"
+                                                :dashboard-id="dashboardId"
+        />
     </p-overlay-layout>
 </template>
 
