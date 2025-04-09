@@ -87,6 +87,23 @@ const state = reactive({
                 })),
             ];
         }
+        if (entryPoint.value === 'PROJECT') {
+            return [
+                defaultItem,
+                ...state.publicFolderItems.filter((folder) => {
+                    if (projectContextType.value === 'PROJECT') {
+                        return folder.project_id === projectGroupOrProjectId.value;
+                    }
+                    if (projectContextType.value === 'PROJECT_GROUP') {
+                        return folder.project_group_id === projectGroupOrProjectId.value;
+                    }
+                    return false;
+                }).map((folder) => ({
+                    label: folder.name,
+                    name: folder.folder_id,
+                })),
+            ];
+        }
         return [
             defaultItem,
             ...state.publicFolderItems.map((folder) => ({

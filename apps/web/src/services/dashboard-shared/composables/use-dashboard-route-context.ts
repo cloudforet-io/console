@@ -24,17 +24,13 @@ export const useDashboardRouteContext = () => {
     const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
     const entryPoint = computed<EntryPoint>(() => {
-        // If route is not part of DASHBOARDS, we consider it irrelevant
-        if (!route.matched.some((m) => m.meta.menuId === MENU_ID.DASHBOARDS)) return 'UNKNOWN';
-
         // Global admin mode overrides route-level checks
         if (isAdminMode.value) return 'ADMIN';
 
         // Project dashboard route (nested under project-level menu)
         if (route.matched.some((m) => m.meta.menuId === MENU_ID.PROJECT)) return 'PROJECT';
-
-        // Default workspace dashboard
-        return 'WORKSPACE';
+        if (route.matched.some((m) => m.meta.menuId === MENU_ID.DASHBOARDS)) return 'WORKSPACE';
+        return 'UNKNOWN';
     });
 
     const projectGroupOrProjectId = computed(() => {
