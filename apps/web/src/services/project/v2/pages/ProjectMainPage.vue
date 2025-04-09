@@ -98,7 +98,7 @@ const handleUpdateDashboardId = (id?: string) => {
             params: {
                 projectGroupOrProjectId: props.projectGroupOrProjectId,
             },
-        });
+        }).catch(() => {});
     } else {
         router.replace({
             name: PROJECT_ROUTE_V2._NAME,
@@ -106,7 +106,7 @@ const handleUpdateDashboardId = (id?: string) => {
                 projectGroupOrProjectId: props.projectGroupOrProjectId,
                 dashboardId: id,
             },
-        });
+        }).catch(() => {});
     }
 };
 
