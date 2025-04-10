@@ -52,6 +52,7 @@ import {
     useDashboardContainerWidth,
 } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-container-width';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardRefinedVars } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-refined-vars';
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -78,7 +79,6 @@ const props = defineProps<{
 const dashboardId = computed(() => props.dashboardId);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -87,6 +87,7 @@ const allReferenceStore = useAllReferenceStore();
 const displayStore = useDisplayStore();
 const { publicDataTableAPI } = usePublicDataTableApi();
 const { privateDataTableAPI } = usePrivateDataTableApi();
+const { refinedVars } = useDashboardRefinedVars(dashboardId);
 
 /* Query */
 const {
@@ -547,7 +548,7 @@ onBeforeUnmount(() => {
                                :mode="displayStore.state.visibleSidebar ? 'edit-layout' : 'view'"
                                :loading="getWidgetLoading(widget.widget_id)"
                                :dashboard-options="dashboardDetailState.options"
-                               :dashboard-vars="dashboardDetailGetters.refinedVars"
+                               :dashboard-vars="refinedVars"
                                :dashboard-id="dashboardId"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
                                :disable-manage-buttons="!isManageable"

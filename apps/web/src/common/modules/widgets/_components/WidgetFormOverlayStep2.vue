@@ -38,6 +38,7 @@ import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 import DashboardToolsetDateDropdown from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariablesV2 from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesV2.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardRefinedVars } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-refined-vars';
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -46,11 +47,9 @@ import {
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
-
 const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
@@ -59,6 +58,7 @@ const appContextStore = useAppContextStore();
 const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
+const { refinedVars } = useDashboardRefinedVars(dashboardId);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -361,7 +361,7 @@ onUnmounted(() => {
                            :widget-options="widget?.options"
                            :data-tables="dataTableList"
                            :dashboard-options="dashboardDetailState.options"
-                           :dashboard-vars="dashboardDetailGetters.refinedVars"
+                           :dashboard-vars="refinedVars"
                            :dashboard-id="dashboardId"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            disable-refresh-on-loading

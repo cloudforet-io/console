@@ -19,13 +19,8 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import getRandomId from '@/lib/random-id-generator';
-import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboard-shared/dashboard-detail/constants/dashboard-managed-variables-schema';
 
@@ -72,17 +67,12 @@ const refineProjectDashboardVariables = (variables: DashboardVariables, projectI
 };
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
-    const appContextStore = useAppContextStore();
-    const userStore = useUserStore();
-    const storeState = reactive({
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    });
     const state = reactive({
         loadingDashboard: false,
         dashboardId: '' as string | undefined,
         dashboard: undefined as PublicDashboardModel|PrivateDashboardModel|undefined,
         projectId: undefined as string | undefined,
+        projectGroupId: undefined as string | undefined,
         options: DASHBOARD_DEFAULT.options as DashboardOptions,
         vars: {} as DashboardVars,
         variables: {} as DashboardVariables,
@@ -104,24 +94,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     });
 
     const getters = reactive({
-        refinedVars: computed<DashboardVars>(() => {
-            const isProjectSharedDashboard = !!state.projectId;
-            const _vars: DashboardVars = cloneDeep(state.vars);
-            if (isProjectSharedDashboard && !!state.projectId) {
-                _vars.project = [state.projectId];
-            }
-            if (storeState.isAdminMode) {
-                if (state.selectedWorkspaceId && state.selectedWorkspaceId !== 'all') {
-                    _vars[WorkspaceVariableModel.meta.idKey] = [state.selectedWorkspaceId];
-                } else {
-                    delete _vars[WorkspaceVariableModel.meta.idKey];
-                }
-            } else {
-                delete _vars[WorkspaceVariableModel.meta.idKey];
-            }
-            return _vars;
-        }),
-
         // only for 1.0 legacy dashboard
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
@@ -160,13 +132,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     /* Mutations */
     const setOptions = (options: DashboardOptions) => { state.options = options; };
-    const setVars = (vars: DashboardVars) => { state.vars = vars; };
+    const setVars = (vars?: DashboardVars) => { state.vars = vars; };
     const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => { state.variablesSchema = variablesSchema; };
     const setVariables = (variables: DashboardVariables) => { state.variables = variables; };
     const setVariablesInitMap = (variablesInitMap: Record<string, boolean>) => { state.variablesInitMap = variablesInitMap; };
     const setDashboardWidgets = (dashboardWidgets: Array<PublicWidgetModel|PrivateWidgetModel>) => { state.dashboardWidgets = dashboardWidgets; };
     const setLoadingWidgets = (loading: boolean) => { state.loadingWidgets = loading; };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
+    const setProjectGroupId = (projectGroupId?: string) => { state.projectGroupId = projectGroupId; };
     const setShowDateRangeNotification = (visible: boolean) => { state.showDateRangeNotification = visible; };
     const setSelectedWorkspaceId = (workspaceId?: string) => { state.selectedWorkspaceId = workspaceId; };
     const setVariableImportModalVisible = (visible: boolean) => { state.variableImportModalVisible = visible; };
@@ -176,6 +149,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.loadingDashboard = false;
         state.dashboardId = undefined;
         setProjectId('');
+        setProjectGroupId('');
         setOptions(DASHBOARD_DEFAULT.options);
         setVariables({});
         setVariablesSchema({ properties: {}, order: [] });
@@ -190,10 +164,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
         }
-        if (!!dashboardInfo.project_id && dashboardInfo.project_id !== '*' && dashboardInfo.project_id !== '-') {
-            state.projectId = dashboardInfo.project_id;
-        }
-        state.vars = dashboardInfo.vars ?? {};
+        state.projectId = dashboardInfo.project_id;
+        state.projectGroupId = dashboardInfo.project_group_id;
         state.dashboard = dashboardInfo;
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardId = _dashboardInfo.dashboard_id;
@@ -282,6 +254,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardWidgets,
         setLoadingWidgets,
         setProjectId,
+        setProjectGroupId,
         setShowDateRangeNotification,
         setSelectedWorkspaceId,
         setVariableImportModalVisible,
