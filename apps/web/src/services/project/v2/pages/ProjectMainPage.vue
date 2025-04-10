@@ -124,6 +124,7 @@ const handleUpdateDashboardId = (id?: string) => {
             />
         </keep-alive>
         <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
+                            class="mt-6"
                             :project-id="projectId"
                             :project-group-id="projectGroupId"
                             :dashboard-id="props.dashboardId"
