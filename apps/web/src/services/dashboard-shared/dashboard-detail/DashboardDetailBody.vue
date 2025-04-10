@@ -17,7 +17,8 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardDetailHeader from '@/services/dashboard-shared/dashboard-detail/components/DashboardDetailHeader.vue';
 import DashboardRefreshDropdown
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardRefreshDropdown.vue';
@@ -30,7 +31,6 @@ import DashboardVariablesV2
 import DashboardWidgetContainerV2
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardWidgetContainerV2.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardManageable } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-manageable';
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
 import DashboardVariables from '@/services/dashboard-shared/dashboard-detail/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboard-shared/dashboard-detail/legacy/DashboardWidgetContainer.vue';

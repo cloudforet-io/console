@@ -35,6 +35,7 @@ import { i18n } from '@/translations';
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useGoBack } from '@/common/composables/go-back';
 
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardCreateStep1 from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep1.vue';
 import DashboardCreateStep2 from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep2.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
@@ -42,7 +43,6 @@ import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
-import { useDashboardRouteContext } from '../_composables/use-dashboard-route-context';
 
 interface Step {
     step: number;

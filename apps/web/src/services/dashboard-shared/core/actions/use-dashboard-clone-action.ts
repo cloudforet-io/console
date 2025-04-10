@@ -16,8 +16,8 @@ import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/compos
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
-import { getSharedDashboardLayouts } from '@/services/dashboard-shared/helpers/dashboard-share-helper';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
 
 
 interface UseDashboardCloneActionOptions {

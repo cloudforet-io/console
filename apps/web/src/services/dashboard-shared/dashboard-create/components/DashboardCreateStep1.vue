@@ -15,7 +15,7 @@ import type { DashboardTemplateModel } from '@/schema/repository/dashboard-templ
 import { i18n } from '@/translations';
 
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardCreateBlankBoardItem from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateBlankBoardItem.vue';
 import type { FilterLabelItem } from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';

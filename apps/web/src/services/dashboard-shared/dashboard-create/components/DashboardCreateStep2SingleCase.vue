@@ -32,7 +32,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardCreateScopeForm from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateScopeForm.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 import {

@@ -14,12 +14,12 @@ import { i18n } from '@/translations';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { getControlDashboardMenuItems } from '@/services/dashboard-shared/core/helpers/dashboard-control-menu-helper';
 import DashboardControlButtons from '@/services/dashboard-shared/dashboard-detail/components/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardManageable } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-manageable';
-import { getControlDashboardMenuItems } from '@/services/dashboard-shared/helpers/dashboard-control-menu-helper';
 
 interface Props {
     dashboardId: string;

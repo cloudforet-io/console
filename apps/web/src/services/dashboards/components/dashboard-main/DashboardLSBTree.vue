@@ -22,8 +22,8 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardManageable } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-manageable';
-import { getControlDashboardMenuItems, getControlFolderMenuItems } from '@/services/dashboard-shared/helpers/dashboard-control-menu-helper';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
+import { getControlDashboardMenuItems, getControlFolderMenuItems } from '@/services/dashboard-shared/core/helpers/dashboard-control-menu-helper';
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';

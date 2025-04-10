@@ -10,7 +10,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 
 interface UseDashboardManageableOptions {
