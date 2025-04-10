@@ -20,7 +20,6 @@ import { green, blue, coral } from '@/styles/colors';
 import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 
 interface Props {
-    period: { start: string; end: string };
     data: CostXYChartData[];
     currency: Currency|undefined;
 }

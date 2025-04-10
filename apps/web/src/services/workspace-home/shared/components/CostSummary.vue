@@ -1,41 +1,37 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, onUnmounted, ref, watch,
+} from 'vue';
 
 import dayjs from 'dayjs';
-import { isEmpty, sortBy } from 'lodash';
+import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PFieldTitle, PLink, PSpinner, PStatus, screens,
 } from '@cloudforet/mirinae';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { UnifiedCostAnalyzeParameters } from '@/api-clients/cost-analysis/unified-cost/schema/api-verbs/analyze';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { RoleInfo } from '@/store/user/type';
+import { useProjectReferenceStore, type ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
-import type { UnifiedCostAnalyzeResult } from '@/services/cost-explorer/types/unified-cost-type';
+import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
 import CostSummaryChart from '@/services/workspace-home/shared/components/CostSummaryChart.vue';
 import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
+import type { CostChartData } from '@/services/workspace-home/shared/composables/use-cost-chart-data';
+import { useCostChartData } from '@/services/workspace-home/shared/composables/use-cost-chart-data';
 import { useCostDataSourceQuery } from '@/services/workspace-home/shared/composables/use-cost-data-source-query';
 import { useCostReportConfigQuery } from '@/services/workspace-home/shared/composables/use-cost-report-config-query';
 import { COST_SUMMARY_STATE_TYPE } from '@/services/workspace-home/shared/constants/cost-summary-constant';
@@ -51,150 +47,116 @@ const props = withDefaults(defineProps<{
     styleType: 'default',
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const userStore = useUserStore();
 
+/* period */
 const { width } = useWindowSize();
-
-
-
-const { dataSource } = useCostDataSourceQuery();
-const storeState = reactive({
-    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.state.currentRoleInfo),
-    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+const isDesktopSize = computed(() => width.value > screens.laptop.max);
+const period = computed<Period>(() => {
+    const reportMonth = dayjs().utc();
+    const reportMonthPeriod = isDesktopSize.value ? 12 : 6;
+    const start = dayjs(reportMonth).utc().subtract(reportMonthPeriod, 'month').format('YYYY-MM');
+    const end = reportMonth.format('YYYY-MM');
+    return { start, end };
 });
 
-const isWorkspaceMember = computed(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER);
+/* permission */
+const userStore = useUserStore();
+const isWorkspaceMember = computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER);
+const pageAccessPermissionMap = computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap);
+
+/* project select dropdown */
+const showProjectSelectDropdown = isWorkspaceMember;
+const selectedProjects = ref<string[]>([]);
+const projectReferenceStore = useProjectReferenceStore();
+const projects = computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems);
+const handleSelectedProject = (selectedProject: string[]) => {
+    selectedProjects.value = selectedProject;
+};
+watch(projects, (prjs) => {
+    if (!showProjectSelectDropdown.value) return;
+    const project = Object.keys(prjs)[0];
+    selectedProjects.value = [project];
+}, { immediate: true });
+
+/* data source */
+const { dataSource } = useCostDataSourceQuery();
+
+/* access link */
+const accessLink = computed<boolean>(() => !isEmpty(pageAccessPermissionMap.value[MENU_ID.COST_REPORT]));
+
+/* cost report config */
 const { costReportConfig } = useCostReportConfigQuery({
     enabled: computed(() => !isWorkspaceMember.value),
 });
-const state = reactive({
-    loading: true,
-    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.COST_REPORT])),
-    isDesktopSize: computed(() => width.value > screens.laptop.max),
-    currency: computed<Currency|undefined>(() => costReportConfig.value?.currency || CURRENCY.USD),
-    chartData: undefined as CostXYChartData[]|undefined,
-    emptyData: computed<EmptyData>(() => {
-        let result = {} as EmptyData;
-        if (dataSource.value?.length === 0) {
-            result = {
-                to: { name: COST_EXPLORER_ROUTE.LANDING._NAME },
-                title: i18n.t('HOME.ACTIVATION_REQUIRED'),
-                desc: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
-                buttonText: i18n.t('HOME.LEARN_MORE'),
-            };
-        } else if (isWorkspaceMember.value && isEmpty(storeState.projects)) {
-            result = {
-                title: i18n.t('HOME.PROJECT_REQUIRED'),
-                desc: i18n.t('HOME.PROJECT_REQUIRED_DESC'),
-            };
-        } else {
-            result = {
-                to: { name: COST_EXPLORER_ROUTE.COST_REPORT._NAME },
-                title: i18n.t('HOME.NO_COST_DATA'),
-                desc: i18n.t('HOME.NO_COST_DATA_DESC'),
-                buttonText: i18n.t('HOME.COST_SUMMARY_GO_TO_REPORT'),
-            };
-        }
-        return result;
-    }),
-    selectedProjects: [] as Array<string>,
 
-    period: computed(() => {
-        const reportMonth = dayjs().utc();
-        const reportMonthPeriod = state.isDesktopSize ? 12 : 6;
-        const start = dayjs(reportMonth).utc().subtract(reportMonthPeriod, 'month').format('YYYY-MM');
-        const end = reportMonth.format('YYYY-MM');
-        return { start, end };
+/* currency */
+const currency = computed<Currency>(() => costReportConfig.value?.currency || CURRENCY.USD);
+
+/* chart data */
+const mounted = ref(false);
+onMounted(() => {
+    mounted.value = true;
+});
+onUnmounted(() => {
+    mounted.value = false;
+});
+const { chartData, isLoading } = useCostChartData({
+    enabled: computed(() => {
+        if (!isWorkspaceMember.value) {
+            return !!costReportConfig.value && mounted.value;
+        }
+        return selectedProjects.value.length !== 0 && mounted.value;
     }),
-    recentMonthValue: computed<CostXYChartData|undefined>(() => state.chartData[state.chartData.length - 2]),
-    currentMonthValue: computed<CostXYChartData|undefined>(() => state.chartData[state.chartData.length - 1]),
-    recentDateRangeText: computed<string>(() => {
-        const lastMonth = dayjs().utc().subtract(1, 'month');
-        return `${lastMonth.startOf('month').format('YYYY-MM-DD')} ~ ${lastMonth.endOf('month').format('YYYY-MM-DD')}`;
-    }),
-    currentDateRangeText: computed<string>(() => {
-        const currentMonth = dayjs().utc();
-        return `${currentMonth.startOf('month').format('YYYY-MM-DD')} ~ ${currentMonth.format('YYYY-MM-DD')}`;
+    period,
+    currency,
+    projectIds: computed(() => {
+        if (isWorkspaceMember.value) {
+            return selectedProjects.value;
+        }
+        return props.projectIds;
     }),
 });
 
-const handleSelectedProject = async (selectedProject: string[]) => {
-    state.selectedProjects = selectedProject;
-    await analyzeCostReportData();
-};
-const fillMissingMonths = (dataList: CostXYChartData[]): CostXYChartData[] => {
-    const result: CostXYChartData[] = [];
-    const today = dayjs().utc();
-    if (dataList.length === 0) return result;
-
-    dataList.sort((a, b) => dayjs(a.date).utc().diff(dayjs(b.date).utc()));
-
-    const startDate = dayjs(dataList[0]?.date).utc();
-    let currentDate = startDate;
-
-    while (currentDate.isBefore(today, 'month')) {
-        const dateToCheck = currentDate.clone();
-        const data = dataList.find((item) => dayjs(item.date).utc().isSame(dateToCheck, 'month'));
-        result.push(
-            data || { date: dateToCheck.add(1, 'month').format('YYYY-MM'), value: 0, is_confirmed: true },
-        );
-        currentDate = currentDate.add(1, 'month');
+/* empty data */
+const emptyData = computed<EmptyData>(() => {
+    let result = {} as EmptyData;
+    if (dataSource.value?.length === 0) {
+        result = {
+            to: { name: COST_EXPLORER_ROUTE.LANDING._NAME },
+            title: i18n.t('HOME.ACTIVATION_REQUIRED'),
+            desc: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
+            buttonText: i18n.t('HOME.LEARN_MORE'),
+        };
+    } else if (isWorkspaceMember.value && isEmpty(projects.value)) {
+        result = {
+            title: i18n.t('HOME.PROJECT_REQUIRED'),
+            desc: i18n.t('HOME.PROJECT_REQUIRED_DESC'),
+        };
+    } else {
+        result = {
+            to: { name: COST_EXPLORER_ROUTE.COST_REPORT._NAME },
+            title: i18n.t('HOME.NO_COST_DATA'),
+            desc: i18n.t('HOME.NO_COST_DATA_DESC'),
+            buttonText: i18n.t('HOME.COST_SUMMARY_GO_TO_REPORT'),
+        };
     }
     return result;
-};
-
-
-const analyzeCostReportData = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze<UnifiedCostAnalyzeParameters, AnalyzeResponse<UnifiedCostAnalyzeResult>>({
-            query: {
-                start: state.period.start,
-                end: state.period.end,
-                group_by: isWorkspaceMember.value ? ['project_id', 'is_confirmed'] : ['is_confirmed'],
-                fields: {
-                    value_sum: {
-                        key: `cost.${state.currency}`,
-                        operator: 'sum',
-                    },
-                },
-                granularity: GRANULARITY.MONTHLY,
-                field_group: ['date'],
-                filter: isWorkspaceMember.value ? [
-                    { k: 'project_id', v: state.selectedProjects[0], o: 'eq' },
-                ] : undefined,
-            },
-        });
-        if (!results) return;
-        const _chartData = (results || []).flatMap((item) => ((item.value_sum ?? [])).map((valueSum) => ({
-            ...valueSum,
-            is_confirmed: item.is_confirmed,
-        })));
-        state.chartData = sortBy(fillMissingMonths(_chartData), 'date');
-    } catch (e) {
-        state.chartData = undefined;
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => state.isDesktopSize, async () => {
-    await analyzeCostReportData();
 });
-watch(() => storeState.projects, async (projects) => {
-    if (!isWorkspaceMember.value) return;
-    const project = Object.keys(projects)[0];
-    state.selectedProjects = [project];
-    await analyzeCostReportData();
-}, { immediate: true });
-watch(costReportConfig, async (data) => {
-    if (!data) return;
-    await analyzeCostReportData();
-}, { immediate: true });
+
+/* monthly cost */
+const recentMonthValue = computed<CostChartData|undefined>(() => chartData.value?.[chartData.value.length - 2]);
+const currentMonthValue = computed<CostChartData|undefined>(() => chartData.value?.[chartData.value.length - 1]);
+
+/* date range */
+const recentDateRangeText = computed<string>(() => {
+    const lastMonth = dayjs().utc().subtract(1, 'month');
+    return `${lastMonth.startOf('month').format('YYYY-MM-DD')} ~ ${lastMonth.endOf('month').format('YYYY-MM-DD')}`;
+});
+const currentDateRangeText = computed<string>(() => {
+    const currentMonth = dayjs().utc();
+    return `${currentMonth.startOf('month').format('YYYY-MM-DD')} ~ ${currentMonth.format('YYYY-MM-DD')}`;
+});
+
 </script>
 
 <template>
@@ -206,9 +168,9 @@ watch(costReportConfig, async (data) => {
                            class="main-title"
             />
             <project-select-dropdown
-                v-if="isWorkspaceMember && !isEmpty(storeState.projects)"
+                v-if="isWorkspaceMember && !isEmpty(projects)"
                 class="project-select-dropdown"
-                :selected-project-ids="state.selectedProjects"
+                :selected-project-ids="selectedProjects"
                 :use-fixed-menu-style="false"
                 project-selectable
                 position="right"
@@ -218,27 +180,27 @@ watch(costReportConfig, async (data) => {
                 @update:selected-project-ids="handleSelectedProject"
             />
         </div>
-        <div v-if="state.loading"
+        <div v-if="isLoading"
              class="loading"
         >
             <p-spinner size="lg" />
         </div>
         <div v-else>
-            <div v-if="state.chartData?.length > 0">
+            <div v-if="chartData && chartData.length > 0">
                 <div class="content-wrapper">
                     <div class="price-wrapper">
                         <div class="price-view">
                             <p>{{ $t('HOME.COST_SUMMARY_LAST_MONT_TOTAL_COST') }}</p>
                             <p class="price">
-                                <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.recentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
-                                <p-status v-bind="costStateSummaryFormatter(state.recentMonthValue?.is_confirmed ? COST_SUMMARY_STATE_TYPE.CONFIRM : COST_SUMMARY_STATE_TYPE.ESTIMATED)"
-                                          :text="state.recentMonthValue?.is_confirmed ? $t('HOME.CONFIRM') : $t('HOME.ESTIMATED')"
+                                <span class="unit">{{ CURRENCY_SYMBOL?.[currency] }}</span>
+                                <span>{{ currencyMoneyFormatter(recentMonthValue?.value, { currency, style: 'decimal' }) }}</span>
+                                <p-status v-bind="costStateSummaryFormatter(recentMonthValue?.is_confirmed ? COST_SUMMARY_STATE_TYPE.CONFIRM : COST_SUMMARY_STATE_TYPE.ESTIMATED)"
+                                          :text="recentMonthValue?.is_confirmed ? $t('HOME.CONFIRM') : $t('HOME.ESTIMATED')"
                                           class="capitalize state"
                                 />
                             </p>
                             <p class="date">
-                                {{ state.recentDateRangeText }}
+                                {{ recentDateRangeText }}
                             </p>
                         </div>
                         <p-divider class="divider"
@@ -247,25 +209,24 @@ watch(costReportConfig, async (data) => {
                         <div class="price-view">
                             <p>{{ $t('HOME.COST_SUMMARY_CURRENT_TOTAL_COST') }}</p>
                             <p class="price">
-                                <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.currentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                <span class="unit">{{ CURRENCY_SYMBOL?.[currency] }}</span>
+                                <span>{{ currencyMoneyFormatter(currentMonthValue?.value, { currency, style: 'decimal' }) }}</span>
                                 <p-status v-bind="costStateSummaryFormatter(COST_SUMMARY_STATE_TYPE.AGGREGATING)"
                                           :text="$t('HOME.AGGREGATING')"
                                           class="capitalize state"
                                 />
                             </p>
                             <p class="date">
-                                {{ state.currentDateRangeText }}
+                                {{ currentDateRangeText }}
                             </p>
                         </div>
                     </div>
                     <span class="chart-description">{{ $t('HOME.COST_SUMMARY_DESC') }}</span>
-                    <cost-summary-chart :period="state.period"
-                                        :currency="state.currency"
-                                        :data="state.chartData"
+                    <cost-summary-chart :currency="currency"
+                                        :data="chartData"
                     />
                 </div>
-                <div v-if="!isWorkspaceMember && state.accessLink">
+                <div v-if="!isWorkspaceMember && accessLink">
                     <p-divider class="divider" />
                     <div class="link-footer">
                         <p-link highlight
@@ -292,7 +253,7 @@ watch(costReportConfig, async (data) => {
             </div>
             <empty-summary-data v-else
                                 :image-url="require('/images/home/img_workspace-home_cost-summary_empty-state-background-min.png')"
-                                :empty-data="state.emptyData"
+                                :empty-data="emptyData"
                                 :type="SUMMARY_DATA_TYPE.COST"
             />
         </div>
