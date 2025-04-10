@@ -2,6 +2,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
 const _getShareMenuItems = (isShared: boolean): MenuItem[] => [
@@ -21,7 +23,7 @@ export const getControlDashboardMenuItems = (
 ): MenuItem[] => {
     const _isPrivate = dashboardId.startsWith('private');
     const _isDeprecated = dashboard.version === '1.0';
-    const _isShared = !!dashboard?.shared;
+    const _isShared = !!(dashboard as PublicDashboardModel)?.shared;
     if (!manageable) {
         if (_isDeprecated) return [];
         return [
@@ -69,7 +71,7 @@ export const getControlDashboardMenuItems = (
 
 export const getControlFolderMenuItems = (folderId: string, manageable: boolean, folder: FolderModel): MenuItem[] => {
     const _isPrivate = folderId.startsWith('private');
-    const _isShared = !!folder?.shared;
+    const _isShared = !!(folder as PublicFolderModel)?.shared;
     if (!manageable) {
         return [
             {
