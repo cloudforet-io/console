@@ -14,7 +14,7 @@ import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vu
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const props = defineProps<{
     projectId?: string,
@@ -23,6 +23,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{(e: 'update:dashboard-id', value?: string): void;}>();
 const router = useRouter();
+const projectPageModalStore = useProjectPageModalStore();
 
 const activeTab = ref('overview');
 watch(() => props.dashboardId, (did) => {
@@ -120,7 +121,7 @@ const handleCreateProjectDashboard = (item: string) => {
             },
         });
     } else if (item === 'folder') {
-        console.log('create folder');
+        projectPageModalStore.openCreateFolderFormModal();
     }
 };
 

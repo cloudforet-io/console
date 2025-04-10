@@ -32,7 +32,11 @@ const ProjectMemberInviteModal = () => import('@/services/project/v2/components/
 const ProjectTagsModal = () => import('@/services/project/v2/components/ProjectTagsModal.vue');
 const ProjectFormModal = () => import('@/services/project/v2/components/ProjectFormModal.vue');
 const ProjectGroupFormModal = () => import('@/services/project/v2/components/ProjectGroupFormModal.vue');
-
+const ProjectDashboardFolderFormModal = () => import('@/services/project/v2/components/ProjectDashboardFolderFormModal.vue');
+const ProjectDashboardNameEditModal = () => import('@/services/project/v2/components/ProjectDashboardNameEditModal.vue');
+const ProjectDashboardChangeFolderModal = () => import('@/services/project/v2/components/ProjectDashboardChangeFolderModal.vue');
+const ProjectDashboardDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardDeleteModal.vue');
+const ProjectDashboardCloneModal = () => import('@/services/project/v2/components/ProjectDashboardCloneModal.vue');
 const props = defineProps<{
     projectGroupOrProjectId?: string;
     dashboardId?: string;
@@ -125,7 +129,7 @@ const handleUpdateDashboardId = (id?: string) => {
                                           :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
             />
         </keep-alive>
-        <project-detail-tab v-if="mounted && projectId"
+        <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
                             class="mt-6"
                             :project-id="projectId"
                             :project-group-id="projectGroupId"
@@ -149,6 +153,21 @@ const handleUpdateDashboardId = (id?: string) => {
             <project-group-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'projectGroup'"
                                       :target-parent-group-id="targetParentGroupId"
                                       @created="handleCreated"
+            />
+            <project-dashboard-folder-form-modal v-if="projectPageModelStore.state.folderFormModalVisible"
+                                                 :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
+            <project-dashboard-name-edit-modal v-if="projectPageModelStore.state.dashboardNameEditModalVisible"
+                                               :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
+            <project-dashboard-change-folder-modal v-if="projectPageModelStore.state.dashboardChangeFolderModalVisible"
+                                                   :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
+            <project-dashboard-delete-modal v-if="projectPageModelStore.state.dashboardDeleteModalVisible"
+                                            :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
+            <project-dashboard-clone-modal v-if="projectPageModelStore.state.dashboardCloneModalVisible"
+                                           :project-group-or-project-id="props.projectGroupOrProjectId"
             />
         </template>
     </div>

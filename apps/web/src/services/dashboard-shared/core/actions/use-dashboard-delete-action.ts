@@ -41,8 +41,8 @@ export const useDashboardDeleteAction = (options: UseDashboardDeleteActionOption
         onSuccess: async (data, variables) => {
             const _dashboardId = variables.dashboard_id;
             const _isPrivate = _dashboardId.startsWith('private');
-            const dashboardListQueryKey = _isPrivate ? privateDashboardGetQueryKey(_dashboardId) : publicDashboardGetQueryKey(_dashboardId);
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey });
+            const dashboardGetQueryKey = _isPrivate ? privateDashboardGetQueryKey(_dashboardId) : publicDashboardGetQueryKey(_dashboardId);
+            queryClient.invalidateQueries({ queryKey: dashboardGetQueryKey });
             if (onSuccess) await onSuccess(data, variables);
         },
         onError: (error, variables) => {

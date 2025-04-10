@@ -1,0 +1,75 @@
+<script lang="ts" setup>
+import { computed } from 'vue';
+import { useRouter } from 'vue-router/composables';
+
+
+import { i18n } from '@/translations';
+
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useDashboardDeleteAction } from '@/services/dashboard-shared/core/actions/use-dashboard-delete-action';
+import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
+import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+
+import { PROJECT_ROUTE_V2 } from '../routes/route-constant';
+
+interface Props {
+    projectGroupOrProjectId: string;
+}
+const props = defineProps<Props>();
+const router = useRouter();
+const projectPageModalStore = useProjectPageModalStore();
+const visible = computed(() => projectPageModalStore.state.dashboardDeleteModalVisible);
+const dashboardId = computed(() => projectPageModalStore.state.targetId);
+const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
+const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
+/* Query */
+const {
+    invalidateAllQueries: invalidateDashboardList,
+} = useProjectDashboardQuery({
+    projectId,
+    projectGroupId,
+});
+
+const handleDeleteDashboardConfirm = async () => {
+    if (!dashboardId.value) {
+        throw new Error('Dashboard ID is not provided');
+    }
+    deleteDashboard({
+        dashboard_id: dashboardId.value,
+    });
+};
+
+/* Api */
+const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteAction({
+    dashboardId,
+    onSuccess: async () => {
+        invalidateDashboardList();
+        projectPageModalStore.closeDashboardDeleteModal();
+        await router.replace({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: projectGroupOrProjectId.value,
+            },
+        }).catch(() => {});
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
+    },
+});
+
+</script>
+
+<template>
+    <delete-modal :header-title="$t('DASHBOARDS.FORM.DELETE_TITLE')"
+                  :visible="visible"
+                  :loading="loading"
+                  @confirm="handleDeleteDashboardConfirm"
+                  @closed="projectPageModalStore.resetTarget"
+                  @cancel="projectPageModalStore.closeDashboardDeleteModal"
+                  @close="projectPageModalStore.closeDashboardDeleteModal"
+    />
+</template>

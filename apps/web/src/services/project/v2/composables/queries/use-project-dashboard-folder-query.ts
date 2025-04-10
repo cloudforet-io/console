@@ -2,6 +2,8 @@ import {
     computed, type ComputedRef,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/list';
@@ -17,10 +19,11 @@ const GC_TIME = 1000 * 60 * 5;
 
 
 export const useProjectDashboardFolderQuery = (options: {
-    projectId: ComputedRef<string|undefined>,
+    projectId?: ComputedRef<string|undefined>,
     projectGroupId?: ComputedRef<string|undefined>,
 }) => {
     const { publicFolderAPI } = usePublicFolderApi();
+    const queryClient = useQueryClient();
 
     const projectPageContext = computed<ProjectPageContextType>(() => {
         if (options.projectGroupId?.value) {
@@ -52,6 +55,11 @@ export const useProjectDashboardFolderQuery = (options: {
         params: computed<PublicFolderListParameters>(() => ({
             project_id: options.projectId?.value,
             project_group_id: options.projectGroupId?.value,
+            query: {
+                filter: [
+                    { k: 'resource_group', v: 'PROJECT', o: 'eq' },
+                ],
+            },
         })),
     });
 
@@ -77,10 +85,22 @@ export const useProjectDashboardFolderQuery = (options: {
 
     const isLoading = computed<boolean>(() => dashboardFolderSharedListQuery.isFetching.value || dashboardFolderListQuery.isFetching.value);
 
+    const setQueryData = (newData: PublicFolderModel[]) => {
+        queryClient.setQueryData(dashboardFolderListQueryKey.value, {
+            results: [...(dashboardFolderListQuery.data.value ?? []), ...newData],
+        });
+    };
+
+    const invalidateAllQueries = () => {
+        queryClient.invalidateQueries({ queryKey: dashboardFolderListQueryKey.value });
+    };
+
     return {
         dashboardFolderSharedList: computed<PublicFolderModel[]>(() => dashboardFolderSharedListQuery.data.value ?? []),
         dashboardFolderList: computed<PublicFolderModel[]>(() => dashboardFolderListQuery.data.value ?? []),
         isLoading,
+        setQueryData,
+        invalidateAllQueries,
     };
 };
 

@@ -2,6 +2,8 @@ import {
     computed, type ComputedRef,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardListParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/list';
@@ -21,7 +23,7 @@ export const useProjectDashboardQuery = (options: {
     projectGroupId?: ComputedRef<string|undefined>,
 }) => {
     const { publicDashboardAPI } = usePublicDashboardApi();
-
+    const queryClient = useQueryClient();
     const projectPageContext = computed<ProjectPageContextType>(() => {
         if (options.projectGroupId?.value) {
             return 'PROJECT_GROUP';
@@ -45,6 +47,7 @@ export const useProjectDashboardQuery = (options: {
                     { k: 'scope', v: 'PROJECT', o: 'eq' },
                     { k: 'shared', v: true, o: 'eq' },
                 ],
+                sort: [{ key: 'created_at', desc: false }],
             },
         })),
     });
@@ -57,6 +60,7 @@ export const useProjectDashboardQuery = (options: {
                 filter: [
                     { k: 'version', v: '1.0', o: 'not' },
                 ],
+                sort: [{ key: 'created_at', desc: false }],
             },
         })),
     });
@@ -83,10 +87,22 @@ export const useProjectDashboardQuery = (options: {
 
     const isLoading = computed<boolean>(() => dashboardSharedListQuery.isFetching.value || dashboardListQuery.isFetching.value);
 
+    const setQueryData = (newData: PublicDashboardModel[]) => {
+        queryClient.setQueryData(dashboardListQueryKey.value, {
+            results: [...(dashboardListQuery.data.value ?? []), ...newData],
+        });
+    };
+
+    const invalidateAllQueries = () => {
+        queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+    };
+
     return {
         dashboardSharedList: computed<PublicDashboardModel[]>(() => dashboardSharedListQuery.data.value ?? []),
         dashboardList: computed<PublicDashboardModel[]>(() => dashboardListQuery.data.value ?? []),
         isLoading,
+        setQueryData,
+        invalidateAllQueries,
     };
 };
 

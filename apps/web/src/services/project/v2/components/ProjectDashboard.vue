@@ -11,6 +11,7 @@ import type { DashboardModel, DashboardFolderModel } from '@/api-clients/dashboa
 import DashboardDetailBody from '@/services/dashboard-shared/dashboard-detail/DashboardDetailBody.vue';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 interface Props {
     projectId?: string;
@@ -19,7 +20,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-
+const projectPageModalStore = useProjectPageModalStore();
 /* Query */
 const {
     dashboardList,
@@ -40,6 +41,12 @@ const {
 const dashboardItems = computed<Array<DashboardModel>>(() => [...dashboardSharedList.value, ...dashboardList.value]);
 const dashboardFolderItems = computed<Array<DashboardFolderModel>>(() => [...dashboardFolderSharedList.value, ...dashboardFolderList.value]);
 
+const handleSelectToolset = (toolsetId: string|undefined) => {
+    if (toolsetId === 'edit') projectPageModalStore.openDashboardNameEditModal(props.dashboardId);
+    if (toolsetId === 'move') projectPageModalStore.openDashboardChangeFolderModal(props.dashboardId);
+    if (toolsetId === 'delete') projectPageModalStore.openDashboardDeleteModal(props.dashboardId);
+    if (toolsetId === 'clone') projectPageModalStore.openDashboardCloneModal(props.dashboardId);
+};
 </script>
 
 <template>
@@ -47,6 +54,7 @@ const dashboardFolderItems = computed<Array<DashboardFolderModel>>(() => [...das
         <dashboard-detail-body :dashboard-id="props.dashboardId"
                                :dashboard-items="dashboardItems"
                                :folder-items="dashboardFolderItems"
+                               @select-toolset="handleSelectToolset"
         />
     </div>
 </template>

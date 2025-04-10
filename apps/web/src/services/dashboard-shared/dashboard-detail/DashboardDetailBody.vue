@@ -42,7 +42,7 @@ import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 interface Props {
     dashboardId: string;
     dashboardItems?: Array<DashboardModel>;
-    folderItems?: Array<DashboardFolderModel>;
+    folderItems: Array<DashboardFolderModel>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -194,6 +194,7 @@ onUnmounted(() => {
 <template>
     <div class="dashboard-detail-body">
         <dashboard-detail-header :dashboard-id="props.dashboardId"
+                                 :folder-items="props.folderItems"
                                  @select-toolset="handleSelectToolset"
         />
         <p-divider v-if="entryPoint !== 'PROJECT'"

@@ -9,13 +9,13 @@ import {
 } from '@cloudforet/mirinae';
 import { getClonedName } from '@cloudforet/utils';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -51,7 +51,6 @@ const queryClient = useQueryClient();
 
 const router = useRouter();
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const {
     forms: {
@@ -77,7 +76,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -121,6 +119,15 @@ const handleConfirm = async () => {
     } else if (storeState.isAdminMode) {
         state.isPrivate = false;
     }
+
+    if (!state.isPrivate) {
+        if (storeState.isAdminMode) {
+            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        } else {
+            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+        }
+    }
+
     mutate(_sharedDashboard as DashboardCreateParams);
 };
 
