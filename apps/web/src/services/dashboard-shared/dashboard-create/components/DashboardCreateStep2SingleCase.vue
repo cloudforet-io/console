@@ -259,7 +259,7 @@ defineExpose({
                               block
                 />
             </p-field-group>
-            <dashboard-create-scope-form v-if="entryPoint !== 'ADMIN' && entryPoint !== 'PROJECT'" />
+            <dashboard-create-scope-form />
             <p-field-group :label="$t('DASHBOARDS.ALL_DASHBOARDS.LOCATION')"
                            required
                            class="mt-4"
