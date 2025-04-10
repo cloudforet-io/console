@@ -24,7 +24,7 @@ export const useDashboardFolderShareAction = (options: UseDashboardFolderShareAc
     const { publicDashboardAPI } = usePublicDashboardApi();
     const queryClient = useQueryClient();
     const { withSuffix: publicFolderGetQueryKey } = useServiceQueryKey('dashboard', 'public-folder', 'get');
-    const { withSuffix: publicDashbordGetQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
+    const { withSuffix: publicDashboardGetQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
     const {
         folderId, isShared, onSuccess, onError, onSettled,
     } = options;
@@ -61,7 +61,7 @@ export const useDashboardFolderShareAction = (options: UseDashboardFolderShareAc
                 const _dashboardIds = _dashboardList.results?.map((dashboard) => dashboard.dashboard_id);
                 if (_dashboardIds) {
                     await Promise.all(
-                        _dashboardIds.map((dashboardId) => queryClient.invalidateQueries({ queryKey: publicDashbordGetQueryKey(dashboardId) })),
+                        _dashboardIds.map((dashboardId) => queryClient.invalidateQueries({ queryKey: publicDashboardGetQueryKey(dashboardId) })),
                     );
                 }
             }
