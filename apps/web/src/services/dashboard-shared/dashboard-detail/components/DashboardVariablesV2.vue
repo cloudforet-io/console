@@ -30,9 +30,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboa
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
-
 interface Props {
-    isProjectDashboard?: boolean;
     loading?: boolean;
     disableSaveButton?: boolean;
     originVars?: DashboardVars;
@@ -68,8 +66,8 @@ const state = reactive({
     globalVariables: computed<DashboardGlobalVariable[]>(() => {
         const properties = state.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
         const _usedProperties: DashboardGlobalVariable[] = Object.values(properties).filter((d) => d.use);
-        if (props.isProjectDashboard) {
-            const _usedPropertiesWithoutProject = getOrderedGlobalVariables(_usedProperties).filter((d) => d.key !== 'project_id');
+        if (entryPoint.value === 'PROJECT') {
+            const _usedPropertiesWithoutProject = getOrderedGlobalVariables(_usedProperties).filter((d) => d.key !== 'project_id' && d.key !== 'project_group_id');
             return getOrderedGlobalVariables(_usedPropertiesWithoutProject);
         }
         return getOrderedGlobalVariables(_usedProperties);
@@ -93,9 +91,8 @@ const handleClickSaveButton = () => {
     emit('update', { vars: state.tempVars });
 };
 const handleResetVariables = () => {
-    const _originVars = state.dashboardVars;
-    state.tempVars = { ..._originVars };
-    dashboardDetailStore.setVars(_originVars);
+    state.tempVars = state.dashboardVars;
+    // dashboardDetailStore.setVars();
 };
 
 watch(() => dashboard.value?.vars, (_vars) => {
