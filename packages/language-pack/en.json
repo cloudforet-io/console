@@ -5097,6 +5097,11 @@
 		}
 	},
 	"PROJECT": {
+		"DASHBOARD": {
+			"CREATE": {
+				"TITLE": "Create New Dashboard"
+			}
+		},
 		"DETAIL": {
 			"ACCESS": "Access",
 			"ADD": "Add",

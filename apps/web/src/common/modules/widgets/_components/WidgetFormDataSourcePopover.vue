@@ -47,8 +47,8 @@ import type {
     DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions, DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
-import { useDashboardWidgetListQuery } from '@/services/dashboards/shared/composables/use-dashboard-widget-list-query';
+import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;

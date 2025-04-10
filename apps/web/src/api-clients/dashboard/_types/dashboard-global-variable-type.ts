@@ -1,5 +1,5 @@
 // Base Model
-import type { GLOBAL_VARIABLE_FILTER_TYPE_MAP } from '@/services/dashboards/constants/dashboard-global-variable';
+import type { GLOBAL_VARIABLE_FILTER_TYPE_MAP } from '@/services/dashboard-shared/dashboard-detail/constants/dashboard-global-variable';
 
 interface DashboardGlobalVariableBase {
     key: string; // new_variable

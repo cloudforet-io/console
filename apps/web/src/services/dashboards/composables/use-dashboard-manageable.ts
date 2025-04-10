@@ -1,13 +1,14 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardGetQuery } from '@/services/dashboards/shared/composables/use-dashboard-get-query';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 
 interface UseDashboardManageableOptions {
     dashboardId: ComputedRef<string|undefined>;
@@ -18,11 +19,12 @@ interface UseDashboardManageableReturn {
 }
 
 export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOptions): UseDashboardManageableReturn => {
-    const appContextStore = useAppContextStore();
     const userStore = useUserStore();
-    const route = useRoute();
+
+    const { entryPoint } = useDashboardRouteContext();
+
+
     const storeState = reactive({
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
 
@@ -31,11 +33,21 @@ export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOp
     });
 
     const isManageable = computed(() => {
-        if (storeState.isAdminMode) return true;
-        if (dashboard.value?.dashboard_id.startsWith('private')) return true;
-        // TODO: implement this condition after project dashboard is implemented
-        if (!!route.params.id && !!route.params.dashboardId) return false;
-        if (storeState.isWorkspaceOwner) return true;
+        if (entryPoint.value === 'ADMIN') return true;
+
+        if (entryPoint.value === 'WORKSPACE') {
+            if (dashboard.value?.dashboard_id.startsWith('private')) return true;
+            const publicDashboard = dashboard.value as PublicDashboardModel;
+            if (publicDashboard?.shared && publicDashboard?.resource_group === RESOURCE_GROUP.DOMAIN) return false;
+            if (storeState.isWorkspaceOwner) return true;
+            return false;
+        }
+
+        if (entryPoint.value === 'PROJECT') {
+            const publicDashboard = dashboard.value as PublicDashboardModel;
+            if (publicDashboard?.shared) return false;
+            return true;
+        }
         return false;
     });
 
