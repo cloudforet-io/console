@@ -1,4 +1,4 @@
-import type { FEATURES } from '@/lib/config/global-config/constants';
+import type { FEATURES } from '@/lib/config/global-config/constants/constants';
 import type { MenuId } from '@/lib/menu/config';
 
 export type GlobalServiceConfig = Record<string, { ENABLED: boolean; VERSION: string }>;
@@ -18,3 +18,15 @@ type FeatureSettingType = {
 };
 export type FeatureSchemaType = Record<FeatureKeyType, FeatureSettingType>;
 
+type apiClientType = {
+    V1: string;
+    V2?: string;
+};
+export type ApiClientsSchemaType = {
+    DASHBOARDS: apiClientType,
+    PROJECT: apiClientType,
+    ASSET_INVENTORY: apiClientType,
+    COST_ANALYSIS: apiClientType,
+    OPS_FLOW: apiClientType,
+    ALERT_MANAGER: apiClientType,
+};

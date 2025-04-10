@@ -1,4 +1,4 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type { FeatureVersionSettingsType } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';

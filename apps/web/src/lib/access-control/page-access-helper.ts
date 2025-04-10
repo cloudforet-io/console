@@ -14,7 +14,7 @@ import {
     WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
 import config from '@/lib/config';
-import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 import type { Menu, MenuId } from '@/lib/menu/config';
 
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';

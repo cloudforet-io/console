@@ -1,5 +1,5 @@
-import { FEATURES } from '@/lib/config/global-config/constants';
-import type { FeatureSchemaType } from '@/lib/config/global-config/type';
+import { FEATURES } from '@/lib/config/global-config/constants/constants';
+import type { FeatureSchemaType } from '@/lib/config/global-config/types/type';
 import { MENU_ID } from '@/lib/menu/config';
 
 export const initialFeatureSchema: FeatureSchemaType = {
