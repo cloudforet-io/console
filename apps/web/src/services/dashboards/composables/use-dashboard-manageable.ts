@@ -38,14 +38,14 @@ export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOp
         if (entryPoint.value === 'WORKSPACE') {
             if (dashboard.value?.dashboard_id.startsWith('private')) return true;
             const publicDashboard = dashboard.value as PublicDashboardModel;
-            if (publicDashboard.shared && publicDashboard.resource_group === RESOURCE_GROUP.DOMAIN) return false;
+            if (publicDashboard?.shared && publicDashboard?.resource_group === RESOURCE_GROUP.DOMAIN) return false;
             if (storeState.isWorkspaceOwner) return true;
             return false;
         }
 
         if (entryPoint.value === 'PROJECT') {
             const publicDashboard = dashboard.value as PublicDashboardModel;
-            if (publicDashboard.shared) return false;
+            if (publicDashboard?.shared) return false;
             return true;
         }
         return false;
