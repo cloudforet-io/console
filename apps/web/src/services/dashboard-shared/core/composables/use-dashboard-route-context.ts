@@ -40,7 +40,7 @@ export const useDashboardRouteContext = () => {
     });
 
     const projectContextType = computed<ProjectContextType>(() => {
-        const id = projectGroupOrProjectId.value;
+        const id = route.params.projectGroupOrProjectId;
         if (!id) return undefined;
         if (id.startsWith('pg-')) return 'PROJECT_GROUP';
         if (id.startsWith('project-')) return 'PROJECT';

@@ -1,30 +1,29 @@
 import { computed, type ComputedRef } from 'vue';
 
-import type { WidgetLoadParams, WidgetLoadResponse, WidgetLoadSumParams } from '@/api-clients/dashboard/_types/widget-type';
+import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
+import type { WidgetLoadParams, WidgetLoadSumParams } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
+import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 
 
-interface UseWidgetLoadQueryContextOptions {
+
+interface UseWidgetLoadQueryOptions {
     widgetId: ComputedRef<string>;
     params: ComputedRef<WidgetLoadParams>;
     additionalDeps?: ComputedRef<object>;
-}
-
-interface UseWidgetLoadQueryContextResult {
-    fetcher: () => Promise<WidgetLoadResponse>;
-    key: ComputedRef<QueryKeyArray>;
+    enabled?: ComputedRef<boolean>;
 }
 
 
-export const useWidgetLoadQueryContext = ({
+export const useWidgetLoadQuery = ({
     widgetId,
     params,
     additionalDeps,
-}: UseWidgetLoadQueryContextOptions): UseWidgetLoadQueryContextResult => {
+    enabled,
+}: UseWidgetLoadQueryOptions) => {
     const { publicWidgetAPI } = usePublicWidgetApi();
     const { privateWidgetAPI } = usePrivateWidgetApi();
 
@@ -46,37 +45,39 @@ export const useWidgetLoadQueryContext = ({
         params,
     });
 
-    const fetcher = () => {
-        if (!params.value) {
-            throw new Error('Widget parameters are required');
-        }
-        return isPrivate.value
-            ? privateWidgetAPI.load(privateWidgetLoadParams.value)
-            : publicWidgetAPI.load(publicWidgetLoadParams.value);
-    };
-
-    return {
-        fetcher,
-        key: isPrivate.value ? privateWidgetLoadQueryKey : publicWidgetLoadQueryKey,
-    };
+    return useScopedQuery({
+        queryKey: isPrivate.value ? privateWidgetLoadQueryKey : publicWidgetLoadQueryKey,
+        queryFn: () => {
+            if (isPrivate.value) {
+                if (!privateWidgetLoadParams.value) {
+                    throw new Error('Widget parameters are required');
+                }
+                return privateWidgetAPI.load(privateWidgetLoadParams.value);
+            }
+            if (!publicWidgetLoadParams.value) {
+                throw new Error('Widget parameters are required');
+            }
+            return publicWidgetAPI.load(publicWidgetLoadParams.value);
+        },
+        enabled,
+        staleTime: WIDGET_LOAD_STALE_TIME,
+    }, ['DOMAIN', 'WORKSPACE']);
 };
 
 
-interface UseWidgetLoadSumQueryContextOptions {
+interface UseWidgetLoadSumQueryOptions {
     widgetId: ComputedRef<string>;
     params: ComputedRef<WidgetLoadSumParams>;
     additionalDeps?: ComputedRef<object>;
-}
-interface UseWidgetLoadSumQueryContextResult {
-    fetcher: () => Promise<WidgetLoadResponse>;
-    key: ComputedRef<QueryKeyArray>;
+    enabled?: ComputedRef<boolean>;
 }
 
-export const useWidgetLoadSumQueryContext = ({
+export const useWidgetLoadSumQuery = ({
     widgetId,
     params,
     additionalDeps,
-}: UseWidgetLoadSumQueryContextOptions): UseWidgetLoadSumQueryContextResult => {
+    enabled,
+}: UseWidgetLoadSumQueryOptions) => {
     const { publicWidgetAPI } = usePublicWidgetApi();
     const { privateWidgetAPI } = usePrivateWidgetApi();
 
@@ -98,17 +99,21 @@ export const useWidgetLoadSumQueryContext = ({
         params,
     });
 
-    const fetcher = () => {
-        if (!params.value) {
-            throw new Error('Widget parameters are required');
-        }
-        return isPrivate.value
-            ? privateWidgetAPI.loadSum(privateWidgetLoadSumParams.value)
-            : publicWidgetAPI.loadSum(publicWidgetLoadSumParams.value);
-    };
-
-    return {
-        fetcher,
-        key: isPrivate.value ? privateWidgetLoadSumQueryKey : publicWidgetLoadSumQueryKey,
-    };
+    return useScopedQuery({
+        queryKey: isPrivate.value ? privateWidgetLoadSumQueryKey : publicWidgetLoadSumQueryKey,
+        queryFn: () => {
+            if (isPrivate.value) {
+                if (!privateWidgetLoadSumParams.value) {
+                    throw new Error('Widget parameters are required');
+                }
+                return privateWidgetAPI.loadSum(privateWidgetLoadSumParams.value);
+            }
+            if (!publicWidgetLoadSumParams.value) {
+                throw new Error('Widget parameters are required');
+            }
+            return publicWidgetAPI.loadSum(publicWidgetLoadSumParams.value);
+        },
+        enabled,
+        staleTime: WIDGET_LOAD_STALE_TIME,
+    }, ['DOMAIN', 'WORKSPACE']);
 };

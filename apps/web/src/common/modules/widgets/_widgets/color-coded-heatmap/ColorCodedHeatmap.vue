@@ -3,7 +3,6 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import { orderBy } from 'lodash';
 
 import {
@@ -18,8 +17,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetLoadQueryContext } from '@/common/modules/widgets/_composables/use-widget-load-query-context';
-import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -68,7 +66,7 @@ const widgetOptionsState = reactive({
 });
 
 /* Api */
-const { fetcher: queryFn, key: queryKey } = useWidgetLoadQueryContext({
+const loadQuery = useWidgetLoadQuery({
     widgetId: computed(() => props.widgetId),
     params: computed(() => ({
         widget_id: props.widgetId,
@@ -88,23 +86,18 @@ const { fetcher: queryFn, key: queryKey } = useWidgetLoadQueryContext({
         widgetName: props.widgetName,
         dataTableId: props.dataTableId,
     })),
-});
-
-const queryResult = useQuery({
-    queryKey,
-    queryFn,
     enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
-    staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isFetching.value || dataTableLoading.value);
+
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || dataTableLoading.value);
 const errorMessage = computed<string|undefined>(() => {
     if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
-    return queryResult.error?.value?.message as string;
+    return loadQuery.error?.value?.message as string;
 });
 
 const refinedData = computed(() => {
-    const data = queryResult.data?.value;
+    const data = loadQuery.data?.value;
     if (!data?.results || !widgetOptionsState.groupByInfo?.data || !widgetOptionsState.formatRulesInfo?.field) return [];
     const groupByField = widgetOptionsState.groupByInfo.data as string;
     const formatRulesField = widgetOptionsState.formatRulesInfo.field as string;
@@ -153,7 +146,7 @@ watch(() => widgetOptionsState.formatRulesInfo, async () => {
 
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResult.refetch();
+        loadQuery.refetch();
     },
 });
 onMounted(() => {
