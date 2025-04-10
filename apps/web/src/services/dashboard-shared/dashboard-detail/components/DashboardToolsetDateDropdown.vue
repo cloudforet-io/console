@@ -21,8 +21,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import DashboardToolsetDateCustomModal
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetDateCustomModal.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardManageable } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
-import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 
 interface Props {
     dateRange?: DateRange;

@@ -5,7 +5,7 @@ import {
 } from 'vue';
 
 import {
-    PDivider, PI,
+    PI,
 } from '@cloudforet/mirinae';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
@@ -14,9 +14,9 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import DashboardDetailBody from '@/services/dashboard-shared/dashboard-detail/DashboardDetailBody.vue';
-import DashboardDetailHeader from '@/services/dashboards/components/dashboard-detail/DashboardDetailHeader.vue';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 interface Props {
     dashboardId: string;
@@ -25,7 +25,7 @@ const props = defineProps<Props>();
 
 const gnbStore = useGnbStore();
 const { breadcrumbs } = useBreadcrumbs();
-
+const dashboardPageControlStore = useDashboardPageControlStore();
 /* Query */
 const {
     publicDashboardList,
@@ -58,6 +58,15 @@ watch(favoriteOptions, (_favoriteOptions) => {
 onUnmounted(() => {
     gnbStore.setBreadcrumbs([]);
 });
+
+const handleSelectToolset = (toolsetId: string|undefined) => {
+    if (toolsetId === 'edit') dashboardPageControlStore.openEditNameModal(props.dashboardId);
+    if (toolsetId === 'clone') dashboardPageControlStore.openCloneModal(props.dashboardId);
+    if (toolsetId === 'move') dashboardPageControlStore.openMoveModal(props.dashboardId);
+    if (toolsetId === 'share') dashboardPageControlStore.openShareModal(props.dashboardId);
+    if (toolsetId === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(props.dashboardId);
+    if (toolsetId === 'delete') dashboardPageControlStore.openDeleteModal(props.dashboardId);
+};
 </script>
 
 <template>
@@ -79,11 +88,10 @@ onUnmounted(() => {
                 </p>
             </div>
         </div>
-        <dashboard-detail-header :dashboard-id="props.dashboardId" />
-        <p-divider class="divider" />
         <dashboard-detail-body :dashboard-id="props.dashboardId"
                                :dashboard-items="dashboardItems"
                                :folder-items="folderItems"
+                               @select-toolset="handleSelectToolset"
         />
     </div>
 </template>
@@ -110,47 +118,6 @@ onUnmounted(() => {
                 @apply text-paragraph-md text-gray-900;
             }
         }
-    }
-    .divider {
-        @apply mb-4;
-    }
-    .fixed-header {
-        @apply sticky bg-gray-100;
-        z-index: 20;
-        top: 0;
-        padding-top: 1rem;
-
-        .filter-box {
-            @apply flex justify-between items-start mb-4;
-            flex-wrap: wrap;
-            row-gap: 0.25rem;
-
-            .left-part {
-                display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-                column-gap: 1rem;
-            }
-
-            .right-part {
-                display: flex;
-                flex-wrap: wrap;
-                flex-shrink: 0;
-            }
-        }
-
-        .dashboard-selectors {
-            padding-bottom: 0.75rem;
-
-            .variable-selector-wrapper {
-                @apply relative flex items-center flex-wrap;
-                gap: 0.5rem;
-                padding-right: 1rem;
-            }
-        }
-    }
-    .widget-container-body {
-        padding-top: 0.75rem;
     }
 }
 </style>

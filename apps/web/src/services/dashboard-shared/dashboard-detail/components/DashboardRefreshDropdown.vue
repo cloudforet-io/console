@@ -17,8 +17,8 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import { i18n } from '@/translations';
 
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardManageable } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-manageable';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
-import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 
 
 const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);
