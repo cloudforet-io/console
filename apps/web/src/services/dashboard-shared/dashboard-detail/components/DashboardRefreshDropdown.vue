@@ -16,9 +16,9 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
-import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 
 
 const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);

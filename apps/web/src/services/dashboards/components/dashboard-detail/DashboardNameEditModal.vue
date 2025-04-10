@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardUpdateAction } from '@/services/dashboard-shared/core/actions/use-dashboard-update-action';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -41,12 +41,6 @@ const {
     keys,
 } = useDashboardQuery();
 const queryClient = useQueryClient();
-const {
-    fetcher,
-    keys: dashboardDetailKeys,
-} = useDashboardGetQuery({
-    dashboardId: computed(() => props.dashboardId),
-});
 const route = useRoute();
 
 const appContextStore = useAppContextStore();
@@ -92,26 +86,20 @@ const state = reactive({
     isDetailPage: computed(() => route.params.dashboardId !== undefined),
 });
 
-const { mutate, isPending: loading } = useMutation(
-    {
-        mutationFn: fetcher.updateDashboardFn,
-        onSuccess: (_dashboard: DashboardModel) => {
-            const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-            if (state.isDetailPage) {
-                const dashboardQueryKey = isPrivate ? dashboardDetailKeys.privateDashboardGetQueryKey : dashboardDetailKeys.publicDashboardGetQueryKey;
-                queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
-            }
-        },
-        onError: (e) => {
-            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
-        },
-        onSettled() {
-            state.proxyVisible = false;
-        },
+const { mutate, isPending: loading } = useDashboardUpdateAction({
+    dashboardId: computed(() => props.dashboardId),
+    onSuccess: (_dashboard: DashboardModel) => {
+        const isPrivate = _dashboard.dashboard_id.startsWith('private');
+        const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+        queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
     },
-);
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
+    },
+    onSettled() {
+        state.proxyVisible = false;
+    },
+});
 
 const handleConfirm = async () => {
     mutate({

@@ -8,4 +8,5 @@ export interface PublicDashboardListParameters {
     workspace_id?: string;
     project_id?: string;
     project_group_id?: string;
+    folder_id?: string;
 }

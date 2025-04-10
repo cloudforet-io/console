@@ -18,8 +18,8 @@ import { useUserStore } from '@/store/user/user-store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
-
 
 
 interface BoardSet {
@@ -39,6 +39,11 @@ const storeState = reactive({
     isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceState.getters.currentWorkspace),
 });
+
+const {
+    entryPoint,
+} = useDashboardRouteContext();
+
 const state = reactive({
     dashboardScopeBoardSets: computed(() => {
         const boardSets: BoardSet[] = [
@@ -79,7 +84,9 @@ onMounted(() => {
             <p-field-title class="field-title">
                 {{ $t('DASHBOARDS.CREATE.DASHBOARD_SCOPE') }}
             </p-field-title>
-            <div class="grid gap-2">
+            <div v-if="entryPoint !== 'ADMIN' && entryPoint !== 'PROJECT'"
+                 class="grid gap-2"
+            >
                 <p-board-item v-for="dashboardScopeItem in state.dashboardScopeBoardSets"
                               :key="`dashboard-scope-${dashboardScopeItem.value}`"
                               class="dashboard-scope-board-item"
@@ -119,17 +126,28 @@ onMounted(() => {
                     </template>
                 </p-board-item>
             </div>
+            <div v-else
+                 class="flex items-center gap-1 pt-1"
+            >
+                <p-i name="ic_info-circle"
+                     width="0.875rem"
+                     height="0.875rem"
+                />
+                <span class="text-paragraph-sm text-gray-700">
+                    <strong>Only Public</strong>
+                    {{ $t('(Everyone in this workspace)') }}
+                </span>
+            </div>
         </div>
     </section>
 </template>
 
 <style lang="postcss" scoped>
-.field-title {
-    padding-bottom: 0.75rem;
-}
 .dashboard-scope-board-item {
     height: 4.375rem;
     cursor: pointer;
+    padding-top: 0.75rem;
+
     &.selected {
         .dashboard-scope-title {
             font-weight: 700;

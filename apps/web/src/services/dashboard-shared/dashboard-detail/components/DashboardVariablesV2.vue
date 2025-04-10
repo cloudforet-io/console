@@ -14,7 +14,7 @@ import type {
 
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardGlobalVariableFilter
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardGlobalVariableFilter.vue';
 import DashboardManageVariableImportModal

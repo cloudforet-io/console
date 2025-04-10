@@ -17,9 +17,9 @@ import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 

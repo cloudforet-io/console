@@ -2278,6 +2278,7 @@
 			"SET_HOME": "Set as Home Dashboard",
 			"SHARE": "Share",
 			"SHARED_BY_ADMIN": "Shared by Admin",
+			"SHARED_BY_WORKSPACE": "Shared by Workspace",
 			"SHARED_TO_ALL_PROJECTS": "Shared to All Projects",
 			"SHARED_TO_WORKSPACES": "Shared to Workspaces",
 			"SHARE_DASHBOARD": "Share Dashboard",

@@ -26,7 +26,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardVariablesFormModal
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesFormModal.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';

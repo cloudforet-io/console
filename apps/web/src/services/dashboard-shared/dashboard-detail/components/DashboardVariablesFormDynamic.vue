@@ -27,7 +27,7 @@ import {
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import {
     DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
 } from '@/services/dashboard-shared/dashboard-detail/constants/dashboard-global-variable-preset';

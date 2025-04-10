@@ -2,18 +2,15 @@
 import { onClickOutside } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
-
 import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
-import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
-import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useDashboardUpdateAction } from '@/services/dashboard-shared/core/actions/use-dashboard-update-action';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
 import DashboardLabels from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabels.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 
 
 
@@ -26,15 +23,12 @@ const labelPopoverRef = ref<HTMLElement|null>(null);
 /* Query */
 const {
     dashboard,
-    fetcher,
-    keys,
 } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
 const { isManageable } = useDashboardManageable({
     dashboardId: computed(() => props.dashboardId),
 });
-const queryClient = useQueryClient();
 const state = reactive({
     visible: false,
     dashboardLabels: computed<string[]>(() => dashboard.value?.labels || []),
@@ -42,20 +36,15 @@ const state = reactive({
 });
 
 const handleUpdateLabels = async (labels: string[]) => {
-    mutate({
+    updateDashboard({
         dashboard_id: props.dashboardId,
         labels,
     });
 };
 
-const { mutate } = useMutation(
+const { mutate: updateDashboard } = useDashboardUpdateAction(
     {
-        mutationFn: fetcher.updateDashboardFn,
-        onSuccess: (_dashboard: PublicDashboardModel|PrivateDashboardModel) => {
-            const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardQueryKey = isPrivate ? keys.privateDashboardGetQueryKey : keys.publicDashboardGetQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
-        },
+        dashboardId: computed(() => props.dashboardId),
         onError: (e) => {
             ErrorHandler.handleError(e);
         },

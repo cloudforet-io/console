@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
+import { PDivider } from '@cloudforet/mirinae';
+
 import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
@@ -15,7 +17,9 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import DashboardDetailHeader from '@/services/dashboard-shared/dashboard-detail/components/DashboardDetailHeader.vue';
 import DashboardRefreshDropdown
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
@@ -31,7 +35,6 @@ import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboa
 import DashboardVariables from '@/services/dashboard-shared/dashboard-detail/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboard-shared/dashboard-detail/legacy/DashboardWidgetContainer.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
-import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
@@ -46,6 +49,8 @@ const props = withDefaults(defineProps<Props>(), {
     dashboardItems: () => [],
     folderItems: () => [],
 });
+const emit = defineEmits<{(e: 'select-toolset', toolsetId: string|undefined): void;
+}>();
 const dashboardId = computed(() => props.dashboardId);
 const router = useRouter();
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -98,6 +103,9 @@ const handleUpdateDashboardVariables = (params) => {
         dashboard_id: props.dashboardId,
         ...params,
     });
+};
+const handleSelectToolset = (toolsetId: string|undefined) => {
+    emit('select-toolset', toolsetId);
 };
 
 
@@ -184,103 +192,117 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="dashboard-detail-body"
-         :class="{ 'project-dashboard': entryPoint === 'PROJECT' }"
-    >
-        <div class="fixed-header">
-            <div class="filter-box">
-                <div class="left-part">
-                    <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
-                    <dashboard-toolset-scope v-if="entryPoint === 'ADMIN'" />
+    <div class="dashboard-detail-body">
+        <dashboard-detail-header :dashboard-id="props.dashboardId"
+                                 @select-toolset="handleSelectToolset"
+        />
+        <p-divider v-if="entryPoint !== 'PROJECT'"
+                   class="divider"
+        />
+        <div class="dashboard-detail-content"
+             :class="{ 'project-dashboard': entryPoint === 'PROJECT' }"
+        >
+            <div class="fixed-header">
+                <div class="filter-box">
+                    <div class="left-part">
+                        <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
+                        <dashboard-toolset-scope v-if="entryPoint === 'ADMIN'" />
+                    </div>
+                    <div class="right-part">
+                        <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                                    :loading="dashboardLoading || widgetLoading || dashboardUpdateLoading"
+                                                    @refresh="handleRefresh"
+                        />
+                    </div>
                 </div>
-                <div class="right-part">
-                    <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="dashboardLoading || widgetLoading || dashboardUpdateLoading"
-                                                @refresh="handleRefresh"
+                <div v-if="!dashboardUpdateLoading"
+                     class="dashboard-selectors"
+                >
+                    <dashboard-variables v-if="isDeprecatedDashboard"
+                                         class="variable-selector-wrapper"
+                                         :loading="dashboardUpdateLoading"
+                                         @update="handleUpdateDashboardVariables"
+                    />
+                    <dashboard-variables-v2 v-else
+                                            class="variable-selector-wrapper"
+                                            :disable-save-button="!isManageable"
+                                            :loading="dashboardUpdateLoading"
+                                            :dashboard-id="props.dashboardId"
+                                            :dashboard-items="dashboardItemsV2"
+                                            :folder-items="folderItems"
+                                            @update="handleUpdateDashboardVariables"
                     />
                 </div>
             </div>
-            <div v-if="!dashboardUpdateLoading"
-                 class="dashboard-selectors"
-            >
-                <dashboard-variables v-if="isDeprecatedDashboard"
-                                     class="variable-selector-wrapper"
-                                     :loading="dashboardUpdateLoading"
-                                     @update="handleUpdateDashboardVariables"
+
+            <div class="widget-container-body">
+                <dashboard-widget-container v-if="isDeprecatedDashboard"
+                                            ref="widgetContainerRef"
                 />
-                <dashboard-variables-v2 v-else
-                                        class="variable-selector-wrapper"
-                                        :disable-save-button="!isManageable"
-                                        :loading="dashboardUpdateLoading"
-                                        :dashboard-id="props.dashboardId"
-                                        :dashboard-items="dashboardItemsV2"
-                                        :folder-items="folderItems"
-                                        @update="handleUpdateDashboardVariables"
+                <dashboard-widget-container-v2 v-else
+                                               ref="widgetContainerRef"
+                                               :dashboard-id="props.dashboardId"
                 />
             </div>
+            <portal-target name="dashboard-detail-body" />
         </div>
-
-        <div class="widget-container-body">
-            <dashboard-widget-container v-if="isDeprecatedDashboard"
-                                        ref="widgetContainerRef"
-            />
-            <dashboard-widget-container-v2 v-else
-                                           ref="widgetContainerRef"
-                                           :dashboard-id="props.dashboardId"
-            />
-        </div>
-        <portal-target name="dashboard-detail-body" />
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .dashboard-detail-body {
-    &.project-dashboard {
-        @apply bg-gray-100 rounded-lg px-2 pb-2 mx-4;
+    .divider {
+        @apply mb-4;
+    }
+    .dashboard-detail-content {
+        &.project-dashboard {
+            @apply bg-gray-100 rounded-lg px-2 pb-2 mx-4;
+
+            .fixed-header {
+                position: unset;
+            }
+        }
 
         .fixed-header {
-            position: unset;
-        }
-    }
+            @apply sticky bg-gray-100;
+            z-index: 20;
+            top: 0;
+            padding-top: 1rem;
 
-    .fixed-header {
-        @apply sticky bg-gray-100;
-        z-index: 20;
-        top: 0;
-        padding-top: 1rem;
-
-        .filter-box {
-            @apply flex justify-between items-start mb-4;
-            flex-wrap: wrap;
-            row-gap: 0.25rem;
-
-            .left-part {
-                display: flex;
-                align-items: center;
+            .filter-box {
+                @apply flex justify-between items-start mb-4;
                 flex-wrap: wrap;
-                column-gap: 1rem;
+                row-gap: 0.25rem;
+
+                .left-part {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    column-gap: 1rem;
+                }
+
+                .right-part {
+                    display: flex;
+                    flex-wrap: wrap;
+                    flex-shrink: 0;
+                }
             }
 
-            .right-part {
-                display: flex;
-                flex-wrap: wrap;
-                flex-shrink: 0;
+            .dashboard-selectors {
+                padding-bottom: 0.75rem;
+
+                .variable-selector-wrapper {
+                    @apply relative flex items-center flex-wrap;
+                    gap: 0.5rem;
+                    padding-right: 1rem;
+                }
             }
         }
 
-        .dashboard-selectors {
-            padding-bottom: 0.75rem;
-
-            .variable-selector-wrapper {
-                @apply relative flex items-center flex-wrap;
-                gap: 0.5rem;
-                padding-right: 1rem;
-            }
+        .widget-container-body {
+            padding-top: 0.75rem;
         }
-    }
-
-    .widget-container-body {
-        padding-top: 0.75rem;
     }
 }
+
 </style>

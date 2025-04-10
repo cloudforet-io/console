@@ -7,45 +7,30 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { BadgeStyleType, BadgeType } from '@cloudforet/mirinae/types/data-display/badge/type';
 
-import type { DashboardScope } from '@/api-clients/dashboard/_types/dashboard-type';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { getControlDashboardMenuItems } from '@/services/dashboard-shared/core/helpers/dashboard-control-menu-helper';
+import DashboardControlButtons from '@/services/dashboard-shared/dashboard-detail/components/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import DashboardControlButtons from '@/services/dashboards/components/dashboard-detail/DashboardControlButtons.vue';
-import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
-import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
-import { useDashboardManageable } from '@/services/dashboards/composables/use-dashboard-manageable';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
-
-
 
 interface Props {
     dashboardId: string;
-    templateName?: string;
+    folderItems?: Array<FolderModel>;
 }
-const props = defineProps<Props>();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const appContextStore = useAppContextStore();
-const userStore = useUserStore();
-
-/* Query */
-const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
-const {
-    publicFolderList,
-    privateFolderList,
-} = useDashboardFolderQuery();
-
+const props = withDefaults(defineProps<Props>(), {
+    folderItems: () => [],
+});
+const emit = defineEmits<{(e: 'select-toolset', toolsetId: string|undefined): void;
+}>();
+const { entryPoint } = useDashboardRouteContext();
 
 const { dashboard } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
@@ -54,35 +39,14 @@ const { isManageable } = useDashboardManageable({
     dashboardId: computed(() => props.dashboardId),
 });
 
-const queryState = reactive({
-    publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
-        if (storeState.isAdminMode) return _v2DashboardItems;
-        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
-    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
-    publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderList.value;
-        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateFolderItems: computed(() => privateFolderList.value),
-    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
+const controlMenuItems = computed<MenuItem[]>(() => {
+    if (!dashboard.value) return [];
+    return getControlDashboardMenuItems(props.dashboardId, isManageable.value, dashboard.value, entryPoint.value === 'PROJECT');
 });
 
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-});
-const { getControlMenuItems } = useDashboardControlMenuItems({
-    isAdminMode: computed(() => storeState.isAdminMode),
-    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
-});
 const state = reactive({
     isPrivate: computed<boolean>(() => !!dashboard.value?.dashboard_id.startsWith('private')),
     isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared),
-    sharedScope: computed<DashboardScope|undefined>(() => dashboard.value?.scope),
-    selectedSharedScope: 'WORKSPACE' as DashboardScope,
     showBadge: computed<boolean>(() => {
         if (dashboard.value?.user_id) return true;
         return state.isSharedDashboard;
@@ -90,43 +54,46 @@ const state = reactive({
     badgeType: computed<BadgeType>(() => 'subtle'),
     badgeStyleType: computed<BadgeStyleType>(() => {
         if (state.isPrivate) return 'gray150';
-        if (state.sharedScope === 'PROJECT') return 'primary3';
         return 'indigo100';
     }),
     badgeText: computed(() => {
         if (props.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
-            if (storeState.isAdminMode) {
+            if (entryPoint.value === 'ADMIN') {
                 if (dashboard.value?.scope === 'PROJECT') {
                     return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
                 }
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
             }
-            if (state.sharedScope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
-            return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+            if (entryPoint.value === 'WORKSPACE') {
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+            }
+            if (entryPoint.value === 'PROJECT') {
+                if (dashboard.value?.resource_group === RESOURCE_GROUP.DOMAIN) return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_WORKSPACE');
+            }
         }
         return '';
     }),
     folderName: computed<string|undefined>(() => {
-        const _folderId = queryState.allDashboardItems.find((d) => d.dashboard_id === props.dashboardId)?.folder_id;
-        const folder = queryState.allFolderItems.find((d) => d.folder_id === _folderId);
-        return folder?.name;
+        if (props.folderItems.length > 0) {
+            const currentFolder = props.folderItems.find((d) => d.folder_id === dashboard.value?.folder_id);
+            return currentFolder?.name;
+        }
+        return undefined;
     }),
 });
 
 /* Event */
 const handleSelectItem = (item: MenuItem) => {
-    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(props.dashboardId);
-    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(props.dashboardId);
-    if (item.name === 'move') dashboardPageControlStore.openMoveModal(props.dashboardId);
-    if (item.name === 'share') dashboardPageControlStore.openShareModal(props.dashboardId);
-    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(props.dashboardId);
-    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(props.dashboardId);
+    emit('select-toolset', item.name);
 };
 </script>
 
 <template>
-    <div class="dashboard-detail-header">
+    <div class="dashboard-detail-header"
+         :class="{ 'project-dashboard': entryPoint === 'PROJECT' }"
+    >
         <div v-if="state.folderName"
              class="folder-name-wrapper"
         >
@@ -137,7 +104,7 @@ const handleSelectItem = (item: MenuItem) => {
             />
             <span class="folder-name">{{ state.folderName }}</span>
         </div>
-        <p-heading-layout class="mb-6">
+        <p-heading-layout class="detail-heading-layout">
             <template #heading>
                 <p-heading :title="dashboard?.name">
                     <p-skeleton v-if="!dashboard?.name"
@@ -163,7 +130,7 @@ const handleSelectItem = (item: MenuItem) => {
                                            style-type="tertiary-icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            size="sm"
-                                           :menu="getControlMenuItems(props.dashboardId)"
+                                           :menu="controlMenuItems"
                                            :selected="[]"
                                            use-fixed-menu-style
                                            reset-selection-on-menu-close
@@ -184,17 +151,22 @@ const handleSelectItem = (item: MenuItem) => {
                 />
             </template>
         </p-heading-layout>
-        <p v-if="props.templateName"
-           class="template-name"
-        >
-            {{ props.templateName }}
-        </p>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .dashboard-detail-header {
+    &.project-dashboard {
+        padding: 2rem 1.5rem 0;
+        .detail-heading-layout {
+            @apply mb-0;
+        }
+    }
     margin-bottom: 0.75rem;
+
+    .detail-heading-layout {
+        @apply mb-6;
+    }
     .folder-name-wrapper {
         display: flex;
         align-items: center;

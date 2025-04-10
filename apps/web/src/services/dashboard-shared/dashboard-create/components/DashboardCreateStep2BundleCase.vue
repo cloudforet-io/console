@@ -28,7 +28,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/_composables/use-dashboard-route-context';
+import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,

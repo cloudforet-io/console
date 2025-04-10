@@ -5,70 +5,46 @@ import {
 } from 'vue';
 
 import {
-    groupBy, map, sumBy,
-} from 'lodash';
-
-import { PFieldTitle, PIconButton, PEmpty } from '@cloudforet/mirinae';
+    PFieldTitle, PIconButton, PEmpty,
+} from '@cloudforet/mirinae';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 
-import AssetSummaryDailyUpdateItem from '@/services/workspace-home/components/AssetSummaryDailyUpdateItem.vue';
+import AssetSummaryDailyUpdateItem from '@/services/workspace-home/shared/components/AssetSummaryDailyUpdateItem.vue';
+import type { DailyUpdateItem } from '@/services/workspace-home/shared/types/asset-daily-updates-type';
 import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
-import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
-import { DEFAULT_PADDING } from '@/services/workspace-home/types/workspace-home-type';
-import type { CloudServiceData, DailyUpdatesListItem } from '@/services/workspace-home/types/workspace-home-type';
 
+
+const DEFAULT_PADDING = 24;
 const DAILY_UPDATE__DEFAULT_WIDTH = 136 + 8;
 
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const dailyUpdateEl = ref<null | HTMLElement>(null);
 
-
 const props = withDefaults(defineProps<{
-    projectGroupId?: string;
-    projectId?: string;
     styleType?: WidgetStyleType;
+    dailyUpdates?: DailyUpdateItem[];
 }>(), {
-    projectGroupId: undefined,
-    projectId: undefined,
     styleType: 'default',
+    dailyUpdates: () => [],
 });
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageState = workspaceHomePageStore.state;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
+
 const storeState = reactive({
     cloudServiceTypeMap: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloud_service_type),
-    dailyUpdatesListItems: computed<DailyUpdatesListItem>(() => workspaceHomePageState.dailyUpdatesListItems),
 });
+
 const state = reactive({
     cloudServiceTypeList: computed<CloudServiceTypeItem[]>(() => Object.values(storeState.cloudServiceTypeMap)),
-    dailyUpdatesList: computed<CloudServiceData[]>(() => {
-        const mergedArray = [...storeState.dailyUpdatesListItems.created, ...storeState.dailyUpdatesListItems.deleted];
-
-        const grouped = groupBy(mergedArray, (item) => `${item.cloud_service_group}-${item.cloud_service_type}-${item.provider}`);
-
-        return map(grouped, (group) => {
-            const cloudServiceType = state.cloudServiceTypeList.find((i) => i.data.cloud_service_type_key === `${group[0].provider}.${group[0].cloud_service_group}.${group[0].cloud_service_type}`);
-            return {
-                cloud_service_group: cloudServiceType?.data.group,
-                cloud_service_type: cloudServiceType?.name,
-                total_count: sumBy(group, 'total_count') || 0,
-                provider: cloudServiceType?.data.provider,
-                icon: cloudServiceType?.icon,
-                created_count: sumBy(group, 'created_count') || 0,
-                deleted_count: sumBy(group, 'deleted_count') || 0,
-            };
-        });
-    }),
     pageStart: 0,
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / DAILY_UPDATE__DEFAULT_WIDTH)),
-    pageMax: computed<number>(() => Math.max(state.dailyUpdatesList.length - state.visibleCount, 0)),
+    pageMax: computed<number>(() => Math.max(props.dailyUpdates.length - state.visibleCount, 0)),
 });
 
 const handleClickArrowButton = (increment: number) => {
@@ -95,16 +71,16 @@ const handleClickArrowButton = (increment: number) => {
                 <span class="desc">{{ $t('HOME.ASSET_SUMMARY_DAILY_UPDATE_DESC') }}</span>
             </template>
         </p-field-title>
-        <div v-if="state.dailyUpdatesList.length > 0"
+        <div v-if="props.dailyUpdates.length > 0"
              ref="rowItemsWrapperRef"
              class="row-items-wrapper"
         >
             <div ref="dailyUpdateEl"
                  class="row-items-container"
             >
-                <asset-summary-daily-update-item v-for="(item, idx) in state.dailyUpdatesList"
+                <asset-summary-daily-update-item v-for="(item, idx) in props.dailyUpdates"
                                                  :key="`asset-summary-daily-update-item-${idx}`"
-                                                 :item="item"
+                                                 v-bind="item"
                 />
             </div>
             <p-icon-button v-if="state.pageStart !== 0"

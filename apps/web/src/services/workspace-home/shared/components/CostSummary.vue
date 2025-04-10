@@ -34,21 +34,20 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { UnifiedCostAnalyzeResult } from '@/services/cost-explorer/types/unified-cost-type';
 import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
-import { COST_SUMMARY_STATE_TYPE, SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import CostSummaryChart from '@/services/workspace-home/shared/components/CostSummaryChart.vue';
 import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
 import { useCostDataSourceQuery } from '@/services/workspace-home/shared/composables/use-cost-data-source-query';
 import { useCostReportConfigQuery } from '@/services/workspace-home/shared/composables/use-cost-report-config-query';
+import { COST_SUMMARY_STATE_TYPE } from '@/services/workspace-home/shared/constants/cost-summary-constant';
+import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
+import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
 import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
-import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
 
 const props = withDefaults(defineProps<{
-    projectGroupId?: string;
-    projectId?: string;
+    projectIds?: string[];
     styleType?: WidgetStyleType;
 }>(), {
-    projectGroupId: undefined,
-    projectId: undefined,
+    projectIds: undefined,
     styleType: 'default',
 });
 

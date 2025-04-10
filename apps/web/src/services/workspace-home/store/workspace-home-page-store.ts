@@ -20,7 +20,6 @@ import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/s
 import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -37,7 +36,7 @@ import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/a
 import { convertFormKeys } from '@/services/workspace-home/composables/use-workspace-home';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type {
-    ProviderReferenceDataMap, ProviderResourceDataItem, DailyUpdatesListItem,
+    DailyUpdatesListItem,
     BookmarkType,
 } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -55,15 +54,12 @@ interface WorkspaceHomeState {
     recentList: UserConfigModel[];
     favoriteMenuList: FavoriteItem[];
     // summary
-    providers: ProviderResourceDataItem[];
     dailyUpdatesListItems: DailyUpdatesListItem;
 }
 
 export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
-    const allReferenceStore = useAllReferenceStore();
-    const allReferenceGetters = allReferenceStore.getters;
     const bookmarkStore = useBookmarkStore();
     const bookmarkState = bookmarkStore.state;
     const userStore = useUserStore();
@@ -80,7 +76,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         recentList: [],
         favoriteMenuList: [],
 
-        providers: [],
         dailyUpdatesListItems: {
             created: [],
             deleted: [],
@@ -90,7 +85,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
     const _getters = reactive({
         userId: computed<string|undefined>(() => userStore.state.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-        providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
         bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
         filterByFolder: computed<TranslateResult|undefined>(() => bookmarkState.filterByFolder),
     });
@@ -142,7 +136,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             state.isFileFullMode = false;
             state.recentList = [];
             state.favoriteMenuList = [];
-            state.providers = [];
             state.dailyUpdatesListItems = {
                 created: [],
                 deleted: [],
@@ -286,43 +279,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 state.appsTotalCount = total_count || undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            }
-        },
-        fetchCloudServiceResources: async () => {
-            const labels = ['Server', 'Database', 'Storage'];
-
-            try {
-                await Promise.all(labels.map(async (label) => {
-                    const metricId = `metric-managed-${label.toLowerCase()}-${label !== 'Storage' ? 'count' : 'size'}`;
-                    const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-                    const { status, response } = await fetcher({
-                        metric_id: metricId,
-                        query: {
-                            granularity: 'DAILY',
-                            group_by: ['labels.Provider'],
-                            start: dayjs.utc().format('YYYY-MM-DD'),
-                            end: dayjs.utc().format('YYYY-MM-DD'),
-                            fields: {
-                                count: {
-                                    key: 'value',
-                                    operator: 'sum',
-                                },
-                            },
-                            sort: [{ key: '_total_count', desc: true }],
-                            field_group: ['date'],
-                        },
-                    });
-
-                    if (status === 'succeed') {
-                        (response?.results || []).forEach((i) => {
-                            _getters.providerMap[i.Provider][label.toLowerCase()] = i._total_count;
-                        });
-                    }
-                }));
-                state.providers = Object.keys(_getters.providerMap).map((key) => _getters.providerMap[key]);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.providers = [];
             }
         },
         fetchDailyUpdatesList: async (): Promise<void> => {
