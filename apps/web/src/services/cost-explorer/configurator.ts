@@ -41,6 +41,8 @@ class CostExplorerConfigurator {
     }
 
     static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        if (!settings.uiAffects) return;
+
         const budgetDetailPageStore = useBudgetDetailPageStore();
         budgetDetailPageStore.setVisibleBudgetNotification(settings.uiAffects?.visibleBudgetNotification);
     }

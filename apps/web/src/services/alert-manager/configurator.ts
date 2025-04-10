@@ -37,6 +37,8 @@ class AlertManagerConfigurator {
     }
 
     static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        if (!settings.uiAffects) return;
+
         const gnbStore = useGnbStore();
         const myPageStore = useMyPageStore();
 

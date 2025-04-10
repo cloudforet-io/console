@@ -16,6 +16,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
+import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
+import { generateRoutes } from '@/lib/config/global-config/generate-routes';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
@@ -32,8 +34,6 @@ import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
 
-import ServiceConfigurator from '@/services/configurator';
-
 const initQueryHelper = () => {
     const userStore = useUserStore(pinia);
     QueryHelper.init(computed(() => userStore.state.timezone));
@@ -43,6 +43,7 @@ let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
     const userStore = useUserStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
+    const schema = featureSchemaManager.getFeatureSchema();
     const afterGrantedCallback = () => allReferenceStore.flush();
 
     const adminChildren = integralRoutes[0].children?.find(
@@ -54,12 +55,12 @@ const initRouter = (domainId?: string) => {
     )?.children;
 
     if (adminChildren) {
-        const dynamicAdminRoutes = ServiceConfigurator.getRoutes('admin');
+        const dynamicAdminRoutes = generateRoutes(schema, 'admin');
         adminChildren.push(...dynamicAdminRoutes);
     }
 
     if (workspaceChildren) {
-        const dynamicWorkspaceRoutes = ServiceConfigurator.getRoutes('workspace');
+        const dynamicWorkspaceRoutes = generateRoutes(schema, 'workspace');
         workspaceChildren.push(...dynamicWorkspaceRoutes);
     }
 
@@ -89,7 +90,7 @@ const init = async () => {
         const domainId = await initDomain(config);
         const userId = await initUserAndAuth(config);
         const mergedConfig = await mergeConfig(config, domainId);
-        await ServiceConfigurator.initialize(mergedConfig);
+        await featureSchemaManager.initialize(mergedConfig);
         await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
         await initModeSetting();

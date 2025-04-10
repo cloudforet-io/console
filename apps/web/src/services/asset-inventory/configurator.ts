@@ -41,6 +41,8 @@ class AssetInventoryConfigurator {
     }
 
     static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        if (!settings.uiAffects) return;
+
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
         cloudServiceDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
     }

@@ -25,6 +25,8 @@ class ProjectConfigurator {
     }
 
     static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
+        if (!settings.uiAffects) return;
+
         const projectDetailPageStore = useProjectDetailPageStore();
         projectDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
     }

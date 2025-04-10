@@ -17,6 +17,9 @@ export const initialFeatureSchema: FeatureSchemaType = {
                 visibleAlertTabAtDetail: true,
             },
         },
+        V2: {
+            menu: { [MENU_ID.PROJECT]: true },
+        },
     },
     [FEATURES.SERVICE_ACCOUNT]: {
         currentVersion: 'V1',

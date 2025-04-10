@@ -1,28 +1,35 @@
+import { isEmpty } from 'lodash';
+
 import { FEATURES } from '@/lib/config/global-config/constants/constants';
 import { initialFeatureSchema } from '@/lib/config/global-config/schema/feature-schema';
 import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 import { MENU_ID } from '@/lib/menu/config';
 
-export class FeatureSchemaManager {
-    private serviceConfig: GlobalServiceConfig;
+class FeatureSchemaManager {
+    private config: GlobalServiceConfig = {} as GlobalServiceConfig;
 
-    private readonly schema: FeatureSchemaType;
+    private schema: FeatureSchemaType = {} as FeatureSchemaType;
 
-    constructor(serviceConfig: GlobalServiceConfig) {
-        this.serviceConfig = serviceConfig;
+    async initialize(mergedConfig: GlobalServiceConfig): Promise<void> {
+        this.config = mergedConfig;
+        if (isEmpty(this.config)) return;
+
         this.schema = JSON.parse(JSON.stringify(initialFeatureSchema));
+        await this.applyGlobalConfig();
     }
 
-    applyGlobalConfig(): FeatureSchemaType {
-        Object.entries(this.serviceConfig).forEach(([serviceName, config]) => {
+    getFeatureSchema(): FeatureSchemaType {
+        return this.schema;
+    }
+
+    private applyGlobalConfig(): void {
+        Object.entries(this.config).forEach(([serviceName, config]) => {
             if (config.ENABLED) {
                 this.updateSchema(serviceName, config.VERSION);
             } else {
                 delete this.schema[serviceName];
             }
         });
-
-        return this.schema;
     }
 
     private updateSchema(serviceName: string, version: string): void {
@@ -51,4 +58,6 @@ export class FeatureSchemaManager {
         }
     }
 }
+
+export default new FeatureSchemaManager();
 
