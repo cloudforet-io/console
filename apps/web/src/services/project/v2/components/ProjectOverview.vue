@@ -22,11 +22,6 @@ const projectIds = computed(() => (props.projectId ? [props.projectId] : childPr
 
 <template>
     <div>
-        <div class="px-6 pt-8">
-            <p class="pb-4 text-label-xl text-gray-800 font-bold">
-                Overview
-            </p>
-        </div>
         <div class="bg-gray-100 py-1 border-gray-100 border-x overflow-hidden">
             <div class="flex space-x-1 tablet:flex-wrap">
                 <asset-summary v-if="visibleContents"

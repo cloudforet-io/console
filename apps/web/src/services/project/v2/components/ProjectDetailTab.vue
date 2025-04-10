@@ -9,6 +9,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import { i18n } from '@/translations';
 
 import ProjectDashboard from '@/services/project/v2/components/ProjectDashboard.vue';
 import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vue';
@@ -82,13 +83,13 @@ const tabs = computed<TabItem[]>(() => {
         icon: 'ic_service_dashboard',
     })) ?? [];
     return [
-        { name: 'overview', label: 'Overview' }, // TODO: i18n
+        { name: 'overview', label: i18n.t('PROJECT.LANDING.OVERVIEW') },
         ...folderTabs,
         ...dashboardTabs,
     ];
 });
-// HACK: To trigger render tab on mounted
-const tabNamesKey = computed(() => tabs.value.map((tab) => tab.name).join(','));
+// HACK: To trigger render tab on mounted, to trigger render on i18n change
+const tabNamesKey = computed(() => tabs.value.map((tab) => tab.label).join(','));
 
 const handleUpdateActiveTab = (tab: string) => {
     activeTab.value = tab;
