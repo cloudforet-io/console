@@ -75,11 +75,11 @@ const state = reactive({
         SUN: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SUNDAY'),
     })),
     fields: computed<DataTableFieldType[]>(() => {
-        const forwardField = (state.notificationInfo.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) ? [{ label: 'Member', name: 'data' }] : [];
+        const forwardField = (state.notificationInfo.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) ? [{ label: 'Member', name: 'data', disableCopy: true }] : [];
         return [
-            { label: 'Name', name: 'name' },
+            { label: 'Name', name: 'name', disableCopy: true },
             { label: 'Channel', name: 'protocol_id' },
-            { label: 'State', name: 'state' },
+            { label: 'State', name: 'state', disableCopy: true },
             ...forwardField,
             { label: 'Schedule', name: 'schedule', disableCopy: true },
         ];
