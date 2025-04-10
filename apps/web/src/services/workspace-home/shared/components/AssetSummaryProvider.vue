@@ -8,28 +8,28 @@ import { sortBy } from 'lodash';
 
 import { PIconButton } from '@cloudforet/mirinae';
 
-import AssetSummaryProviderItem from '@/services/workspace-home/components/AssetSummaryProviderItem.vue';
-import { useAssetSummaryProviders } from '@/services/workspace-home/shared/composables/use-asset-summary-providers';
-import {
-    DEFAULT_PADDING,
-} from '@/services/workspace-home/types/workspace-home-type';
-import type {
-    ProviderResourceDataItem,
-} from '@/services/workspace-home/types/workspace-home-type';
+import AssetSummaryProviderItem from '@/services/workspace-home/shared/components/AssetSummaryProviderItem.vue';
+import type { AssetProviderItem } from '@/services/workspace-home/shared/types/asset-provider-type';
 
+const DEFAULT_PADDING = 24;
 const PROVIDER_DEFAULT_WIDTH = 184 + 8;
+
+const props = withDefaults(defineProps<{
+    providers?: AssetProviderItem[];
+}>(), {
+    providers: () => [],
+});
 
 const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const providerEl = ref<null | HTMLElement>(null);
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
-const { providers } = useAssetSummaryProviders();
 const state = reactive({
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / PROVIDER_DEFAULT_WIDTH)),
     pageStart: 0,
-    pageMax: computed<number>(() => Math.max(providers.value.length - state.visibleCount, 0)),
-    providerList: computed<ProviderResourceDataItem[]>(() => sortBy(providers.value, (i) => i.data.order) as ProviderResourceDataItem[]),
+    pageMax: computed<number>(() => Math.max(props.providers.length - state.visibleCount, 0)),
+    providerList: computed<AssetProviderItem[]>(() => sortBy(props.providers, (i) => i.order)),
 });
 
 const handleClickArrowButton = (increment: number) => {
@@ -53,9 +53,9 @@ const handleClickArrowButton = (increment: number) => {
         <div ref="providerEl"
              class="row-items-container"
         >
-            <asset-summary-provider-item v-for="(item, idx) in state.providerList"
-                                         :key="`asset-summary-item-${idx}`"
-                                         :item="item"
+            <asset-summary-provider-item v-for="(item) in state.providerList"
+                                         :key="item.provider"
+                                         v-bind="item"
             />
         </div>
         <p-icon-button v-if="state.pageStart !== 0"

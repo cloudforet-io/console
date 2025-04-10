@@ -14,11 +14,8 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { ProviderResourceDataItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { AssetProviderItem } from '@/services/workspace-home/shared/types/asset-provider-type';
 
-interface Props {
-    item?: ProviderResourceDataItem;
-}
 
 const MANAGED_TARGET_TYPE = {
     SERVER: 'server',
@@ -26,9 +23,7 @@ const MANAGED_TARGET_TYPE = {
     STORAGE: 'storage',
 } as const;
 
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
+const props = defineProps<AssetProviderItem>();
 
 const router = useRouter();
 
@@ -41,14 +36,14 @@ const state = reactive({
 });
 const handleClickButton = (type: string) => {
     if (!state.accessLink) return;
-    if (!props.item) return;
+    if (!props.provider) return;
     let target = '';
     if (type === MANAGED_TARGET_TYPE.STORAGE) target = `metric-managed-${type}-size`;
     else target = `metric-managed-${type}-count`;
 
     router.push({
         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-        params: { metricId: target, groupBy: props.item.key },
+        params: { metricId: target, groupBy: props.provider },
     });
 };
 </script>
@@ -57,13 +52,13 @@ const handleClickButton = (type: string) => {
     <div class="asset-summary-provider-item">
         <div class="title-wrapper">
             <p-lazy-img
-                v-if="props.item.icon"
-                :src="assetUrlConverter(props.item.icon)"
+                v-if="props.icon"
+                :src="assetUrlConverter(props.icon)"
                 width="1.25rem"
                 height="1.25rem"
                 class="icon"
             />
-            <span>{{ props.item.name }}</span>
+            <span>{{ props.name }}</span>
         </div>
         <div class="data-wrapper">
             <p-text-button class="data-row"
@@ -73,7 +68,7 @@ const handleClickButton = (type: string) => {
                            @click="handleClickButton(MANAGED_TARGET_TYPE.SERVER)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_SERVER') }}</span>
-                <span>{{ numberFormatter(props.item.server) || 0 }}</span>
+                <span>{{ numberFormatter(props.server) || 0 }}</span>
             </p-text-button>
             <p-text-button class="data-row"
                            :class="{ 'no-access': !state.accessLink }"
@@ -82,7 +77,7 @@ const handleClickButton = (type: string) => {
                            @click="handleClickButton(MANAGED_TARGET_TYPE.DATABASE)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_DATABASE') }}</span>
-                <span>{{ numberFormatter(props.item.database) || 0 }}</span>
+                <span>{{ numberFormatter(props.database) || 0 }}</span>
             </p-text-button>
             <p-text-button class="data-row"
                            :class="{ 'no-access': !state.accessLink }"
@@ -91,7 +86,7 @@ const handleClickButton = (type: string) => {
                            @click="handleClickButton(MANAGED_TARGET_TYPE.STORAGE)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_STORAGE') }}</span>
-                <span>{{ byteFormatter(props.item.storage) || 0 }}</span>
+                <span>{{ byteFormatter(props.storage) || 0 }}</span>
             </p-text-button>
         </div>
     </div>
