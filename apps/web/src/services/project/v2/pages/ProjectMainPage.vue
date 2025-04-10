@@ -32,6 +32,7 @@ const ProjectMemberInviteModal = () => import('@/services/project/v2/components/
 const ProjectTagsModal = () => import('@/services/project/v2/components/ProjectTagsModal.vue');
 const ProjectFormModal = () => import('@/services/project/v2/components/ProjectFormModal.vue');
 const ProjectGroupFormModal = () => import('@/services/project/v2/components/ProjectGroupFormModal.vue');
+const ProjectDashboardFolderFormModal = () => import('@/services/project/v2/components/ProjectDashboardFolderFormModal.vue');
 
 const props = defineProps<{
     projectGroupOrProjectId?: string;
@@ -125,7 +126,7 @@ const handleUpdateDashboardId = (id?: string) => {
                                           :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
             />
         </keep-alive>
-        <project-detail-tab v-if="mounted && projectId"
+        <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
                             class="mt-6"
                             :project-id="projectId"
                             :project-group-id="projectGroupId"
@@ -150,6 +151,12 @@ const handleUpdateDashboardId = (id?: string) => {
                                       :target-parent-group-id="targetParentGroupId"
                                       @created="handleCreated"
             />
+            <project-dashboard-folder-form-modal v-if="projectPageModelStore.state.folderFormModalVisible"
+                                                 :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
+            <!-- dashboard name edit modal -->
+            <!-- change folder modal -->
+            <!-- dashboard delete modal -->
         </template>
     </div>
 </template>

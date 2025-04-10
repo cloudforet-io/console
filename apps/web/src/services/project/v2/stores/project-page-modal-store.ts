@@ -12,6 +12,8 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         projectFormModalVisible: false,
         targetId: '' as string|undefined,
         targetType: undefined as 'project'|'projectGroup'|undefined,
+
+        folderFormModalVisible: false,
     });
 
     const actions = {
@@ -108,6 +110,17 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         },
         closeFormModal() {
             state.projectFormModalVisible = false;
+        },
+        openCreateFolderFormModal() {
+            state.targetId = undefined;
+            state.folderFormModalVisible = true;
+        },
+        openEditFolderFormModal(targetFolderId: string) {
+            state.targetId = targetFolderId;
+            state.folderFormModalVisible = true;
+        },
+        closeFolderFormModal() {
+            state.folderFormModalVisible = false;
         },
         // overal
         resetTarget() {
