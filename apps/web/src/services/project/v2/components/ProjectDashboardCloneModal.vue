@@ -9,6 +9,7 @@ import { getClonedName } from '@cloudforet/utils';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { i18n } from '@/translations';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -38,7 +39,7 @@ const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectI
 const {
     dashboardList,
     dashboardSharedList,
-    invalidateAllQueries: invalidateDashboardList,
+    setQueryData,
 } = useProjectDashboardQuery({
     projectId,
     projectGroupId,
@@ -94,7 +95,7 @@ const handleConfirm = async () => {
 const { mutate, isPending: dashboardCloneLoading } = useDashboardCloneAction({
     dashboardId,
     onSuccess: async (data: DashboardModel) => {
-        invalidateDashboardList();
+        setQueryData([data as PublicDashboardModel]);
         projectPageModalStore.closeDashboardCloneModal();
         await router.replace({
             name: PROJECT_ROUTE_V2._NAME,

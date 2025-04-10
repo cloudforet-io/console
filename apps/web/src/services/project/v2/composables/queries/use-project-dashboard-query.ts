@@ -47,6 +47,7 @@ export const useProjectDashboardQuery = (options: {
                     { k: 'scope', v: 'PROJECT', o: 'eq' },
                     { k: 'shared', v: true, o: 'eq' },
                 ],
+                sort: [{ key: 'created_at', desc: false }],
             },
         })),
     });
@@ -59,6 +60,7 @@ export const useProjectDashboardQuery = (options: {
                 filter: [
                     { k: 'version', v: '1.0', o: 'not' },
                 ],
+                sort: [{ key: 'created_at', desc: false }],
             },
         })),
     });
