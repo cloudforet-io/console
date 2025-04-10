@@ -18,8 +18,8 @@ import { copyAnyData } from '@/lib/helper/copy-helper';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
+import { getSharedDashboardLayouts } from '@/services/dashboard-shared/helpers/dashboard-share-helper';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
 
 

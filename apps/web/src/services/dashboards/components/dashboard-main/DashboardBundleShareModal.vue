@@ -2,18 +2,14 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import {
     PDataTable, PI, PButtonModal, PRadioGroup, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PublicDashboardShareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/share';
-import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/unshare';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import type { PublicFolderShareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/share';
-import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/unshare';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
@@ -26,11 +22,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardFolderShareAction } from '@/services/dashboard-shared/actions/use-dashboard-folder-share-action';
+import { useDashboardShareAction } from '@/services/dashboard-shared/actions/use-dashboard-share-action';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
-
 
 
 
@@ -57,13 +54,11 @@ const dashboardPageControlStore = useDashboardPageControlStore();
 const {
     publicDashboardList,
     privateDashboardList,
-    api: dashboardApi,
     keys: dashboardKeys,
 } = useDashboardQuery();
 const {
     publicFolderList,
     privateFolderList,
-    api: folderApi,
     keys: folderKeys,
 } = useDashboardFolderQuery();
 const queryClient = useQueryClient();
@@ -188,23 +183,13 @@ const unshareDashboard = () => {
         dashboard_id: props.dashboardId || '',
     });
 };
-const folderSharefetcher = (params: PublicFolderShareParameters|PublicFolderUnshareParameters) => {
-    if (!state.isShared) {
-        return folderApi.publicFolderAPI.share(params as PublicFolderShareParameters);
-    }
-    return folderApi.publicFolderAPI.unshare(params as PublicFolderUnshareParameters);
-};
-const dashboardShareFetcher = (params: PublicDashboardShareParameters|PublicDashboardUnshareParameters) => {
-    if (!state.isShared) {
-        return dashboardApi.publicDashboardAPI.share(params as PublicDashboardShareParameters);
-    }
-    return dashboardApi.publicDashboardAPI.unshare(params as PublicDashboardUnshareParameters);
-};
 
-const { mutate: folderShareMutate, isPending: folderLoading } = useMutation({
-    mutationFn: folderSharefetcher,
+const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFolderShareAction({
+    folderId: computed(() => state.targetFolderId),
+    isShared: computed(() => state.isShared),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: dashboardKeys.privateDashboardListQueryKey.value });
         if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
         else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
     },
@@ -218,8 +203,10 @@ const { mutate: folderShareMutate, isPending: folderLoading } = useMutation({
     },
 });
 
-const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useMutation({
-    mutationFn: dashboardShareFetcher,
+
+const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useDashboardShareAction({
+    dashboardId: computed(() => props.dashboardId),
+    isShared: computed(() => state.isShared),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });
         if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');

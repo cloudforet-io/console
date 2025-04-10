@@ -2,20 +2,14 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@cloudforet/mirinae';
 import { getClonedName } from '@cloudforet/utils';
 
-import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
-import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
-import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
-import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
-import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
@@ -26,12 +20,11 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardCloneAction } from '@/services/dashboard-shared/actions/use-dashboard-clone-action';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
@@ -47,15 +40,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
-const { privateWidgetAPI } = usePrivateWidgetApi();
-const { publicWidgetAPI } = usePublicWidgetApi();
 
 /* Query */
 const {
     publicDashboardList,
     privateDashboardList,
     keys,
-    api,
 } = useDashboardQuery();
 const queryClient = useQueryClient();
 
@@ -111,22 +101,6 @@ const state = reactive({
     }),
 });
 
-/* Api */
-const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
-    try {
-        const isPrivate = dashboardId.startsWith('private');
-        const fetcher = isPrivate
-            ? privateWidgetAPI.list
-            : publicWidgetAPI.list;
-        const res = await fetcher({
-            dashboard_id: dashboardId,
-        });
-        return res.results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 
 const handleUpdateVisible = (visible) => {
     state.proxyVisible = visible;
@@ -138,62 +112,42 @@ const handleChangePrivate = (val: boolean) => {
 };
 const handleConfirm = async () => {
     if (!isAllValid) return;
-    const _dashboardWidgets = await listDashboardWidgets(props.dashboardId);
 
-    const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, _dashboardWidgets, storeState.costDataSource);
     const _sharedDashboard: DashboardCreateParams = {
         name: name.value,
-        layouts: _sharedLayouts,
-        options: state.targetDashboard.options || {},
-        labels: state.targetDashboard.labels || [],
-        tags: { created_by: userStore.state.userId },
-        vars: state.targetDashboard.vars,
-        vars_schema: state.targetDashboard.vars_schema,
     };
     if (storeState.isWorkspaceMember) {
         state.isPrivate = true;
     } else if (storeState.isAdminMode) {
         state.isPrivate = false;
-        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-    } else if (!state.isPrivate) {
-        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = state.targetDashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
     }
-
-    mutate(_sharedDashboard as PrivateDashboardCreateParameters);
+    mutate(_sharedDashboard as DashboardCreateParams);
 };
 
-const createDashboard = (params: DashboardCreateParams): Promise<DashboardModel> => {
-    if (state.isPrivate) {
-        return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
-    }
-    return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
-};
-
-const { mutate, isPending: dashboardCloneLoading } = useMutation(
-    {
-        mutationFn: createDashboard,
-        onSuccess: (dashboard: DashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-        },
-        onError: (e) => {
-            showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
-        },
-        onSettled(data) {
-            state.proxyVisible = false;
-            if (data?.dashboard_id) {
-                const dashboardDetailRouteName = storeState.isAdminMode
-                    ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-                    : DASHBOARDS_ROUTE.DETAIL._NAME;
-                router.push({
-                    name: dashboardDetailRouteName,
-                    params: { dashboardId: data.dashboard_id },
-                }).catch(() => {});
-            }
-        },
+const { mutate, isPending: dashboardCloneLoading } = useDashboardCloneAction({
+    dashboardId: computed(() => props.dashboardId),
+    isPrivate: computed(() => state.isPrivate),
+    onSuccess: (dashboard: DashboardModel) => {
+        const isPrivate = dashboard.dashboard_id.startsWith('private');
+        const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+        queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
     },
-);
+    onError: (e) => {
+        showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
+    },
+    onSettled(data) {
+        state.proxyVisible = false;
+        if (data?.dashboard_id) {
+            const dashboardDetailRouteName = storeState.isAdminMode
+                ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+                : DASHBOARDS_ROUTE.DETAIL._NAME;
+            router.push({
+                name: dashboardDetailRouteName,
+                params: { dashboardId: data.dashboard_id },
+            }).catch(() => {});
+        }
+    },
+});
 
 watch(() => props.visible, (visible) => {
     if (visible) {
