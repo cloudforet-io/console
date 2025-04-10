@@ -35,14 +35,11 @@ import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/c
 import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
-import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 
 const props = withDefaults(defineProps<{
     projectIds?: string[];
-    styleType?: WidgetStyleType;
 }>(), {
     projectIds: undefined,
-    styleType: 'default',
 });
 
 
@@ -200,7 +197,6 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
     <div class="account-summary">
         <p-field-title :label="$t('HOME.ACCOUNT_SUMMARY')"
                        size="lg"
-                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="main-title"
         />
         <div v-if="isLoadingServiceAccount"
@@ -238,8 +234,7 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
                     </div>
                     <div class="main-content">
                         <p-field-title :label="$t('HOME.ACCOUNT_SUMMARY_BY_PROVIDER')"
-                                       size="lg"
-                                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
+                                       size="md"
                                        class="title"
                         />
                         <div class="content">
@@ -303,10 +298,10 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
 
 <style scoped lang="postcss">
 .account-summary {
-    @apply flex flex-col;
+    @apply flex flex-col rounded-lg bg-white;
     min-height: 30.5rem;
     .main-title {
-        padding-left: 1rem;
+        @apply pt-6 px-6;
     }
     .loading {
         @apply flex items-center justify-center;

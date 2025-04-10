@@ -37,14 +37,11 @@ import { useCostReportConfigQuery } from '@/services/workspace-home/shared/compo
 import { COST_SUMMARY_STATE_TYPE } from '@/services/workspace-home/shared/constants/cost-summary-constant';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
-import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 
 const props = withDefaults(defineProps<{
     projectIds?: string[];
-    styleType?: WidgetStyleType;
 }>(), {
     projectIds: undefined,
-    styleType: 'default',
 });
 
 
@@ -164,7 +161,6 @@ const currentDateRangeText = computed<string>(() => {
         <div class="heading-wrapper">
             <p-field-title :label="$t('HOME.COST_SUMMARY_TITLE')"
                            size="lg"
-                           :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                            class="main-title"
             />
             <project-select-dropdown
@@ -262,6 +258,7 @@ const currentDateRangeText = computed<string>(() => {
 
 <style scoped lang="postcss">
 .cost-summary {
+    @apply rounded-lg bg-white;
     min-height: 30.5rem;
     .heading-wrapper {
         @apply flex;
@@ -275,7 +272,7 @@ const currentDateRangeText = computed<string>(() => {
         min-height: 27.5rem;
     }
     .main-title {
-        padding-left: 1rem;
+        @apply pt-6 px-6;
     }
     .content-wrapper {
         @apply flex flex-col;

@@ -26,16 +26,13 @@ import { useAssetDailyUpdates } from '@/services/workspace-home/shared/composabl
 import { useAssetSummaryProviders } from '@/services/workspace-home/shared/composables/use-asset-summary-providers';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
-import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 
 const METRIC_MANAGED_CREATED_COUNT = 'metric-managed-created-count';
 
 const props = withDefaults(defineProps<{
     projectIds?: string[];
-    styleType?: WidgetStyleType;
 }>(), {
     projectIds: undefined,
-    styleType: 'default',
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -84,7 +81,6 @@ const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds 
     <div class="asset-summary">
         <p-field-title :label="$t('HOME.ASSET_SUMMARY_TITLE')"
                        size="lg"
-                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="main-title"
         />
         <div v-if="isLoadingProviders || isLoadingDailyUpdates"
@@ -95,9 +91,7 @@ const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds 
         <div v-else-if="!state.isNoCollectors && !state.isNoServiceAccounts">
             <div class="content-wrapper">
                 <asset-summary-provider :providers="providers" />
-                <asset-summary-daily-updates :style-type="props.styleType"
-                                             :daily-updates="dailyUpdates"
-                />
+                <asset-summary-daily-updates :daily-updates="dailyUpdates" />
             </div>
             <p-divider v-if="state.accessLink"
                        class="divider"
@@ -124,8 +118,9 @@ const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds 
 
 <style scoped lang="postcss">
 .asset-summary {
+    @apply rounded-lg bg-white;
     .main-title {
-        padding-left: 1rem;
+        @apply pt-6 px-6;
     }
     .loading-wrapper {
         @apply flex items-center justify-center;

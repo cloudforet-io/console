@@ -35,7 +35,6 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
         @apply bg-white border border-gray-200 text-label-md;
         width: calc(50% - 0.5rem);
         max-width: 43rem;
-        padding-top: 1.375rem;
         border-radius: 0.375rem;
         flex: 1;
         &.cost {
