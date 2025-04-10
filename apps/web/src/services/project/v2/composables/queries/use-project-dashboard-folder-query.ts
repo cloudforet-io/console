@@ -10,7 +10,7 @@ import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-import type { ProjectPageContextType } from '@/services/project/v2/types/project-page-context-type';
+import { useProjectPageContext } from '@/services/project/v2/composables/use-proejct-page-context';
 
 const STALE_TIME = 1000 * 60 * 5;
 const GC_TIME = 1000 * 60 * 5;
@@ -25,16 +25,10 @@ export const useProjectDashboardFolderQuery = (options: {
     const { publicFolderAPI } = usePublicFolderApi();
     const queryClient = useQueryClient();
 
-    const projectPageContext = computed<ProjectPageContextType>(() => {
-        if (options.projectGroupId?.value) {
-            return 'PROJECT_GROUP';
-        }
-        if (options.projectId?.value) {
-            return 'PROJECT';
-        }
-        return undefined;
+    const projectPageContext = useProjectPageContext({
+        projectGroupId: options.projectGroupId,
+        projectId: options.projectId,
     });
-
 
     /* Query Keys */
     const { key: dashboardFolderSharedListQueryKey, params: dashboardFolderSharedListParams } = useServiceQueryKey('dashboard', 'public-folder', 'list', {

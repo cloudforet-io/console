@@ -25,9 +25,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
+import { useProjectPageContext } from '@/services/project/v2/composables/use-proejct-page-context';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
-import type { ProjectPageContextType } from '@/services/project/v2/types/project-page-context-type';
 
 interface Props {
     projectGroupOrProjectId?: string;
@@ -52,10 +52,9 @@ const {
     projectGroupId,
 });
 
-const projectContext = computed<ProjectPageContextType>(() => {
-    if (projectGroupId.value) return 'PROJECT_GROUP';
-    if (projectId.value) return 'PROJECT';
-    return undefined;
+const projectPageContext = useProjectPageContext({
+    projectGroupId,
+    projectId,
 });
 
 const existingNameList = computed<string[]>(() => dashboardFolderList.value.map((d) => d.name));
@@ -93,9 +92,9 @@ const handleFormConfirm = async () => {
         const params: FolderCreateParams = {
             name: name.value as string,
             tags: { created_by: userStore.state.userId },
-            resource_group: projectContext.value === 'PROJECT_GROUP' ? RESOURCE_GROUP.WORKSPACE : RESOURCE_GROUP.PROJECT,
+            resource_group: projectPageContext.value === 'PROJECT_GROUP' ? RESOURCE_GROUP.WORKSPACE : RESOURCE_GROUP.PROJECT,
         };
-        if (projectContext.value === 'PROJECT_GROUP') {
+        if (projectPageContext.value === 'PROJECT_GROUP') {
             params.project_group_id = projectGroupId.value;
         } else {
             params.project_id = projectId.value;
