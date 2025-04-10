@@ -4,10 +4,9 @@ import {
     toRef,
     onMounted,
     ref,
+    nextTick,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
-
-import { nextTick } from 'process';
 
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import ProjectAndGroupListPanel from '@/services/project/v2/components/ProjectAndGroupListPanel.vue';
@@ -17,12 +16,7 @@ import { useProjectOrGroupId } from '@/services/project/v2/composables/use-proje
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
-
 /* modals */
-const isModalLoadReady = ref(false);
-onMounted(() => {
-    isModalLoadReady.value = true;
-});
 const ProjectDetailTab = () => import('@/services/project/v2/components/ProjectDetailTab.vue');
 const ProjectGroupMemberManagementModal = () => import('@/services/project/v2/components/ProjectGroupMemberManagementModal.vue');
 const ProjectMemberManagementModal = () => import('@/services/project/v2/components/ProjectMemberManagementModal.vue');
@@ -130,14 +124,13 @@ const handleUpdateDashboardId = (id?: string) => {
             />
         </keep-alive>
         <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
-                            class="mt-6"
                             :project-id="projectId"
                             :project-group-id="projectGroupId"
                             :dashboard-id="props.dashboardId"
                             @update:dashboard-id="handleUpdateDashboardId"
         />
 
-        <template v-if="isModalLoadReady">
+        <template v-if="mounted">
             <project-group-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'projectGroup'" />
             <project-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'project'" />
             <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
