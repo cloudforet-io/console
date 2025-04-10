@@ -64,13 +64,23 @@ export const useDashboardGetQuery = ({
     /* Querys */
     const publicDashboardQuery = useScopedQuery({
         queryKey: publicDashboardGetQueryKey,
-        queryFn: () => publicDashboardAPI.get(publicDashboardGetParams.value),
+        queryFn: () => {
+            if (!publicDashboardGetParams.value.dashboard_id) {
+                throw new Error('dashboard_id is required');
+            }
+            return publicDashboardAPI.get(publicDashboardGetParams.value);
+        },
         enabled: computed(() => !!dashboardId.value && !isPrivate.value),
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateDashboardQuery = useScopedQuery({
         queryKey: privateDashboardGetQueryKey,
-        queryFn: () => privateDashboardAPI.get(privateDashboardGetParams.value),
+        queryFn: () => {
+            if (!privateDashboardGetParams.value.dashboard_id) {
+                throw new Error('dashboard_id is required');
+            }
+            return privateDashboardAPI.get(privateDashboardGetParams.value);
+        },
         enabled: computed(() => !!dashboardId.value && isPrivate.value),
         staleTime: STALE_TIME,
     }, ['WORKSPACE']);

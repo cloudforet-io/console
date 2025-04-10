@@ -121,7 +121,7 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
             params: {
                 projectGroupOrProjectId,
             },
-        });
+        }).catch(() => {});
     } else if (item === 'folder') {
         projectPageModalStore.openCreateFolderFormModal();
     }
