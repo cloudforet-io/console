@@ -2278,6 +2278,7 @@
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
 			"SHARED_BY_ADMIN": "Adminにより共有",
+			"SHARED_BY_WORKSPACE": "Workspaceにより共有",
 			"SHARED_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
 			"SHARE_DASHBOARD": "ダッシュボードを共有",
