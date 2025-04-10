@@ -125,7 +125,7 @@ const handleUpdateDashboardId = (id?: string) => {
                                           :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
             />
         </keep-alive>
-        <project-detail-tab v-if="mounted && projectId"
+        <project-detail-tab v-if="mounted && (projectId || projectGroupId)"
                             class="mt-6"
                             :project-id="projectId"
                             :project-group-id="projectGroupId"
