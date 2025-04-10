@@ -57,20 +57,21 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     verb: V,
     options: UseServiceQueryKeyOptions<T> = {},
 ): UseServiceQueryKeyResult<T> => {
+    const { params, contextKey } = options;
+
     // Runtime validation for development environment
     if (import.meta.env.DEV) {
         if (!service || !resource || !verb) {
             console.warn('Required parameters (service, resource, verb) must be provided');
         }
-        if (options.params) {
-            const rawParams = toValue(options.params);
+        if (params) {
+            const rawParams = toValue(params);
             if (rawParams === null || typeof rawParams !== 'object') {
                 console.warn('params must be a non-null object');
             }
         }
     }
 
-    const { params, contextKey } = options;
     const queryKeyAppContext = useQueryKeyAppContext();
 
 
@@ -102,7 +103,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
         key: queryKey,
         params: computed(() => {
             const resolvedParams = toValue(params);
-            return resolvedParams;
+            return createImmutableObjectKeyItem(resolvedParams);
         }),
         withSuffix: (arg) => {
             if (typeof arg === 'object' && arg !== null) {
