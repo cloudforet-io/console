@@ -8,64 +8,58 @@ import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
-export const getDashboardTreeData = (folderList: FolderModel[], dashboardList: DashboardModel[], newIdList?: string[]): TreeNode<DashboardTreeDataType>[] => {
-    const nodes: Record<string, TreeNode<DashboardTreeDataType>> = {};
-    folderList.forEach((d) => {
-        nodes[d.folder_id] = {
-            id: d.folder_id,
+export const getDashboardTreeData = (
+    folderList: FolderModel[],
+    dashboardList: DashboardModel[],
+    newIdList?: string[],
+): TreeNode<DashboardTreeDataType>[] => {
+    const folderNodeMap: Record<string, TreeNode<DashboardTreeDataType>> = {};
+    const rootNodes: TreeNode<DashboardTreeDataType>[] = [];
+
+    folderList.forEach((folder) => {
+        const folderNode: TreeNode<DashboardTreeDataType> = {
+            id: folder.folder_id,
             depth: 0,
             data: {
-                name: d.name,
+                id: folder.folder_id,
+                name: folder.name,
                 type: 'FOLDER',
-                id: d.folder_id,
-                createdBy: d.tags?.created_by,
-                isNew: newIdList?.includes(d.folder_id),
-                ...d,
+                createdBy: folder.tags?.created_by,
+                isNew: newIdList?.includes(folder.folder_id),
+                ...folder,
             },
             children: [],
         };
-    });
-    dashboardList.forEach((d) => {
-        nodes[d.dashboard_id] = {
-            id: d.dashboard_id,
-            depth: 0,
-            data: {
-                name: d.name,
-                id: d.dashboard_id,
-                type: 'DASHBOARD',
-                createdBy: d.tags?.created_by,
-                isNew: newIdList?.includes(d.dashboard_id),
-                ...d,
-            },
-        };
+        folderNodeMap[folder.folder_id] = folderNode;
+        rootNodes.push(folderNode);
     });
 
-    const rootNodes: TreeNode<DashboardTreeDataType>[] = [];
-    const setDepth = (node, depth) => {
-        node.depth = depth;
-        if (!node.children) return;
-        node.children.forEach((child) => {
-            setDepth(child, depth + 1);
-        });
-    };
-    Object.values(nodes).forEach((node) => {
-        const folderId = node.data?.folderId;
-        if (!folderId) {
-            rootNodes.push(node);
-            setDepth(node, 0);
+    dashboardList.forEach((dashboard) => {
+        const dashboardNode: TreeNode<DashboardTreeDataType> = {
+            id: dashboard.dashboard_id,
+            depth: 0,
+            data: {
+                id: dashboard.dashboard_id,
+                name: dashboard.name,
+                type: 'DASHBOARD',
+                createdBy: dashboard.tags?.created_by,
+                isNew: newIdList?.includes(dashboard.dashboard_id),
+                ...dashboard,
+            },
+        };
+
+        const folderNode = dashboard.folder_id ? folderNodeMap[dashboard.folder_id] : undefined;
+
+        if (folderNode) {
+            dashboardNode.depth = 1;
+            folderNode.children.push(dashboardNode);
         } else {
-            const parentNode = nodes[folderId];
-            if (parentNode) {
-                parentNode.children = parentNode.children || [];
-                parentNode.children.push(node);
-                setDepth(node, parentNode.depth + 1);
-            }
+            rootNodes.push(dashboardNode);
         }
     });
 
     return rootNodes;
 };
-
 export const getSelectedDataTableItems = (folderItems: FolderModel[], dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): DashboardDataTableItem[] => {
     const _results: DashboardDataTableItem[] = [];
     const _selectedIdList: string[] = Object.keys(selectedIdMap).filter((key) => selectedIdMap[key]);
