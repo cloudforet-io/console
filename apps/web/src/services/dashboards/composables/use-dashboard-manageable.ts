@@ -2,6 +2,7 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -36,13 +37,15 @@ export const useDashboardManageable = ({ dashboardId }: UseDashboardManageableOp
 
         if (entryPoint.value === 'WORKSPACE') {
             if (dashboard.value?.dashboard_id.startsWith('private')) return true;
-            if (dashboard.value?.shared && dashboard.value?.resource_group === RESOURCE_GROUP.DOMAIN) return false;
+            const publicDashboard = dashboard.value as PublicDashboardModel;
+            if (publicDashboard.shared && publicDashboard.resource_group === RESOURCE_GROUP.DOMAIN) return false;
             if (storeState.isWorkspaceOwner) return true;
             return false;
         }
 
         if (entryPoint.value === 'PROJECT') {
-            if (dashboard.value?.shared) return false;
+            const publicDashboard = dashboard.value as PublicDashboardModel;
+            if (publicDashboard.shared) return false;
             return true;
         }
         return false;

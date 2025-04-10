@@ -10,10 +10,10 @@ import type { Currency } from '@/store/display/type';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
+import type { WidgetFrameProps } from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_components/WidgetFrame.vue';
 import type { WidgetState } from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_composables/use-widget/use-widget';
 import { getNonInheritedWidgetOptionNamesAmongUsedVariables } from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_helpers/widget-schema-helper';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_types/widget-type';
-import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;
