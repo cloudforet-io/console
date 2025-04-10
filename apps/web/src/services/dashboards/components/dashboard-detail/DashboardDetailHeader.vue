@@ -23,7 +23,7 @@ import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-deta
 
 interface Props {
     dashboardId: string;
-    folderItems?: Array<FolderModel>;
+    folderItems: Array<FolderModel>;
 }
 const props = withDefaults(defineProps<Props>(), {
     folderItems: () => [],

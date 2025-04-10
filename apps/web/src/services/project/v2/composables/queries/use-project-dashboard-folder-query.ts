@@ -86,7 +86,6 @@ export const useProjectDashboardFolderQuery = (options: {
     const isLoading = computed<boolean>(() => dashboardFolderSharedListQuery.isFetching.value || dashboardFolderListQuery.isFetching.value);
 
     const setQueryData = (newData: PublicFolderModel[]) => {
-        console.debug('setQueryData', newData);
         queryClient.setQueryData(dashboardFolderListQueryKey.value, {
             results: [...(dashboardFolderListQuery.data.value ?? []), ...newData],
         });
