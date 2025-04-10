@@ -13,7 +13,6 @@ import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store
 
 import AssetSummaryDailyUpdateItem from '@/services/workspace-home/shared/components/AssetSummaryDailyUpdateItem.vue';
 import type { DailyUpdateItem } from '@/services/workspace-home/shared/types/asset-daily-updates-type';
-import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
 
 
 const DEFAULT_PADDING = 24;
@@ -23,10 +22,8 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const dailyUpdateEl = ref<null | HTMLElement>(null);
 
 const props = withDefaults(defineProps<{
-    styleType?: WidgetStyleType;
     dailyUpdates?: DailyUpdateItem[];
 }>(), {
-    styleType: 'default',
     dailyUpdates: () => [],
 });
 
@@ -64,7 +61,6 @@ const handleClickArrowButton = (increment: number) => {
 <template>
     <div class="daily-update-wrapper">
         <p-field-title :label="$t('HOME.ASSET_SUMMARY_DAILY_UPDATE_TITLE')"
-                       :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="daily-update-title"
         >
             <template #right>

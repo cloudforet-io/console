@@ -1,7 +1,6 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import dayjs from 'dayjs';
 import { sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -9,7 +8,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
@@ -17,7 +15,6 @@ import type { AppListParameters } from '@/api-clients/identity/app/schema/api-ve
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -32,11 +29,8 @@ import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/ty
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
-import { convertFormKeys } from '@/services/workspace-home/composables/use-workspace-home';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type {
-    DailyUpdatesListItem,
     BookmarkType,
 } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -53,8 +47,6 @@ interface WorkspaceHomeState {
     // user config
     recentList: UserConfigModel[];
     favoriteMenuList: FavoriteItem[];
-    // summary
-    dailyUpdatesListItems: DailyUpdatesListItem;
 }
 
 export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () => {
@@ -76,10 +68,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         recentList: [],
         favoriteMenuList: [],
 
-        dailyUpdatesListItems: {
-            created: [],
-            deleted: [],
-        },
     });
 
     const _getters = reactive({
@@ -136,10 +124,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             state.isFileFullMode = false;
             state.recentList = [];
             state.favoriteMenuList = [];
-            state.dailyUpdatesListItems = {
-                created: [],
-                deleted: [],
-            };
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
@@ -279,47 +263,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 state.appsTotalCount = total_count || undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            }
-        },
-        fetchDailyUpdatesList: async (): Promise<void> => {
-            const labels = ['created', 'deleted'];
-
-            try {
-                await Promise.all(labels.map(async (label) => {
-                    const metricId = `metric-managed-${label.toLowerCase()}-count`;
-                    const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-                    const { status, response } = await fetcher({
-                        metric_id: metricId,
-                        query: {
-                            granularity: 'DAILY',
-                            group_by: ['labels.Provider', 'labels.Cloud Service Group', 'labels.Cloud Service Type'],
-                            start: dayjs.utc().format('YYYY-MM-DD'),
-                            end: dayjs.utc().format('YYYY-MM-DD'),
-                            fields: {
-                                count: {
-                                    key: 'value',
-                                    operator: 'sum',
-                                },
-                            },
-                            sort: [{ key: '_total_count', desc: true }],
-                            field_group: ['date'],
-                        },
-                    });
-
-                    if (status === 'succeed') {
-                        const results = convertFormKeys(response.results || []);
-                        state.dailyUpdatesListItems[label] = results.map((i) => ({
-                            cloud_service_group: i.cloud_service_group,
-                            cloud_service_type: i.cloud_service_type,
-                            total_count: i._total_count,
-                            provider: i.provider,
-                            [`${label}_count`]: i.count[0].value,
-                        }));
-                    }
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dailyUpdatesListItems = { created: state.dailyUpdatesListItems.created || [], deleted: state.dailyUpdatesListItems.deleted || [] };
             }
         },
     };

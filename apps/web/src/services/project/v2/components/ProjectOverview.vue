@@ -27,17 +27,22 @@ const projectIds = computed(() => (props.projectId ? [props.projectId] : childPr
                 Overview
             </p>
         </div>
-        <div>
-            <asset-summary v-if="visibleContents"
-                           style-type="compact"
-                           :project-ids="projectIds"
-            />
-            <account-summary style-type="compact"
-                             :project-ids="projectIds"
-            />
+        <div class="bg-gray-100 py-1 border-gray-100 border-x overflow-hidden">
+            <div class="flex space-x-1 tablet:flex-wrap">
+                <asset-summary v-if="visibleContents"
+                               style-type="compact"
+                               :project-ids="projectIds"
+                               class="w-1/2 tablet:w-full bg-white rounded-lg"
+                />
+                <account-summary style-type="compact"
+                                 :project-ids="projectIds"
+                                 class="w-1/2 tablet:w-full bg-white rounded-lg"
+                />
+            </div>
         </div>
         <cost-summary style-type="compact"
                       :project-ids="projectIds"
+                      class="bg-white rounded-lg"
         />
     </div>
 </template>
