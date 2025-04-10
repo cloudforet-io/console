@@ -45,6 +45,7 @@ const handleSelectToolset = (toolsetId: string|undefined) => {
     if (toolsetId === 'edit') projectPageModalStore.openDashboardNameEditModal(props.dashboardId);
     if (toolsetId === 'move') projectPageModalStore.openDashboardChangeFolderModal(props.dashboardId);
     if (toolsetId === 'delete') projectPageModalStore.openDashboardDeleteModal(props.dashboardId);
+    if (toolsetId === 'clone') projectPageModalStore.openDashboardCloneModal(props.dashboardId);
 };
 </script>
 

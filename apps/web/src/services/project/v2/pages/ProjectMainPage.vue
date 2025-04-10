@@ -36,6 +36,7 @@ const ProjectDashboardFolderFormModal = () => import('@/services/project/v2/comp
 const ProjectDashboardNameEditModal = () => import('@/services/project/v2/components/ProjectDashboardNameEditModal.vue');
 const ProjectDashboardChangeFolderModal = () => import('@/services/project/v2/components/ProjectDashboardChangeFolderModal.vue');
 const ProjectDashboardDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardDeleteModal.vue');
+const ProjectDashboardCloneModal = () => import('@/services/project/v2/components/ProjectDashboardCloneModal.vue');
 const props = defineProps<{
     projectGroupOrProjectId?: string;
     dashboardId?: string;
@@ -164,6 +165,9 @@ const handleUpdateDashboardId = (id?: string) => {
             />
             <project-dashboard-delete-modal v-if="projectPageModelStore.state.dashboardDeleteModalVisible"
                                             :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
+            <project-dashboard-clone-modal v-if="projectPageModelStore.state.dashboardCloneModalVisible"
+                                           :project-group-or-project-id="props.projectGroupOrProjectId"
             />
         </template>
     </div>

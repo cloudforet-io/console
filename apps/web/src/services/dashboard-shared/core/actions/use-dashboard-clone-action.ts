@@ -3,7 +3,6 @@ import type { ComputedRef } from 'vue';
 import { useMutation } from '@tanstack/vue-query';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
@@ -16,7 +15,6 @@ import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/compos
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
 
 
@@ -35,9 +33,6 @@ export const useDashboardCloneAction = (options: UseDashboardCloneActionOptions)
     const { publicWidgetAPI } = usePublicWidgetApi();
     const allReferenceStore = useAllReferenceStore();
     const userStore = useUserStore();
-    const {
-        entryPoint,
-    } = useDashboardRouteContext();
 
     const {
         dashboardId, isPrivate, onSuccess, onError, onSettled,
@@ -78,7 +73,7 @@ export const useDashboardCloneAction = (options: UseDashboardCloneActionOptions)
         const _sharedLayouts = await getSharedDashboardLayouts(dashboard.layouts, widgetList.results || [], allReferenceStore.getters.costDataSource);
 
         const _sharedDashboard: DashboardCreateParams = {
-            name: params.name,
+            ...params,
             layouts: _sharedLayouts,
             options: dashboard.options || {},
             labels: dashboard.labels || [],
@@ -86,15 +81,6 @@ export const useDashboardCloneAction = (options: UseDashboardCloneActionOptions)
             vars: dashboard.vars,
             vars_schema: dashboard.vars_schema,
         };
-        if (entryPoint.value === 'ADMIN') {
-            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-        } else if (entryPoint.value === 'WORKSPACE') {
-            if (!isPrivate?.value) {
-                (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
-            }
-        } else if (entryPoint.value === 'PROJECT') {
-            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
-        }
 
 
         if (isPrivate?.value) {
