@@ -2,10 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { ProviderItem } from '@/store/reference/provider-reference-store';
-import type { ReferenceMap } from '@/store/reference/type';
-
-import type { SUMMARY_DATA_TYPE, BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import type { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 // summary
 
@@ -26,21 +23,8 @@ export type DailyUpdatesListItem = {
     created: CloudServiceData[],
     deleted: CloudServiceData[],
 };
-export type ProviderResourceDataItem = ProviderItem & {
-    server?: number;
-    database?: number;
-    storage?: number;
-};
-export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
-export type SummaryDataType = typeof SUMMARY_DATA_TYPE[keyof typeof SUMMARY_DATA_TYPE];
 
 // bookmark
-export interface EmptyData {
-    to?: { name: string };
-    title: string | TranslateResult;
-    buttonText?: string | TranslateResult;
-    desc: string | TranslateResult;
-}
 export interface MoreMenuItem extends MenuItem {
     workspaceId?: string;
 }

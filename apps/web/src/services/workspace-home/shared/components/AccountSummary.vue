@@ -8,15 +8,16 @@ import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import { countBy, isEmpty, map } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PStatus, PFieldTitle, PLazyImg, PDivider, PLink, PSpinner, PProgressBar,
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
+import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -29,22 +30,18 @@ import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
-import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
+import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
+import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
 import type { WidgetStyleType } from '@/services/workspace-home/shared/types/widget-style-type';
-import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
 
 const props = withDefaults(defineProps<{
-    projectGroupId?: string;
-    projectId?: string;
+    projectIds?: string[];
     styleType?: WidgetStyleType;
 }>(), {
-    projectGroupId: undefined,
-    projectId: undefined,
+    projectIds: undefined,
     styleType: 'default',
 });
 
@@ -64,8 +61,27 @@ const storeState = reactive({
     provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
+
+const { serviceAccountAPI } = useServiceAccountApi();
+const { key: serviceAccountQueryKey, params } = useServiceQueryKey('identity', 'service-account', 'list', {
+    params: computed<ServiceAccountListParameters>(() => ({
+        query: {
+            filter: props.projectIds?.length ? [{
+                k: 'project_id',
+                v: props.projectIds,
+                o: 'in',
+            }] : undefined,
+        },
+    })),
+});
+const { data: serviceAccountData, isLoading: isLoadingServiceAccount } = useScopedQuery({
+    queryKey: serviceAccountQueryKey,
+    queryFn: () => serviceAccountAPI.list(params.value),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+}, ['WORKSPACE']);
+
 const state = reactive({
-    loading: true,
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
     writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
     emptyData: computed<EmptyData>(() => {
@@ -80,8 +96,8 @@ const state = reactive({
         }
         return result;
     }),
-    items: [] as ServiceAccountModel[],
-    itemsTotalCount: 0,
+    items: computed<ServiceAccountModel[]>(() => serviceAccountData.value?.results || []),
+    itemsTotalCount: computed<number>(() => serviceAccountData.value?.total_count || 0),
     itemsByState: computed(() => {
         const stateCounts = countBy(state.items, 'state');
         return map(stateCounts, (count, i) => ({
@@ -136,11 +152,11 @@ const state = reactive({
         tooltip: {
             trigger: 'item',
             position: 'right',
-            formatter: (params) => {
-                const _name = storeState.provider[params.name].label;
-                const _value = numberFormatter(params.value) || '';
-                const percent = getPercent(params.value, state.itemsTotalCount);
-                return `${params.marker} ${_name}: <b>${_value}</b> (${percent}%)`;
+            formatter: (p) => {
+                const _name = storeState.provider[p.name].label;
+                const _value = numberFormatter(p.value) || '';
+                const percent = getPercent(p.value, state.itemsTotalCount);
+                return `${p.marker} ${_name}: <b>${_value}</b> (${percent}%)`;
             },
         },
         series: [
@@ -164,20 +180,6 @@ const getPercent = (value: number, total: number) => {
     const roundedValue = Math.ceil(_value * 100) / 100;
     return parseFloat(roundedValue.toFixed(2));
 };
-const fetchServiceAccountList = async () => {
-    state.loading = true;
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>();
-        state.items = results || [];
-        state.itemsTotalCount = total_count;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.itemsTotalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-};
 
 watch([() => state.totalChartData, () => totalChartContext.value], ([, chartCtx]) => {
     if (chartCtx) {
@@ -192,10 +194,6 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
     }
 }, { immediate: true });
 
-watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([currentWorkspaceId]) => {
-    if (!currentWorkspaceId) return;
-    await fetchServiceAccountList();
-}, { immediate: true });
 </script>
 
 <template>
@@ -205,7 +203,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.provider], async ([
                        :font-weight="props.styleType === 'compact' ? 'regular' : 'bold'"
                        class="main-title"
         />
-        <div v-if="state.loading"
+        <div v-if="isLoadingServiceAccount"
              class="loading"
         >
             <p-spinner size="lg" />

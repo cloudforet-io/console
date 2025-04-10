@@ -17,8 +17,9 @@ import {
     green, indigo, peacock, violet,
 } from '@/styles/colors';
 
-import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import type { EmptyData, SummaryDataType } from '@/services/workspace-home/types/workspace-home-type';
+import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
+import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
+import type { SummaryDataType } from '@/services/workspace-home/shared/types/summary-type';
 
 type IconInfo = {
     name: string,
@@ -73,12 +74,22 @@ const state = reactive({
         };
     }),
 });
+
+const handleClickButton = () => {
+    if (props.emptyData?.to) {
+        router.push(props.emptyData.to);
+    }
+};
 </script>
 
 <template>
-    <div class="empty-summary-data"
+    <div v-if="props.emptyData"
+         class="empty-summary-data"
          :style="{ backgroundImage: `url(${props.imageUrl})` }"
-         :class="{[props.type.toLowerCase()]: true, 'no-project-data': state.isWorkspaceMember && isEmpty(storeState.projects)}"
+         :class="{
+             [props.type ? props.type.toLowerCase() : '']: true,
+             'no-project-data': state.isWorkspaceMember && isEmpty(storeState.projects)
+         }"
     >
         <div class="icon-wrapper">
             <p-i class="menu-icon"
@@ -92,7 +103,7 @@ const state = reactive({
         <span class="desc">{{ props.emptyData.desc }}</span>
         <p-text-button v-if="!state.isWorkspaceMember && props.emptyData?.buttonText"
                        style-type="highlight"
-                       @click="router.push(props.emptyData.to)"
+                       @click="handleClickButton"
         >
             <span>{{ props.emptyData.buttonText }}</span>
         </p-text-button>
