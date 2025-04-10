@@ -5,6 +5,7 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import { PTab, PSelectDropdown } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
@@ -107,7 +108,7 @@ const projectDashboardCreateMenuItems = computed(() => [
     },
 ]);
 
-const handleCreateProjectDashboard = (item: string) => {
+const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem) => {
     const projectGroupOrProjectId = props.projectGroupId ?? props.projectId;
     if (!projectGroupOrProjectId) {
         console.warn('projectGroupId or projectId is not selected');
