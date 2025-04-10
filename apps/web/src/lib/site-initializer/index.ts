@@ -43,7 +43,6 @@ let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
     const userStore = useUserStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
-    const schema = featureSchemaManager.getFeatureSchema();
     const afterGrantedCallback = () => allReferenceStore.flush();
 
     const adminChildren = integralRoutes[0].children?.find(
@@ -55,12 +54,12 @@ const initRouter = (domainId?: string) => {
     )?.children;
 
     if (adminChildren) {
-        const dynamicAdminRoutes = generateRoutes(schema, 'admin');
+        const dynamicAdminRoutes = generateRoutes('admin');
         adminChildren.push(...dynamicAdminRoutes);
     }
 
     if (workspaceChildren) {
-        const dynamicWorkspaceRoutes = generateRoutes(schema, 'workspace');
+        const dynamicWorkspaceRoutes = generateRoutes('workspace');
         workspaceChildren.push(...dynamicWorkspaceRoutes);
     }
 
@@ -90,11 +89,11 @@ const init = async () => {
         const domainId = await initDomain(config);
         const userId = await initUserAndAuth(config);
         const mergedConfig = await mergeConfig(config, domainId);
-        await featureSchemaManager.initialize(mergedConfig);
-        await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
         await initModeSetting();
         await initWorkspace(userId);
+        await featureSchemaManager.initialize(mergedConfig);
+        await APIClientManager.initialize(mergedConfig);
         initRouter(domainId);
         // prefetchResources();
         initI18n();

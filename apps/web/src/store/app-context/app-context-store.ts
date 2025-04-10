@@ -38,7 +38,6 @@ export const useAppContextStore = defineStore('app-context-store', () => {
         },
     };
 
-
     return {
         getters,
         ...actions,

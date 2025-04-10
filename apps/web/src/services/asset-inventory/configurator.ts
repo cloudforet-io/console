@@ -1,51 +1,66 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/types/type';
+import type { RouteConfig } from 'vue-router';
+
+import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 
-class AssetInventoryConfigurator {
-    static getAdminRoutes() {
-        return adminAssetInventoryRoutes;
+class AssetInventoryConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [
+        {
+            feature: 'ALERT_MANAGER',
+            affects: [
+                {
+                    method: 'visibleAssetAlertTab',
+                    version: 'V2',
+                },
+            ],
+        },
+    ];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return assetInventoryRoute;
+    // eslint-disable-next-line class-methods-use-this
+    getRoutes(isAdmin?: boolean): RouteConfig | null {
+        return isAdmin ? adminAssetInventoryRoutes : assetInventoryRoute;
     }
 
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
-        return {
-            id: MENU_ID.ASSET_INVENTORY,
-            subMenuList: subMenuIds,
-        };
-    }
-
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): FeatureMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.ASSET_INVENTORY,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 4,
         };
-    }
 
-    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
-        if (!settings.uiAffects) return;
-
-        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-        cloudServiceDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.CLOUD_SERVICE, needPermissionByRole: true },
+                    { id: MENU_ID.SERVER, needPermissionByRole: true },
+                    { id: MENU_ID.SECURITY, needPermissionByRole: true },
+                    { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
+                ],
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.CLOUD_SERVICE },
+                    { id: MENU_ID.SERVER },
+                    { id: MENU_ID.SECURITY },
+                    { id: MENU_ID.COLLECTOR },
+                ],
+            },
+            version: this.version,
+        };
     }
 }
 
-export default AssetInventoryConfigurator;
+export default new AssetInventoryConfigurator();

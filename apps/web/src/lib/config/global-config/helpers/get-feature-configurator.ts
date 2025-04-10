@@ -1,3 +1,5 @@
+import type { FeatureConfiguratorType } from '@/lib/config/global-config/types/type';
+
 import AlertManagerConfigurator from '@/services/alert-manager/configurator';
 import AssetInventoryConfigurator from '@/services/asset-inventory/configurator';
 import CostExplorerConfigurator from '@/services/cost-explorer/configurator';
@@ -12,12 +14,10 @@ const configurators = {
     PROJECT: ProjectConfigurator,
     SERVICE_ACCOUNT: ServiceAccountConfigurator,
     ASSET_INVENTORY: AssetInventoryConfigurator,
-    COST_EXPLORER: CostExplorerConfigurator,
+    COST_ANALYSIS: CostExplorerConfigurator,
     ALERT_MANAGER: AlertManagerConfigurator,
     OPS_FLOW: OpsFlowConfigurator,
     IAM: IamConfigurator,
 } as const;
 
-export type FeatureConfiguratorType = typeof configurators[keyof typeof configurators];
-
-export const getFeatureConfigurator = (featureName: string): FeatureConfiguratorType | null => configurators[featureName as keyof typeof configurators] || null;
+export const getFeatureConfigurator = (featureName: string): FeatureConfiguratorType | null => configurators[featureName] || null;

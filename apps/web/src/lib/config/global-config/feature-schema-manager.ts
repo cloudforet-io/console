@@ -1,63 +1,70 @@
-import { isEmpty } from 'lodash';
+import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
 
-import { FEATURES } from '@/lib/config/global-config/constants/constants';
-import { initialFeatureSchema } from '@/lib/config/global-config/schema/feature-schema';
+import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
 import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/types/type';
-import { MENU_ID } from '@/lib/menu/config';
 
-class FeatureSchemaManager {
-    private config: GlobalServiceConfig = {} as GlobalServiceConfig;
+export class FeatureSchemaManager {
+    private config: GlobalServiceConfig = {
+        IAM: {
+            ENABLED: true,
+            VERSION: 'V1',
+        },
+    };
 
-    private schema: FeatureSchemaType = {} as FeatureSchemaType;
-
-    async initialize(mergedConfig: GlobalServiceConfig): Promise<void> {
-        this.config = mergedConfig;
-        if (isEmpty(this.config)) return;
-
-        this.schema = JSON.parse(JSON.stringify(initialFeatureSchema));
-        await this.applyGlobalConfig();
+    initialize(config: GlobalServiceConfig) {
+        this.config = {
+            ...this.config,
+            ...config,
+        };
+        this.createSchema();
     }
 
-    getFeatureSchema(): FeatureSchemaType {
-        return this.schema;
-    }
+    createSchema() {
+        const globalConfigStore = useGlobalConfigStore();
+        const schema = {} as FeatureSchemaType;
 
-    private applyGlobalConfig(): void {
-        Object.entries(this.config).forEach(([serviceName, config]) => {
-            if (config.ENABLED) {
-                this.updateSchema(serviceName, config.VERSION);
-            } else {
-                delete this.schema[serviceName];
+        const featureMethodMap: Record<string, Record<string, boolean>> = {};
+
+        Object.keys(this.config).forEach((feature) => {
+            if (this.config[feature]?.ENABLED) {
+                const configurator = getFeatureConfigurator(feature);
+                if (configurator) {
+                    const currentVersion = this.config[feature]?.VERSION || 'V1';
+                    configurator.initialize(currentVersion);
+                    const menuConfig = configurator.getMenu();
+
+                    if (configurator.uiAffect) {
+                        configurator.uiAffect.forEach((uiAffect) => {
+                            const targetFeature = uiAffect.feature;
+                            const targetVersion = targetFeature === feature
+                                ? currentVersion
+                                : (this.config[targetFeature]?.VERSION || 'V1');
+
+                            if (!featureMethodMap[targetFeature]) {
+                                featureMethodMap[targetFeature] = {};
+                            }
+
+                            uiAffect.affects.forEach((affect) => {
+                                if (affect.version === targetVersion) {
+                                    featureMethodMap[targetFeature][affect.method] = true;
+                                }
+                            });
+                        });
+                    }
+
+                    schema[feature] = {
+                        version: currentVersion,
+                        menu: menuConfig.menu,
+                        adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
+                        uiAffects: feature in featureMethodMap ? featureMethodMap[feature] : {},
+                    };
+                }
             }
         });
-    }
 
-    private updateSchema(serviceName: string, version: string): void {
-        if (!this.schema || !this.schema[serviceName]) return;
-
-        this.schema[serviceName].currentVersion = version;
-
-        if (serviceName === FEATURES.ALERT_MANAGER) {
-            if (version === 'V2') {
-                const iamFeatureSettings = this.schema[FEATURES.IAM].V1;
-                iamFeatureSettings.menu[MENU_ID.USER_GROUP] = true;
-                if (iamFeatureSettings.adminMenu) {
-                    iamFeatureSettings.adminMenu[MENU_ID.USER_GROUP] = true;
-                }
-                this.updateUiAffects(FEATURES.PROJECT, 'V1', 'visibleAlertTabAtDetail', false);
-                this.updateUiAffects(FEATURES.ASSET_INVENTORY, 'V1', 'visibleAlertTabAtDetail', false);
-                this.updateUiAffects(FEATURES.COST_EXPLORER, 'V1', 'visibleBudgetNotification', true);
-            }
-        }
-    }
-
-    private updateUiAffects(featureKey: string, version: string, affectKey: string, value: boolean): void {
-        const feature = this.schema[featureKey]?.[version];
-        if (feature?.uiAffects?.[affectKey] !== undefined) {
-            feature.uiAffects[affectKey] = value;
-        }
+        globalConfigStore.setSchema(schema);
     }
 }
 
-export default new FeatureSchemaManager();
 
+export default new FeatureSchemaManager();

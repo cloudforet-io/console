@@ -1,22 +1,21 @@
-import type { FEATURES } from '@/lib/config/global-config/constants/constants';
-import type { MenuId } from '@/lib/menu/config';
+import type { RouteConfig } from 'vue-router';
 
-export type GlobalServiceConfig = Record<string, { ENABLED: boolean; VERSION: string }>;
+import type { FEATURES } from '@/lib/config/global-config/constants/constants';
+import type { Menu } from '@/lib/menu/config';
+
+export type FeatureVersion = 'V1' | 'V2';
+export type GlobalServiceConfig = Record<string, { ENABLED: boolean; VERSION: FeatureVersion}>;
 
 export type FeatureKeyType = typeof FEATURES[keyof typeof FEATURES];
 
-type MenuConfig = Partial<Record<MenuId, boolean>>;
-export type FeatureVersionSettingsType = {
-    menu: MenuConfig;
-    adminMenu?: MenuConfig;
+export interface FeatureMenuConfig {
+    menu: Menu;
+    adminMenu?: Menu|null;
     uiAffects?: Record<string, boolean>;
-};
-type FeatureSettingType = {
-    currentVersion: string;
-    V1: FeatureVersionSettingsType;
-    V2?: FeatureVersionSettingsType;
-};
-export type FeatureSchemaType = Record<FeatureKeyType, FeatureSettingType>;
+    version?: FeatureVersion;
+}
+
+export type FeatureSchemaType = Record<FeatureKeyType, FeatureMenuConfig>;
 
 type apiClientType = {
     V1: string;
@@ -30,3 +29,20 @@ export type ApiClientsSchemaType = {
     OPS_FLOW: apiClientType,
     ALERT_MANAGER: apiClientType,
 };
+
+export interface FeatureConfiguratorType {
+    getRoutes: (isAdmin?: boolean) => RouteConfig|null;
+    getMenu: (isAdmin?: boolean) => FeatureMenuConfig;
+    initialize: (version: FeatureVersion) => void;
+    uiAffect: FeatureUiAffect[];
+}
+
+interface UiAffectConfig {
+    method: string;
+    version: string;
+}
+
+export interface FeatureUiAffect {
+    feature: string;
+    affects: UiAffectConfig[];
+}

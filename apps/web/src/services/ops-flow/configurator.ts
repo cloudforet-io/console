@@ -1,47 +1,52 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/types/type';
+import type { RouteConfig } from 'vue-router';
+
+import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
 
-class OpsFlowConfigurator {
-    static getAdminRoutes() {
-        return adminOpsFlowRoutes;
+class OpsFlowConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return opsFlowRoutes;
+    // eslint-disable-next-line class-methods-use-this
+    getRoutes(isAdmin?: boolean): RouteConfig {
+        return isAdmin ? adminOpsFlowRoutes : opsFlowRoutes;
     }
 
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
-        return {
-            id: MENU_ID.OPS_FLOW,
-            subMenuList: subMenuIds,
-        };
-    }
-
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): FeatureMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.OPS_FLOW,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 7,
         };
-    }
 
-    static applyUiAffects(): void|null {
-        return null;
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.OPS_FLOW_LANDING, needPermissionByRole: true },
+                    { id: MENU_ID.TASK_BOARD, needPermissionByRole: true },
+                    { id: MENU_ID.APP, needPermissionByRole: true },
+                ],
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.TASK_MANAGEMENT },
+                ],
+            },
+            version: this.version,
+        };
     }
 }
 
-export default OpsFlowConfigurator;
+export default new OpsFlowConfigurator();
