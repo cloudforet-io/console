@@ -84,6 +84,13 @@ onClickOutside(folderTabRef, () => {
         @click="handleSelectTab"
     >
         <div class="content-wrapper">
+            <p-i v-if="props.tab.icon"
+                 class="folder-tab-icon"
+                 :name="props.tab.icon"
+                 width="0.875rem"
+                 height="0.875rem"
+                 color="gray-600"
+            />
             <span class="label">
                 {{ tab.label }}
             </span>
@@ -91,7 +98,7 @@ onClickOutside(folderTabRef, () => {
                  :name="state.visible ? 'ic_chevron-up' : 'ic_chevron-down'"
                  width="1.25rem"
                  height="1.25rem"
-                 color="inherit"
+                 color="gray-600"
             />
         </div>
         <p-context-menu v-if="state.visible"
@@ -112,6 +119,10 @@ onClickOutside(folderTabRef, () => {
     }
     .content-wrapper {
         @apply flex items-center justify-center w-full h-full;
+        .folder-tab-icon {
+            min-width: 0.875rem;
+            margin-right: 0.25rem;
+        }
         .label {
             @apply w-full text-label-md block truncate;
         }
