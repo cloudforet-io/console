@@ -1,7 +1,6 @@
-import type { RouteConfig } from 'vue-router';
-
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect, GlobalServiceConfig,
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    GlobalServiceConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -18,9 +17,12 @@ class IamConfigurator implements FeatureConfiguratorType {
         this.version = version;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    getRoutes(isAdmin?: boolean): RouteConfig | null {
-        return isAdmin ? adminIamRoutes : iamRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: iamRoutes,
+            adminRoutes: adminIamRoutes,
+            version: this.version,
+        };
     }
 
     getMenu(config?: GlobalServiceConfig): FeatureMenuConfig {

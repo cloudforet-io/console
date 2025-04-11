@@ -1,6 +1,6 @@
-import type { RouteConfig } from 'vue-router';
-
-import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -26,9 +26,12 @@ class CostExplorerConfigurator implements FeatureConfiguratorType {
         this.version = version;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    getRoutes(isAdmin?: boolean): RouteConfig | null {
-        return isAdmin ? adminCostExplorerRoutes : costExplorerRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: costExplorerRoutes,
+            adminRoutes: adminCostExplorerRoutes,
+            version: this.version,
+        };
     }
 
     getMenu(): FeatureMenuConfig {

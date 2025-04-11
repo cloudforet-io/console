@@ -53,14 +53,13 @@ const initRouter = (domainId?: string) => {
         (route) => route.name === ROOT_ROUTE.WORKSPACE._NAME,
     )?.children;
 
+    const featureRoutes = generateRoutes();
     if (adminChildren) {
-        const dynamicAdminRoutes = generateRoutes('admin');
-        adminChildren.push(...dynamicAdminRoutes);
+        adminChildren.push(...featureRoutes.adminRoutes);
     }
 
     if (workspaceChildren) {
-        const dynamicWorkspaceRoutes = generateRoutes('workspace');
-        workspaceChildren.push(...dynamicWorkspaceRoutes);
+        workspaceChildren.push(...featureRoutes.routes);
     }
 
     if (!domainId) {
