@@ -1,4 +1,3 @@
-import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
@@ -11,73 +10,57 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
-import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-
-interface UseDashboardManageableOptions {
-    dashboardId: ComputedRef<string|undefined>;
-}
 
 interface UseDashboardManageableReturn {
-    isManageable: ComputedRef<boolean>;
     getDashboardManageable: (_dashboard?: DashboardModel) => boolean;
     getFolderManageable: (_folder?: FolderModel) => boolean;
 }
 
-export const useDashboardManageable = (options?: UseDashboardManageableOptions): UseDashboardManageableReturn => {
+export const useDashboardManageable = (): UseDashboardManageableReturn => {
     const userStore = useUserStore();
-    const { dashboardId } = options ?? {};
-
     const { entryPoint } = useDashboardRouteContext();
-
 
     const storeState = reactive({
         isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
 
-    const { dashboard } = useDashboardGetQuery({
-        dashboardId: computed(() => dashboardId?.value),
-    });
+    const _isManageable = (isPrivate: boolean, isShared: boolean, resourceGroup: string | undefined): boolean => {
+        if (entryPoint.value === 'ADMIN') return true;
+        if (entryPoint.value === 'WORKSPACE') {
+            if (isPrivate) return true;
+            if (isShared && resourceGroup === RESOURCE_GROUP.DOMAIN) return false;
+            if (storeState.isWorkspaceOwner) return true;
+            return false;
+        }
+        if (entryPoint.value === 'PROJECT') {
+            return !isShared;
+        }
+        return false;
+    };
 
-    const isManageable = computed(() => getDashboardManageable(dashboard.value));
+
 
     const getDashboardManageable = (_dashboard?: DashboardModel): boolean => {
         if (!_dashboard) return false;
-        if (entryPoint.value === 'ADMIN') return true;
-        if (entryPoint.value === 'WORKSPACE') {
-            if (_dashboard.dashboard_id?.startsWith('private')) return true;
-            const publicDashboard = _dashboard as PublicDashboardModel;
-            if (publicDashboard?.shared && publicDashboard?.resource_group === RESOURCE_GROUP.DOMAIN) return false;
-            if (storeState.isWorkspaceOwner) return true;
-            return false;
-        }
-        if (entryPoint.value === 'PROJECT') {
-            const publicDashboard = _dashboard as PublicDashboardModel;
-            if (publicDashboard?.shared) return false;
-            return true;
-        }
-        return false;
+        const publicDashboard = _dashboard as PublicDashboardModel;
+        return _isManageable(
+            _dashboard.dashboard_id?.startsWith('private') || false,
+            publicDashboard?.shared || false,
+            publicDashboard?.resource_group,
+        );
     };
+
     const getFolderManageable = (_folder?: FolderModel): boolean => {
         if (!_folder) return false;
-        if (entryPoint.value === 'ADMIN') return true;
-        if (entryPoint.value === 'WORKSPACE') {
-            if (_folder.folder_id?.startsWith('private')) return true;
-            const publicFolder = _folder as PublicFolderModel;
-            if (publicFolder?.shared && publicFolder?.resource_group === RESOURCE_GROUP.DOMAIN) return false;
-            if (storeState.isWorkspaceOwner) return true;
-            return false;
-        }
-        if (entryPoint.value === 'PROJECT') {
-            const publicFolder = _folder as PublicFolderModel;
-            if (publicFolder?.shared) return false;
-            return true;
-        }
-        return false;
+        const publicFolder = _folder as PublicFolderModel;
+        return _isManageable(
+            _folder.folder_id?.startsWith('private') || false,
+            publicFolder?.shared || false,
+            publicFolder?.resource_group,
+        );
     };
 
-
     return {
-        isManageable,
         getDashboardManageable,
         getFolderManageable,
     };
