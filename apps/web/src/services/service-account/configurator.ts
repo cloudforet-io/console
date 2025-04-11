@@ -1,6 +1,6 @@
-import type { RouteConfig } from 'vue-router';
-
-import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
 import { MENU_ID } from '@/lib/menu/config';
 
 import adminServiceAccountRoute from '@/services/service-account/routes/admin/routes';
@@ -15,9 +15,12 @@ class ServiceAccountConfigurator implements FeatureConfiguratorType {
         this.version = version;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    getRoutes(isAdmin?: boolean): RouteConfig|null {
-        return isAdmin ? adminServiceAccountRoute : serviceAccountRoute;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: serviceAccountRoute,
+            adminRoutes: adminServiceAccountRoute,
+            version: this.version,
+        };
     }
 
     getMenu(): FeatureMenuConfig {

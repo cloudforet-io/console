@@ -31,7 +31,7 @@ export class FeatureSchemaManager {
                 if (configurator) {
                     const currentVersion = this.config[feature]?.VERSION || 'V1';
                     configurator.initialize(currentVersion);
-                    const menuConfig = configurator.getMenu();
+                    const menuConfig = configurator.getMenu(this.config);
 
                     if (configurator.uiAffect) {
                         configurator.uiAffect.forEach((uiAffect) => {

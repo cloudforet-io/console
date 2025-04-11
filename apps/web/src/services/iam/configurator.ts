@@ -1,6 +1,7 @@
-import type { RouteConfig } from 'vue-router';
-
-import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    GlobalServiceConfig,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -16,12 +17,16 @@ class IamConfigurator implements FeatureConfiguratorType {
         this.version = version;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    getRoutes(isAdmin?: boolean): RouteConfig | null {
-        return isAdmin ? adminIamRoutes : iamRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: iamRoutes,
+            adminRoutes: adminIamRoutes,
+            version: this.version,
+        };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(config?: GlobalServiceConfig): FeatureMenuConfig {
+        const alertManagerVersion = config?.ALERT_MANAGER?.VERSION;
         const baseMenu: Menu = {
             id: MENU_ID.IAM,
             needPermissionByRole: true,
@@ -29,23 +34,30 @@ class IamConfigurator implements FeatureConfiguratorType {
             order: 8,
         };
 
+        const workspaceSubMenuList: Menu[] = [
+            { id: MENU_ID.USER, needPermissionByRole: true },
+            { id: MENU_ID.APP, needPermissionByRole: true },
+        ];
+
+        const adminSubMenuList: Menu[] = [
+            { id: MENU_ID.USER },
+            { id: MENU_ID.APP },
+            { id: MENU_ID.ROLE },
+        ];
+
+        if (alertManagerVersion === 'V2') {
+            workspaceSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP, needPermissionByRole: true });
+            adminSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP });
+        }
+
         return {
             menu: {
                 ...baseMenu,
-                subMenuList: [
-                    { id: MENU_ID.USER, needPermissionByRole: true },
-                    { id: MENU_ID.USER_GROUP, needPermissionByRole: true },
-                    { id: MENU_ID.APP, needPermissionByRole: true },
-                ],
+                subMenuList: workspaceSubMenuList,
             },
             adminMenu: {
                 ...baseMenu,
-                subMenuList: [
-                    { id: MENU_ID.USER },
-                    { id: MENU_ID.USER_GROUP },
-                    { id: MENU_ID.APP },
-                    { id: MENU_ID.ROLE },
-                ],
+                subMenuList: adminSubMenuList,
             },
             version: this.version,
         };

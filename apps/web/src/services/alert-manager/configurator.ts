@@ -1,6 +1,6 @@
-import type { RouteConfig } from 'vue-router';
-
-import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -31,10 +31,12 @@ class AlertManagerConfigurator implements FeatureConfiguratorType {
         this.version = version;
     }
 
-    getRoutes(isAdmin?: boolean): RouteConfig|null {
-        if (isAdmin) return null;
-
-        return this.version === 'V1' ? alertManagerRouteV1 : alertManagerRoute;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: this.version === 'V1' ? alertManagerRouteV1 : alertManagerRoute,
+            adminRoutes: null,
+            version: this.version,
+        };
     }
 
     getMenu(): FeatureMenuConfig {

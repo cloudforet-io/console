@@ -9,9 +9,14 @@ export type GlobalServiceConfig = Record<string, { ENABLED: boolean; VERSION: Fe
 export type FeatureKeyType = typeof FEATURES[keyof typeof FEATURES];
 
 export interface FeatureMenuConfig {
+    version?: FeatureVersion;
     menu: Menu;
     adminMenu?: Menu|null;
     uiAffects?: Record<string, boolean>;
+}
+export interface FeatureRouteConfig {
+    routes: RouteConfig|null;
+    adminRoutes: RouteConfig|null;
     version?: FeatureVersion;
 }
 
@@ -31,8 +36,8 @@ export type ApiClientsSchemaType = {
 };
 
 export interface FeatureConfiguratorType {
-    getRoutes: (isAdmin?: boolean) => RouteConfig|null;
-    getMenu: (isAdmin?: boolean) => FeatureMenuConfig;
+    getRoutes: () => FeatureRouteConfig;
+    getMenu: (config?: GlobalServiceConfig) => FeatureMenuConfig;
     initialize: (version: FeatureVersion) => void;
     uiAffect: FeatureUiAffect[];
 }

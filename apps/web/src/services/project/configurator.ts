@@ -1,6 +1,6 @@
-import type { RouteConfig } from 'vue-router';
-
-import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
 import { MENU_ID } from '@/lib/menu/config';
 
 import projectRoutesV1 from '@/services/project/v1/routes/routes';
@@ -25,9 +25,12 @@ class ProjectConfigurator implements FeatureConfiguratorType {
         this.version = version;
     }
 
-    getRoutes(isAdmin?: boolean): RouteConfig|null {
-        if (isAdmin) return null;
-        return this.version === 'V1' ? projectRoutesV1 : projectRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: this.version === 'V1' ? projectRoutesV1 : projectRoutes,
+            adminRoutes: null,
+            version: this.version,
+        };
     }
 
     getMenu(): FeatureMenuConfig {

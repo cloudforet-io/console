@@ -10,19 +10,28 @@ import infoRoutes from '@/services/info/routes/routes';
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
-export const generateRoutes = (mode: string): RouteConfig[] => {
+interface GeneratedFeatureRouteConfig {
+    routes: RouteConfig[];
+    adminRoutes: RouteConfig[];
+}
+
+export const generateRoutes = (): GeneratedFeatureRouteConfig => {
     const globalConfigStore = useGlobalConfigStore();
     const schema = globalConfigStore.state.schema;
-    const baseRoutes = mode === 'admin'
-        ? [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes]
-        : [workspaceHomeRoute, infoRoutes];
+    const baseRoutes: GeneratedFeatureRouteConfig = {
+        routes: [workspaceHomeRoute, infoRoutes],
+        adminRoutes: [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes],
+    };
 
     Object.keys(schema).forEach((serviceName) => {
         const configurator = getFeatureConfigurator(serviceName);
         if (configurator) {
-            const route = configurator.getRoutes(mode === 'admin');
-            if (route && !baseRoutes.some((existingRoute) => existingRoute.path === route.path)) {
-                baseRoutes.push(route);
+            const featureRoutes = configurator.getRoutes();
+            if (featureRoutes?.routes) {
+                baseRoutes.routes.push(featureRoutes.routes);
+            }
+            if (featureRoutes?.adminRoutes) {
+                baseRoutes.adminRoutes.push(featureRoutes.adminRoutes);
             }
         }
     });
