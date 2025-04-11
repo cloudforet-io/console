@@ -17,7 +17,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 
-import { useDashboardCloneAction } from '@/services/dashboard-shared/core/actions/use-dashboard-clone-action';
+import { useDashboardCloneMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-clone-mutation';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectPageContext } from '@/services/project/v2/composables/use-proejct-page-context';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
@@ -88,11 +88,10 @@ const handleConfirm = async () => {
         _sharedDashboard.project_id = projectId.value;
     }
 
-    mutate(_sharedDashboard as DashboardCreateParams);
+    cloneDashboard(_sharedDashboard as DashboardCreateParams, dashboardId.value);
 };
 
-const { mutate, isPending: dashboardCloneLoading } = useDashboardCloneAction({
-    dashboardId,
+const { mutate: cloneDashboard, isPending: dashboardCloneLoading } = useDashboardCloneMutation({
     onSuccess: async (data: DashboardModel) => {
         setQueryData([data as PublicDashboardModel]);
         projectPageModalStore.closeDashboardCloneModal();

@@ -22,8 +22,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardFolderShareAction } from '@/services/dashboard-shared/core/actions/use-dashboard-folder-share-action';
-import { useDashboardShareAction } from '@/services/dashboard-shared/core/actions/use-dashboard-share-action';
+import { useDashboardFolderShareMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-folder-share-mutation';
+import { useDashboardShareMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-share-mutation';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -184,8 +184,7 @@ const unshareDashboard = () => {
     });
 };
 
-const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFolderShareAction({
-    folderId: computed(() => state.targetFolderId),
+const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFolderShareMutation({
     isShared: computed(() => state.isShared),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
@@ -204,8 +203,7 @@ const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFold
 });
 
 
-const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useDashboardShareAction({
-    dashboardId: computed(() => props.dashboardId),
+const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useDashboardShareMutation({
     isShared: computed(() => state.isShared),
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });

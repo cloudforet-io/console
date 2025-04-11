@@ -17,7 +17,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { useDashboardDeleteAction } from '@/services/dashboard-shared/core/actions/use-dashboard-delete-action';
+import { useDashboardDeleteMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-delete-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -66,8 +66,7 @@ const handleDeleteDashboardConfirm = async () => {
 };
 
 /* Api */
-const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteAction({
-    dashboardId: computed(() => props.dashboardId),
+const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteMutation({
     onSuccess: async (_, params) => {
         const _isPrivate = params.dashboard_id.startsWith('private');
         const dashboardListQueryKey = _isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;

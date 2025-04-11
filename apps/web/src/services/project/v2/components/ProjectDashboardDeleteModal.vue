@@ -9,7 +9,7 @@ import { i18n } from '@/translations';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardDeleteAction } from '@/services/dashboard-shared/core/actions/use-dashboard-delete-action';
+import { useDashboardDeleteMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-delete-mutation';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
@@ -44,8 +44,7 @@ const handleDeleteDashboardConfirm = async () => {
 };
 
 /* Api */
-const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteAction({
-    dashboardId,
+const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteMutation({
     onSuccess: async () => {
         invalidateDashboardList();
         projectPageModalStore.closeDashboardDeleteModal();

@@ -11,30 +11,29 @@ import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/publ
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-interface UseDashboardFolderShareActionOptions {
-    folderId: ComputedRef<string|undefined>;
+interface UseDashboardFolderShareMutationOptions {
     isShared: ComputedRef<boolean>;
     onSuccess?: (data: PublicFolderModel, variables: PublicFolderShareParameters|PublicFolderUnshareParameters) => void|Promise<void>;
     onError?: (error: Error, variables: PublicFolderShareParameters|PublicFolderUnshareParameters) => void|Promise<void>;
     onSettled?: (data: PublicFolderModel|undefined, error: Error|null, variables: PublicFolderShareParameters|PublicFolderUnshareParameters) => void|Promise<void>;
 }
 
-export const useDashboardFolderShareAction = (options: UseDashboardFolderShareActionOptions) => {
+export const useDashboardFolderShareMutation = (options: UseDashboardFolderShareMutationOptions) => {
     const { publicFolderAPI } = usePublicFolderApi();
     const { publicDashboardAPI } = usePublicDashboardApi();
     const queryClient = useQueryClient();
     const { withSuffix: publicFolderGetQueryKey } = useServiceQueryKey('dashboard', 'public-folder', 'get');
     const { withSuffix: publicDashboardGetQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
     const {
-        folderId, isShared, onSuccess, onError, onSettled,
+        isShared, onSuccess, onError, onSettled,
     } = options;
 
 
-    const listPublicDashboard = async () => {
-        if (!folderId.value) throw new Error('Folder ID is not provided');
+    const listPublicDashboard = async (folderId: string) => {
+        if (!folderId) throw new Error('Folder ID is not provided');
         try {
             const _dashboardList = await publicDashboardAPI.list({
-                folder_id: folderId.value,
+                folder_id: folderId,
             });
             return _dashboardList;
         } catch (error) {
@@ -46,7 +45,7 @@ export const useDashboardFolderShareAction = (options: UseDashboardFolderShareAc
     };
 
     const shareFolderFn = async (params: PublicFolderShareParameters|PublicFolderUnshareParameters): Promise<PublicFolderModel> => {
-        if (!folderId.value) throw new Error('Folder ID is not provided');
+        if (!params.folder_id) throw new Error('Folder ID is not provided');
         if (isShared.value) return publicFolderAPI.unshare(params as PublicFolderUnshareParameters);
         return publicFolderAPI.share(params as PublicFolderShareParameters);
     };
@@ -57,7 +56,7 @@ export const useDashboardFolderShareAction = (options: UseDashboardFolderShareAc
             const _folderId = variables.folder_id;
             queryClient.invalidateQueries({ queryKey: publicFolderGetQueryKey(_folderId) });
             if (!isShared.value) {
-                const _dashboardList = await listPublicDashboard();
+                const _dashboardList = await listPublicDashboard(_folderId);
                 const _dashboardIds = _dashboardList.results?.map((dashboard) => dashboard.dashboard_id);
                 if (_dashboardIds) {
                     await Promise.all(

@@ -1,5 +1,3 @@
-import type { ComputedRef } from 'vue';
-import { computed } from 'vue';
 
 import {
     useMutation, useQueryClient,
@@ -10,14 +8,13 @@ import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboar
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-interface UseDashboardDeleteActionOptions {
-    dashboardId: ComputedRef<string|undefined>;
+interface UseDashboardDeleteMutationOptions {
     onSuccess?: (data: unknown, variables: DashboardDeleteParams) => void|Promise<void>;
     onError?: (error: Error, variables: DashboardDeleteParams) => void|Promise<void>;
     onSettled?: (data: unknown|undefined, error: Error|null, variables: DashboardDeleteParams) => void|Promise<void>;
 }
 
-export const useDashboardDeleteAction = (options: UseDashboardDeleteActionOptions) => {
+export const useDashboardDeleteMutation = (options: UseDashboardDeleteMutationOptions) => {
     const { publicDashboardAPI } = usePublicDashboardApi();
     const { privateDashboardAPI } = usePrivateDashboardApi();
     const queryClient = useQueryClient();
@@ -25,14 +22,13 @@ export const useDashboardDeleteAction = (options: UseDashboardDeleteActionOption
     const { withSuffix: privateDashboardGetQueryKey } = useServiceQueryKey('dashboard', 'private-dashboard', 'get');
 
     const {
-        dashboardId, onSuccess, onError, onSettled,
+        onSuccess, onError, onSettled,
     } = options;
 
-    const isPrivate = computed(() => dashboardId.value?.startsWith('private'));
-
     const deleteDashboardFn = (params: DashboardDeleteParams) => {
-        if (!dashboardId.value) throw new Error('Dashboard ID is not provided');
-        const fetcher = isPrivate.value ? privateDashboardAPI.delete : publicDashboardAPI.delete;
+        if (!params.dashboard_id) throw new Error('Dashboard ID is not provided');
+        const _isPrivate = params.dashboard_id.startsWith('private');
+        const fetcher = _isPrivate ? privateDashboardAPI.delete : publicDashboardAPI.delete;
         return fetcher(params);
     };
 

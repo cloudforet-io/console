@@ -18,60 +18,56 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 
 import type {
-    SharedDashboardInfo, SharedDashboardLayout, SharedDataTableInfo, SharedWidgetInfo,
+    SharedDashboardLayout, SharedDataTableInfo, SharedWidgetInfo,
 } from '@/services/dashboards/types/shared-dashboard-type';
 
 
 type DataTableModel = PublicDataTableModel | PrivateDataTableModel;
 type WidgetModel = PublicWidgetModel | PrivateWidgetModel;
 
-const _listWidgetDataTables = async (widgetId: string, costDataSource: CostDataSourceReferenceMap): Promise<[string, DataTableModel[]]|undefined> => {
+const _fetchWidgetDataTables = async (widgetId: string, costDataSource: CostDataSourceReferenceMap): Promise<[string, DataTableModel[]]|undefined> => {
     if (!widgetId) return undefined;
-    const _isPrivate = widgetId.startsWith('private');
-    const _fetcher = _isPrivate
+    const isPrivate = widgetId.startsWith('private');
+    const fetcher = isPrivate
         ? SpaceConnector.clientV2.dashboard.privateDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>
         : SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>;
     try {
-        const { results } = await _fetcher({
-            widget_id: widgetId,
-        });
+        const { results } = await fetcher({ widget_id: widgetId });
         if (!results) return undefined;
-        const _refinedResults = cloneDeep(results);
+        const refinedResults = cloneDeep(results);
         results.forEach((r, idx) => {
             if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
-                const _dataSourceId = r.options.COST?.data_source_id || '';
-                _refinedResults[idx].options.COST.plugin_id = costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
-                _refinedResults[idx].options.COST.data_source_id = undefined;
+                const dataSourceId = r.options.COST?.data_source_id || '';
+                refinedResults[idx].options.COST.plugin_id = costDataSource[dataSourceId]?.data?.plugin_info?.plugin_id;
+                refinedResults[idx].options.COST.data_source_id = undefined;
             }
         });
-        return [widgetId, _refinedResults || []];
+        return [widgetId, refinedResults || []];
     } catch (e) {
         ErrorHandler.handleError(e);
         return undefined;
     }
 };
+
 const _getWidgetDataTablesMap = async (dashboardLayouts: DashboardLayout[], costDataSource: CostDataSourceReferenceMap): Promise<Record<string, DataTableModel[]>> => {
-    const _dashboardWidgetIdList = flattenDeep(dashboardLayouts?.map((layout) => layout.widgets?.map((w) => w)) || []);
-    const results = await Promise.allSettled(_dashboardWidgetIdList.map((widgetId) => _listWidgetDataTables(widgetId, costDataSource)));
-    const _widgetDataTablesMap: Record<string, DataTableModel[]> = {};
-    results.forEach((r) => {
-        if (r.status === 'fulfilled') {
-            if (!r.value) return;
+    const dashboardWidgetIdList = flattenDeep(dashboardLayouts?.map((layout) => layout.widgets) || []);
+    const results = await Promise.allSettled(dashboardWidgetIdList.map((widgetId) => _fetchWidgetDataTables(widgetId, costDataSource)));
+    return results.reduce((acc, r) => {
+        if (r.status === 'fulfilled' && r.value) {
             const [widgetId, dataTables] = r.value;
             if (widgetId && dataTables) {
-                _widgetDataTablesMap[widgetId] = dataTables;
+                acc[widgetId] = dataTables;
             }
         }
-    });
-    return _widgetDataTablesMap;
+        return acc;
+    }, {} as Record<string, DataTableModel[]>);
 };
 
 const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTableModel[]>, widgetId: string, dataTableId?: string): [SharedDataTableInfo[], number] => {
-    const _dataTables = widgetDataTablesMap[widgetId] || [];
-    const _dataTableIndex = _dataTables.findIndex((d) => d.data_table_id === dataTableId);
-    const _sharedDataTables: SharedDataTableInfo[] = [];
-    _dataTables.forEach((dt) => {
-        const _sharedDataTable = {
+    const dataTables = widgetDataTablesMap[widgetId] || [];
+    const dataTableIndex = dataTables.findIndex((d) => d.data_table_id === dataTableId);
+    const sharedDataTables = dataTables.map((dt) => {
+        const sharedDataTable: SharedDataTableInfo = {
             name: dt.name,
             data_type: dt.data_type,
             source_type: dt.source_type,
@@ -79,57 +75,43 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
             options: dt.options,
         };
         if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+            const operatorOptions = dt.options[dt.operator];
             if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
-                const _dataTableIds = dt.options[dt.operator]?.data_tables;
-                const _dataTableIndices = _dataTableIds?.map((dtId) => _dataTables.findIndex((d) => d.data_table_id === dtId));
-                _sharedDataTable.options = {
-                    [dt.operator]: {
-                        ...dt.options[dt.operator],
-                        data_tables: _dataTableIndices,
-                    },
-                };
+                const dataTableIds = operatorOptions?.data_tables;
+                const dataTableIndices = dataTableIds?.map((dtId) => dataTables.findIndex((d) => d.data_table_id === dtId));
+                sharedDataTable.options = { [dt.operator]: { ...operatorOptions, data_tables: dataTableIndices } };
             } else {
-                const _dataTableId = dt.options[dt.operator]?.data_table_id;
-                const _dataTableIdx = _dataTables.findIndex((d) => d.data_table_id === _dataTableId);
-                _sharedDataTable.options = {
-                    [dt.operator]: {
-                        ...dt.options[dt.operator],
-                        data_table_id: _dataTableIdx,
-                    },
-                };
+                const operatorDataTableId = operatorOptions?.data_table_id;
+                const dataTableIdx = dataTables.findIndex((d) => d.data_table_id === operatorDataTableId);
+                sharedDataTable.options = { [dt.operator]: { ...operatorOptions, data_table_id: dataTableIdx } };
             }
         }
-        _sharedDataTables.push(_sharedDataTable);
+        return sharedDataTable;
     });
-    return [_sharedDataTables, _dataTableIndex];
+    return [sharedDataTables, dataTableIndex];
 };
+
 export const getSharedDashboardLayouts = async (
     dashboardLayouts: DashboardLayout[],
     dashboardWidgets: WidgetModel[],
     costDataSource: CostDataSourceReferenceMap,
 ): Promise<SharedDashboardLayout[]> => {
-    const _widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts, costDataSource);
-    const _sharedLayouts: SharedDashboardInfo['layouts'] = [];
-    dashboardLayouts?.forEach((layout) => {
-        const _sharedWidgets: SharedWidgetInfo[] = [];
-        layout.widgets?.forEach((widgetId) => {
-            const _widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
-            if (_widget) {
-                const _dataTableId = _widget.data_table_id;
-                const [_dataTables, _dataTableIndex] = _getSharedDataTableInfoList(_widgetDataTablesMap, _widget.widget_id, _dataTableId);
-                const _sharedWidgetInfo: SharedWidgetInfo = {
-                    widget_type: _widget.widget_type,
-                    size: _widget.size,
-                    options: _widget.options,
-                    data_tables: _dataTables,
-                    data_table_id: _dataTableIndex > -1 ? _dataTableIndex : 0,
+    const widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts, costDataSource);
+    return dashboardLayouts.map((layout) => {
+        const sharedWidgets = layout.widgets?.map((widgetId) => {
+            const widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
+            if (widget) {
+                const [dataTables, dataTableIndex] = _getSharedDataTableInfoList(widgetDataTablesMap, widget.widget_id, widget.data_table_id);
+                return {
+                    widget_type: widget.widget_type,
+                    size: widget.size,
+                    options: widget.options,
+                    data_tables: dataTables,
+                    data_table_id: dataTableIndex > -1 ? dataTableIndex : 0,
                 };
-                _sharedWidgets.push(_sharedWidgetInfo);
             }
-        });
-        _sharedLayouts.push({
-            widgets: _sharedWidgets,
-        });
+            return null;
+        }).filter(Boolean) as SharedWidgetInfo[];
+        return { widgets: sharedWidgets };
     });
-    return _sharedLayouts;
 };

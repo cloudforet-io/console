@@ -19,7 +19,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardChangeFolderAction } from '@/services/dashboard-shared/core/actions/use-dashboard-change-folder-action';
+import { useDashboardChangeFolderMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-change-folder-mutation';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -84,8 +84,7 @@ const state = reactive({
 });
 
 /* Api */
-const { mutate: changeFolder } = useDashboardChangeFolderAction({
-    dashboardId: computed(() => props.dashboardId),
+const { mutate: changeFolder } = useDashboardChangeFolderMutation({
     onSuccess: () => {
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
         const isPrivate = props.dashboardId.startsWith('private');

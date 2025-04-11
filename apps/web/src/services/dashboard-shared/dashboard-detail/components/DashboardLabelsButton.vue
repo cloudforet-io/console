@@ -7,7 +7,7 @@ import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardUpdateAction } from '@/services/dashboard-shared/core/actions/use-dashboard-update-action';
+import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-update-mutation';
 import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
 import DashboardLabels from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabels.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
@@ -42,9 +42,8 @@ const handleUpdateLabels = async (labels: string[]) => {
     });
 };
 
-const { mutate: updateDashboard } = useDashboardUpdateAction(
+const { mutate: updateDashboard } = useDashboardUpdateMutation(
     {
-        dashboardId: computed(() => props.dashboardId),
         onError: (e) => {
             ErrorHandler.handleError(e);
         },

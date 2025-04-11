@@ -10,7 +10,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useDashboardUpdateAction } from '@/services/dashboard-shared/core/actions/use-dashboard-update-action';
+import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-update-mutation';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
@@ -60,8 +60,7 @@ const {
     },
 });
 
-const { mutate, isPending: loading } = useDashboardUpdateAction({
-    dashboardId,
+const { mutate: updateDashboard, isPending: loading } = useDashboardUpdateMutation({
     onSuccess: () => {
         invalidateDashboardList();
     },
@@ -78,7 +77,7 @@ const handleConfirm = async () => {
         console.error('dashboardId is required');
         return;
     }
-    mutate({
+    updateDashboard({
         dashboard_id: dashboardId.value,
         name: name.value,
     });

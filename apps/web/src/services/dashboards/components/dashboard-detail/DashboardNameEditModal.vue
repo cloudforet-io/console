@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardUpdateAction } from '@/services/dashboard-shared/core/actions/use-dashboard-update-action';
+import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-update-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -86,8 +86,7 @@ const state = reactive({
     isDetailPage: computed(() => route.params.dashboardId !== undefined),
 });
 
-const { mutate, isPending: loading } = useDashboardUpdateAction({
-    dashboardId: computed(() => props.dashboardId),
+const { mutate: updateDashboard, isPending: loading } = useDashboardUpdateMutation({
     onSuccess: (_dashboard: DashboardModel) => {
         const isPrivate = _dashboard.dashboard_id.startsWith('private');
         const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
@@ -102,7 +101,7 @@ const { mutate, isPending: loading } = useDashboardUpdateAction({
 });
 
 const handleConfirm = async () => {
-    mutate({
+    updateDashboard({
         dashboard_id: props.dashboardId,
         name: _name.value,
     });

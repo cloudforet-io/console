@@ -23,7 +23,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardCloneAction } from '@/services/dashboard-shared/core/actions/use-dashboard-clone-action';
+import { useDashboardCloneMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-clone-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -128,11 +128,10 @@ const handleConfirm = async () => {
         }
     }
 
-    mutate(_sharedDashboard as DashboardCreateParams);
+    cloneDashboard(_sharedDashboard as DashboardCreateParams, props.dashboardId);
 };
 
-const { mutate, isPending: dashboardCloneLoading } = useDashboardCloneAction({
-    dashboardId: computed(() => props.dashboardId),
+const { mutate: cloneDashboard, isPending: dashboardCloneLoading } = useDashboardCloneMutation({
     isPrivate: computed(() => state.isPrivate),
     onSuccess: (dashboard: DashboardModel) => {
         const isPrivate = dashboard.dashboard_id.startsWith('private');

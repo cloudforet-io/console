@@ -1,15 +1,12 @@
 import type { ComputedRef } from 'vue';
-
-import { useMutation } from '@tanstack/vue-query';
+import { computed } from 'vue';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DashboardCreateParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
-import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
 import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
-import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -17,16 +14,17 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
 
+import { useDashboardCreateMutation } from './use-dashbaord-create-mutation';
 
-interface UseDashboardCloneActionOptions {
-    dashboardId: ComputedRef<string|undefined>;
+
+interface UseDashboardCloneMutationOptions {
     isPrivate?: ComputedRef<boolean>;
     onSuccess?: (data: DashboardModel, variables: DashboardCreateParams) => void|Promise<void>;
     onError?: (error: Error, variables: DashboardCreateParams) => void|Promise<void>;
     onSettled?: (data: DashboardModel|undefined, error: Error|null, variables: DashboardCreateParams) => void|Promise<void>;
 }
 
-export const useDashboardCloneAction = (options: UseDashboardCloneActionOptions) => {
+export const useDashboardCloneMutation = (options: UseDashboardCloneMutationOptions) => {
     const { publicDashboardAPI } = usePublicDashboardApi();
     const { privateDashboardAPI } = usePrivateDashboardApi();
     const { privateWidgetAPI } = usePrivateWidgetApi();
@@ -35,40 +33,54 @@ export const useDashboardCloneAction = (options: UseDashboardCloneActionOptions)
     const userStore = useUserStore();
 
     const {
-        dashboardId, isPrivate, onSuccess, onError, onSettled,
+        isPrivate, onSuccess, onError, onSettled,
     } = options;
 
 
-    const getDashboardFn = async (): Promise<DashboardModel> => {
-        if (!dashboardId.value) throw new Error('Dashboard id not found');
+    const dashboardCreateMutation = useDashboardCreateMutation({
+        isPrivate,
+        onSuccess: async (data, variables) => {
+            if (onSuccess) await onSuccess(data, variables);
+        },
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
+        },
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
+        },
+    });
+
+
+    const _getDashboardFn = async (dashboardId: string): Promise<DashboardModel> => {
+        if (!dashboardId) throw new Error('Dashboard id not found');
         try {
-            if (dashboardId.value.startsWith('private')) {
-                return privateDashboardAPI.get({ dashboard_id: dashboardId.value });
+            if (dashboardId.startsWith('private')) {
+                return privateDashboardAPI.get({ dashboard_id: dashboardId });
             }
-            return publicDashboardAPI.get({ dashboard_id: dashboardId.value });
+            return publicDashboardAPI.get({ dashboard_id: dashboardId });
         } catch (error) {
             throw new Error('Dashboard not found');
         }
     };
 
-    const listWidgetFn = async (): Promise<ListResponse<WidgetModel>> => {
-        if (!dashboardId.value) throw new Error('Dashboard id not found');
+    const _listWidgetFn = async (dashboardId: string): Promise<ListResponse<WidgetModel>> => {
+        if (!dashboardId) throw new Error('Dashboard id not found');
         try {
-            if (dashboardId.value.startsWith('private')) {
-                return privateWidgetAPI.list({ dashboard_id: dashboardId.value });
+            if (dashboardId.startsWith('private')) {
+                return privateWidgetAPI.list({ dashboard_id: dashboardId });
             }
-            return publicWidgetAPI.list({ dashboard_id: dashboardId.value });
+            return publicWidgetAPI.list({ dashboard_id: dashboardId });
         } catch (error) {
             throw new Error('Widget list not found');
         }
     };
 
 
-    const cloneDashboardFn = async (params: DashboardCreateParams): Promise<DashboardModel> => {
-        if (!dashboardId.value) throw new Error('Dashboard id not found');
+    const cloneDashboardFn = async (params: DashboardCreateParams, dashboardId?: string): Promise<DashboardModel> => {
+        if (!dashboardId) throw new Error('Dashboard id not found');
 
-        const dashboard = await getDashboardFn();
-        const widgetList = await listWidgetFn();
+        const dashboard = await _getDashboardFn(dashboardId);
+        const widgetList = await _listWidgetFn(dashboardId);
 
         const _sharedLayouts = await getSharedDashboardLayouts(dashboard.layouts, widgetList.results || [], allReferenceStore.getters.costDataSource);
 
@@ -82,23 +94,14 @@ export const useDashboardCloneAction = (options: UseDashboardCloneActionOptions)
             vars_schema: dashboard.vars_schema,
         };
 
-
         if (isPrivate?.value) {
-            return privateDashboardAPI.create(_sharedDashboard as PrivateDashboardCreateParameters);
+            return dashboardCreateMutation.mutateAsync(_sharedDashboard);
         }
-        return publicDashboardAPI.create(_sharedDashboard as PublicDashboardCreateParameters);
+        return dashboardCreateMutation.mutateAsync(_sharedDashboard);
     };
 
-    return useMutation({
-        mutationFn: cloneDashboardFn,
-        onSuccess: async (data, variables) => {
-            if (onSuccess) await onSuccess(data, variables);
-        },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
-        },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
-        },
-    });
+    return {
+        mutate: cloneDashboardFn,
+        isPending: computed(() => dashboardCreateMutation.isPending.value),
+    };
 };
