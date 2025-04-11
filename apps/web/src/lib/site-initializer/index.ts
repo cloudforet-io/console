@@ -17,7 +17,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
-import { generateRoutes } from '@/lib/config/global-config/generate-routes';
+import { generateRoutes } from '@/lib/config/global-config/helpers/generate-routes';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
@@ -53,14 +53,13 @@ const initRouter = (domainId?: string) => {
         (route) => route.name === ROOT_ROUTE.WORKSPACE._NAME,
     )?.children;
 
+    const featureRoutes = generateRoutes();
     if (adminChildren) {
-        const dynamicAdminRoutes = generateRoutes('admin');
-        adminChildren.push(...dynamicAdminRoutes);
+        adminChildren.push(...featureRoutes.adminRoutes);
     }
 
     if (workspaceChildren) {
-        const dynamicWorkspaceRoutes = generateRoutes('workspace');
-        workspaceChildren.push(...dynamicWorkspaceRoutes);
+        workspaceChildren.push(...featureRoutes.routes);
     }
 
     if (!domainId) {
