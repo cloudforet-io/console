@@ -1,48 +1,69 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type { RouteConfig } from 'vue-router';
+
+import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import alertManagerRouteV1 from '@/services/alert-manager/v1/routes/routes';
 import alertManagerRoute from '@/services/alert-manager/v2/routes/routes';
-import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 
-class AlertManagerConfigurator {
-    static getAdminRoutes() {
-        return null;
+
+class AlertManagerConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [
+        {
+            feature: 'ALERT_MANAGER',
+            affects: [
+                {
+                    method: 'visibleAlertIcon',
+                    version: 'V1',
+                },
+                {
+                    method: 'visibleUserNotification',
+                    version: 'V2',
+                },
+            ],
+        },
+    ];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes(version: string) {
-        return version === 'V1' ? alertManagerRouteV1 : alertManagerRoute;
+    getRoutes(isAdmin?: boolean): RouteConfig|null {
+        if (isAdmin) return null;
+
+        return this.version === 'V1' ? alertManagerRouteV1 : alertManagerRoute;
     }
 
-    static getAdminMenu(): Menu|null {
-        return null;
-    }
-
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): FeatureMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.ALERT_MANAGER,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 6,
         };
-    }
 
-    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
-        const gnbStore = useGnbStore();
-        const myPageStore = useMyPageStore();
+        if (this.version === 'V1') {
+            baseMenu.subMenuList = [
+                { id: MENU_ID.ALERT_MANAGER_DASHBOARD, needPermissionByRole: true },
+                { id: MENU_ID.ALERTS, needPermissionByRole: true },
+                { id: MENU_ID.ESCALATION_POLICY, needPermissionByRole: true },
+            ];
+        } else {
+            baseMenu.subMenuList = [
+                { id: MENU_ID.SERVICE, needPermissionByRole: true },
+                { id: MENU_ID.ALERTS, needPermissionByRole: true },
+            ];
+        }
 
-        gnbStore.setVisibleAlertIcon(settings.uiAffects?.visibleAlertIcon);
-        myPageStore.setVisibleUserNotification(settings.uiAffects?.visibleUserNotification);
+        return {
+            menu: baseMenu,
+            adminMenu: null,
+            version: this.version,
+        };
     }
 }
 
-export default AlertManagerConfigurator;
+export default new AlertManagerConfigurator();

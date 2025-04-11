@@ -1,55 +1,55 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type { RouteConfig } from 'vue-router';
+
+import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import adminIamRoutes, { ADMIN_USER_GROUP_ROUTE } from '@/services/iam/routes/admin/routes';
-import iamRoutes, { USER_GROUP_ROUTE } from '@/services/iam/routes/routes';
+import adminIamRoutes from '@/services/iam/routes/admin/routes';
+import iamRoutes from '@/services/iam/routes/routes';
 
-class IamConfigurator {
-    static getAdminRoutes(version: string) {
-        const adminRoutes = adminIamRoutes;
-        if (version === 'V1') {
-            adminRoutes.children?.push(ADMIN_USER_GROUP_ROUTE);
-        }
-        return adminRoutes;
+class IamConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes(version: string) {
-        const routes = iamRoutes;
-        if (version === 'V1') {
-            routes.children?.push(USER_GROUP_ROUTE);
-        }
-        return routes;
+    // eslint-disable-next-line class-methods-use-this
+    getRoutes(isAdmin?: boolean): RouteConfig | null {
+        return isAdmin ? adminIamRoutes : iamRoutes;
     }
 
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
-        return {
-            id: MENU_ID.IAM,
-            subMenuList: subMenuIds,
-        };
-    }
-
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): FeatureMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.IAM,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 8,
         };
-    }
 
-    static applyUiAffects(): void|null {
-        return null;
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.USER, needPermissionByRole: true },
+                    { id: MENU_ID.USER_GROUP, needPermissionByRole: true },
+                    { id: MENU_ID.APP, needPermissionByRole: true },
+                ],
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.USER },
+                    { id: MENU_ID.USER_GROUP },
+                    { id: MENU_ID.APP },
+                    { id: MENU_ID.ROLE },
+                ],
+            },
+            version: this.version,
+        };
     }
 }
 
-export default IamConfigurator;
+export default new IamConfigurator();

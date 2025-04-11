@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import type { FeatureKeyType } from '@/lib/config/global-config/type';
+import type { FeatureKeyType } from '@/lib/config/global-config/types/type';
 import type { MenuId } from '@/lib/menu/config';
 
 export interface RoleFormData {

@@ -1,6 +1,6 @@
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import { useMenuStore } from '@/store/menu/menu-store';
+import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
 
 import type {
     PageAccessMap,
@@ -14,7 +14,7 @@ import {
     WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
 import config from '@/lib/config';
-import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 import type { Menu, MenuId } from '@/lib/menu/config';
 
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
@@ -48,9 +48,9 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
 
 export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], isRolePage?: boolean): PageAccessMap => {
     const globalConfig = config.get('SERVICES') || {};
-    const menuStore = useMenuStore();
+    const globalConfigStore = useGlobalConfigStore();
     const result: PageAccessMap = {};
-    const menuListByVersion = !isRolePage ? menuStore.state.menuList : getEnabledMenus(globalConfig);
+    const menuListByVersion = !isRolePage ? globalConfigStore.getters.menuList : getEnabledMenus(globalConfig);
     const flattenedMenuList = flattenMenu(menuListByVersion);
     const setPermissions = (id: string, read = true, write = true, access = true) => {
         result[id] = { read, write, access };
