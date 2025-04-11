@@ -5,6 +5,7 @@ export const DEFAULT_MENU_LIST: Menu[] = [
     {
         id: MENU_ID.WORKSPACE_HOME,
         needPermissionByRole: true,
+        order: 0,
     },
     {
         id: MENU_ID.INFO,

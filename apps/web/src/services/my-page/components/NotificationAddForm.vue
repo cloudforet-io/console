@@ -15,6 +15,8 @@ import type { ChannelSchedule } from '@/schema/notification/type';
 import type { UserChannelCreateParameters as UserChannelCreateParametersV1 } from '@/schema/notification/user-channel/api-verbs/create';
 import { i18n } from '@/translations';
 
+import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
@@ -23,7 +25,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationAddFormData from '@/services/my-page/components/NotificationAddFormData.vue';
 import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
 import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
-import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 import type { NotificationAddFormDataPayload, NotificationAddFormTopicPayload, NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
 
 const props = withDefaults(defineProps<{
@@ -37,10 +38,10 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const myPageStore = useMyPageStore();
+const globalConfigStore = useGlobalConfigStore();
 
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => myPageStore.state.visibleUserNotification),
+    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER.uiAffects?.visibleUserNotification ?? false),
     isDataValid: false,
     notificationLevel: 'LV1' as NotificationLevel,
     //

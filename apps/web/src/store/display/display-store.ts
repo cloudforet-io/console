@@ -29,7 +29,6 @@ import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
     DisplayStoreGetters,
 } from '@/store/display/type';
-import { useMenuStore } from '@/store/menu/menu-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
@@ -37,6 +36,8 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useGlobalConfigStore } from '../global-config/global-config-store';
 
 const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
@@ -308,12 +309,12 @@ export const useDisplayStore = defineStore('display-store', () => {
     const getAllMenuList = (route?: Route): DisplayMenu[] => {
         const isMyPage = route?.path.startsWith('/my-page');
         const appContextStore = useAppContextStore();
-        const menuStore = useMenuStore();
+        const globalConfigStore = useGlobalConfigStore();
         const appContextState = appContextStore.$state;
         const userWorkspaceStore = useUserWorkspaceStore();
         const isAdminMode = appContextState.getters.isAdminMode;
         const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
-        const menuList = menuStore.state.menuList;
+        const menuList = globalConfigStore.getters.menuList;
         let _allGnbMenuList: DisplayMenu[];
 
         _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode, currentWorkspaceId);

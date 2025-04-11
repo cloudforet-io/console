@@ -27,6 +27,7 @@ import type { UserChannelListParameters as UserChannelListParametersV1 } from '@
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
+import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -37,7 +38,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
@@ -51,7 +51,7 @@ interface EnrichedProtocolItem extends ProtocolModel {
 }
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const myPageStore = useMyPageStore();
+const globalConfigStore = useGlobalConfigStore();
 
 const props = withDefaults(defineProps<{
     projectId?: string;
@@ -62,7 +62,7 @@ const props = withDefaults(defineProps<{
 });
 const route = useRoute();
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => myPageStore.state.visibleUserNotification),
+    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER.uiAffects?.visibleUserNotification ?? false),
     loading: true,
     channelLoading: true,
     userId: computed<string|undefined>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : userStore.state.userId)),

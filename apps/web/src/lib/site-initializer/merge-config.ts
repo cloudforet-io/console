@@ -4,7 +4,7 @@ import type { PublicConfigGetParameters } from '@/api-clients/config/public-conf
 import { PUBLIC_CONFIG_NAMES } from '@/api-clients/config/public-config/schema/constant';
 import type { PublicConfigModel } from '@/api-clients/config/public-config/schema/model';
 
-import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 
 export const mergeConfig = async (config, domainId: string): Promise<GlobalServiceConfig> => {
     const baseConfig = config.get('SERVICES') || {};
