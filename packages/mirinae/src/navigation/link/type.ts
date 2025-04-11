@@ -1,3 +1,5 @@
+import type { Location } from 'vue-router';
+
 export const LinkSize = {
     sm: 'sm',
     md: 'md',
