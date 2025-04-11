@@ -32,7 +32,7 @@ export type ApiClientsSchemaType = {
 
 export interface FeatureConfiguratorType {
     getRoutes: (isAdmin?: boolean) => RouteConfig|null;
-    getMenu: (isAdmin?: boolean) => FeatureMenuConfig;
+    getMenu: (config?: GlobalServiceConfig) => FeatureMenuConfig;
     initialize: (version: FeatureVersion) => void;
     uiAffect: FeatureUiAffect[];
 }

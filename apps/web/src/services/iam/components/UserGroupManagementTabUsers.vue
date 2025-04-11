@@ -14,9 +14,13 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
+import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -36,6 +40,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const appContextStore = useAppContextStore();
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
@@ -70,6 +75,7 @@ const state = reactive({
     userItemTotalCount: computed<number>(() => userGroupPageState.users.totalCount),
     filteredUserList: [] as UserListItemType[],
     totalCount: 0,
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
 
 const tableState = reactive({
@@ -139,8 +145,11 @@ const handleChange = async (options: any = {}) => {
 
 /* API */
 const fetchWorkspaceUserList = async (params: WorkspaceUserListParameters) => {
+    const fetcher = state.isAdminMode
+        ? SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>
+        : SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>;
     try {
-        const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
+        const { results, total_count } = await fetcher(params);
         state.filteredUserList = results ?? [];
         userGroupPageState.users.list = results;
         state.totalCount = total_count ?? 0;
