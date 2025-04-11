@@ -96,7 +96,7 @@ export const useCostChartData = ({
             // Sort and fill missing months
             return sortBy(fillMissingMonths(_chartData), 'date');
         },
-        enabled: computed(() => enabled && !!currency),
+        enabled: computed(() => enabled.value && !!currency),
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 10, // 10 minutes
     }, ['WORKSPACE']);

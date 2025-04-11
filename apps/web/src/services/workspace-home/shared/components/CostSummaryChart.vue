@@ -17,10 +17,10 @@ import type { Currency } from '@/store/display/type';
 
 import { green, blue, coral } from '@/styles/colors';
 
-import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
+import type { CostChartData } from '@/services/workspace-home/shared/composables/use-cost-chart-data';
 
 interface Props {
-    data: CostXYChartData[];
+    data: CostChartData[];
     currency: Currency|undefined;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -31,7 +31,7 @@ const chartContext = ref<HTMLElement|null>(null);
 
 const state = reactive({
     chart: null as EChartsType | null,
-    chartData: computed<CostXYChartData[]>(() => {
+    chartData: computed<CostChartData[]>(() => {
         const data = props.data ?? [];
         if (!data) return [];
         return data;

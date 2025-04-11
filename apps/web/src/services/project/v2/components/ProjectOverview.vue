@@ -17,7 +17,15 @@ const props = defineProps<{
     projectId?: string;
 }>();
 const childProjectIds = useProjectIdsFromGroup(toRef(props, 'projectGroupId'));
-const projectIds = computed(() => (props.projectId ? [props.projectId] : childProjectIds.value));
+const projectIds = computed(() => {
+    if (props.projectId) {
+        return [props.projectId];
+    }
+    if (props.projectGroupId) {
+        return childProjectIds.value;
+    }
+    return [];
+});
 </script>
 
 <template>
@@ -25,17 +33,17 @@ const projectIds = computed(() => (props.projectId ? [props.projectId] : childPr
         <div class="bg-gray-100 py-1 border-gray-100 border-x overflow-hidden">
             <div class="flex space-x-1 tablet:flex-wrap">
                 <asset-summary v-if="visibleContents"
-                               style-type="compact"
+                               mode="project"
                                :project-ids="projectIds"
                                class="w-1/2 tablet:w-full bg-white rounded-lg"
                 />
-                <account-summary style-type="compact"
+                <account-summary mode="project"
                                  :project-ids="projectIds"
                                  class="w-1/2 tablet:w-full bg-white rounded-lg"
                 />
             </div>
         </div>
-        <cost-summary style-type="compact"
+        <cost-summary mode="project"
                       :project-ids="projectIds"
                       class="bg-white rounded-lg"
         />

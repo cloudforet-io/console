@@ -77,7 +77,7 @@ const state = reactive({
                         group: props.cloudServiceGroup,
                         type: props.cloudServiceType,
                     },
-                } : undefined"
+                } : {}"
                 >
                     <span class="label">{{ $t('HOME.ASSET_SUMMARY_CREATED', { count: props.createdCount }) }}</span>
                 </router-link>
@@ -103,7 +103,7 @@ const state = reactive({
                         group: props.cloudServiceGroup,
                         type: props.cloudServiceType,
                     },
-                } : undefined"
+                } : {}"
                 >
                     <span class="label">{{ $t('HOME.ASSET_SUMMARY_DELETED', { count: props.deletedCount }) }}</span>
                 </router-link>

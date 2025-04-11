@@ -26,13 +26,16 @@ import { useAssetDailyUpdates } from '@/services/workspace-home/shared/composabl
 import { useAssetSummaryProviders } from '@/services/workspace-home/shared/composables/use-asset-summary-providers';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
+import type { WidgetMode } from '@/services/workspace-home/shared/types/widget-mode-type';
 
 const METRIC_MANAGED_CREATED_COUNT = 'metric-managed-created-count';
 
 const props = withDefaults(defineProps<{
     projectIds?: string[];
+    mode?: WidgetMode;
 }>(), {
     projectIds: undefined,
+    mode: 'workspace',
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -72,8 +75,14 @@ const state = reactive({
 });
 
 const projectIds = computed(() => props.projectIds ?? []);
-const { isLoadingDailyUpdates, dailyUpdates } = useAssetDailyUpdates({ projectIds });
-const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds });
+const enabled = computed(() => {
+    if (props.mode === 'workspace') {
+        return !state.isNoCollectors && !state.isNoServiceAccounts;
+    }
+    return !state.isNoCollectors && !state.isNoServiceAccounts && projectIds.value.length > 0;
+});
+const { isLoadingDailyUpdates, dailyUpdates } = useAssetDailyUpdates({ projectIds, enabled });
+const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds, enabled });
 
 </script>
 
@@ -100,7 +109,7 @@ const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds 
                     highlight
                     :to="{
                         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                        params: { metricId: METRIC_MANAGED_CREATED_COUNT},
+                        params: { metricId: METRIC_MANAGED_CREATED_COUNT },
                     }"
                     action-icon="internal-link"
                     class="link"

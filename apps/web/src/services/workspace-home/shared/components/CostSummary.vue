@@ -37,11 +37,14 @@ import { useCostReportConfigQuery } from '@/services/workspace-home/shared/compo
 import { COST_SUMMARY_STATE_TYPE } from '@/services/workspace-home/shared/constants/cost-summary-constant';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
+import type { WidgetMode } from '@/services/workspace-home/shared/types/widget-mode-type';
 
 const props = withDefaults(defineProps<{
     projectIds?: string[];
+    mode?: WidgetMode;
 }>(), {
     projectIds: undefined,
+    mode: 'workspace',
 });
 
 
@@ -62,7 +65,10 @@ const isWorkspaceMember = computed(() => userStore.state.currentRoleInfo?.roleTy
 const pageAccessPermissionMap = computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap);
 
 /* project select dropdown */
-const showProjectSelectDropdown = isWorkspaceMember;
+const showProjectSelectDropdown = computed(() => {
+    if (props.mode === 'workspace') return isWorkspaceMember.value;
+    return false;
+});
 const selectedProjects = ref<string[]>([]);
 const projectReferenceStore = useProjectReferenceStore();
 const projects = computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems);
@@ -83,7 +89,10 @@ const accessLink = computed<boolean>(() => !isEmpty(pageAccessPermissionMap.valu
 
 /* cost report config */
 const { costReportConfig } = useCostReportConfigQuery({
-    enabled: computed(() => !isWorkspaceMember.value),
+    enabled: computed(() => {
+        if (props.mode === 'workspace') return !isWorkspaceMember.value;
+        return false;
+    }),
 });
 
 /* currency */
@@ -99,16 +108,23 @@ onUnmounted(() => {
 });
 const { chartData, isLoading } = useCostChartData({
     enabled: computed(() => {
-        if (!isWorkspaceMember.value) {
-            return !!costReportConfig.value && mounted.value;
+        if (props.mode === 'workspace') {
+            if (!isWorkspaceMember.value) {
+                return !!costReportConfig.value && mounted.value;
+            }
+            return mounted.value;
         }
-        return selectedProjects.value.length !== 0 && mounted.value;
+        // project mode
+        return !!props.projectIds && props.projectIds.length > 0 && mounted.value;
     }),
     period,
     currency,
     projectIds: computed(() => {
-        if (isWorkspaceMember.value) {
-            return selectedProjects.value;
+        if (props.mode === 'workspace') {
+            if (isWorkspaceMember.value) {
+                return selectedProjects.value;
+            }
+            return undefined;
         }
         return props.projectIds;
     }),
@@ -164,7 +180,7 @@ const currentDateRangeText = computed<string>(() => {
                            class="main-title"
             />
             <project-select-dropdown
-                v-if="isWorkspaceMember && !isEmpty(projects)"
+                v-if="showProjectSelectDropdown && !isEmpty(projects)"
                 class="project-select-dropdown"
                 :selected-project-ids="selectedProjects"
                 :use-fixed-menu-style="false"

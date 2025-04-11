@@ -23,7 +23,6 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
@@ -35,11 +34,14 @@ import { serviceAccountStateSummaryFormatter } from '@/services/workspace-home/c
 import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
+import type { WidgetMode } from '@/services/workspace-home/shared/types/widget-mode-type';
 
 const props = withDefaults(defineProps<{
     projectIds?: string[];
+    mode?: WidgetMode;
 }>(), {
     projectIds: undefined,
+    mode: 'workspace',
 });
 
 
@@ -54,7 +56,6 @@ const providerChartContext = ref<HTMLElement|null>(null);
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
-    serviceAccount: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
     pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
@@ -71,8 +72,15 @@ const { key: serviceAccountQueryKey, params } = useServiceQueryKey('identity', '
         },
     })),
 });
+
+const enabled = computed(() => {
+    if (props.mode === 'workspace') return true;
+    return props.projectIds && props.projectIds.length > 0;
+});
+
 const { data: serviceAccountData, isLoading: isLoadingServiceAccount } = useScopedQuery({
     queryKey: serviceAccountQueryKey,
+    enabled,
     queryFn: () => serviceAccountAPI.list(params.value),
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
@@ -81,11 +89,11 @@ const { data: serviceAccountData, isLoading: isLoadingServiceAccount } = useScop
 const state = reactive({
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
     writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
-    emptyData: computed<EmptyData>(() => {
-        let result;
-        if (isEmpty(storeState.serviceAccount)) {
+    emptyData: computed<EmptyData|undefined>(() => {
+        let result: EmptyData|undefined;
+        if (isEmpty(serviceAccountData.value?.results)) {
             result = {
-                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : {},
+                to: state.writableServiceAccount ? { name: SERVICE_ACCOUNT_ROUTE._NAME } : undefined,
                 title: i18n.t('HOME.NO_ACCOUNT'),
                 desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
                 buttonText: state.writableServiceAccount ? i18n.t('HOME.NO_ACCOUNT_ADD_NEW') : undefined,
@@ -205,7 +213,7 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
             <p-spinner size="lg" />
         </div>
         <div v-else>
-            <div v-if="!isEmpty(storeState.serviceAccount)"
+            <div v-if="!state.emptyData"
                  class="content-container"
             >
                 <div class="content-wrapper">
