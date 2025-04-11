@@ -1,12 +1,10 @@
-// composables/useDashboardRouteContext.ts
 import { computed } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { MENU_ID } from '@/lib/menu/config';
+import { useDashboardEntryPoint } from '@/services/dashboard-shared/core/composables/_internal/dashboard-shared-entry-context';
 
-type EntryPoint = 'ADMIN' | 'WORKSPACE' | 'PROJECT' | 'UNKNOWN';
 type ProjectContextType = 'PROJECT' | 'PROJECT_GROUP' | undefined;
 
 /**
@@ -17,22 +15,14 @@ type ProjectContextType = 'PROJECT' | 'PROJECT_GROUP' | undefined;
  *   (Business logic guarantees this, though they are optional in the type system.)
  * - Use `entryPoint === 'PROJECT'` check before using project-specific fields.
  */
-export const useDashboardRouteContext = () => {
+export const useDashboardSharedContext = () => {
     const route = useRoute();
     const appContextStore = useAppContextStore();
 
     const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
+    const entryPoint = useDashboardEntryPoint();
 
-    const entryPoint = computed<EntryPoint>(() => {
-        // Global admin mode overrides route-level checks
-        if (isAdminMode.value) return 'ADMIN';
-
-        // Project dashboard route (nested under project-level menu)
-        if (route.matched.some((m) => m.meta.menuId === MENU_ID.PROJECT)) return 'PROJECT';
-        if (route.matched.some((m) => m.meta.menuId === MENU_ID.DASHBOARDS)) return 'WORKSPACE';
-        return 'UNKNOWN';
-    });
-
+    /* Project Context */
     const projectGroupOrProjectId = computed(() => {
         if (entryPoint.value !== 'PROJECT') return undefined;
         const id = route.params.projectGroupOrProjectId;
