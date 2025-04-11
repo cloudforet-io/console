@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-update-mutation';
+import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-update-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 

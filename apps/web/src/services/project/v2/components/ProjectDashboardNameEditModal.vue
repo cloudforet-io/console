@@ -10,7 +10,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-update-mutation';
+import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-update-mutation';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';

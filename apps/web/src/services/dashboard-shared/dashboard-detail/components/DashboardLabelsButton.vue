@@ -7,7 +7,7 @@ import { PButton, PBadge, PPopover } from '@cloudforet/mirinae';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-update-mutation';
+import { useDashboardUpdateMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-update-mutation';
 import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
 import DashboardLabels from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabels.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';

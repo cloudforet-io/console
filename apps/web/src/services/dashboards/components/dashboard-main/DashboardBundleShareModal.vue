@@ -22,8 +22,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardFolderShareMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-folder-share-mutation';
-import { useDashboardShareMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-share-mutation';
+import { useDashboardFolderShareMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-folder-share-mutation';
+import { useDashboardShareMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-share-mutation';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';

@@ -23,7 +23,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardCloneMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-clone-mutation';
+import { useDashboardCloneMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-clone-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';

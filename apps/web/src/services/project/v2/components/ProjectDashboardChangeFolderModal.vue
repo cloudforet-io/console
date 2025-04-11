@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import { useDashboardChangeFolderMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-change-folder-mutation';
+import { useDashboardChangeFolderMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-change-folder-mutation';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';

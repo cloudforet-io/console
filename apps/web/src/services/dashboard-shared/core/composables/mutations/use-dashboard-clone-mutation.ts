@@ -12,10 +12,8 @@ import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/compos
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
+import { useDashboardCreateMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashbaord-create-mutation';
 import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
-
-import { useDashboardCreateMutation } from './use-dashbaord-create-mutation';
-
 
 interface UseDashboardCloneMutationOptions {
     isPrivate?: ComputedRef<boolean>;

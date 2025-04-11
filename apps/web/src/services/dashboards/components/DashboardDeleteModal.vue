@@ -17,7 +17,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { useDashboardDeleteMutation } from '@/services/dashboard-shared/core/actions/use-dashboard-delete-mutation';
+import { useDashboardDeleteMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-delete-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
