@@ -14,7 +14,8 @@ import type {
 
 import ChangedMark from '@/common/components/marks/ChangedMark.vue';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-manageable';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import DashboardGlobalVariableFilter
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardGlobalVariableFilter.vue';
 import DashboardManageVariableImportModal
@@ -28,7 +29,6 @@ import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboard-shared/dashboar
 import { getOrderedGlobalVariables } from '@/services/dashboard-shared/dashboard-detail/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
-
 
 interface Props {
     loading?: boolean;
@@ -56,7 +56,9 @@ const { dashboard } = useDashboardGetQuery({
 
 const {
     entryPoint,
-} = useDashboardRouteContext();
+} = useDashboardSharedContext();
+
+const { getDashboardManageable } = useDashboardManageable();
 
 const state = reactive({
     showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
@@ -84,7 +86,6 @@ const state = reactive({
     }),
     showSaveButton: computed<boolean>(() => !props.disableSaveButton && state.modifiedVariablesSchemaProperties.length > 0),
     notChanged: computed(() => state.modifiedVariablesSchemaProperties.length === 0),
-    isSharedDashboard: computed<boolean>(() => !!dashboard.value?.shared && entryPoint.value !== 'ADMIN'),
 });
 
 const handleClickSaveButton = () => {
@@ -139,7 +140,7 @@ watch([() => state.tempVars, dashboard], ([_tempVars]) => {
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
-        <dashboard-variables-more-button v-if="!state.isSharedDashboard"
+        <dashboard-variables-more-button v-if="getDashboardManageable(dashboard)"
                                          :widget-mode="props.widgetMode"
                                          :dashboard-id="dashboardId"
         />

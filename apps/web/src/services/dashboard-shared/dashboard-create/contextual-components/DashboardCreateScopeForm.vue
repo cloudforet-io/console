@@ -18,7 +18,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 
 
@@ -41,8 +41,9 @@ const storeState = reactive({
 });
 
 const {
+    isAdminMode,
     entryPoint,
-} = useDashboardRouteContext();
+} = useDashboardSharedContext();
 
 const state = reactive({
     dashboardScopeBoardSets: computed(() => {
@@ -84,7 +85,7 @@ onMounted(() => {
             <p-field-title class="field-title">
                 {{ $t('DASHBOARDS.CREATE.DASHBOARD_SCOPE') }}
             </p-field-title>
-            <div v-if="entryPoint !== 'ADMIN' && entryPoint !== 'PROJECT'"
+            <div v-if="!isAdminMode && entryPoint !== 'PROJECT'"
                  class="grid gap-2"
             >
                 <p-board-item v-for="dashboardScopeItem in state.dashboardScopeBoardSets"

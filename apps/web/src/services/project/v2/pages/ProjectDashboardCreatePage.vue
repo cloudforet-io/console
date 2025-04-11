@@ -7,7 +7,8 @@ import type { DashboardModel, DashboardFolderModel } from '@/api-clients/dashboa
 
 
 
-import DashboardCreateBody from '@/services/dashboard-shared/dashboard-create/DashboardCreateBody.vue';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/dashboard-shared/core/constants/dashboard-shared-constant';
+import DashboardCreateLayout from '@/services/dashboard-shared/dashboard-create/DashboardCreateLayout.vue';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
@@ -40,9 +41,10 @@ const dashboardFolderItems = computed<Array<DashboardFolderModel>>(() => [...das
 </script>
 
 <template>
-    <dashboard-create-body class="project-dashboard-create-page"
-                           :dashboard-items="dashboardItems"
-                           :folder-items="dashboardFolderItems"
+    <dashboard-create-layout class="project-dashboard-create-page"
+                             :entry-point="DASHBOARD_SHARED_ENTRY_POINT.PROJECT"
+                             :dashboard-items="dashboardItems"
+                             :folder-items="dashboardFolderItems"
     />
 </template>
 

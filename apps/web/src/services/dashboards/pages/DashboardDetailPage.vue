@@ -13,7 +13,8 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import DashboardDetailBody from '@/services/dashboard-shared/dashboard-detail/DashboardDetailBody.vue';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/dashboard-shared/core/constants/dashboard-shared-constant';
+import DashboardDetailLayout from '@/services/dashboard-shared/dashboard-detail/DashboardDetailLayout.vue';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -88,10 +89,11 @@ const handleSelectToolset = (toolsetId: string|undefined) => {
                 </p>
             </div>
         </div>
-        <dashboard-detail-body :dashboard-id="props.dashboardId"
-                               :dashboard-items="dashboardItems"
-                               :folder-items="folderItems"
-                               @select-toolset="handleSelectToolset"
+        <dashboard-detail-layout :dashboard-id="props.dashboardId"
+                                 :dashboard-items="dashboardItems"
+                                 :folder-items="folderItems"
+                                 :entry-point="DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS"
+                                 @select-toolset="handleSelectToolset"
         />
     </div>
 </template>

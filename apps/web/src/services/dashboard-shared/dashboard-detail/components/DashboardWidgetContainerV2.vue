@@ -45,15 +45,15 @@ import type {
     WidgetExpose, WidgetProps, WidgetSize, WidgetOverlayType,
 } from '@/common/modules/widgets/types/widget-display-type';
 
-import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-manageable';
 import DashboardReorderSidebar
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardReorderSidebar.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-container-width';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardRefinedVars } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-refined-vars';
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
+import { useDashboardRefinedVars } from '@/services/dashboard-shared/dashboard-detail/contextual-composables/use-dashboard-refined-vars';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {

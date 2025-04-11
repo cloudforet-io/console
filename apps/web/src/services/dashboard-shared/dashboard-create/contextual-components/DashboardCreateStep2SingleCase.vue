@@ -32,8 +32,8 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
-import DashboardCreateScopeForm from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateScopeForm.vue';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
+import DashboardCreateScopeForm from '@/services/dashboard-shared/dashboard-create/contextual-components/DashboardCreateScopeForm.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
@@ -57,8 +57,8 @@ const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const userStore = useUserStore();
 const {
-    entryPoint, projectGroupOrProjectId, projectContextType,
-} = useDashboardRouteContext();
+    isAdminMode, entryPoint, projectGroupOrProjectId, projectContextType,
+} = useDashboardSharedContext();
 
 const getDashboardNameList = (dashboardType: DashboardType) => {
     if (dashboardType === 'PRIVATE') {
@@ -162,23 +162,29 @@ const { mutate: createDashboard } = useMutation(
         },
         onSettled(data) {
             if (data?.dashboard_id) {
-                if (entryPoint.value === 'ADMIN') {
-                    router.push({
-                        name: ADMIN_DASHBOARDS_ROUTE._NAME,
-                        params: { dashboardId: data.dashboard_id },
-                    }).catch(() => {});
-                } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+                if (entryPoint.value === 'DASHBOARDS') {
+                    if (isAdminMode.value) {
+                        router.push({
+                            name: ADMIN_DASHBOARDS_ROUTE._NAME,
+                            params: { dashboardId: data.dashboard_id },
+                        }).catch(() => {});
+                    } else {
+                        router.push({
+                            name: DASHBOARDS_ROUTE._NAME,
+                            params: { dashboardId: data.dashboard_id },
+                        }).catch(() => {});
+                    }
+                } else if (entryPoint.value === 'PROJECT') {
+                    if (!projectGroupOrProjectId.value) {
+                        console.error('projectGroupOrProjectId is not provided');
+                        return;
+                    }
                     router.push({
                         name: PROJECT_ROUTE_V2._NAME,
                         params: {
                             projectGroupOrProjectId: projectGroupOrProjectId.value,
                             dashboardId: data.dashboard_id,
                         },
-                    }).catch(() => {});
-                } else if (entryPoint.value === 'WORKSPACE') {
-                    router.push({
-                        name: DASHBOARDS_ROUTE._NAME,
-                        params: { dashboardId: data.dashboard_id },
                     }).catch(() => {});
                 } else {
                     console.error('Invalid entry point');
@@ -199,16 +205,18 @@ const handleConfirm = async () => {
         vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
     };
 
-    if (entryPoint.value === 'ADMIN') {
-        (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+    if (entryPoint.value === 'DASHBOARDS') {
+        if (isAdminMode.value) {
+            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
+            (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
+        }
     } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT') {
         (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
         (_dashboardParams as PublicDashboardCreateParameters).project_id = projectGroupOrProjectId.value;
     } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT_GROUP') {
         (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
         (_dashboardParams as PublicDashboardCreateParameters).project_group_id = projectGroupOrProjectId.value;
-    } else if (dashboardCreatePageState.dashboardScope !== 'PRIVATE') {
-        (_dashboardParams as PublicDashboardCreateParameters).resource_group = dashboardCreatePageState.dashboardScope || RESOURCE_GROUP.WORKSPACE;
     }
 
     createDashboard(_dashboardParams as DashboardCreateParams);

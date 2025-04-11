@@ -42,7 +42,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
+import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-layout-template-helper';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';

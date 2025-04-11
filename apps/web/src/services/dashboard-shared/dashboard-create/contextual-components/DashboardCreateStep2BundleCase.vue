@@ -28,7 +28,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 import {
     DASHBOARD_VARS_SCHEMA_PRESET,
@@ -55,7 +55,9 @@ const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
 const router = useRouter();
-const { entryPoint, projectContextType, projectGroupOrProjectId } = useDashboardRouteContext();
+const {
+    isAdminMode, entryPoint, projectContextType, projectGroupOrProjectId,
+} = useDashboardSharedContext();
 
 const storeState = reactive({
     isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
@@ -70,9 +72,9 @@ const state = reactive({
     }),
     privateMap: {} as Record<string, boolean>,
     tableFields: computed(() => {
-        if (entryPoint.value === 'ADMIN'
+        if (isAdminMode.value
             || entryPoint.value === 'PROJECT'
-            || (entryPoint.value === 'WORKSPACE' && storeState.isWorkspaceMember)) return TABLE_FIELDS.filter((f) => f.name !== 'private');
+            || (entryPoint.value === 'DASHBOARDS' && storeState.isWorkspaceMember)) return TABLE_FIELDS.filter((f) => f.name !== 'private');
         if (state.bundleCaseType === 'TEMPLATE') return TABLE_FIELDS.filter((f) => f.name !== 'location');
         return TABLE_FIELDS;
     }),
@@ -119,16 +121,18 @@ const createBundleOotb = async () => {
             tags: { created_by: userStore.state.userId },
             vars_schema: DASHBOARD_VARS_SCHEMA_PRESET,
         };
-        if (entryPoint.value === 'ADMIN') {
-            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        if (entryPoint.value === 'DASHBOARDS') {
+            if (isAdminMode.value) {
+                (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+            } else if (!storeState.isWorkspaceMember && !_isPrivate) {
+                (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+            }
         } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT') {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
             (_dashboardParams as PublicDashboardCreateParameters).project_id = projectGroupOrProjectId.value;
         } else if (entryPoint.value === 'PROJECT' && projectContextType.value === 'PROJECT_GROUP') {
             (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
             (_dashboardParams as PublicDashboardCreateParameters).project_group_id = projectGroupOrProjectId.value;
-        } else if (!storeState.isWorkspaceMember && !_isPrivate) {
-            (_dashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
         }
         let _createType: DashboardType = _isPrivate ? 'PRIVATE' : 'PUBLIC';
         if (storeState.isWorkspaceMember) {
@@ -163,18 +167,22 @@ const handleConfirm = async () => {
     await queryClient.invalidateQueries({ queryKey: publicDashboardListQueryKey.value });
     await queryClient.invalidateQueries({ queryKey: privateDashboardListQueryKey.value });
 
-    if (entryPoint.value === 'ADMIN') {
-        router.push({ name: ADMIN_DASHBOARDS_ROUTE._NAME }).catch(() => {});
-    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+    if (entryPoint.value === 'DASHBOARDS') {
+        if (isAdminMode.value) {
+            router.push({ name: ADMIN_DASHBOARDS_ROUTE._NAME }).catch(() => {});
+        } else {
+            router.push({ name: DASHBOARDS_ROUTE._NAME }).catch(() => {});
+        }
+    } else if (entryPoint.value === 'PROJECT') {
+        if (!projectGroupOrProjectId.value) {
+            console.error('projectGroupOrProjectId is not provided');
+            return;
+        }
         router.push({
             name: PROJECT_ROUTE_V2._NAME,
             params: {
                 projectGroupOrProjectId: projectGroupOrProjectId.value,
             },
-        }).catch(() => {});
-    } else if (entryPoint.value === 'WORKSPACE') {
-        router.push({
-            name: DASHBOARDS_ROUTE._NAME,
         }).catch(() => {});
     } else {
         console.error('Invalid entry point');

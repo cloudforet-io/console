@@ -7,7 +7,7 @@ import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-typ
 
 import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
 
@@ -19,7 +19,7 @@ export const useDashboardRefinedVars = (dashboardId: ComputedRef<string|undefine
     const { dashboard } = useDashboardGetQuery({
         dashboardId,
     });
-    const { projectContextType, projectGroupOrProjectId, isAdminMode } = useDashboardRouteContext();
+    const { projectContextType, projectGroupOrProjectId, isAdminMode } = useDashboardSharedContext();
 
     const refinedVars = computed<DashboardVars>(() => {
         let _vars: DashboardVars = cloneDeep(dashboard.value?.vars ?? {});

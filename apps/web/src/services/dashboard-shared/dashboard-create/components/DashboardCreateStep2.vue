@@ -8,9 +8,9 @@ import { PButton } from '@cloudforet/mirinae';
 import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import DashboardCreateStep2BundleCase
-    from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep2BundleCase.vue';
+    from '@/services/dashboard-shared/dashboard-create/contextual-components/DashboardCreateStep2BundleCase.vue';
 import DashboardCreateStep2SingleCase
-    from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep2SingleCase.vue';
+    from '@/services/dashboard-shared/dashboard-create/contextual-components/DashboardCreateStep2SingleCase.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 
 interface Props {

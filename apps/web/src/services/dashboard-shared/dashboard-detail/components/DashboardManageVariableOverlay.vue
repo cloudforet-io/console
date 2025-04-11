@@ -26,7 +26,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardVariablesFormModal
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesFormModal.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
@@ -35,12 +34,6 @@ import {
 } from '@/services/dashboard-shared/dashboard-detail/constants/dashboard-vars-schema-preset';
 import { getOrderedGlobalVariables } from '@/services/dashboard-shared/dashboard-detail/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-
-
-
 
 
 interface GlobalVariableTableItem {
@@ -60,10 +53,6 @@ const userStore = useUserStore();
 const dashboardDetailInfoStore = useDashboardDetailInfoStore();
 const router = useRouter();
 const dashboardId = computed(() => props.dashboardId);
-const {
-    entryPoint,
-    projectGroupOrProjectId,
-} = useDashboardRouteContext();
 
 /* Query */
 const {
@@ -243,31 +232,15 @@ const handleToggleUse = (variableKey: string, val: boolean) => {
     updateUseDashboardVarsSchema(dashboardId.value, variableKey, val);
 };
 const handleCloseOverlay = () => {
-    if (entryPoint.value === 'ADMIN') {
-        router.replace({
-            name: ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: dashboardId.value,
-            },
-        }).catch(() => {});
-    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
-        router.replace({
-            name: PROJECT_ROUTE_V2._NAME,
-            params: {
-                projectGroupOrProjectId: projectGroupOrProjectId.value,
-                dashboardId: dashboardId.value,
-            },
-        }).catch(() => {});
-    } else if (entryPoint.value === 'WORKSPACE') {
-        router.replace({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: dashboardId.value,
-            },
-        }).catch(() => {});
-    } else {
-        console.error('Invalid entry point');
+    const _currentRoute = router.currentRoute;
+    if (!_currentRoute.name) {
+        console.error('currentRoute is not provided');
+        return;
     }
+    router.replace({
+        name: _currentRoute.name,
+        params: _currentRoute.params,
+    }).catch(() => {});
 };
 const handleConfirmDelete = () => {
     if (!dashboardId.value || !state.selectedVariableKey) return;

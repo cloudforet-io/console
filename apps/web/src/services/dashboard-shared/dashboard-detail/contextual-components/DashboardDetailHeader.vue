@@ -14,9 +14,9 @@ import { i18n } from '@/translations';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-manageable';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import { useDashboardControlMenuHelper } from '@/services/dashboard-shared/core/composables/use-dashboard-control-menu-helper';
-import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import DashboardControlButtons from '@/services/dashboard-shared/dashboard-detail/components/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
     folderItems: () => [],
 });
 const emit = defineEmits<{(e: 'select-toolset', toolsetId: string|undefined): void;}>();
-const { entryPoint } = useDashboardRouteContext();
+const { isAdminMode, entryPoint } = useDashboardSharedContext();
 
 const { dashboard } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
@@ -58,13 +58,13 @@ const state = reactive({
     badgeText: computed(() => {
         if (props.dashboardId?.startsWith('private')) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
         if (state.isSharedDashboard) {
-            if (entryPoint.value === 'ADMIN') {
-                if (dashboard.value?.scope === 'PROJECT') {
-                    return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            if (entryPoint.value === 'DASHBOARDS') {
+                if (isAdminMode.value) {
+                    if (dashboard.value?.scope === 'PROJECT') {
+                        return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+                    }
+                    return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
                 }
-                return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
-            }
-            if (entryPoint.value === 'WORKSPACE') {
                 return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
             }
             if (entryPoint.value === 'PROJECT') {

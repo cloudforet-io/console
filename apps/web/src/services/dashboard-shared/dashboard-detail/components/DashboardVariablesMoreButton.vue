@@ -25,13 +25,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboard-shared/dashboard-detail/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/dashboard-shared/dashboard-detail/helpers/dashboard-global-variables-helper';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface VariableMenuItem extends MenuItem {
     use?: boolean;
@@ -46,10 +42,6 @@ interface Props {
 const props = defineProps<Props>();
 const router = useRouter();
 const dashboardId = computed(() => props.dashboardId);
-const {
-    entryPoint,
-    projectGroupOrProjectId,
-} = useDashboardRouteContext();
 
 /* Query */
 const {
@@ -152,35 +144,16 @@ const { mutate, isPending: loading } = useMutation(
 /* Event */
 const handleOpenOverlay = () => {
     hideContextMenu();
-
-    if (entryPoint.value === 'ADMIN') {
-        router.push({
-            name: ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: dashboardId.value,
-            },
-            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-        }).catch(() => {});
-    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
-        router.push({
-            name: PROJECT_ROUTE_V2._NAME,
-            params: {
-                projectGroupOrProjectId: projectGroupOrProjectId.value,
-                dashboardId: dashboardId.value,
-            },
-            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-        }).catch(() => {});
-    } else if (entryPoint.value === 'WORKSPACE') {
-        router.push({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: {
-                dashboardId: dashboardId.value,
-            },
-            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-        }).catch(() => {});
-    } else {
-        console.error('Invalid entry point');
+    const _currentRoute = router.currentRoute;
+    if (!_currentRoute.name) {
+        console.error('currentRoute is not provided');
+        return;
     }
+    router.push({
+        name: _currentRoute.name,
+        params: _currentRoute.params,
+        hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+    }).catch(() => {});
 };
 const handleClickButton = () => {
     if (visibleMenu.value) hideContextMenu();

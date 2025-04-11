@@ -23,6 +23,7 @@ import {
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
 import {
     PCenteredLayoutHeader,
@@ -35,14 +36,13 @@ import { i18n } from '@/translations';
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useGoBack } from '@/common/composables/go-back';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
-import DashboardCreateStep1 from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep1.vue';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import DashboardCreateStep2 from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep2.vue';
+import DashboardCreateStep1 from '@/services/dashboard-shared/dashboard-create/contextual-components/DashboardCreateStep1.vue';
 import { useDashboardCreatePageStore } from '@/services/dashboard-shared/dashboard-create/stores/dashboard-create-page-store';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-
 
 interface Step {
     step: number;
@@ -56,7 +56,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { entryPoint, projectGroupOrProjectId } = useDashboardRouteContext();
+const { isAdminMode, entryPoint, projectGroupOrProjectId } = useDashboardSharedContext();
 
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
@@ -67,33 +67,36 @@ const state = reactive({
     steps: computed<Step[]>(() => [
         {
             step: 1,
-            description: entryPoint.value === 'ADMIN' ? '' : i18n.t('DASHBOARDS.CREATE.STEP1_DESC'),
+            description: isAdminMode.value ? '' : i18n.t('DASHBOARDS.CREATE.STEP1_DESC'),
         },
         {
             step: 2,
-            description: entryPoint.value === 'ADMIN' ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
+            description: isAdminMode.value ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
         },
     ]),
     closeConfirmModalVisible: false,
 });
 
-const goBackRoute = computed(() => {
-    if (entryPoint.value === 'ADMIN') {
-        return {
-            name: ADMIN_DASHBOARDS_ROUTE._NAME,
-        };
-    }
-    if (entryPoint.value === 'WORKSPACE') {
+const goBackRoute = computed<Location|undefined>(() => {
+    if (entryPoint.value === 'DASHBOARDS') {
+        if (isAdminMode.value) {
+            return {
+                name: ADMIN_DASHBOARDS_ROUTE._NAME,
+            };
+        }
         return {
             name: DASHBOARDS_ROUTE._NAME,
         };
     }
-    return {
-        name: PROJECT_ROUTE_V2._NAME,
-        params: {
-            projectGroupOrProjectId: projectGroupOrProjectId.value as string,
-        },
-    };
+    if (entryPoint.value === 'PROJECT') {
+        return {
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: projectGroupOrProjectId.value as string,
+            },
+        };
+    }
+    return undefined;
 });
 
 /* Event */

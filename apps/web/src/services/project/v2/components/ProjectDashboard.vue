@@ -8,7 +8,8 @@ import type { DashboardModel, DashboardFolderModel } from '@/api-clients/dashboa
 
 
 
-import DashboardDetailBody from '@/services/dashboard-shared/dashboard-detail/DashboardDetailBody.vue';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/dashboard-shared/core/constants/dashboard-shared-constant';
+import DashboardDetailLayout from '@/services/dashboard-shared/dashboard-detail/DashboardDetailLayout.vue';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
@@ -51,10 +52,11 @@ const handleSelectToolset = (toolsetId: string|undefined) => {
 
 <template>
     <div class="project-dashboard">
-        <dashboard-detail-body :dashboard-id="props.dashboardId"
-                               :dashboard-items="dashboardItems"
-                               :folder-items="dashboardFolderItems"
-                               @select-toolset="handleSelectToolset"
+        <dashboard-detail-layout :dashboard-id="props.dashboardId"
+                                 :dashboard-items="dashboardItems"
+                                 :folder-items="dashboardFolderItems"
+                                 :entry-point="DASHBOARD_SHARED_ENTRY_POINT.PROJECT"
+                                 @select-toolset="handleSelectToolset"
         />
     </div>
 </template>

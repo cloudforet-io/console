@@ -7,8 +7,8 @@ import type { DashboardModel, DashboardFolderModel } from '@/api-clients/dashboa
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-
-import DashboardCreateBody from '@/services/dashboard-shared/dashboard-create/DashboardCreateBody.vue';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/dashboard-shared/core/constants/dashboard-shared-constant';
+import DashboardCreateLayout from '@/services/dashboard-shared/dashboard-create/DashboardCreateLayout.vue';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
@@ -47,8 +47,9 @@ const dashboardState = reactive({
 </script>
 
 <template>
-    <dashboard-create-body class="dashboard-create-page"
-                           :dashboard-items="dashboardState.allDashboardItems"
-                           :folder-items="dashboardState.allDashboardFolderItems"
+    <dashboard-create-layout class="dashboard-create-page"
+                             :entry-point="DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS"
+                             :dashboard-items="dashboardState.allDashboardItems"
+                             :folder-items="dashboardState.allDashboardFolderItems"
     />
 </template>

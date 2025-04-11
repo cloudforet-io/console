@@ -17,21 +17,21 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
-import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
-import DashboardDetailHeader from '@/services/dashboard-shared/dashboard-detail/components/DashboardDetailHeader.vue';
+import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-manageable';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import DashboardRefreshDropdown
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
 import DashboardToolsetScope
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetScope.vue';
-import DashboardVariablesV2
-    from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesV2.vue';
 import DashboardWidgetContainerV2
     from '@/services/dashboard-shared/dashboard-detail/components/DashboardWidgetContainerV2.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
+import DashboardDetailHeader from '@/services/dashboard-shared/dashboard-detail/contextual-components/DashboardDetailHeader.vue';
+import DashboardVariablesV2
+    from '@/services/dashboard-shared/dashboard-detail/contextual-components/DashboardVariablesV2.vue';
 import DashboardVariables from '@/services/dashboard-shared/dashboard-detail/legacy/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboard-shared/dashboard-detail/legacy/DashboardWidgetContainer.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
@@ -49,6 +49,8 @@ const props = withDefaults(defineProps<Props>(), {
     dashboardItems: () => [],
     folderItems: () => [],
 });
+
+
 const emit = defineEmits<{(e: 'select-toolset', toolsetId: string|undefined): void;
 }>();
 const dashboardId = computed(() => props.dashboardId);
@@ -60,8 +62,8 @@ const widgetContainerRef = ref<typeof DashboardWidgetContainer|typeof DashboardW
 
 const { getDashboardManageable } = useDashboardManageable();
 const {
-    entryPoint, projectGroupOrProjectId, projectContextType,
-} = useDashboardRouteContext();
+    isAdminMode, entryPoint, projectGroupOrProjectId, projectContextType,
+} = useDashboardSharedContext();
 
 /* Query */
 const queryClient = useQueryClient();
@@ -159,21 +161,27 @@ watch(widgetList, (_widgetList) => {
 watch([dashboardError, widgetError], ([_dashboardError, _widgetError]) => {
     if (_dashboardError || _widgetError) {
         ErrorHandler.handleError(_dashboardError || _widgetError);
-        if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+        if (entryPoint.value === 'PROJECT') {
+            if (!projectGroupOrProjectId.value) {
+                console.error('projectGroupOrProjectId is not provided');
+                return;
+            }
             router.push({
                 name: PROJECT_ROUTE_V2._NAME,
                 params: {
                     projectGroupOrProjectId: projectGroupOrProjectId.value,
                 },
             });
-        } else if (entryPoint.value === 'WORKSPACE') {
-            router.push({
-                name: DASHBOARDS_ROUTE._NAME,
-            });
-        } else if (entryPoint.value === 'ADMIN') {
-            router.push({
-                name: ADMIN_DASHBOARDS_ROUTE._NAME,
-            });
+        } else if (entryPoint.value === 'DASHBOARDS') {
+            if (isAdminMode.value) {
+                router.push({
+                    name: ADMIN_DASHBOARDS_ROUTE._NAME,
+                });
+            } else {
+                router.push({
+                    name: DASHBOARDS_ROUTE._NAME,
+                });
+            }
         } else {
             console.error('Invalid entry point');
         }
@@ -205,7 +213,7 @@ onUnmounted(() => {
                 <div class="filter-box">
                     <div class="left-part">
                         <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
-                        <dashboard-toolset-scope v-if="entryPoint === 'ADMIN'" />
+                        <dashboard-toolset-scope v-if="entryPoint === 'DASHBOARDS' && isAdminMode" />
                     </div>
                     <div class="right-part">
                         <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"

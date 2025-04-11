@@ -7,9 +7,11 @@ import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashbo
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
+
 
 interface UseDashboardManageableReturn {
     getDashboardManageable: (_dashboard?: DashboardModel) => boolean;
@@ -18,15 +20,17 @@ interface UseDashboardManageableReturn {
 
 export const useDashboardManageable = (): UseDashboardManageableReturn => {
     const userStore = useUserStore();
-    const { entryPoint } = useDashboardRouteContext();
+    const appContextStore = useAppContextStore();
+    const { entryPoint } = useDashboardSharedContext();
+    const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
     const storeState = reactive({
         isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
 
     const _isManageable = (isPrivate: boolean, isShared: boolean, resourceGroup: string | undefined): boolean => {
-        if (entryPoint.value === 'ADMIN') return true;
-        if (entryPoint.value === 'WORKSPACE') {
+        if (isAdminMode.value) return true;
+        if (entryPoint.value === 'DASHBOARDS') {
             if (isPrivate) return true;
             if (isShared && resourceGroup === RESOURCE_GROUP.DOMAIN) return false;
             if (storeState.isWorkspaceOwner) return true;

@@ -15,7 +15,7 @@ import type { DashboardTemplateModel } from '@/schema/repository/dashboard-templ
 import { i18n } from '@/translations';
 
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
+import { useDashboardSharedContext } from '@/services/dashboard-shared/core/composables/_internal/use-dashboard-shared-context';
 import DashboardCreateBlankBoardItem from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateBlankBoardItem.vue';
 import type { FilterLabelItem } from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboard-shared/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
@@ -38,7 +38,7 @@ const router = useRouter();
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
-const { entryPoint, projectGroupOrProjectId } = useDashboardRouteContext();
+const { isAdminMode, entryPoint, projectGroupOrProjectId } = useDashboardSharedContext();
 
 const state = reactive({
     templates: [] as DashboardTemplateModel[],
@@ -103,18 +103,22 @@ const handleSelectProvider = (providers: FilterLabelItem[]) => {
     filterState.selectedProviders = providers.map((d) => d.label.toLowerCase());
 };
 const handleClickCancel = () => {
-    if (entryPoint.value === 'ADMIN') {
-        router.push({ name: ADMIN_DASHBOARDS_ROUTE._NAME }).catch(() => {});
-    } else if (entryPoint.value === 'PROJECT' && projectGroupOrProjectId.value) {
+    if (entryPoint.value === 'DASHBOARDS') {
+        if (isAdminMode.value) {
+            router.push({ name: ADMIN_DASHBOARDS_ROUTE._NAME }).catch(() => {});
+        } else {
+            router.push({ name: DASHBOARDS_ROUTE._NAME }).catch(() => {});
+        }
+    } else if (entryPoint.value === 'PROJECT') {
+        if (!projectGroupOrProjectId.value) {
+            console.error('projectGroupOrProjectId is not provided');
+            return;
+        }
         router.push({
             name: PROJECT_ROUTE_V2._NAME,
             params: {
                 projectGroupOrProjectId: projectGroupOrProjectId.value,
             },
-        }).catch(() => {});
-    } else if (entryPoint.value === 'WORKSPACE') {
-        router.push({
-            name: DASHBOARDS_ROUTE._NAME,
         }).catch(() => {});
     } else {
         console.error('Invalid entry point');

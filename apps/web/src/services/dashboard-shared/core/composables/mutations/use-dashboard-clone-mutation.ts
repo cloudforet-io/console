@@ -13,7 +13,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useDashboardCreateMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashbaord-create-mutation';
-import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-share-helper';
+import { getSharedDashboardLayouts } from '@/services/dashboard-shared/core/helpers/dashboard-layout-template-helper';
 
 interface UseDashboardCloneMutationOptions {
     isPrivate?: ComputedRef<boolean>;

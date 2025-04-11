@@ -11,6 +11,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -27,7 +28,6 @@ import {
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
 import {
     DASHBOARD_GLOBAL_VARIABLES_PRESET_LIST,
 } from '@/services/dashboard-shared/dashboard-detail/constants/dashboard-global-variable-preset';
@@ -52,9 +52,7 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
-const {
-    isAdminMode,
-} = useDashboardRouteContext();
+const appContextStore = useAppContextStore();
 const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 
 const storeState = reactive({
@@ -201,7 +199,7 @@ const state = reactive({
     selectedCostDataSourceMenuItem: computed<MenuItem[]>(() => state.costDataSourceMenuItems.filter((d) => d.name === state.selectedCostDataSourceId)),
 });
 const { allItems: costDataSourceFilterMenuItems } = useCostDataSourceFilterMenuItems({
-    isAdminMode,
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => storeState.costDataSources[state.selectedCostDataSourceId]),
 });
 
