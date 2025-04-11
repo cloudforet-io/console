@@ -152,7 +152,9 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
                     </keep-alive>
                 </div>
             </template>
-            <template #header-right-contents>
+            <template v-if="props.projectId || props.projectGroupId"
+                      #header-right-contents
+            >
                 <p-select-dropdown style-type="tertiary-icon-button"
                                    button-icon="ic_plus"
                                    size="sm"
