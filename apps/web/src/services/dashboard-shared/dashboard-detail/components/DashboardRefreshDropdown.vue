@@ -46,9 +46,8 @@ const {
     dashboardId: computed(() => props.dashboardId),
 });
 const queryClient = useQueryClient();
-const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => props.dashboardId),
-});
+const { getDashboardManageable } = useDashboardManageable();
+const dashboardManageable = computed(() => getDashboardManageable(dashboard.value));
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -104,7 +103,7 @@ const handleSelectRefreshIntervalOption = (option) => {
     clearRefreshInterval();
     executeRefreshInterval();
 
-    if (isManageable.value) {
+    if (dashboardManageable.value) {
         mutate({
             dashboard_id: props.dashboardId,
             options: {

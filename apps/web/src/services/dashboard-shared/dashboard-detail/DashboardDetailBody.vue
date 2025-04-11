@@ -58,9 +58,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|typeof DashboardWidgetContainerV2|null>(null);
 
-const { isManageable } = useDashboardManageable({
-    dashboardId,
-});
+const { getDashboardManageable } = useDashboardManageable();
 const {
     entryPoint, projectGroupOrProjectId, projectContextType,
 } = useDashboardRouteContext();
@@ -226,7 +224,7 @@ onUnmounted(() => {
                     />
                     <dashboard-variables-v2 v-else
                                             class="variable-selector-wrapper"
-                                            :disable-save-button="!isManageable"
+                                            :disable-save-button="!getDashboardManageable(dashboard)"
                                             :loading="dashboardUpdateLoading"
                                             :dashboard-id="props.dashboardId"
                                             :dashboard-items="dashboardItemsV2"

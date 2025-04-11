@@ -25,8 +25,8 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
+import { useDashboardControlMenuHelper } from '@/services/dashboard-shared/core/composables/use-dashboard-control-menu-helper';
 import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
-import { getControlDashboardMenuItems, getControlFolderMenuItems } from '@/services/dashboard-shared/core/helpers/dashboard-control-menu-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
@@ -51,6 +51,7 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
 
 const { getDashboardManageable, getFolderManageable } = useDashboardManageable();
+const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboardControlMenuHelper();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),

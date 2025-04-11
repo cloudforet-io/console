@@ -108,9 +108,8 @@ const {
     dashboardId,
 });
 const queryClient = useQueryClient();
-const { isManageable } = useDashboardManageable({
-    dashboardId,
-});
+const { getDashboardManageable } = useDashboardManageable();
+const dashboardManageable = computed(() => getDashboardManageable(dashboard.value));
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
@@ -551,7 +550,7 @@ onBeforeUnmount(() => {
                                :dashboard-vars="refinedVars"
                                :dashboard-id="dashboardId"
                                :disable-refresh-on-variable-change="widgetGenerateState.showOverlay || dashboardDetailState.loadingDashboard"
-                               :disable-manage-buttons="!isManageable"
+                               :disable-manage-buttons="!dashboardManageable"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :load-disabled="widgetGenerateState.showOverlay || getWidgetLoading(widget.widget_id)"
                                @mounted="handleWidgetMounted(widget.widget_id)"
@@ -570,7 +569,7 @@ onBeforeUnmount(() => {
             <p-empty show-image
                      image-size="sm"
                      class="empty-wrapper"
-                     :show-button="isManageable"
+                     :show-button="dashboardManageable"
             >
                 {{ $t('DASHBOARDS.DETAIL.NO_WIDGET_TEXT') }}
                 <template #button>

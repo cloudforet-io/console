@@ -26,9 +26,9 @@ const {
 } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
-const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => props.dashboardId),
-});
+const { getDashboardManageable } = useDashboardManageable();
+const dashboardManageable = computed(() => getDashboardManageable(dashboard.value));
+
 const state = reactive({
     visible: false,
     dashboardLabels: computed<string[]>(() => dashboard.value?.labels || []),
@@ -78,7 +78,7 @@ onClickOutside(labelPopoverRef, () => { state.visible = false; });
             </p-button>
             <template #content>
                 <div class="content-wrapper">
-                    <dashboard-labels :editable="!state.isDeprecatedDashboard && isManageable"
+                    <dashboard-labels :editable="!state.isDeprecatedDashboard && dashboardManageable"
                                       :dashboard-id="props.dashboardId"
                                       @update-labels="handleUpdateLabels"
                     />

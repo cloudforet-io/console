@@ -14,9 +14,9 @@ import { i18n } from '@/translations';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardControlMenuHelper } from '@/services/dashboard-shared/core/composables/use-dashboard-control-menu-helper';
 import { useDashboardManageable } from '@/services/dashboard-shared/core/composables/use-dashboard-manageable';
 import { useDashboardRouteContext } from '@/services/dashboard-shared/core/composables/use-dashboard-route-context';
-import { getControlDashboardMenuItems } from '@/services/dashboard-shared/core/helpers/dashboard-control-menu-helper';
 import DashboardControlButtons from '@/services/dashboard-shared/dashboard-detail/components/DashboardControlButtons.vue';
 import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
 import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
@@ -28,20 +28,19 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     folderItems: () => [],
 });
-const emit = defineEmits<{(e: 'select-toolset', toolsetId: string|undefined): void;
-}>();
+const emit = defineEmits<{(e: 'select-toolset', toolsetId: string|undefined): void;}>();
 const { entryPoint } = useDashboardRouteContext();
 
 const { dashboard } = useDashboardGetQuery({
     dashboardId: computed(() => props.dashboardId),
 });
-const { isManageable } = useDashboardManageable({
-    dashboardId: computed(() => props.dashboardId),
-});
+const { getDashboardManageable } = useDashboardManageable();
+const dashboardManageable = computed(() => getDashboardManageable(dashboard.value));
 
+const { getControlDashboardMenuItems } = useDashboardControlMenuHelper();
 const controlMenuItems = computed<MenuItem[]>(() => {
     if (!dashboard.value) return [];
-    return getControlDashboardMenuItems(props.dashboardId, isManageable.value, dashboard.value, entryPoint.value === 'PROJECT');
+    return getControlDashboardMenuItems(props.dashboardId, dashboardManageable.value, dashboard.value, entryPoint.value === 'PROJECT');
 });
 
 const state = reactive({
@@ -145,7 +144,7 @@ const handleSelectItem = (item: MenuItem) => {
             <template v-if="dashboard?.version !== '1.0'"
                       #extra
             >
-                <dashboard-control-buttons v-if="isManageable"
+                <dashboard-control-buttons v-if="dashboardManageable"
                                            :dashboard-id="props.dashboardId"
                                            :name="dashboard?.name"
                 />

@@ -47,9 +47,8 @@ const {
     dashboardId,
 });
 const queryClient = useQueryClient();
-const { isManageable } = useDashboardManageable({
-    dashboardId,
-});
+const { getDashboardManageable } = useDashboardManageable();
+const dashboardManageable = computed(() => getDashboardManageable(dashboard.value));
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
@@ -116,7 +115,7 @@ const handleSelectMonthMenuItem = (selected: string) => {
         updateDashboardDateRange(state.selectedDateRange);
     }
 
-    if (isManageable.value && !props.widgetMode) {
+    if (dashboardManageable.value && !props.widgetMode) {
         mutate({
             dashboard_id: dashboardId.value,
             options: {
