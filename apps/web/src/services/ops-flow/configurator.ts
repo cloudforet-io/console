@@ -35,7 +35,6 @@ class OpsFlowConfigurator implements FeatureConfiguratorType {
                 subMenuList: [
                     { id: MENU_ID.OPS_FLOW_LANDING, needPermissionByRole: true },
                     { id: MENU_ID.TASK_BOARD, needPermissionByRole: true },
-                    { id: MENU_ID.APP, needPermissionByRole: true },
                 ],
             },
             adminMenu: {
