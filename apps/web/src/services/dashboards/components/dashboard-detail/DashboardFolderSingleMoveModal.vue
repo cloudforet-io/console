@@ -19,7 +19,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardChangeFolderMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-change-folder-mutation';
+import { useDashboardChangeFolderMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-change-folder-mutation';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';

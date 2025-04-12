@@ -6,7 +6,7 @@ import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/api-clients/
 import {
     getInitialSchemaProperties, getNonInheritedWidgetOptionNamesAmongUsedVariables,
     getRefinedSchemaProperties, getWidgetOptionKeyByVariableKey,
-} from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_helpers/widget-schema-helper';
+} from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/_helpers/widget-schema-helper';
 
 const DEFAULT_WIDGET_CONFIG = {
     widget_config_id: 'test',

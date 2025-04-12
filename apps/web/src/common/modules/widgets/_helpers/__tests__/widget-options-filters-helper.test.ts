@@ -1,6 +1,6 @@
 import type { WidgetFilterKey, WidgetFiltersMap } from '@/api-clients/dashboard/_types/widget-type';
 
-import { setFilterAndGetWidgetFiltersMap } from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_helpers/widget-options-filters-helper';
+import { setFilterAndGetWidgetFiltersMap } from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/_helpers/widget-options-filters-helper';
 
 
 describe('[Widget Options Filters Helper] setFilterAndGetWidgetFiltersMap', () => {

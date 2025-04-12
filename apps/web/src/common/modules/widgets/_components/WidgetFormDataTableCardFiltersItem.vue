@@ -26,8 +26,8 @@ import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/t
 
 import { blue, gray } from '@/styles/colors';
 
-import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import { getOrderedGlobalVariables } from '@/services/dashboard-shared/dashboard-detail/helpers/dashboard-global-variables-helper';
+import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
+import { getOrderedGlobalVariables } from '@/services/_shared/dashboard/dashboard-detail/helpers/dashboard-global-variables-helper';
 
 
 interface Props {

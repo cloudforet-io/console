@@ -1,7 +1,7 @@
 import { range } from 'lodash';
 import { describe, it, expect } from 'vitest';
 
-import { getRefinedXYChartData } from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_helpers/widget-chart-data-helper';
+import { getRefinedXYChartData } from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/_helpers/widget-chart-data-helper';
 
 interface SubData {
     date: string;

@@ -13,17 +13,17 @@ import { PSkeleton } from '@cloudforet/mirinae';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardLabelsButton from '@/services/dashboard-shared/dashboard-detail/components/DashboardLabelsButton.vue';
-import DashboardRefreshDropdown from '@/services/dashboard-shared/dashboard-detail/components/DashboardRefreshDropdown.vue';
+import DashboardLabelsButton from '@/services/_shared/dashboard/dashboard-detail/components/DashboardLabelsButton.vue';
+import DashboardRefreshDropdown from '@/services/_shared/dashboard/dashboard-detail/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
-    from '@/services/dashboard-shared/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2
-    from '@/services/dashboard-shared/dashboard-detail/components/DashboardVariablesV2.vue';
+    from '@/services/_shared/dashboard/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
 import DashboardWidgetContainerV2
-    from '@/services/dashboard-shared/dashboard-detail/components/DashboardWidgetContainerV2.vue';
-import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardWidgetListQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-widget-list-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboard-shared/dashboard-detail/stores/dashboard-detail-info-store';
+    from '@/services/_shared/dashboard/dashboard-detail/components/DashboardWidgetContainerV2.vue';
+import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-widget-list-query';
+import DashboardVariablesV2
+    from '@/services/_shared/dashboard/dashboard-detail/contextual-components/DashboardVariablesV2.vue';
+import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 

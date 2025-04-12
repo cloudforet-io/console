@@ -7,7 +7,7 @@ import type { InheritOptions, WidgetConfig, WidgetOptionsSchema } from '@/api-cl
 import {
     getInheritingOptionKeys,
     getInitialWidgetInheritOptions,
-} from '@/services/dashboard-shared/dashboard-detail/legacy/widgets/_helpers/widget-inherit-options-helper';
+} from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/_helpers/widget-inherit-options-helper';
 
 
 

@@ -37,10 +37,10 @@ import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
 
+import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
 
 
 

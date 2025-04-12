@@ -13,8 +13,8 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/dashboard-shared/core/constants/dashboard-shared-constant';
-import DashboardDetailLayout from '@/services/dashboard-shared/dashboard-detail/DashboardDetailLayout.vue';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import DashboardDetailLayout from '@/services/_shared/dashboard/dashboard-detail/DashboardDetailLayout.vue';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';

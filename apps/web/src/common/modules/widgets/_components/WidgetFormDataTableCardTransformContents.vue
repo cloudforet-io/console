@@ -62,7 +62,7 @@ import type {
     JoinOptions, ValueMappingOptions, ConcatOptions, AggregateOptions, AggregateFunction,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardGetQuery } from '@/services/dashboard-shared/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
 
 
 
