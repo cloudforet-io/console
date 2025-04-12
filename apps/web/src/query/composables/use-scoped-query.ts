@@ -32,8 +32,7 @@
 
 import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/core';
-import type { ComputedRef } from 'vue';
-import { computed, getCurrentInstance } from 'vue';
+import { computed, type ComputedRef } from 'vue';
 
 import {
     useQuery, type UseQueryOptions, type UseQueryReturnType,
@@ -53,9 +52,16 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
     options: UseQueryOptions<TQueryFnData, TError, TData>,
     requiredScopes: [GrantScope, ...GrantScope[]],
 ): UseQueryReturnType<TData, TError> => {
-    // Warns if `requiredScopes` array is missing or empty during development
-    if (import.meta.env.DEV) {
-        _warnMissingRequiredScopes(requiredScopes);
+    // [Dev Warning] This query is missing `requiredScopes`.
+    // All scoped queries must explicitly define at least one valid scope for clarity and safety.
+    if (import.meta.env.DEV && (!requiredScopes || requiredScopes.length === 0)) {
+        _warnOncePerTick(() => {
+            console.warn('[useScopedQuery] `requiredScopes` is missing or empty.', {
+                queryKey: _extractQueryKey((options as any).queryKey),
+                suggestion: 'Pass at least one valid scope like [\'DOMAIN\'], [\'WORKSPACE\'], etc.',
+            });
+            return true;
+        });
     }
 
     const appContextStore = useAppContextStore();
@@ -75,15 +81,20 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
         return inheritedEnabled && isValidScope.value && isAppReady.value;
     });
 
-    // Logs a warning once per queryKey when the current scope is invalid for this query
+    // [Dev Warning] The current user's scope is not included in the allowed `requiredScopes`.
+    // This usually indicates a configuration mistake in the query declaration.
     if (import.meta.env.DEV) {
-        _warnInvalidScopeOnce({
-            queryKey: _extractQueryKey((options as any).queryKey),
-            enabled: toValue(queryEnabled),
-            currentScope: currentGrantScope.value,
-            requiredScopes,
-            isAppReady: isAppReady.value,
-        });
+        const currentScope = currentGrantScope.value;
+        if (isAppReady.value && currentScope && !requiredScopes.includes(currentScope)) {
+            _warnOncePerTick(() => {
+                console.warn('[useScopedQuery] Invalid requiredScopes for current scope:', {
+                    queryKey: _extractQueryKey((options as any).queryKey),
+                    requiredScopes,
+                    currentScope,
+                });
+                return true;
+            });
+        }
     }
 
     return useQuery<TQueryFnData, TError, TData>({
@@ -95,72 +106,30 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
 const _extractQueryKey = (input: unknown): QueryKeyArray => toValue(input as ComputedRef<QueryKeyArray>);
 
 
-// Warns if `requiredScopes` array is missing or empty during development
-const _warnMissingRequiredScopes = (scopes: GrantScope[]) => {
-    if (import.meta.env.DEV && (!scopes || scopes.length === 0)) {
-        console.warn('[useScopedQuery] `requiredScopes` is missing or empty.', {
-            suggestion: 'Pass at least one valid scope like [\'DOMAIN\'], [\'WORKSPACE\'], etc.',
-        });
+
+/* Warning Logger Utilities */
+const _warnedKeys = new Set<string>();
+const _getCallerKey = (): string => {
+    try {
+        const err = new Error();
+        const stack = err.stack?.split('\n') || [];
+
+        const caller = stack.find((line, i) => i > 1
+            && (line.includes('.ts') || line.includes('.vue'))
+            && !line.includes('use-scoped-query'));
+
+        return caller?.trim() ?? 'UNKNOWN_CALLSITE';
+    } catch {
+        return 'UNKNOWN_CALLSITE';
     }
 };
+const _warnOncePerTick = (log: () => boolean) => {
+    const key = _getCallerKey();
+    if (_warnedKeys.has(key)) return;
+    const didLog = log();
 
-/**
- * Logs a warning when a query is not executed due to invalid scope,
- * but only once per queryKey during development.
- *
- * Conditions to trigger warning:
- * - `enabled` is true
- * - app is ready (not loading)
- * - currentScope is defined
- * - currentScope NOT included in requiredScopes
- */
-const _warnedKeysPerInstance = new WeakMap<object, Set<string>>();
-const _warnInvalidScopeOnce = (params: {
-    queryKey: QueryKeyArray;
-    enabled: boolean;
-    currentScope: GrantScope | undefined;
-    requiredScopes: GrantScope[];
-    isAppReady: boolean;
-}) => {
-    if (!import.meta.env.DEV) return;
-
-    // Get the current Vue component instance (used to scope the warning cache)
-    const instance = getCurrentInstance();
-    if (!instance) return;
-
-    const {
-        queryKey, enabled, currentScope, requiredScopes, isAppReady,
-    } = params;
-
-    if (!isAppReady || !currentScope) return;
-
-    const isValidScope = requiredScopes.includes(currentScope);
-
-    if (!enabled && isValidScope) return;
-
-    if (isValidScope) return;
-
-    // Safely serialize the queryKey (even if it contains objects)
-    const key = (() => {
-        try {
-            return JSON.stringify(queryKey);
-        } catch {
-            return Array.isArray(queryKey) ? queryKey.join(':') : String(queryKey);
-        }
-    })();
-
-    // Cache per component instance to prevent duplicate logs
-    let keySet = _warnedKeysPerInstance.get(instance);
-    if (!keySet) {
-        keySet = new Set();
-        _warnedKeysPerInstance.set(instance, keySet);
+    if (didLog) {
+        _warnedKeys.add(key);
+        queueMicrotask(() => _warnedKeys.delete(key));
     }
-    if (keySet.has(key)) return;
-    keySet.add(key);
-
-    console.warn('[useScopedQuery] Query not executed due to invalid grant scope.', {
-        queryKey,
-        currentScope,
-        requiredScopes,
-    });
 };
