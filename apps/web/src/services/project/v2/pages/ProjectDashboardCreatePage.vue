@@ -7,8 +7,8 @@ import type { DashboardModel, DashboardFolderModel } from '@/api-clients/dashboa
 
 
 
-import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/dashboard-shared/core/constants/dashboard-shared-constant';
-import DashboardCreateLayout from '@/services/dashboard-shared/dashboard-create/DashboardCreateLayout.vue';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import DashboardCreateLayout from '@/services/_shared/dashboard/dashboard-create/DashboardCreateLayout.vue';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';

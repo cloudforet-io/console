@@ -9,8 +9,8 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import { useDashboardDeleteMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-delete-mutation';
-import { useDashboardFolderDeleteMutation } from '@/services/dashboard-shared/core/composables/mutations/use-dashboard-folder-delete-mutation';
+import { useDashboardDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-delete-mutation';
+import { useDashboardFolderDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-folder-delete-mutation';
 
 export const useDashboardBundleDeleteWorkflow = () => {
     const queryClient = useQueryClient();

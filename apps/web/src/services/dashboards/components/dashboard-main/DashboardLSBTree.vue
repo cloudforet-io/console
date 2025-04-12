@@ -22,7 +22,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 
-import { useDashboardControlMenuHelper } from '@/services/dashboard-shared/core/composables/use-dashboard-control-menu-helper';
+import { useDashboardControlMenuHelper } from '@/services/_shared/dashboard/core/composables/use-dashboard-control-menu-helper';
 import { isDashboardOrFolderManageable } from '@/services/dashboards/helpers/dashboard-manageable-helper';
 import { getDashboardTreeData } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
