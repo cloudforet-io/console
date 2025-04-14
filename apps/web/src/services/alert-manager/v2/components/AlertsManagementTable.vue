@@ -51,7 +51,7 @@ import {
     ALERT_STATUS_FILTERS, ALERT_PERIOD_DROPDOWN_MENU,
 } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import {
-    convertRelativePeriodToPeriod, initiatePeriodByGranularity,
+    convertRelativePeriodToPeriod,
 } from '@/services/alert-manager/v2/helpers/alert-period-helper';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
@@ -111,8 +111,13 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
     ])),
-    period: initiatePeriodByGranularity()[0],
+    period: { start: undefined, end: undefined },
     periodMenuItems: computed<AlertPeriodItemType[]>(() => [
+        {
+            type: 'item',
+            name: 'ALL',
+            label: i18n.t('ALERT_MANAGER.ALERTS.ALL'),
+        },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_1_MONTH,
             relativePeriod: { value: 1 },
@@ -120,17 +125,17 @@ const filterState = reactive({
         },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_3_MONTHS,
-            relativePeriod: { value: 2 },
+            relativePeriod: { value: 3 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_3_MONTHS'),
         },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_6_MONTHS,
-            relativePeriod: { value: 5 },
+            relativePeriod: { value: 6 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_6_MONTHS'),
         },
         {
             name: ALERT_PERIOD_DROPDOWN_MENU.LAST_12_MONTHS,
-            relativePeriod: { value: 11 },
+            relativePeriod: { value: 12 },
             label: i18n.t('ALERT_MANAGER.ALERTS.LAST_12_MONTHS'),
         },
         {
@@ -152,7 +157,8 @@ const filterState = reactive({
         const { isStartInvalid, isEndInvalid } = checkPeriod(LIMIT_MONTH);
         return isStartInvalid || isEndInvalid;
     }),
-    selectedPeriod: ALERT_PERIOD_DROPDOWN_MENU.LAST_1_MONTH as string,
+    selectedPeriod: ALERT_PERIOD_DROPDOWN_MENU.ALL as string,
+    showPeriodBadge: computed<boolean>(() => filterState.selectedPeriod === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM && filterState.period.start && filterState.period.end),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
@@ -237,6 +243,9 @@ const handleSelectPeriod = async (periodMenuName: AlertPeriodDropdownMenuType) =
         state.customRangeModalVisible = true;
         return;
     }
+    if (periodMenuName === ALERT_PERIOD_DROPDOWN_MENU.ALL) {
+        filterState.period = { start: undefined, end: undefined };
+    }
     filterState.selectedPeriod = periodMenuName;
     const selectedPeriodItem = filterState.periodMenuItems.find((d) => d.name === periodMenuName) || {} as AlertPeriodItemType;
     filterState.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : filterState.period;
@@ -274,13 +283,14 @@ const handleExportToExcel = async () => {
     });
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
-    filterState.period = { start: dayjs(start).startOf('month').format('YYYY-MM-DD'), end: dayjs(end).endOf('month').format('YYYY-MM-DD') };
+    filterState.period = { start, end };
     filterState.selectedPeriod = ALERT_PERIOD_DROPDOWN_MENU.CUSTOM;
     state.customRangeModalVisible = false;
     fetchAlertsList();
 };
 
 const fetchAlertsList = async () => {
+    state.loading = true;
     try {
         filterQueryHelper.setFilters([]);
         if (storeState.selectedUrgency !== 'ALL') {
@@ -295,12 +305,17 @@ const fetchAlertsList = async () => {
             filterQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
         }
 
-        if (filterState.period.start) {
+        if (filterState.period.start && filterState.period.end && (filterState.period.start === filterState.period.end)) {
             filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+        } else {
+            if (filterState.period.start) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+            }
+            if (filterState.period.end) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.end, o: '<=' });
+            }
         }
-        if (filterState.period.end) {
-            filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.end, o: '<=' });
-        }
+
 
         if (state.isServicePage) {
             filterQueryHelper.addFilter({ k: 'service_id', v: storeState.serviceId, o: '=' });
@@ -320,6 +335,8 @@ const fetchAlertsList = async () => {
         await alertPageStore.fetchAlertsList(params);
     } catch (e) {
         ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -343,12 +360,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
         await queryTagHelper.setURLQueryStringFilters(route.query.filters);
     }
 
-    try {
-        state.loading = true;
-        await fetchAlertsList();
-    } finally {
-        state.loading = false;
-    }
+    await fetchAlertsList();
 })();
 </script>
 
@@ -398,15 +410,24 @@ watch(() => storeState.serviceId, async (serviceId) => {
                             <span>{{ item.label }}</span>
                         </template>
                     </p-select-dropdown>
-                    <p-select-dropdown :menu="filterState.periodMenuItems"
-                                       :selection-label="$t('ALERT_MANAGER.ALERTS.PERIOD')"
-                                       disable-proxy
-                                       style-type="rounded"
-                                       use-fixed-menu-style
-                                       :selected="filterState.selectedPeriod"
-                                       :invalid="filterState.isPeriodInvalid"
-                                       @select="handleSelectPeriod"
-                    />
+                    <div>
+                        <p-select-dropdown :menu="filterState.periodMenuItems"
+                                           :selection-label="$t('ALERT_MANAGER.ALERTS.PERIOD')"
+                                           disable-proxy
+                                           style-type="rounded"
+                                           use-fixed-menu-style
+                                           :selected="filterState.selectedPeriod"
+                                           :invalid="filterState.isPeriodInvalid"
+                                           @select="handleSelectPeriod"
+                        />
+                        <p-badge v-if="filterState.showPeriodBadge"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                                 class="ml-2"
+                        >
+                            {{ `${dayjs.utc(filterState.period.start).format('MMM D, YYYY')} ~ ${dayjs.utc(filterState.period.end).format('MMM D, YYYY')}` }}
+                        </p-badge>
+                    </div>
                     <p-divider vertical
                                class="divider"
                     />
@@ -521,7 +542,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
         <custom-date-modal :visible.sync="state.customRangeModalVisible"
                            :start="filterState.period?.start"
                            :end="filterState.period?.end"
-                           :datetime-picker-data-type="'yearToMonth'"
+                           :datetime-picker-data-type="'yearToDate'"
                            use-restricted-mode
                            @confirm="handleCustomRangeModalConfirm"
         />
