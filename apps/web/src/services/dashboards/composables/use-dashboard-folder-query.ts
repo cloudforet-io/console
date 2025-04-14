@@ -7,7 +7,6 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { FolderModel, FolderUpdateParams } from '@/api-clients/dashboard/_types/folder-type';
 import { usePrivateFolderApi } from '@/api-clients/dashboard/private-folder/composables/use-private-folder-api';
@@ -16,6 +15,7 @@ import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
