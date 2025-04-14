@@ -34,7 +34,7 @@ export interface FeatureConfiguratorType {
     getRoutes: (isAdmin?: boolean) => RouteConfig|null;
     getMenu: (config?: GlobalServiceConfig) => FeatureMenuConfig;
     initialize: (version: FeatureVersion) => void;
-    uiAffect: FeatureUiAffect[];
+    uiAffect?: FeatureUiAffect[];
 }
 
 interface UiAffectConfig {
