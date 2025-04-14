@@ -126,7 +126,6 @@ const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> =
 };
 
 const initSelected = async (value: any) => {
-    console.log('[[[[[[initSelected]]]]]] - ', props.variable.key, value);
     // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
     const selectedValues = flattenDeep([value ?? []]);
     const items = await loadOptionItems(selectedValues);
