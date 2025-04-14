@@ -43,10 +43,10 @@ export const useBudgetDetailPageStore = defineStore('page-budget-detail', {
                 ErrorHandler.handleRequestError(e, '');
             }
         },
-        async updateBudgetNotifications(params: { budgetId: string; notifications: BudgetModel['notifications'] }): Promise<void> {
+        async updateBudgetNotifications(params: { budgetId: string; notifications: BudgetModel['notification'] }): Promise<void> {
             try {
                 this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.setNotification<BudgetSetNotificationParameters, BudgetModel>({
-                    notifications: params.notifications,
+                    notification: params.notifications,
                     budget_id: params.budgetId,
                 });
             } catch (e) {
