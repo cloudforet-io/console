@@ -1,33 +1,50 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
-import type { Menu } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
+import { MENU_ID } from '@/lib/menu/config';
 
 import projectRoutesV1 from '@/services/project/v1/routes/routes';
-import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 import projectRoutes from '@/services/project/v2/routes/routes';
 
-class ProjectConfigurator {
-    static getAdminRoutes() {
-        return null;
+class ProjectConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [
+        {
+            feature: 'ALERT_MANAGER',
+            affects: [
+                {
+                    method: 'visibleProjectAlertTab',
+                    version: 'V1',
+                },
+            ],
+        },
+    ];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes(version: string) {
-        return version === 'V1' ? projectRoutesV1 : projectRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: this.version === 'V1' ? projectRoutesV1 : projectRoutes,
+            adminRoutes: null,
+            version: this.version,
+        };
     }
 
-    static getAdminMenu(): Menu|null {
-        return null;
-    }
-
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menuId = Object.keys(settings.menu)[0];
-        return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
-    }
-
-    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
-        const projectDetailPageStore = useProjectDetailPageStore();
-        projectDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
+    getMenu(): FeatureMenuConfig {
+        return {
+            menu: {
+                id: MENU_ID.PROJECT,
+                needPermissionByRole: true,
+                subMenuList: [],
+                order: 2,
+            },
+            adminMenu: null,
+            version: this.version,
+        };
     }
 }
 
-export default ProjectConfigurator;
+export default new ProjectConfigurator();

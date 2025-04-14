@@ -1,8 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ApiClientsSchemaType } from '@/lib/config/global-config/api-client-schema';
-import { ApiClientEndpoint } from '@/lib/config/global-config/api-client-schema';
-import type { GlobalServiceConfig } from '@/lib/config/global-config/type';
+import { ApiClientEndpoint } from '@/lib/config/global-config/schema/api-client-schema';
+import type { ApiClientsSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 
 
 class APIClientManager {

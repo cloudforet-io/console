@@ -3,7 +3,7 @@ import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
-import { FEATURES } from '@/lib/config/global-config/constants';
+import { FEATURES } from '@/lib/config/global-config/constants/constants';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { MENU_ID } from '@/lib/menu/config';
 

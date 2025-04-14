@@ -1,32 +1,39 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
-import type { Menu } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
+import { MENU_ID } from '@/lib/menu/config';
 
 import adminServiceAccountRoute from '@/services/service-account/routes/admin/routes';
 import serviceAccountRoute from '@/services/service-account/routes/routes';
 
-class ServiceAccountConfigurator {
-    static getAdminRoutes() {
-        return adminServiceAccountRoute;
+class ServiceAccountConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return serviceAccountRoute;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: serviceAccountRoute,
+            adminRoutes: adminServiceAccountRoute,
+            version: this.version,
+        };
     }
 
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menuId = Object.keys(settings.adminMenu || settings.menu)[0];
-        return { id: MENU_INFO_MAP[menuId].menuId };
-    }
-
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menuId = Object.keys(settings.menu)[0];
-        return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
-    }
-
-    static applyUiAffects(): void|null {
-        return null;
+    getMenu(): FeatureMenuConfig {
+        return {
+            menu: {
+                id: MENU_ID.SERVICE_ACCOUNT,
+                needPermissionByRole: true,
+                subMenuList: [],
+                order: 3,
+            },
+            version: this.version,
+        };
     }
 }
 
-export default ServiceAccountConfigurator;
+export default new ServiceAccountConfigurator();

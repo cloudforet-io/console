@@ -1,49 +1,69 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type {
+    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import costExplorerRoutes from '@/services/cost-explorer/routes/routes';
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
-class CostExplorerConfigurator {
-    static getAdminRoutes() {
-        return adminCostExplorerRoutes;
+class CostExplorerConfigurator implements FeatureConfiguratorType {
+    private version: 'V1' | 'V2' = 'V1';
+
+    readonly uiAffect: FeatureUiAffect[] = [
+        {
+            feature: 'ALERT_MANAGER',
+            affects: [
+                {
+                    method: 'visibleBudgetNotification',
+                    version: 'V2',
+                },
+            ],
+        },
+    ];
+
+    initialize(version: 'V1' | 'V2'): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return costExplorerRoutes;
-    }
-
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
+    getRoutes(): FeatureRouteConfig {
         return {
-            id: MENU_ID.COST_EXPLORER,
-            subMenuList: subMenuIds,
+            routes: costExplorerRoutes,
+            adminRoutes: adminCostExplorerRoutes,
+            version: this.version,
         };
     }
 
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): FeatureMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.COST_EXPLORER,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 5,
         };
-    }
 
-    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
-        const budgetDetailPageStore = useBudgetDetailPageStore();
-        budgetDetailPageStore.setVisibleBudgetNotification(settings.uiAffects?.visibleBudgetNotification);
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.COST_ANALYSIS, needPermissionByRole: true },
+                    { id: MENU_ID.BUDGET, needPermissionByRole: true },
+                    { id: MENU_ID.COST_REPORT, needPermissionByRole: true },
+                ],
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.COST_ANALYSIS },
+                    { id: MENU_ID.BUDGET },
+                    { id: MENU_ID.COST_REPORT },
+                    { id: MENU_ID.DATA_SOURCES },
+                    { id: MENU_ID.COST_ADVANCED_SETTINGS },
+                ],
+            },
+            version: this.version,
+        };
     }
 }
 
-export default CostExplorerConfigurator;
+export default new CostExplorerConfigurator();
