@@ -52,10 +52,10 @@ class CostExplorerConfigurator implements FeatureConfiguratorType {
                 ...baseMenu,
                 subMenuList: [
                     { id: MENU_ID.COST_ANALYSIS },
-                    { id: MENU_ID.COST_ADVANCED_SETTINGS },
                     { id: MENU_ID.BUDGET },
                     { id: MENU_ID.COST_REPORT },
                     { id: MENU_ID.DATA_SOURCES },
+                    { id: MENU_ID.COST_ADVANCED_SETTINGS },
                 ],
             },
             version: this.version,
