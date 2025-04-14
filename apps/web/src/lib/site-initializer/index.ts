@@ -27,7 +27,6 @@ import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
-import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
 import { mergeConfig } from '@/lib/site-initializer/merge-config';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
@@ -107,7 +106,6 @@ const init = async () => {
         initRequestIdleCallback();
         const results = await Promise.allSettled([
             checkSsoAccessToken(),
-            initTaskManagementTemplate(),
         ]);
         const errors: any[] = [];
         results.forEach((result) => {

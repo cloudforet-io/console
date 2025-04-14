@@ -41,7 +41,7 @@ const router = useRouter();
 const globalConfigStore = useGlobalConfigStore();
 
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER.uiAffects?.visibleUserNotification ?? false),
+    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleUserNotification ?? false),
     isDataValid: false,
     notificationLevel: 'LV1' as NotificationLevel,
     //

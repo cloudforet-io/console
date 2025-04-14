@@ -16,10 +16,10 @@ export class FeatureSchemaManager {
             ...this.config,
             ...config,
         };
-        this.createSchema();
+        this.setFeatureSchema();
     }
 
-    createSchema() {
+    setFeatureSchema() {
         const globalConfigStore = useGlobalConfigStore();
         const schema = {} as FeatureSchemaType;
 
@@ -32,7 +32,6 @@ export class FeatureSchemaManager {
                     const currentVersion = this.config[feature]?.VERSION || 'V1';
                     configurator.initialize(currentVersion);
                     const menuConfig = configurator.getMenu(this.config);
-
                     if (configurator.uiAffect) {
                         configurator.uiAffect.forEach((uiAffect) => {
                             const targetFeature = uiAffect.feature;
