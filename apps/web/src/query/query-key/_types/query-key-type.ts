@@ -1,7 +1,7 @@
 import type { API_DOC } from '@/api-clients/_common/constants/api-doc-constant';
 
 
-export type QueryKeyArray = unknown[];
+export type QueryKeyArray = readonly unknown[];
 
 export type QueryScope = 'service' | 'reference';
 

@@ -84,6 +84,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         } catch (e) {
             if (e instanceof APIError && e.status === 404) {
                 state.templateId = 'default';
+                console.warn('404 Not Found: Template Id Data not found.');
                 return;
             }
             ErrorHandler.handleError(e);
@@ -111,6 +112,7 @@ export const useTaskManagementTemplateStore = defineStore('task-management-templ
         } catch (e) {
             if (e instanceof APIError && e.status === 404) {
                 state.enableLanding = false;
+                console.warn('404 Not Found: Template Landing Data not found.');
                 return;
             }
             ErrorHandler.handleError(e);

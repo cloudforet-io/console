@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineEmits, defineProps, reactive, watch,
+    computed, defineProps, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 

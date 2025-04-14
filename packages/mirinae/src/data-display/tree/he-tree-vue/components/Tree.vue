@@ -23,7 +23,7 @@
 import {
     reactive, toRefs,
     computed, watch, ref,
-    onBeforeMount, defineExpose, toRef,
+    onBeforeMount, toRef,
     defineAsyncComponent,
 } from 'vue';
 

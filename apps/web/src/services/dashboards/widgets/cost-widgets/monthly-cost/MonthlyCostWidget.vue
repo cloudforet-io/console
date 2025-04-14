@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, watch,
+    computed, defineProps, nextTick, reactive, ref, toRef, watch,
 } from 'vue';
 
 import type { AxisRenderer, DateAxis } from '@amcharts/amcharts5/xy';
