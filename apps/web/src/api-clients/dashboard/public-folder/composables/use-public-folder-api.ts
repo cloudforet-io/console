@@ -10,41 +10,15 @@ import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/publ
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
-interface UsePublicFolderApiReturn {
-    publicFolderAPI: {
-        create: (params: PublicFolderCreateParameters) => Promise<PublicFolderModel>;
-        update: (params: PublicFolderUpdateParameters) => Promise<PublicFolderModel>;
-        share: (params: PublicFolderShareParameters) => Promise<PublicFolderModel>;
-        unshare: (params: PublicFolderUnshareParameters) => Promise<PublicFolderModel>;
-        delete: (params: PublicFolderDeleteParameters) => Promise<void>;
-        get: (params: PublicFolderGetParameters) => Promise<PublicFolderModel>;
-        list: (params: PublicFolderListParameters) => Promise<ListResponse<PublicFolderModel>>;
-    }
-}
-
-export const usePublicFolderApi = (): UsePublicFolderApiReturn => {
+export const usePublicFolderApi = () => {
     const action = {
-        async create(params: PublicFolderCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.create<PublicFolderCreateParameters, PublicFolderModel>(params);
-        },
-        async update(params: PublicFolderUpdateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.update<PublicFolderUpdateParameters, PublicFolderModel>(params);
-        },
-        async share(params: PublicFolderShareParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.share<PublicFolderShareParameters, PublicFolderModel>(params);
-        },
-        async unshare(params: PublicFolderUnshareParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.unshare<PublicFolderUnshareParameters, PublicFolderModel>(params);
-        },
-        async delete(params: PublicFolderDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.delete<PublicFolderDeleteParameters>(params);
-        },
-        async get(params: PublicFolderGetParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.get<PublicFolderGetParameters, PublicFolderModel>(params);
-        },
-        async list(params: PublicFolderListParameters) {
-            return SpaceConnector.clientV2.dashboard.publicFolder.list<PublicFolderListParameters, ListResponse<PublicFolderModel>>(params);
-        },
+        create: SpaceConnector.clientV2.dashboard.publicFolder.create<PublicFolderCreateParameters, PublicFolderModel>,
+        update: SpaceConnector.clientV2.dashboard.publicFolder.update<PublicFolderUpdateParameters, PublicFolderModel>,
+        share: SpaceConnector.clientV2.dashboard.publicFolder.share<PublicFolderShareParameters, PublicFolderModel>,
+        unshare: SpaceConnector.clientV2.dashboard.publicFolder.unshare<PublicFolderUnshareParameters, PublicFolderModel>,
+        delete: SpaceConnector.clientV2.dashboard.publicFolder.delete<PublicFolderDeleteParameters>,
+        get: SpaceConnector.clientV2.dashboard.publicFolder.get<PublicFolderGetParameters, PublicFolderModel>,
+        list: SpaceConnector.clientV2.dashboard.publicFolder.list<PublicFolderListParameters, ListResponse<PublicFolderModel>>,
     };
 
     return {

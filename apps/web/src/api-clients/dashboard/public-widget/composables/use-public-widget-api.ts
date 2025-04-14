@@ -11,41 +11,15 @@ import type { PublicWidgetLoadSumParameters } from '@/api-clients/dashboard/publ
 import type { PublicWidgetUpdateParameters } from '@/api-clients/dashboard/public-widget/schema/api-verbs/update';
 import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/schema/model';
 
-interface UsePublicWidgetApiReturn {
-    publicWidgetAPI: {
-        create: (params: PublicWidgetCreateParameters) => Promise<PublicWidgetModel>;
-        update: (params: PublicWidgetUpdateParameters) => Promise<PublicWidgetModel>;
-        delete: (params: PublicWidgetDeleteParameters) => Promise<void>;
-        load: (params: PublicWidgetLoadParameters) => Promise<WidgetLoadResponse>;
-        loadSum: (params: PublicWidgetLoadSumParameters) => Promise<WidgetLoadResponse>;
-        get: (params: PublicWidgetGetParameters) => Promise<PublicWidgetModel>;
-        list: (params: PublicWidgetListParameters) => Promise<ListResponse<PublicWidgetModel>>;
-    }
-}
-
-export const usePublicWidgetApi = (): UsePublicWidgetApiReturn => {
+export const usePublicWidgetApi = () => {
     const action = {
-        async create(params: PublicWidgetCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>(params);
-        },
-        async update(params: PublicWidgetUpdateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>(params);
-        },
-        async delete(params: PublicWidgetDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>(params);
-        },
-        async load(params: PublicWidgetLoadParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>(params);
-        },
-        async loadSum(params: PublicWidgetLoadSumParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, WidgetLoadResponse>(params);
-        },
-        async get(params: PublicWidgetGetParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.get<PublicWidgetGetParameters, PublicWidgetModel>(params);
-        },
-        async list(params: PublicWidgetListParameters) {
-            return SpaceConnector.clientV2.dashboard.publicWidget.list<PublicWidgetListParameters, ListResponse<PublicWidgetModel>>(params);
-        },
+        create: SpaceConnector.clientV2.dashboard.publicWidget.create<PublicWidgetCreateParameters, PublicWidgetModel>,
+        update: SpaceConnector.clientV2.dashboard.publicWidget.update<PublicWidgetUpdateParameters, PublicWidgetModel>,
+        delete: SpaceConnector.clientV2.dashboard.publicWidget.delete<PublicWidgetDeleteParameters>,
+        load: SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, WidgetLoadResponse>,
+        loadSum: SpaceConnector.clientV2.dashboard.publicWidget.loadSum<PublicWidgetLoadSumParameters, WidgetLoadResponse>,
+        get: SpaceConnector.clientV2.dashboard.publicWidget.get<PublicWidgetGetParameters, PublicWidgetModel>,
+        list: SpaceConnector.clientV2.dashboard.publicWidget.list<PublicWidgetListParameters, ListResponse<PublicWidgetModel>>,
     };
 
     return {

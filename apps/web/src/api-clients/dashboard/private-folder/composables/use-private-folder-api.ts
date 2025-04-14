@@ -8,33 +8,14 @@ import type { PrivateFolderListParameters } from '@/api-clients/dashboard/privat
 import type { PrivateFolderUpdateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/update';
 import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 
-interface UsePrivateFolderApiReturn {
-    privateFolderAPI: {
-        create: (params: PrivateFolderCreateParameters) => Promise<PrivateFolderModel>;
-        update: (params: PrivateFolderUpdateParameters) => Promise<PrivateFolderModel>;
-        delete: (params: PrivateFolderDeleteParameters) => Promise<void>;
-        get: (params: PrivateFolderGetParameters) => Promise<PrivateFolderModel>;
-        list: (params: PrivateFolderListParameters) => Promise<ListResponse<PrivateFolderModel>>;
-    };
-}
 
-export const usePrivateFolderApi = (): UsePrivateFolderApiReturn => {
+export const usePrivateFolderApi = () => {
     const action = {
-        async create(params: PrivateFolderCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.privateFolder.create<PrivateFolderCreateParameters, PrivateFolderModel>(params);
-        },
-        async update(params: PrivateFolderUpdateParameters) {
-            return SpaceConnector.clientV2.dashboard.privateFolder.update<PrivateFolderUpdateParameters, PrivateFolderModel>(params);
-        },
-        async delete(params: PrivateFolderDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.privateFolder.delete<PrivateFolderDeleteParameters>(params);
-        },
-        async get(params: PrivateFolderGetParameters) {
-            return SpaceConnector.clientV2.dashboard.privateFolder.get<PrivateFolderGetParameters, PrivateFolderModel>(params);
-        },
-        async list(params: PrivateFolderListParameters) {
-            return SpaceConnector.clientV2.dashboard.privateFolder.list<PrivateFolderListParameters, ListResponse<PrivateFolderModel>>(params);
-        },
+        create: SpaceConnector.clientV2.dashboard.privateFolder.create<PrivateFolderCreateParameters, PrivateFolderModel>,
+        update: SpaceConnector.clientV2.dashboard.privateFolder.update<PrivateFolderUpdateParameters, PrivateFolderModel>,
+        delete: SpaceConnector.clientV2.dashboard.privateFolder.delete<PrivateFolderDeleteParameters>,
+        get: SpaceConnector.clientV2.dashboard.privateFolder.get<PrivateFolderGetParameters, PrivateFolderModel>,
+        list: SpaceConnector.clientV2.dashboard.privateFolder.list<PrivateFolderListParameters, ListResponse<PrivateFolderModel>>,
     };
 
     return {

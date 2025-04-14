@@ -11,41 +11,15 @@ import type { PrivateWidgetLoadSumParameters } from '@/api-clients/dashboard/pri
 import type { PrivateWidgetUpdateParameters } from '@/api-clients/dashboard/private-widget/schema/api-verbs/update';
 import type { PrivateWidgetModel } from '@/api-clients/dashboard/private-widget/schema/model';
 
-interface UsePrivateWidgetApiReturn {
-    privateWidgetAPI: {
-        create: (params: PrivateWidgetCreateParameters) => Promise<PrivateWidgetModel>;
-        update: (params: PrivateWidgetUpdateParameters) => Promise<PrivateWidgetModel>;
-        delete: (params: PrivateWidgetDeleteParameters) => Promise<void>;
-        load: (params: PrivateWidgetLoadParameters) => Promise<WidgetLoadResponse>;
-        loadSum: (params: PrivateWidgetLoadSumParameters) => Promise<WidgetLoadResponse>;
-        get: (params: PrivateWidgetGetParameters) => Promise<PrivateWidgetModel>;
-        list: (params: PrivateWidgetListParameters) => Promise<ListResponse<PrivateWidgetModel>>;
-    }
-}
-
-export const usePrivateWidgetApi = (): UsePrivateWidgetApiReturn => {
+export const usePrivateWidgetApi = () => {
     const action = {
-        async create(params: PrivateWidgetCreateParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>(params);
-        },
-        async update(params: PrivateWidgetUpdateParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>(params);
-        },
-        async delete(params: PrivateWidgetDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>(params);
-        },
-        async load(params: PrivateWidgetLoadParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>(params);
-        },
-        async loadSum(params: PrivateWidgetLoadSumParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, WidgetLoadResponse>(params);
-        },
-        async get(params: PrivateWidgetGetParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.get<PrivateWidgetGetParameters, PrivateWidgetModel>(params);
-        },
-        async list(params: PrivateWidgetListParameters) {
-            return SpaceConnector.clientV2.dashboard.privateWidget.list<PrivateWidgetListParameters, ListResponse<PrivateWidgetModel>>(params);
-        },
+        create: SpaceConnector.clientV2.dashboard.privateWidget.create<PrivateWidgetCreateParameters, PrivateWidgetModel>,
+        update: SpaceConnector.clientV2.dashboard.privateWidget.update<PrivateWidgetUpdateParameters, PrivateWidgetModel>,
+        delete: SpaceConnector.clientV2.dashboard.privateWidget.delete<PrivateWidgetDeleteParameters>,
+        load: SpaceConnector.clientV2.dashboard.privateWidget.load<PrivateWidgetLoadParameters, WidgetLoadResponse>,
+        loadSum: SpaceConnector.clientV2.dashboard.privateWidget.loadSum<PrivateWidgetLoadSumParameters, WidgetLoadResponse>,
+        get: SpaceConnector.clientV2.dashboard.privateWidget.get<PrivateWidgetGetParameters, PrivateWidgetModel>,
+        list: SpaceConnector.clientV2.dashboard.privateWidget.list<PrivateWidgetListParameters, ListResponse<PrivateWidgetModel>>,
     };
 
     return {

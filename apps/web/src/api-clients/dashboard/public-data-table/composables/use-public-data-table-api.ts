@@ -12,41 +12,15 @@ import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-d
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 
-interface UsePublicDataTableApiReturn {
-    publicDataTableAPI: {
-        add: (params: DataTableAddParameters) => Promise<PublicDataTableModel>;
-        transform: (params: DataTableTransformParameters) => Promise<PublicDataTableModel>;
-        update: (params: DataTableUpdateParameters) => Promise<PublicDataTableModel>;
-        delete: (params: DataTableDeleteParameters) => Promise<void>;
-        load: (params: DataTableLoadParameters) => Promise<DataTableLoadResponse>;
-        get: (params: DataTableGetParameters) => Promise<PublicDataTableModel>;
-        list: (params: DataTableListParameters) => Promise<ListResponse<PublicDataTableModel>>;
-    }
-}
-
-export const usePublicDataTableApi = (): UsePublicDataTableApiReturn => {
+export const usePublicDataTableApi = () => {
     const action = {
-        async add(params: DataTableAddParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.add<DataTableAddParameters, PublicDataTableModel>(params);
-        },
-        async transform(params: DataTableTransformParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.transform<DataTableTransformParameters, PublicDataTableModel>(params);
-        },
-        async update(params: DataTableUpdateParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, PublicDataTableModel>(params);
-        },
-        async delete(params: DataTableDeleteParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters>(params);
-        },
-        async load(params: DataTableLoadParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, DataTableLoadResponse>(params);
-        },
-        async get(params: DataTableGetParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.get<DataTableGetParameters, PublicDataTableModel>(params);
-        },
-        async list(params: DataTableListParameters) {
-            return SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<PublicDataTableModel>>(params);
-        },
+        add: SpaceConnector.clientV2.dashboard.publicDataTable.add<DataTableAddParameters, PublicDataTableModel>,
+        transform: SpaceConnector.clientV2.dashboard.publicDataTable.transform<DataTableTransformParameters, PublicDataTableModel>,
+        update: SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, PublicDataTableModel>,
+        delete: SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters>,
+        load: SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, DataTableLoadResponse>,
+        get: SpaceConnector.clientV2.dashboard.publicDataTable.get<DataTableGetParameters, PublicDataTableModel>,
+        list: SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<PublicDataTableModel>>,
     };
 
     return {
