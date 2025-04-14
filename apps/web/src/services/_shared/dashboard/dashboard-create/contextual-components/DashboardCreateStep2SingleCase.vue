@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, defineExpose, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 

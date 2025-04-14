@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, reactive, toRef,
+    computed, defineProps, reactive, toRef,
 } from 'vue';
 
 import { sortBy } from 'lodash';

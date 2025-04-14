@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineEmits, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {

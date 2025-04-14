@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, defineEmits, reactive, ref, toRef, watch,
+    computed, reactive, ref, toRef, watch,
 } from 'vue';
 
 import { cloneDeep, debounce } from 'lodash';

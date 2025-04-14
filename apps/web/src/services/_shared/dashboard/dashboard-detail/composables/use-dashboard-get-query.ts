@@ -3,7 +3,6 @@ import { computed } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import type { PrivateDashboardGetParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/get';
@@ -13,6 +12,7 @@ import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/
 import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 const STALE_TIME = 1000 * 60 * 5;

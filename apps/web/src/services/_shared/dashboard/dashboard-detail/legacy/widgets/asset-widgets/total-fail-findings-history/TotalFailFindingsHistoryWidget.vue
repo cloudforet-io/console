@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
+    computed, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref,
+    computed, defineProps, nextTick, reactive, ref,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
