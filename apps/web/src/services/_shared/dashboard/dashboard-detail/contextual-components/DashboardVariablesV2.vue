@@ -64,7 +64,6 @@ const state = reactive({
     showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     dashboardVarsSchemaProperties: computed<DashboardGlobalVariableSchemaProperties>(() => dashboard.value?.vars_schema?.properties ?? {}),
     dashboardVars: computed<DashboardVars>(() => dashboard.value?.vars ?? {}),
-    tempVars: undefined as DashboardVars|undefined,
     globalVariables: computed<DashboardGlobalVariable[]>(() => {
         const properties = state.dashboardVarsSchemaProperties as Record<string, DashboardGlobalVariable>;
         const _usedProperties: DashboardGlobalVariable[] = Object.values(properties).filter((d) => d.use);
@@ -78,7 +77,7 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
         state.globalVariables.forEach((_var) => {
-            if (!isEqual(state.dashboardVars?.[_var.key], state.tempVars?.[_var.key])) {
+            if (!isEqual(state.dashboardVars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
                 results.push(_var.key);
             }
         });
@@ -89,20 +88,16 @@ const state = reactive({
 });
 
 const handleClickSaveButton = () => {
-    emit('update', { vars: state.tempVars });
+    emit('update', { vars: dashboardDetailState.vars });
 };
 const handleResetVariables = () => {
-    state.tempVars = state.dashboardVars;
-    // dashboardDetailStore.setVars();
+    dashboardDetailStore.setVars(dashboard.value?.vars);
 };
 
 watch(() => dashboard.value?.vars, (_vars) => {
-    state.tempVars = { ..._vars };
-}, { immediate: true });
+    dashboardDetailStore.setVars(_vars);
+}, { immediate: true, deep: true });
 
-watch([() => state.tempVars, dashboard], ([_tempVars]) => {
-    dashboardDetailStore.setVars(_tempVars);
-}, { deep: true });
 </script>
 
 <template>
@@ -111,9 +106,7 @@ watch([() => state.tempVars, dashboard], ([_tempVars]) => {
     >
         <template v-for="(property, idx) in state.globalVariables">
             <div :key="`${property.name}-${idx}`">
-                <dashboard-global-variable-filter :variable="property"
-                                                  :vars.sync="state.tempVars"
-                />
+                <dashboard-global-variable-filter :variable="property" />
                 <changed-mark v-if="state.modifiedVariablesSchemaProperties.includes(property.key)" />
             </div>
         </template>

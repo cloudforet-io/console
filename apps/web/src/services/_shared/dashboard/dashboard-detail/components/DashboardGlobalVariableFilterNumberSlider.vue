@@ -13,22 +13,21 @@ import type {
     DashboardGlobalVariable,
     NumberAnyVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
 
 interface Props {
     variable: DashboardGlobalVariable;
-    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
 const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
@@ -42,7 +41,6 @@ const state = reactive({
     min: computed<number>(() => parseFloat(state.variable.options.min)),
     max: computed<number>(() => parseFloat(state.variable.options.max)),
     value: undefined as number|undefined,
-    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 const handleUpdateSliderValue = debounce((value: string) => {
@@ -53,13 +51,13 @@ const handleUpdateSliderValue = debounce((value: string) => {
 
 const changeVariables = (changedSelected?: number) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(props.vars ?? {});
+    const vars = cloneDeep(dashboardDetailState.vars ?? {});
     if (changedSelected !== undefined) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
     }
-    state.proxyVars = vars;
+    dashboardDetailStore.setVars(vars);
 };
 
 watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchema) => {
@@ -72,11 +70,14 @@ watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchem
 }, { immediate: true });
 
 // for reset
-watch(() => props.vars, (_vars) => {
+watch(() => dashboardDetailState.vars, (_vars) => {
     const _variable = props.variable as NumberAnyVariable;
     const tempVarsValue = _vars?.[_variable.key] as number|undefined;
-    if (state.value !== parseFloat(tempVarsValue)) {
-        state.value = parseFloat(tempVarsValue);
+    if (tempVarsValue === undefined) {
+        state.value = _variable.options.min;
+        changeVariables(state.value);
+    } else if (state.value !== tempVarsValue) {
+        state.value = tempVarsValue;
     }
 });
 

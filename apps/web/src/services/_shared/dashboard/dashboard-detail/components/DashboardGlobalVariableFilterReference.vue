@@ -16,7 +16,6 @@ import type {
     DashboardGlobalVariable,
     ReferenceVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -33,22 +32,22 @@ import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 
 interface Props {
     variable: DashboardGlobalVariable;
-    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
 const { dashboard } = useDashboardGetQuery({
@@ -91,7 +90,6 @@ const state = reactive({
         return getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
     }),
     selected: [] as MenuItem[],
-    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 // event
@@ -102,7 +100,7 @@ const handleSelectOption = () => {
 // helper
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(props.vars ?? {});
+    const vars = cloneDeep(dashboardDetailState.vars ?? {});
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete vars[_key];
@@ -111,7 +109,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         vars[_key] = reconvertedSelected[0];
     }
-    state.proxyVars = vars;
+    dashboardDetailStore.setVars(vars);
 };
 
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
@@ -126,24 +124,14 @@ const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> =
     foundItems = foundItems.concat(results);
     return foundItems;
 };
-const initVariableAndSelected = (items: MenuItem[]) => {
-    const found = items[0];
-    if (found) {
-        state.selected = [found];
-        changeVariables([found]);
-    }
-};
 
 const initSelected = async (value: any) => {
+    console.log('[[[[[[initSelected]]]]]] - ', props.variable.key, value);
     // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
     const selectedValues = flattenDeep([value ?? []]);
     const items = await loadOptionItems(selectedValues);
     const selectedItems = items.filter((item) => selectedValues.includes(item.name));
-    if (selectedItems.length) {
-        state.selected = selectedItems;
-    } else {
-        initVariableAndSelected(items);
-    }
+    state.selected = selectedItems;
 };
 
 watch(() => dashboard.value?.vars_schema?.properties, async (varsSchema, prevVarsSchema) => {
@@ -161,7 +149,7 @@ watch(() => dashboard.value?.vars_schema?.properties, async (varsSchema, prevVar
 
 
 // for reset
-watch(() => props.vars, (_vars) => {
+watch(() => dashboardDetailState.vars, (_vars) => {
     const selectedValues = state.selected.map((d) => d.name);
     const _variable = props.variable as ReferenceVariable;
     const tempVarsValue = flattenDeep([(_vars?.[_variable.key] as string|string[]|undefined) ?? []]);

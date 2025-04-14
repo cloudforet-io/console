@@ -4,9 +4,6 @@ import {
 } from 'vue';
 
 import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 const FILTER_COMPONENT_MAP: Record<GlobalVariableFilterType, ReturnType<typeof defineAsyncComponent>> = {
     ENUM: defineAsyncComponent(() => import('@/services/_shared/dashboard/dashboard-detail/components/DashboardGlobalVariableFilterEnum.vue')),
@@ -19,12 +16,9 @@ const FILTER_COMPONENT_MAP: Record<GlobalVariableFilterType, ReturnType<typeof d
 
 interface Props {
     variable: DashboardGlobalVariable;
-    vars?: DashboardVars;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void;
-}>();
 
 const state = reactive({
     variableMethod: computed<DashboardGlobalVariable['method']>(() => props.variable.method),
@@ -36,7 +30,6 @@ const state = reactive({
         if (props.variable.options.inputType === 'input') return 'NUMBER_INPUT'; // input - number
         return 'NUMBER_SLIDER'; // slider - number
     }),
-    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 </script>
@@ -45,7 +38,6 @@ const state = reactive({
     <div class="dashboard-global-variable-filter">
         <component :is="FILTER_COMPONENT_MAP[state.variableFilterType]"
                    :variable="props.variable"
-                   :vars.sync="state.proxyVars"
         />
     </div>
 </template>

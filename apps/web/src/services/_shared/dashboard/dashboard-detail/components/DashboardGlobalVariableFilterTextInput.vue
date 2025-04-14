@@ -14,22 +14,23 @@ import type {
     DashboardGlobalVariable,
     TextAnyVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
-import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
 
 interface Props {
     variable: DashboardGlobalVariable;
-    vars?: DashboardVars;
 }
 
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:vars', val: DashboardVars): void}>();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
+
 const { dashboard } = useDashboardGetQuery({
     dashboardId,
 });
@@ -41,7 +42,6 @@ const state = reactive({
     value: undefined as string|undefined,
     editMode: false,
     keyword: '',
-    proxyVars: useProxyValue<DashboardVars|undefined>('vars', props, emit),
 });
 
 const handleDeleteTextValue = () => {
@@ -66,13 +66,13 @@ const handleClickDoneButton = () => {
 
 const changeVariables = (changedSelected?: string) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(props.vars ?? {});
+    const vars = cloneDeep(dashboardDetailState.vars ?? {});
     if (changedSelected) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
     }
-    state.proxyVars = vars;
+    dashboardDetailStore.setVars(vars);
 };
 
 // set default value
@@ -85,7 +85,7 @@ watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchem
 }, { immediate: true });
 
 // for reset
-watch(() => props.vars, (_vars) => {
+watch(() => dashboardDetailState.vars, (_vars) => {
     const _variable = props.variable as TextAnyVariable;
     const tempVarsValue = _vars?.[_variable.key] as string|undefined;
     if (state.value !== tempVarsValue) {
