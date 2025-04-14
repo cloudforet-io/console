@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, reactive,
+    computed, defineProps, reactive,
 } from 'vue';
 
 import { min } from 'lodash';
