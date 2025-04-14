@@ -2,7 +2,6 @@
 import {
     computed, onBeforeMount, onUnmounted, reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEqual } from 'lodash';
@@ -12,8 +11,12 @@ import {
 } from '@cloudforet/mirinae';
 
 import type {
-    DashboardOptions, DashboardVars,
+    DashboardModel,
+    DashboardOptions, DashboardUpdateParams, DashboardVars,
 } from '@/api-clients/dashboard/_types/dashboard-type';
+import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
+import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -30,13 +33,13 @@ import { WIDGET_WIDTH_RANGE_LIST } from '@/common/modules/widgets/_constants/wid
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import WidgetFieldValueManager from '@/common/modules/widgets/_widget-field-value-manager';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 import DashboardToolsetDateDropdown from '@/services/_shared/dashboard/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
-import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
 import { useDashboardWidgetListQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-widget-list-query';
 import DashboardVariablesV2 from '@/services/_shared/dashboard/dashboard-detail/contextual-components/DashboardVariablesV2.vue';
 import { useDashboardRefinedVars } from '@/services/_shared/dashboard/dashboard-detail/contextual-composables/use-dashboard-refined-vars';
@@ -49,16 +52,25 @@ import {
 
 const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const dashboardVarsStore = useDashboardVarsStore();
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
+const widgetContextStore = useWidgetContextStore();
+const widgetContextGetters = widgetContextStore.getters;
+const widgetContextState = widgetContextStore.state;
+const {
+    publicDashboardAPI,
+} = usePublicDashboardApi();
+const {
+    privateDashboardAPI,
+} = usePrivateDashboardApi();
+
 
 const emit = defineEmits<{(event: 'watch-options-changed', value: boolean): void;}>();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
+const dashboard = computed<DashboardModel|undefined>(() => widgetContextState.dashboard);
+const dashboardId = computed(() => widgetContextGetters.dashboardId);
 const { refinedVars } = useDashboardRefinedVars(dashboardId);
 
 const storeState = reactive({
@@ -66,13 +78,6 @@ const storeState = reactive({
 });
 
 /* Query */
-const {
-    dashboard,
-    keys: dashboardKeys,
-    fetcher: dashboardFetcher,
-} = useDashboardGetQuery({
-    dashboardId,
-});
 const {
     widgetList,
 } = useDashboardWidgetListQuery({
@@ -190,6 +195,10 @@ const updateWidget = async () => {
     }
 
     if (_isCreating || state.isDashboardLayoutChanged) {
+        if (!dashboardId.value) {
+            console.error('dashboard is not found');
+            return;
+        }
         const _layouts = cloneDeep(dashboard.value?.layouts || []);
         if (_layouts.length) {
             const _targetLayout = _layouts[0];
@@ -213,12 +222,17 @@ const updateWidget = async () => {
     }
 };
 
+const { withSuffix: publicDashboardGetQueryKeyWithSuffix } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
+const { withSuffix: privateDashboardGetQueryKeyWithSuffix } = useServiceQueryKey('dashboard', 'private-dashboard', 'get');
+const updateDashboardFn = (params: DashboardUpdateParams): Promise<DashboardModel> => (state.isPrivate ? privateDashboardAPI.update(params) : publicDashboardAPI.update(params));
 const { mutate: updateDashboard } = useMutation(
     {
-        mutationFn: dashboardFetcher.updateDashboardFn,
-        onSuccess: (data) => {
-            const dashboardQueryKey = state.isPrivate ? dashboardKeys.privateDashboardGetQueryKey : dashboardKeys.publicDashboardGetQueryKey;
-            queryClient.setQueryData(dashboardQueryKey.value, () => data);
+        mutationFn: updateDashboardFn,
+        onSuccess: (_, variables) => {
+            const dashboardQueryKey = state.isPrivate
+                ? privateDashboardGetQueryKeyWithSuffix(variables.dashboard_id)
+                : publicDashboardGetQueryKeyWithSuffix(variables.dashboard_id);
+            queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
         },
     },
 );
@@ -248,7 +262,7 @@ const sanitizeAndSortWidgets = (_layoutWidgets: string[] = [], _widgetList: stri
 
 const initSnapshot = () => {
     state.varsSnapshot = cloneDeep(dashboard.value?.vars || {});
-    state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
+    state.dashboardOptionsSnapshot = cloneDeep(dashboard.value?.options || {});
 };
 const reset = () => {
     dashboardVarsStore.setVars(state.varsSnapshot);
@@ -361,7 +375,7 @@ onUnmounted(() => {
                            :width="state.widgetWidth"
                            :widget-options="widget?.options"
                            :data-tables="dataTableList"
-                           :dashboard-options="dashboardDetailState.options"
+                           :dashboard-options="dashboard?.options"
                            :dashboard-vars="refinedVars"
                            :dashboard-id="dashboardId"
                            :all-reference-type-info="state.allReferenceTypeInfo"

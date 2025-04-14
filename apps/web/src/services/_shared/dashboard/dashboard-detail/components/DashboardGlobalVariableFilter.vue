@@ -3,7 +3,12 @@ import {
     computed, reactive, defineAsyncComponent,
 } from 'vue';
 
-import type { DashboardGlobalVariable, GlobalVariableFilterType } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+
+import type { GLOBAL_VARIABLE_FILTER_TYPE_MAP } from '@/services/_shared/dashboard/dashboard-detail/constants/dashboard-global-variable';
+
+type GlobalVariableFilterType = keyof typeof GLOBAL_VARIABLE_FILTER_TYPE_MAP;
+
 
 const FILTER_COMPONENT_MAP: Record<GlobalVariableFilterType, ReturnType<typeof defineAsyncComponent>> = {
     ENUM: defineAsyncComponent(() => import('@/services/_shared/dashboard/dashboard-detail/components/DashboardGlobalVariableFilterEnum.vue')),

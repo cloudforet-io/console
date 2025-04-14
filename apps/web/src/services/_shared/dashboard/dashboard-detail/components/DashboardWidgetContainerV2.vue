@@ -34,7 +34,6 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
@@ -44,6 +43,7 @@ import type { WidgetHeaderValue } from '@/common/modules/widgets/_widget-fields/
 import type {
     WidgetExpose, WidgetProps, WidgetSize, WidgetOverlayType,
 } from '@/common/modules/widgets/types/widget-display-type';
+import WidgetFormOverlayLayout from '@/common/modules/widgets/WidgetFormOverlayLayout.vue';
 
 import { useDashboardManageable } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-manageable';
 import DashboardReorderSidebar
@@ -589,7 +589,7 @@ onBeforeUnmount(() => {
                       @update:visible="widgetDeleteState.visibleModal = $event"
                       @confirm="handleDeleteModalConfirm"
         />
-        <widget-form-overlay />
+        <widget-form-overlay-layout :dashboard="dashboard" />
         <dashboard-reorder-sidebar :dashboard-id="dashboardId"
                                    :widget-info-list="state.refinedWidgetInfoList ?? []"
         />

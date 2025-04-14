@@ -50,11 +50,13 @@ export const useDashboardWidgetListQuery = ({
 
     /* Query Keys */
     const { key: publicWidgetListQueryKey, params: publicWidgetListParams } = useServiceQueryKey('dashboard', 'public-widget', 'list', {
+        contextKey: dashboardId.value,
         params: computed<PublicWidgetListParameters>(() => ({
             dashboard_id: dashboardId.value as string,
         })),
     });
     const { key: privateWidgetListQueryKey, params: privateWidgetListParams } = useServiceQueryKey('dashboard', 'private-widget', 'list', {
+        contextKey: dashboardId.value,
         params: computed<PrivateWidgetListParameters>(() => ({
             dashboard_id: dashboardId.value as string,
         })),

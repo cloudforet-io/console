@@ -50,11 +50,13 @@ export const useWidgetDataTableListQuery = ({
 
     /* Query Keys */
     const { key: publicDataTableListQueryKey, params: publicDataTableListParams } = useServiceQueryKey('dashboard', 'public-data-table', 'list', {
+        contextKey: widgetId.value,
         params: computed<DataTableListParameters>(() => ({
             widget_id: widgetId.value as string,
         })),
     });
     const { key: privateDataTableListQueryKey, params: privateDataTableListParams } = useServiceQueryKey('dashboard', 'private-data-table', 'list', {
+        contextKey: widgetId.value,
         params: computed<DataTableListParameters>(() => ({
             widget_id: widgetId.value as string,
         })),

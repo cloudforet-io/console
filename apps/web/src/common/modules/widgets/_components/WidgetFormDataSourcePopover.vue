@@ -3,7 +3,6 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -13,6 +12,7 @@ import {
 
 import type { WidgetCreateParams, WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -41,21 +41,22 @@ import {
     DATA_TABLE_TYPE, TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableDataType, DataTableSourceType, DataTableOperator, DataTableAddOptions, DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardWidgetListQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-widget-list-query';
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
+const widgetContextStore = useWidgetContextStore();
+const widgetContextState = widgetContextStore.state;
+const widgetContextGetters = widgetContextStore.getters;
 const userStore = useUserStore();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
+const dashboardId = computed(() => widgetContextGetters.dashboardId);
 
 const emit = defineEmits<{(e: 'scroll'): void;}>();
 
@@ -75,18 +76,6 @@ const {
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const queryClient = useQueryClient();
-
-const {
-    dashboard,
-} = useDashboardGetQuery({
-    dashboardId,
-});
-const {
-    keys: widgetKeys,
-} = useDashboardWidgetListQuery({
-    dashboardId,
-});
-
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -204,22 +193,25 @@ const state = reactive({
 });
 
 /* Api */
+const { withSuffix: privateWidgetListWithSuffix } = useServiceQueryKey('dashboard', 'private-widget', 'list');
+const { withSuffix: publicWidgetListWithSuffix } = useServiceQueryKey('dashboard', 'public-widget', 'list');
+
 const widgetCreateFn = (params: WidgetCreateParams): Promise<WidgetModel> => {
-    if (dashboardId.value?.startsWith('private')) {
+    if (!params.dashboard_id) {
+        throw new Error('dashboardId is undefined');
+    }
+
+    if (params.dashboard_id.startsWith('private')) {
         return widgetApi.privateWidgetAPI.create(params);
     }
     return widgetApi.publicWidgetAPI.create(params);
 };
 const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutation({
     mutationFn: widgetCreateFn,
-    onSuccess: (data) => {
-        const _isPrivate = dashboardId.value?.startsWith('private');
-        const widgetListQueryKey = _isPrivate ? widgetKeys.privateWidgetListQueryKey : widgetKeys.publicWidgetListQueryKey;
-        queryClient.setQueryData(widgetListQueryKey.value, (oldData: ListResponse<WidgetModel>) => (oldData.results?.length ? {
-            ...oldData, results: [...oldData.results, data],
-        } : {
-            ...oldData, results: [data],
-        }));
+    onSuccess: (data, variables) => {
+        const _isPrivate = variables.dashboard_id.startsWith('private');
+        const widgetListQueryKey = _isPrivate ? privateWidgetListWithSuffix(variables.dashboard_id) : publicWidgetListWithSuffix(variables.dashboard_id);
+        queryClient.invalidateQueries({ queryKey: widgetListQueryKey });
         widgetGenerateStore.setWidgetFormInfo(data);
     },
     onError: (e) => {
@@ -227,7 +219,7 @@ const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutatio
     },
 });
 const dataTableAddFn = (params: DataTableAddParameters): Promise<DataTableModel> => {
-    if (dashboardId.value?.startsWith('private')) {
+    if (params.widget_id.startsWith('private')) {
         return dataTableApi.privateDataTableAPI.add(params);
     }
     return dataTableApi.publicDataTableAPI.add(params);
@@ -297,10 +289,13 @@ const handleSelectPopperCondition = (condition: DataTableDataType) => {
     state.selectedPopperCondition = condition;
 };
 const handleConfirmDataSource = async () => {
+    if (!dashboardId.value) {
+        throw new Error('dashboardId is undefined');
+    }
     // create widget
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
         await createWidget({
-            dashboard_id: dashboardId.value as string,
+            dashboard_id: dashboardId.value,
             tags: { created_by: userStore.state.userId },
             widget_type: 'table',
         });
@@ -355,7 +350,7 @@ const handleConfirmDataSource = async () => {
 
         const mergedParams = {
             ...addParameters,
-            vars: dashboard.value?.vars || {},
+            vars: widgetContextState.dashboard?.vars || {},
         };
         if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
             mergedParams.options = costOptions;

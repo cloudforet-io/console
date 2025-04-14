@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
@@ -51,6 +50,7 @@ import {
     DATA_TABLE_TYPE, DATA_TABLE_OPERATOR, DEFAULT_TRANSFORM_DATA_TABLE_VALUE_MAP,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type {
     DataTableAlertModalMode, TransformDataTableInfo,
@@ -61,10 +61,6 @@ import type {
     AddLabelsOptions, PivotOptions,
     JoinOptions, ValueMappingOptions, ConcatOptions, AggregateOptions, AggregateFunction,
 } from '@/common/modules/widgets/types/widget-model';
-
-import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
-
-
 
 
 
@@ -77,17 +73,12 @@ interface Props {
 type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const props = defineProps<Props>();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
+const widgetContextStore = useWidgetContextStore();
+const widgetContextState = widgetContextStore.state;
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 /* Querys */
-const {
-    dashboard,
-} = useDashboardGetQuery({
-    dashboardId,
-});
 const {
     widget,
     keys: widgetKeys,
@@ -359,11 +350,14 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         }
     };
     if (firstUpdating) {
+        if (!widgetGenerateState.widgetId) {
+            throw new Error('Widget ID is required');
+        }
         const createParams = {
             name: state.dataTableName,
             widget_id: widgetGenerateState.widgetId,
             operator: state.operator,
-            vars: dashboard.value?.vars || {},
+            vars: widgetContextState.dashboard?.vars || {},
             options: { [state.operator]: options() },
         };
         const dataTable = await transformDataTableFn(createParams);
