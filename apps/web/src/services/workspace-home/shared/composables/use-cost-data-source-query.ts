@@ -2,8 +2,8 @@ import type { Ref } from 'vue';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import { useDataSourceApi } from '@/api-clients/cost-analysis/data-source/composables/use-data-source-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 const dataSourceApiHelper = new ApiQueryHelper().setSort('workspace_id', false);

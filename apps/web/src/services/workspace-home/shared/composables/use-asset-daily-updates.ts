@@ -6,8 +6,8 @@ import {
     groupBy, map, sumBy,
 } from 'lodash';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composables/use-metric-data-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';

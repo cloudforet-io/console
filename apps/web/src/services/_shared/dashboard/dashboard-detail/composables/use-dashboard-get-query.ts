@@ -1,7 +1,7 @@
+
+
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
-
-import type { QueryKey } from '@tanstack/vue-query';
 
 import type { DashboardModel, DashboardUpdateParams } from '@/api-clients/dashboard/_types/dashboard-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
@@ -13,12 +13,13 @@ import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/publi
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 const STALE_TIME = 1000 * 60 * 5;
 
 interface UseDashboardGetQueryOptions {
-    dashboardId: ComputedRef<string|undefined>;
+    dashboardId?: ComputedRef<string|undefined>;
 }
 
 interface UseDashboardGetQueryReturn {
@@ -26,8 +27,8 @@ interface UseDashboardGetQueryReturn {
     isLoading: ComputedRef<boolean>;
     isError: ComputedRef<boolean>;
     keys: {
-        publicDashboardGetQueryKey: ComputedRef<QueryKey>;
-        privateDashboardGetQueryKey: ComputedRef<QueryKey>;
+        publicDashboardGetQueryKey: ComputedRef<QueryKeyArray>;
+        privateDashboardGetQueryKey: ComputedRef<QueryKeyArray>;
     };
     api: {
         publicDashboardAPI: ReturnType<typeof usePublicDashboardApi>['publicDashboardAPI'];
@@ -44,20 +45,20 @@ export const useDashboardGetQuery = ({
     const { publicDashboardAPI } = usePublicDashboardApi();
     const { privateDashboardAPI } = usePrivateDashboardApi();
 
-    const isPrivate = computed(() => !!dashboardId.value?.startsWith('private'));
+    const isPrivate = computed(() => !!dashboardId?.value?.startsWith('private'));
 
 
     /* Query Keys */
     const { key: publicDashboardGetQueryKey, params: publicDashboardGetParams } = useServiceQueryKey('dashboard', 'public-dashboard', 'get', {
-        contextKey: computed(() => dashboardId.value),
+        contextKey: computed(() => dashboardId?.value),
         params: computed<PublicDashboardGetParameters>(() => ({
-            dashboard_id: dashboardId.value as string,
+            dashboard_id: dashboardId?.value as string,
         })),
     });
     const { key: privateDashboardGetQueryKey, params: privateDashboardGetParams } = useServiceQueryKey('dashboard', 'private-dashboard', 'get', {
-        contextKey: computed(() => dashboardId.value),
+        contextKey: computed(() => dashboardId?.value),
         params: computed<PrivateDashboardGetParameters>(() => ({
-            dashboard_id: dashboardId.value as string,
+            dashboard_id: dashboardId?.value as string,
         })),
     });
 
@@ -70,7 +71,7 @@ export const useDashboardGetQuery = ({
             }
             return publicDashboardAPI.get(publicDashboardGetParams.value);
         },
-        enabled: computed(() => !!dashboardId.value && !isPrivate.value),
+        enabled: computed(() => !!dashboardId?.value && !isPrivate.value),
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateDashboardQuery = useScopedQuery({
@@ -81,7 +82,7 @@ export const useDashboardGetQuery = ({
             }
             return privateDashboardAPI.get(privateDashboardGetParams.value);
         },
-        enabled: computed(() => !!dashboardId.value && isPrivate.value),
+        enabled: computed(() => !!dashboardId?.value && isPrivate.value),
         staleTime: STALE_TIME,
     }, ['WORKSPACE']);
 

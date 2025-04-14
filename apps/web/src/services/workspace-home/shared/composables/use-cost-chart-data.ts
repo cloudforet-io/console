@@ -4,9 +4,9 @@ import { computed } from 'vue';
 import dayjs from 'dayjs';
 import { sortBy } from 'lodash';
 
-import { useScopedQuery } from '@/api-clients/_common/composables/use-scoped-query';
 import { useUnifiedCostApi } from '@/api-clients/cost-analysis/unified-cost/composables/use-unified-cost-api';
 import type { UnifiedCostAnalyzeParameters } from '@/api-clients/cost-analysis/unified-cost/schema/api-verbs/analyze';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import type { Currency } from '@/store/display/type';
