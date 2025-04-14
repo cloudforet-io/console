@@ -62,7 +62,7 @@ const props = withDefaults(defineProps<{
 });
 const route = useRoute();
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER.uiAffects?.visibleUserNotification ?? false),
+    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleUserNotification ?? false),
     loading: true,
     channelLoading: true,
     userId: computed<string|undefined>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : userStore.state.userId)),

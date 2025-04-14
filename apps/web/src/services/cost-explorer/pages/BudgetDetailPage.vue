@@ -36,7 +36,7 @@ const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    visibleBudgetNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER.uiAffects?.visibleBudgetNotification ?? false),
+    visibleBudgetNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleBudgetNotification ?? false),
     isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
     adminModeLink: computed<Location>(() => ({
         name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
