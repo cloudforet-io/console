@@ -4,13 +4,15 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
+
 import dayjs from 'dayjs';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import type { ApiFilter, Query } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolboxTable, PSelectDropdown, PButtonModal, PI, PProgressBar, PStatus, PLink,
 } from '@cloudforet/mirinae';
@@ -31,11 +33,14 @@ import { useServiceAccountReferenceStore } from '@/store/reference/service-accou
 import type { ListResponse } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToolset.vue';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
+import { BUDGET_SEARCH_HANDLERS } from '../constants/budget-constant';
+import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 import type { Period } from '../types/cost-explorer-query-type';
 import BudgetDeleteCheckModal from './BudgetDeleteCheckModal.vue';
 
@@ -61,6 +66,7 @@ interface BudgetMainListState {
     isEditable: ComputedRef<boolean>;
     isDeleteable: ComputedRef<boolean>;
     selectedBudgetIds: string[];
+    addRequests: any;
 }
 
 interface BudgetQuery {
@@ -69,6 +75,7 @@ interface BudgetQuery {
     period: string|undefined;
     projectList: string[];
     serviceAccountList: any[];
+    utilization?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -84,6 +91,8 @@ const budgetUsageApiQueryHelper = new ApiQueryHelper();
 const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const budgetCreatePageStore = useBudgetCreatePageStore();
+const budgetCreatePageState = budgetCreatePageStore.state;
 
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
@@ -107,6 +116,7 @@ const state = reactive<BudgetMainListState>({
     isEditable: computed<boolean>(() => state.selectedIndex.length === 1),
     isDeleteable: computed<boolean>(() => state.selectedIndex.length > 0),
     selectedBudgetIds: [],
+    addRequests: undefined,
 });
 
 const tableState = reactive({
@@ -120,6 +130,7 @@ const tableState = reactive({
             name: 'target',
             label: 'Target',
             width: '20%',
+            sortable: false,
         },
         {
             name: 'cycle',
@@ -130,26 +141,31 @@ const tableState = reactive({
             name: 'period',
             label: 'Period',
             width: '10%',
+            sortable: false,
         },
         {
             name: 'budget',
             label: 'Budget',
             width: '10%',
+            sortable: false,
         },
         {
             name: 'actualSpend',
             label: 'Actual Spend',
             width: '10%',
+            sortable: false,
         },
         {
             name: 'utilization',
             label: 'Utilization',
             width: '10%',
+            sortable: false,
         },
         {
             name: 'remaining',
             label: 'Remaining',
             width: '10%',
+            sortable: false,
         },
         {
             name: 'state',
@@ -157,7 +173,7 @@ const tableState = reactive({
             width: '7%',
         },
     ]),
-    items: computed(() => state.budgets.map((budget) => {
+    items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
         const startDate = dayjs.utc(budget.start, 'YYYY-MM');
         const endDate = dayjs.utc(budget.end, 'YYYY-MM');
         return {
@@ -166,16 +182,14 @@ const tableState = reactive({
             cycle: budget.time_unit,
             period: budget.time_unit === 'MONTHLY' ? dayjs.utc().format('YYYY-MM')
                 : `${startDate.format('YYYY-MM')} ~ ${endDate.format('YYYY-MM')}`,
-            budget: budget.time_unit === 'MONTHLY' ? state.budgetUsages.filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
+            budget: budget.time_unit === 'MONTHLY' ? (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
             && dayjs.utc(budgetUsage.date).format('YYYY-MM') === dayjs.utc().format('YYYY-MM'))
                 .map((budgetUsage) => budgetUsage.budget)[0] ?? 0 : budget.limit,
             actualSpend: budget.time_unit === 'MONTHLY' ? state.budgetUsages
                 .filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM'))
                 .map((budgetUsage) => budgetUsage.actual_spend)[0] ?? 0
-                : state.budgetUsages.filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0),
-            utilization: budget.time_unit === 'MONTHLY' ? state.budgetUsages.filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
-            && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM')).map((budgetUsage) => budgetUsage.utilization)[0] ?? 0
-                : 0,
+                : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0),
+            utilization: budget.utilization_rate,
             remaining: 0,
             state: dayjs.utc().isSameOrAfter(startDate, 'month') && dayjs.utc().isSameOrBefore(endDate, 'month')
                 ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ACTIVE_TIL_DATE') : 'EXPIRED',
@@ -185,10 +199,18 @@ const tableState = reactive({
         { name: 'delete', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DELETE'), disabled: !state.isDeleteable },
     ]),
     selectedActionItem: '',
+    valueHandlerMap: computed(() => ({
+        name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
+        time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit', 'string'),
+    })),
 });
 
 const budgetApiQueryHelper = new ApiQueryHelper()
-    .setPage(state.pageStart, state.pageLimit);
+    .setPage(state.pageStart, state.pageLimit)
+    .setSort('name', true);
+
+const queryTagHelper = useQueryTags({ keyItemSets: BUDGET_SEARCH_HANDLERS });
+const { queryTags } = queryTagHelper;
 
 const handleModalVisible = (visible: boolean) => {
     emit('update:select-month-modal-visible', visible);
@@ -198,13 +220,75 @@ const handleQuery = (query: BudgetQuery) => {
     state.query = query;
 };
 
+const handleDeleteConfirm = async () => {
+    budgetCreatePageState.loading = true;
+    try {
+        await fetchBudgets();
+        await listBudgetUsages();
+    } finally {
+        state.selectedIndex = [];
+        budgetCreatePageState.loading = false;
+    }
+};
+
+const getBudgetFilters = (): ApiFilter[] => {
+    const filters: ApiFilter[] = [];
+
+    if (state.query?.cycle && state.query.cycle !== 'all') {
+        filters.push({
+            k: 'time_unit',
+            v: state.query.cycle === 'fixedTerm' ? 'TOTAL' : 'MONTHLY',
+            o: 'eq',
+        });
+    }
+
+    if (state.query?.projectList?.length) {
+        filters.push({
+            k: 'project_id',
+            v: state.query.projectList,
+            o: 'contain_in',
+        });
+    }
+
+    if (state.query?.serviceAccountList?.length) {
+        filters.push({
+            k: 'service_account_id',
+            v: state.query.serviceAccountList,
+            o: 'contain_in',
+        });
+    }
+
+    if (state.query?.utilization && state.query.utilization !== 'all') {
+        const utilizationMap: Record<string, number> = {
+            budgetExceeded: 100,
+            overNintyPercentSpent: 90,
+            overEightyPercentSpent: 80,
+            overSeventyPercentSpent: 70,
+            overSixtyPercentSpent: 60,
+            overFiftyPercentSpent: 50,
+            overFortyPercentSpent: 40,
+            overThirtyPercentSpent: 30,
+            overTwentyPercentSpent: 20,
+            overTenPercentSpent: 10,
+        };
+
+        const value = utilizationMap[state.query.utilization];
+        if (value !== undefined) {
+            filters.push({
+                k: 'utilization_rate',
+                v: value,
+                o: state.query.utilization === 'budgetExceeded' ? 'gt' : 'gte',
+            });
+        }
+    }
+
+    return filters;
+};
+
 /* API */
 const fetchBudgetUsages = async () => {
     try {
         state.loading = true;
-        budgetUsageApiQueryHelper
-            .setFilters(state.queryFilters)
-            .setPage(state.pageStart, state.pageLimit);
         if (isAdminMode.value) {
             budgetUsageApiQueryHelper.addFilter({
                 k: 'resource_group',
@@ -224,25 +308,25 @@ const fetchBudgetUsages = async () => {
                         operator: 'sum',
                     },
                 },
-                select: {
-                    budget_id: 'budget_id',
-                    name: 'name',
-                    actual_spend: 'actual_spend',
-                    budget: 'budget',
-                    utilization: {
-                        operator: 'multiply',
-                        fields: [
-                            {
-                                operator: 'divide',
-                                fields: ['actual_spend', 'budget'],
-                            },
-                            100,
-                        ],
-                    },
-                    date: 'date',
-                    currency: 'currency',
-                },
-                sort: [{ key: 'utilization', desc: true }],
+                // select: {
+                //     budget_id: 'budget_id',
+                //     name: 'name',
+                //     actual_spend: 'actual_spend',
+                //     budget: 'budget',
+                //     utilization: {
+                //         operator: 'multiply',
+                //         fields: [
+                //             {
+                //                 operator: 'divide',
+                //                 fields: ['actual_spend', 'budget'],
+                //             },
+                //             100,
+                //         ],
+                //     },
+                //     date: 'date',
+                //     currency: 'currency',
+                // },
+                // sort: [{ key: 'utilization', desc: true }],
                 page: { limit: 200 },
                 ...budgetUsageApiQueryHelper.data,
             },
@@ -258,8 +342,12 @@ const fetchBudgetUsages = async () => {
 
 const fetchBudgets = async () => {
     if (state.loading) return;
+
+    const filters = getBudgetFilters();
+
     const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>({
         query: {
+            filter: filters,
             ...budgetApiQueryHelper.data,
         },
     });
@@ -283,26 +371,46 @@ const handleDelete = () => {
     state.modalVisible = true;
 };
 
-/* Watcher */
-watch(() => state.query, () => {
-    budgetApiQueryHelper.setFilters([
-        {
-            k: 'project_id',
-            v: state.query.projectList ?? '',
-            o: '',
-        },
-        {
-            k: 'service_account_id',
-            v: state.query.serviceAccountList,
-            o: '',
-        },
-    ]);
-}, { deep: true, immediate: true });
-
-watch(() => state.query, async () => {
-    if (state.query.projectList && state.query.projectList.length > 0 || state.query.serviceAccountList) {
-        await fetchBudgets();
+const handleChange = async (options: any = {}) => {
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.queryTags !== undefined) {
+        state.queryFilters = queryHelper.setFiltersAsQueryTag(options.queryTags).filters;
     }
+
+    if (options.sortBy || options.sortDesc !== undefined) {
+        const key = options.sortBy ?? 'name';
+        const desc = options.sortDesc ?? true;
+        let budgetSortKey = key;
+        let usageSortKey = key;
+
+        if (key === 'actualSpend') {
+            budgetSortKey = 'name';
+            usageSortKey = 'utilization';
+        } else if (key === 'cycle') {
+            budgetSortKey = 'time_unit';
+        }
+
+        state.sort = [{
+            key: key === 'actualSpend' ? 'budget_usage' : key,
+            desc,
+        }];
+
+        budgetApiQueryHelper.setSort(budgetSortKey, desc);
+        budgetUsageApiQueryHelper.setSort(usageSortKey, desc);
+    }
+
+    budgetApiQueryHelper.setFilters(state.queryFilters);
+    await fetchBudgets();
+    await listBudgetUsages();
+};
+
+/* Watcher */
+watch(() => state.query, async () => {
+    state.addRequests = {
+        project_id: state.query.projectList,
+    };
+    await fetchBudgets();
 }, { deep: true, immediate: true });
 
 watch(() => state.selectedIndex, () => {
@@ -339,7 +447,12 @@ onMounted(async () => {
                              search-type="query"
                              searchable
                              :select-index="state.selectedIndex"
+                             :key-item-sets="BUDGET_SEARCH_HANDLERS"
+                             :value-handler-map="tableState.valueHandlerMap"
+                             :query-tags="queryTags"
                              @update:select-index="handleUpdateSelectIndex"
+                             @change="handleChange"
+                             @refresh="handleChange()"
             >
                 <template #toolbox-left>
                     <p-select-dropdown placeholder="Action"
@@ -364,7 +477,7 @@ onMounted(async () => {
                     >
                         <p>
                             <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
-                            <span>{{ value }}</span>
+                            <span>{{ value.toLocaleString() }}</span>
                         </p>
                     </div>
                 </template>
@@ -409,25 +522,20 @@ onMounted(async () => {
                 <template #col-actualSpend-format="{item, value, rowIndex}">
                     <p :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
-                        {{ Number(value).toFixed(2) }}
+                        {{ Number(value).toLocaleString() }}
                     </p>
                 </template>
                 <template #col-utilization-format="{item, value}">
                     <div :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
-                        <div v-if="item.cycle === 'TOTAL' && item.actualSpend > 0">
-                            <p-progress-bar :percentage="Number(((Number(item.actualSpend) / Number(item.budget)) * 100).toFixed(2))"
-                                            :color="Number(((Number(item.actualSpend) / Number(item.budget)) * 100).toFixed(2)) < 100
-                                                && Number(((Number(item.actualSpend) / Number(item.budget)) * 100).toFixed(2)) > 0
+                        <div v-if="value">
+                            <p-progress-bar :percentage="value"
+                                            :color="Number(value) < 100
+                                                && Number(value) > 0
                                                 ? '#7F9CF5' : '#FF6A6A'"
                             />
-                            {{ ((Number(item.actualSpend) / Number(item.budget)) * 100).toFixed(2) }} %
+                            <span>{{ Number(value).toFixed(2) }} %</span>
                         </div>
-                        <div v-else>
-                            <p-progress-bar :percentage="value"
-                                            :color="Number(Number(value).toFixed(2)) > 0 && Number(Number(value).toFixed(2)) < 100 ? '#7F9CF5' : '#FF6A6A'"
-                            />
-                            {{ Number(value).toFixed(2) }} %
-                        </div>
+                        <span v-else />
                     </div>
                 </template>
                 <template #col-remaining-format="{item, rowIndex}">
@@ -448,9 +556,11 @@ onMounted(async () => {
             </p-toolbox-table>
         </div>
         <p-button-modal header-title="Do you want to On/Off your Alert?" />
-        <budget-delete-check-modal :visible="state.modalVisible"
-                                   :selected-indices="state.selectedBudgetIds"
-                                   @update:visible="state.modalVisible = $event"
+        <budget-delete-check-modal
+            :visible="state.modalVisible"
+            :selected-indices="state.selectedBudgetIds"
+            @update:visible="state.modalVisible = $event"
+            @confirm="handleDeleteConfirm"
         />
     </div>
 </template>
