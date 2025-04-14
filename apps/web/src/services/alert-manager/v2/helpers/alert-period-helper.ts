@@ -8,8 +8,3 @@ export const convertRelativePeriodToPeriod = (alertRelativePeriod: AlertRelative
         start: today.subtract(alertRelativePeriod.value, 'month').format('YYYY-MM-DD'),
     };
 };
-
-export const initiatePeriodByGranularity = (): [Period, AlertRelativePeriod|undefined] => {
-    const last1MonthsRelativePeriod: AlertRelativePeriod = { value: 1 };
-    return [convertRelativePeriodToPeriod(last1MonthsRelativePeriod), last1MonthsRelativePeriod];
-};
