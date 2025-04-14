@@ -92,6 +92,7 @@ const createBudget = async (type: 'skip' | 'set') => {
     if (budgetCreatePageState.loading) return;
 
     try {
+        budgetCreatePageState.loading = true;
         const params: BudgetCreateParameters = {
             name: budgetCreatePageState.name,
             limit: budgetCreatePageState.limit,
@@ -103,7 +104,7 @@ const createBudget = async (type: 'skip' | 'set') => {
             notification: type === 'set' ? {
                 state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
                     ? 'ENABLED' : 'DISABLED',
-                plans: Number(budgetCreatePageState.thresholds) > 0 ? budgetCreatePageState.thresholds.map((threshold) => ({
+                plans: budgetCreatePageState.thresholds.length > 0 ? budgetCreatePageState.thresholds.map((threshold) => ({
                     unit: 'PERCENT',
                     threshold: threshold.value === 0 ? 0 : Number(threshold.value),
                 })) : [],
@@ -196,12 +197,14 @@ const createBudget = async (type: 'skip' | 'set') => {
         </p-field-group>
         <div class="mt-8 flex justify-end gap-4">
             <p-button style-type="tertiary"
+                      :loading="budgetCreatePageState.loading"
                       @click="createBudget('skip')"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SKIP_FOR_LATER') }}
             </p-button>
             <p-button class="substitutive"
                       :disabled="!invalidThreshold || !isAlertRecipientsSelected"
+                      :loading="budgetCreatePageState.loading"
                       @click="createBudget('set')"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SET') }}

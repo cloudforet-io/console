@@ -6,5 +6,8 @@ export interface BudgetUpdateParameters {
     name?: string;
     limit?: number;
     planned_limits?: BudgetPlannedLimit[];
+    start?: string;
+    end?: string;
+    utilization_rate?: number;
     tags?: Tags;
 }
