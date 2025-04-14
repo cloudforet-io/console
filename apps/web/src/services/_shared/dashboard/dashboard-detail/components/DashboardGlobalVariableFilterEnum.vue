@@ -19,7 +19,7 @@ import type {
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
+import { useDashboardVarsStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-vars-store';
 
 
 interface Props {
@@ -30,8 +30,8 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardVarsStore = useDashboardVarsStore();
+const dashboardVarsState = dashboardVarsStore.state;
 
 
 const { dashboard } = useDashboardGetQuery({
@@ -53,7 +53,7 @@ const handleSelectOption = () => {
 
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars ?? {});
+    const vars = cloneDeep(dashboardVarsState.vars ?? {});
     const selectedValues: string[] = changedSelected.map((d) => d.name) as string[];
     if (selectedValues.length === 0) {
         delete vars[_key];
@@ -65,7 +65,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
         }
         vars[_key] = _vars;
     }
-    dashboardDetailStore.setVars(vars);
+    dashboardVarsStore.setVars(vars);
 };
 
 const initSelected = (value: any) => {
@@ -90,7 +90,7 @@ watch(() => dashboard.value?.vars_schema?.properties, async (varsSchema, prevVar
 }, { immediate: true });
 
 // for reset
-watch(() => dashboardDetailState.vars, (_vars) => {
+watch(() => dashboardVarsState.vars, (_vars) => {
     const selectedValues = state.selected.map((d) => d.name);
     const _variable = props.variable as TextEnumVariable|NumberEnumVariable;
     const tempVarsValue = flattenDeep([(_vars?.[_variable.key] as string|string[]|undefined) ?? []]);

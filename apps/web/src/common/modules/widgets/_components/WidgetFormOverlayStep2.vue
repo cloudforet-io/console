@@ -41,17 +41,18 @@ import { useDashboardWidgetListQuery } from '@/services/_shared/dashboard/dashbo
 import DashboardVariablesV2 from '@/services/_shared/dashboard/dashboard-detail/contextual-components/DashboardVariablesV2.vue';
 import { useDashboardRefinedVars } from '@/services/_shared/dashboard/dashboard-detail/contextual-composables/use-dashboard-refined-vars';
 import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
+import { useDashboardVarsStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-vars-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
-
 
 const overlayWidgetRef = ref<HTMLElement|null>(null);
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
+const dashboardVarsStore = useDashboardVarsStore();
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const appContextStore = useAppContextStore();
 
@@ -250,7 +251,7 @@ const initSnapshot = () => {
     state.dashboardOptionsSnapshot = cloneDeep(dashboardDetailState.options);
 };
 const reset = () => {
-    dashboardDetailStore.setVars(state.varsSnapshot);
+    dashboardVarsStore.setVars(state.varsSnapshot);
     dashboardDetailStore.setOptions(state.dashboardOptionsSnapshot);
 };
 

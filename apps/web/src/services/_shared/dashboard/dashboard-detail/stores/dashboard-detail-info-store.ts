@@ -12,7 +12,6 @@ import type {
     DashboardVariables,
     DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
-    DashboardVars,
     DashboardGlobalVariablesSchema,
 } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
@@ -74,7 +73,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         projectId: undefined as string | undefined,
         projectGroupId: undefined as string | undefined,
         options: DASHBOARD_DEFAULT.options as DashboardOptions,
-        vars: {} as DashboardVars,
+
         variables: {} as DashboardVariables,
         variablesSchema: {
             properties: {},
@@ -132,7 +131,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     /* Mutations */
     const setOptions = (options: DashboardOptions) => { state.options = options; };
-    const setVars = (vars?: DashboardVars) => { state.vars = vars; };
     const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => { state.variablesSchema = variablesSchema; };
     const setVariables = (variables: DashboardVariables) => { state.variables = variables; };
     const setVariablesInitMap = (variablesInitMap: Record<string, boolean>) => { state.variablesInitMap = variablesInitMap; };
@@ -154,7 +152,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariables({});
         setVariablesSchema({ properties: {}, order: [] });
         setVariablesInitMap({});
-        setVars({});
         setLoadingWidgets(false);
         state.showDateRangeNotification = true;
         state.selectedWorkspaceId = undefined;
@@ -247,7 +244,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const mutations = {
         setOptions,
-        setVars,
         setVariablesSchema,
         setVariables,
         setVariablesInitMap,

@@ -10,9 +10,11 @@ import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource
 import { useDashboardSharedContext } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-shared-context';
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
 import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
-
+import { useDashboardVarsStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-vars-store';
 
 export const useDashboardRefinedVars = (dashboardId: ComputedRef<string|undefined>) => {
+    const dashboardVarsStore = useDashboardVarsStore();
+    const dashboardVarsState = dashboardVarsStore.state;
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.state;
 
@@ -23,7 +25,7 @@ export const useDashboardRefinedVars = (dashboardId: ComputedRef<string|undefine
 
     const refinedVars = computed<DashboardVars>(() => {
         let _vars: DashboardVars = cloneDeep(dashboard.value?.vars ?? {});
-        const tempVars: DashboardVars = cloneDeep(dashboardDetailState.vars ?? {});
+        const tempVars: DashboardVars = cloneDeep(dashboardVarsState.vars ?? {});
         if (!isEmpty(tempVars)) _vars = tempVars;
         if (projectGroupOrProjectId.value) {
             if (projectContextType.value === 'PROJECT') {

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, onUnmounted,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { isEqual } from 'lodash';
@@ -28,6 +30,7 @@ import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-det
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/_shared/dashboard/dashboard-detail/constants/manage-variable-overlay-constant';
 import { getOrderedGlobalVariables } from '@/services/_shared/dashboard/dashboard-detail/helpers/dashboard-global-variables-helper';
 import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
+import { useDashboardVarsStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-vars-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 interface Props {
@@ -49,6 +52,8 @@ const dashboardId = computed(() => props.dashboardId);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardVarsStore = useDashboardVarsStore();
+const dashboardVarsState = dashboardVarsStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const { dashboard } = useDashboardGetQuery({
     dashboardId,
@@ -77,7 +82,7 @@ const state = reactive({
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         const results: string[] = [];
         state.globalVariables.forEach((_var) => {
-            if (!isEqual(state.dashboardVars?.[_var.key], dashboardDetailState.vars?.[_var.key])) {
+            if (!isEqual(state.dashboardVars?.[_var.key], dashboardVarsState.vars?.[_var.key])) {
                 results.push(_var.key);
             }
         });
@@ -88,15 +93,20 @@ const state = reactive({
 });
 
 const handleClickSaveButton = () => {
-    emit('update', { vars: dashboardDetailState.vars });
+    emit('update', { vars: dashboardVarsState.vars });
 };
 const handleResetVariables = () => {
-    dashboardDetailStore.setVars(dashboard.value?.vars);
+    dashboardVarsStore.setVars(dashboard.value?.vars);
 };
 
 watch(() => dashboard.value?.vars, (_vars) => {
-    dashboardDetailStore.setVars(_vars);
+    dashboardVarsStore.setVars(_vars);
 }, { immediate: true, deep: true });
+
+
+onUnmounted(() => {
+    dashboardVarsStore.reset();
+});
 
 </script>
 

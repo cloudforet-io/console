@@ -35,7 +35,7 @@ import {
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
+import { useDashboardVarsStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-vars-store';
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 
 interface Props {
@@ -46,8 +46,8 @@ interface Props {
 const props = defineProps<Props>();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardVarsStore = useDashboardVarsStore();
+const dashboardVarsState = dashboardVarsStore.state;
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
 const { dashboard } = useDashboardGetQuery({
@@ -100,7 +100,7 @@ const handleSelectOption = () => {
 // helper
 const changeVariables = (changedSelected: MenuItem[]) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars ?? {});
+    const vars = cloneDeep(dashboardVarsState.vars ?? {});
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete vars[_key];
@@ -109,7 +109,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         vars[_key] = reconvertedSelected[0];
     }
-    dashboardDetailStore.setVars(vars);
+    dashboardVarsStore.setVars(vars);
 };
 
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
@@ -149,7 +149,7 @@ watch(() => dashboard.value?.vars_schema?.properties, async (varsSchema, prevVar
 
 
 // for reset
-watch(() => dashboardDetailState.vars, (_vars) => {
+watch(() => dashboardVarsState.vars, (_vars) => {
     const selectedValues = state.selected.map((d) => d.name);
     const _variable = props.variable as ReferenceVariable;
     const tempVarsValue = flattenDeep([(_vars?.[_variable.key] as string|string[]|undefined) ?? []]);

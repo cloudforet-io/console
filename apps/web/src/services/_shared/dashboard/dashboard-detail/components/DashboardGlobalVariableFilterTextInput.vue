@@ -15,9 +15,9 @@ import type {
     TextAnyVariable,
 } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
-
 import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
-import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
+import { useDashboardVarsStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-vars-store';
+
 
 interface Props {
     variable: DashboardGlobalVariable;
@@ -27,8 +27,8 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardVarsStore = useDashboardVarsStore();
+const dashboardVarsState = dashboardVarsStore.state;
 
 
 const { dashboard } = useDashboardGetQuery({
@@ -66,13 +66,13 @@ const handleClickDoneButton = () => {
 
 const changeVariables = (changedSelected?: string) => {
     const _key = state.variable.key;
-    const vars = cloneDeep(dashboardDetailState.vars ?? {});
+    const vars = cloneDeep(dashboardVarsState.vars ?? {});
     if (changedSelected) {
         vars[_key] = changedSelected;
     } else {
         delete vars[_key];
     }
-    dashboardDetailStore.setVars(vars);
+    dashboardVarsStore.setVars(vars);
 };
 
 // set default value
@@ -85,7 +85,7 @@ watch(() => dashboard.value?.vars_schema?.properties, (varsSchema, prevVarsSchem
 }, { immediate: true });
 
 // for reset
-watch(() => dashboardDetailState.vars, (_vars) => {
+watch(() => dashboardVarsState.vars, (_vars) => {
     const _variable = props.variable as TextAnyVariable;
     const tempVarsValue = _vars?.[_variable.key] as string|undefined;
     if (state.value !== tempVarsValue) {

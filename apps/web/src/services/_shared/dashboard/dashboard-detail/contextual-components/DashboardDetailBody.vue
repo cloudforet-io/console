@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { PDivider } from '@cloudforet/mirinae';
+import { PDivider, PSkeleton } from '@cloudforet/mirinae';
 
 import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
@@ -222,23 +222,28 @@ onUnmounted(() => {
                         />
                     </div>
                 </div>
-                <div v-if="!dashboardUpdateLoading"
-                     class="dashboard-selectors"
-                >
-                    <dashboard-variables v-if="isDeprecatedDashboard"
-                                         class="variable-selector-wrapper"
-                                         :loading="dashboardUpdateLoading"
-                                         @update="handleUpdateDashboardVariables"
+
+                <div class="dashboard-selectors">
+                    <p-skeleton v-if="dashboardUpdateLoading || dashboardLoading"
+                                width="100%"
+                                height="2rem"
                     />
-                    <dashboard-variables-v2 v-else
-                                            class="variable-selector-wrapper"
-                                            :disable-save-button="!getDashboardManageable(dashboard)"
-                                            :loading="dashboardUpdateLoading"
-                                            :dashboard-id="props.dashboardId"
-                                            :dashboard-items="dashboardItemsV2"
-                                            :folder-items="folderItems"
-                                            @update="handleUpdateDashboardVariables"
-                    />
+                    <template v-else>
+                        <dashboard-variables v-if="isDeprecatedDashboard"
+                                             class="variable-selector-wrapper"
+                                             :loading="dashboardUpdateLoading"
+                                             @update="handleUpdateDashboardVariables"
+                        />
+                        <dashboard-variables-v2 v-else
+                                                class="variable-selector-wrapper"
+                                                :disable-save-button="!getDashboardManageable(dashboard)"
+                                                :loading="dashboardUpdateLoading"
+                                                :dashboard-id="props.dashboardId"
+                                                :dashboard-items="dashboardItemsV2"
+                                                :folder-items="folderItems"
+                                                @update="handleUpdateDashboardVariables"
+                        />
+                    </template>
                 </div>
             </div>
 
