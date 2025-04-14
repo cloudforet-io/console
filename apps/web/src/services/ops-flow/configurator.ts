@@ -3,6 +3,7 @@ import type { RouteConfig } from 'vue-router';
 import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
 
 import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
@@ -22,6 +23,8 @@ class OpsFlowConfigurator implements FeatureConfiguratorType {
     }
 
     getMenu(): FeatureMenuConfig {
+        initTaskManagementTemplate();
+
         const baseMenu: Menu = {
             id: MENU_ID.OPS_FLOW,
             needPermissionByRole: true,
