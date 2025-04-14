@@ -98,12 +98,12 @@ const handleUpdateActiveTab = (tab: string) => {
 
 const projectDashboardCreateMenuItems = computed(() => [
     {
-        label: 'Create Dashboard',
+        label: i18n.t('PROJECT.DASHBOARD.CREATE.CREATE_DASHBOARD'),
         name: 'dashboard',
         icon: 'ic_plus',
     },
     {
-        label: 'Create Folder',
+        label: i18n.t('PROJECT.DASHBOARD.CREATE.CREATE_FOLDER'),
         name: 'folder',
         icon: 'ic_plus',
     },

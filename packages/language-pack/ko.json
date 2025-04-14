@@ -5100,6 +5100,8 @@
 	"PROJECT": {
 		"DASHBOARD": {
 			"CREATE": {
+				"CREATE_DASHBOARD": "대시보드 생성",
+				"CREATE_FOLDER": "폴더 생성",
 				"TITLE": "프로젝트 대시보드 생성"
 			}
 		},
