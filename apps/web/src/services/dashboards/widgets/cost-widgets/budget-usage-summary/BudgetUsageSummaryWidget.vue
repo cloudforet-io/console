@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose,
+    computed,
     defineProps, nextTick, reactive, ref,
 } from 'vue';
 

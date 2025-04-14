@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, reactive,
+    defineProps, reactive,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
