@@ -6,6 +6,7 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import type { AlertManagementTableHandlerType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 export const ALERT_PERIOD_DROPDOWN_MENU = {
+    ALL: 'ALL',
     LAST_1_MONTH: 'LAST_1_MONTH',
     LAST_3_MONTHS: 'LAST_3_MONTHS',
     LAST_6_MONTHS: 'LAST_6_MONTHS',
