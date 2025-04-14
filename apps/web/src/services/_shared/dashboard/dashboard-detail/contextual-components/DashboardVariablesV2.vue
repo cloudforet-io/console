@@ -147,10 +147,12 @@ onUnmounted(() => {
                                          :widget-mode="props.widgetMode"
                                          :dashboard-id="dashboardId"
         />
-        <portal to="dashboard-detail-body">
+        <portal to="dashboard-manage-variable-overlay">
             <dashboard-manage-variable-overlay :visible="state.showOverlay"
                                                :dashboard-id="dashboardId"
             />
+        </portal>
+        <portal to="dashboard-manage-variable-import-modal">
             <dashboard-manage-variable-import-modal :dashboard-id="dashboardId"
                                                     :dashboard-items="props.dashboardItems"
                                                     :folder-items="props.folderItems"

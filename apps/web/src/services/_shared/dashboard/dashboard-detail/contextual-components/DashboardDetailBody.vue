@@ -19,6 +19,7 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 
 import { useDashboardManageable } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-manageable';
 import { useDashboardSharedContext } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-shared-context';
+import DashboardManageVariablePortalTargets from '@/services/_shared/dashboard/dashboard-detail/components/DashboardManageVariablePortalTargets.vue';
 import DashboardRefreshDropdown
     from '@/services/_shared/dashboard/dashboard-detail/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
@@ -256,7 +257,7 @@ onUnmounted(() => {
                                                :dashboard-id="props.dashboardId"
                 />
             </div>
-            <portal-target name="dashboard-detail-body" />
+            <dashboard-manage-variable-portal-targets />
         </div>
     </div>
 </template>
