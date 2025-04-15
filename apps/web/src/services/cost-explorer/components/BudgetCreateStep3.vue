@@ -12,6 +12,9 @@ import {
 
 import type { BudgetCreateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/create';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
+import { i18n } from '@/translations';
+
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
@@ -126,8 +129,10 @@ const createBudget = async (type: 'skip' | 'set') => {
         router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
-    } catch (error) {
+        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_SUCCESS'));
+    } catch (error: any) {
         ErrorHandler.handleError(error, true);
+        showErrorMessage(error?.code, error?.message);
     } finally {
         budgetCreatePageStore.reset();
     }
