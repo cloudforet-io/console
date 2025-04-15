@@ -51,20 +51,15 @@ export type GeneratedRouteMetadata = Record<string, VersionedRouteConfig>;
 export type GeneratedRouteMetadataConfig = Record<string, RouteVersionInfo>;
 export type GeneratedRouteMetadataSchema = Record<string, GeneratedRouteMetadataConfig>;
 
-
-
-export interface GeneratedFeatureRouteConfig {
+export interface GeneratedRouteSchema {
     routes: RouteConfig[];
     adminRoutes: RouteConfig[];
 }
-
 export interface FeatureRouteConfig {
     routes: RouteConfig|null;
     adminRoutes: RouteConfig|null;
     version?: FeatureVersion;
 }
-
-export type FeatureSchemaType = Record<FeatureKeyType, GeneratedMenuSchema>;
 
 type apiClientType = {
     V1: string;

@@ -18,7 +18,7 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -55,7 +55,7 @@ const projectDetailPageState = projectDetailPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const userStore = useUserStore();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
 
@@ -68,7 +68,7 @@ const {
 } = useDashboardFolderQuery();
 
 const storeState = reactive({
-    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     language: computed<string|undefined>(() => userStore.state.language),

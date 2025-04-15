@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -12,7 +13,7 @@ import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManag
 import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
 
-class OpsFlowConfigurator {
+class OpsFlowConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {};

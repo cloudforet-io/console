@@ -34,7 +34,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -85,7 +85,7 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const projectTreeStore = useProjectTreeStore();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
@@ -98,7 +98,7 @@ const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
-    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({

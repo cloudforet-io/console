@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -11,7 +12,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
 
-class AssetInventoryConfigurator {
+class AssetInventoryConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {};

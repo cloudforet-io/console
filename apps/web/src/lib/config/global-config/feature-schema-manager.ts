@@ -1,9 +1,15 @@
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
 import type {
-    GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedUiAffectSchema, GlobalServiceConfig,
+    GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedRouteSchema, GeneratedUiAffectSchema, GlobalServiceConfig,
 } from '@/lib/config/global-config/types/type';
+
+import adminAdvancedRoutes from '@/services/advanced/routes/admin/routes';
+import adminInfoRoutes from '@/services/info/routes/admin/routes';
+import infoRoutes from '@/services/info/routes/routes';
+import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
+import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
 export class FeatureSchemaManager {
     private config: GlobalServiceConfig = {
@@ -19,12 +25,13 @@ export class FeatureSchemaManager {
             ...config,
         };
         this.createMenuSchema();
-        this.createUiAffectsSchema();
+        this.createRouteSchema();
         this.createRouteMetadata();
+        this.createUiAffectsSchema();
     }
 
     createMenuSchema() {
-        const globalConfigStore = useGlobalConfigStore();
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
         const generatedMenuSchema = {} as GeneratedMenuSchema;
 
         Object.keys(this.config).forEach((feature) => {
@@ -45,11 +52,55 @@ export class FeatureSchemaManager {
             }
         });
 
-        globalConfigStore.setMenuSchema(generatedMenuSchema);
+        globalConfigSchemaStore.setMenuSchema(generatedMenuSchema);
+    }
+
+    createRouteSchema() {
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+
+        const baseRoutes: GeneratedRouteSchema = {
+            routes: [workspaceHomeRoute, infoRoutes],
+            adminRoutes: [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes],
+        };
+
+        Object.keys(this.config).forEach((feature) => {
+            if (this.config[feature]?.ENABLED) {
+                const configurator = getFeatureConfigurator(feature);
+                if (configurator) {
+                    const featureRoutes = configurator.getRoutes();
+                    if (featureRoutes?.routes) {
+                        baseRoutes.routes.push(featureRoutes.routes);
+                    }
+                    if (featureRoutes?.adminRoutes) {
+                        baseRoutes.adminRoutes.push(featureRoutes.adminRoutes);
+                    }
+                }
+            }
+        });
+
+        globalConfigSchemaStore.setRouteSchema(baseRoutes);
+    }
+
+    createRouteMetadata() {
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+        const routeMetadata = {} as GeneratedRouteMetadataSchema;
+
+        Object.keys(this.config).forEach((feature) => {
+            if (this.config[feature]?.ENABLED) {
+                const configurator = getFeatureConfigurator(feature);
+                if (configurator) {
+                    const currentVersion = this.config[feature]?.VERSION || 'V1';
+                    configurator.initialize(currentVersion);
+                    routeMetadata[feature] = configurator.getRouteMetadata();
+                }
+            }
+        });
+
+        globalConfigSchemaStore.setRouteMetadataSchema(routeMetadata);
     }
 
     createUiAffectsSchema() {
-        const globalConfigStore = useGlobalConfigStore();
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
         const schema = {} as GeneratedUiAffectSchema;
 
         const featureMethodMap: Record<string, Record<string, boolean>> = {};
@@ -85,25 +136,7 @@ export class FeatureSchemaManager {
             }
         });
 
-        globalConfigStore.setUiAffectsSchema(schema);
-    }
-
-    createRouteMetadata(): void {
-        const globalConfigStore = useGlobalConfigStore();
-        const routeMetadata = {} as GeneratedRouteMetadataSchema;
-
-        Object.keys(this.config).forEach((feature) => {
-            if (this.config[feature]?.ENABLED) {
-                const configurator = getFeatureConfigurator(feature);
-                if (configurator) {
-                    const currentVersion = this.config[feature]?.VERSION || 'V1';
-                    configurator.initialize(currentVersion);
-                    routeMetadata[feature] = configurator.getRouteMetadata();
-                }
-            }
-        });
-
-        globalConfigStore.setRouteMetadataSchema(routeMetadata);
+        globalConfigSchemaStore.setUiAffectsSchema(schema);
     }
 }
 

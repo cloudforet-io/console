@@ -6,25 +6,28 @@ import { defineStore } from 'pinia';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import type {
+    GeneratedRouteSchema,
     GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedUiAffectSchema,
 } from '@/lib/config/global-config/types/type';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { DEFAULT_MENU_LIST, DEFAULT_ADMIN_MENU_LIST } from '@/lib/menu/menu-architecture';
 
-interface GlobalConfigStoreState {
+interface GlobalConfigSchemaStoreState {
     uiAffectsSchema: GeneratedUiAffectSchema;
     menuSchema: GeneratedMenuSchema;
     routeMetadataSchema: GeneratedRouteMetadataSchema;
+    routeSchema: GeneratedRouteSchema;
 }
 export type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
 
-export const useGlobalConfigStore = defineStore('global-config-store', () => {
+export const useGlobalConfigSchemaStore = defineStore('global-config-schema-store', () => {
     const appContextStore = useAppContextStore();
 
-    const state = reactive<GlobalConfigStoreState>({
+    const state = reactive<GlobalConfigSchemaStoreState>({
         uiAffectsSchema: {} as GeneratedUiAffectSchema,
         menuSchema: {} as GeneratedMenuSchema,
         routeMetadataSchema: {} as GeneratedRouteMetadataSchema,
+        routeSchema: {} as GeneratedRouteSchema,
     });
 
     const _getters = reactive({
@@ -86,6 +89,9 @@ export const useGlobalConfigStore = defineStore('global-config-store', () => {
         },
         setRouteMetadataSchema(routeMetadataSchema: GeneratedRouteMetadataSchema) {
             state.routeMetadataSchema = routeMetadataSchema;
+        },
+        setRouteSchema(routeSchema: GeneratedRouteSchema) {
+            state.routeSchema = routeSchema;
         },
     };
 

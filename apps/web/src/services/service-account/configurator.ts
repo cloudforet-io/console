@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -10,7 +11,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminServiceAccountRoute from '@/services/service-account/routes/admin/routes';
 import serviceAccountRoute from '@/services/service-account/routes/routes';
 
-class ServiceAccountConfigurator {
+class ServiceAccountConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {};

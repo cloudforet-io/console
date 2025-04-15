@@ -1,7 +1,7 @@
 import { useRouter } from 'vue-router/composables';
 
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
 import type { MenuId } from '@/lib/menu/config';
 
@@ -17,15 +17,15 @@ type NavigateOptionsType = RouterOptionsType & {
 
 export const useServiceRouter = () => {
     const router = useRouter();
-    const globalConfigStore = useGlobalConfigStore();
-    const globalConfigState = globalConfigStore.state;
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+    const globalConfigSchemaState = globalConfigSchemaStore.state;
 
     const navigate = async (options: NavigateOptionsType) => {
         const {
             feature, routeKey, params, method,
         } = options;
 
-        const featureMetadata = globalConfigState.routeMetadataSchema[feature.toUpperCase()];
+        const featureMetadata = globalConfigSchemaState.routeMetadataSchema[feature.toUpperCase()];
         const convertedParams = params ? transformParams(featureMetadata[routeKey].params || {}, params) : undefined;
 
         if (!featureMetadata) {

@@ -14,7 +14,7 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -61,7 +61,7 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const router = useRouter();
 
@@ -69,7 +69,7 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
 
 /* Tabs */
 const state = reactive({
-    visibleAlertTab: computed(() => globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAssetAlertTab),
+    visibleAlertTab: computed(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAssetAlertTab),
 });
 const singleItemTabState = reactive({
     tabs: computed(() => {

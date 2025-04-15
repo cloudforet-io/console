@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -11,7 +12,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import costExplorerRoutes from '@/services/cost-explorer/routes/routes';
 
-class CostExplorerConfigurator {
+class CostExplorerConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {};

@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -13,18 +14,10 @@ import projectRoutesV1 from '@/services/project/v1/routes/routes';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import projectRoutes from '@/services/project/v2/routes/routes';
 
-class ProjectConfigurator {
+class ProjectConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {
-        landing: {
-            V1: {
-                name: PROJECT_ROUTE_V1._NAME,
-            },
-            V2: {
-                name: PROJECT_ROUTE_V2._NAME,
-            },
-        },
         detail: {
             V1: {
                 name: PROJECT_ROUTE_V1.DETAIL._NAME,

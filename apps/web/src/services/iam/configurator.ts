@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -12,7 +13,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminIamRoutes from '@/services/iam/routes/admin/routes';
 import iamRoutes from '@/services/iam/routes/routes';
 
-class IamConfigurator {
+class IamConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {};

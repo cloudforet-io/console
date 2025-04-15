@@ -11,7 +11,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -34,13 +34,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const { visibleContents: visibleAssetContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 const { visibleContents: visibleAlertContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
 
 const state = reactive({
-    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && (globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && (globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
     hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });

@@ -27,7 +27,7 @@ import type { UserChannelListParameters as UserChannelListParametersV1 } from '@
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -51,7 +51,7 @@ interface EnrichedProtocolItem extends ProtocolModel {
 }
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const props = withDefaults(defineProps<{
     projectId?: string;
@@ -62,7 +62,7 @@ const props = withDefaults(defineProps<{
 });
 const route = useRoute();
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
+    visibleUserNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
     loading: true,
     channelLoading: true,
     userId: computed<string|undefined>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : userStore.state.userId)),

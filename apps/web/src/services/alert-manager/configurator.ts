@@ -1,4 +1,5 @@
 import type {
+    FeatureConfigurator,
     FeatureRouteConfig,
     FeatureVersion,
     GeneratedMenuConfig,
@@ -12,7 +13,7 @@ import alertManagerRouteV1 from '@/services/alert-manager/v1/routes/routes';
 import alertManagerRoute from '@/services/alert-manager/v2/routes/routes';
 
 
-class AlertManagerConfigurator {
+class AlertManagerConfigurator implements FeatureConfigurator {
     private version: FeatureVersion = 'V1';
 
     private routeMetadata: GeneratedRouteMetadata = {};
