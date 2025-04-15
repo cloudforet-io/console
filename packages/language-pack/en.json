@@ -535,7 +535,8 @@
 						"EDIT": "Edit",
 						"NAME_INVALID_TEXT": "The name is either missing or already in use.",
 						"SERVICE_ACCOUNT_MANAGERS": "Service Account Managers",
-						"TITLE": "Base Information"
+						"TITLE": "Base Information",
+						"UPDATE_SUCCESS": "{data} successfully updated"
 					},
 					"BUDGETED": "Budgeted",
 					"BUDGET_NOTIFICATIONS": "Budget Notifications",
@@ -674,7 +675,7 @@
 						"FIXED_TERM": "Fixed term",
 						"INCRASE_BY_SPECIFIC_PERCENTAGE": "Increase by a specific % each month",
 						"INITIAL_AMOUNT": "Initial Amount",
-						"LAST_COST_TREND": "Last {{count}} Month Cost Trend",
+						"LAST_COST_TREND": "Last {count} Month Cost Trend",
 						"MONTHLY": "Monthly",
 						"MONTHLY_BUDGET_ALLOCATION": "Monthly Budget Allocation",
 						"MONTHLY_GROWTH_RATE": "Monthly Growth Rate",
@@ -721,6 +722,7 @@
 					"COST_TYPE": "Cost Type",
 					"CREATE": "Create",
 					"CREATE_BUDGET": "Create Budget",
+					"CREATE_SUCCESS": "Budget successfully created",
 					"CUSTOM": "Custom",
 					"DATA_SOURCE": "Data Source",
 					"DELETE": "Delete",

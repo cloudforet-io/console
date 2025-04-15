@@ -46,9 +46,11 @@ const storeState = reactive({
 
 const state = reactive<BudgetMainToolsetState>({
     yearList: [
-        { name: 'nextYear', label: dayjs.utc().add(1, 'year').format('YYYY') },
-        { name: 'thisYear', label: dayjs.utc().format('YYYY') },
-        { name: 'lastYear', label: dayjs.utc().subtract(1, 'year').format('YYYY') },
+        { name: 'all', label: 'All' },
+        { type: 'divider', name: 'divider' },
+        { name: dayjs.utc().add(1, 'year').format('YYYY'), label: dayjs.utc().add(1, 'year').format('YYYY') },
+        { name: dayjs.utc().format('YYYY'), label: dayjs.utc().format('YYYY') },
+        { name: dayjs.utc().subtract(1, 'year').format('YYYY'), label: dayjs.utc().subtract(1, 'year').format('YYYY') },
     ],
     selectedYear: '',
     budgetCycleList: [
