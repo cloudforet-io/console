@@ -83,32 +83,39 @@ const state = reactive({
 const processData = (results: any[]) => {
     const allDates = state.xAxisData;
 
-    const processedData = allDates.map((date) => {
-        const matchingResults = results.filter((r) => r.date === date);
-        return {
-            date,
-            average_cost: matchingResults.length > 0
-                ? matchingResults.reduce((sum, curr) => sum + curr.cost_trend, 0) / matchingResults.length
-                : 0,
-        };
+    const dataMap: Record<string, number> = {};
+    results.forEach((item) => {
+        (item.cost_trend || []).forEach((trend) => {
+            dataMap[trend.date] = (dataMap[trend.date] || 0) + trend.value;
+        });
     });
 
-    return processedData;
+    return allDates.map((date) => ({
+        date,
+        value: dataMap[date] || 0,
+    }));
 };
 
 const fetchBudgetUsageAnalyze = async () => {
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        const { results } = await SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze({
             query: {
-                group_by: ['budget_id', 'name', 'date'],
-                start: budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM') : dayjs.utc().subtract(3, 'month').format('YYYY-MM'),
-                end: budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM') : dayjs.utc().subtract(1, 'month').format('YYYY-MM'),
+                start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
+                end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+                group_by: !budgetCreatePageState.scope.serviceAccount ? ['project_id', 'is_confirmed'] : ['project_id', 'service_account_id', 'is_confirmed'],
                 fields: {
                     cost_trend: {
-                        key: 'cost',
-                        operator: 'average',
+                        key: `cost.${budgetCreatePageState.currency}`,
+                        operator: 'sum',
                     },
                 },
+                granularity: 'MONTHLY',
+                field_group: ['date'],
+                filter: !budgetCreatePageState.scope.serviceAccount ? [
+                    { k: 'project_id', v: budgetCreatePageState.project, o: 'eq' },
+                ] : [
+                    { k: 'service_account_id', v: budgetCreatePageState.scope.serviceAccount, o: 'eq' },
+                ],
             },
         });
         state.data = processData(results);
@@ -121,7 +128,7 @@ const drawChart = (data: any) => {
     if (isEmpty(data)) return;
 
     state.chartData = {
-        name: `Last ${state.xAxisData.length} Month Cost Trend`,
+        // name: `Last ${state.xAxisData.length} Month Cost Trend`,
         type: 'bar',
         stack: false,
         barMaxWidth: 50,
@@ -133,7 +140,7 @@ const drawChart = (data: any) => {
             position: 'top',
             formatter: (params) => `${CURRENCY_SYMBOL[budgetCreatePageState.currency]} ${Number(params.value).toFixed(2)}`,
         },
-        data: data.map((item) => item.average_cost),
+        data: data.map((item) => item.value),
     };
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions, true);
@@ -149,7 +156,12 @@ watch(() => budgetCreatePageState, async () => {
 </script>
 
 <template>
-    <p-pane-layout class="chart-wrapper">
+    <p-pane-layout class="chart-wrapper p-4">
+        <p class="font-bold text-sm">
+            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.LAST_COST_TREND', {
+                count: Number(dayjs(budgetCreatePageState.endMonth[0], 'YYYY-MM').diff(dayjs(budgetCreatePageState.startMonth[0], 'YYYY-MM'), 'month') + 1),
+            }) }}
+        </p>
         <div ref="chartContext"
              class="chart"
         />
