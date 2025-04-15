@@ -535,7 +535,8 @@
 						"EDIT": "편집",
 						"NAME_INVALID_TEXT": "이름을 입력하지 않았거나, 이미 존재하는 이름입니다.",
 						"SERVICE_ACCOUNT_MANAGERS": "서비스 어카운트 관리자",
-						"TITLE": "기본 정보"
+						"TITLE": "기본 정보",
+						"UPDATE_SUCCESS": "{data} 이(가) 성공적으로 업데이트되었습니다."
 					},
 					"BUDGETED": "예산",
 					"BUDGET_NOTIFICATIONS": "예산 사용 알림 설정",
@@ -674,7 +675,7 @@
 						"FIXED_TERM": "고정 예산",
 						"INCRASE_BY_SPECIFIC_PERCENTAGE": "",
 						"INITIAL_AMOUNT": "",
-						"LAST_COST_TREND": "최근 {{count}}개월 비용 추이",
+						"LAST_COST_TREND": "최근 {count}개월 비용 추이",
 						"MONTHLY": "",
 						"MONTHLY_BUDGET_ALLOCATION": "",
 						"MONTHLY_GROWTH_RATE": "",
@@ -721,6 +722,7 @@
 					"COST_TYPE": "비용 발생 기준",
 					"CREATE": "예산 생성",
 					"CREATE_BUDGET": "예산 생성",
+					"CREATE_SUCCESS": "",
 					"CUSTOM": "기간 선택",
 					"DATA_SOURCE": "데이터 소스",
 					"DELETE": "삭제",
