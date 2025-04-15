@@ -19,7 +19,7 @@
 			"CREATED_BY": "생성자: {user}",
 			"CREATE_ALERT": "얼럿 생성",
 			"CRITICAL": "위험 경고",
-			"CUSTOM": "기간 선택",
+			"CUSTOM": "커스텀",
 			"CUSTOM_DATE_RANGE": "상세 기간 선택",
 			"DESC": "설명",
 			"DETAILS": "상세 정보",
@@ -954,7 +954,7 @@
 				"FORM": {
 					"CANCEL": "취소",
 					"CREATE": "생성",
-					"CUSTOM_RANGE": "기간 선택",
+					"CUSTOM_RANGE": "커스텀",
 					"FROM": "시작",
 					"TO": "종료"
 				},
