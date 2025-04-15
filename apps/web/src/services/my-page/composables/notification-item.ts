@@ -34,7 +34,7 @@ const globalConfigStore = useGlobalConfigStore();
 
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
     const state = reactive({
-        visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleUserNotification ?? false),
+        visibleUserNotification: computed<boolean>(() => globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
         isEditMode: _state.isEditMode,
         dataForEdit: _state.dataForEdit,
         userChannelId: _state.userChannelId,

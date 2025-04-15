@@ -1,8 +1,7 @@
-import type { RouteConfig } from 'vue-router';
-
 import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
 
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
+import type { GeneratedFeatureRouteConfig } from '@/lib/config/global-config/types/type';
 
 import adminAdvancedRoutes from '@/services/advanced/routes/admin/routes';
 import adminInfoRoutes from '@/services/info/routes/admin/routes';
@@ -10,14 +9,9 @@ import infoRoutes from '@/services/info/routes/routes';
 import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
 import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
-interface GeneratedFeatureRouteConfig {
-    routes: RouteConfig[];
-    adminRoutes: RouteConfig[];
-}
-
 export const generateRoutes = (): GeneratedFeatureRouteConfig => {
     const globalConfigStore = useGlobalConfigStore();
-    const schema = globalConfigStore.state.schema;
+    const schema = globalConfigStore.state.menuSchema;
     const baseRoutes: GeneratedFeatureRouteConfig = {
         routes: [workspaceHomeRoute, infoRoutes],
         adminRoutes: [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes],

@@ -1,17 +1,23 @@
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedUiAffectConfig,
 } from '@/lib/config/global-config/types/type';
 import { MENU_ID } from '@/lib/menu/config';
 
 import adminServiceAccountRoute from '@/services/service-account/routes/admin/routes';
 import serviceAccountRoute from '@/services/service-account/routes/routes';
 
-class ServiceAccountConfigurator implements FeatureConfiguratorType {
-    private version: 'V1' | 'V2' = 'V1';
+class ServiceAccountConfigurator {
+    private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [];
+    private routeMetadata: GeneratedRouteMetadata = {};
 
-    initialize(version: 'V1' | 'V2'): void {
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
+
+    initialize(version: FeatureVersion): void {
         this.version = version;
     }
 
@@ -23,7 +29,7 @@ class ServiceAccountConfigurator implements FeatureConfiguratorType {
         };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(): GeneratedMenuConfig {
         return {
             menu: {
                 id: MENU_ID.SERVICE_ACCOUNT,
@@ -33,6 +39,10 @@ class ServiceAccountConfigurator implements FeatureConfiguratorType {
             },
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadata {
+        return this.routeMetadata;
     }
 }
 

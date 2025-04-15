@@ -1,5 +1,9 @@
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect, FeatureVersion,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedUiAffectConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -7,10 +11,12 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminDashboardsRoute from '@/services/dashboards/routes/admin/routes';
 import dashboardsRoute from '@/services/dashboards/routes/routes';
 
-class DashboardConfigurator implements FeatureConfiguratorType {
+class DashboardConfigurator {
     private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [];
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
 
     initialize(version: FeatureVersion): void {
         this.version = version;
@@ -24,7 +30,7 @@ class DashboardConfigurator implements FeatureConfiguratorType {
         };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(): GeneratedMenuConfig {
         const baseMenu: Menu = {
             id: MENU_ID.DASHBOARDS,
             needPermissionByRole: true,
@@ -36,6 +42,10 @@ class DashboardConfigurator implements FeatureConfiguratorType {
             menu: baseMenu,
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadata {
+        return this.routeMetadata;
     }
 }
 

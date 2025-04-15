@@ -1,5 +1,9 @@
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedUiAffectConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -8,10 +12,12 @@ import alertManagerRouteV1 from '@/services/alert-manager/v1/routes/routes';
 import alertManagerRoute from '@/services/alert-manager/v2/routes/routes';
 
 
-class AlertManagerConfigurator implements FeatureConfiguratorType {
-    private version: 'V1' | 'V2' = 'V1';
+class AlertManagerConfigurator {
+    private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [
         {
             feature: 'ALERT_MANAGER',
             affects: [
@@ -27,7 +33,7 @@ class AlertManagerConfigurator implements FeatureConfiguratorType {
         },
     ];
 
-    initialize(version: 'V1' | 'V2'): void {
+    initialize(version: FeatureVersion): void {
         this.version = version;
     }
 
@@ -39,7 +45,7 @@ class AlertManagerConfigurator implements FeatureConfiguratorType {
         };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(): GeneratedMenuConfig {
         const baseMenu: Menu = {
             id: MENU_ID.ALERT_MANAGER,
             needPermissionByRole: true,
@@ -65,6 +71,10 @@ class AlertManagerConfigurator implements FeatureConfiguratorType {
             adminMenu: null,
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadata {
+        return this.routeMetadata;
     }
 }
 

@@ -98,7 +98,7 @@ const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
-    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigStore.state.schema?.ALERT_MANAGER?.uiAffects?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({

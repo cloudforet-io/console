@@ -69,7 +69,7 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
 
 /* Tabs */
 const state = reactive({
-    visibleAlertTab: computed(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleAssetAlertTab),
+    visibleAlertTab: computed(() => globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAssetAlertTab),
 });
 const singleItemTabState = reactive({
     tabs: computed(() => {

@@ -1,7 +1,9 @@
 import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
 
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
-import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/types/type';
+import type {
+    GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedUiAffectSchema, GlobalServiceConfig,
+} from '@/lib/config/global-config/types/type';
 
 export class FeatureSchemaManager {
     private config: GlobalServiceConfig = {
@@ -16,12 +18,39 @@ export class FeatureSchemaManager {
             ...this.config,
             ...config,
         };
-        this.setFeatureSchema();
+        this.createMenuSchema();
+        this.createUiAffectsSchema();
+        this.createRouteMetadata();
     }
 
-    setFeatureSchema() {
+    createMenuSchema() {
         const globalConfigStore = useGlobalConfigStore();
-        const schema = {} as FeatureSchemaType;
+        const generatedMenuSchema = {} as GeneratedMenuSchema;
+
+        Object.keys(this.config).forEach((feature) => {
+            if (this.config[feature]?.ENABLED) {
+                const configurator = getFeatureConfigurator(feature);
+                if (configurator) {
+                    const currentVersion = this.config[feature]?.VERSION || 'V1';
+                    configurator.initialize(currentVersion);
+
+                    const menuConfig = configurator.getMenu(this.config);
+
+                    generatedMenuSchema[feature] = {
+                        version: currentVersion,
+                        menu: menuConfig.menu,
+                        adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
+                    };
+                }
+            }
+        });
+
+        globalConfigStore.setMenuSchema(generatedMenuSchema);
+    }
+
+    createUiAffectsSchema() {
+        const globalConfigStore = useGlobalConfigStore();
+        const schema = {} as GeneratedUiAffectSchema;
 
         const featureMethodMap: Record<string, Record<string, boolean>> = {};
 
@@ -31,7 +60,7 @@ export class FeatureSchemaManager {
                 if (configurator) {
                     const currentVersion = this.config[feature]?.VERSION || 'V1';
                     configurator.initialize(currentVersion);
-                    const menuConfig = configurator.getMenu(this.config);
+
                     if (configurator.uiAffect) {
                         configurator.uiAffect.forEach((uiAffect) => {
                             const targetFeature = uiAffect.feature;
@@ -51,19 +80,31 @@ export class FeatureSchemaManager {
                         });
                     }
 
-                    schema[feature] = {
-                        version: currentVersion,
-                        menu: menuConfig.menu,
-                        adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
-                        uiAffects: feature in featureMethodMap ? featureMethodMap[feature] : {},
-                    };
+                    schema[feature] = feature in featureMethodMap ? featureMethodMap[feature] : {};
                 }
             }
         });
 
-        globalConfigStore.setSchema(schema);
+        globalConfigStore.setUiAffectsSchema(schema);
+    }
+
+    createRouteMetadata(): void {
+        const globalConfigStore = useGlobalConfigStore();
+        const routeMetadata = {} as GeneratedRouteMetadataSchema;
+
+        Object.keys(this.config).forEach((feature) => {
+            if (this.config[feature]?.ENABLED) {
+                const configurator = getFeatureConfigurator(feature);
+                if (configurator) {
+                    const currentVersion = this.config[feature]?.VERSION || 'V1';
+                    configurator.initialize(currentVersion);
+                    routeMetadata[feature] = configurator.getRouteMetadata();
+                }
+            }
+        });
+
+        globalConfigStore.setRouteMetadataSchema(routeMetadata);
     }
 }
-
 
 export default new FeatureSchemaManager();

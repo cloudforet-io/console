@@ -5,12 +5,16 @@ import { defineStore } from 'pinia';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import type { FeatureSchemaType } from '@/lib/config/global-config/types/type';
+import type {
+    GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedUiAffectSchema,
+} from '@/lib/config/global-config/types/type';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { DEFAULT_MENU_LIST, DEFAULT_ADMIN_MENU_LIST } from '@/lib/menu/menu-architecture';
 
 interface GlobalConfigStoreState {
-    schema: FeatureSchemaType;
+    uiAffectsSchema: GeneratedUiAffectSchema;
+    menuSchema: GeneratedMenuSchema;
+    routeMetadataSchema: GeneratedRouteMetadataSchema;
 }
 export type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
 
@@ -18,7 +22,9 @@ export const useGlobalConfigStore = defineStore('global-config-store', () => {
     const appContextStore = useAppContextStore();
 
     const state = reactive<GlobalConfigStoreState>({
-        schema: {} as FeatureSchemaType,
+        uiAffectsSchema: {} as GeneratedUiAffectSchema,
+        menuSchema: {} as GeneratedMenuSchema,
+        routeMetadataSchema: {} as GeneratedRouteMetadataSchema,
     });
 
     const _getters = reactive({
@@ -30,7 +36,7 @@ export const useGlobalConfigStore = defineStore('global-config-store', () => {
             const menuList: Menu[] = _getters.isAdminMode ? [] : DEFAULT_MENU_LIST;
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            Object.entries(state.schema).forEach(([_, featureSetting]) => {
+            Object.entries(state.menuSchema).forEach(([_, featureSetting]) => {
                 if (featureSetting) {
                     const menu = _getters.isAdminMode ? featureSetting.adminMenu : featureSetting.menu;
                     if (menu && !menuList.some((existingMenu) => existingMenu.id === menu.id)) {
@@ -72,8 +78,14 @@ export const useGlobalConfigStore = defineStore('global-config-store', () => {
     });
 
     const actions = {
-        setSchema(schema: FeatureSchemaType) {
-            state.schema = schema;
+        setMenuSchema(menuSchema: GeneratedMenuSchema) {
+            state.menuSchema = menuSchema;
+        },
+        setUiAffectsSchema(uiAffectsSchema: GeneratedUiAffectSchema) {
+            state.uiAffectsSchema = uiAffectsSchema;
+        },
+        setRouteMetadataSchema(routeMetadataSchema: GeneratedRouteMetadataSchema) {
+            state.routeMetadataSchema = routeMetadataSchema;
         },
     };
 

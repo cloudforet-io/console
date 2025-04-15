@@ -40,7 +40,7 @@ const { visibleContents: visibleAssetContents } = useContentsAccessibility(MENU_
 const { visibleContents: visibleAlertContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
 
 const state = reactive({
-    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && (globalConfigStore.state.schema?.ALERT_MANAGER?.uiAffects?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && (globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
     hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });

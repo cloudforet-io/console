@@ -38,7 +38,7 @@ const state = reactive({
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
-    visibleAlertIcon: computed(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleAlertIcon),
+    visibleAlertIcon: computed(() => globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAlertIcon),
     tooltipTexts: computed<Record<string, string>>(() => ({
         adminToggle: (state.isAdminMode ? i18n.t('COMMON.GNB.TOOLTIP.EXIT_ADMIN_MODE') : i18n.t('COMMON.GNB.TOOLTIP.ENABLE_ADMIN_MODE')) as string,
     })),

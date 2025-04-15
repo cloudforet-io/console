@@ -1,5 +1,9 @@
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedUiAffectConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -8,12 +12,14 @@ import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManag
 import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
 
-class OpsFlowConfigurator implements FeatureConfiguratorType {
-    private version: 'V1' | 'V2' = 'V1';
+class OpsFlowConfigurator {
+    private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [];
+    private routeMetadata: GeneratedRouteMetadata = {};
 
-    initialize(version: 'V1' | 'V2'): void {
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
+
+    initialize(version: FeatureVersion): void {
         this.version = version;
     }
 
@@ -25,7 +31,7 @@ class OpsFlowConfigurator implements FeatureConfiguratorType {
         };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(): GeneratedMenuConfig {
         initTaskManagementTemplate();
 
         const baseMenu: Menu = {
@@ -51,6 +57,10 @@ class OpsFlowConfigurator implements FeatureConfiguratorType {
             },
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadata {
+        return this.routeMetadata;
     }
 }
 

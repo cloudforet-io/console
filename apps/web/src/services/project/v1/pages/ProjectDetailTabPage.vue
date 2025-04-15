@@ -68,7 +68,7 @@ const {
 } = useDashboardFolderQuery();
 
 const storeState = reactive({
-    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigStore.state.schema?.ALERT_MANAGER?.uiAffects?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     language: computed<string|undefined>(() => userStore.state.language),
