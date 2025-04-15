@@ -10,6 +10,7 @@ import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composable
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
+import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 
 import type { DailyUpdateItem } from '@/services/workspace-home/shared/types/asset-daily-updates-type';
@@ -101,7 +102,7 @@ export const useAssetDailyUpdates = (ops?: {
     const deleted = useDailyUpdateAnalyzeQuery('deleted', { enabled, projectIds });
 
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
-    const cloudServiceTypeList = computed(() => Object.values(cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems));
+    const cloudServiceTypeList = computed<CloudServiceTypeItem[]>(() => Object.values(cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems));
 
     const dailyUpdates = computed<DailyUpdateItem[]>(() => {
         const merged = [...created.data.value ?? [], ...deleted.data.value ?? []];

@@ -7,6 +7,7 @@ import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composable
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
+import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 
 import type { AssetProviderItem } from '@/services/workspace-home/shared/types/asset-provider-type';
@@ -77,7 +78,7 @@ export const useAssetSummaryProviders = (opts?: {
     const providerReferenceStore = useProviderReferenceStore();
     const providerMap = computed<Record<string, AssetProviderItem>>(() => {
         const map: Record<string, AssetProviderItem> = {};
-        Object.entries(providerReferenceStore.getters.providerItems)
+        (Object.entries(providerReferenceStore.getters.providerItems) as [string, ProviderItem][])
             .forEach(([key, provider]) => {
                 map[key] = {
                     provider: key,
