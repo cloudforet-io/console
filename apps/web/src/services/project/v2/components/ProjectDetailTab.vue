@@ -88,8 +88,6 @@ const tabs = computed<TabItem[]>(() => {
         ...dashboardTabs,
     ];
 });
-// HACK: To trigger render tab on mounted, to trigger render on i18n change
-const tabNamesKey = computed(() => tabs.value.map((tab) => tab.label).join(','));
 
 const handleUpdateActiveTab = (tab: string) => {
     activeTab.value = tab;
@@ -131,7 +129,7 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
 
 <template>
     <div>
-        <p-tab :key="`${props.projectId}-${tabNamesKey}`"
+        <p-tab :key="`tab-${props.projectGroupId ?? props.projectId}`"
                :tabs="tabs"
                :active-tab="activeTab"
                @update:active-tab="handleUpdateActiveTab"
