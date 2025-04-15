@@ -4,7 +4,6 @@ import { onClickOutside } from '@vueuse/core/index';
 import {
     computed, onMounted, reactive, ref,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { isArray } from 'lodash';
 
@@ -22,12 +21,12 @@ import {
     KEYWORD_FILTER_DISABLED_KEYS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { isGlobalVariableFormat } from '@/common/modules/widgets/_helpers/global-variable-helper';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import type { DataTableQueryFilterForDropdown } from '@/common/modules/widgets/types/widget-data-table-type';
 
 import { blue, gray } from '@/styles/colors';
 
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
-import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
+import { getOrderedGlobalVariables } from '@/services/_shared/dashboard/dashboard-detail/helpers/dashboard-global-variables-helper';
 
 
 interface Props {
@@ -39,16 +38,15 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
 const emit = defineEmits<{(e: 'delete'): void;
     (e: 'update:selected-filter', filter: DataTableQueryFilterForDropdown): void;
 }>();
+
+const widgetContextStore = useWidgetContextStore();
+const widgetContextState = widgetContextStore.state;
+
 const operatorButtonRef = ref<HTMLElement | null>(null);
 
-const { dashboard } = useDashboardGetQuery({
-    dashboardId,
-});
 const state = reactive({
     visibleMenu: false,
     operatorMenu: computed<MenuItem[]>(() => {
@@ -102,7 +100,7 @@ const state = reactive({
     selectedOperator: [] as MenuItem[],
     proxySelectedFilter: useProxyValue<DataTableQueryFilterForDropdown>('selectedFilter', props, emit),
     globalVariableItems: computed<MenuItem[]>(() => {
-        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboard.value?.vars_schema?.properties ?? {});
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(widgetContextState.dashboard?.vars_schema?.properties ?? {});
         const _orderedVariables = getOrderedGlobalVariables(_refinedProperties);
         return _orderedVariables.map((variable) => ({
             name: `{{ global.${variable.key} }}`,

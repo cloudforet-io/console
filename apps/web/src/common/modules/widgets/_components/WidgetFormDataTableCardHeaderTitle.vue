@@ -214,10 +214,10 @@ const syncDataTableList = async (data: DataTableModel) => {
                  height="1.25rem"
             />
             <p-tooltip class="data-table-name"
-                       :contents="storeState.currentDataTable.name"
+                       :contents="storeState.currentDataTable?.name"
             >
                 <p>
-                    {{ storeState.currentDataTable.name }}
+                    {{ storeState.currentDataTable?.name }}
                 </p>
             </p-tooltip>
             <p-icon-button class="edit-button"

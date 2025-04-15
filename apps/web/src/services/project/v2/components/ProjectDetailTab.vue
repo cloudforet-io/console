@@ -1,25 +1,31 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import {
+    computed, nextTick, onBeforeUnmount, onMounted, ref, watch,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PTab } from '@cloudforet/mirinae';
+import { PTab, PSelectDropdown } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
-import type { PublicDashboardListParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/list';
-import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
-import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/list';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import type { DashboardFolderModel, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import { i18n } from '@/translations';
 
 import ProjectDashboard from '@/services/project/v2/components/ProjectDashboard.vue';
-
+import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vue';
+import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
+import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const props = defineProps<{
-    projectId: string,
+    projectId?: string,
+    projectGroupId?: string,
     dashboardId?: string,
 }>();
 const emit = defineEmits<{(e: 'update:dashboard-id', value?: string): void;}>();
-
+const router = useRouter();
+const projectPageModalStore = useProjectPageModalStore();
 
 const activeTab = ref('overview');
 watch(() => props.dashboardId, (did) => {
@@ -29,95 +35,133 @@ watch(() => props.projectId, () => {
     activeTab.value = 'overview';
 });
 
-/* dashboard tabs */
-const { publicDashboardAPI } = usePublicDashboardApi();
-const { publicFolderAPI } = usePublicFolderApi();
-const { key: dashboardListQueryKey, params: dashboardListParams } = useServiceQueryKey('dashboard', 'public-dashboard', 'list', {
-    params: computed<PublicDashboardListParameters>(() => ({
-        // project_id: props.id,
-        query: {
-            filter: [
-                { k: 'shared', v: true, o: 'eq' },
-                { k: 'version', v: '1.0', o: 'not' },
-                { k: 'scope', v: 'PROJECT', o: 'eq' },
-            ],
-        },
-    })),
+/* mounted */
+const mounted = ref(false);
+onMounted(() => {
+    nextTick(() => {
+        mounted.value = true;
+    });
 });
-const { data: dashboardList } = useScopedQuery({
-    queryKey: dashboardListQueryKey,
-    queryFn: () => publicDashboardAPI.list(dashboardListParams.value),
-    select: (data) => data?.results ?? [],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 5, // 5 minutes
-});
-const { key: dashboardFolderListQueryKey, params: dashboardFolderListParams } = useServiceQueryKey('dashboard', 'public-folder', 'list', {
-    params: computed<PublicFolderListParameters>(() => ({
-        // project_id: props.id,
-        query: {
-            filter: [
-                { k: 'shared', v: true, o: 'eq' },
-                { k: 'scope', v: 'PROJECT', o: 'eq' },
-            ],
-        },
-    })),
-});
-const { data: dashboardFolderList } = useScopedQuery({
-    queryKey: dashboardFolderListQueryKey,
-    queryFn: () => publicFolderAPI.list(dashboardFolderListParams.value),
-    select: (data) => data?.results || [],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 5, // 5 minutes
+onBeforeUnmount(() => {
+    mounted.value = false;
 });
 
+/* Query */
+const {
+    dashboardList,
+    dashboardSharedList,
+} = useProjectDashboardQuery({
+    projectGroupId: computed(() => props.projectGroupId),
+    projectId: computed(() => props.projectId),
+});
+const {
+    dashboardFolderList,
+    dashboardFolderSharedList,
+} = useProjectDashboardFolderQuery({
+    projectGroupId: computed(() => props.projectGroupId),
+    projectId: computed(() => props.projectId),
+});
+
+const dashboardItems = computed<Array<DashboardModel>>(() => [...dashboardSharedList.value, ...dashboardList.value]);
+const dashboardFolderItems = computed<Array<DashboardFolderModel>>(() => [...dashboardFolderSharedList.value, ...dashboardFolderList.value]);
+
 const tabs = computed<TabItem[]>(() => {
-    const folderTabs = dashboardFolderList.value?.map((folder) => ({
+    const folderTabs = dashboardFolderItems.value?.map((folder) => ({
         name: folder.folder_id,
         label: folder.name,
         tabType: 'folder',
         icon: 'ic_folder',
-        subItems: dashboardList.value?.filter((dashboard) => dashboard.folder_id === folder.folder_id).map((dashboard) => ({
+        subItems: dashboardItems.value?.filter((dashboard) => dashboard.folder_id === folder.folder_id).map((dashboard) => ({
             name: dashboard.dashboard_id,
             label: dashboard.name,
             icon: 'ic_service_dashboard',
         })),
     })) ?? [];
-    const dashboardTabs = dashboardList.value?.filter((dashboard) => !dashboard.folder_id).map((dashboard) => ({
+    const dashboardTabs = dashboardItems.value?.filter((dashboard) => !dashboard.folder_id).map((dashboard) => ({
         name: dashboard.dashboard_id,
         label: dashboard.name,
         icon: 'ic_service_dashboard',
     })) ?? [];
     return [
-        { name: 'overview', label: 'Overview' }, // TODO: i18n
+        { name: 'overview', label: i18n.t('PROJECT.LANDING.OVERVIEW') },
         ...folderTabs,
         ...dashboardTabs,
     ];
 });
+// HACK: To trigger render tab on mounted, to trigger render on i18n change
+const tabNamesKey = computed(() => tabs.value.map((tab) => tab.label).join(','));
 
-const onChangeTab = (tab: string) => {
+const handleUpdateActiveTab = (tab: string) => {
     activeTab.value = tab;
     emit('update:dashboard-id', tab === 'overview' ? undefined : tab);
 };
+
+const projectDashboardCreateMenuItems = computed(() => [
+    {
+        label: i18n.t('PROJECT.DASHBOARD.CREATE.CREATE_DASHBOARD'),
+        name: 'dashboard',
+        icon: 'ic_plus',
+    },
+    {
+        label: i18n.t('PROJECT.DASHBOARD.CREATE.CREATE_FOLDER'),
+        name: 'folder',
+        icon: 'ic_plus',
+    },
+]);
+
+const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem) => {
+    const projectGroupOrProjectId = props.projectGroupId ?? props.projectId;
+    if (!projectGroupOrProjectId) {
+        console.warn('projectGroupId or projectId is not selected');
+        return;
+    }
+    if (item === 'dashboard') {
+        router.push({
+            name: PROJECT_ROUTE_V2.DASHBOARD_CREATE._NAME,
+            params: {
+                projectGroupOrProjectId,
+            },
+        }).catch(() => {});
+    } else if (item === 'folder') {
+        projectPageModalStore.openCreateFolderFormModal();
+    }
+};
+
 </script>
 
 <template>
     <div>
-        <p-tab :tabs="tabs"
+        <p-tab :key="`${props.projectId}-${tabNamesKey}`"
+               :tabs="tabs"
                :active-tab="activeTab"
-               @change="onChangeTab"
+               @update:active-tab="handleUpdateActiveTab"
         >
-            <template #default="tab">
-                <keep-alive v-if="tab.name === 'overview'">
-                    <div v-if="activeTab === 'overview'">
-                        Overview will be implemented later.
-                    </div>
-                </keep-alive>
-                <keep-alive v-else-if="tab.name">
-                    <project-dashboard :id="props.projectId"
-                                       :key="`${tab.name}-${props.projectId}`"
-                                       :dashboard-id="tab.name"
-                    />
-                </keep-alive>
+            <template #default>
+                <div>
+                    <keep-alive>
+                        <project-overview v-if="activeTab === 'overview'"
+                                          :project-group-id="props.projectGroupId"
+                                          :project-id="props.projectId"
+                        />
+                        <project-dashboard v-else
+                                           :key="`${props.projectId}-${activeTab}`"
+                                           :project-id="props.projectId"
+                                           :project-group-id="props.projectGroupId"
+                                           :dashboard-id="activeTab"
+                        />
+                    </keep-alive>
+                </div>
+            </template>
+            <template v-if="props.projectId || props.projectGroupId"
+                      #header-right-contents
+            >
+                <p-select-dropdown style-type="tertiary-icon-button"
+                                   button-icon="ic_plus"
+                                   size="sm"
+                                   menu-position="right"
+                                   :menu="projectDashboardCreateMenuItems"
+                                   @select="handleCreateProjectDashboard"
+                />
             </template>
         </p-tab>
     </div>

@@ -2127,7 +2127,7 @@
 				"FILTER_PROVIDER": "プロバイダー"
 			},
 			"TEMPLATES": "テンプレート",
-			"TITLE": "新規ダッシュボード作成",
+			"TITLE": "新規プロジェクトダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
 			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
 			"VIEW": "ビュー",
@@ -2278,6 +2278,7 @@
 			"SET_HOME": "ホームダッシュボードとして設定",
 			"SHARE": "共有",
 			"SHARED_BY_ADMIN": "Adminにより共有",
+			"SHARED_BY_WORKSPACE": "Workspaceにより共有",
 			"SHARED_TO_ALL_PROJECTS": "すべてのプロジェクトに共有",
 			"SHARED_TO_WORKSPACES": "ワークスペースに共有",
 			"SHARE_DASHBOARD": "ダッシュボードを共有",
@@ -5097,6 +5098,13 @@
 		}
 	},
 	"PROJECT": {
+		"DASHBOARD": {
+			"CREATE": {
+				"CREATE_DASHBOARD": "ダッシュボード作成",
+				"CREATE_FOLDER": "フォルダ作成",
+				"TITLE": "新規ダッシュボード作成"
+			}
+		},
 		"DETAIL": {
 			"ACCESS": "アクセス",
 			"ADD": "追加",
@@ -5447,6 +5455,7 @@
 			"NO_GROUP_MEMBER": "グループメンバーなし",
 			"NO_PROJECT_GROUP_MSG": "このワークスペースにはまだプロジェクトまたはプロジェクトグループが作成されていません。",
 			"ONLY_PEOPLE_INVITED": "招待された人だけ",
+			"OVERVIEW": "",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",

@@ -4,7 +4,6 @@ import {
     computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
@@ -24,9 +23,9 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetLoadQueryContext } from '@/common/modules/widgets/_composables/use-widget-load-query-context';
+import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { DATE_FIELD, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT, SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getReferenceLabel, getWidgetDateFields, getWidgetDateRange,
@@ -74,7 +73,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
 
-    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetLoadResponse | null>(() => loadQuery.data?.value || null),
     chart: null as EChartsType | null,
     dataField: computed<string>(() => widgetOptionsState.dataFieldInfo?.data?.[0] || ''),
     xAxisData: computed<string[]>(() => {
@@ -181,7 +180,7 @@ const widgetOptionsState = reactive({
 
 
 /* Api */
-const { fetcher: queryFn, key: queryKey } = useWidgetLoadQueryContext({
+const loadQuery = useWidgetLoadQuery({
     widgetId: computed(() => props.widgetId),
     params: computed(() => ({
         widget_id: props.widgetId,
@@ -196,20 +195,14 @@ const { fetcher: queryFn, key: queryKey } = useWidgetLoadQueryContext({
         widgetName: props.widgetName,
         dataTableId: props.dataTableId,
     })),
-});
-
-
-const queryResult = useQuery({
-    queryKey,
-    queryFn,
     enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
-    staleTime: WIDGET_LOAD_STALE_TIME,
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isFetching.value || dataTableLoading.value);
+
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || dataTableLoading.value);
 const errorMessage = computed<string|undefined>(() => {
     if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
-    return queryResult.error?.value?.message as string;
+    return loadQuery.error?.value?.message as string;
 });
 
 /* Util */
@@ -280,7 +273,7 @@ useResizeObserver(chartContext, throttle(() => {
 
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResult.refetch();
+        loadQuery.refetch();
     },
 });
 onMounted(() => {

@@ -1,7 +1,6 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import dayjs from 'dayjs';
 import { sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -9,21 +8,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
-import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
-import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -36,11 +29,8 @@ import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/ty
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
-import { convertFormKeys } from '@/services/workspace-home/composables/use-workspace-home';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type {
-    ProviderReferenceDataMap, ProviderResourceDataItem, DailyUpdatesListItem,
     BookmarkType,
 } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -57,18 +47,11 @@ interface WorkspaceHomeState {
     // user config
     recentList: UserConfigModel[];
     favoriteMenuList: FavoriteItem[];
-    // summary
-    costReportConfig: CostReportConfigModel|null|undefined;
-    dataSource: CostDataSourceModel[];
-    providers: ProviderResourceDataItem[];
-    dailyUpdatesListItems: DailyUpdatesListItem;
 }
 
 export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
-    const allReferenceStore = useAllReferenceStore();
-    const allReferenceGetters = allReferenceStore.getters;
     const bookmarkStore = useBookmarkStore();
     const bookmarkState = bookmarkStore.state;
     const userStore = useUserStore();
@@ -85,19 +68,11 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         recentList: [],
         favoriteMenuList: [],
 
-        costReportConfig: null,
-        dataSource: [],
-        providers: [],
-        dailyUpdatesListItems: {
-            created: [],
-            deleted: [],
-        },
     });
 
     const _getters = reactive({
         userId: computed<string|undefined>(() => userStore.state.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-        providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
         bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
         filterByFolder: computed<TranslateResult|undefined>(() => bookmarkState.filterByFolder),
     });
@@ -137,7 +112,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
 
     const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
     const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
-    const costReportConfigApiHelper = new ApiQueryHelper().setSort('created_at', true);
     const listCountQueryHelper = new ApiQueryHelper().setCountOnly();
 
     const actions = {
@@ -150,13 +124,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             state.isFileFullMode = false;
             state.recentList = [];
             state.favoriteMenuList = [];
-            state.costReportConfig = null;
-            state.dataSource = [];
-            state.providers = [];
-            state.dailyUpdatesListItems = {
-                created: [],
-                deleted: [],
-            };
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
@@ -296,109 +263,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 state.appsTotalCount = total_count || undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            }
-        },
-        fetchCostReportConfig: async () => {
-            if (state.costReportConfig !== null) return;
-            try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
-                    query: costReportConfigApiHelper.data,
-                });
-                state.costReportConfig = results?.[0];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.costReportConfig = undefined;
-            }
-        },
-        fetchDataSource: async () => {
-            try {
-                const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
-                    query: {
-                        sort: [{ key: 'workspace_id', desc: false }],
-                    },
-                });
-                state.dataSource = response?.results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dataSource = [];
-            }
-        },
-        fetchCloudServiceResources: async () => {
-            const labels = ['Server', 'Database', 'Storage'];
-
-            try {
-                await Promise.all(labels.map(async (label) => {
-                    const metricId = `metric-managed-${label.toLowerCase()}-${label !== 'Storage' ? 'count' : 'size'}`;
-                    const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-                    const { status, response } = await fetcher({
-                        metric_id: metricId,
-                        query: {
-                            granularity: 'DAILY',
-                            group_by: ['labels.Provider'],
-                            start: dayjs.utc().format('YYYY-MM-DD'),
-                            end: dayjs.utc().format('YYYY-MM-DD'),
-                            fields: {
-                                count: {
-                                    key: 'value',
-                                    operator: 'sum',
-                                },
-                            },
-                            sort: [{ key: '_total_count', desc: true }],
-                            field_group: ['date'],
-                        },
-                    });
-
-                    if (status === 'succeed') {
-                        (response?.results || []).forEach((i) => {
-                            _getters.providerMap[i.Provider][label.toLowerCase()] = i._total_count;
-                        });
-                    }
-                }));
-                state.providers = Object.keys(_getters.providerMap).map((key) => _getters.providerMap[key]);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.providers = [];
-            }
-        },
-        fetchDailyUpdatesList: async (): Promise<void> => {
-            const labels = ['created', 'deleted'];
-
-            try {
-                await Promise.all(labels.map(async (label) => {
-                    const metricId = `metric-managed-${label.toLowerCase()}-count`;
-                    const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-                    const { status, response } = await fetcher({
-                        metric_id: metricId,
-                        query: {
-                            granularity: 'DAILY',
-                            group_by: ['labels.Provider', 'labels.Cloud Service Group', 'labels.Cloud Service Type'],
-                            start: dayjs.utc().format('YYYY-MM-DD'),
-                            end: dayjs.utc().format('YYYY-MM-DD'),
-                            fields: {
-                                count: {
-                                    key: 'value',
-                                    operator: 'sum',
-                                },
-                            },
-                            sort: [{ key: '_total_count', desc: true }],
-                            field_group: ['date'],
-                        },
-                    });
-
-                    if (status === 'succeed') {
-                        const results = convertFormKeys(response.results || []);
-                        state.dailyUpdatesListItems[label] = results.map((i) => ({
-                            cloud_service_group: i.cloud_service_group,
-                            cloud_service_type: i.cloud_service_type,
-                            total_count: i._total_count,
-                            provider: i.provider,
-                            [`${label}_count`]: i.count[0].value,
-                        }));
-                    }
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dailyUpdatesListItems = { created: state.dailyUpdatesListItems.created || [], deleted: state.dailyUpdatesListItems.deleted || [] };
             }
         },
     };

@@ -4,7 +4,6 @@ import {
     computed, defineExpose, onMounted, reactive, ref,
 } from 'vue';
 
-import { useQueries } from '@tanstack/vue-query';
 import { debounce, throttle } from 'lodash';
 
 import {
@@ -19,9 +18,8 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetLoadSumQueryContext } from '@/common/modules/widgets/_composables/use-widget-load-query-context';
+import { useWidgetLoadSumQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {
     getPreviousDateRange,
@@ -63,8 +61,8 @@ const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
     previousLoading: false,
 
-    data: computed<WidgetLoadResponse | null>(() => queryResults.value?.[0].data || null),
-    previousData: computed<WidgetLoadResponse | null>(() => queryResults.value?.[1]?.data || null),
+    data: computed<WidgetLoadResponse | null>(() => loadQuery.data?.value || null),
+    previousData: computed<WidgetLoadResponse | null>(() => comparisonQuery.data?.value || null),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     previousValue: computed<number>(() => {
         if (isPivotDataTable.value) return state.previousData?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
@@ -151,7 +149,7 @@ const setValueTextFontSize = debounce(() => {
 }, 300);
 
 /* Api */
-const { fetcher: baseQueryFn, key: baseQueryKey } = useWidgetLoadSumQueryContext({
+const loadQuery = useWidgetLoadSumQuery({
     widgetId: computed(() => props.widgetId),
     params: computed(() => ({
         widget_id: props.widgetId,
@@ -164,10 +162,11 @@ const { fetcher: baseQueryFn, key: baseQueryKey } = useWidgetLoadSumQueryContext
         widgetName: props.widgetName,
         dataTableId: props.dataTableId,
     })),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
 });
 
 
-const { fetcher: comparisonQueryFn, key: comparisonQueryKey } = useWidgetLoadSumQueryContext({
+const comparisonQuery = useWidgetLoadSumQuery({
     widgetId: computed(() => props.widgetId),
     params: computed(() => ({
         widget_id: props.widgetId,
@@ -180,30 +179,15 @@ const { fetcher: comparisonQueryFn, key: comparisonQueryKey } = useWidgetLoadSum
         widgetName: props.widgetName,
         dataTableId: props.dataTableId,
     })),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && widgetOptionsState.comparisonInfo?.toggleValue && !props.loadDisabled),
 });
 
-const queryResults = useQueries({
-    queries: [
-        {
-            queryKey: baseQueryKey,
-            queryFn: baseQueryFn,
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
-            staleTime: WIDGET_LOAD_STALE_TIME,
-        },
-        {
-            queryKey: comparisonQueryKey,
-            queryFn: comparisonQueryFn,
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && widgetOptionsState.comparisonInfo?.toggleValue && !props.loadDisabled),
-            staleTime: WIDGET_LOAD_STALE_TIME,
-        },
-    ],
-});
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || dataTableLoading.value);
-const previousLoading = computed<boolean>(() => queryResults.value?.[1].isFetching || dataTableLoading.value);
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || dataTableLoading.value);
+const previousLoading = computed<boolean>(() => comparisonQuery.isFetching.value || dataTableLoading.value);
 const errorMessage = computed<string|undefined>(() => {
     if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
-    return queryResults.value?.[0].error?.message as string;
+    return loadQuery.error?.value?.message as string;
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -219,8 +203,8 @@ useResizeObserver(valueTextRef, throttle(() => {
 
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResults.value?.[0].refetch();
-        queryResults.value?.[1].refetch();
+        loadQuery.refetch();
+        comparisonQuery.refetch();
     },
 });
 onMounted(() => {

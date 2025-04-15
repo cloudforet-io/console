@@ -119,7 +119,7 @@ const getInvalidFieldNameText = (fieldName?: string): TranslateResult|undefined 
     if (!isFieldNameValid(fieldName, storeState.currentDataTable)) return i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DUPLICATED_FIELD_NAME');
     return undefined;
 };
-const isFieldNameValid = (fieldName: string, dataTable?: PublicDataTableModel|PrivateDataTableModel): boolean => {
+const isFieldNameValid = (fieldName: string, dataTable?: Partial<PublicDataTableModel|PrivateDataTableModel>): boolean => {
     if (!dataTable) return true;
     const _dataInfoKeys = Object.keys(dataTable.data_info || {});
     return !_dataInfoKeys.includes(fieldName);

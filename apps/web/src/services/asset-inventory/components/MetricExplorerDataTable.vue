@@ -19,7 +19,7 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
+import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

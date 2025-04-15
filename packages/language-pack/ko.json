@@ -2278,6 +2278,7 @@
 			"SET_HOME": "홈 대시보드로 설정",
 			"SHARE": "공유",
 			"SHARED_BY_ADMIN": "Admin에 의해 공유됨",
+			"SHARED_BY_WORKSPACE": "Workspace에 의해 공유됨",
 			"SHARED_TO_ALL_PROJECTS": "전체 프로젝트에 공유됨",
 			"SHARED_TO_WORKSPACES": "워크스페이스에 공유됨",
 			"SHARE_DASHBOARD": "대시보드 공유",
@@ -5097,6 +5098,13 @@
 		}
 	},
 	"PROJECT": {
+		"DASHBOARD": {
+			"CREATE": {
+				"CREATE_DASHBOARD": "대시보드 생성",
+				"CREATE_FOLDER": "폴더 생성",
+				"TITLE": "프로젝트 대시보드 생성"
+			}
+		},
 		"DETAIL": {
 			"ACCESS": "접근",
 			"ADD": "추가 ",
@@ -5447,6 +5455,7 @@
 			"NO_GROUP_MEMBER": "프로젝트 그룹 멤버 없음",
 			"NO_PROJECT_GROUP_MSG": "이 워크스페이스에는 아직 생성된 프로젝트 또는 프로젝트 그룹이 없습니다.",
 			"ONLY_PEOPLE_INVITED": "초대된 사용자만",
+			"OVERVIEW": "홈",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",
 			"PLACE_HOLDER_SHOW_MORE": "더보기",

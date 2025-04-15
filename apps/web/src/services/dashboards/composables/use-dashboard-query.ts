@@ -91,7 +91,7 @@ export const useDashboardQuery = (): UseDashboardQueryReturn => {
         if (_state.isAdminMode) {
             publicDashboardListApiQueryHelper.addFilter({ k: 'resource_group', v: 'DOMAIN', o: '=' });
         } else {
-            publicDashboardListApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '=' });
+            publicDashboardListApiQueryHelper.addFilter({ k: 'resource_group', v: ['WORKSPACE', 'DOMAIN'], o: '' });
         }
         _state.publicDashboardListApiQuery = publicDashboardListApiQueryHelper.data;
     }, { immediate: true });

@@ -3,7 +3,6 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
@@ -29,14 +28,9 @@ import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
-
-
-
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
 
 /* Query */
 const {
@@ -101,7 +95,7 @@ const state = reactive({
 /* Api */
 const deleteWidget = async (widgetId: string) => {
     if (!widgetId) return;
-    const isPrivate = dashboardId.value?.startsWith('private');
+    const isPrivate = widgetId?.startsWith('private');
     const _fetcher = isPrivate
         ? api.privateWidgetAPI.delete
         : api.publicWidgetAPI.delete;

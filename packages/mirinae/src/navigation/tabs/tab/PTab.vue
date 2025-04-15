@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, nextTick, reactive, ref,
+    computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
 import { onClickOutside, useResizeObserver } from '@vueuse/core';
@@ -172,12 +172,22 @@ const calculateWidths = () => {
     state.hiddenTabItems = hiddenTabs.filter((tab) => tab.tabType !== 'divider');
     state.firstRenderDone = true; // This is to prevent the tabs from being hidden on the first render
 };
+
+// Calculate the widths of the tabs when tab size is changed
 useResizeObserver(tabContainerRef, throttle(() => {
     state.firstRenderDone = false;
     nextTick(() => {
         calculateWidths();
     });
 }, 500));
+
+// Calculate the widths of the tabs when the tabs are updated
+watch(() => props.tabs, () => {
+    state.firstRenderDone = false;
+    nextTick(() => {
+        calculateWidths();
+    });
+});
 
 onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
 
@@ -219,6 +229,13 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
                         @click="handleSelectTab(tab, idx)"
                     >
                         <div class="content-wrapper">
+                            <p-i v-if="tab.icon"
+                                 class="tab-icon"
+                                 :name="tab.icon"
+                                 color="inherit"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
                             <span class="label">
                                 {{ tab.label }}
                             </span>
@@ -321,7 +338,7 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
         width: 100%;
         flex: 1;
         li {
-            @apply relative text-gray-400 cursor-pointer;
+            @apply relative text-gray-600 cursor-pointer;
             height: 2.5rem;
             min-height: 2.5rem;
             max-width: 10rem;
@@ -343,6 +360,10 @@ onClickOutside(hiddenTabsMenuRef, hideHiddenTabs);
             }
             .content-wrapper {
                 @apply flex items-center justify-center w-full h-full;
+                .tab-icon {
+                    min-width: 0.875rem;
+                    margin-right: 0.25rem;
+                }
                 .label {
                     @apply w-full text-label-md block truncate;
                 }

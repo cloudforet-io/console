@@ -5,7 +5,6 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useQuery } from '@tanstack/vue-query';
 import bytes from 'bytes';
 import { sortBy } from 'lodash';
 
@@ -22,6 +21,7 @@ import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data
 import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
 import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -37,10 +37,10 @@ import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
 
+import { useDashboardRefinedVars } from '@/services/_shared/dashboard/dashboard-detail/contextual-composables/use-dashboard-refined-vars';
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
 
 
 
@@ -59,6 +59,8 @@ const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
+const { refinedVars } = useDashboardRefinedVars(dashboardId);
+
 const {
     privateDataTableAPI,
 } = usePrivateDataTableApi();
@@ -71,9 +73,6 @@ const {
     dataTableList,
 } = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
-});
-const { dashboard } = useDashboardGetQuery({
-    dashboardId,
 });
 
 const storeState = reactive({
@@ -256,14 +255,6 @@ const getSortIcon = (field: PreviewTableField) => {
     // return '';
 };
 
-// const getTimeDiffSubText = (field: PreviewTableField): string => {
-//     if (!state.dataInfo?.[field.name]) return '';
-//     const { timediff } = state.dataInfo[field.name];
-//     if (!timediff || !Object.entries(timediff ?? {}).length) return '';
-//     const [key, value] = Object.entries(timediff)[0];
-//     return `( ${value} ${key} )`;
-// };
-
 const { key: privateDataTableLoadQueryKey, params: privateDataTableLoadParams } = useServiceQueryKey('dashboard', 'private-data-table', 'load', {
     contextKey: computed(() => storeState.selectedDataTableId),
     params: computed<DataTableLoadParameters>(() => ({
@@ -271,7 +262,7 @@ const { key: privateDataTableLoadQueryKey, params: privateDataTableLoadParams } 
         granularity: state.selectedGranularity,
         sort: state.sortBy,
         page: state.page,
-        vars: dashboard.value?.vars,
+        vars: refinedVars.value,
     })),
 });
 
@@ -282,11 +273,11 @@ const { key: publicDataTableLoadQueryKey, params: publicDataTableLoadParams } = 
         granularity: state.selectedGranularity,
         sort: state.sortBy,
         page: state.page,
-        vars: dashboard.value?.vars,
+        vars: refinedVars.value,
     })),
 });
 
-const queryResult = useQuery({
+const queryResult = useScopedQuery({
     queryKey: state.isPrivate ? privateDataTableLoadQueryKey.value : publicDataTableLoadQueryKey.value,
     queryFn: () => {
         if (!storeState.selectedDataTableId) {
@@ -300,7 +291,7 @@ const queryResult = useQuery({
     enabled: computed(() => storeState.selectedDataTableId !== undefined && state.selectedDataTable !== undefined),
     staleTime: WIDGET_LOAD_STALE_TIME,
     retry: 2,
-});
+}, ['WORKSPACE', 'DOMAIN']);
 
 const dataTableLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isFetching.value);
 const isError = computed<boolean>(() => queryResult.isError.value);

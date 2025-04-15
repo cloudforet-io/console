@@ -4,14 +4,21 @@ import { defineStore } from 'pinia';
 
 export const useProjectPageModalStore = defineStore('project-page-modal', () => {
     const state = reactive({
+        targetId: '' as string|undefined,
+        targetType: undefined as 'project'|'projectGroup'|undefined,
+
         manageMemberModalVisible: false,
         deleteModalVisible: false,
         moveModalVisible: false,
         inviteMemberModalVisible: false,
         manageTagsModalVisible: false,
         projectFormModalVisible: false,
-        targetId: '' as string|undefined,
-        targetType: undefined as 'project'|'projectGroup'|undefined,
+
+        folderFormModalVisible: false,
+        dashboardNameEditModalVisible: false,
+        dashboardChangeFolderModalVisible: false,
+        dashboardDeleteModalVisible: false,
+        dashboardCloneModalVisible: false,
     });
 
     const actions = {
@@ -109,7 +116,45 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         closeFormModal() {
             state.projectFormModalVisible = false;
         },
-        // overal
+        openCreateFolderFormModal() {
+            state.targetId = undefined;
+            state.folderFormModalVisible = true;
+        },
+        openEditFolderFormModal(targetFolderId: string) {
+            state.targetId = targetFolderId;
+            state.folderFormModalVisible = true;
+        },
+        closeFolderFormModal() {
+            state.folderFormModalVisible = false;
+        },
+        openDashboardNameEditModal(targetDashboardId: string) {
+            state.targetId = targetDashboardId;
+            state.dashboardNameEditModalVisible = true;
+        },
+        closeDashboardNameEditModal() {
+            state.dashboardNameEditModalVisible = false;
+        },
+        openDashboardChangeFolderModal(targetDashboardId: string) {
+            state.targetId = targetDashboardId;
+            state.dashboardChangeFolderModalVisible = true;
+        },
+        closeDashboardChangeFolderModal() {
+            state.dashboardChangeFolderModalVisible = false;
+        },
+        openDashboardDeleteModal(targetDashboardId: string) {
+            state.targetId = targetDashboardId;
+            state.dashboardDeleteModalVisible = true;
+        },
+        closeDashboardDeleteModal() {
+            state.dashboardDeleteModalVisible = false;
+        },
+        openDashboardCloneModal(targetDashboardId: string) {
+            state.targetId = targetDashboardId;
+            state.dashboardCloneModalVisible = true;
+        },
+        closeDashboardCloneModal() {
+            state.dashboardCloneModalVisible = false;
+        },
         resetTarget() {
             state.targetId = undefined;
             state.targetType = undefined;

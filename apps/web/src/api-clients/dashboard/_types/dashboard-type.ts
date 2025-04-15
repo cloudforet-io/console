@@ -13,6 +13,7 @@ import type { PrivateDashboardGetParameters } from '@/api-clients/dashboard/priv
 import type { PrivateDashboardListParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/list';
 import type { PrivateDashboardUpdateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/update';
 import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dashboard/schema/model';
+import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
 import type { PublicDashboardChangeFolderParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/change-folder';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import type { PublicDashboardDeleteParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/delete';
@@ -20,9 +21,11 @@ import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/publi
 import type { PublicDashboardListParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/list';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { Value } from '@/lib/variable-models/_base/types';
+
 
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
@@ -30,6 +33,7 @@ export type DashboardFolderType = 'PUBLIC'|'PRIVATE';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export type DashboardModel = PublicDashboardModel | PrivateDashboardModel;
+export type DashboardFolderModel = PublicFolderModel | PrivateFolderModel;
 export type DashboardCreateParams = PublicDashboardCreateParameters | PrivateDashboardCreateParameters;
 export type DashboardChangeFolderParams = PublicDashboardChangeFolderParameters | PrivateDashboardChangeFolderParameters;
 export type DashboardListParams = PublicDashboardListParameters | PrivateDashboardListParameters;
