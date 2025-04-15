@@ -4,6 +4,7 @@ import type {
     FeatureVersion,
     GeneratedMenuConfig,
     GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
     GeneratedUiAffectConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
@@ -74,8 +75,20 @@ class AssetInventoryConfigurator implements FeatureConfigurator {
         };
     }
 
-    getRouteMetadata(): GeneratedRouteMetadata {
-        return this.routeMetadata;
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 
