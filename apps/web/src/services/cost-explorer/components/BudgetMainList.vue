@@ -234,6 +234,14 @@ const handleDeleteConfirm = async () => {
 const getBudgetFilters = (): ApiFilter[] => {
     const filters: ApiFilter[] = [];
 
+    if (state.query?.year && state.query?.year !== 'all') {
+        filters.push({
+            k: 'budget_year',
+            v: state.query?.year,
+            o: 'eq',
+        });
+    }
+
     if (state.query?.cycle && state.query.cycle !== 'all') {
         filters.push({
             k: 'time_unit',
