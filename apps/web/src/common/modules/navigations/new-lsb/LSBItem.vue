@@ -49,13 +49,16 @@ const props = withDefaults(defineProps<LSBItemProps>(), {
             <slot name="outer-right" />
         </template>
         <template #action="{isHovered}">
-            <favorite-button v-if="props.favoriteVisibility !== 'none'"
-                             v-show="props.favoriteVisibility === 'hovered-only' ? isHovered : true"
-                             :item-id="props.favoriteOptions?.id ?? props.id"
-                             :favorite-type="props.favoriteOptions?.type ?? FAVORITE_TYPE.MENU"
-                             :visible-active-case-only="props.favoriteVisibility === 'active-only'"
-                             scale="0.8"
-            />
+            <div v-if="props.favoriteVisibility !== 'none'"
+                 v-show="props.favoriteVisibility === 'hovered-only' ? isHovered : true"
+                 class="flex items-center justify-center w-6 h-6 rounded-md border border-gray-100 bg-white shadow-md"
+            >
+                <favorite-button :item-id="props.favoriteOptions?.id ?? props.id"
+                                 :favorite-type="props.favoriteOptions?.type ?? FAVORITE_TYPE.MENU"
+                                 :visible-active-case-only="props.favoriteVisibility === 'active-only'"
+                                 scale="0.8"
+                />
+            </div>
         </template>
     </p-tree-node>
 </template>
