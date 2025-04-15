@@ -29,6 +29,8 @@ import type { CloudServiceListParameters } from '@/schema/inventory/cloud-servic
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
+import { useServiceRouter } from '@/router/helpers/use-service-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -38,6 +40,7 @@ import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
+import { MENU_ID } from '@/lib/menu/config';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
@@ -46,7 +49,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface Props {
     cloudServiceId: string;
@@ -83,6 +85,7 @@ const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
 
 const router = useRouter();
+const serviceRouter = useServiceRouter();
 
 const state = reactive({
     data: undefined as any,
@@ -142,8 +145,9 @@ const handleClickLinkButton = async (type: string, id: string) => {
             ErrorHandler.handleRequestError(e, e.message);
         }
     } else {
-        window.open(router.resolve({
-            name: PROJECT_ROUTE_V1.DETAIL._NAME,
+        window.open(serviceRouter.resolve({
+            feature: MENU_ID.PROJECT,
+            routeKey: 'detail',
             params: { id, workspaceId: state.data.workspace_id },
         }).href, '_blank');
     }

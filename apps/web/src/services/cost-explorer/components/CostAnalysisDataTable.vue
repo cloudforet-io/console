@@ -26,7 +26,6 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -43,6 +42,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -63,7 +63,7 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 
@@ -84,7 +84,6 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const router = useRouter();
-
 
 const getValueSumKey = (dataType: string) => {
     switch (dataType) {
@@ -408,8 +407,9 @@ const handleClickRowData = (fieldName: string, value: string) => {
 
     if (storeState.isAdminMode) return;
     if (fieldName === GROUP_BY.PROJECT) {
-        _routeName = PROJECT_ROUTE_V1.DETAIL._NAME;
-        _params = { id: value, workspaceId: storeState.currentWorkspaceId };
+        const { name, params } = referenceRouter(value, { resource_type: 'identity.Project' });
+        _routeName = name || PROJECT_ROUTE_V2._NAME;
+        _params = params || {};
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
         _routeName = SERVICE_ACCOUNT_ROUTE.DETAIL._NAME;

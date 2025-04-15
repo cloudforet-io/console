@@ -10,9 +10,7 @@ import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/mod
 import {
     ERROR_ROUTE, EXTERNAL_PAGES, ROOT_ROUTE, ROUTE_SCOPE,
 } from '@/router/constant';
-import type { RouteScopeType } from '@/router/type';
-
-
+import type { RouteScopeType } from '@/router/types';
 
 import { calculateIsAccessibleRoute } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';

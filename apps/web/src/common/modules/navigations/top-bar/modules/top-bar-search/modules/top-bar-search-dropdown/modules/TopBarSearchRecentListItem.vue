@@ -9,13 +9,14 @@ import {
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import type { RecentItem } from '@/common/modules/navigations/type';
-
 
 interface Props {
     recentItem?: RecentItem;
@@ -132,11 +133,15 @@ const handleClick = () => {
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, state.convertResourceId, storeState.currentWorkspaceId, props.recentItem?.data));
     } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) {
-        router.push(topBarSearchReferenceRouter(
-            topBarSearchStore.state.activeTab,
-            state.convertResourceId,
-            storeState.currentWorkspaceId,
-        ));
+        if (topBarSearchStore.state.activeTab === SEARCH_TAB.PROJECT) {
+            router.push(referenceRouter(state.convertResourceId, { resource_type: 'identity.Project' })).catch(() => {});
+        } else {
+            router.push(topBarSearchReferenceRouter(
+                topBarSearchStore.state.activeTab,
+                state.convertResourceId,
+                storeState.currentWorkspaceId,
+            ));
+        }
     }
     topBarSearchStore.setIsActivated(false);
 };

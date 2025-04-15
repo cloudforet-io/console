@@ -5,17 +5,23 @@ import { concat } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { useServiceRouter } from '@/router/helpers/use-service-router';
+
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { ADMIN_SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/admin/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
+
+import { MENU_ID } from '../menu/config';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
 }
+
+const serviceRouter = useServiceRouter();
 
 const queryHelper = new QueryHelper();
 
@@ -34,27 +40,24 @@ const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
 };
 
 const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+    const location = serviceRouter.getLocation({
+        feature: MENU_ID.PROJECT,
+        routeKey: 'detail',
+        params: { id: data },
+    });
     if (data) {
         return {
-            name,
+            ...location,
             query,
-            params: data ? {
-                id: data,
-                ...(reference.workspace_id ? { workspaceId: reference.workspace_id } : {}),
-            } : undefined,
         };
     } return {};
 };
 
-const projectGroupLinkFormatter: LinkFormatter = (name, data) => {
-    const location = {
-        name,
-        params: {
-            projectGroupId: data,
-        },
-    };
-    return location;
-};
+const projectGroupLinkFormatter: LinkFormatter = (name, data) => serviceRouter.getLocation({
+    feature: MENU_ID.PROJECT,
+    routeKey: 'projectGroup',
+    params: { id: data },
+});
 
 const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     const location = { name, query };
@@ -110,12 +113,18 @@ const routerMap = (isAdminMode?: boolean): RouterMap => ({
         },
     'identity.Project':
         {
-            name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
+            name: serviceRouter.getLocation({
+                feature: MENU_ID.PROJECT,
+                routeKey: 'detail',
+            }).name || PROJECT_ROUTE_V2._NAME,
             formatter: projectLinkFormatter,
         },
     'identity.ProjectGroup':
         {
-            name: PROJECT_ROUTE_V1._NAME,
+            name: serviceRouter.getLocation({
+                feature: MENU_ID.PROJECT,
+                routeKey: 'projectGroup',
+            }).name || PROJECT_ROUTE_V2._NAME,
             formatter: projectGroupLinkFormatter,
         },
     'inventory.Collector':

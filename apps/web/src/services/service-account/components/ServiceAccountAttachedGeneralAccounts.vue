@@ -40,13 +40,13 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { green, red } from '@/styles/colors';
 
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { getAccountFields, stateFormatter } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
@@ -142,6 +142,7 @@ const getAttachedGeneralAccountList = async () => {
         state.loading = false;
     }
 };
+const getProjectDetailLocation = (id: string) => referenceRouter(id, { resource_type: 'identity.Project' });
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
@@ -358,9 +359,9 @@ watch(() => state.trustedAccountId, async (ta) => {
                               class="capitalize"
                     />
                 </template>
-                <template #col-project_id-format="{value, item}">
+                <template #col-project_id-format="{value}">
                     <span class="project-id-wrapper">
-                        <router-link :to="{ name: PROJECT_ROUTE_V1.DETAIL._NAME, params: { id: value, workspaceId: item.workspace_id } }"
+                        <router-link :to="getProjectDetailLocation(value)"
                                      target="_blank"
                         >
                             <span>{{ state.project[value]?.label }}</span>

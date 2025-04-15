@@ -16,6 +16,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
@@ -31,7 +32,6 @@ import TopBarSearchServiceTab
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-
 
 interface Props {
     isFocused: boolean;
@@ -133,7 +133,13 @@ const handleSelect = (item) => {
                 label: item?.name,
             },
         });
-    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) {
+        if (topBarSearchStore.state.activeTab === SEARCH_TAB.PROJECT) {
+            router.push(referenceRouter(item.resource_id, { resource_type: 'identity.Project' })).catch(() => {});
+        } else {
+            router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+        }
+    }
 
     topBarSearchStore.setIsActivated(false);
 };
