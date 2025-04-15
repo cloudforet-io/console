@@ -28,7 +28,7 @@ The Tree Node component is a versatile element for displaying hierarchical data 
 <p-tree-node
   id="node-1"
   name="Parent Node"
-  :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+  :icon="ic_collect"
   :hasChildren="true"
   :expanded="expanded"
   @update:expanded="expanded = $event"
@@ -37,7 +37,7 @@ The Tree Node component is a versatile element for displaying hierarchical data 
     <p-tree-node
       id="child-1"
       name="Child Node"
-      :icon="{ icon: 'ic_tree_file', color: 'inherit' }"
+      :icon="{ iconName: 'ic_collect', iconColor: 'red' }"
       :depth="1"
     />
   </template>
@@ -69,6 +69,7 @@ How to display a node in loading state.
 
 ## Draggable
 How to make a node draggable.
+NOT implemented yet.
 <Canvas of={PTreeNodeStories.Draggable} />
 
 ## With Link

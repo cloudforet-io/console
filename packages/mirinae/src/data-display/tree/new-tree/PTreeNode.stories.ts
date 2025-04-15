@@ -4,7 +4,6 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getTreeNodeArgs, getTreeNodeArgTypes, getTreeNodeParameters } from '@/data-display/tree/new-tree/story-helper';
-import PI from '@/foundation/icons/PI.vue';
 
 import PTreeNode from './PTreeNode.vue';
 
@@ -36,7 +35,6 @@ export const Basic: Story = {
                 <p-tree-node
                     id="node-1"
                     name="Basic Tree Node"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
                     :selectable="true"
                 ></p-tree-node>
             </div>
@@ -76,7 +74,7 @@ export const TreeStructure: Story = {
                 <p-tree-node
                     id="parent"
                     name="Parent Node"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+                    icon="ic_collect"
                     :hasChildren="true"
                     :expanded="expanded"
                     @update:expanded="expanded = $event"
@@ -85,16 +83,14 @@ export const TreeStructure: Story = {
                         <p-tree-node
                             id="child-1"
                             name="Child Node 1"
-                            :icon="{ icon: 'ic_tree_file', color: 'inherit' }"
+                            icon="ic_service_policy"
                             :depth="1"
-                            :selectable="true"
                         ></p-tree-node>
                         <p-tree-node
                             id="child-2"
                             name="Child Node 2"
-                            :icon="{ icon: 'ic_tree_file', color: 'inherit' }"
+                            icon="ic_service_policy"
                             :depth="1"
-                            :selectable="true"
                         ></p-tree-node>
                     </template>
                 </p-tree-node>
@@ -112,26 +108,25 @@ export const TreeStructure: Story = {
 // Slots usage story
 export const WithSlots: Story = {
     render: () => ({
-        components: { PTreeNode, PI },
+        components: { PTreeNode },
         template: `
             <div class="bg-white p-4 max-w-sm">
                 <p-tree-node
                     id="custom"
                     name="Node with Custom Slots"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
-                    :selectable="true"
+                    icon="ic_tree_folder"
                 >
                     <template #outer-left>
-                        <p-i name="ic_common-tag" width="1rem" height="1rem" class="mx-1" />
+                        outer-left
                     </template>
                     <template #inner-left>
-                        <p-i name="ic_common-tag" width="1rem" height="1rem" class="mx-1" />
+                        inner-left
                     </template>
                     <template #inner-right>
-                        <p-i name="ic_common-tag" width="1rem" height="1rem" class="mx-1" />
+                        inner-right
                     </template>
                     <template #outer-right>
-                        <p-i name="ic_common-tag" width="1rem" height="1rem" class="mx-1" />
+                        outer-right
                     </template>
                     <template #action>
                         <button class="px-2 py-1 bg-blue-100 rounded text-xs">Action</button>
@@ -154,7 +149,7 @@ export const Selectable: Story = {
                 <p-tree-node
                     id="selectable"
                     name="Selectable Node"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+                    icon="ic_tree_folder"
                     :selectable="true"
                     :selected="selected"
                     @update:selected="selected = $event"
@@ -179,10 +174,10 @@ export const Loading: Story = {
                 <p-tree-node
                     id="loading"
                     name="Loading Node"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
                     :hasChildren="true"
                     :loading="true"
                     :expanded="true"
+                    displayType="tree"
                 ></p-tree-node>
             </div>
         `,
@@ -201,7 +196,7 @@ export const Draggable: Story = {
                 <p-tree-node
                     id="draggable"
                     name="Draggable Node"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+                    :hasChildren="true"
                     :draggable="true"
                 ></p-tree-node>
             </div>
@@ -221,7 +216,6 @@ export const WithLink: Story = {
                 <p-tree-node
                     id="with-link"
                     name="Node with Link"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
                     :selectable="true"
                     :link="{ to: { path: '/example' } }"
                 ></p-tree-node>
@@ -242,16 +236,13 @@ export const DisplayType: Story = {
                 <p-tree-node
                     id="display-type"
                     name="Display Type: Tree"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
                     displayType="tree"
-                    :selectable="true"
+                    :hasChildren="true"
                 ></p-tree-node>
                 <p-tree-node
                     id="display-type-list"
                     name="Display Type: List"
-                    :icon="{ icon: 'ic_tree_file', color: 'inherit' }"
                     displayType="list"
-                    :selectable="true"
                     class="mt-2"
                 ></p-tree-node>
             </div>
@@ -271,21 +262,24 @@ export const IconTypes: Story = {
                 <p-tree-node
                     id="icon-string"
                     name="Icon as String"
-                    icon="ic_tree_folder"
-                    :selectable="true"
+                    icon="ic_collect"
                 ></p-tree-node>
                 <p-tree-node
                     id="icon-object"
                     name="Icon as Object"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
-                    :selectable="true"
+                    :icon="{ iconName: 'ic_collect' }"
                     class="mt-2"
                 ></p-tree-node>
                 <p-tree-node
                     id="icon-custom"
                     name="Icon with Custom Color"
-                    :icon="{ icon: 'ic_tree_folder', color: 'red' }"
-                    :selectable="true"
+                    :icon="{ iconName: 'ic_collect', iconColor: 'red' }"
+                    class="mt-2"
+                ></p-tree-node>
+                <p-tree-node
+                    id="icon-img"
+                    name="Icon with Image URL"
+                    :icon="{ imgUrl: 'https://example.com/icon.png' }"
                     class="mt-2"
                 ></p-tree-node>
             </div>
@@ -305,24 +299,24 @@ export const Depth: Story = {
                 <p-tree-node
                     id="depth-0"
                     name="Depth 0"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+                    icon="ic_collect"
                     :depth="0"
-                    :selectable="true"
+                    displayType="tree"
                 ></p-tree-node>
                 <p-tree-node
                     id="depth-1"
                     name="Depth 1"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+                    icon="ic_collect"
                     :depth="1"
-                    :selectable="true"
+                    displayType="tree"
                     class="mt-2"
                 ></p-tree-node>
                 <p-tree-node
                     id="depth-2"
                     name="Depth 2"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
+                    icon="ic_collect"
                     :depth="2"
-                    :selectable="true"
+                    displayType="tree"
                     class="mt-2"
                 ></p-tree-node>
             </div>
@@ -342,11 +336,10 @@ export const DefaultSlot: Story = {
                 <p-tree-node
                     id="default-slot"
                     name="Default Slot"
-                    :icon="{ icon: 'ic_tree_folder', color: 'inherit' }"
-                    :selectable="true"
+                    icon="ic_tree_folder"
                 >
-                    <template #default>
-                        <span class="font-bold text-blue-500">Custom Node Text</span>
+                    <template #default="{ name }">
+                        <span class="font-bold text-blue-500">{{ name }}</span>
                     </template>
                 </p-tree-node>
             </div>
