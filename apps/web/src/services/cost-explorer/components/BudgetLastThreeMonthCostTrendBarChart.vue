@@ -159,7 +159,9 @@ watch(() => budgetCreatePageState, async () => {
     <p-pane-layout class="chart-wrapper p-4">
         <p class="font-bold text-sm">
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.LAST_COST_TREND', {
-                count: Number(dayjs(budgetCreatePageState.endMonth[0], 'YYYY-MM').diff(dayjs(budgetCreatePageState.startMonth[0], 'YYYY-MM'), 'month') + 1),
+                count: budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0
+                    ? Number(dayjs(budgetCreatePageState.endMonth[0], 'YYYY-MM').diff(dayjs(budgetCreatePageState.startMonth[0], 'YYYY-MM'), 'month') + 1)
+                    : 3,
             }) }}
         </p>
         <div ref="chartContext"
