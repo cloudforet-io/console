@@ -36,7 +36,6 @@ const setNotification = async () => {
 };
 
 const handleClose = () => {
-    // TODO: 취소했을 땐 토글 원래대로 해야함.
     emit('update:visible', false);
 };
 
