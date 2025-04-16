@@ -87,14 +87,14 @@ const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccoun
                 <p-button icon-left="ic_plus"
                           style-type="tertiary"
                           size="md"
-                          @click="projectPageModalStore.openCreateProjectGroupFormModal()"
+                          @click="projectPageModalStore.openProjectGroupCreateModal()"
                 >
                     {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                 </p-button>
                 <p-button icon-left="ic_plus"
                           style-type="primary"
                           size="md"
-                          @click="projectPageModalStore.openCreateProjectFormModal()"
+                          @click="projectPageModalStore.openProjectCreateModal()"
                 >
                     {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
                 </p-button>

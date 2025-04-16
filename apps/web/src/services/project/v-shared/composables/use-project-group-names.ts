@@ -6,14 +6,14 @@ import { useProjectGroupsQuery } from '@/services/project/v-shared/composables/q
 export const useProjectGroupNames = ({
     projectGroupId, enabled,
 }: {
-  projectGroupId: Ref<string|undefined>;
+  projectGroupId?: Ref<string|undefined>;
   enabled: Ref<boolean>;
 }) => {
     const { data } = useProjectGroupsQuery({ enabled });
 
     const projectGroupNames = computed<string[]>(() => {
         if (!data.value) return [];
-        if (projectGroupId.value) {
+        if (projectGroupId?.value) {
             return data.value.filter((pg) => pg.project_group_id !== projectGroupId.value).map((item) => item.name);
         }
         return data.value.map((item) => item.name);

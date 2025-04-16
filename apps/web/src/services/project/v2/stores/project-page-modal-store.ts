@@ -7,12 +7,18 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         targetId: '' as string|undefined,
         targetType: undefined as 'project'|'projectGroup'|undefined,
 
-        manageMemberModalVisible: false,
+        projectGroupMemberModalVisible: false,
+        projectMemberModalVisible: false,
         deleteModalVisible: false,
         moveModalVisible: false,
         inviteMemberModalVisible: false,
         manageTagsModalVisible: false,
-        projectFormModalVisible: false,
+
+        projectCreateModalVisible: false,
+        projectRenameModalVisible: false,
+        projectGroupCreateModalVisible: false,
+        projectGroupRenameModalVisible: false,
+        projectEditAccessModalVisible: false,
 
         folderFormModalVisible: false,
         dashboardNameEditModalVisible: false,
@@ -22,19 +28,23 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
     });
 
     const actions = {
-        // manage member
-        openProjectGroupManageMemberModal(targetProjectGroupId: string) {
+        // project group member
+        openProjectGroupMemberModal(targetProjectGroupId: string) {
             state.targetId = targetProjectGroupId;
             state.targetType = 'projectGroup';
-            state.manageMemberModalVisible = true;
+            state.projectGroupMemberModalVisible = true;
         },
-        openProjectManageMemberModal(targetProjectId: string) {
+        closeProjectGroupMemberModal() {
+            state.projectGroupMemberModalVisible = false;
+        },
+        // project member
+        openProjectMemberModal(targetProjectId: string) {
             state.targetId = targetProjectId;
             state.targetType = 'project';
-            state.manageMemberModalVisible = true;
+            state.projectMemberModalVisible = true;
         },
-        closeManageMemberModal() {
-            state.manageMemberModalVisible = false;
+        closeProjectMemberModal() {
+            state.projectMemberModalVisible = false;
         },
         // delete project
         openProjectGroupDeleteModal(targetProjectGroupId: string) {
@@ -92,30 +102,52 @@ export const useProjectPageModalStore = defineStore('project-page-modal', () => 
         closeManageTagsModal() {
             state.manageTagsModalVisible = false;
         },
-        // form
-        openCreateProjectGroupFormModal() {
-            state.targetId = undefined;
-            state.targetType = 'projectGroup';
-            state.projectFormModalVisible = true;
-        },
-        openCreateProjectFormModal() {
-            state.targetId = undefined;
+        // create project
+        openProjectCreateModal(parentGroupId?: string) {
+            state.targetId = parentGroupId;
             state.targetType = 'project';
-            state.projectFormModalVisible = true;
+            state.projectCreateModalVisible = true;
         },
-        openEditProjectGroupFormModal(targetProjectGroupId: string) {
-            state.targetId = targetProjectGroupId;
-            state.targetType = 'projectGroup';
-            state.projectFormModalVisible = true;
+        closeProjectCreateModal() {
+            state.projectCreateModalVisible = false;
         },
-        openEditProjectFormModal(targetProjectId: string) {
+        // rename project
+        openProjectRenameModal(targetProjectId: string) {
             state.targetId = targetProjectId;
             state.targetType = 'project';
-            state.projectFormModalVisible = true;
+            state.projectRenameModalVisible = true;
         },
-        closeFormModal() {
-            state.projectFormModalVisible = false;
+        closeProjectRenameModal() {
+            state.projectRenameModalVisible = false;
         },
+        // create project group
+        openProjectGroupCreateModal(parentGroupId?: string) {
+            state.targetId = parentGroupId;
+            state.targetType = 'projectGroup';
+            state.projectGroupCreateModalVisible = true;
+        },
+        closeProjectGroupCreateModal() {
+            state.projectGroupCreateModalVisible = false;
+        },
+        // rename project group
+        openProjectGroupRenameModal(targetGroupId: string) {
+            state.targetId = targetGroupId;
+            state.targetType = 'projectGroup';
+            state.projectGroupRenameModalVisible = true;
+        },
+        closeProjectGroupRenameModal() {
+            state.projectGroupRenameModalVisible = false;
+        },
+        // edit access
+        openProjectEditAccessModal(targetProjectId: string) {
+            state.targetId = targetProjectId;
+            state.targetType = 'project';
+            state.projectEditAccessModalVisible = true;
+        },
+        closeEditAccessModal() {
+            state.projectEditAccessModalVisible = false;
+        },
+        // dashboards
         openCreateFolderFormModal() {
             state.targetId = undefined;
             state.folderFormModalVisible = true;

@@ -27,9 +27,8 @@ import { useRoleFormatters } from '@/services/project/v2/composables/use-role-fo
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => !!projectPageModalStore.state.manageMemberModalVisible
-    && projectPageModalStore.state.targetType === 'projectGroup'
-    && !!projectPageModalStore.state.targetId);
+const visible = computed(() => projectPageModalStore.state.projectGroupMemberModalVisible);
+const targetId = computed(() => projectPageModalStore.state.targetId);
 
 /* mode */
 const userStore = useUserStore();
@@ -38,7 +37,7 @@ const readonlyMode = computed<boolean>(() => userStore.state.currentRoleInfo?.ro
 /* project group users */
 const { projectGroupAPI } = useProjectGroupApi();
 const { data: projectGroup, isLoading, invalidateQuery } = useProjectGroupQuery({
-    projectGroupId: computed(() => projectPageModalStore.state.targetId),
+    projectGroupId: targetId,
     enabled: visible,
 });
 const projectGroupUserIdList = computed<string[]>(() => projectGroup.value?.users ?? []);
@@ -88,16 +87,16 @@ const { getRoleImage, getRoleName } = useRoleFormatters();
 
 /* member mutations */
 const addMember = async (userIds: string[]) => {
-    if (!projectPageModalStore.state.targetId) throw new Error('Project Group ID is not defined');
+    if (!targetId.value) throw new Error('Project Group ID is not defined');
     await projectGroupAPI.addUsers({
-        project_group_id: projectPageModalStore.state.targetId,
+        project_group_id: targetId.value,
         users: userIds,
     });
 };
 const removeMember = async (userIds: string[]) => {
-    if (!projectPageModalStore.state.targetId) throw new Error('Project Group ID is not defined');
+    if (!targetId.value) throw new Error('Project Group ID is not defined');
     const params: ProjectGroupRemoveUsersParameters = {
-        project_group_id: projectPageModalStore.state.targetId,
+        project_group_id: targetId.value,
         users: userIds,
     };
     await projectGroupAPI.removeUsers(params);
@@ -126,7 +125,7 @@ const handleConfirm = async () => {
     if (!readonlyMode.value) {
         await addAndRemoveMember();
     }
-    projectPageModalStore.closeManageMemberModal();
+    projectPageModalStore.closeProjectGroupMemberModal();
 };
 
 
@@ -141,8 +140,8 @@ const handleConfirm = async () => {
         size="md"
         :visible="visible"
         :hide-footer-close-button="readonlyMode"
-        @close="projectPageModalStore.closeManageMemberModal"
-        @cancel="projectPageModalStore.closeManageMemberModal"
+        @close="projectPageModalStore.closeProjectGroupMemberModal"
+        @cancel="projectPageModalStore.closeProjectGroupMemberModal"
         @closed="projectPageModalStore.resetTarget"
         @confirm="handleConfirm"
     >
