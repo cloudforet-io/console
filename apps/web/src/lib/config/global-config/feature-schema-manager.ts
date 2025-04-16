@@ -1,7 +1,10 @@
 import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
+import { pinia } from '@/store/pinia';
 
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
 import type {
+    FeatureConfigurator,
+    FeatureVersion,
     GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedRouteSchema, GeneratedUiAffectSchema, GlobalServiceConfig,
 } from '@/lib/config/global-config/types/type';
 
@@ -19,6 +22,8 @@ export class FeatureSchemaManager {
         },
     };
 
+    private globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
+
     initialize(config: GlobalServiceConfig) {
         this.config = {
             ...this.config,
@@ -30,113 +35,93 @@ export class FeatureSchemaManager {
         this.createUiAffectsSchema();
     }
 
-    createMenuSchema() {
-        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
-        const generatedMenuSchema = {} as GeneratedMenuSchema;
-
+    private forEachEnabledFeature<T>(callback: (feature: string, configurator: FeatureConfigurator, currentVersion: FeatureVersion) => T): T[] {
+        const results: T[] = [];
         Object.keys(this.config).forEach((feature) => {
             if (this.config[feature]?.ENABLED) {
                 const configurator = getFeatureConfigurator(feature);
                 if (configurator) {
                     const currentVersion = this.config[feature]?.VERSION || 'V1';
                     configurator.initialize(currentVersion);
-
-                    const menuConfig = configurator.getMenu(this.config);
-
-                    generatedMenuSchema[feature] = {
-                        version: currentVersion,
-                        menu: menuConfig.menu,
-                        adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
-                    };
+                    results.push(callback(feature, configurator, currentVersion));
                 }
             }
         });
+        return results;
+    }
 
-        globalConfigSchemaStore.setMenuSchema(generatedMenuSchema);
+    createMenuSchema() {
+        const generatedMenuSchema = {} as GeneratedMenuSchema;
+
+        this.forEachEnabledFeature((feature, configurator, currentVersion) => {
+            const menuConfig = configurator.getMenu(this.config);
+            generatedMenuSchema[feature] = {
+                version: currentVersion,
+                menu: menuConfig.menu,
+                adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
+            };
+        });
+
+        this.globalConfigSchemaStore.setMenuSchema(generatedMenuSchema);
     }
 
     createRouteSchema() {
-        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
-
         const baseRoutes: GeneratedRouteSchema = {
             routes: [workspaceHomeRoute, infoRoutes],
             adminRoutes: [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes],
         };
 
-        Object.keys(this.config).forEach((feature) => {
-            if (this.config[feature]?.ENABLED) {
-                const configurator = getFeatureConfigurator(feature);
-                if (configurator) {
-                    const featureRoutes = configurator.getRoutes();
-                    if (featureRoutes?.routes) {
-                        baseRoutes.routes.push(featureRoutes.routes);
-                    }
-                    if (featureRoutes?.adminRoutes) {
-                        baseRoutes.adminRoutes.push(featureRoutes.adminRoutes);
-                    }
-                }
+        this.forEachEnabledFeature((feature, configurator) => {
+            const featureRoutes = configurator.getRoutes();
+            if (featureRoutes?.routes) {
+                baseRoutes.routes.push(featureRoutes.routes);
+            }
+            if (featureRoutes?.adminRoutes) {
+                baseRoutes.adminRoutes.push(featureRoutes.adminRoutes);
             }
         });
 
-        globalConfigSchemaStore.setRouteSchema(baseRoutes);
+        this.globalConfigSchemaStore.setRouteSchema(baseRoutes);
     }
 
     createRouteMetadata() {
-        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
         const routeMetadata = {} as GeneratedRouteMetadataSchema;
 
-        Object.keys(this.config).forEach((feature) => {
-            if (this.config[feature]?.ENABLED) {
-                const configurator = getFeatureConfigurator(feature);
-                if (configurator) {
-                    const currentVersion = this.config[feature]?.VERSION || 'V1';
-                    configurator.initialize(currentVersion);
-                    routeMetadata[feature] = configurator.getRouteMetadata();
-                }
-            }
+        this.forEachEnabledFeature((feature, configurator) => {
+            routeMetadata[feature] = configurator.getRouteMetadata();
         });
 
-        globalConfigSchemaStore.setRouteMetadataSchema(routeMetadata);
+        this.globalConfigSchemaStore.setRouteMetadataSchema(routeMetadata);
     }
 
     createUiAffectsSchema() {
-        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
         const schema = {} as GeneratedUiAffectSchema;
-
         const featureMethodMap: Record<string, Record<string, boolean>> = {};
 
-        Object.keys(this.config).forEach((feature) => {
-            if (this.config[feature]?.ENABLED) {
-                const configurator = getFeatureConfigurator(feature);
-                if (configurator) {
-                    const currentVersion = this.config[feature]?.VERSION || 'V1';
-                    configurator.initialize(currentVersion);
+        this.forEachEnabledFeature((feature, configurator, currentVersion) => {
+            if (configurator.uiAffect) {
+                configurator.uiAffect.forEach((uiAffect) => {
+                    const targetFeature = uiAffect.feature;
+                    const targetVersion = targetFeature === feature
+                        ? currentVersion
+                        : (this.config[targetFeature]?.VERSION || 'V1');
 
-                    if (configurator.uiAffect) {
-                        configurator.uiAffect.forEach((uiAffect) => {
-                            const targetFeature = uiAffect.feature;
-                            const targetVersion = targetFeature === feature
-                                ? currentVersion
-                                : (this.config[targetFeature]?.VERSION || 'V1');
-
-                            if (!featureMethodMap[targetFeature]) {
-                                featureMethodMap[targetFeature] = {};
-                            }
-
-                            uiAffect.affects.forEach((affect) => {
-                                if (affect.version === targetVersion) {
-                                    featureMethodMap[targetFeature][affect.method] = true;
-                                }
-                            });
-                        });
+                    if (!featureMethodMap[targetFeature]) {
+                        featureMethodMap[targetFeature] = {};
                     }
 
-                    schema[feature] = feature in featureMethodMap ? featureMethodMap[feature] : {};
-                }
+                    uiAffect.affects.forEach((affect) => {
+                        if (affect.version === targetVersion) {
+                            featureMethodMap[targetFeature][affect.method] = true;
+                        }
+                    });
+                });
             }
+
+            schema[feature] = feature in featureMethodMap ? featureMethodMap[feature] : {};
         });
 
-        globalConfigSchemaStore.setUiAffectsSchema(schema);
+        this.globalConfigSchemaStore.setUiAffectsSchema(schema);
     }
 }
 
