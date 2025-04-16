@@ -4,6 +4,7 @@ import type { Location } from 'vue-router/types/router';
 import { ERROR_ROUTE } from '@/router/constant';
 
 import { useGlobalConfigSchemaStore, type FlattenedMenuMap } from '@/store/global-config-schema/global-config-schema-store';
+import { pinia } from '@/store/pinia';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
@@ -18,7 +19,7 @@ export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMa
     const menuId = route.meta?.menuId;
     if (!menuId) return { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
 
-    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
     const generateFlattenedMenuMap = globalConfigSchemaStore.getters.generateFlattenedMenuMap;
     const subMenuIdList = getSubMenuListByMenuId(menuId, generateFlattenedMenuMap);
     let redirectMenuId: MenuId|undefined;

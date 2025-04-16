@@ -65,7 +65,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const router = useRouter();
-const serviceRouter = useServiceRouter();
+const serviceRouter = useServiceRouter(router);
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
 

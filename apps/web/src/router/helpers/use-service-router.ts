@@ -1,5 +1,4 @@
-import { useRouter } from 'vue-router/composables';
-import type { Location } from 'vue-router/types/router';
+import type { Location, VueRouter } from 'vue-router/types/router';
 
 import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
@@ -15,7 +14,7 @@ type NavigateOptionsType = RouterOptionsType & {
     method: 'push' | 'replace';
 };
 
-export const useServiceRouter = () => {
+export const useServiceRouter = (router: VueRouter) => {
     const globalConfigSchemaStore = useGlobalConfigSchemaStore();
     const globalConfigSchemaState = globalConfigSchemaStore.state;
 
@@ -58,14 +57,12 @@ export const useServiceRouter = () => {
     };
 
     const navigate = async (options: NavigateOptionsType) => {
-        const router = useRouter();
         const { method } = options;
         const location = getLocation(options);
         return router[method](location);
     };
 
     const resolve = (options: RouterOptionsType) => {
-        const router = useRouter();
         const location = getLocation(options);
         return router.resolve(location);
     };
@@ -74,7 +71,6 @@ export const useServiceRouter = () => {
         push: (options: RouterOptionsType) => navigate({ ...options, method: 'push' }),
         replace: (options: RouterOptionsType) => navigate({ ...options, method: 'replace' }),
         getLocation,
-
         resolve,
     };
 };

@@ -30,9 +30,9 @@ type Emit<Data> = {
     (event: 'edit', value?: Data): void;
 };
 
-const globalConfigSchemaStore = useGlobalConfigSchemaStore();
-
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+
     const state = reactive({
         visibleUserNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
         isEditMode: _state.isEditMode,
