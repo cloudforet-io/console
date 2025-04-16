@@ -4,9 +4,8 @@ import { computed, reactive, watch } from 'vue';
 import { useMutation } from '@tanstack/vue-query';
 
 import {
-    PButtonModal, PFieldGroup, PI, PSelectDropdown,
+    PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
@@ -15,8 +14,6 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { gray, indigo } from '@/styles/colors';
 
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
 import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
@@ -27,20 +24,6 @@ const visible = computed(() => projectPageModalStore.state.projectEditAccessModa
 const targetId = computed(() => projectPageModalStore.state.targetId);
 
 const state = reactive({
-    accessMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
-        {
-            name: 'PRIVATE',
-            label: i18n.t('PROJECT.LANDING.ONLY_PEOPLE_INVITED'),
-            icon: 'ic_lock-filled',
-            iconColor: gray[800],
-        },
-        {
-            name: 'PUBLIC',
-            label: i18n.t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE'),
-            icon: 'ic_globe-filled',
-            iconColor: indigo[600],
-        },
-    ])),
     selectedAccess: 'PRIVATE' as ProjectType,
 });
 
@@ -89,8 +72,8 @@ const confirm = async () => {
     projectPageModalStore.closeEditAccessModal();
 };
 
-const handleSelectAccess = (selectedAccess) => {
-    state.selectedAccess = selectedAccess as ProjectType;
+const handleSelectAccess = (accessType) => {
+    state.selectedAccess = accessType;
 };
 </script>
 
@@ -114,26 +97,36 @@ const handleSelectAccess = (selectedAccess) => {
                            required
             >
                 <template #default>
-                    <p-select-dropdown class="access-dropdown"
-                                       :menu="state.accessMenuItems"
-                                       :selected="state.selectedAccess"
-                                       use-fixed-menu-style
-                                       @select="handleSelectAccess"
+                    <p-radio-group direction="vertical"
+                                   class="w-full"
                     >
-                        <template #dropdown-button>
-                            <div class="text-wrapper">
-                                <p-i :name="state.selectedAccess === 'PRIVATE' ? 'ic_lock-filled' : 'ic_globe-filled'"
-                                     width="1rem"
-                                     height="1rem"
-                                     :color="state.selectedAccess === 'PRIVATE' ? gray[900] : indigo[600]"
-                                />
-                                <span>{{ state.selectedAccess === 'PRIVATE' ? $t('PROJECT.LANDING.ONLY_PEOPLE_INVITED') : $t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE') }}</span>
-                                <span class="sub-text">
-                                    {{ $t('PROJECT.LANDING.CAN_ACCESS_TO_THIS_PROJECT') }}
-                                </span>
-                            </div>
-                        </template>
-                    </p-select-dropdown>
+                        <p-radio :selected="state.selectedAccess"
+                                 value="PRIVATE"
+                                 @change="handleSelectAccess('PRIVATE')"
+                        >
+                            <p-i name="ic_lock-filled"
+                                 class="mx-1"
+                                 width="1rem"
+                                 height="1rem"
+                                 color="inherit"
+                            />
+                            <span class="option-label">{{ $t('PROJECT.LANDING.ONLY_PEOPLE_INVITED') }}</span>
+                            <span class="option-description">{{ $t('PROJECT.LANDING.CAN_ACCESS_TO_THIS_PROJECT') }}</span>
+                        </p-radio>
+                        <p-radio :selected="state.selectedAccess"
+                                 value="PUBLIC"
+                                 @change="handleSelectAccess('PUBLIC')"
+                        >
+                            <p-i name="ic_globe-filled"
+                                 class="mx-1"
+                                 width="1rem"
+                                 height="1rem"
+                                 color="inherit"
+                            />
+                            <span class="option-label">{{ $t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE') }}</span>
+                            <span class="option-description">{{ $t('PROJECT.LANDING.CAN_ACCESS_TO_THIS_PROJECT') }}</span>
+                        </p-radio>
+                    </p-radio-group>
                 </template>
             </p-field-group>
         </template>
@@ -142,17 +135,11 @@ const handleSelectAccess = (selectedAccess) => {
 
 <style lang="postcss" scoped>
 .project-edit-access-modal {
-    .access-dropdown {
-        width: 100%;
-        .text-wrapper {
-            @apply text-gray-800 text-label-md;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        .sub-text {
-            @apply text-gray-500;
-        }
+    .option-label {
+        @apply text-label-md font-medium;
+    }
+    .option-description {
+        @apply text-gray-500 ml-1;
     }
 }
 </style>
