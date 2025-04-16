@@ -5416,6 +5416,8 @@
 			"CREATE_GROUP": "프로젝트 그룹 생성",
 			"CREATE_PROJECT": "프로젝트 생성 ",
 			"DATABASE": "데이터베이스",
+			"DELETE": "삭제",
+			"EDIT_TAG": "태그 수정",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "프로젝트 그룹 생성하기 ",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "프로젝트를 통해 리소스를 관리하세요. ",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1": "먼저, 프로젝트 그룹을 만드세요. ",
@@ -5456,6 +5458,7 @@
 				"REMOVE": "제거"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
+			"MOVE": "이동\n",
 			"NO_GROUP_MEMBER": "프로젝트 그룹 멤버 없음",
 			"NO_PROJECT_GROUP_MSG": "이 워크스페이스에는 아직 생성된 프로젝트 또는 프로젝트 그룹이 없습니다.",
 			"ONLY_PEOPLE_INVITED": "초대된 사용자만",
@@ -5473,6 +5476,7 @@
 				"DONE": "완료",
 				"EDIT": "편집"
 			},
+			"SAVE_CHANGES": "변경 저장",
 			"SEARCH": "검색 ",
 			"SEARCH_EMPTY_TEXT": "검색결과가 없습니다.\n다시 확인 후 검색해 주세요.",
 			"SEARCH_PLACEHOLDER": "프로젝트 또는 프로젝트 그룹 검색",

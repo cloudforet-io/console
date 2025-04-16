@@ -5416,6 +5416,8 @@
 			"CREATE_GROUP": "プロジェクトグループ作成",
 			"CREATE_PROJECT": "プロジェクト作成",
 			"DATABASE": "データベース",
+			"DELETE": "",
+			"EDIT_TAG": "",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "プロジェクトグループ作成",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "プロジェクトでリソースを管理してください",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1": "まず、プロジェクトグループを作成してください。",
@@ -5456,6 +5458,7 @@
 				"REMOVE": "削除"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
+			"MOVE": "",
 			"NO_GROUP_MEMBER": "グループメンバーなし",
 			"NO_PROJECT_GROUP_MSG": "このワークスペースにはまだプロジェクトまたはプロジェクトグループが作成されていません。",
 			"ONLY_PEOPLE_INVITED": "招待された人だけ",
@@ -5473,6 +5476,7 @@
 				"DONE": "完了",
 				"EDIT": "編集"
 			},
+			"SAVE_CHANGES": "",
 			"SEARCH": "検索",
 			"SEARCH_EMPTY_TEXT": "結果が見つかりませんでした。\n別の用語で再試行してください。",
 			"SEARCH_PLACEHOLDER": "プロジェクトまたはグループを検索",

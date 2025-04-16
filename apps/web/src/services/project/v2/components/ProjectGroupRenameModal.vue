@@ -119,6 +119,9 @@ const handleConfirm = async () => {
                     @closed="projectPageModalStore.resetTarget"
                     @confirm="handleConfirm"
     >
+        <template #confirm-button>
+            {{ $t('PROJECT.LANDING.SAVE_CHANGES') }}
+        </template>
         <template #body>
             <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
                            :invalid-text="invalidTexts.projectGroupName"

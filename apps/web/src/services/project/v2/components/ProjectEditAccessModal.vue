@@ -92,6 +92,9 @@ const handleSelectAccess = (accessType) => {
                     @closed="projectPageModalStore.resetTarget"
                     @confirm="confirm"
     >
+        <template #confirm-button>
+            {{ $t('PROJECT.LANDING.SAVE_CHANGES') }}
+        </template>
         <template #body>
             <p-field-group :label="$t('PROJECT.DETAIL.ACCESS')"
                            required
