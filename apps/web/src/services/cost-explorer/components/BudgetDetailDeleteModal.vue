@@ -6,6 +6,9 @@ import { PDoubleCheckModal } from '@cloudforet/mirinae';
 
 
 import type { BudgetDeleteParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/delete';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -35,6 +38,7 @@ const handleConfirm = async () => {
         });
         emit('update:visible', false);
         emit('confirm');
+        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_SUCCESS'));
     } catch (e) {
         ErrorHandler.handleError(e);
     }
