@@ -40,6 +40,7 @@ import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToo
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 import { BUDGET_SEARCH_HANDLERS } from '../constants/budget-constant';
+import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 import type { Period } from '../types/cost-explorer-query-type';
 import BudgetDeleteCheckModal from './BudgetDeleteCheckModal.vue';
@@ -473,7 +474,13 @@ onMounted(async () => {
                 <template #col-name-format="{value, rowIndex}">
                     <div class="flex flex-col gap-5">
                         <p-link highlight
-                                :to="{ path: `${state.budgets[rowIndex].budget_id}` }"
+                                :to="{
+                                    name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
+                                    params: {
+                                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+                                        budgetId: state.budgets[rowIndex].budget_id
+                                    }
+                                }"
                         >
                             {{ value }}
                         </p-link>
@@ -549,7 +556,7 @@ onMounted(async () => {
                 <template #col-remaining-format="{item, rowIndex}">
                     <p :class="{exceeded: (Number(item.budget) - Number(item.actualSpend)) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
-                        {{ Math.abs(Number((Number(item.budget) - Number(item.actualSpend)).toFixed(2))) }}
+                        {{ Math.abs(Number((Number(item.budget) - Number(item.actualSpend)).toFixed(2))).toLocaleString() }}
                     </p>
                 </template>
                 <template #col-state-format="{item}">
