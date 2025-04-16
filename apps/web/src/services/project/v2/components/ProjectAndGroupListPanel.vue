@@ -20,8 +20,7 @@ import { useProjectListStore } from '@/services/project/v2/stores/project-list-s
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const props = defineProps<{
-    targetId?: string;
-    targetType?: 'project' | 'projectGroup';
+    projectGroupId?: string;
 }>();
 
 /* ui */
@@ -35,20 +34,20 @@ const projectListStore = useProjectListStore();
 
 /* filtered data */
 const projects = computed(() => {
-    if (props.targetType === 'projectGroup' && props.targetId) {
-        return projectListStore.getProjectsByGroupId(props.targetId);
+    if (props.projectGroupId) {
+        return projectListStore.getProjectsByGroupId(props.projectGroupId);
     }
-    if (!props.targetType && !props.targetId) {
+    if (!props.projectGroupId) { // all projects
         return projectListStore.projects;
     }
     return [];
 });
 
 const projectGroups = computed(() => {
-    if (props.targetType === 'projectGroup' && props.targetId) {
-        return projectListStore.getProjectGroupsByParentId(props.targetId);
+    if (props.projectGroupId) {
+        return projectListStore.getProjectGroupsByParentId(props.projectGroupId);
     }
-    if (!props.targetType && !props.targetId) {
+    if (!props.projectGroupId) { // all projects
         return projectListStore.projectGroups;
     }
     return [];
