@@ -13,14 +13,12 @@ import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
 import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
 import { i18n as _i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 import { ALERT_MANAGER_ROUTE_V1 } from '@/services/alert-manager/v1/routes/route-constant';
-
-
 
 interface Props {
     data?: EventRuleModel;
@@ -31,6 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 interface Field {
     name: keyof EventRuleOptions | keyof EventRuleActions;
@@ -108,7 +108,7 @@ const state = reactive({
                             <td v-else-if="field.name === 'change_project'">
                                 <p-link action-icon="internal-link"
                                         new-tab
-                                        :to="referenceRouter(
+                                        :to="getReferenceLocation(
                                             state.items[field.name] ?? '',
                                             {
                                                 resource_type: 'identity.Project',

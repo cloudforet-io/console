@@ -42,8 +42,8 @@ import { useUserStore } from '@/store/user/user-store';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { MENU_ID } from '@/lib/menu/config';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
+import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 import {
     arrayToQueryString, queryStringToArray,
     queryStringToObject,
@@ -99,7 +99,9 @@ assetInventorySettingsStore.initState(userStore.state.userId);
 
 const route = useRoute();
 const router = useRouter();
-const serviceRouter = useServiceRouter();
+const serviceRouter = useServiceRouter(router);
+
+const { referenceFieldFormatter } = useReferenceFieldFormatter();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),

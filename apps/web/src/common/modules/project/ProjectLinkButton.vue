@@ -7,9 +7,9 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 const props = defineProps<{
     projectId: string;
@@ -21,8 +21,10 @@ const emit = defineEmits<{(event: 'click'): void;
 }>();
 const projectReferenceStore = useProjectReferenceStore();
 
+const { getReferenceLocation } = useReferenceRouter();
+
 const hasProjectReferenceLoaded = computed<boolean>(() => !!projectReferenceStore.getters.projectItems);
-const projectPageLocation = computed<Location>(() => referenceRouter(props.projectId, { resource_type: 'identity.Project' }));
+const projectPageLocation = computed<Location>(() => getReferenceLocation(props.projectId, { resource_type: 'identity.Project' }));
 const getProjectName = (projectId: string): string|undefined => projectReferenceStore.getters.projectItems[projectId]?.label;
 </script>
 

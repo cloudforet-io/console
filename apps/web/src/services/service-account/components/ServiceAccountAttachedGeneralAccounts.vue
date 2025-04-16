@@ -34,13 +34,14 @@ import { SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/sc
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -67,6 +68,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
@@ -142,7 +145,7 @@ const getAttachedGeneralAccountList = async () => {
         state.loading = false;
     }
 };
-const getProjectDetailLocation = (id: string) => referenceRouter(id, { resource_type: 'identity.Project' });
+const getProjectDetailLocation = (id: string) => getReferenceLocation(id, { resource_type: 'identity.Project' });
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;

@@ -36,11 +36,10 @@ import {
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 export default {
     name: 'ServiceAccountProjectDetail',
@@ -63,6 +62,9 @@ export default {
         const allReferenceStore = useAllReferenceStore();
         const userWorkspaceStore = useUserWorkspaceStore();
         const router = useRouter();
+
+        const { getReferenceLocation } = useReferenceRouter();
+
         const storeState = reactive({
             projects: computed(() => allReferenceStore.getters.project),
         });
@@ -73,7 +75,7 @@ export default {
             }),
             projectLink: computed(() => {
                 if (props.projectId) {
-                    return router.resolve(referenceRouter(props.projectId, {
+                    return router.resolve(getReferenceLocation(props.projectId, {
                         resource_type: 'identity.Project',
                         workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                     })).resolved;

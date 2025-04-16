@@ -123,9 +123,9 @@ import {
 
 import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 
-import { useUserStore } from '@/store/user/user-store';
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { StatisticsType } from '@/common/modules/monitoring/config';
@@ -182,6 +182,9 @@ export default {
     setup(props) {
         const router = useRouter();
         const userStore = useUserStore();
+        const { getReferenceLocation } = useReferenceRouter();
+
+
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
             timezone: computed(() => userStore.state.timezone),
@@ -213,8 +216,9 @@ export default {
             resources = resources.map((resource, idx) => ({
                 ...resource,
                 color: COLORS[idx],
-                link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
+                link: router.resolve(getReferenceLocation(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
+            console.log('resources', resources);
             state.availableResources = sortBy(resources, (m) => m.name);
         };
         const getDataSource = async () => {

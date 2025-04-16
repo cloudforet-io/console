@@ -7,9 +7,9 @@ import {
     PI, PIconButton, PLazyImg, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
@@ -29,6 +29,8 @@ const topBarSearchStore = useTopBarSearchStore();
 const allReferenceStore = useAllReferenceStore();
 const recentStore = useRecentStore();
 const router = useRouter();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const storeState = reactive({
     workspaceMap: computed(() => topBarSearchStore.storeState.workspaceMap),
@@ -134,7 +136,7 @@ const handleClick = () => {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, state.convertResourceId, storeState.currentWorkspaceId, props.recentItem?.data));
     } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) {
         if (topBarSearchStore.state.activeTab === SEARCH_TAB.PROJECT) {
-            router.push(referenceRouter(state.convertResourceId, { resource_type: 'identity.Project' })).catch(() => {});
+            router.push(getReferenceLocation(state.convertResourceId, { resource_type: 'identity.Project' })).catch(() => {});
         } else {
             router.push(topBarSearchReferenceRouter(
                 topBarSearchStore.state.activeTab,

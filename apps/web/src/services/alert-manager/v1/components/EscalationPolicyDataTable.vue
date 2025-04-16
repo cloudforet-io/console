@@ -14,10 +14,10 @@ import type {
 } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -42,6 +42,8 @@ const emit = defineEmits<{(e: 'update:select-index', value: number[]): void;
 
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     finishConditions: computed<Record<EscalationPolicyFinishCondition, TranslateResult>>(() => ({
@@ -134,7 +136,7 @@ const onChangeSort = (sortBy: string, sortDesc?: boolean) => {
             <template v-if="value && value !== '*'">
                 <p-link action-icon="internal-link"
                         new-tab
-                        :to="referenceRouter(
+                        :to="getReferenceLocation(
                             value,
                             {
                                 resource_type: 'identity.Project',

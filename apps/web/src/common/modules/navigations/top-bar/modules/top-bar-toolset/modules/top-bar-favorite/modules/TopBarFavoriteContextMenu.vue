@@ -16,6 +16,8 @@ import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-s
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -40,7 +42,6 @@ import {
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -79,6 +80,8 @@ const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 const userStore = useUserStore();
 const displayStore = useDisplayStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 /* Query */
 const {
@@ -273,9 +276,9 @@ const handleSelect = (item: FavoriteMenuItem) => {
             },
         }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.PROJECT) {
-        router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
+        router.push(getReferenceLocation(itemName, { resource_type: 'identity.Project' })).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-        router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
+        router.push(getReferenceLocation(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.METRIC) {
         router.push({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,

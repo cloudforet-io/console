@@ -28,6 +28,8 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -42,7 +44,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -66,7 +67,6 @@ import type {
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
-
 type CostAnalyzeRawData = {
   [groupBy: string]: string | any;
   value_sum?: Array<{
@@ -84,6 +84,8 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const router = useRouter();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const getValueSumKey = (dataType: string) => {
     switch (dataType) {
@@ -407,7 +409,7 @@ const handleClickRowData = (fieldName: string, value: string) => {
 
     if (storeState.isAdminMode) return;
     if (fieldName === GROUP_BY.PROJECT) {
-        const { name, params } = referenceRouter(value, { resource_type: 'identity.Project' });
+        const { name, params } = getReferenceLocation(value, { resource_type: 'identity.Project' });
         _routeName = name || PROJECT_ROUTE_V2._NAME;
         _params = params || {};
     }

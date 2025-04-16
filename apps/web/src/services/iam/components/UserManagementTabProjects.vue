@@ -13,8 +13,9 @@ import type { ProjectRemoveUsersParameters } from '@/api-clients/identity/projec
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -38,6 +39,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const state = reactive({
     loading: false,
@@ -72,7 +75,7 @@ const handleClickButton = async (value: string) => {
 const closeRemoveModal = () => {
     modalState.visible = false;
 };
-const getProjectDetailLocation = (id: string) => referenceRouter(id, { resource_type: 'identity.Project' });
+const getProjectDetailLocation = (id: string) => getReferenceLocation(id, { resource_type: 'identity.Project' });
 
 /* API */
 const fetchProjectList = async () => {

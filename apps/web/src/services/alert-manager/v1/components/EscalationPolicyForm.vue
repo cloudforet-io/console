@@ -15,11 +15,11 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
@@ -46,6 +46,9 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const userStore = useUserStore();
+
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
@@ -165,7 +168,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link action-icon="internal-link"
                                  new-tab
-                                 :to="referenceRouter(escalationPolicyFormState.projectId,{
+                                 :to="getReferenceLocation(escalationPolicyFormState.projectId,{
                                      resource_type: 'identity.Project',
                                      workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                                  })"

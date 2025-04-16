@@ -11,12 +11,13 @@ import {
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
@@ -55,6 +56,8 @@ const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
 const userStore = useUserStore();
 const windowSize = useWindowSize();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
@@ -135,7 +138,7 @@ const handleSelect = (item) => {
         });
     } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) {
         if (topBarSearchStore.state.activeTab === SEARCH_TAB.PROJECT) {
-            router.push(referenceRouter(item.resource_id, { resource_type: 'identity.Project' })).catch(() => {});
+            router.push(getReferenceLocation(item.resource_id, { resource_type: 'identity.Project' })).catch(() => {});
         } else {
             router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
         }
