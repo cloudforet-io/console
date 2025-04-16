@@ -556,6 +556,7 @@
 					"COST_TYPE": "コストタイプ",
 					"DELETE": "削除",
 					"DELETE_MODAL_TITLE": "予算に関する通知設定を削除しますか？",
+					"DELETE_SUCCESS": "",
 					"DETAILS": "詳細情報",
 					"FIELD": {
 						"ACTUAL_COST": "費用",
@@ -579,7 +580,7 @@
 						"BUDGET_USAGE": "予算金額の {symbol} 使用",
 						"CANCEL": "取消",
 						"CRITICAL": "警告",
-						"SAVE_CHANGES": "",
+						"SAVE_CHANGES": "変更事項保存",
 						"SET_BUDGET_NOTIFICATIONS": "予算通知の設定",
 						"SPECIFIC_USER": "特定のメンバー",
 						"THRESHOLD": "閾値",
@@ -591,6 +592,7 @@
 						"WARNING": "警告"
 					},
 					"MONTHLY_PLANNING": "月別予算計画",
+					"NAME_EDIT_SUCCESS": "予算名が正常に更新されました",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
 					"ORIGINAL_DATA": "原本データー",
 					"PAGE_NOTIFICATION": "この予算の設定は管理者モードでのみ変更できます。",
@@ -653,6 +655,7 @@
 					"CANCEL": "取消",
 					"CONFIRM": "確認",
 					"CREATE": {
+						"ADDITIONAL_RECIPIENTS": "追加の受信者",
 						"ADD_RECIPIENTS_TEXT": "",
 						"ADD_THRESHOLD": "閾値を追加",
 						"ALERT_RECIPIENTS": "",
