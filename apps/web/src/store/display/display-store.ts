@@ -29,6 +29,7 @@ import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
     DisplayStoreGetters,
 } from '@/store/display/type';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
@@ -36,8 +37,6 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useGlobalConfigSchemaStore } from '../global-config-schema/global-config-schema-store';
 
 const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {

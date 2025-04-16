@@ -12,6 +12,7 @@ import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-t
 import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
 import { useWidgetLoadQuery, useWidgetLoadSumQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
@@ -40,8 +41,6 @@ import type {
     WidgetProps, WidgetEmit, WidgetExpose,
 } from '@/common/modules/widgets/types/widget-display-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
-
-import { useWidgetDataTableQuery } from '../../_composables/use-widget-data-table-query';
 
 const REFERENCE_FIELDS = ['Project', 'Workspace', 'Region', 'Service Account'];
 
