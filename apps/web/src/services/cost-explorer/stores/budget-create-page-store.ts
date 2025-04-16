@@ -177,6 +177,11 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
             },
         ];
         state.budgetManager = '';
+        state.selectedMonthlyBudgetAllocation = undefined;
+        state.budgetAppliedSameAmount = undefined;
+        state.initialAmount = undefined;
+        state.monthlyGrowthRate = undefined;
+        state.analyzedCostData = undefined;
         state.budgetEachDate = [];
     };
 
