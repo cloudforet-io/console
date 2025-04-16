@@ -22,17 +22,17 @@ export class FeatureSchemaManager {
         },
     };
 
-    private globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
-
     initialize(config: GlobalServiceConfig) {
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
         this.config = {
             ...this.config,
             ...config,
         };
-        this.createMenuSchema();
-        this.createRouteSchema();
-        this.createRouteMetadata();
-        this.createUiAffectsSchema();
+
+        globalConfigSchemaStore.setMenuSchema(this.createMenuSchema());
+        globalConfigSchemaStore.setRouteSchema(this.createRouteSchema());
+        globalConfigSchemaStore.setRouteMetadataSchema(this.createRouteMetadata());
+        globalConfigSchemaStore.setUiAffectsSchema(this.createUiAffectsSchema());
     }
 
     private forEachEnabledFeature<T>(callback: (feature: string, configurator: FeatureConfigurator, currentVersion: FeatureVersion) => T): T[] {
@@ -50,7 +50,7 @@ export class FeatureSchemaManager {
         return results;
     }
 
-    createMenuSchema() {
+    createMenuSchema(): GeneratedMenuSchema {
         const generatedMenuSchema = {} as GeneratedMenuSchema;
 
         this.forEachEnabledFeature((feature, configurator, currentVersion) => {
@@ -62,10 +62,10 @@ export class FeatureSchemaManager {
             };
         });
 
-        this.globalConfigSchemaStore.setMenuSchema(generatedMenuSchema);
+        return generatedMenuSchema;
     }
 
-    createRouteSchema() {
+    createRouteSchema(): GeneratedRouteSchema {
         const baseRoutes: GeneratedRouteSchema = {
             routes: [workspaceHomeRoute, infoRoutes],
             adminRoutes: [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes],
@@ -81,20 +81,20 @@ export class FeatureSchemaManager {
             }
         });
 
-        this.globalConfigSchemaStore.setRouteSchema(baseRoutes);
+        return baseRoutes;
     }
 
-    createRouteMetadata() {
+    createRouteMetadata(): GeneratedRouteMetadataSchema {
         const routeMetadata = {} as GeneratedRouteMetadataSchema;
 
         this.forEachEnabledFeature((feature, configurator) => {
             routeMetadata[feature] = configurator.getRouteMetadata();
         });
 
-        this.globalConfigSchemaStore.setRouteMetadataSchema(routeMetadata);
+        return routeMetadata;
     }
 
-    createUiAffectsSchema() {
+    createUiAffectsSchema(): GeneratedUiAffectSchema {
         const schema = {} as GeneratedUiAffectSchema;
         const featureMethodMap: Record<string, Record<string, boolean>> = {};
 
@@ -121,7 +121,7 @@ export class FeatureSchemaManager {
             schema[feature] = feature in featureMethodMap ? featureMethodMap[feature] : {};
         });
 
-        this.globalConfigSchemaStore.setUiAffectsSchema(schema);
+        return schema;
     }
 }
 
