@@ -120,13 +120,13 @@ const handleSelectTreeItem = (node: TreeNode<DashboardTreeDataType>, value: [boo
                 state.proxySelectedIdMap[child.id] = _isSelected;
             });
         }
-    } else if (node.data.folderId) {
+    } else if (node.data.folder_id) {
         if (_isSelected) {
-            state.proxySelectedIdMap[node.data.folderId] = true;
+            state.proxySelectedIdMap[node.data.folder_id] = true;
         } else {
-            const _folderNode = props.dashboardTreeData.find((n) => n.data.id === node.data.folderId);
+            const _folderNode = props.dashboardTreeData.find((n) => n.data.id === node.data.folder_id);
             if (_folderNode?.children?.every((child) => !state.proxySelectedIdMap[child.id])) {
-                state.proxySelectedIdMap[node.data.folderId] = false;
+                state.proxySelectedIdMap[node.data.folder_id] = false;
             }
         }
     }

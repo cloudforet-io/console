@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -45,7 +46,7 @@ interface Props {
     useFixedMenuStyle?: boolean;
     projectGroupSelectOptions?: ProjectGroupSelectOptions;
     position?: 'left' | 'right';
-    selectionLabel?: string;
+    selectionLabel?: TranslateResult;
     hideCreateButton?: boolean;
     workspaceId?: string;
     isInitSelectedItem?: boolean;

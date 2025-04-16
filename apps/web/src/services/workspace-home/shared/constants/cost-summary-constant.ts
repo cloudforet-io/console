@@ -1,0 +1,5 @@
+export const COST_SUMMARY_STATE_TYPE = {
+    AGGREGATING: 'AGGREGATING',
+    CONFIRM: 'CONFIRM',
+    ESTIMATED: 'ESTIMATED',
+} as const;

@@ -2,7 +2,6 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import { usePrivateDataTableApi } from '@/api-clients/dashboard/private-data-table/composables/use-private-data-table-api';
-import type { DataTableGetParameters } from '@/api-clients/dashboard/private-data-table/schema/api-verbs/get';
 import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
@@ -15,28 +14,25 @@ export const useWidgetDataTableQuery = (dataTableId: ComputedRef<string|undefine
     const { publicDataTableAPI } = usePublicDataTableApi();
     const { privateDataTableAPI } = usePrivateDataTableApi();
 
-    const isPrivate = computed(() => {
-        if (!dataTableId.value) return false;
-        return dataTableId.value.startsWith('private');
-    });
+    const isPrivate = computed(() => dataTableId.value?.startsWith('private'));
 
     const { key: publicKey, params: publicParams } = useServiceQueryKey('dashboard', 'public-data-table', 'get', {
         contextKey: dataTableId,
-        params: {
-            data_table_id: dataTableId.value,
-        } as DataTableGetParameters,
+        params: computed(() => ({
+            data_table_id: dataTableId.value as string,
+        })),
     });
     const { key: privateKey, params: privateParams } = useServiceQueryKey('dashboard', 'private-data-table', 'get', {
         contextKey: dataTableId,
-        params: {
-            data_table_id: dataTableId.value,
-        } as DataTableGetParameters,
+        params: computed(() => ({
+            data_table_id: dataTableId.value as string,
+        })),
     });
 
     const privateDataTableQuery = useScopedQuery({
         queryKey: privateKey,
         queryFn: () => {
-            if (!dataTableId.value) {
+            if (!privateParams.value.data_table_id) {
                 throw new Error('DataTable ID is required for fetching data');
             }
             return privateDataTableAPI.get(privateParams.value);
@@ -48,7 +44,7 @@ export const useWidgetDataTableQuery = (dataTableId: ComputedRef<string|undefine
     const publicDataTableQuery = useScopedQuery({
         queryKey: publicKey,
         queryFn: () => {
-            if (!dataTableId.value) {
+            if (!publicParams.value.data_table_id) {
                 throw new Error('DataTable ID is required for fetching data');
             }
             return publicDataTableAPI.get(publicParams.value);

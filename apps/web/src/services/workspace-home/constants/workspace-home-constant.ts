@@ -55,16 +55,6 @@ export const WORKSPACE_HOME_DATA_TYPE = {
     BILLING: 'Billing',
 } as const;
 
-export const SUMMARY_DATA_TYPE = {
-    ASSET: 'Asset',
-    COST: 'Cost',
-    ACCOUNT: 'Account',
-} as const;
-export const COST_SUMMARY_STATE_TYPE = {
-    AGGREGATING: 'AGGREGATING',
-    CONFIRM: 'CONFIRM',
-    ESTIMATED: 'ESTIMATED',
-} as const;
 export const SERVICE_ACCOUNT_SUMMARY_STATE_COLOR = {
     ACTIVE: {
         iconColor: styles.green[600],

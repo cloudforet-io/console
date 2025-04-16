@@ -1,26 +1,22 @@
 <script setup lang="ts">
 
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { PButton, PPopover, PCopyButton } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
-import { useDashboardGetQuery } from '@/services/dashboards/composables/use-dashboard-get-query';
-import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 
-const route = useRoute();
-const dashboardId = computed(() => route.params.dashboardId);
+import { getOrderedGlobalVariables } from '@/services/_shared/dashboard/dashboard-detail/helpers/dashboard-global-variables-helper';
 
-const { dashboard } = useDashboardGetQuery({
-    dashboardId,
-});
+const widgetContextStore = useWidgetContextStore();
+const widgetContextState = widgetContextStore.state;
 
 const state = reactive({
     popperVisible: false,
     variableItems: computed<DashboardGlobalVariable[]>(() => {
-        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboard.value?.vars_schema?.properties || {})
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(widgetContextState.dashboard?.vars_schema?.properties || {})
             .map((property) => ({
                 key: property.key,
                 name: property.name,

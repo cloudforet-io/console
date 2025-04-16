@@ -3,7 +3,6 @@ import {
     defineExpose, reactive, computed, onMounted,
 } from 'vue';
 
-import { useQueries } from '@tanstack/vue-query';
 import { sortBy } from 'lodash';
 
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
@@ -15,9 +14,8 @@ import { i18n } from '@/translations';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetLoadQueryContext, useWidgetLoadSumQueryContext } from '@/common/modules/widgets/_composables/use-widget-load-query-context';
+import { useWidgetLoadQuery, useWidgetLoadSumQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
 import type { CustomTableColumnWidthValue } from '@/common/modules/widgets/_widget-fields/custom-table-column-width/type';
 import type { DataFieldHeatmapColorValue } from '@/common/modules/widgets/_widget-fields/data-field-heatmap-color/type';
@@ -138,7 +136,7 @@ const getTableDefaultSortBy = (_sortBy: Sort[]) => {
     return defaultSortBy;
 };
 
-const { fetcher: loadFetcher, key: loadKey } = useWidgetLoadQueryContext({
+const loadQuery = useWidgetLoadQuery({
     widgetId: computed(() => props.widgetId),
     params: computed(() => ({
         widget_id: props.widgetId,
@@ -157,9 +155,15 @@ const { fetcher: loadFetcher, key: loadKey } = useWidgetLoadQueryContext({
         widgetName: props.widgetName,
         dataTableId: props.dataTableId,
     })),
+    enabled: computed(() => {
+        const widgetActive = props.widgetState !== 'INACTIVE';
+        const dataTableReady = !!dataTable.value;
+        const loadDisabled = props.loadDisabled;
+        return widgetActive && dataTableReady && !loadDisabled;
+    }),
 });
 
-const { fetcher: loadSumFetcher, key: loadSumKey } = useWidgetLoadSumQueryContext({
+const loadSumQuery = useWidgetLoadSumQuery({
     widgetId: computed(() => props.widgetId),
     params: computed(() => ({
         widget_id: props.widgetId,
@@ -173,47 +177,25 @@ const { fetcher: loadSumFetcher, key: loadSumKey } = useWidgetLoadSumQueryContex
         dataTableId: props.dataTableId,
         enabledTotal: !!widgetOptionsState.totalInfo?.toggleValue,
     })),
+    enabled: computed(() => {
+        const widgetActive = props.widgetState !== 'INACTIVE';
+        const dataTableReady = !!dataTable.value;
+        const totalEnabled = !!widgetOptionsState.totalInfo?.toggleValue;
+        const loadDisabled = props.loadDisabled;
+        return widgetActive && dataTableReady && totalEnabled && !loadDisabled;
+    }),
 });
 
-const queryResults = useQueries({
-    queries: [
-        {
-            queryKey: loadKey,
-            queryFn: loadFetcher,
-            enabled: computed<boolean>(() => {
-                const widgetActive = props.widgetState !== 'INACTIVE';
-                const dataTableReady = !!dataTable.value;
-                const loadDisabled = props.loadDisabled;
-                return widgetActive && dataTableReady && !loadDisabled;
-            }),
-            staleTime: WIDGET_LOAD_STALE_TIME,
-        },
-        {
-            queryKey: loadSumKey,
-            queryFn: loadSumFetcher,
-            enabled: computed<boolean>(() => {
-                const widgetActive = props.widgetState !== 'INACTIVE';
-                const dataTableReady = !!dataTable.value;
-                const totalEnabled = !!widgetOptionsState.totalInfo?.toggleValue;
-                const loadDisabled = props.loadDisabled;
-
-                return widgetActive && dataTableReady && totalEnabled && !loadDisabled;
-            }),
-            staleTime: WIDGET_LOAD_STALE_TIME,
-        },
-    ],
-});
-
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || queryResults.value?.[1].isFetching || dataTableLoading.value);
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || loadSumQuery.isFetching.value || dataTableLoading.value);
 const errorMessage = computed<string|undefined>(() => {
     if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
-    return queryResults.value?.[0].error?.message as string || queryResults.value?.[1].error?.message as string;
+    return loadQuery.error?.value?.message as string || loadSumQuery.error?.value?.message as string;
 });
 
 
 const refinedData = computed<WidgetLoadResponse|null>(() => {
-    const data = queryResults.value?.[0].data;
-    const totalData = queryResults.value?.[1].data;
+    const data = loadQuery.data?.value;
+    const totalData = loadSumQuery.data?.value;
 
     if (!data) return null;
 
@@ -243,7 +225,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
     dateRange,
     errorMessage,
     widgetLoading,
-    noData: computed(() => (queryResults.value?.[0].data ? !(queryResults.value?.[0].data?.results?.length) : false)),
+    noData: computed(() => (loadQuery.data?.value ? !(loadQuery.data?.value?.results?.length) : false)),
 });
 
 const handleUpdateThisPage = async (newPage: number) => {
@@ -252,8 +234,8 @@ const handleUpdateThisPage = async (newPage: number) => {
 
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResults.value?.[0].refetch();
-        queryResults.value?.[1].refetch();
+        loadQuery.refetch();
+        loadSumQuery.refetch();
     },
 });
 onMounted(() => {

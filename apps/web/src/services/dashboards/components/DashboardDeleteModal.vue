@@ -2,10 +2,8 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
-import type { PrivateDashboardDeleteParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/delete';
-import type { PublicDashboardDeleteParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -19,6 +17,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { useDashboardDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-delete-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -43,7 +42,6 @@ const appContextStore = useAppContextStore();
 const router = useRouter();
 /* Query */
 const {
-    api,
     keys,
 } = useDashboardQuery();
 const queryClient = useQueryClient();
@@ -68,44 +66,33 @@ const handleDeleteDashboardConfirm = async () => {
 };
 
 /* Api */
-const deleteDashboardFn = (params: PublicDashboardDeleteParameters|PrivateDashboardDeleteParameters): Promise<void> => {
-    const _isPrivate = params.dashboard_id.startsWith('private');
-    if (_isPrivate) {
-        return api.privateDashboardAPI.delete(params as PrivateDashboardDeleteParameters);
-    }
-    return api.publicDashboardAPI.delete(params as PublicDashboardDeleteParameters);
-};
-
-const { mutate: deleteDashboard, isPending: loading } = useMutation(
-    {
-        mutationFn: deleteDashboardFn,
-        onSuccess: async (_, params) => {
-            const _isPrivate = params.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = _isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            await queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-            await recentStore.deleteRecent({
-                type: RECENT_TYPE.DASHBOARD,
-                itemId: props.dashboardId,
+const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteMutation({
+    onSuccess: async (_, params) => {
+        const _isPrivate = params.dashboard_id.startsWith('private');
+        const dashboardListQueryKey = _isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+        await queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        await recentStore.deleteRecent({
+            type: RECENT_TYPE.DASHBOARD,
+            itemId: props.dashboardId,
+        });
+        const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === params.dashboard_id);
+        if (isFavoriteItem) {
+            await favoriteStore.deleteFavorite({
+                itemType: FAVORITE_TYPE.DASHBOARD,
+                workspaceId: storeState.currentWorkspaceId || '',
+                itemId: params.dashboard_id,
             });
-            const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === params.dashboard_id);
-            if (isFavoriteItem) {
-                await favoriteStore.deleteFavorite({
-                    itemType: FAVORITE_TYPE.DASHBOARD,
-                    workspaceId: storeState.currentWorkspaceId || '',
-                    itemId: params.dashboard_id,
-                });
-            }
-            state.proxyVisible = false;
-            const dashboardRouteName = storeState.isAdminMode
-                ? ADMIN_DASHBOARDS_ROUTE._NAME
-                : DASHBOARDS_ROUTE._NAME;
-            await router.replace({ name: dashboardRouteName }).catch(() => {});
-        },
-        onError(error) {
-            ErrorHandler.handleRequestError(error, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
-        },
+        }
+        state.proxyVisible = false;
+        const dashboardRouteName = storeState.isAdminMode
+            ? ADMIN_DASHBOARDS_ROUTE._NAME
+            : DASHBOARDS_ROUTE._NAME;
+        await router.replace({ name: dashboardRouteName }).catch(() => {});
     },
-);
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
+    },
+});
 
 </script>
 

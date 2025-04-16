@@ -44,6 +44,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 
+import type { Location } from 'vue-router';
+
 import PI from '@/foundation/icons/PI.vue';
 import { ACTION_ICON, LinkSize } from '@/navigation/link/type';
 import type { ActionIcon } from '@/navigation/link/type';

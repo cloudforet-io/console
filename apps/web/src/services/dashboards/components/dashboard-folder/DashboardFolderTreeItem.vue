@@ -10,6 +10,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
@@ -23,12 +25,12 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
-import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
+import { useDashboardControlMenuHelper } from '@/services/_shared/dashboard/core/composables/use-dashboard-control-menu-helper';
+import { isDashboardOrFolderManageable } from '@/services/dashboards/helpers/dashboard-manageable-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
-
 
 interface Props {
     treeData: TreeNode<DashboardTreeDataType>;
@@ -48,10 +50,7 @@ const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
 const userStore = useUserStore();
 
-const { getControlMenuItems } = useDashboardControlMenuItems({
-    isAdminMode: computed(() => storeState.isAdminMode),
-    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
-});
+const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboardControlMenuHelper();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -67,22 +66,50 @@ const state = reactive({
 
 /* Util */
 const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined => {
-    if (node.data.shared) {
-        if (node.data.scope === 'PROJECT') return violet[500];
+    if (node.data?.shared) {
+        if (node.data?.scope === 'PROJECT') return violet[500];
         return indigo[500];
     }
     return undefined;
 };
 const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|undefined => {
-    if (node.data.shared) {
+    if (node.data?.shared) {
         if (storeState.isAdminMode) {
-            if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
-        if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+        if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
         return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
     }
     return undefined;
+};
+
+const getControlMenuItems = (node: TreeNode<DashboardTreeDataType>): MenuItem[] => {
+    if (node.data.type === 'DASHBOARD') {
+        const _dashboard = node.data as DashboardModel;
+        const _isPrivate = _dashboard.dashboard_id?.startsWith('private') || false;
+        const _manageable = isDashboardOrFolderManageable(
+            storeState.isAdminMode,
+            storeState.isWorkspaceOwner,
+            _isPrivate,
+            _dashboard?.shared,
+            _dashboard?.resource_group,
+        );
+        return getControlDashboardMenuItems(node.data.id, _manageable, _dashboard);
+    }
+    if (node.data.type === 'FOLDER') {
+        const _folder = node.data as FolderModel;
+        const _isPrivate = _folder.folder_id?.startsWith('private') || false;
+        const _manageable = isDashboardOrFolderManageable(
+            storeState.isAdminMode,
+            storeState.isWorkspaceOwner,
+            _isPrivate,
+            _folder?.shared,
+            _folder?.resource_group,
+        );
+        return getControlFolderMenuItems(node.data.id, _manageable, _folder);
+    }
+    return [];
 };
 
 /* Event */
@@ -165,7 +192,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                         >
                             <p-select-dropdown style-type="tertiary-icon-button"
                                                button-icon="ic_ellipsis-horizontal"
-                                               :menu="getControlMenuItems(node.data.id)"
+                                               :menu="getControlMenuItems(node)"
                                                :selected="[]"
                                                size="sm"
                                                menu-position="left"
