@@ -218,7 +218,6 @@ export default {
                 color: COLORS[idx],
                 link: router.resolve(getReferenceLocation(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
-            console.log('resources', resources);
             state.availableResources = sortBy(resources, (m) => m.name);
         };
         const getDataSource = async () => {
