@@ -83,7 +83,7 @@ const tabs = computed<TabItem[]>(() => {
         icon: 'ic_service_dashboard',
     })) ?? [];
     return [
-        { name: 'overview', label: i18n.t('PROJECT.LANDING.OVERVIEW') },
+        ...((props.projectGroupId || props.projectId) ? [{ name: 'overview', label: i18n.t('PROJECT.LANDING.OVERVIEW') }] : []),
         ...folderTabs,
         ...dashboardTabs,
     ];

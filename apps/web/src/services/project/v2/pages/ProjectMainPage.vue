@@ -120,7 +120,7 @@ const handleUpdateDashboardId = (id?: string) => {
                         :project-group-id="projectGroupId"
         />
         <keep-alive>
-            <project-and-group-list-panel v-if="mounted && projectGroupId"
+            <project-and-group-list-panel v-if="mounted && !projectId"
                                           :key="projectGroupId ?? 'all'"
                                           class="mt-4"
                                           :project-group-id="projectGroupId"
