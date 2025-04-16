@@ -16,15 +16,14 @@ import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-v
 import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 interface UserRoleItem {
     labels?: string[]|string;
@@ -49,6 +48,8 @@ const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     title: computed(() => i18n.t('IAM.USER.MAIN.ASSIGNED_ROLES')),
     loading: true,
@@ -66,7 +67,7 @@ const state = reactive({
 
 const getProjectLink = (value, isProject: boolean) => {
     if (isProject) {
-        const link = router.resolve(referenceRouter(value, {
+        const link = router.resolve(getReferenceLocation(value, {
             resource_type: 'identity.Project',
         }));
         return {
@@ -74,7 +75,7 @@ const getProjectLink = (value, isProject: boolean) => {
             workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
         };
     }
-    const link = router.resolve(referenceRouter(value, {
+    const link = router.resolve(getReferenceLocation(value, {
         resource_type: 'identity.ProjectGroup',
     }));
     return {

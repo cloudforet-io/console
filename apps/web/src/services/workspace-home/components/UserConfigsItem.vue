@@ -4,11 +4,12 @@ import { useRouter } from 'vue-router/composables';
 
 import { PI, PTextHighlighting } from '@cloudforet/mirinae';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import { getParsedKeysWithManagedCostQueryFavoriteKey } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -28,11 +29,12 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
 });
-
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 
 
 const router = useRouter();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const state = reactive({
     iconColor: computed<string|undefined>(() => {
@@ -65,11 +67,11 @@ const handleClickItem = () => {
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.PROJECT) {
-        router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
+        router.push(getReferenceLocation(itemName, { resource_type: 'identity.Project' })).catch(() => {});
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-        router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
+        router.push(getReferenceLocation(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {

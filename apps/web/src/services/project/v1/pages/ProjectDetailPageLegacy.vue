@@ -19,13 +19,14 @@ import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -44,7 +45,6 @@ import ProjectMainProjectGroupMoveModal from '@/services/project/v1/components/P
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
-
 
 interface Props {
     id?: string;
@@ -65,7 +65,9 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+
 const { getProperRouteLocation } = useProperRouteLocation();
+const { getReferenceLocation } = useReferenceRouter();
 
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -83,17 +85,17 @@ const state = reactive({
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
                 name: state.projectGroupInfo.name,
-                to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
+                to: getReferenceLocation(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
         if (route.name === PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME) {
             results = results.concat([
-                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+                { name: state.item?.name, to: getReferenceLocation(state.item?.project_id, { resource_type: 'identity.Project' }) },
                 { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
             ]);
         } else if (route.name === PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
             results = results.concat([
-                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+                { name: state.item?.name, to: getReferenceLocation(state.item?.project_id, { resource_type: 'identity.Project' }) },
                 { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
             ]);
         } else {

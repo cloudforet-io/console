@@ -24,10 +24,9 @@ import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/a
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
+import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { Period } from '@/services/asset-inventory/types/type';
-
-import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '../types/cloud-service-card-type';
 
 interface Props {
     item: CloudServiceAnalyzeResult;

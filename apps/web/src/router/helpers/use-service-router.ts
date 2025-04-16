@@ -1,5 +1,4 @@
-import { useRouter } from 'vue-router/composables';
-
+import type { Location, VueRouter } from 'vue-router/types/router';
 
 import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
@@ -15,34 +14,9 @@ type NavigateOptionsType = RouterOptionsType & {
     method: 'push' | 'replace';
 };
 
-export const useServiceRouter = () => {
-    const router = useRouter();
+export const useServiceRouter = (router: VueRouter) => {
     const globalConfigSchemaStore = useGlobalConfigSchemaStore();
     const globalConfigSchemaState = globalConfigSchemaStore.state;
-
-    const navigate = async (options: NavigateOptionsType) => {
-        const {
-            feature, routeKey, params, method,
-        } = options;
-
-        const featureMetadata = globalConfigSchemaState.routeMetadataSchema[feature.toUpperCase()];
-        const convertedParams = params ? transformParams(featureMetadata[routeKey].params || {}, params) : undefined;
-
-        if (!featureMetadata) {
-            return router[method]({ name: feature, params: convertedParams });
-        }
-
-        const routeConfig = featureMetadata[routeKey];
-        if (!routeConfig) {
-            return router[method]({ name: feature, params: convertedParams });
-        }
-
-        const navigationOptions = {
-            name: routeConfig.name,
-            params: convertedParams,
-        };
-        return router[method](navigationOptions);
-    };
 
     const transformParams = (
         paramConfig: Record<string, any>,
@@ -59,8 +33,45 @@ export const useServiceRouter = () => {
         return result;
     };
 
+    const getLocation = (options: RouterOptionsType): Location => {
+        const {
+            feature, routeKey, params,
+        } = options;
+
+        const featureMetadata = globalConfigSchemaState.routeMetadataSchema[feature.toUpperCase()];
+        const convertedParams = params ? transformParams(featureMetadata[routeKey].params || {}, params) : undefined;
+
+        if (!featureMetadata) {
+            return { name: feature, params: convertedParams };
+        }
+
+        const routeConfig = featureMetadata[routeKey];
+        if (!routeConfig) {
+            return { name: feature, params: convertedParams };
+        }
+
+        return {
+            name: routeConfig.name,
+            params: convertedParams,
+        };
+    };
+
+    const navigate = async (options: NavigateOptionsType) => {
+        const { method } = options;
+        const location = getLocation(options);
+        return router[method](location);
+    };
+
+    const resolve = (options: RouterOptionsType) => {
+        const location = getLocation(options);
+        return router.resolve(location);
+    };
+
     return {
         push: (options: RouterOptionsType) => navigate({ ...options, method: 'push' }),
         replace: (options: RouterOptionsType) => navigate({ ...options, method: 'replace' }),
+        getLocation,
+        resolve,
     };
 };
+

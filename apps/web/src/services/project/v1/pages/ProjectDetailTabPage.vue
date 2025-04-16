@@ -15,6 +15,8 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -24,7 +26,6 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import { useUserStore } from '@/store/user/user-store';
 
 import { MENU_ID } from '@/lib/menu/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -58,6 +59,7 @@ const userStore = useUserStore();
 const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
+const { getReferenceLocation } = useReferenceRouter();
 
 /* Query */
 const {
@@ -84,17 +86,17 @@ const state = reactive({
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
                 name: state.projectGroupInfo.name,
-                to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
+                to: getReferenceLocation(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
         // if (route.name === PROJECT_ROUTE_V1.DETAIL.EVENT_RULE._NAME) {
         //     results = results.concat([
-        //         { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+        //         { name: state.item?.name, to: getReferenceLocation(state.item?.project_id, { resource_type: 'identity.Project' }) },
         //         { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
         //     ]);
         // } else if (route.name === PROJECT_ROUTE_V1.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
         //     results = results.concat([
-        //         { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+        //         { name: state.item?.name, to: getReferenceLocation(state.item?.project_id, { resource_type: 'identity.Project' }) },
         //         { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
         //     ]);
         // } else {

@@ -33,6 +33,20 @@ class ProjectConfigurator implements FeatureConfigurator {
                 },
             },
         },
+        projectGroup: {
+            V1: {
+                name: PROJECT_ROUTE_V1._NAME,
+                params: {
+                    id: 'projectGroupId',
+                },
+            },
+            V2: {
+                name: PROJECT_ROUTE_V2._NAME,
+                params: {
+                    id: 'projectGroupOrProjectId',
+                },
+            },
+        },
     };
 
     readonly uiAffect: GeneratedUiAffectConfig[] = [
