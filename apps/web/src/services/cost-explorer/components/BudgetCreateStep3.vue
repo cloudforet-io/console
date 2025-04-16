@@ -14,6 +14,8 @@ import type { BudgetCreateParameters } from '@/api-clients/cost-analysis/budget/
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,6 +27,7 @@ import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
+const userReferenceStore = useUserReferenceStore();
 
 const router = useRouter();
 
@@ -35,9 +38,7 @@ const isAlertRecipientsSelected = ref<boolean>(false);
 watch(() => budgetCreatePageState.thresholds, () => {
     const filteredThresholdInvalidState = budgetCreatePageState.thresholds.filter((threshold) => {
         if (threshold.value) {
-            if (Number(threshold.value) === 10 || Number(threshold.value) === 20 || Number(threshold.value) === 30
-            || Number(threshold.value) === 40 || Number(threshold.value) === 50 || Number(threshold.value) === 60
-            || Number(threshold.value) === 70 || Number(threshold.value) === 80 || Number(threshold.value) === 90) {
+            if (Number(threshold.value) > 0 && Number(threshold.value) < 101) {
                 return false;
             } if (Number(threshold.value) <= 0 || typeof threshold.value !== 'number') {
                 return true;
@@ -70,10 +71,6 @@ const handleUpdateThreshold = (value: number, index: number) => {
     budgetCreatePageState.thresholds[index].value = value;
 };
 
-const handleBudgetManager = () => {
-    budgetCreatePageState.currentStep = 1;
-};
-
 const handleRemoveThreshold = () => {
     const index = budgetCreatePageState.thresholds.length - 1;
     if (index >= 0) {
@@ -104,6 +101,7 @@ const createBudget = async (type: 'skip' | 'set') => {
             time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
             start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
             end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+            budget_year: '2025', // TODO: select between start and end.
             notification: type === 'set' ? {
                 state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
                     ? 'ENABLED' : 'DISABLED',
@@ -180,22 +178,17 @@ const createBudget = async (type: 'skip' | 'set') => {
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADD_THRESHOLD') }}
         </p-button>
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ALERT_RECIPIENTS')"
-                       :help-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADD_RECIPIENTS_TEXT')"
-                       class="mt-8"
+                       :help-text="`${$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADD_RECIPIENTS_TEXT')} ${budgetCreatePageState.budgetManager}
+                            ${userReferenceStore.getters.userItems[budgetCreatePageState.budgetManager]?.name
+                       ? `(${userReferenceStore.getters.userItems[budgetCreatePageState.budgetManager].name})` : ''}`"
+                       class="mt-8 flex flex-col gap-1"
                        required
         >
-            <template #label-extra>
-                <p-button class="ml-3 font-light"
-                          size="sm"
-                          style-type="tertiary"
-                          @click="handleBudgetManager"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.EDIT_BUDGET_MANAGER') }}
-                </p-button>
-            </template>
+            <span class="font-normal text-sm">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADDITIONAL_RECIPIENTS') }}</span>
             <user-select-dropdown show-user-list
                                   selection-type="multiple"
                                   :selected-ids="budgetCreatePageState.recipients.users"
+                                  :excluded-selected-ids="[budgetCreatePageState.budgetManager]"
                                   @update:selected-ids="handleSelectIds"
                                   @formatted-selected-ids="handleFormatRecipients"
             />

@@ -556,6 +556,7 @@
 					"COST_TYPE": "Cost Type",
 					"DELETE": "Delete",
 					"DELETE_MODAL_TITLE": "Are you sure you want to delete the budget notifications?",
+					"DELETE_SUCCESS": "Budget successfully deleted.",
 					"DETAILS": "Details",
 					"FIELD": {
 						"ACTUAL_COST": "Actual Cost",
@@ -591,6 +592,7 @@
 						"WARNING": "Warning"
 					},
 					"MONTHLY_PLANNING": "Monthly Planning",
+					"NAME_EDIT_SUCCESS": "Budget name updated successfully",
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
 					"ORIGINAL_DATA": "Original Data",
 					"PAGE_NOTIFICATION": "This budget’s settings can only be changed in admin mode.",
@@ -653,7 +655,8 @@
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
 					"CREATE": {
-						"ADD_RECIPIENTS_TEXT": "The recipients of the alert include the Budget Manager.",
+						"ADDITIONAL_RECIPIENTS": "Additional Recipients",
+						"ADD_RECIPIENTS_TEXT": "The alert will be sent to the assigned Budget Manager:",
 						"ADD_THRESHOLD": "Add Threshold",
 						"ALERT_RECIPIENTS": "Alert Recipients",
 						"AMOUNT_EACH_MONTH": "Amount Each Month",
