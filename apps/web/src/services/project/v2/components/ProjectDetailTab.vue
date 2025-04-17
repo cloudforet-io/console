@@ -31,7 +31,7 @@ const activeTab = ref('overview');
 watch(() => props.dashboardId, (did) => {
     activeTab.value = did ?? 'overview';
 }, { immediate: true });
-watch(() => props.projectId, () => {
+watch([() => props.projectId, () => props.projectGroupId], () => {
     activeTab.value = 'overview';
 });
 

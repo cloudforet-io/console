@@ -131,7 +131,7 @@ const handleUpdateDashboardId = (id?: string) => {
                                           :project-group-id="projectGroupId"
             />
         </keep-alive>
-        <project-detail-tab v-if="mounted"
+        <project-detail-tab v-if="mounted && props.projectGroupOrProjectId"
                             class="mt-6"
                             :project-id="projectId"
                             :project-group-id="projectGroupId"
