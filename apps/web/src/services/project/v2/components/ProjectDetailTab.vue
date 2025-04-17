@@ -142,12 +142,12 @@ const handleOpenDashboardEditOverlay = () => {
                 <div>
                     <keep-alive>
                         <project-overview v-if="activeTab === 'overview'"
-                                          :key="`${props.projectGroupId ?? props.projectId}-${activeTab}`"
+                                          :key="`${props.projectGroupId ?? props.projectId}-overview`"
                                           :project-group-id="props.projectGroupId"
                                           :project-id="props.projectId"
                         />
                         <project-dashboard v-else
-                                           :key="`${props.projectGroupId ?? props.projectId}-${activeTab}`"
+                                           :key="`${props.projectGroupId ?? props.projectId}-dashboard-${activeTab}`"
                                            :project-id="props.projectId"
                                            :project-group-id="props.projectGroupId"
                                            :dashboard-id="activeTab"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onMounted, onUnmounted, ref, watch,
+    computed, onMounted, onUnmounted, ref, toRef, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -108,6 +108,7 @@ onUnmounted(() => {
     mounted.value = false;
 });
 const { chartData, isLoading } = useCostChartData({
+    mode: toRef(props, 'mode'),
     enabled: computed(() => {
         if (props.mode === 'workspace') {
             if (!isWorkspaceMember.value) {
