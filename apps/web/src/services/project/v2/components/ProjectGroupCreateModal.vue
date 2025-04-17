@@ -73,7 +73,7 @@ const { mutateAsync: createProjectGroup, isPending: isCreating } = useMutation({
 
 /* Event */
 const handleConfirm = async () => {
-    if (isCreating) return;
+    if (isCreating.value) return;
     if (!projectGroupName.value) return;
     if (!isAllValid.value) return;
 
