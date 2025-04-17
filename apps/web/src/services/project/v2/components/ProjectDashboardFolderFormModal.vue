@@ -14,7 +14,6 @@ import type { FolderCreateParams, FolderUpdateParams } from '@/api-clients/dashb
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
-import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -45,7 +44,6 @@ const { publicFolderAPI } = usePublicFolderApi();
 /* Query */
 const {
     dashboardFolderList,
-    setQueryData,
     invalidateAllQueries,
 } = useProjectDashboardFolderQuery({
     projectId,
@@ -106,10 +104,10 @@ const handleFormConfirm = async () => {
 const { mutate: createFolder } = useMutation(
     {
         mutationFn: (params: PublicFolderCreateParameters) => publicFolderAPI.create(params as PublicFolderCreateParameters),
-        onSuccess: (folder: PublicFolderModel) => {
+        onSuccess: () => {
             showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
             projectDashboardModalStore.closeFolderFormModal();
-            setQueryData([folder]);
+            invalidateAllQueries();
         },
         onError: (e) => {
             ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_E_CREATE_FOLDER'));
