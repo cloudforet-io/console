@@ -12,7 +12,7 @@ import { cloneDeep } from 'lodash';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
-    POverlayLayout, PButton, PDataLoader, PEmpty, PToolbox, PHeading,
+    POverlayLayout, PButton, PDataLoader, PEmpty, PToolbox,
 } from '@cloudforet/mirinae';
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type {
@@ -177,6 +177,13 @@ const getDashboardValueHandler = (): ValueHandler | undefined => {
 const handleCreateDashboard = () => {
     const dashboardCreateRouteName = PROJECT_ROUTE_V2.DASHBOARD_CREATE._NAME;
     router.push({ name: dashboardCreateRouteName }).catch(() => {});
+    projectDashboardModalStore.closeDashboardEditOverlay();
+    dashboardTreeControlStore.reset();
+};
+const handleCreateFolder = () => {
+    projectDashboardModalStore.closeDashboardEditOverlay();
+    dashboardTreeControlStore.reset();
+    projectDashboardModalStore.openCreateFolderFormModal();
 };
 const handleUpdateSelectedIdMap = (selectedIdMap: Record<string, boolean>) => {
     dashboardTreeControlStore.setSelectedPublicIdMap(selectedIdMap);
@@ -246,7 +253,27 @@ onUnmounted(() => {
         <template #default>
             <div class="dashboard-edit-list-overlay-body">
                 <div class="dashboard-tree-list-layout">
-                    <p-heading :title="$t('Dashboard List')" />
+                    <div class="layout-header flex justify-between items-center pb-4">
+                        <p class="text-label-lg text-gray-700 font-bold">
+                            {{ i18n.t('Dashboard List') }}
+                        </p>
+                        <div class="inline-flex items-center gap-2">
+                            <p-button icon-left="ic_plus"
+                                      style-type="tertiary"
+                                      size="sm"
+                                      @click="handleCreateFolder"
+                            >
+                                {{ i18n.t('PROJECT.DASHBOARD.CREATE.CREATE_FOLDER') }}
+                            </p-button>
+                            <p-button icon-left="ic_plus"
+                                      style-type="secondary"
+                                      size="sm"
+                                      @click="handleCreateDashboard"
+                            >
+                                {{ i18n.t('PROJECT.DASHBOARD.CREATE.CREATE_DASHBOARD') }}
+                            </p-button>
+                        </div>
+                    </div>
                     <p-toolbox filters-visible
                                search-type="query"
                                placeholder="Search Dashboard"
