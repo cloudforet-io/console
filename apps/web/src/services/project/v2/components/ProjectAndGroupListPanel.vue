@@ -83,7 +83,7 @@ const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccoun
                      @click="isCollapsed = !isCollapsed"
                 />
                 <div class="text-label-lg font-medium">
-                    {{ $t('PROJECT.LADING.GROUPS_AND_PROJECTS') }}
+                    {{ $t('PROJECT.LANDING.GROUPS_AND_PROJECTS') }}
                 </div>
             </div>
             <div class="grow flex flex-wrap justify-end items-center gap-2">

@@ -207,7 +207,7 @@ const handleConfirm = async () => {
         <template v-if="readonlyMode"
                   #confirm-button
         >
-            Done
+            {{ $t('PROJECT.LANDING.DONE') }}
         </template>
     </p-button-modal>
 </template>

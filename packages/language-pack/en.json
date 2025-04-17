@@ -5388,9 +5388,6 @@
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
 			"URGENCY": "Urgency"
 		},
-		"LADING": {
-			"GROUPS_AND_PROJECTS": "Project Groups and Projects"
-		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
@@ -5417,6 +5414,7 @@
 			"CREATE_PROJECT": "Create Project",
 			"DATABASE": "Database",
 			"DELETE": "Delete",
+			"DONE": "Done",
 			"EDIT_TAG": "Edit Tag",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "Create Project Group",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "Manage your resources through projects.",
@@ -5429,6 +5427,7 @@
 			"EMPTY_TEXT_SEARCH": "It appears that there are no results.",
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
+			"GROUPS_AND_PROJECTS": "Project Groups and Projects",
 			"GROUP_MEMBER": "Group Member",
 			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "Group Members will have access to all sub-projects",
 			"INVITE_ONLY": "Invite only",
