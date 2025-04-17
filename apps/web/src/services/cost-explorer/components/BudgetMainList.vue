@@ -235,6 +235,22 @@ const handleDeleteConfirm = async () => {
 const getBudgetFilters = (): ApiFilter[] => {
     const filters: ApiFilter[] = [];
 
+    if (state.query?.target && state.query?.target !== 'all') {
+        if (state.query?.target === 'project') {
+            filters.push({
+                k: 'service_account_id',
+                v: false,
+                o: 'exists',
+            });
+        } else if (state.query?.target === 'serviceAccount') {
+            filters.push({
+                k: 'service_account_id',
+                v: '',
+                o: 'not',
+            });
+        }
+    }
+
     if (state.query?.year && state.query?.year !== 'all') {
         filters.push({
             k: 'budget_year',

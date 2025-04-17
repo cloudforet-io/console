@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
 
-import { PSelectDropdown, PI } from '@cloudforet/mirinae';
+import { PSelectDropdown, PI, PDivider } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
@@ -13,30 +13,24 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-interface Props {
-  modalVisible: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    modalVisible: false,
-});
-
 const emit = defineEmits<{(e: 'update:select-month-modal-visible', value: boolean): void; (e: 'update:query', value: any): void;}>();
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 interface BudgetMainToolsetState {
-  yearList: SelectDropdownMenuItem[];
-  selectedYear: string;
-  budgetCycleList: SelectDropdownMenuItem[];
-  selectedBudgetCycle: string;
-  projectList: SelectDropdownMenuItem[];
-  selectedProjectList: SelectDropdownMenuItem[];
-  serviceAccountList: SelectDropdownMenuItem[];
-  selectedServiceAccountList: SelectDropdownMenuItem[];
-  utilizationList: SelectDropdownMenuItem[];
-  selectedUtilization: string;
+    targetList: SelectDropdownMenuItem[];
+    selectedTarget: string;
+    yearList: SelectDropdownMenuItem[];
+    selectedYear: string;
+    budgetCycleList: SelectDropdownMenuItem[];
+    selectedBudgetCycle: string;
+    projectList: SelectDropdownMenuItem[];
+    selectedProjectList: SelectDropdownMenuItem[];
+    serviceAccountList: SelectDropdownMenuItem[];
+    selectedServiceAccountList: SelectDropdownMenuItem[];
+    utilizationList: SelectDropdownMenuItem[];
+    selectedUtilization: string;
 }
 
 const storeState = reactive({
@@ -45,16 +39,23 @@ const storeState = reactive({
 });
 
 const state = reactive<BudgetMainToolsetState>({
+    targetList: [
+        { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ALL') },
+        { name: 'project', label: 'Project' },
+        { name: 'serviceAccount', label: 'Service Account' },
+    ],
+    selectedTarget: 'all',
     yearList: [
-        { name: 'all', label: 'All' },
+        { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ALL') },
         { type: 'divider', name: 'divider' },
         { name: dayjs.utc().add(1, 'year').format('YYYY'), label: dayjs.utc().add(1, 'year').format('YYYY') },
         { name: dayjs.utc().format('YYYY'), label: dayjs.utc().format('YYYY') },
         { name: dayjs.utc().subtract(1, 'year').format('YYYY'), label: dayjs.utc().subtract(1, 'year').format('YYYY') },
     ],
-    selectedYear: '',
+    selectedYear: 'all',
     budgetCycleList: [
         { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ALL') },
+        { type: 'divider', name: 'divider' },
         { name: 'monthly', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY') },
         { name: 'fixedTerm', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') },
     ],
@@ -114,17 +115,12 @@ watch(() => state.selectedServiceAccountList, () => {
     }
 }, { deep: true, immediate: true });
 
-watch(() => props.modalVisible, () => {
-    if (!props.modalVisible) {
-        state.selectedYear = '';
-    }
-}, { immediate: true });
-
 watch(() => state, () => {
     emit('update:query', {
-        year: state.selectedYear,
+        target: state.selectedTarget,
         projectList: state.selectedProjectList,
         serviceAccountList: state.selectedServiceAccountList.map((serviceAccount) => serviceAccount.name),
+        year: state.selectedYear,
         cycle: state.selectedBudgetCycle,
         utilization: state.selectedUtilization,
     });
@@ -137,28 +133,38 @@ const handleProjectList = (projectIds) => {
 
 <template>
     <div class="mt-3 flex gap-2 items-center">
-        <p-select-dropdown style-type="rounded"
-                           :menu="state.yearList"
-                           :selected.sync="state.selectedYear"
-                           selection-label="Year"
+        <p-select-dropdown selection-label="Target"
+                           style-type="rounded"
+                           :menu="state.targetList"
+                           :selected.sync="state.selectedTarget"
         />
+        <div class="flex gap-1 items-center">
+            <p-i name="ic_filter"
+                 width="14"
+                 height="14"
+            />
+            <span class="font-bold text-sm">Filter:</span>
+        </div>
         <project-select-dropdown style-type="rounded"
                                  appearance-type="badge"
                                  selection-label="Project"
                                  :project-group-selectable="false"
                                  multi-selectable
                                  show-dropdown-left-area
+                                 show-delete-all-button
                                  @update:selected-project-ids="handleProjectList"
         />
         <p-select-dropdown style-type="rounded"
                            :menu="state.serviceAccountList"
                            :selected.sync="state.selectedServiceAccountList"
+                           :disabled="state.selectedTarget === 'project'"
                            selection-label="Service Account"
                            appearance-type="badge"
                            use-fixed-menu-style
                            show-select-marker
                            multi-selectable
                            show-clear-selection
+                           show-delete-all-button
                            selection-highlight
                            :page-size="15"
         >
@@ -169,6 +175,14 @@ const handleProjectList = (projectIds) => {
                 />
             </template>
         </p-select-dropdown>
+        <p-divider
+            class="divider"
+        />
+        <p-select-dropdown style-type="rounded"
+                           :menu="state.yearList"
+                           :selected.sync="state.selectedYear"
+                           selection-label="Year"
+        />
         <p-select-dropdown style-type="rounded"
                            :menu="state.budgetCycleList"
                            :selected.sync="state.selectedBudgetCycle"
@@ -182,3 +196,10 @@ const handleProjectList = (projectIds) => {
         />
     </div>
 </template>
+
+<style>
+.divider {
+    height: 1rem;
+    width: 0.0625rem;
+}
+</style>
