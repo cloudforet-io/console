@@ -42,7 +42,7 @@
       "VERSION": "V1"
     },
     "OPS_FLOW": {
-      "ENABLED": true,
+      "ENABLED": false,
       "VERSION": "V1"
     },
     "ALERT_MANAGER": {
