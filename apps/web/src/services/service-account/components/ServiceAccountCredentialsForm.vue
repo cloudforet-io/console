@@ -371,7 +371,8 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
                    stretch
             >
                 <template #input>
-                    <p-json-schema-form :form-data.sync="formState.customSchemaForm"
+                    <p-json-schema-form v-if="state.credentialSchema"
+                                        :form-data.sync="formState.customSchemaForm"
                                         :schema="state.credentialSchema"
                                         :language="storeState.language"
                                         class="custom-schema-box"
