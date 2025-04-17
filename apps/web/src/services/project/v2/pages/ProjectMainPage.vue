@@ -134,23 +134,29 @@ const handleUpdateDashboardId = (id?: string) => {
                             @update:dashboard-id="handleUpdateDashboardId"
         />
 
-        <template v-if="mounted">
-            <project-group-member-management-modal />
-            <project-member-management-modal />
-            <project-delete-modal @deleted="handleDeleted" />
-            <project-move-modal />
-            <project-member-invite-modal />
-            <project-tags-modal />
-            <project-create-modal :target-parent-group-id="targetParentGroupId"
+        <keep-alive v-if="mounted">
+            <project-group-member-management-modal v-if="projectPageModelStore.state.projectGroupMemberModalVisible" />
+            <project-member-management-modal v-if="projectPageModelStore.state.projectMemberModalVisible" />
+            <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
+                                  @deleted="handleDeleted"
+            />
+            <project-move-modal v-if="projectPageModelStore.state.moveModalVisible" />
+            <project-member-invite-modal v-if="projectPageModelStore.state.inviteMemberModalVisible" />
+            <project-tags-modal v-if="projectPageModelStore.state.manageTagsModalVisible" />
+
+            <project-create-modal v-if="projectPageModelStore.state.projectCreateModalVisible"
+                                  :target-parent-group-id="targetParentGroupId"
                                   @created="handleCreated"
             />
-            <project-rename-modal />
-            <project-edit-access-modal />
-            <project-group-create-modal :target-parent-group-id="targetParentGroupId"
+            <project-rename-modal v-if="projectPageModelStore.state.projectRenameModalVisible" />
+            <project-edit-access-modal v-if="projectPageModelStore.state.projectEditAccessModalVisible" />
+
+            <project-group-create-modal v-if="projectPageModelStore.state.projectGroupCreateModalVisible"
+                                        :target-parent-group-id="targetParentGroupId"
                                         @created="handleCreated"
             />
-            <project-group-rename-modal />
-        </template>
+            <project-group-rename-modal v-if="projectPageModelStore.state.projectGroupRenameModalVisible" />
+        </keep-alive>
         <template v-if="mounted">
             <project-dashboard-folder-form-modal v-if="projectPageModelStore.state.folderFormModalVisible"
                                                  :project-group-or-project-id="props.projectGroupOrProjectId"

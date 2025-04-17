@@ -4,7 +4,6 @@ import {
     computed, ref,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import { uniq } from 'lodash';
 
 import {
@@ -13,6 +12,8 @@ import {
 
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';
 import ProjectGroupCard from '@/services/project/v2/components/ProjectGroupCard.vue';
@@ -54,17 +55,19 @@ const projectGroups = computed(() => {
 });
 
 /* service accounts */
-const { serviceAccountAPI, serviceAccountListQueryKey } = useServiceAccountApi();
-const serviceAccountListParams: ServiceAccountListParameters = {
-    query: {
-        only: ['provider', 'project_id'],
-    },
-};
-const { data: serviceAccountList } = useQuery({
-    queryKey: computed(() => [...serviceAccountListQueryKey.value, serviceAccountListParams]),
-    queryFn: () => serviceAccountAPI.list(serviceAccountListParams),
-    select: (data) => data.results ?? [],
+const { serviceAccountAPI } = useServiceAccountApi();
+const { key: serviceAccountListQueryKey, params } = useServiceQueryKey('identity', 'service-account', 'list', {
+    params: {
+        query: {
+            only: ['provider', 'project_id'],
+        },
+    } as ServiceAccountListParameters,
 });
+const { data: serviceAccountList } = useScopedQuery({
+    queryKey: serviceAccountListQueryKey,
+    queryFn: () => serviceAccountAPI.list(params.value),
+    select: (data) => data.results ?? [],
+}, ['WORKSPACE']);
 const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccountList.value?.filter((d) => d.project_id === projectId).map((d) => d.provider));
 
 </script>

@@ -1,16 +1,17 @@
 import type { Ref } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
-
 import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/composables/use-workspace-user-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 
 export const useWorkspaceUsersQuery = (ops?: {
   enabled?: Ref<boolean>|boolean
  }) => {
     const { enabled } = ops ?? {};
-    const { workspaceUserAPI, workspaceUserListQueryKey } = useWorkspaceUserApi();
-    const { data, error } = useQuery({
+    const { workspaceUserAPI } = useWorkspaceUserApi();
+    const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+    const { data, error } = useScopedQuery({
         queryKey: workspaceUserListQueryKey,
         queryFn: async () => {
             const res = await workspaceUserAPI.list({});
@@ -19,7 +20,7 @@ export const useWorkspaceUsersQuery = (ops?: {
         enabled,
         staleTime: 1000 * 60 * 20, // 10 minutes
         gcTime: 1000 * 60 * 10, // 10 minutes
-    });
+    }, ['WORKSPACE']);
 
 
     return {
