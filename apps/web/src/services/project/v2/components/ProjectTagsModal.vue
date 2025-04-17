@@ -93,16 +93,18 @@ const { mutate: updateTags, isPending: isUpdating } = useMutation({
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
     },
+    onSettled: () => {
+        projectPageModalStore.closeManageTagsModal();
+    },
 });
 
 /* Event Handler */
 const handleUpdateTags = (_tags: Tags) => {
     newTags.value = _tags;
 };
-const handleSaveTags = async () => {
+const handleSaveTags = () => {
     if (!isTagsValid.value) return;
-    await updateTags(newTags.value);
-    projectPageModalStore.closeManageTagsModal();
+    updateTags(newTags.value);
 };
 </script>
 
