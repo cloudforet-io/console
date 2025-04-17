@@ -48,6 +48,7 @@ import { useProjectPageContext } from '@/services/project/v2/composables/use-pro
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 /* Modal Cases
+* Single Case: If props.folderId exists, clone single folder
 * Multiple Case: Otherwise, clone multiple folders (get selected data from dashboardPageControlGetters)
 */
 
@@ -88,6 +89,7 @@ const { publicFolderAPI } = usePublicFolderApi();
 const { publicWidgetAPI } = usePublicWidgetApi();
 
 const visible = computed(() => projectDashboardModalState.dashboardBundleCloneModalVisible);
+const folderId = computed(() => projectDashboardModalState.targetId);
 const loading = ref(false);
 /* Query */
 const {
@@ -99,6 +101,7 @@ const {
 });
 const {
     dashboardFolderList,
+    dashboardFolderSharedList,
     invalidateAllQueries: invalidateDashboardFolderList,
 } = useProjectDashboardFolderQuery({
     projectGroupId,
@@ -124,19 +127,26 @@ const state = reactive({
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
         // 1. Use Existing Folder Structure
         if (!state.changeFolderStructure) {
-            const _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
-            return getSelectedDataTableItems(dashboardFolderList.value, dashboardList.value, _selectedIdMap);
+            let _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
+            if (folderId.value) {
+                const _childrenIdList = dashboardList.value.filter((d) => d.folder_id === folderId.value);
+                _selectedIdMap = {
+                    [folderId.value]: true,
+                    ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
+                };
+            }
+            return getSelectedDataTableItems([...dashboardFolderSharedList.value, ...dashboardFolderList.value], dashboardList.value, _selectedIdMap);
         }
 
         // 2. Change Folder Structure
         let _targetDashboardList: DashboardModel[] = [];
-        // if (props.folderId) {
-        //     _targetDashboardList = dashboardList.value.filter((d) => d.folder_id === props.folderId);
-        // } else {
-        const _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
-        _targetDashboardList = dashboardList.value.filter((d) => _selectedIdMap[d.dashboard_id]);
-        // }
-        return getChangedFolderModalTableItems(dashboardFolderList.value, _targetDashboardList);
+        if (folderId.value) {
+            _targetDashboardList = dashboardList.value.filter((d) => d.folder_id === folderId.value);
+        } else {
+            const _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
+            _targetDashboardList = dashboardList.value.filter((d) => _selectedIdMap[d.dashboard_id]);
+        }
+        return getChangedFolderModalTableItems([...dashboardFolderSharedList.value, ...dashboardFolderList.value], _targetDashboardList);
     }),
     disableModalConfirm: computed<boolean>(() => {
         if (!state.changeFolderStructure) return false; // 1. Use Existing Folder Structure
@@ -254,7 +264,7 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
         return [];
     }
 };
-const cloneDashboard = async (dashboardId: string, folderId?: string) => {
+const cloneDashboard = async (dashboardId: string, targetFolderId?: string) => {
     const _dashboard = dashboardList.value.find((item) => item.dashboard_id === dashboardId);
     if (!_dashboard) throw new Error('Dashboard not found');
 
@@ -267,7 +277,7 @@ const cloneDashboard = async (dashboardId: string, folderId?: string) => {
         options: _dashboard.options || {},
         labels: _dashboard.labels || [],
         tags: { created_by: storeState.userId },
-        folder_id: folderId,
+        folder_id: targetFolderId,
         vars: _dashboard.vars,
         vars_schema: _dashboard.vars_schema,
     };

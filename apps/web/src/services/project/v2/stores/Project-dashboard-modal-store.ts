@@ -29,6 +29,7 @@ export const useProjectDashboardModalStore = defineStore('project-dashboard-moda
         },
         closeFolderFormModal() {
             state.folderFormModalVisible = false;
+            state.targetId = undefined;
         },
         openDashboardNameEditModal(targetDashboardId: string) {
             state.targetId = targetDashboardId;
@@ -36,6 +37,7 @@ export const useProjectDashboardModalStore = defineStore('project-dashboard-moda
         },
         closeDashboardNameEditModal() {
             state.dashboardNameEditModalVisible = false;
+            state.targetId = undefined;
         },
         openDashboardChangeFolderModal(targetDashboardId: string) {
             state.targetId = targetDashboardId;
@@ -50,6 +52,7 @@ export const useProjectDashboardModalStore = defineStore('project-dashboard-moda
         },
         closeDashboardDeleteModal() {
             state.dashboardDeleteModalVisible = false;
+            state.targetId = undefined;
         },
         openDashboardCloneModal(targetDashboardId: string) {
             state.targetId = targetDashboardId;
@@ -57,30 +60,36 @@ export const useProjectDashboardModalStore = defineStore('project-dashboard-moda
         },
         closeDashboardCloneModal() {
             state.dashboardCloneModalVisible = false;
+            state.targetId = undefined;
         },
         openDashboardEditOverlay() {
             state.dashboardEditOverlayVisible = true;
         },
         closeDashboardEditOverlay() {
             state.dashboardEditOverlayVisible = false;
+            state.targetId = undefined;
         },
         openDashboardBundleDeleteModal() {
             state.dashboardBundleDeleteModalVisible = true;
         },
         closeDashboardBundleDeleteModal() {
             state.dashboardBundleDeleteModalVisible = false;
+            state.targetId = undefined;
         },
         openDashboardBundleMoveModal() {
             state.dashboardBundleMoveModalVisible = true;
         },
         closeDashboardBundleMoveModal() {
             state.dashboardBundleMoveModalVisible = false;
+            state.targetId = undefined;
         },
-        openDashboardBundleCloneModal() {
+        openDashboardBundleCloneModal(targetFolderId?: string) {
             state.dashboardBundleCloneModalVisible = true;
+            state.targetId = targetFolderId;
         },
         closeDashboardBundleCloneModal() {
             state.dashboardBundleCloneModalVisible = false;
+            state.targetId = undefined;
         },
         resetTarget() {
             state.targetId = undefined;
