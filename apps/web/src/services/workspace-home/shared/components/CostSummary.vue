@@ -88,11 +88,12 @@ const { dataSource } = useCostDataSourceQuery();
 const accessLink = computed<boolean>(() => !isEmpty(pageAccessPermissionMap.value[MENU_ID.COST_REPORT]));
 
 /* cost report config */
+const costReportEnabled = computed(() => {
+    if (props.mode === 'workspace') return !isWorkspaceMember.value;
+    return false;
+});
 const { costReportConfig } = useCostReportConfigQuery({
-    enabled: computed(() => {
-        if (props.mode === 'workspace') return !isWorkspaceMember.value;
-        return false;
-    }),
+    enabled: costReportEnabled,
 });
 
 /* currency */
@@ -248,12 +249,15 @@ const currentDateRangeText = computed<string>(() => {
                         >
                             {{ $t('HOME.COST_SUMMARY_GO_TO_COST_ANALYSIS') }}
                         </p-link>
-                        <div class="vertical-divider">
+                        <div v-if="costReportEnabled"
+                             class="vertical-divider"
+                        >
                             <p-divider style="height: 14px;"
                                        vertical
                             />
                         </div>
-                        <p-link highlight
+                        <p-link v-if="costReportEnabled"
+                                highlight
                                 :to="{ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME }"
                                 action-icon="internal-link"
                                 class="link"
@@ -279,7 +283,7 @@ const currentDateRangeText = computed<string>(() => {
     .heading-wrapper {
         @apply flex;
         .project-select-dropdown {
-            margin-right: 1rem;
+            @apply mt-6 mr-6;
             margin-left: auto;
         }
     }
