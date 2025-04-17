@@ -14,7 +14,6 @@ import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 /* modals */
@@ -35,10 +34,7 @@ const ProjectDashboardNameEditModal = () => import('@/services/project/v2/compon
 const ProjectDashboardChangeFolderModal = () => import('@/services/project/v2/components/ProjectDashboardChangeFolderModal.vue');
 const ProjectDashboardDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardDeleteModal.vue');
 const ProjectDashboardCloneModal = () => import('@/services/project/v2/components/ProjectDashboardCloneModal.vue');
-const ProjectDashboardEditListOverlay = () => import('@/services/project/v2/components/ProjectDashboardEditListOverlay.vue');
-const ProjectDashboardBundleDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardBundleDeleteModal.vue');
-const ProjectDashboardBundleMoveModal = () => import('@/services/project/v2/components/ProjectDashboardBundleMoveModal.vue');
-const ProjectDashboardBundleCloneModal = () => import('@/services/project/v2/components/ProjectDashboardBundleCloneModal.vue');
+
 const props = defineProps<{
     projectGroupOrProjectId?: string;
     dashboardId?: string;
@@ -50,7 +46,6 @@ const { projectGroupId, projectId } = useProjectOrGroupId(toRef(props, 'projectG
 
 /* modals */
 const projectPageModelStore = useProjectPageModalStore();
-const projectDashboardModalStore = useProjectDashboardModalStore();
 
 /* target parent group id */
 const { data: project } = useProjectQuery({
@@ -140,54 +135,37 @@ const handleUpdateDashboardId = (id?: string) => {
         />
 
         <template v-if="mounted">
-            <project-group-member-management-modal v-if="projectPageModelStore.state.projectGroupMemberModalVisible" />
-            <project-member-management-modal v-if="projectPageModelStore.state.projectMemberModalVisible" />
-            <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
-                                  @deleted="handleDeleted"
-            />
-            <project-move-modal v-if="projectPageModelStore.state.moveModalVisible" />
-            <project-member-invite-modal v-if="projectPageModelStore.state.inviteMemberModalVisible" />
-            <project-tags-modal v-if="projectPageModelStore.state.manageTagsModalVisible" />
-
-            <project-create-modal v-if="projectPageModelStore.state.projectCreateModalVisible"
-                                  :target-parent-group-id="targetParentGroupId"
+            <project-group-member-management-modal />
+            <project-member-management-modal />
+            <project-delete-modal @deleted="handleDeleted" />
+            <project-move-modal />
+            <project-member-invite-modal />
+            <project-tags-modal />
+            <project-create-modal :target-parent-group-id="targetParentGroupId"
                                   @created="handleCreated"
             />
-            <project-rename-modal v-if="projectPageModelStore.state.projectRenameModalVisible" />
-            <project-edit-access-modal v-if="projectPageModelStore.state.projectEditAccessModalVisible" />
-
-            <project-group-create-modal v-if="projectPageModelStore.state.projectGroupCreateModalVisible"
-                                        :target-parent-group-id="targetParentGroupId"
+            <project-rename-modal />
+            <project-edit-access-modal />
+            <project-group-create-modal :target-parent-group-id="targetParentGroupId"
                                         @created="handleCreated"
             />
-            <project-group-rename-modal v-if="projectPageModelStore.state.projectGroupRenameModalVisible" />
-
-            <project-dashboard-folder-form-modal v-if="projectDashboardModalStore.state.folderFormModalVisible"
+            <project-group-rename-modal />
+        </template>
+        <template v-if="mounted">
+            <project-dashboard-folder-form-modal v-if="projectPageModelStore.state.folderFormModalVisible"
                                                  :project-group-or-project-id="props.projectGroupOrProjectId"
             />
-            <project-dashboard-name-edit-modal v-if="projectDashboardModalStore.state.dashboardNameEditModalVisible"
+            <project-dashboard-name-edit-modal v-if="projectPageModelStore.state.dashboardNameEditModalVisible"
                                                :project-group-or-project-id="props.projectGroupOrProjectId"
             />
-            <project-dashboard-change-folder-modal v-if="projectDashboardModalStore.state.dashboardChangeFolderModalVisible"
+            <project-dashboard-change-folder-modal v-if="projectPageModelStore.state.dashboardChangeFolderModalVisible"
                                                    :project-group-or-project-id="props.projectGroupOrProjectId"
             />
-            <project-dashboard-delete-modal v-if="projectDashboardModalStore.state.dashboardDeleteModalVisible"
+            <project-dashboard-delete-modal v-if="projectPageModelStore.state.dashboardDeleteModalVisible"
                                             :project-group-or-project-id="props.projectGroupOrProjectId"
             />
-            <project-dashboard-clone-modal v-if="projectDashboardModalStore.state.dashboardCloneModalVisible"
+            <project-dashboard-clone-modal v-if="projectPageModelStore.state.dashboardCloneModalVisible"
                                            :project-group-or-project-id="props.projectGroupOrProjectId"
-            />
-            <project-dashboard-edit-list-overlay v-if="projectDashboardModalStore.state.dashboardEditOverlayVisible"
-                                                 :project-group-or-project-id="props.projectGroupOrProjectId"
-            />
-            <project-dashboard-bundle-delete-modal v-if="projectDashboardModalStore.state.dashboardBundleDeleteModalVisible"
-                                                   :project-group-or-project-id="props.projectGroupOrProjectId"
-            />
-            <project-dashboard-bundle-move-modal v-if="projectDashboardModalStore.state.dashboardBundleMoveModalVisible"
-                                                 :project-group-or-project-id="props.projectGroupOrProjectId"
-            />
-            <project-dashboard-bundle-clone-modal v-if="projectDashboardModalStore.state.dashboardBundleCloneModalVisible"
-                                                  :project-group-or-project-id="props.projectGroupOrProjectId"
             />
         </template>
     </div>

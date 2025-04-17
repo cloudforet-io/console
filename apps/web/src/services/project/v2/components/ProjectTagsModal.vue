@@ -57,6 +57,7 @@ const tags = computed(() => {
     }
     return projectGroup.value?.tags ?? {};
 });
+const contextKey = computed(() => Object.entries(tags.value).join(', '));
 
 
 /* Form */
@@ -128,7 +129,8 @@ const handleSaveTags = async () => {
             <p class="text-paragraph-md text-gray-900 whitespace-pre-wrap">
                 {{ $t('PROJECT.DETAIL.UPDATE_TAG_DESC') }}
             </p>
-            <project-tags-input-group :tags="newTags"
+            <project-tags-input-group :key="`${targetId}-${contextKey}`"
+                                      :tags="newTags"
                                       :disabled="isLoading"
                                       show-validation
                                       :is-valid.sync="isTagsValid"
