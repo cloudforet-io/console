@@ -13,7 +13,7 @@ import type { ProjectChannelUpdateParameters } from '@/schema/notification/proje
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -30,11 +30,11 @@ type Emit<Data> = {
     (event: 'edit', value?: Data): void;
 };
 
-const globalConfigStore = useGlobalConfigStore();
-
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+
     const state = reactive({
-        visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleUserNotification ?? false),
+        visibleUserNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
         isEditMode: _state.isEditMode,
         dataForEdit: _state.dataForEdit,
         userChannelId: _state.userChannelId,

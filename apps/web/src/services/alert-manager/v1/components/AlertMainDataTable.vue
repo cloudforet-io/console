@@ -22,6 +22,8 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertListParameters, AlertListResponse } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -34,7 +36,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -63,6 +64,8 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 const router = useRouter();
 const route = useRoute();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const props = withDefaults(defineProps<{
@@ -487,7 +490,7 @@ initPage();
                     <template v-if="value">
                         <p-link action-icon="internal-link"
                                 new-tab
-                                :to="referenceRouter(value,{
+                                :to="getReferenceLocation(value,{
                                     resource_type: 'identity.Project',
                                     workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                                 })"

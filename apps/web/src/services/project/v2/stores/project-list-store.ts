@@ -2,6 +2,8 @@ import { computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+
 import type { ProjectGroupReferenceItem } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
@@ -75,6 +77,10 @@ export const useProjectListStore = defineStore('project-list', () => {
         };
     });
 
+    const syncProject = (project: ProjectModel) => {
+        projectReferenceStore.sync(project);
+    };
+
     return {
         isLoading,
         projectGroups,
@@ -84,5 +90,6 @@ export const useProjectListStore = defineStore('project-list', () => {
         getItemsByParentGroupId,
         getProjectsByGroupId,
         getProjectGroupsByParentId,
+        syncProject,
     };
 });

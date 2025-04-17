@@ -10,7 +10,7 @@ import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/cons
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 
 import { stateFormatter } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
 import type { ItemLayout } from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
@@ -26,6 +26,8 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
+
+const { referenceFieldFormatter } = useReferenceFieldFormatter();
 
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),

@@ -1,5 +1,11 @@
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -7,10 +13,12 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
 
-class AssetInventoryConfigurator implements FeatureConfiguratorType {
-    private version: 'V1' | 'V2' = 'V1';
+class AssetInventoryConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [
         {
             feature: 'ALERT_MANAGER',
             affects: [
@@ -22,7 +30,7 @@ class AssetInventoryConfigurator implements FeatureConfiguratorType {
         },
     ];
 
-    initialize(version: 'V1' | 'V2'): void {
+    initialize(version: FeatureVersion): void {
         this.version = version;
     }
 
@@ -34,7 +42,7 @@ class AssetInventoryConfigurator implements FeatureConfiguratorType {
         };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(): GeneratedMenuConfig {
         const baseMenu: Menu = {
             id: MENU_ID.ASSET_INVENTORY,
             needPermissionByRole: true,
@@ -65,6 +73,22 @@ class AssetInventoryConfigurator implements FeatureConfiguratorType {
             },
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 

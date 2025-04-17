@@ -20,13 +20,12 @@ import { useProjectPageModalStore } from '@/services/project/v2/stores/project-p
 
 
 const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => !!projectPageModalStore.state.manageMemberModalVisible
-    && projectPageModalStore.state.targetType === 'project'
-    && !!projectPageModalStore.state.targetId);
+const visible = computed(() => projectPageModalStore.state.projectMemberModalVisible);
+const targetId = computed(() => projectPageModalStore.state.targetId);
 
 /* project */
 const { data: project, setQueryData } = useProjectQuery({
-    projectId: computed(() => projectPageModalStore.state.targetId),
+    projectId: targetId,
     enabled: visible,
 });
 const projectType = computed<ProjectType|undefined>(() => project.value?.project_type);
@@ -77,17 +76,17 @@ const handleRemoveProjectUser = async (projectId: string, userId: string) => {
 };
 
 /* modal handling */
-const handleCloseMemberModal = () => {
-    projectPageModalStore.closeManageMemberModal();
+const handleCloseModal = () => {
+    projectPageModalStore.closeProjectMemberModal();
 };
 const triggerInvite = ref(false);
 const handleClickInvite = () => {
-    const projectId = projectPageModalStore.state.targetId as string;
+    const projectId = targetId.value as string;
     triggerInvite.value = true;
-    projectPageModalStore.closeManageMemberModal();
+    projectPageModalStore.closeProjectMemberModal();
     projectPageModalStore.openProjectInviteMemberModal(projectId);
 };
-const handleClosedMemberModal = () => {
+const handleClosedModal = () => {
     if (!triggerInvite.value) {
         projectPageModalStore.resetTarget();
     }
@@ -104,13 +103,13 @@ watch(visible, () => (v) => {
                     :visible="visible"
                     size="md"
                     hide-footer-close-button
-                    @close="projectPageModalStore.closeManageMemberModal"
-                    @cancel="projectPageModalStore.closeManageMemberModal"
-                    @closed="handleClosedMemberModal"
-                    @confirm="handleCloseMemberModal"
+                    @close="projectPageModalStore.closeProjectMemberModal"
+                    @cancel="projectPageModalStore.closeProjectMemberModal"
+                    @closed="handleClosedModal"
+                    @confirm="handleCloseModal"
     >
         <template #body>
-            <div v-if="projectPageModalStore.state.targetId"
+            <div v-if="targetId"
                  class="member-contents-wrapper"
             >
                 <div class="member-contents">
@@ -143,7 +142,7 @@ watch(visible, () => (v) => {
                                     <span>{{ getUserRole(userId) }}</span>
                                     <p-icon-button name="ic_delete"
                                                    size="sm"
-                                                   @click="handleRemoveProjectUser(projectPageModalStore.state.targetId, userId)"
+                                                   @click="handleRemoveProjectUser(targetId, userId)"
                                     />
                                 </div>
                             </div>

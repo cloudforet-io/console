@@ -12,12 +12,13 @@ import { SpaceRouter } from '@/router';
 import type { SecretModel } from '@/schema/secret/secret/model';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
 
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 
 import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 
@@ -43,6 +44,9 @@ const storeState = reactive({
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
+const { getReferenceLocation } = useReferenceRouter();
+const { referenceFieldFormatter } = useReferenceFieldFormatter();
+
 const state = reactive({
     attachedTrustedAccount: computed(() => {
         if (props.attachedTrustedAccountId) return storeState.trustedAccounts[props.attachedTrustedAccountId];
@@ -64,7 +68,7 @@ const state = reactive({
             key: 'schema_id', name: 'Secret Schema', type: 'text', options: { disable_copy: true },
         }];
         if (props.attachedTrustedAccountId) {
-            const link = SpaceRouter.router.resolve(referenceRouter(props.attachedTrustedAccountId, { resource_type: 'identity.ServiceAccount' })).href;
+            const link = SpaceRouter.router.resolve(getReferenceLocation(props.attachedTrustedAccountId, { resource_type: 'identity.ServiceAccount' })).href;
             fields.push({
                 key: 'trusted_secret_id',
                 name: 'Trusted Account',

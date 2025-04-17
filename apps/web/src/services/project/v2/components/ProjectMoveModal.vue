@@ -132,6 +132,9 @@ watch([visible, () => state.originParentGroupId], ([v, _id]) => {
                     @closed="projectPageModalStore.resetTarget()"
                     @confirm="handleConfirm"
     >
+        <template #confirm-button>
+            {{ $t('PROJECT.LANDING.MOVE') }}
+        </template>
         <template #body>
             <p-radio-group direction="vertical">
                 <p-radio :value="true"

@@ -93,11 +93,12 @@ watch(() => props.selectedPaths, (paths) => {
                      @update:expanded="expandedMap[item.key] = $event"
         >
             <template #action="{ id, hasChildren }">
-                <favorite-button :item-id="id"
-                                 :favorite-type="hasChildren ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.PROJECT"
-                                 scale="0.8"
-                                 class="favorite-button"
-                />
+                <div class="flex items-center justify-center w-6 h-6 rounded-md border border-gray-100 bg-white shadow-md">
+                    <favorite-button :item-id="id"
+                                     :favorite-type="hasChildren ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.PROJECT"
+                                     scale="0.8"
+                    />
+                </div>
             </template>
             <template #children="node">
                 <project-l-s-b-tree :parent-group-id="node.id"
@@ -109,41 +110,3 @@ watch(() => props.selectedPaths, (paths) => {
     </div>
 </template>
 
-<style scoped lang="postcss">
-.project-main-tree {
-    width: 100%;
-    .project-menu-item-content {
-        @apply flex items-center justify-between w-full;
-        height: 2rem;
-        .contents-wrapper {
-            @apply flex items-center gap-1 w-full;
-
-            .project-icon {
-                min-width: 0.875rem;
-            }
-            .text {
-                @apply text-label-md text-gray-900;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
-
-        .favorite-button {
-            display: none;
-            min-width: 1.5rem;
-            height: 1rem;
-            padding-left: 0.5rem;
-        }
-
-        &:hover {
-            .contents-wrapper {
-                width: calc(100% - 1.5rem);
-            }
-            .favorite-button {
-                display: block;
-            }
-        }
-    }
-}
-</style>

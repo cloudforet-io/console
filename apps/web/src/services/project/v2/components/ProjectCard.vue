@@ -107,7 +107,10 @@ const { isEllipsis } = useTextEllipsis({ textEl });
                     <template v-for="(provider, index) in props.serviceAccountProviderList">
                         <router-link v-if="index < 5"
                                      :key="index"
-                                     :to="{name: SERVICE_ACCOUNT_ROUTE._NAME,query: { provider: getProvider(provider) ? provider : null },}"
+                                     :to="{
+                                         name: SERVICE_ACCOUNT_ROUTE._NAME,
+                                         query: { provider: getProvider(provider) ? provider : null }
+                                     }"
                                      class="flex-shrink-0 inline-block w-4 h-4 bg-no-repeat bg-[length:100%] bg-center hover:opacity-50 mr-[0.37rem]"
                                      :style="{backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`}"
                                      @click.native.stop.prevent

@@ -1,7 +1,5 @@
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
-
 import type {
     PageAccessMap,
 } from '@/lib/access-control/config';
@@ -46,11 +44,18 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-export const getPageAccessMapFromRawData = (pageAccessPermissions?: string[], isRolePage?: boolean): PageAccessMap => {
+export const getPageAccessMapFromRawData = ({
+    pageAccessPermissions,
+    isRolePage,
+    menuList,
+}: {
+    pageAccessPermissions?: string[],
+    isRolePage?: boolean,
+    menuList?: Menu[],
+}): PageAccessMap => {
     const globalConfig = config.get('SERVICES') || {};
-    const globalConfigStore = useGlobalConfigStore();
     const result: PageAccessMap = {};
-    const menuListByVersion = !isRolePage ? globalConfigStore.getters.menuList : getEnabledMenus(globalConfig);
+    const menuListByVersion = !isRolePage ? (menuList || []) : getEnabledMenus(globalConfig);
     const flattenedMenuList = flattenMenu(menuListByVersion);
     const setPermissions = (id: string, read = true, write = true, access = true) => {
         result[id] = { read, write, access };

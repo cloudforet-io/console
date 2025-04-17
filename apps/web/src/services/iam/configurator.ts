@@ -1,5 +1,11 @@
 import type {
-    FeatureConfiguratorType, FeatureMenuConfig, FeatureRouteConfig, FeatureUiAffect,
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
     GlobalServiceConfig,
 } from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
@@ -8,12 +14,14 @@ import { MENU_ID } from '@/lib/menu/config';
 import adminIamRoutes from '@/services/iam/routes/admin/routes';
 import iamRoutes from '@/services/iam/routes/routes';
 
-class IamConfigurator implements FeatureConfiguratorType {
-    private version: 'V1' | 'V2' = 'V1';
+class IamConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [];
+    private routeMetadata: GeneratedRouteMetadata = {};
 
-    initialize(version: 'V1' | 'V2'): void {
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
+
+    initialize(version: FeatureVersion): void {
         this.version = version;
     }
 
@@ -25,7 +33,7 @@ class IamConfigurator implements FeatureConfiguratorType {
         };
     }
 
-    getMenu(config?: GlobalServiceConfig): FeatureMenuConfig {
+    getMenu(config?: GlobalServiceConfig): GeneratedMenuConfig {
         const alertManagerVersion = config?.ALERT_MANAGER?.VERSION;
         const baseMenu: Menu = {
             id: MENU_ID.IAM,
@@ -61,6 +69,22 @@ class IamConfigurator implements FeatureConfiguratorType {
             },
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 

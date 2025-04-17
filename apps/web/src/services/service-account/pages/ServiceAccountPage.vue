@@ -43,8 +43,8 @@ import type { PageAccessMap } from '@/lib/access-control/config';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
+import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import AutoSyncState from '@/common/components/badge/auto-sync-state/AutoSyncState.vue';
@@ -86,6 +86,7 @@ const userStore = useUserStore();
 
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { referenceFieldFormatter } = useReferenceFieldFormatter();
 
 
 const storeState = reactive({

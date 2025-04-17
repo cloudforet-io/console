@@ -7,6 +7,7 @@ import { PLink, PScopedNotification } from '@cloudforet/mirinae';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,14 +27,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userStore = useUserStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
-    budgetData: computed<BudgetModel | null>(() => budgetPageState.budgetData),
-    isWorkspaceTarget: computed<boolean>(
-        () => state.budgetData?.resource_group === 'WORKSPACE',
-    ),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
+    visibleBudgetNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleBudgetNotification ?? false),
+    isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
     adminModeLink: computed<Location>(() => ({
         name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
         params: {

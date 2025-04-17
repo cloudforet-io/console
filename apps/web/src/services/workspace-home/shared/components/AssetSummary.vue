@@ -50,8 +50,8 @@ const storeState = reactive({
 const state = reactive({
     isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
     isNoServiceAccounts: computed<boolean>(() => !Object.keys(storeState.serviceAccounts).length),
-    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
-    writableServiceCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR].write),
+    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
+    writableServiceCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR]?.write),
     emptyData: computed<EmptyData>(() => {
         let result;
         if (state.isNoServiceAccounts) {

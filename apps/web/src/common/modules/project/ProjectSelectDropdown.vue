@@ -27,8 +27,7 @@ import { useProjectTree } from '@/common/modules/project/use-project-tree';
 
 import { indigo, peacock } from '@/styles/colors';
 
-
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface ProjectGroupSelectOptions {
     id: string;
@@ -84,6 +83,7 @@ const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -257,7 +257,7 @@ const refreshProjectTree = async () => {
 
 const handleClickCreateButton = () => {
     window.open(SpaceRouter.router.resolve({
-        name: PROJECT_ROUTE_V1._NAME,
+        name: PROJECT_ROUTE_V2._NAME,
         ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
     }).href);
     state.visibleMenu = false;

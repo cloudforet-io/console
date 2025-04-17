@@ -6,11 +6,10 @@ import {
     PTextButton, PI, PLink, PSkeleton,
 } from '@cloudforet/mirinae';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
-
-
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = defineProps<{
     projectId: string;
@@ -21,16 +20,11 @@ const props = defineProps<{
 const emit = defineEmits<{(event: 'click'): void;
 }>();
 const projectReferenceStore = useProjectReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const hasProjectReferenceLoaded = computed<boolean>(() => !!projectReferenceStore.getters.projectItems);
-const projectPageLocation = computed<Location>(() => ({
-    name: PROJECT_ROUTE_V1.DETAIL._NAME,
-    params: {
-        workspaceId: userWorkspaceStore.getters.currentWorkspaceId as string,
-        id: props.projectId,
-    },
-}));
+const projectPageLocation = computed<Location>(() => getReferenceLocation(props.projectId, { resource_type: 'identity.Project' }));
 const getProjectName = (projectId: string): string|undefined => projectReferenceStore.getters.projectItems[projectId]?.label;
 </script>
 

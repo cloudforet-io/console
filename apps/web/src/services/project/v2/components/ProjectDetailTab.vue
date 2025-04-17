@@ -83,13 +83,11 @@ const tabs = computed<TabItem[]>(() => {
         icon: 'ic_service_dashboard',
     })) ?? [];
     return [
-        { name: 'overview', label: i18n.t('PROJECT.LANDING.OVERVIEW') },
+        ...((props.projectGroupId || props.projectId) ? [{ name: 'overview', label: i18n.t('PROJECT.LANDING.OVERVIEW') }] : []),
         ...folderTabs,
         ...dashboardTabs,
     ];
 });
-// HACK: To trigger render tab on mounted, to trigger render on i18n change
-const tabNamesKey = computed(() => tabs.value.map((tab) => tab.label).join(','));
 
 const handleUpdateActiveTab = (tab: string) => {
     activeTab.value = tab;
@@ -131,7 +129,7 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
 
 <template>
     <div>
-        <p-tab :key="`${props.projectId}-${tabNamesKey}`"
+        <p-tab :key="`tab-${props.projectGroupId ?? props.projectId}`"
                :tabs="tabs"
                :active-tab="activeTab"
                @update:active-tab="handleUpdateActiveTab"
@@ -140,11 +138,12 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
                 <div>
                     <keep-alive>
                         <project-overview v-if="activeTab === 'overview'"
+                                          :key="`${props.projectGroupId ?? props.projectId}-${activeTab}`"
                                           :project-group-id="props.projectGroupId"
                                           :project-id="props.projectId"
                         />
                         <project-dashboard v-else
-                                           :key="`${props.projectId}-${activeTab}`"
+                                           :key="`${props.projectGroupId ?? props.projectId}-${activeTab}`"
                                            :project-id="props.projectId"
                                            :project-group-id="props.projectGroupId"
                                            :dashboard-id="activeTab"

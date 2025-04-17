@@ -11,6 +11,7 @@ import type {
     TreeNodeDisplayType, TreeNodeIcon, TreeNodeLink,
 } from '@/data-display/tree/new-tree/type';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useTextEllipsis } from '@/hooks/use-text-ellipsis/use-text-ellipsis';
 
@@ -101,12 +102,17 @@ const slotProps = computed(() => ({
     isSelected,
     isEllipsis,
 }));
+
+const handleClick = () => {
+    if (props.link) return;
+    isSelected.value = !isSelected.value;
+};
 </script>
 
 <template>
     <div class="p-tree-node">
         <div class="tree-node-wrapper"
-             :class="{'selected': isSelected, 'selectable': props.selectable }"
+             :class="{'selected': isSelected, 'selectable': props.selectable, 'draggable': props.draggable}"
              @mouseenter="hoveredItem = props.id"
              @mouseleave="hoveredItem = ''"
         >
@@ -114,7 +120,8 @@ const slotProps = computed(() => ({
                        class="node-outer-container"
                        :target="target"
                        :to="to"
-                       @click.native="$event.stopImmediatePropagation()"
+                       @click.native.prevent="handleClick"
+                       @click.prevent="handleClick"
             >
                 <div v-for="dep in depthArray"
                      :key="`depth-${dep}`"
@@ -134,15 +141,22 @@ const slotProps = computed(() => ({
                 <div v-if="enableToggle"
                      class="toggle-container"
                 >
-                    <p-i v-if="showToggle"
-                         name="ic_chevron-down"
-                         width="1rem"
-                         height="1rem"
-                         color="inherit transparent"
-                         class="toggle-button"
-                         :class="{ 'is-collapsed': !isExpanded }"
-                         @click.prevent="isExpanded = !isExpanded"
-                    />
+                    <template v-if="showToggle">
+                        <p-spinner v-if="props.loading"
+                                   size="xs"
+                                   style-type="gray"
+                                   class="toggle-button"
+                        />
+                        <p-i v-else
+                             name="ic_chevron-down"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit transparent"
+                             class="toggle-button"
+                             :class="{ 'is-collapsed': !isExpanded }"
+                             @click.prevent="isExpanded = !isExpanded"
+                        />
+                    </template>
                 </div>
                 <div class="node-inner-container">
                     <p-i v-if="iconName"
@@ -166,11 +180,7 @@ const slotProps = computed(() => ({
                     >
                         <p-tooltip :key="`${props.id}-tooltip-${isEllipsis}`"
                                    position="bottom-start"
-                                   :contents="props.name"
-                                   :options="{
-                                       trigger: 'manual',
-                                       show: isHovered && isEllipsis,
-                                   }"
+                                   :contents="isHovered && isEllipsis ? props.name : ''"
                         >
                             <slot v-bind="slotProps">
                                 {{ props.name }}
@@ -206,7 +216,10 @@ const slotProps = computed(() => ({
 <style lang="postcss">
 .p-tree-node {
     > .tree-node-wrapper {
-        @apply relative cursor-move border border-transparent outline-none rounded-md text-label-md;
+        @apply relative border border-transparent outline-none rounded-md text-label-md;
+        &.draggable {
+            @apply cursor-move;
+        }
         &.selectable {
             &:focus {
                 @apply bg-white border-secondary1;

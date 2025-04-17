@@ -14,7 +14,9 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useServiceRouter } from '@/router/helpers/use-service-router';
+
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -43,7 +45,6 @@ import BoardTaskTable from '@/services/ops-flow/components/BoardTaskTable.vue';
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 interface Props {
     tableState: any;
@@ -61,15 +62,16 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const router = useRouter();
+const serviceRouter = useServiceRouter(router);
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
 
 /* Tabs */
 const state = reactive({
-    visibleAlertTab: computed(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleAssetAlertTab),
+    visibleAlertTab: computed(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAssetAlertTab),
 });
 const singleItemTabState = reactive({
     tabs: computed(() => {
@@ -130,8 +132,9 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
             ErrorHandler.handleRequestError(e, e.message);
         }
     } else {
-        window.open(router.resolve({
-            name: PROJECT_ROUTE_V1.DETAIL._NAME,
+        window.open(serviceRouter.resolve({
+            feature: MENU_ID.PROJECT,
+            routeKey: 'detail',
             params: { id, workspaceId },
         }).href, '_blank');
     }

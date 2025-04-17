@@ -11,14 +11,13 @@ import {
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 import { gray } from '@/styles/colors';
 
@@ -32,6 +31,8 @@ const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const costTypeWrapperRef = ref<HTMLElement|null>(null);
 const costTypeRef = ref<HTMLElement|null>(null);
@@ -65,7 +66,7 @@ const state = reactive({
     }),
     targetLocation: computed<Location|undefined>(() => {
         if (state.isProjectTarget) {
-            return referenceRouter(
+            return getReferenceLocation(
                 state.budgetData?.project_id,
                 {
                     resource_type: 'identity.Project',

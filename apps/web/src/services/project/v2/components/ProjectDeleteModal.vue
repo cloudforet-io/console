@@ -110,6 +110,7 @@ const deleteProjectGroup = async (projectGroupId: string) => {
     <delete-modal :header-title="state.title"
                   :visible="visible"
                   :loading="state.loading"
+                  :confirm-text="$t('PROJECT.LANDING.DELETE')"
                   @close="projectPageModalStore.closeDeleteModal"
                   @cancel="projectPageModalStore.closeDeleteModal"
                   @closed="projectPageModalStore.resetTarget"
