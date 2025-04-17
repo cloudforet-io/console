@@ -30,6 +30,9 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { DASHBOARD_CONTROL_MENU_ACTION_TYPES } from '@/services/_shared/dashboard/core/constants/dashboard-control-menu-constant';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import type { DashboardControlActionType } from '@/services/_shared/dashboard/core/types/dashboard-control-menu-type';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
@@ -113,8 +116,8 @@ const state = reactive({
         const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
         return {
             clone: _selectedPublicIdList.length === 0,
-            move: isPublicControlButtonDisabled(state.publicDashboardItems, dashboardPageControlState.selectedPublicIdMap),
-            delete: isPublicControlButtonDisabled(state.publicDashboardItems, dashboardPageControlState.selectedPublicIdMap),
+            move: isPublicControlButtonDisabled(state.publicDashboardItems, state.publicFolderItems, dashboardPageControlState.selectedPublicIdMap),
+            delete: isPublicControlButtonDisabled(state.publicDashboardItems, state.publicFolderItems, dashboardPageControlState.selectedPublicIdMap),
         };
     }),
     privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
@@ -211,6 +214,14 @@ const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Re
     } else {
         dashboardPageControlStore.setSelectedPrivateIdMap(selectedIdMap);
     }
+};
+const handleSelectControlActions = (type: DashboardControlActionType, id: string) => {
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.EDIT) dashboardPageControlStore.openEditNameModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.CLONE) dashboardPageControlStore.openCloneModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.MOVE) dashboardPageControlStore.openMoveModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.SHARE) dashboardPageControlStore.openShareModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.SHARE_WITH_CODE) dashboardPageControlStore.openShareWithCodeModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.DELETE) dashboardPageControlStore.openDeleteModal(id);
 };
 
 /* init */
@@ -348,14 +359,16 @@ onUnmounted(() => {
                                              :is-collapsed.sync="state.treeCollapseMap.public"
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
+                                       :entry-point="DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS"
                                        :selected-id-map="dashboardPageControlState.selectedPublicIdMap"
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        :show-control-buttons="!storeState.isWorkspaceMember"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
-                                       @click-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
-                                       @click-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
-                                       @click-move="dashboardPageControlStore.openBundleMoveModal('PUBLIC')"
+                                       @click-control-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
+                                       @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
+                                       @click-control-move="dashboardPageControlStore.openBundleMoveModal('PUBLIC')"
+                                       @select-control-actions="handleSelectControlActions"
                 />
             </div>
             <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
@@ -365,14 +378,16 @@ onUnmounted(() => {
                                              :is-collapsed.sync="state.treeCollapseMap.private"
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
+                                       :entry-point="DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS"
                                        :selected-id-map="dashboardPageControlState.selectedPrivateIdMap"
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="state.privateTreeControlButtonDisableMap"
                                        show-control-buttons
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
-                                       @click-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
-                                       @click-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"
-                                       @click-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
+                                       @click-control-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
+                                       @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"
+                                       @click-control-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
+                                       @select-control-actions="handleSelectControlActions"
                 />
             </div>
             <dashboard-main-board-list v-if="state.deprecatedDashboardItems.length"

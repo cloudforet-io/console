@@ -27,16 +27,16 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectPageContext } from '@/services/project/v2/composables/use-proejct-page-context';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 interface Props {
     projectGroupOrProjectId?: string;
 }
 const props = defineProps<Props>();
 
-const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.folderFormModalVisible);
-const targetFolderId = computed(() => projectPageModalStore.state.targetId);
+const projectDashboardModalStore = useProjectDashboardModalStore();
+const visible = computed(() => projectDashboardModalStore.state.folderFormModalVisible);
+const targetFolderId = computed(() => projectDashboardModalStore.state.targetId);
 const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
 const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
 const userStore = useUserStore();
@@ -108,7 +108,7 @@ const { mutate: createFolder } = useMutation(
         mutationFn: (params: PublicFolderCreateParameters) => publicFolderAPI.create(params as PublicFolderCreateParameters),
         onSuccess: (folder: PublicFolderModel) => {
             showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
-            projectPageModalStore.closeFolderFormModal();
+            projectDashboardModalStore.closeFolderFormModal();
             setQueryData([folder]);
         },
         onError: (e) => {
@@ -122,7 +122,7 @@ const { mutate: updateFolder } = useMutation(
         mutationFn: (params: PublicFolderUpdateParameters) => publicFolderAPI.update(params as PublicFolderUpdateParameters),
         onSuccess: () => {
             showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_UPDATE_FOLDER'), '');
-            projectPageModalStore.closeFolderFormModal();
+            projectDashboardModalStore.closeFolderFormModal();
             invalidateAllQueries();
         },
         onError: (e) => {
@@ -143,7 +143,7 @@ watch(visible, (_visible) => {
     if (folder) {
         setForm('name', folder.name);
     }
-});
+}, { immediate: true });
 
 </script>
 
@@ -156,9 +156,9 @@ watch(visible, (_visible) => {
         :visible.sync="visible"
         :disabled="!isAllValid"
         @confirm="handleFormConfirm"
-        @closed="projectPageModalStore.resetTarget"
-        @cancel="projectPageModalStore.closeFolderFormModal"
-        @close="projectPageModalStore.closeFolderFormModal"
+        @closed="projectDashboardModalStore.resetTarget"
+        @cancel="projectDashboardModalStore.closeFolderFormModal"
+        @close="projectDashboardModalStore.closeFolderFormModal"
     >
         <template #body>
             <p-field-group class="folder-name-input-wrapper"

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PTab, PSelectDropdown } from '@cloudforet/mirinae';
+import { PTab, PSelectDropdown, PIconButton } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
@@ -16,7 +16,7 @@ import ProjectOverview from '@/services/project/v2/components/ProjectOverview.vu
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 const props = defineProps<{
     projectId?: string,
@@ -25,7 +25,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{(e: 'update:dashboard-id', value?: string): void;}>();
 const router = useRouter();
-const projectPageModalStore = useProjectPageModalStore();
+const projectDashboardModalStore = useProjectDashboardModalStore();
 
 const activeTab = ref('overview');
 watch(() => props.dashboardId, (did) => {
@@ -121,8 +121,12 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
             },
         }).catch(() => {});
     } else if (item === 'folder') {
-        projectPageModalStore.openCreateFolderFormModal();
+        projectDashboardModalStore.openCreateFolderFormModal();
     }
+};
+
+const handleOpenDashboardEditOverlay = () => {
+    projectDashboardModalStore.openDashboardEditOverlay();
 };
 
 </script>
@@ -154,13 +158,21 @@ const handleCreateProjectDashboard = (item: string|number|SelectDropdownMenuItem
             <template v-if="props.projectId || props.projectGroupId"
                       #header-right-contents
             >
-                <p-select-dropdown style-type="tertiary-icon-button"
-                                   button-icon="ic_plus"
+                <div class="flex items-center gap-1">
+                    <p-select-dropdown style-type="tertiary-icon-button"
+                                       button-icon="ic_plus"
+                                       size="sm"
+                                       menu-position="right"
+                                       :menu="projectDashboardCreateMenuItems"
+                                       @select="handleCreateProjectDashboard"
+                    />
+                    <p-icon-button name="ic_edit"
                                    size="sm"
-                                   menu-position="right"
-                                   :menu="projectDashboardCreateMenuItems"
-                                   @select="handleCreateProjectDashboard"
-                />
+                                   style-type="tertiary"
+                                   shape="square"
+                                   @click="handleOpenDashboardEditOverlay"
+                    />
+                </div>
             </template>
         </p-tab>
     </div>

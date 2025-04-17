@@ -22,16 +22,16 @@ import { useProjectDashboardQuery } from '@/services/project/v2/composables/quer
 import { useProjectPageContext } from '@/services/project/v2/composables/use-proejct-page-context';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 interface Props {
     projectGroupOrProjectId: string;
 }
 const props = defineProps<Props>();
 const router = useRouter();
-const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.dashboardCloneModalVisible);
-const dashboardId = computed(() => projectPageModalStore.state.targetId);
+const projectDashboardModalStore = useProjectDashboardModalStore();
+const visible = computed(() => projectDashboardModalStore.state.dashboardCloneModalVisible);
+const dashboardId = computed(() => projectDashboardModalStore.state.targetId);
 const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
 const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
 
@@ -94,7 +94,7 @@ const handleConfirm = async () => {
 const { mutate: cloneDashboard, isPending: dashboardCloneLoading } = useDashboardCloneMutation({
     onSuccess: async (data: DashboardModel) => {
         setQueryData([data as PublicDashboardModel]);
-        projectPageModalStore.closeDashboardCloneModal();
+        projectDashboardModalStore.closeDashboardCloneModal();
         await router.replace({
             name: PROJECT_ROUTE_V2._NAME,
             params: {
@@ -124,9 +124,9 @@ watch(visible, (_visible) => {
                     :loading="dashboardCloneLoading"
                     class="dashboard-clone-modal"
                     @confirm="handleConfirm"
-                    @close="projectPageModalStore.closeDashboardCloneModal"
-                    @cancel="projectPageModalStore.closeDashboardCloneModal"
-                    @closed="projectPageModalStore.resetTarget"
+                    @close="projectDashboardModalStore.closeDashboardCloneModal"
+                    @cancel="projectDashboardModalStore.closeDashboardCloneModal"
+                    @closed="projectDashboardModalStore.resetTarget"
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"

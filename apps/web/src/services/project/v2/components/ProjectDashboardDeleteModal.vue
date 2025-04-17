@@ -13,16 +13,16 @@ import { useDashboardDeleteMutation } from '@/services/_shared/dashboard/core/co
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 interface Props {
     projectGroupOrProjectId: string;
 }
 const props = defineProps<Props>();
 const router = useRouter();
-const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.dashboardDeleteModalVisible);
-const dashboardId = computed(() => projectPageModalStore.state.targetId);
+const projectDashboardModalStore = useProjectDashboardModalStore();
+const visible = computed(() => projectDashboardModalStore.state.dashboardDeleteModalVisible);
+const dashboardId = computed(() => projectDashboardModalStore.state.targetId);
 const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
 const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
 /* Query */
@@ -46,7 +46,7 @@ const handleDeleteDashboardConfirm = async () => {
 const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteMutation({
     onSuccess: async () => {
         invalidateDashboardList();
-        projectPageModalStore.closeDashboardDeleteModal();
+        projectDashboardModalStore.closeDashboardDeleteModal();
         await router.replace({
             name: PROJECT_ROUTE_V2._NAME,
             params: {
@@ -66,8 +66,8 @@ const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteMutati
                   :visible="visible"
                   :loading="loading"
                   @confirm="handleDeleteDashboardConfirm"
-                  @closed="projectPageModalStore.resetTarget"
-                  @cancel="projectPageModalStore.closeDashboardDeleteModal"
-                  @close="projectPageModalStore.closeDashboardDeleteModal"
+                  @closed="projectDashboardModalStore.resetTarget"
+                  @cancel="projectDashboardModalStore.closeDashboardDeleteModal"
+                  @close="projectDashboardModalStore.closeDashboardDeleteModal"
     />
 </template>
