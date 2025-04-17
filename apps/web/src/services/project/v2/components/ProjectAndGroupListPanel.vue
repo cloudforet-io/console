@@ -71,19 +71,19 @@ const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccoun
 
 <template>
     <p-pane-layout class="p-4">
-        <div class="flex justify-between items-center flex-wrap">
+        <div class="flex justify-between items-center flex-wrap gap-2">
             <div class="flex items-center gap-[2px]">
                 <p-i :name="isCollapsed ? 'ic_chevron-right' : 'ic_chevron-down'"
                      width="1.5rem"
                      height="1.5rem"
-                     class="cursor-pointer"
+                     class="cursor-pointer flex-shrink-0"
                      @click="isCollapsed = !isCollapsed"
                 />
                 <div class="text-label-lg font-medium">
                     {{ $t('PROJECT.LADING.GROUPS_AND_PROJECTS') }}
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="grow flex flex-wrap justify-end items-center gap-2">
                 <p-button icon-left="ic_plus"
                           style-type="tertiary"
                           size="md"
