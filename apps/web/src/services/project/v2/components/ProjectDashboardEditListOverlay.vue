@@ -206,9 +206,9 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
     }
     if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.CLONE) {
         if (id.includes('folder')) {
-            projectDashboardModalStore.openDashboardCloneModal(id);
+            projectDashboardModalStore.openDashboardBundleCloneModal(id);
         } else {
-            projectDashboardModalStore.openDashboardBundleCloneModal();
+            projectDashboardModalStore.openDashboardCloneModal(id);
         }
     }
     if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.MOVE) projectDashboardModalStore.openDashboardChangeFolderModal(id);
