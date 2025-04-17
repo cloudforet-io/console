@@ -12,7 +12,7 @@ import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/
 import DashboardDetailLayout from '@/services/_shared/dashboard/dashboard-detail/DashboardDetailLayout.vue';
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 interface Props {
     projectId?: string;
@@ -21,7 +21,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const projectPageModalStore = useProjectPageModalStore();
+const projectDashboardModalStore = useProjectDashboardModalStore();
 /* Query */
 const {
     dashboardList,
@@ -43,10 +43,10 @@ const dashboardItems = computed<Array<DashboardModel>>(() => [...dashboardShared
 const dashboardFolderItems = computed<Array<DashboardFolderModel>>(() => [...dashboardFolderSharedList.value, ...dashboardFolderList.value]);
 
 const handleSelectToolset = (toolsetId: string|undefined) => {
-    if (toolsetId === 'edit') projectPageModalStore.openDashboardNameEditModal(props.dashboardId);
-    if (toolsetId === 'move') projectPageModalStore.openDashboardChangeFolderModal(props.dashboardId);
-    if (toolsetId === 'delete') projectPageModalStore.openDashboardDeleteModal(props.dashboardId);
-    if (toolsetId === 'clone') projectPageModalStore.openDashboardCloneModal(props.dashboardId);
+    if (toolsetId === 'edit') projectDashboardModalStore.openDashboardNameEditModal(props.dashboardId);
+    if (toolsetId === 'move') projectDashboardModalStore.openDashboardChangeFolderModal(props.dashboardId);
+    if (toolsetId === 'delete') projectDashboardModalStore.openDashboardDeleteModal(props.dashboardId);
+    if (toolsetId === 'clone') projectDashboardModalStore.openDashboardCloneModal(props.dashboardId);
 };
 </script>
 

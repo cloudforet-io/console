@@ -27,6 +27,7 @@ import { useDashboardShareMutation } from '@/services/_shared/dashboard/core/com
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -49,6 +50,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardTreeControlStore = useDashboardTreeControlStore();
 
 /* Query */
 const {
@@ -198,6 +200,7 @@ const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFold
     },
     onSettled: () => {
         dashboardPageControlStore.reset();
+        dashboardTreeControlStore.reset();
         state.proxyVisible = false;
     },
 });
@@ -216,6 +219,7 @@ const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useDashboa
     },
     onSettled: () => {
         dashboardPageControlStore.reset();
+        dashboardTreeControlStore.reset();
         state.proxyVisible = false;
     },
 });

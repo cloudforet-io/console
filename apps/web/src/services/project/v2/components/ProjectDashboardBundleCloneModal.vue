@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, ref,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -16,20 +17,16 @@ import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type {
     DashboardCreateParams,
     DashboardModel,
-    DashboardType,
 } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { FolderCreateParams, FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
-import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
-import type { PrivateFolderCreateParameters } from '@/api-clients/dashboard/private-folder/schema/api-verbs/create';
-import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
+import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
+import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/create';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -38,22 +35,19 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
 import { getSharedDashboardLayouts } from '@/services/_shared/dashboard/core/helpers/dashboard-layout-template-helper';
-import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
-
-
-
+import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
+import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
+import { useProjectPageContext } from '@/services/project/v2/composables/use-proejct-page-context';
+import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 /* Modal Cases
-* Single Case: If props.folderId exists, clone single folder
 * Multiple Case: Otherwise, clone multiple folders (get selected data from dashboardPageControlGetters)
 */
 
@@ -67,83 +61,61 @@ import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboa
 const CLONE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
     { name: 'location', label: 'Location' },
-    { name: 'private', label: 'Make Private' },
 ];
 interface FolderStructureRadioItem {
     name: string;
     label: TranslateResult;
 }
 interface Props {
-    visible?: boolean;
-    folderId?: string;
+    projectGroupOrProjectId?: string;
 }
-const props = withDefaults(defineProps<Props>(), {
-    visible: false,
-    folderId: undefined,
-});
-const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
-}>();
-const appContextStore = useAppContextStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
+const props = defineProps<Props>();
+
+const projectDashboardModalStore = useProjectDashboardModalStore();
+const projectDashboardModalState = projectDashboardModalStore.state;
 const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
+const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
+const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
+const projectPageContext = useProjectPageContext({
+    projectGroupId,
+    projectId,
+});
 const userStore = useUserStore();
 const allReferenceStore = useAllReferenceStore();
-const { privateWidgetAPI } = usePrivateWidgetApi();
+const { publicDashboardAPI } = usePublicDashboardApi();
+const { publicFolderAPI } = usePublicFolderApi();
 const { publicWidgetAPI } = usePublicWidgetApi();
 
+const visible = computed(() => projectDashboardModalState.dashboardBundleCloneModalVisible);
+const loading = ref(false);
 /* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-    api,
-    keys: dashboardKeys,
-} = useDashboardQuery();
+    dashboardList,
+    invalidateAllQueries: invalidateDashboardList,
+} = useProjectDashboardQuery({
+    projectGroupId,
+    projectId,
+});
 const {
-    publicFolderList,
-    privateFolderList,
-    keys: folderKeys,
-} = useDashboardFolderQuery();
-const queryClient = useQueryClient();
-
+    dashboardFolderList,
+    invalidateAllQueries: invalidateDashboardFolderList,
+} = useProjectDashboardFolderQuery({
+    projectGroupId,
+    projectId,
+});
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     userId: computed<string|undefined>(() => userStore.state.userId),
 });
 
-const queryState = reactive({
-    publicDashboardItems: computed(() => {
-        const _v2DashboardItems = publicDashboardList.value.filter((d) => d.version !== '1.0');
-        if (storeState.isAdminMode) return _v2DashboardItems;
-        return _v2DashboardItems.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateDashboardItems: computed(() => privateDashboardList.value.filter((d) => d.version !== '1.0')),
-    allDashboardItems: computed(() => [...queryState.publicDashboardItems, ...queryState.privateDashboardItems]),
-    publicFolderItems: computed(() => {
-        if (storeState.isAdminMode) return publicFolderList.value;
-        return publicFolderList.value.filter((d) => !(d.resource_group === 'DOMAIN' && !!d.shared && d.scope === 'PROJECT'));
-    }),
-    privateFolderItems: computed(() => privateFolderList.value),
-    allFolderItems: computed(() => [...queryState.publicFolderItems, ...queryState.privateFolderItems]),
-});
 
 const state = reactive({
     loading: false,
-    proxyVisible: useProxyValue<boolean>('visible', props, emit),
     privateMap: {} as Record<string, boolean>, // NOTE: only for maintaining the structure
     tableFields: computed<DataTableFieldType[]>(() => {
         let _results = cloneDeep(CLONE_TABLE_FIELDS);
-        if (storeState.isAdminMode || storeState.isWorkspaceMember) {
-            _results = _results.filter((f) => f.name !== 'private');
-        }
-        // 2.2. Select Existing Folder
-        if (state.changeFolderStructure && state.selectedFolderStructure === 'select_folder') {
-            _results = _results.filter((f) => f.name !== 'private');
-        }
-        // 2.3. No Parent Folder
+        // No Parent Folder
         if (state.changeFolderStructure && state.selectedFolderStructure === 'no_folder') {
             _results = _results.filter((f) => f.name !== 'location');
         }
@@ -152,28 +124,19 @@ const state = reactive({
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
         // 1. Use Existing Folder Structure
         if (!state.changeFolderStructure) {
-            let _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
-            if (props.folderId) {
-                const _childrenIdList = queryState.allDashboardItems.filter((d) => d.folder_id === props.folderId);
-                _selectedIdMap = {
-                    [props.folderId]: true,
-                    ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
-                };
-            } else if (dashboardPageControlState.folderModalType === 'PRIVATE') {
-                _selectedIdMap = dashboardTreeControlState.selectedPrivateIdMap;
-            }
-            return getSelectedDataTableItems(queryState.allFolderItems, queryState.allDashboardItems, _selectedIdMap);
+            const _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
+            return getSelectedDataTableItems(dashboardFolderList.value, dashboardList.value, _selectedIdMap);
         }
 
         // 2. Change Folder Structure
         let _targetDashboardList: DashboardModel[] = [];
-        if (props.folderId) {
-            _targetDashboardList = _targetDashboardList.filter((d) => d.folder_id === props.folderId);
-        } else {
-            const _selectedIdMap = dashboardPageControlState.folderModalType === 'PRIVATE' ? dashboardTreeControlState.selectedPrivateIdMap : dashboardTreeControlState.selectedPublicIdMap;
-            _targetDashboardList = queryState.allDashboardItems.filter((d) => _selectedIdMap[d.dashboard_id]);
-        }
-        return getChangedFolderModalTableItems(queryState.allFolderItems, _targetDashboardList);
+        // if (props.folderId) {
+        //     _targetDashboardList = dashboardList.value.filter((d) => d.folder_id === props.folderId);
+        // } else {
+        const _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
+        _targetDashboardList = dashboardList.value.filter((d) => _selectedIdMap[d.dashboard_id]);
+        // }
+        return getChangedFolderModalTableItems(dashboardFolderList.value, _targetDashboardList);
     }),
     disableModalConfirm: computed<boolean>(() => {
         if (!state.changeFolderStructure) return false; // 1. Use Existing Folder Structure
@@ -193,28 +156,17 @@ const state = reactive({
         if (!state.changeFolderStructure) return undefined;
         if (state.selectedFolderStructure === 'new_folder') return folderName.value;
         if (state.selectedFolderStructure === 'select_folder') {
-            return queryState.allFolderItems.find((f) => f.folder_id === state.selectedFolderId);
+            return dashboardFolderList.value.find((f) => f.folder_id === state.selectedFolderId);
         }
         return undefined;
     }),
     // 2.1. Create New Folder
-    existingNameList: computed<string[]>(() => { // NOTE: only for 'create new folder' case
-        const _targetFolderItems = state.isNewFolderPrivate ? queryState.privateFolderItems : queryState.publicFolderItems;
-        if (dashboardPageControlState.folderFormModalType === 'UPDATE') {
-            return _targetFolderItems.filter((d) => d.folder_id !== state.selectedFolder?.folder_id).map((d) => d.name);
-        }
-        return _targetFolderItems.map((d) => d.name);
-    }),
-    isNewFolderPrivate: false,
+    existingNameList: computed<string[]>(() => dashboardFolderList.value.map((d) => d.name)),
     // 2.2. Select Existing Folder
-    existingFolderMenuItems: computed<SelectDropdownMenuItem[]>(() => {
-        const _allFolderItems: FolderModel[] = [...queryState.publicFolderItems, ...queryState.privateFolderItems];
-        return _allFolderItems.map((folder) => ({
-            label: folder.name,
-            name: folder.folder_id,
-            isPrivate: folder.folder_id.startsWith('private'),
-        }));
-    }),
+    existingFolderMenuItems: computed<SelectDropdownMenuItem[]>(() => dashboardFolderList.value.map((folder) => ({
+        label: folder.name,
+        name: folder.folder_id,
+    }))),
     selectedFolderId: undefined as string | undefined,
 });
 
@@ -237,12 +189,7 @@ const {
 });
 
 /* Util */
-const getDashboardNameList = (dashboardType: DashboardType) => {
-    if (dashboardType === 'PRIVATE') {
-        return (privateDashboardList.value.filter((i) => i.version !== '1.0')).map((item) => item.name);
-    }
-    return publicDashboardList.value.filter((i) => i.version !== '1.0').map((item) => item.name);
-};
+const getDashboardNameList = () => dashboardList.value.map((item) => item.name);
 const getChangedFolderModalTableItems = (folderItems: FolderModel[], targetDashboardItems: DashboardModel[]): DashboardDataTableItem[] => {
     // 2.1. Create New Folder
     if (state.selectedFolderStructure === 'new_folder') {
@@ -295,19 +242,10 @@ const getLocation = (selectedFolder: FolderModel|string|undefined): string => {
 };
 
 /* Api */
-const dashboardCreateFetcher = (params: DashboardCreateParams, isPrivate?: boolean) => {
-    if (isPrivate) {
-        return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
-    }
-    return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
-};
+const dashboardCreateFetcher = (params: DashboardCreateParams) => publicDashboardAPI.create(params as PublicDashboardCreateParameters);
 const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
     try {
-        const isPrivate = dashboardId.startsWith('private');
-        const fetcher = isPrivate
-            ? privateWidgetAPI.list
-            : publicWidgetAPI.list;
-        const res = await fetcher({
+        const res = await publicWidgetAPI.list({
             dashboard_id: dashboardId,
         });
         return res.results || [];
@@ -316,13 +254,11 @@ const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]>
         return [];
     }
 };
-const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId?: string) => {
-    const _dashboardType = isPrivate ? 'PRIVATE' : 'PUBLIC';
-    const _allDashboardItems = [...privateDashboardList.value, ...publicDashboardList.value];
-    const _dashboard = _allDashboardItems.find((item) => item.dashboard_id === dashboardId);
+const cloneDashboard = async (dashboardId: string, folderId?: string) => {
+    const _dashboard = dashboardList.value.find((item) => item.dashboard_id === dashboardId);
     if (!_dashboard) throw new Error('Dashboard not found');
 
-    const _dashboardNameList = getDashboardNameList(_dashboardType);
+    const _dashboardNameList = getDashboardNameList();
     const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
     const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
     const _createdDashboardParams: DashboardCreateParams = {
@@ -335,13 +271,15 @@ const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId
         vars: _dashboard.vars,
         vars_schema: _dashboard.vars_schema,
     };
-    if (storeState.isAdminMode) {
-        (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-    } else if (!isPrivate) {
+    if (projectPageContext.value === 'PROJECT') {
+        (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
+        (_createdDashboardParams as PublicDashboardCreateParameters).project_id = projectId.value;
+    } else if (projectPageContext.value === 'PROJECT_GROUP') {
         (_createdDashboardParams as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+        (_createdDashboardParams as PublicDashboardCreateParameters).project_group_id = projectGroupId.value;
     }
 
-    const createdDashboard = await dashboardCreateFetcher(_createdDashboardParams, isPrivate);
+    const createdDashboard = await dashboardCreateFetcher(_createdDashboardParams);
     if (createdDashboard) {
         dashboardTreeControlStore.setNewIdList([
             ...dashboardTreeControlState.newIdList,
@@ -349,22 +287,21 @@ const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId
         ]);
     }
 };
-const folderCreateFetcher = (params: FolderCreateParams, isPrivate?: boolean) => {
-    if (isPrivate) {
-        return api.privateDashboardAPI.create(params as PrivateFolderCreateParameters);
-    }
-    return api.publicDashboardAPI.create(params as PublicFolderCreateParameters);
-};
-const createFolder = async (name: string, isPrivate: boolean) => {
-    const _existingFolderNameList = isPrivate ? privateFolderList.value.map((d) => d.name) : publicFolderList.value.map((d) => d.name);
+const folderCreateFetcher = (params: FolderCreateParams) => publicFolderAPI.create(params as PublicFolderCreateParameters);
+const createFolder = async (name: string) => {
+    const _existingFolderNameList = dashboardFolderList.value.map((d) => d.name);
     const params: FolderCreateParams = {
         name: getClonedName(_existingFolderNameList, name),
         tags: { created_by: storeState.userId },
     };
-    if (!isPrivate) {
-        (params as PublicFolderCreateParameters).resource_group = storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE;
+    if (projectPageContext.value === 'PROJECT') {
+        (params as PublicFolderCreateParameters).resource_group = RESOURCE_GROUP.PROJECT;
+        (params as PublicFolderCreateParameters).project_id = projectId.value;
+    } else if (projectPageContext.value === 'PROJECT_GROUP') {
+        (params as PublicFolderCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+        (params as PublicFolderCreateParameters).project_group_id = projectGroupId.value;
     }
-    const createdFolder = await folderCreateFetcher(params, isPrivate);
+    const createdFolder = await folderCreateFetcher(params);
     return createdFolder?.folder_id;
 };
 
@@ -376,42 +313,40 @@ const handleToggleChangeFolderStructure = (value: boolean) => {
 };
 
 const handleCloneConfirm = async () => {
-    state.loading = true;
+    loading.value = true;
     const _createDashboardPromises: Promise<void>[] = [];
 
     // 1. Use Existing Folder Structure
     if (!state.changeFolderStructure) {
         await Promise.allSettled(state.modalTableItems.map(async (item) => {
-            const _isPrivate = storeState.isWorkspaceMember ? true : state.privateMap[item.id];
             if (item.type === 'FOLDER') {
-                const createdFolderId = await createFolder(item.name, _isPrivate);
+                const createdFolderId = await createFolder(item.name);
                 if (!createdFolderId) return;
                 dashboardTreeControlStore.setNewIdList([...dashboardTreeControlState.newIdList, createdFolderId]);
                 const _children = state.modalTableItems.filter((d) => d.folderId === item.id);
                 _children.forEach((child) => {
-                    _createDashboardPromises.push(cloneDashboard(child.id, _isPrivate, createdFolderId));
+                    _createDashboardPromises.push(cloneDashboard(child.id, createdFolderId));
                 });
             } else if (!item.folderId) {
-                _createDashboardPromises.push(cloneDashboard(item.id, _isPrivate));
+                _createDashboardPromises.push(cloneDashboard(item.id));
             } else {
-                _createDashboardPromises.push(cloneDashboard(item.id, _isPrivate, item.folderId));
+                _createDashboardPromises.push(cloneDashboard(item.id, item.folderId));
             }
         }));
     } else { // 2. Change Folder Structure
         // 2.1. Create New Folder
         if (state.selectedFolderStructure === 'new_folder') {
-            const createdFolderId = await createFolder(folderName.value || '', state.isNewFolderPrivate);
+            const createdFolderId = await createFolder(folderName.value || '');
             if (!createdFolderId) return;
             dashboardTreeControlStore.setNewIdList([...dashboardTreeControlState.newIdList, createdFolderId]);
             state.modalTableItems.filter((d) => d.type === 'DASHBOARD').forEach((item) => {
-                _createDashboardPromises.push(cloneDashboard(item.id, state.isNewFolderPrivate, createdFolderId));
+                _createDashboardPromises.push(cloneDashboard(item.id, createdFolderId));
             });
         }
         // 2.2. Select Existing Folder
         if (state.selectedFolderStructure === 'select_folder') {
-            const _isSelectedFolderPrivate: boolean = state.selectedFolderId?.startsWith('private');
             state.modalTableItems.filter((d) => d.type === 'DASHBOARD').forEach((item) => {
-                _createDashboardPromises.push(cloneDashboard(item.id, _isSelectedFolderPrivate, state.selectedFolderId));
+                _createDashboardPromises.push(cloneDashboard(item.id, state.selectedFolderId));
             });
         }
         // 2.3. No Parent Folder
@@ -429,14 +364,11 @@ const handleCloneConfirm = async () => {
         const _failedCount = _results.filter((r) => r.status !== 'fulfilled').length;
         showErrorMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_CLONE_DASHBOARD', { count: _failedCount }), '');
     }
-    await queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: dashboardKeys.privateDashboardListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
-    await queryClient.invalidateQueries({ queryKey: folderKeys.privateFolderListQueryKey.value });
-    dashboardPageControlStore.reset();
+    await invalidateDashboardList();
+    await invalidateDashboardFolderList();
     dashboardTreeControlStore.reset();
-    state.proxyVisible = false;
-    state.loading = false;
+    projectDashboardModalStore.closeDashboardBundleCloneModal();
+    loading.value = false;
 };
 const handleChangePrivate = (id: string, value: boolean) => {
     // 1. 'Use Existing Folder Structure' case
@@ -473,12 +405,10 @@ const handleChangePrivate = (id: string, value: boolean) => {
 };
 
 /* Watcher */
-watch(() => state.proxyVisible, (visible) => {
-    if (!visible) {
-        state.privateMap = {};
+watch(visible, (_visible) => {
+    if (!_visible) {
         state.changeFolderStructure = false;
         state.selectedFolderStructure = 'new_folder';
-        state.isNewFolderPrivate = false;
         state.selectedFolderId = undefined;
         initForm();
     }
@@ -486,14 +416,17 @@ watch(() => state.proxyVisible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal :visible.sync="state.proxyVisible"
+    <p-button-modal :visible="visible"
                     size="md"
                     :header-title="$t('DASHBOARDS.ALL_DASHBOARDS.CLONE_DASHBOARD')"
-                    :loading="state.loading"
-                    :disabled="state.loading || state.disableModalConfirm"
+                    :loading="loading"
+                    :disabled="loading || state.disableModalConfirm"
                     :enable-scroll="true"
                     class="dashboard-folder-clone-modal"
                     @confirm="handleCloneConfirm"
+                    @closed="projectDashboardModalStore.resetTarget"
+                    @cancel="projectDashboardModalStore.closeDashboardBundleCloneModal"
+                    @close="projectDashboardModalStore.closeDashboardBundleCloneModal"
     >
         <template #body>
             <div class="change-folder-structure-wrapper">

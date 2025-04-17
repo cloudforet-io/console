@@ -8,6 +8,9 @@ import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import type { DashboardControlActionType } from '@/services/_shared/dashboard/core/types/dashboard-control-menu-type';
+import type { DashboardSharedEntryPoint } from '@/services/_shared/dashboard/core/types/dashboard-shared-type';
 import DashboardFolderTreeItem from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeItem.vue';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -21,6 +24,7 @@ interface ControlButton {
     styleType?: string;
 }
 interface Props {
+    entryPoint?: DashboardSharedEntryPoint;
     selectedIdMap: Record<string, boolean>;
     dashboardTreeData: TreeNode<DashboardTreeDataType>[];
     buttonDisableMap?: Record<string, boolean>;
@@ -30,14 +34,19 @@ interface Props {
     showControlButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
+    entryPoint: () => DASHBOARD_SHARED_ENTRY_POINT.NONE_ENTRY_POINT,
     selectedIdMap: () => ({}),
     dashboardTreeData: () => ([]),
     buttonDisableMap: () => ({}),
 });
+
+
+
 const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<string, boolean>): void;
-    (e: 'click-delete');
-    (e: 'click-move');
-    (e: 'click-clone');
+    (e: 'select-control-actions', type: DashboardControlActionType, id: string): void;
+    (e: 'click-control-delete'): void;
+    (e: 'click-control-move'): void;
+    (e: 'click-control-clone'): void;
 }>();
 const state = reactive({
     proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
@@ -60,19 +69,19 @@ const state = reactive({
             {
                 name: 'clone',
                 icon: 'ic_clone',
-                clickEvent: () => emit('click-clone'),
+                clickEvent: () => emit('click-control-clone'),
                 disabled: !!props.buttonDisableMap?.clone,
             },
             {
                 name: 'move',
                 icon: 'ic_move',
-                clickEvent: () => emit('click-move'),
+                clickEvent: () => emit('click-control-move'),
                 disabled: !!props.buttonDisableMap?.move,
             },
             {
                 name: 'delete',
                 icon: 'ic_delete',
-                clickEvent: () => emit('click-delete'),
+                clickEvent: () => emit('click-control-delete'),
                 disabled: !!props.buttonDisableMap?.delete,
                 styleType: 'negative-transparent',
             },
@@ -142,6 +151,10 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
 const handleClickShowAll = () => {
     state.showAll = true;
 };
+
+const handleSelectControlActions = (type: DashboardControlActionType, id: string) => {
+    emit('select-control-actions', type, id);
+};
 </script>
 
 <template>
@@ -185,10 +198,12 @@ const handleClickShowAll = () => {
                      color="gray[600]"
                      @click="handleClickCollapseButton(treeData)"
                 />
-                <dashboard-folder-tree-item :tree-data="treeData"
+                <dashboard-folder-tree-item :entry-point="props.entryPoint"
+                                            :tree-data="treeData"
                                             :readonly-mode="props.readonlyMode"
                                             :disable-link="props.disableLink"
                                             @toggle-folder="handleClickCollapseButton(treeData)"
+                                            @select-control-actions="handleSelectControlActions"
                 />
             </div>
             <template v-if="state.childrenShowMap[treeData.data.id]">
@@ -200,10 +215,12 @@ const handleClickShowAll = () => {
                                 class="item-checkbox"
                                 @change="handleSelectTreeItem(child, $event)"
                     />
-                    <dashboard-folder-tree-item :tree-data="child"
+                    <dashboard-folder-tree-item :entry-point="props.entryPoint"
+                                                :tree-data="child"
                                                 :disable-link="props.disableLink"
                                                 :readonly-mode="props.readonlyMode"
                                                 class="child-tree-item"
+                                                @select-control-actions="handleSelectControlActions"
                     />
                 </div>
                 <div v-if="!treeData.children?.length"

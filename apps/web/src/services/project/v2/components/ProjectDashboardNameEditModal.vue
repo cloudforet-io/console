@@ -13,15 +13,15 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useDashboardUpdateMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-update-mutation';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 interface Props {
     projectGroupOrProjectId?: string;
 }
 const props = defineProps<Props>();
-const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.dashboardNameEditModalVisible);
-const dashboardId = computed(() => projectPageModalStore.state.targetId);
+const projectDashboardModalStore = useProjectDashboardModalStore();
+const visible = computed(() => projectDashboardModalStore.state.dashboardNameEditModalVisible);
+const dashboardId = computed(() => projectDashboardModalStore.state.targetId);
 const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
 const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
 
@@ -68,7 +68,7 @@ const { mutate: updateDashboard, isPending: loading } = useDashboardUpdateMutati
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
     },
     onSettled() {
-        projectPageModalStore.closeDashboardNameEditModal();
+        projectDashboardModalStore.closeDashboardNameEditModal();
     },
 });
 
@@ -97,9 +97,9 @@ watch(visible, (_visible) => {
                     size="sm"
                     class="dashboard-name-edit-modal"
                     @confirm="handleConfirm"
-                    @closed="projectPageModalStore.resetTarget"
-                    @cancel="projectPageModalStore.closeDashboardNameEditModal"
-                    @close="projectPageModalStore.closeDashboardNameEditModal"
+                    @closed="projectDashboardModalStore.resetTarget"
+                    @cancel="projectDashboardModalStore.closeDashboardNameEditModal"
+                    @close="projectDashboardModalStore.closeDashboardNameEditModal"
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
