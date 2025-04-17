@@ -47,6 +47,7 @@ import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-d
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -85,6 +86,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
 const allReferenceStore = useAllReferenceStore();
 const { privateWidgetAPI } = usePrivateWidgetApi();
@@ -149,7 +152,7 @@ const state = reactive({
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
         // 1. Use Existing Folder Structure
         if (!state.changeFolderStructure) {
-            let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
+            let _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
             if (props.folderId) {
                 const _childrenIdList = queryState.allDashboardItems.filter((d) => d.folder_id === props.folderId);
                 _selectedIdMap = {
@@ -157,7 +160,7 @@ const state = reactive({
                     ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
                 };
             } else if (dashboardPageControlState.folderModalType === 'PRIVATE') {
-                _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
+                _selectedIdMap = dashboardTreeControlState.selectedPrivateIdMap;
             }
             return getSelectedDataTableItems(queryState.allFolderItems, queryState.allDashboardItems, _selectedIdMap);
         }
@@ -167,7 +170,7 @@ const state = reactive({
         if (props.folderId) {
             _targetDashboardList = _targetDashboardList.filter((d) => d.folder_id === props.folderId);
         } else {
-            const _selectedIdMap = dashboardPageControlState.folderModalType === 'PRIVATE' ? dashboardPageControlState.selectedPrivateIdMap : dashboardPageControlState.selectedPublicIdMap;
+            const _selectedIdMap = dashboardPageControlState.folderModalType === 'PRIVATE' ? dashboardTreeControlState.selectedPrivateIdMap : dashboardTreeControlState.selectedPublicIdMap;
             _targetDashboardList = queryState.allDashboardItems.filter((d) => _selectedIdMap[d.dashboard_id]);
         }
         return getChangedFolderModalTableItems(queryState.allFolderItems, _targetDashboardList);
@@ -340,8 +343,8 @@ const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId
 
     const createdDashboard = await dashboardCreateFetcher(_createdDashboardParams, isPrivate);
     if (createdDashboard) {
-        dashboardPageControlStore.setNewIdList([
-            ...dashboardPageControlState.newIdList,
+        dashboardTreeControlStore.setNewIdList([
+            ...dashboardTreeControlState.newIdList,
             createdDashboard.dashboard_id as string,
         ]);
     }
@@ -383,7 +386,7 @@ const handleCloneConfirm = async () => {
             if (item.type === 'FOLDER') {
                 const createdFolderId = await createFolder(item.name, _isPrivate);
                 if (!createdFolderId) return;
-                dashboardPageControlStore.setNewIdList([...dashboardPageControlState.newIdList, createdFolderId]);
+                dashboardTreeControlStore.setNewIdList([...dashboardTreeControlState.newIdList, createdFolderId]);
                 const _children = state.modalTableItems.filter((d) => d.folderId === item.id);
                 _children.forEach((child) => {
                     _createDashboardPromises.push(cloneDashboard(child.id, _isPrivate, createdFolderId));
@@ -399,7 +402,7 @@ const handleCloneConfirm = async () => {
         if (state.selectedFolderStructure === 'new_folder') {
             const createdFolderId = await createFolder(folderName.value || '', state.isNewFolderPrivate);
             if (!createdFolderId) return;
-            dashboardPageControlStore.setNewIdList([...dashboardPageControlState.newIdList, createdFolderId]);
+            dashboardTreeControlStore.setNewIdList([...dashboardTreeControlState.newIdList, createdFolderId]);
             state.modalTableItems.filter((d) => d.type === 'DASHBOARD').forEach((item) => {
                 _createDashboardPromises.push(cloneDashboard(item.id, state.isNewFolderPrivate, createdFolderId));
             });
@@ -431,6 +434,7 @@ const handleCloneConfirm = async () => {
     await queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
     await queryClient.invalidateQueries({ queryKey: folderKeys.privateFolderListQueryKey.value });
     dashboardPageControlStore.reset();
+    dashboardTreeControlStore.reset();
     state.proxyVisible = false;
     state.loading = false;
 };

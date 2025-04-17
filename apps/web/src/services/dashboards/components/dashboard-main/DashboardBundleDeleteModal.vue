@@ -20,6 +20,7 @@ import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-d
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 /* Cases
@@ -44,6 +45,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 
 /* Query */
 const {
@@ -78,7 +81,7 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     modalTableItems: computed<DashboardDataTableItem[]>(() => {
-        let _selectedIdMap = dashboardPageControlState.selectedPublicIdMap;
+        let _selectedIdMap = dashboardTreeControlState.selectedPublicIdMap;
         // single case
         if (props.folderId) {
             const _childrenIdList = queryState.allDashboardItems.filter((d) => d.folder_id === props.folderId);
@@ -87,7 +90,7 @@ const state = reactive({
                 ..._childrenIdList.reduce((acc, d) => ({ ...acc, [d.dashboard_id]: true }), {}),
             };
         } else if (dashboardPageControlState.folderModalType === 'PRIVATE') { // bundle case
-            _selectedIdMap = dashboardPageControlState.selectedPrivateIdMap;
+            _selectedIdMap = dashboardTreeControlState.selectedPrivateIdMap;
         }
         return getSelectedDataTableItems(queryState.allFolderItems, queryState.allDashboardItems, _selectedIdMap);
     }),
@@ -109,6 +112,7 @@ const handleDeleteConfirm = async () => {
         ErrorHandler.handleRequestError(new Error('Delete failed'), i18n.t('DASHBOARDS.ALL_DASHBOARDS.ALT_E_DELETE_DASHBOARD'));
     }
     dashboardPageControlStore.reset();
+    dashboardTreeControlStore.reset();
     state.proxyVisible = false;
 };
 </script>

@@ -35,7 +35,7 @@ import {
 } from '@/services/_shared/dashboard/dashboard-detail/constants/dashboard-vars-schema-preset';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
@@ -51,8 +51,8 @@ const TABLE_FIELDS = [
 ];
 const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
 const router = useRouter();
 const {
@@ -93,8 +93,8 @@ const state = reactive({
 
 /* Util */
 const addToNewIdList = (id: string) => {
-    dashboardPageControlStore.setNewIdList([
-        ...dashboardPageControlState.newIdList,
+    dashboardTreeControlStore.setNewIdList([
+        ...dashboardTreeControlState.newIdList,
         id,
     ]);
 };

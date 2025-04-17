@@ -32,7 +32,7 @@ import type { DashboardControlActionType } from '@/services/_shared/dashboard/co
 import type { DashboardSharedEntryPoint } from '@/services/_shared/dashboard/core/types/dashboard-shared-type';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 interface Props {
@@ -52,8 +52,8 @@ const LABELS_LIMIT = 2;
 const router = useRouter();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
 
 const { getDashboardManageable, getFolderManageable } = useDashboardManageable();
@@ -131,8 +131,8 @@ const handleClickTreeItem = (): void => {
     router.push(_location).catch(() => {});
 };
 const handleClickLabel = (label: string) => {
-    dashboardPageControlStore.setSearchQueryTags([
-        ...dashboardPageControlState.searchQueryTags,
+    dashboardTreeControlStore.setSearchQueryTags([
+        ...dashboardTreeControlState.searchQueryTags,
         {
             key: { name: 'labels', label: 'Label' },
             value: { name: label, label },
