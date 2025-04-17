@@ -57,6 +57,7 @@ const tags = computed(() => {
     }
     return projectGroup.value?.tags ?? {};
 });
+const contextKey = computed(() => Object.entries(tags.value).join(', '));
 
 
 /* Form */
@@ -92,16 +93,18 @@ const { mutate: updateTags, isPending: isUpdating } = useMutation({
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
     },
+    onSettled: () => {
+        projectPageModalStore.closeManageTagsModal();
+    },
 });
 
 /* Event Handler */
 const handleUpdateTags = (_tags: Tags) => {
     newTags.value = _tags;
 };
-const handleSaveTags = async () => {
+const handleSaveTags = () => {
     if (!isTagsValid.value) return;
-    await updateTags(newTags.value);
-    projectPageModalStore.closeManageTagsModal();
+    updateTags(newTags.value);
 };
 </script>
 
@@ -128,7 +131,8 @@ const handleSaveTags = async () => {
             <p class="text-paragraph-md text-gray-900 whitespace-pre-wrap">
                 {{ $t('PROJECT.DETAIL.UPDATE_TAG_DESC') }}
             </p>
-            <project-tags-input-group :tags="newTags"
+            <project-tags-input-group :key="`${targetId}-${contextKey}`"
+                                      :tags="newTags"
                                       :disabled="isLoading"
                                       show-validation
                                       :is-valid.sync="isTagsValid"

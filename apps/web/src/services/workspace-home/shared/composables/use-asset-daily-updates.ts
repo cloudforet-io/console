@@ -14,6 +14,7 @@ import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 
 import type { DailyUpdateItem } from '@/services/workspace-home/shared/types/asset-daily-updates-type';
+import type { WidgetMode } from '@/services/workspace-home/shared/types/widget-mode-type';
 
 export type UpdateLabel = 'created' | 'deleted';
 
@@ -30,11 +31,12 @@ interface SelectResult extends Omit<DailyUpdateItem, 'createdCount' | 'deletedCo
     deletedCount?: number;
 }
 
-const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts?: {
-    enabled?: Ref<boolean>;
+const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
+    enabled: Ref<boolean>;
+    mode: Ref<WidgetMode>;
     projectIds?: Ref<string[]>;
 }) => {
-    const { enabled, projectIds } = opts ?? {};
+    const { enabled, projectIds, mode } = opts;
     const { metricDataAPI } = useMetricDataApi();
     const metricId = `metric-managed-${label}-count`;
 
@@ -64,7 +66,7 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts?: {
                 },
             };
         }),
-        contextKey: metricId,
+        contextKey: [mode?.value, metricId],
     });
 
 
@@ -92,14 +94,15 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts?: {
     };
 };
 
-export const useAssetDailyUpdates = (ops?: {
-    enabled?: Ref<boolean>;
+export const useAssetDailyUpdates = (ops: {
+    enabled: Ref<boolean>;
+    mode: Ref<WidgetMode>;
     projectIds?: Ref<string[]>;
 }) => {
-    const { enabled, projectIds } = ops ?? {};
+    const { enabled, projectIds, mode } = ops;
 
-    const created = useDailyUpdateAnalyzeQuery('created', { enabled, projectIds });
-    const deleted = useDailyUpdateAnalyzeQuery('deleted', { enabled, projectIds });
+    const created = useDailyUpdateAnalyzeQuery('created', { enabled, projectIds, mode });
+    const deleted = useDailyUpdateAnalyzeQuery('deleted', { enabled, projectIds, mode });
 
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
     const cloudServiceTypeList = computed<CloudServiceTypeItem[]>(() => Object.values(cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems));

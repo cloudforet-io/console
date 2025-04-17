@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, toRef } from 'vue';
 
 import { isEmpty } from 'lodash';
 
@@ -81,8 +81,8 @@ const enabled = computed(() => {
     }
     return !state.isNoCollectors && !state.isNoServiceAccounts && projectIds.value.length > 0;
 });
-const { isLoadingDailyUpdates, dailyUpdates } = useAssetDailyUpdates({ projectIds, enabled });
-const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds, enabled });
+const { isLoadingDailyUpdates, dailyUpdates } = useAssetDailyUpdates({ projectIds, enabled, mode: toRef(props, 'mode') });
+const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds, enabled, mode: toRef(props, 'mode') });
 
 </script>
 

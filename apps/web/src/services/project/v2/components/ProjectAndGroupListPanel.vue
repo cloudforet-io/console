@@ -4,7 +4,6 @@ import {
     computed, ref,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import { uniq } from 'lodash';
 
 import {
@@ -13,6 +12,8 @@ import {
 
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';
 import ProjectGroupCard from '@/services/project/v2/components/ProjectGroupCard.vue';
@@ -54,36 +55,38 @@ const projectGroups = computed(() => {
 });
 
 /* service accounts */
-const { serviceAccountAPI, serviceAccountListQueryKey } = useServiceAccountApi();
-const serviceAccountListParams: ServiceAccountListParameters = {
-    query: {
-        only: ['provider', 'project_id'],
-    },
-};
-const { data: serviceAccountList } = useQuery({
-    queryKey: computed(() => [...serviceAccountListQueryKey.value, serviceAccountListParams]),
-    queryFn: () => serviceAccountAPI.list(serviceAccountListParams),
-    select: (data) => data.results ?? [],
+const { serviceAccountAPI } = useServiceAccountApi();
+const { key: serviceAccountListQueryKey, params } = useServiceQueryKey('identity', 'service-account', 'list', {
+    params: {
+        query: {
+            only: ['provider', 'project_id'],
+        },
+    } as ServiceAccountListParameters,
 });
+const { data: serviceAccountList } = useScopedQuery({
+    queryKey: serviceAccountListQueryKey,
+    queryFn: () => serviceAccountAPI.list(params.value),
+    select: (data) => data.results ?? [],
+}, ['WORKSPACE']);
 const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccountList.value?.filter((d) => d.project_id === projectId).map((d) => d.provider));
 
 </script>
 
 <template>
     <p-pane-layout class="p-4">
-        <div class="flex justify-between items-center flex-wrap">
+        <div class="flex justify-between items-center flex-wrap gap-2">
             <div class="flex items-center gap-[2px]">
                 <p-i :name="isCollapsed ? 'ic_chevron-right' : 'ic_chevron-down'"
                      width="1.5rem"
                      height="1.5rem"
-                     class="cursor-pointer"
+                     class="cursor-pointer flex-shrink-0"
                      @click="isCollapsed = !isCollapsed"
                 />
                 <div class="text-label-lg font-medium">
-                    {{ $t('PROJECT.LADING.GROUPS_AND_PROJECTS') }}
+                    {{ $t('PROJECT.LANDING.GROUPS_AND_PROJECTS') }}
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="grow flex flex-wrap justify-end items-center gap-2">
                 <p-button icon-left="ic_plus"
                           style-type="tertiary"
                           size="md"

@@ -1,9 +1,13 @@
+import { toValue } from '@vueuse/core';
 import type { Ref } from 'vue';
-import { computed, isRef } from 'vue';
+import { computed } from 'vue';
 
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 export const useProjectQuery = ({
     projectId,
@@ -12,29 +16,34 @@ export const useProjectQuery = ({
   projectId: Ref<string|undefined>;
 enabled?: Ref<boolean>|boolean;
 }) => {
-    const { projectAPI, projectQueryKey, projectListQueryKey } = useProjectApi();
-    const projectQuery = useQuery({
-        queryKey: computed(() => [...projectQueryKey.value, projectId.value]),
-        queryFn: () => projectAPI.get({ project_id: projectId.value as string }),
+    const { projectAPI } = useProjectApi();
+    const { key: projectQueryKey, params } = useServiceQueryKey('identity', 'project', 'get', {
+        params: computed<ProjectGetParameters>(() => ({ project_id: projectId.value as string })),
+    });
+
+    const projectQuery = useScopedQuery({
+        queryKey: projectQueryKey,
+        queryFn: () => projectAPI.get(params.value),
         enabled: computed(() => {
             if (!projectId.value) return false;
             if (enabled === undefined) return true;
-            return isRef(enabled) ? enabled.value : enabled;
+            return toValue(enabled);
         }),
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 1, // 1 minutes
-    });
+    }, ['WORKSPACE']);
 
     const queryClient = useQueryClient();
     const invalidateQuery = () => {
         if (projectId.value) {
-            queryClient.invalidateQueries({ queryKey: [...projectQueryKey.value, projectId.value] });
+            queryClient.invalidateQueries({ queryKey: projectQueryKey.value });
         }
     };
     const setQueryData = (newData: any) => {
-        queryClient.setQueryData([...projectQueryKey.value, projectId.value], newData);
+        queryClient.setQueryData(projectQueryKey, newData);
     };
 
+    const { key: projectListQueryKey } = useServiceQueryKey('identity', 'project', 'list');
     const invalidateAllQueries = () => {
         queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
     };

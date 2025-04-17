@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref, toRef, watch,
 } from 'vue';
 
 import type { PieSeriesOption } from 'echarts/charts';
@@ -71,6 +71,7 @@ const { key: serviceAccountQueryKey, params } = useServiceQueryKey('identity', '
             }] : undefined,
         },
     })),
+    contextKey: toRef(props, 'mode'),
 });
 
 const enabled = computed(() => {

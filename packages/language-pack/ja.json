@@ -5495,9 +5495,6 @@
 			"TITLE_INFO_MESSAGE": "イベントルールは昇順で実行されます。",
 			"URGENCY": "緊急度"
 		},
-		"LADING": {
-			"GROUPS_AND_PROJECTS": ""
-		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "選択したグループ削除",
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
@@ -5524,6 +5521,7 @@
 			"CREATE_PROJECT": "プロジェクト作成",
 			"DATABASE": "データベース",
 			"DELETE": "",
+			"DONE": "",
 			"EDIT_TAG": "",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "プロジェクトグループ作成",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "プロジェクトでリソースを管理してください",
@@ -5536,6 +5534,7 @@
 			"EMPTY_TEXT_SEARCH": "結果が見つからないようです。",
 			"EVERYONE_AT_THIS_WORKSPACE": "このワークスペースの全員",
 			"FAVORITES": "お気に入り",
+			"GROUPS_AND_PROJECTS": "",
 			"GROUP_MEMBER": "グループメンバー",
 			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "グループメンバーはすべてのサブプロジェクトにアクセスできます",
 			"INVITE_ONLY": "招待のみ",
