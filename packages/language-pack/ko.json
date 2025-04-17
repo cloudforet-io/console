@@ -5388,9 +5388,6 @@
 			"TITLE_INFO_MESSAGE": "이벤트 규칙은 오름차순으로 실행됩니다.",
 			"URGENCY": "긴급도"
 		},
-		"LADING": {
-			"GROUPS_AND_PROJECTS": "프로젝트 그룹과 프로젝트"
-		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "선택한 그룹 삭제 ",
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",
@@ -5417,6 +5414,7 @@
 			"CREATE_PROJECT": "프로젝트 생성 ",
 			"DATABASE": "데이터베이스",
 			"DELETE": "삭제",
+			"DONE": "완료",
 			"EDIT_TAG": "태그 수정",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "프로젝트 그룹 생성하기 ",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "프로젝트를 통해 리소스를 관리하세요. ",
@@ -5429,6 +5427,7 @@
 			"EMPTY_TEXT_SEARCH": "검색 결과가 없습니다.",
 			"EVERYONE_AT_THIS_WORKSPACE": "워크스페이스 내 전체 사용자",
 			"FAVORITES": "즐겨찾기",
+			"GROUPS_AND_PROJECTS": "프로젝트 그룹과 프로젝트",
 			"GROUP_MEMBER": "그룹 멤버",
 			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "하위 프로젝트에 모두 접근 가능한 그룹 멤버 추가",
 			"INVITE_ONLY": "초대된 사용자만",

@@ -5272,8 +5272,8 @@
 			"MODAL_EDIT_ACCESS_TITLE": "Edit Access",
 			"MODAL_ENABLE_WEBHOOK_DESC": "Are you sure you want to enable selected webhook below?",
 			"MODAL_ENABLE_WEBHOOK_TITLE": "Enable Webhook",
-			"MODAL_RENAME_PROJECT_GROUP_TITLE": "Rename Project Group",
-			"MODAL_RENAME_PROJECT_TITLE": "Rename Project",
+			"MODAL_RENAME_PROJECT_GROUP_TITLE": "Edit Project Group Name",
+			"MODAL_RENAME_PROJECT_TITLE": "Edit Project Name",
 			"MODAL_UPDATE_MEMBER_TITLE": "Update Member Information",
 			"MODAL_UPDATE_PROJECT_TITLE": "Update Project",
 			"MODAL_UPDATE_WEBHOOK": "Update",
@@ -5295,7 +5295,7 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
 			"PROJECT_ID": "Project ID:",
 			"PROJECT_MEMBER_LABEL": "Labels",
-			"RENAME": "Rename",
+			"RENAME": "Edit Name",
 			"REPORT_CANCEL": "Cancel",
 			"REPORT_DESC": "SpaceONE offers monthly report based on this project. We will update more content soon.",
 			"REPORT_DOWNLOAD_FILE_DESC": "* Only PDF, PPTX formats are avilable.",
@@ -5388,9 +5388,6 @@
 			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
 			"URGENCY": "Urgency"
 		},
-		"LADING": {
-			"GROUPS_AND_PROJECTS": "Project Groups and Projects"
-		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
@@ -5417,6 +5414,7 @@
 			"CREATE_PROJECT": "Create Project",
 			"DATABASE": "Database",
 			"DELETE": "Delete",
+			"DONE": "Done",
 			"EDIT_TAG": "Edit Tag",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "Create Project Group",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "Manage your resources through projects.",
@@ -5429,6 +5427,7 @@
 			"EMPTY_TEXT_SEARCH": "It appears that there are no results.",
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
+			"GROUPS_AND_PROJECTS": "Project Groups and Projects",
 			"GROUP_MEMBER": "Group Member",
 			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "Group Members will have access to all sub-projects",
 			"INVITE_ONLY": "Invite only",

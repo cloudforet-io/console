@@ -13,6 +13,7 @@ import type { Currency } from '@/store/display/type';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import type { WidgetMode } from '@/services/workspace-home/shared/types/widget-mode-type';
 
 export interface CostChartData {
   is_confirmed: boolean;
@@ -47,11 +48,13 @@ export const useCostChartData = ({
     currency,
     period,
     projectIds,
+    mode,
 }: {
     enabled: Ref<boolean>;
     currency: Ref<Currency>;
     period: Ref<Period>;
     projectIds: Ref<string[]|undefined>;
+    mode: Ref<WidgetMode>;
 }) => {
     // Use unified cost API and queryKey
     const { unifiedCostAPI } = useUnifiedCostApi();
@@ -76,6 +79,7 @@ export const useCostChartData = ({
                 ] : undefined,
             },
         })),
+        contextKey: mode,
     });
 
     const {

@@ -11,6 +11,7 @@ import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 
 import type { AssetProviderItem } from '@/services/workspace-home/shared/types/asset-provider-type';
+import type { WidgetMode } from '@/services/workspace-home/shared/types/widget-mode-type';
 
 type ResourceLabel = 'server' | 'database' | 'storage';
 
@@ -21,11 +22,12 @@ interface ProviderResourceMetricsResult {
     [key: string]: any;
 }
 
-const useResourceMetricQuery = (resourceType: ResourceLabel, opts?: {
-    enabled?: Ref<boolean>;
+const useResourceMetricQuery = (resourceType: ResourceLabel, opts: {
+    enabled: Ref<boolean>;
+    mode: Ref<WidgetMode>;
     projectIds?: Ref<string[]>;
 }) => {
-    const { enabled, projectIds } = opts ?? {};
+    const { enabled, mode, projectIds } = opts;
     const { metricDataAPI } = useMetricDataApi();
 
     const metricType = resourceType === 'storage' ? 'size' : 'count';
@@ -57,7 +59,7 @@ const useResourceMetricQuery = (resourceType: ResourceLabel, opts?: {
                 },
             };
         }),
-        contextKey: metricId,
+        contextKey: [mode.value, metricId],
     });
 
     return useScopedQuery({
@@ -70,11 +72,12 @@ const useResourceMetricQuery = (resourceType: ResourceLabel, opts?: {
     }, ['WORKSPACE']);
 };
 
-export const useAssetSummaryProviders = (opts?: {
-    enabled?: Ref<boolean>;
+export const useAssetSummaryProviders = (opts: {
+    enabled: Ref<boolean>;
+    mode: Ref<WidgetMode>;
     projectIds?: Ref<string[]>;
 }) => {
-    const { enabled, projectIds } = opts ?? {};
+    const { enabled, mode, projectIds } = opts;
     const providerReferenceStore = useProviderReferenceStore();
     const providerMap = computed<Record<string, AssetProviderItem>>(() => {
         const map: Record<string, AssetProviderItem> = {};
@@ -93,9 +96,9 @@ export const useAssetSummaryProviders = (opts?: {
         return map;
     });
 
-    const serverQuery = useResourceMetricQuery('server', { enabled, projectIds });
-    const databaseQuery = useResourceMetricQuery('database', { enabled, projectIds });
-    const storageQuery = useResourceMetricQuery('storage', { enabled, projectIds });
+    const serverQuery = useResourceMetricQuery('server', { enabled, projectIds, mode });
+    const databaseQuery = useResourceMetricQuery('database', { enabled, projectIds, mode });
+    const storageQuery = useResourceMetricQuery('storage', { enabled, projectIds, mode });
 
     const providers = computed((): AssetProviderItem[] => {
         if (serverQuery.data.value) {
