@@ -34,7 +34,7 @@ export const useDashboardControlMenuHelper = () => {
     const MOVE_MENU_ITEM = computed<MenuItem>(() => ({
         type: 'item',
         name: DASHBOARD_CONTROL_MENU_ACTION_TYPES.MOVE,
-        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.MOVE'),
+        label: i18n.t('DASHBOARDS.DETAIL.MOVE'),
         icon: 'ic_move',
     }));
     const SHARE_WITH_CODE_MENU_ITEM = computed<MenuItem>(() => ({

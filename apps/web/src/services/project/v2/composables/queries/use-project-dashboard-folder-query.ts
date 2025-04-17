@@ -49,11 +49,6 @@ export const useProjectDashboardFolderQuery = (options: {
         params: computed<PublicFolderListParameters>(() => ({
             project_id: options.projectId?.value,
             project_group_id: options.projectGroupId?.value,
-            query: {
-                filter: [
-                    { k: 'resource_group', v: 'PROJECT', o: 'eq' },
-                ],
-            },
         })),
     });
 
