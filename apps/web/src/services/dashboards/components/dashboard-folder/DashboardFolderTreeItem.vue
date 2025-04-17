@@ -25,32 +25,40 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
+import { useDashboardManageable } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-manageable';
 import { useDashboardControlMenuHelper } from '@/services/_shared/dashboard/core/composables/use-dashboard-control-menu-helper';
-import { isDashboardOrFolderManageable } from '@/services/dashboards/helpers/dashboard-manageable-helper';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import type { DashboardControlActionType } from '@/services/_shared/dashboard/core/types/dashboard-control-menu-type';
+import type { DashboardSharedEntryPoint } from '@/services/_shared/dashboard/core/types/dashboard-shared-type';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 interface Props {
+    entryPoint?: DashboardSharedEntryPoint;
     treeData: TreeNode<DashboardTreeDataType>;
     // for dashboard create page
     disableLink?: boolean;
     readonlyMode?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
+    entryPoint: () => DASHBOARD_SHARED_ENTRY_POINT.NONE_ENTRY_POINT,
 });
 const emit = defineEmits<{(e: 'toggle-folder'): void;
+    (e: 'select-control-actions', type: DashboardControlActionType, id: string): void;
 }>();
 const LABELS_LIMIT = 2;
 const router = useRouter();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
 
+const { getDashboardManageable, getFolderManageable } = useDashboardManageable();
 const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboardControlMenuHelper();
+
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -87,27 +95,13 @@ const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|u
 const getControlMenuItems = (node: TreeNode<DashboardTreeDataType>): MenuItem[] => {
     if (node.data.type === 'DASHBOARD') {
         const _dashboard = node.data as DashboardModel;
-        const _isPrivate = _dashboard.dashboard_id?.startsWith('private') || false;
-        const _manageable = isDashboardOrFolderManageable(
-            storeState.isAdminMode,
-            storeState.isWorkspaceOwner,
-            _isPrivate,
-            _dashboard?.shared,
-            _dashboard?.resource_group,
-        );
-        return getControlDashboardMenuItems(node.data.id, _manageable, _dashboard);
+        const _manageable = getDashboardManageable(_dashboard, props.entryPoint);
+        return getControlDashboardMenuItems(node.data.id, _manageable, _dashboard, props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.PROJECT);
     }
     if (node.data.type === 'FOLDER') {
         const _folder = node.data as FolderModel;
-        const _isPrivate = _folder.folder_id?.startsWith('private') || false;
-        const _manageable = isDashboardOrFolderManageable(
-            storeState.isAdminMode,
-            storeState.isWorkspaceOwner,
-            _isPrivate,
-            _folder?.shared,
-            _folder?.resource_group,
-        );
-        return getControlFolderMenuItems(node.data.id, _manageable, _folder);
+        const _manageable = getFolderManageable(_folder, props.entryPoint);
+        return getControlFolderMenuItems(node.data.id, _manageable, _folder, props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.PROJECT);
     }
     return [];
 };
@@ -137,8 +131,8 @@ const handleClickTreeItem = (): void => {
     router.push(_location).catch(() => {});
 };
 const handleClickLabel = (label: string) => {
-    dashboardPageControlStore.setSearchQueryTags([
-        ...dashboardPageControlState.searchQueryTags,
+    dashboardTreeControlStore.setSearchQueryTags([
+        ...dashboardTreeControlState.searchQueryTags,
         {
             key: { name: 'labels', label: 'Label' },
             value: { name: label, label },
@@ -147,12 +141,7 @@ const handleClickLabel = (label: string) => {
     ]);
 };
 const handleSelectControlButton = (id: string, item: MenuItem) => {
-    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(id);
-    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(id);
-    if (item.name === 'move') dashboardPageControlStore.openMoveModal(id);
-    if (item.name === 'share') dashboardPageControlStore.openShareModal(id);
-    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(id);
-    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(id);
+    emit('select-control-actions', item.name as DashboardControlActionType, id);
 };
 </script>
 

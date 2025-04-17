@@ -18,15 +18,15 @@ import { useDashboardChangeFolderMutation } from '@/services/_shared/dashboard/c
 import { useProjectDashboardFolderQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-folder-query';
 import { useProjectDashboardQuery } from '@/services/project/v2/composables/queries/use-project-dashboard-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
-import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 
 interface Props {
     projectGroupOrProjectId?: string;
 }
 const props = defineProps<Props>();
-const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.dashboardChangeFolderModalVisible);
-const dashboardId = computed(() => projectPageModalStore.state.targetId);
+const projectDashboardModalStore = useProjectDashboardModalStore();
+const visible = computed(() => projectDashboardModalStore.state.dashboardChangeFolderModalVisible);
+const dashboardId = computed(() => projectDashboardModalStore.state.targetId);
 const projectGroupOrProjectId = computed(() => props.projectGroupOrProjectId);
 const { projectGroupId, projectId } = useProjectOrGroupId(projectGroupOrProjectId);
 
@@ -76,7 +76,7 @@ const { mutate: changeFolder } = useDashboardChangeFolderMutation({
         showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);
     },
     onSettled: () => {
-        projectPageModalStore.closeDashboardChangeFolderModal();
+        projectDashboardModalStore.closeDashboardChangeFolderModal();
     },
 });
 
@@ -87,7 +87,7 @@ const handleFormConfirm = async () => {
         return;
     }
     if (state.selectedFolderId === currentDashboard.value?.folder_id) {
-        projectPageModalStore.closeDashboardChangeFolderModal();
+        projectDashboardModalStore.closeDashboardChangeFolderModal();
         return;
     }
     const params: DashboardChangeFolderParams = {
@@ -103,7 +103,7 @@ const handleFormConfirm = async () => {
 watch(visible, (_visible) => {
     if (!_visible) {
         state.selectedFolderId = '';
-        projectPageModalStore.resetTarget();
+        projectDashboardModalStore.resetTarget();
     } else {
         const _folderId = dashboardFolderList.value.find((d) => d.folder_id === currentDashboard.value?.folder_id)?.folder_id;
         if (_folderId) state.selectedFolderId = _folderId;
@@ -119,9 +119,9 @@ watch(visible, (_visible) => {
         backdrop
         :visible="visible"
         @confirm="handleFormConfirm"
-        @closed="projectPageModalStore.resetTarget"
-        @cancel="projectPageModalStore.closeDashboardChangeFolderModal"
-        @close="projectPageModalStore.closeDashboardChangeFolderModal"
+        @closed="projectDashboardModalStore.resetTarget"
+        @cancel="projectDashboardModalStore.closeDashboardChangeFolderModal"
+        @close="projectDashboardModalStore.closeDashboardChangeFolderModal"
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.ALL_DASHBOARDS.LOCATION')"

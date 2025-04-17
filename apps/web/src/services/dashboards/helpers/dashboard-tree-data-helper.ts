@@ -108,7 +108,7 @@ export const getSelectedDataTableItems = (folderItems: FolderModel[], dashboardI
     return _results;
 };
 
-export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
+export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], folderItems: FolderModel[], selectedIdMap: Record<string, boolean>, isProject = false): boolean => {
     const _selectedIdList: string[] = Object.entries(selectedIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
     if (_selectedIdList.length === 0) return true;
     let result = false;
@@ -116,15 +116,15 @@ export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], 
         if (result) return;
         const _isFolder = id.includes('folder');
         if (_isFolder) {
-            const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
-            _childrenDashboards?.forEach((child) => {
-                if (child?.shared && child?.scope === 'WORKSPACE') {
-                    result = true;
-                }
-            });
+            const _folder = folderItems.find((f) => f.folder_id === id);
+            if (isProject) result = !!_folder?.shared;
+            else if (_folder?.shared && _folder?.scope === 'WORKSPACE') {
+                result = true;
+            }
         } else {
             const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
-            if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
+            if (isProject) result = !!_dashboard?.shared;
+            else if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
                 result = true;
             }
         }

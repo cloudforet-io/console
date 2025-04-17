@@ -30,6 +30,9 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { DASHBOARD_CONTROL_MENU_ACTION_TYPES } from '@/services/_shared/dashboard/core/constants/dashboard-control-menu-constant';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import type { DashboardControlActionType } from '@/services/_shared/dashboard/core/types/dashboard-control-menu-type';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import DashboardFolderTreeTitle from '@/services/dashboards/components/dashboard-folder/DashboardFolderTreeTitle.vue';
 import DashboardMainBoardList from '@/services/dashboards/components/dashboard-main/DashboardMainBoardList.vue';
@@ -43,11 +46,13 @@ import {
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -99,26 +104,26 @@ const state = reactive({
         const _private = privateDashboardList.value.filter((d) => d.version === '1.0');
         return [..._public, ..._private];
     }),
-    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.publicFolderItems, state.publicDashboardItems, dashboardPageControlState.newIdList)),
-    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.privateFolderItems, state.privateDashboardItems, dashboardPageControlState.newIdList)),
+    publicDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.publicFolderItems, state.publicDashboardItems, dashboardTreeControlState.newIdList)),
+    privateDashboardTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => getDashboardTreeData(state.privateFolderItems, state.privateDashboardItems, dashboardTreeControlState.newIdList)),
     publicTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
         if (storeState.isAdminMode) {
-            const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+            const _selectedPublicIdList: string[] = Object.entries(dashboardTreeControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
             return {
                 clone: _selectedPublicIdList.length === 0,
                 move: _selectedPublicIdList.length === 0,
                 delete: _selectedPublicIdList.length === 0,
             };
         }
-        const _selectedPublicIdList: string[] = Object.entries(dashboardPageControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+        const _selectedPublicIdList: string[] = Object.entries(dashboardTreeControlState.selectedPublicIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
         return {
             clone: _selectedPublicIdList.length === 0,
-            move: isPublicControlButtonDisabled(state.publicDashboardItems, dashboardPageControlState.selectedPublicIdMap),
-            delete: isPublicControlButtonDisabled(state.publicDashboardItems, dashboardPageControlState.selectedPublicIdMap),
+            move: isPublicControlButtonDisabled(state.publicDashboardItems, state.publicFolderItems, dashboardTreeControlState.selectedPublicIdMap),
+            delete: isPublicControlButtonDisabled(state.publicDashboardItems, state.publicFolderItems, dashboardTreeControlState.selectedPublicIdMap),
         };
     }),
     privateTreeControlButtonDisableMap: computed<Record<string, boolean>>(() => {
-        const _selectedPrivateIdList: string[] = Object.entries(dashboardPageControlState.selectedPrivateIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
+        const _selectedPrivateIdList: string[] = Object.entries(dashboardTreeControlState.selectedPrivateIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
         return {
             clone: _selectedPrivateIdList.length === 0,
             move: _selectedPrivateIdList.length === 0,
@@ -202,15 +207,23 @@ const handleCreateFolder = () => {
 };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
-        dashboardPageControlStore.setSearchQueryTags(options.queryTags);
+        dashboardTreeControlStore.setSearchQueryTags(options.queryTags);
     }
 };
 const handleUpdateSelectedIdMap = (type: 'PUBLIC' | 'PRIVATE', selectedIdMap: Record<string, boolean>) => {
     if (type === 'PUBLIC') {
-        dashboardPageControlStore.setSelectedPublicIdMap(selectedIdMap);
+        dashboardTreeControlStore.setSelectedPublicIdMap(selectedIdMap);
     } else {
-        dashboardPageControlStore.setSelectedPrivateIdMap(selectedIdMap);
+        dashboardTreeControlStore.setSelectedPrivateIdMap(selectedIdMap);
     }
+};
+const handleSelectControlActions = (type: DashboardControlActionType, id: string) => {
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.EDIT) dashboardPageControlStore.openEditNameModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.CLONE) dashboardPageControlStore.openCloneModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.MOVE) dashboardPageControlStore.openMoveModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.SHARE) dashboardPageControlStore.openShareModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.SHARE_WITH_CODE) dashboardPageControlStore.openShareWithCodeModal(id);
+    if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.DELETE) dashboardPageControlStore.openDeleteModal(id);
 };
 
 /* init */
@@ -218,7 +231,7 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
-    dashboardPageControlStore.setSearchQueryTags(queryState.queryTags);
+    dashboardTreeControlStore.setSearchQueryTags(queryState.queryTags);
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
@@ -268,9 +281,9 @@ const {
     searchFilters: computed(() => state.searchFilters),
 });
 
-watch(() => dashboardPageControlState.searchQueryTags, async (queryTags: QueryTag[]) => {
+watch(() => dashboardTreeControlState.searchQueryTags, async (queryTags: QueryTag[]) => {
     queryTagsHelper.setQueryTags(queryTags || []);
-    dashboardPageControlStore.resetSelectedIdMap();
+    dashboardTreeControlStore.resetSelectedIdMap();
     state.searchFilters = queryTagsHelper.filters.value;
 }, { immediate: true });
 
@@ -348,14 +361,16 @@ onUnmounted(() => {
                                              :is-collapsed.sync="state.treeCollapseMap.public"
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.public"
-                                       :selected-id-map="dashboardPageControlState.selectedPublicIdMap"
+                                       :entry-point="DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS"
+                                       :selected-id-map="dashboardTreeControlState.selectedPublicIdMap"
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        :show-control-buttons="!storeState.isWorkspaceMember"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
-                                       @click-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
-                                       @click-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
-                                       @click-move="dashboardPageControlStore.openBundleMoveModal('PUBLIC')"
+                                       @click-control-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
+                                       @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
+                                       @click-control-move="dashboardPageControlStore.openBundleMoveModal('PUBLIC')"
+                                       @select-control-actions="handleSelectControlActions"
                 />
             </div>
             <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
@@ -365,14 +380,16 @@ onUnmounted(() => {
                                              :is-collapsed.sync="state.treeCollapseMap.private"
                 />
                 <dashboard-folder-tree v-if="!state.treeCollapseMap.private"
-                                       :selected-id-map="dashboardPageControlState.selectedPrivateIdMap"
+                                       :entry-point="DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS"
+                                       :selected-id-map="dashboardTreeControlState.selectedPrivateIdMap"
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="state.privateTreeControlButtonDisableMap"
                                        show-control-buttons
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
-                                       @click-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
-                                       @click-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"
-                                       @click-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
+                                       @click-control-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
+                                       @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"
+                                       @click-control-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
+                                       @select-control-actions="handleSelectControlActions"
                 />
             </div>
             <dashboard-main-board-list v-if="state.deprecatedDashboardItems.length"
