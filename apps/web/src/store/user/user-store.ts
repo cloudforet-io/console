@@ -29,6 +29,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useErrorStore } from '@/store/error/error-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { languages, MANAGED_ROLES, USER_STORAGE_KEY } from '@/store/user/constant';
 import type {
     RoleInfo,
@@ -45,10 +46,8 @@ import {
     getMinimalPageAccessPermissionList,
     getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
-import type { MenuId } from '@/lib/menu/config';
+import type { Menu, MenuId } from '@/lib/menu/config';
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
-
-
 
 const getUserInfo = async (): Promise<Partial<UserStoreState>> => {
     const response = await SpaceConnector.clientV2.identity.userProfile.get<
@@ -117,6 +116,8 @@ const getRoleTypeFromToken = (token: string): RoleType => {
 
 export const useUserStore = defineStore('user-store', () => {
     const domainStore = useDomainStore();
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+
     let storedUserState: Partial<UserStoreState> = {};
     try {
         storedUserState = LocalStorageAccessor.getItem(USER_STORAGE_KEY) ?? {};
@@ -141,6 +142,9 @@ export const useUserStore = defineStore('user-store', () => {
         isSignInLoading: false,
         mfa: storedUserState.mfa,
     });
+    const _getters = reactive({
+        menuList: computed<Menu[]>(() => globalConfigSchemaStore.getters.menuList),
+    });
     const getters = reactive<UserStoreGetters>({
         isDomainAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.DOMAIN_ADMIN),
         isSystemAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.SYSTEM_ADMIN),
@@ -152,7 +156,10 @@ export const useUserStore = defineStore('user-store', () => {
         pageAccessPermissionList: computed<MenuId[]>(() => {
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+            const pagePermissionMap = getPageAccessMapFromRawData({
+                pageAccessPermissions: roleBasePagePermissions,
+                menuList: _getters.menuList,
+            });
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
             const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
 
@@ -172,7 +179,10 @@ export const useUserStore = defineStore('user-store', () => {
 
             const roleType = state.currentRoleInfo?.roleType ?? 'USER';
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
-            const pagePermissionMap = getPageAccessMapFromRawData(roleBasePagePermissions);
+            const pagePermissionMap = getPageAccessMapFromRawData({
+                pageAccessPermissions: roleBasePagePermissions,
+                menuList: _getters.menuList,
+            });
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 
             const isAllReadOnly = checkAllMenuReadonly(roleBasePagePermissions);

@@ -31,6 +31,8 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 
+import { useServiceRouter } from '@/router/helpers/use-service-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -39,8 +41,9 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
+import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 import {
     arrayToQueryString, queryStringToArray,
     queryStringToObject,
@@ -65,7 +68,6 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory/types/type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
 interface Props {
@@ -97,6 +99,9 @@ assetInventorySettingsStore.initState(userStore.state.userId);
 
 const route = useRoute();
 const router = useRouter();
+const serviceRouter = useServiceRouter(router);
+
+const { referenceFieldFormatter } = useReferenceFieldFormatter();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -286,8 +291,9 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
             ErrorHandler.handleRequestError(e, e.message);
         }
     } else {
-        window.open(router.resolve({
-            name: PROJECT_ROUTE_V1.DETAIL._NAME,
+        window.open(serviceRouter.resolve({
+            feature: MENU_ID.PROJECT,
+            routeKey: 'detail',
             params: { id, workspaceId },
         }).href, '_blank');
     }

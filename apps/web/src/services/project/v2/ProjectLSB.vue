@@ -64,9 +64,9 @@ const { visibleMenu, toggleContextMenu, hideContextMenu } = useContextMenuContro
 });
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        projectPageModalStore.openCreateProjectFormModal();
+        projectPageModalStore.openProjectCreateModal();
     } else if (item.name === 'projectGroup') {
-        projectPageModalStore.openCreateProjectGroupFormModal();
+        projectPageModalStore.openProjectGroupCreateModal();
     }
     hideContextMenu();
 };

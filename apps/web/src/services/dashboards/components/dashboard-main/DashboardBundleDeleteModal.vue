@@ -15,14 +15,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardBundleDeleteWorkflow } from '@/services/dashboards/composables/use-dashboard-bundle-delete-workflow';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
-
-import { useDashboardBundleDeleteWorkflow } from '../../composables/use-dashboard-bundle-delete-workflow';
-
 
 /* Cases
 * Single Case: If props.folderId exists, delete single folder

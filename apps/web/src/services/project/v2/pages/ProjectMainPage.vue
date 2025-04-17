@@ -24,13 +24,17 @@ const ProjectDeleteModal = () => import('@/services/project/v2/components/Projec
 const ProjectMoveModal = () => import('@/services/project/v2/components/ProjectMoveModal.vue');
 const ProjectMemberInviteModal = () => import('@/services/project/v2/components/ProjectMemberInviteModal.vue');
 const ProjectTagsModal = () => import('@/services/project/v2/components/ProjectTagsModal.vue');
-const ProjectFormModal = () => import('@/services/project/v2/components/ProjectFormModal.vue');
-const ProjectGroupFormModal = () => import('@/services/project/v2/components/ProjectGroupFormModal.vue');
+const ProjectCreateModal = () => import('@/services/project/v2/components/ProjectCreateModal.vue');
+const ProjectRenameModal = () => import('@/services/project/v2/components/ProjectRenameModal.vue');
+const ProjectEditAccessModal = () => import('@/services/project/v2/components/ProjectEditAccessModal.vue');
+const ProjectGroupCreateModal = () => import('@/services/project/v2/components/ProjectGroupCreateModal.vue');
+const ProjectGroupRenameModal = () => import('@/services/project/v2/components/ProjectGroupRenameModal.vue');
 const ProjectDashboardFolderFormModal = () => import('@/services/project/v2/components/ProjectDashboardFolderFormModal.vue');
 const ProjectDashboardNameEditModal = () => import('@/services/project/v2/components/ProjectDashboardNameEditModal.vue');
 const ProjectDashboardChangeFolderModal = () => import('@/services/project/v2/components/ProjectDashboardChangeFolderModal.vue');
 const ProjectDashboardDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardDeleteModal.vue');
 const ProjectDashboardCloneModal = () => import('@/services/project/v2/components/ProjectDashboardCloneModal.vue');
+
 const props = defineProps<{
     projectGroupOrProjectId?: string;
     dashboardId?: string;
@@ -116,11 +120,10 @@ const handleUpdateDashboardId = (id?: string) => {
                         :project-group-id="projectGroupId"
         />
         <keep-alive>
-            <project-and-group-list-panel v-if="mounted"
-                                          :key="props.projectGroupOrProjectId ?? 'all'"
+            <project-and-group-list-panel v-if="mounted && !projectId"
+                                          :key="projectGroupId ?? 'all'"
                                           class="mt-4"
-                                          :target-id="props.projectGroupOrProjectId"
-                                          :target-type="props.projectGroupOrProjectId ? (projectId ? 'project' : 'projectGroup') : undefined"
+                                          :project-group-id="projectGroupId"
             />
         </keep-alive>
         <project-detail-tab v-if="mounted"
@@ -132,22 +135,28 @@ const handleUpdateDashboardId = (id?: string) => {
         />
 
         <template v-if="mounted">
-            <project-group-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'projectGroup'" />
-            <project-member-management-modal v-if="projectPageModelStore.state.manageMemberModalVisible && projectPageModelStore.state.targetType === 'project'" />
+            <project-group-member-management-modal v-if="projectPageModelStore.state.projectGroupMemberModalVisible" />
+            <project-member-management-modal v-if="projectPageModelStore.state.projectMemberModalVisible" />
             <project-delete-modal v-if="projectPageModelStore.state.deleteModalVisible"
                                   @deleted="handleDeleted"
             />
             <project-move-modal v-if="projectPageModelStore.state.moveModalVisible" />
             <project-member-invite-modal v-if="projectPageModelStore.state.inviteMemberModalVisible" />
             <project-tags-modal v-if="projectPageModelStore.state.manageTagsModalVisible" />
-            <project-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'project'"
-                                :target-parent-group-id="targetParentGroupId"
-                                @created="handleCreated"
+
+            <project-create-modal v-if="projectPageModelStore.state.projectCreateModalVisible"
+                                  :target-parent-group-id="targetParentGroupId"
+                                  @created="handleCreated"
             />
-            <project-group-form-modal v-if="projectPageModelStore.state.projectFormModalVisible && projectPageModelStore.state.targetType === 'projectGroup'"
-                                      :target-parent-group-id="targetParentGroupId"
-                                      @created="handleCreated"
+            <project-rename-modal v-if="projectPageModelStore.state.projectRenameModalVisible" />
+            <project-edit-access-modal v-if="projectPageModelStore.state.projectEditAccessModalVisible" />
+
+            <project-group-create-modal v-if="projectPageModelStore.state.projectGroupCreateModalVisible"
+                                        :target-parent-group-id="targetParentGroupId"
+                                        @created="handleCreated"
             />
+            <project-group-rename-modal v-if="projectPageModelStore.state.projectGroupRenameModalVisible" />
+
             <project-dashboard-folder-form-modal v-if="projectPageModelStore.state.folderFormModalVisible"
                                                  :project-group-or-project-id="props.projectGroupOrProjectId"
             />

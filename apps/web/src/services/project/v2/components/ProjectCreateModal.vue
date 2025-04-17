@@ -9,10 +9,8 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
-import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { i18n } from '@/translations';
-
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -21,16 +19,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { gray, indigo } from '@/styles/colors';
 
-import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
 import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
-
 const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.projectFormModalVisible
-&& projectPageModalStore.state.targetType === 'project');
-const targetId = computed(() => projectPageModalStore.state.targetId);
-
+const visible = computed(() => projectPageModalStore.state.projectCreateModalVisible);
 
 const props = defineProps<{
     targetParentGroupId?: string;
@@ -40,7 +33,7 @@ const emit = defineEmits<{(e: 'created', projectGroupId: string): void;
 
 const projectListStore = useProjectListStore();
 const state = reactive({
-    projectNames: computed(() => projectListStore.projects.filter((item) => item.key !== targetId.value).map((p) => p.name)),
+    projectNames: computed(() => projectListStore.projects.map((p) => p.name)),
     accessMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'PRIVATE',
@@ -64,7 +57,7 @@ const {
     invalidState,
     invalidTexts,
     setForm, isAllValid,
-    initForm, resetValidations,
+    initForm,
 } = useFormValidator({
     projectName: undefined as string|undefined,
 }, {
@@ -75,24 +68,11 @@ const {
         return true;
     },
 });
-const {
-    data: project, isLoading, setQueryData, invalidateAllQueries,
-} = useProjectQuery({
-    projectId: targetId,
-    enabled: visible,
-});
-watch([visible, project], ([v, prj]) => {
+watch(visible, (v) => {
     if (!v) return;
-    if (!prj) {
-        initForm();
-        return;
-    }
-    if (prj) {
-        setForm('projectName', prj.name);
-        state.selectedAccess = prj.project_type ?? 'PRIVATE';
-        resetValidations();
-    }
-}, { immediate: true });
+    initForm();
+    state.selectedAccess = 'PRIVATE';
+});
 
 /* mutations */
 const { projectAPI } = useProjectApi();
@@ -104,7 +84,6 @@ const { mutate: createProject, isPending: isCreatingProject } = useMutation({
     }),
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
-        invalidateAllQueries();
         emit('created', data.project_id);
     },
     onError: (e) => {
@@ -112,85 +91,38 @@ const { mutate: createProject, isPending: isCreatingProject } = useMutation({
     },
 });
 
-
-const { mutateAsync: updateProject, isPending: isUpdatingProject } = useMutation({
-    mutationFn: ({ projectId, name }: { projectId: string; name: string }) => projectAPI.update({
-        project_id: projectId,
-        name,
-    }),
-    onSuccess: (data) => {
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
-        setQueryData(data);
-    },
-    onError: (e) => {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
-    },
-});
-
-const { mutateAsync: updateProjectType, isPending: isUpdatingProjectType } = useMutation({
-    mutationFn: ({ projectId, projectType }: { projectId: string; projectType: ProjectType }) => projectAPI.updateProjectType({
-        project_id: projectId,
-        project_type: projectType,
-    }),
-    onSuccess: (data) => {
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
-        setQueryData(data);
-    },
-    onError: (e) => {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));
-    },
-});
-const isProcessing = computed(() => isCreatingProject.value || isUpdatingProject.value || isUpdatingProjectType.value);
-
 /* Event */
 const confirm = async () => {
-    if (isProcessing.value) return;
+    if (isCreatingProject.value) return;
     if (!isAllValid.value) return;
 
-    const name = projectName.value?.trim() as string; // always exist
-    if (targetId.value) {
-        const promises: Promise<ProjectModel>[] = [];
-        if (name !== project.value?.name) {
-            promises.push(updateProject({
-                projectId: targetId.value,
-                name,
-            }));
-        }
-        if (state.selectedAccess !== project.value?.project_type) {
-            promises.push(updateProjectType({
-                projectId: targetId.value,
-                projectType: state.selectedAccess,
-            }));
-        }
-        await Promise.allSettled(promises);
-    } else {
-        await createProject({
-            name,
-            projectType: state.selectedAccess,
-            groupId: props.targetParentGroupId,
-        });
-    }
-    projectPageModalStore.closeFormModal();
+    const name = projectName.value?.trim() as string;
+    await createProject({
+        name,
+        projectType: state.selectedAccess,
+        groupId: props.targetParentGroupId,
+    });
+    projectPageModalStore.closeProjectCreateModal();
 };
+
 const handleSelectAccess = (selectedAccess) => {
     state.selectedAccess = selectedAccess as ProjectType;
 };
 
-
 </script>
 
 <template>
-    <p-button-modal class="project-form-modal"
-                    :header-title="targetId ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
+    <p-button-modal class="project-create-modal"
+                    :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
                     centered
                     size="sm"
                     fade
                     backdrop
-                    :loading-backdrop="isLoading"
                     :visible="visible"
-                    :disabled="isProcessing || !isAllValid"
-                    @close="projectPageModalStore.closeFormModal"
-                    @cancel="projectPageModalStore.closeFormModal"
+                    :loading="isCreatingProject"
+                    :disabled="!isAllValid"
+                    @close="projectPageModalStore.closeProjectCreateModal"
+                    @cancel="projectPageModalStore.closeProjectCreateModal"
                     @closed="projectPageModalStore.resetTarget"
                     @confirm="confirm"
     >
@@ -240,7 +172,7 @@ const handleSelectAccess = (selectedAccess) => {
 </template>
 
 <style lang="postcss" scoped>
-.project-form-modal {
+.project-create-modal {
     .access-dropdown {
         width: 100%;
         .text-wrapper {

@@ -109,7 +109,7 @@ const handleSaveTags = async () => {
     <p-button-modal
         class="project-tags-modal"
         modal-body-id="project-tags"
-        :header-title="$t('PROJECT.DETAIL.UPDATE_TAG')"
+        :header-title="$t('PROJECT.LANDING.EDIT_TAG')"
         :fade="true"
         :backdrop="true"
         size="sm"
@@ -121,6 +121,9 @@ const handleSaveTags = async () => {
         @closed="projectPageModalStore.resetTarget()"
         @confirm="handleSaveTags"
     >
+        <template #confirm-button>
+            {{ $t('PROJECT.LANDING.SAVE_CHANGES') }}
+        </template>
         <template #body>
             <p class="text-paragraph-md text-gray-900 whitespace-pre-wrap">
                 {{ $t('PROJECT.DETAIL.UPDATE_TAG_DESC') }}

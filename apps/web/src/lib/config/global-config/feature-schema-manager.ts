@@ -1,7 +1,18 @@
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
+import { pinia } from '@/store/pinia';
 
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
-import type { FeatureSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfigurator,
+    FeatureVersion,
+    GeneratedMenuSchema, GeneratedRouteMetadataSchema, GeneratedRouteSchema, GeneratedUiAffectSchema, GlobalServiceConfig,
+} from '@/lib/config/global-config/types/type';
+
+import adminAdvancedRoutes from '@/services/advanced/routes/admin/routes';
+import adminInfoRoutes from '@/services/info/routes/admin/routes';
+import infoRoutes from '@/services/info/routes/routes';
+import adminWorkspaceHomeRoutes from '@/services/workspace-home/routes/admin/routes';
+import workspaceHomeRoute from '@/services/workspace-home/routes/routes';
 
 export class FeatureSchemaManager {
     private config: GlobalServiceConfig = {
@@ -12,58 +23,106 @@ export class FeatureSchemaManager {
     };
 
     initialize(config: GlobalServiceConfig) {
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
         this.config = {
             ...this.config,
             ...config,
         };
-        this.setFeatureSchema();
+
+        globalConfigSchemaStore.setMenuSchema(this.createMenuSchema());
+        globalConfigSchemaStore.setRouteSchema(this.createRouteSchema());
+        globalConfigSchemaStore.setRouteMetadataSchema(this.createRouteMetadata());
+        globalConfigSchemaStore.setUiAffectsSchema(this.createUiAffectsSchema());
     }
 
-    setFeatureSchema() {
-        const globalConfigStore = useGlobalConfigStore();
-        const schema = {} as FeatureSchemaType;
-
-        const featureMethodMap: Record<string, Record<string, boolean>> = {};
-
+    private forEachEnabledFeature<T>(callback: (feature: string, configurator: FeatureConfigurator, currentVersion: FeatureVersion) => T): T[] {
+        const results: T[] = [];
         Object.keys(this.config).forEach((feature) => {
             if (this.config[feature]?.ENABLED) {
                 const configurator = getFeatureConfigurator(feature);
                 if (configurator) {
                     const currentVersion = this.config[feature]?.VERSION || 'V1';
                     configurator.initialize(currentVersion);
-                    const menuConfig = configurator.getMenu(this.config);
-                    if (configurator.uiAffect) {
-                        configurator.uiAffect.forEach((uiAffect) => {
-                            const targetFeature = uiAffect.feature;
-                            const targetVersion = targetFeature === feature
-                                ? currentVersion
-                                : (this.config[targetFeature]?.VERSION || 'V1');
-
-                            if (!featureMethodMap[targetFeature]) {
-                                featureMethodMap[targetFeature] = {};
-                            }
-
-                            uiAffect.affects.forEach((affect) => {
-                                if (affect.version === targetVersion) {
-                                    featureMethodMap[targetFeature][affect.method] = true;
-                                }
-                            });
-                        });
-                    }
-
-                    schema[feature] = {
-                        version: currentVersion,
-                        menu: menuConfig.menu,
-                        adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
-                        uiAffects: feature in featureMethodMap ? featureMethodMap[feature] : {},
-                    };
+                    results.push(callback(feature, configurator, currentVersion));
                 }
             }
         });
+        return results;
+    }
 
-        globalConfigStore.setSchema(schema);
+    createMenuSchema(): GeneratedMenuSchema {
+        const generatedMenuSchema = {} as GeneratedMenuSchema;
+
+        this.forEachEnabledFeature((feature, configurator, currentVersion) => {
+            const menuConfig = configurator.getMenu(this.config);
+            generatedMenuSchema[feature] = {
+                version: currentVersion,
+                menu: menuConfig.menu,
+                adminMenu: menuConfig?.adminMenu === null ? null : (menuConfig?.adminMenu || menuConfig?.menu),
+            };
+        });
+
+        return generatedMenuSchema;
+    }
+
+    createRouteSchema(): GeneratedRouteSchema {
+        const baseRoutes: GeneratedRouteSchema = {
+            routes: [workspaceHomeRoute, infoRoutes],
+            adminRoutes: [adminWorkspaceHomeRoutes, adminAdvancedRoutes, adminInfoRoutes],
+        };
+
+        this.forEachEnabledFeature((feature, configurator) => {
+            const featureRoutes = configurator.getRoutes();
+            if (featureRoutes?.routes) {
+                baseRoutes.routes.push(featureRoutes.routes);
+            }
+            if (featureRoutes?.adminRoutes) {
+                baseRoutes.adminRoutes.push(featureRoutes.adminRoutes);
+            }
+        });
+
+        return baseRoutes;
+    }
+
+    createRouteMetadata(): GeneratedRouteMetadataSchema {
+        const routeMetadata = {} as GeneratedRouteMetadataSchema;
+
+        this.forEachEnabledFeature((feature, configurator) => {
+            routeMetadata[feature] = configurator.getRouteMetadata();
+        });
+
+        return routeMetadata;
+    }
+
+    createUiAffectsSchema(): GeneratedUiAffectSchema {
+        const schema = {} as GeneratedUiAffectSchema;
+        const featureMethodMap: Record<string, Record<string, boolean>> = {};
+
+        this.forEachEnabledFeature((feature, configurator, currentVersion) => {
+            if (configurator.uiAffect) {
+                configurator.uiAffect.forEach((uiAffect) => {
+                    const targetFeature = uiAffect.feature;
+                    const targetVersion = targetFeature === feature
+                        ? currentVersion
+                        : (this.config[targetFeature]?.VERSION || 'V1');
+
+                    if (!featureMethodMap[targetFeature]) {
+                        featureMethodMap[targetFeature] = {};
+                    }
+
+                    uiAffect.affects.forEach((affect) => {
+                        if (affect.version === targetVersion) {
+                            featureMethodMap[targetFeature][affect.method] = true;
+                        }
+                    });
+                });
+            }
+
+            schema[feature] = feature in featureMethodMap ? featureMethodMap[feature] : {};
+        });
+
+        return schema;
     }
 }
-
 
 export default new FeatureSchemaManager();

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, watch,
+    computed, ref, watch,
 } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
@@ -19,24 +19,15 @@ import { useProjectGroupQuery } from '@/services/project/v-shared/composables/qu
 import { useProjectGroupNames } from '@/services/project/v-shared/composables/use-project-group-names';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
-const props = defineProps<{
-    targetParentGroupId?: string;
-}>();
-const emit = defineEmits<{(e: 'created', projectGroupId: string): void;
-}>();
-
 const projectPageModalStore = useProjectPageModalStore();
-const visible = computed(() => projectPageModalStore.state.projectFormModalVisible
-&& projectPageModalStore.state.targetType === 'projectGroup');
+const visible = computed(() => projectPageModalStore.state.projectGroupRenameModalVisible);
 const targetId = computed(() => projectPageModalStore.state.targetId);
-const updateMode = computed(() => projectPageModalStore.state.targetId !== undefined);
 
 /* project group */
 const { data: projectGroup, isLoading, setQueryData } = useProjectGroupQuery({
     projectGroupId: targetId,
     enabled: visible,
 });
-
 
 /* project group names */
 const projectGroupNames = useProjectGroupNames({
@@ -50,7 +41,7 @@ const {
     invalidState,
     invalidTexts,
     setForm, isAllValid,
-    initForm, resetValidations,
+    resetValidations,
 } = useFormValidator({
     projectGroupName: undefined as string|undefined,
 }, {
@@ -61,13 +52,15 @@ const {
         return true;
     },
 });
+
+const originalName = ref<string>('');
+
 watch([visible, projectGroup], async ([v, pg]) => {
     if (!v) return;
-    if (updateMode.value) {
-        setForm('projectGroupName', pg?.name);
+    if (pg) {
+        setForm('projectGroupName', pg.name);
+        originalName.value = pg.name;
         resetValidations();
-    } else {
-        initForm();
     }
 }, { immediate: true });
 
@@ -75,18 +68,6 @@ watch([visible, projectGroup], async ([v, pg]) => {
 /* mutations */
 const { projectGroupAPI, projectGroupListQueryKey } = useProjectGroupApi();
 const queryClient = useQueryClient();
-
-const { mutateAsync: createProjectGroup, isPending: isCreating } = useMutation({
-    mutationFn: projectGroupAPI.create,
-    onSuccess: (data) => {
-        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
-        queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
-        emit('created', data.project_group_id);
-    },
-    onError: (e) => {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
-    },
-});
 
 const { mutateAsync: updateProjectGroup, isPending: isUpdating } = useMutation({
     mutationFn: projectGroupAPI.update,
@@ -100,53 +81,47 @@ const { mutateAsync: updateProjectGroup, isPending: isUpdating } = useMutation({
     },
 });
 
-const isProcessing = computed(() => isCreating.value || isUpdating.value);
-
-
 /* Event */
 const handleConfirm = async () => {
-    if (isProcessing.value) return;
+    if (isUpdating.value) return;
     if (!projectGroupName.value) return;
     if (!isAllValid.value) return;
 
-    if (updateMode.value) {
-        if (!targetId.value) {
-            ErrorHandler.handleRequestError(new Error('projectGroupId is required'), 'projectGroupId is required', true);
-            return;
-        }
-        const hasChanged = projectGroup.value?.name !== projectGroupName.value;
-        if (hasChanged) {
-            await updateProjectGroup({
-                name: projectGroupName.value,
-                project_group_id: targetId.value,
-            });
-        }
-    } else {
-        await createProjectGroup({
+    if (!targetId.value) {
+        ErrorHandler.handleRequestError(new Error('projectGroupId is required'), 'projectGroupId is required', true);
+        return;
+    }
+    const hasChanged = originalName.value !== projectGroupName.value;
+    if (hasChanged) {
+        await updateProjectGroup({
             name: projectGroupName.value,
-            parent_group_id: props.targetParentGroupId,
+            project_group_id: targetId.value,
         });
     }
-    projectPageModalStore.closeFormModal();
+
+    projectPageModalStore.closeProjectGroupRenameModal();
 };
 
 </script>
 
 <template>
-    <p-button-modal :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
+    <p-button-modal :header-title="$t('PROJECT.DETAIL.MODAL_RENAME_PROJECT_GROUP_TITLE')"
                     centered
                     size="sm"
                     fade
                     backdrop
                     :loading-backdrop="isLoading"
                     :visible="visible"
-                    :loading="isProcessing"
-                    :disabled="isProcessing || !isAllValid || projectGroup?.name === projectGroupName"
-                    @close="projectPageModalStore.closeFormModal"
-                    @cancel="projectPageModalStore.closeFormModal"
+                    :loading="isUpdating"
+                    :disabled="isUpdating || !isAllValid || projectGroup?.name === projectGroupName"
+                    @close="projectPageModalStore.closeProjectGroupRenameModal"
+                    @cancel="projectPageModalStore.closeProjectGroupRenameModal"
                     @closed="projectPageModalStore.resetTarget"
                     @confirm="handleConfirm"
     >
+        <template #confirm-button>
+            {{ $t('PROJECT.LANDING.SAVE_CHANGES') }}
+        </template>
         <template #body>
             <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
                            :invalid-text="invalidTexts.projectGroupName"

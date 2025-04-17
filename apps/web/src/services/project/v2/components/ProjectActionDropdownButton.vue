@@ -32,6 +32,11 @@ const actionItems = computed<SelectDropdownMenuItem[]>(() => [
         label: i18n.t('PROJECT.DETAIL.RENAME'),
         icon: 'ic_edit-text',
     },
+    ...(props.projectId ? [{
+        name: 'editAccess',
+        label: i18n.t('PROJECT.DETAIL.EDIT_ACCESS'),
+        icon: 'ic_edit',
+    }] : []),
     {
         name: 'move',
         label: i18n.t('PROJECT.DETAIL.MOVE'),
@@ -57,9 +62,13 @@ const handleSelectItem = (selectedItem: SelectDropdownMenuItem|string|number) =>
     if (typeof selected === 'object') selected = (selectedItem as SelectDropdownMenuItem).name;
     if (selected === 'rename') {
         if (props.projectId) {
-            projectPageModalStore.openEditProjectFormModal(props.projectId);
+            projectPageModalStore.openProjectRenameModal(props.projectId);
         } else if (props.projectGroupId) {
-            projectPageModalStore.openEditProjectGroupFormModal(props.projectGroupId);
+            projectPageModalStore.openProjectGroupRenameModal(props.projectGroupId);
+        }
+    } else if (selected === 'editAccess') {
+        if (props.projectId) {
+            projectPageModalStore.openProjectEditAccessModal(props.projectId);
         }
     } else if (selected === 'move') {
         if (props.projectId) {

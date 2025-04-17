@@ -29,6 +29,7 @@ import type {
     DisplayMenu, DisplayStoreState, SidebarProps, SidebarType,
     DisplayStoreGetters,
 } from '@/store/display/type';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
@@ -36,8 +37,6 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useGlobalConfigStore } from '../global-config/global-config-store';
 
 const verbose = false;
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
@@ -309,12 +308,12 @@ export const useDisplayStore = defineStore('display-store', () => {
     const getAllMenuList = (route?: Route): DisplayMenu[] => {
         const isMyPage = route?.path.startsWith('/my-page');
         const appContextStore = useAppContextStore();
-        const globalConfigStore = useGlobalConfigStore();
+        const globalConfigSchemaStore = useGlobalConfigSchemaStore();
         const appContextState = appContextStore.$state;
         const userWorkspaceStore = useUserWorkspaceStore();
         const isAdminMode = appContextState.getters.isAdminMode;
         const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
-        const menuList = globalConfigStore.getters.menuList;
+        const menuList = globalConfigSchemaStore.getters.menuList;
         let _allGnbMenuList: DisplayMenu[];
 
         _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode, currentWorkspaceId);

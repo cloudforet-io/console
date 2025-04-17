@@ -1,4 +1,4 @@
-import type { FeatureConfiguratorType } from '@/lib/config/global-config/types/type';
+import type { FeatureConfigurator } from '@/lib/config/global-config/types/type';
 
 import AlertManagerConfigurator from '@/services/alert-manager/configurator';
 import AssetInventoryConfigurator from '@/services/asset-inventory/configurator';
@@ -20,4 +20,4 @@ const configurators = {
     IAM: IamConfigurator,
 } as const;
 
-export const getFeatureConfigurator = (featureName: string): FeatureConfiguratorType | null => configurators[featureName] || null;
+export const getFeatureConfigurator = (featureName: string): FeatureConfigurator | null => configurators[featureName] || null;

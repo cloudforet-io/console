@@ -6,11 +6,11 @@ import {
 } from '@cloudforet/mirinae';
 
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -37,6 +37,8 @@ const {
 
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     modalVisible: false,
@@ -60,7 +62,7 @@ const onSelectProject = (selected) => {
                 <p-copy-button :value="props.alertData.project_id">
                     <p-link action-icon="internal-link"
                             new-tab
-                            :to="referenceRouter(
+                            :to="getReferenceLocation(
                                 props.alertData.project_id,
                                 { resource_type: 'identity.Project', workspace_id: userWorkspaceStore.getters.currentWorkspaceId },)"
                             highlight

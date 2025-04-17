@@ -26,8 +26,9 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -63,9 +64,8 @@ import type {
     Period,
     DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-
 
 type CostAnalyzeRawData = {
   [groupBy: string]: string | any;
@@ -85,6 +85,7 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const router = useRouter();
 
+const { getReferenceLocation } = useReferenceRouter();
 
 const getValueSumKey = (dataType: string) => {
     switch (dataType) {
@@ -408,8 +409,9 @@ const handleClickRowData = (fieldName: string, value: string) => {
 
     if (storeState.isAdminMode) return;
     if (fieldName === GROUP_BY.PROJECT) {
-        _routeName = PROJECT_ROUTE_V1.DETAIL._NAME;
-        _params = { id: value, workspaceId: storeState.currentWorkspaceId };
+        const { name, params } = getReferenceLocation(value, { resource_type: 'identity.Project' });
+        _routeName = name || PROJECT_ROUTE_V2._NAME;
+        _params = params || {};
     }
     if (fieldName === GROUP_BY.SERVICE_ACCOUNT) {
         _routeName = SERVICE_ACCOUNT_ROUTE.DETAIL._NAME;

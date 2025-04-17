@@ -1,0 +1,98 @@
+{/* PTreeNode.mdx */}
+
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as PTreeNodeStories from './PTreeNode.stories';
+
+<Meta of={PTreeNodeStories} />
+
+# Tree Node
+
+The Tree Node component is a versatile element for displaying hierarchical data in a tree structure. It provides a flexible way to represent nodes with icons, text, and interactive features like expand/collapse, selection, and dragging.
+
+## Key Features
+
+- **Expand/Collapse**: Toggle functionality to show or hide child elements (controlled by `expanded` and `hasChildren` props)
+- **Selection**: Ability to select a node (when `selectable` is true)
+- **Router Link**: Can function as a router link (using the `link` property when `selectable` is true)
+- **Drag and Drop**: Can be made draggable (when `draggable` is true)
+- **Customizable Layout**: Multiple slots (`outer-left`, `inner-left`, `inner-right`, `outer-right`, `action`, `children`, `default`) to customize various parts of the node
+- **Text Ellipsis**: Automatically shows tooltip when text is truncated
+- **Depth Indentation**: Supports nested levels with proper indentation (using the `depth` prop)
+- **Loading State**: Visual indication when children are loading
+- **Display Types**: Supports both 'tree' and 'list' display types
+
+## Usage Example
+
+```vue
+<p-tree-node
+  id="node-1"
+  name="Parent Node"
+  :icon="ic_collect"
+  :hasChildren="true"
+  :expanded="expanded"
+  @update:expanded="expanded = $event"
+>
+  <template #children>
+    <p-tree-node
+      id="child-1"
+      name="Child Node"
+      :icon="{ iconName: 'ic_collect', iconColor: 'red' }"
+      :depth="1"
+    />
+  </template>
+</p-tree-node>
+```
+
+<br/>
+<br/>
+
+## Basic
+Basic way to display a tree node.
+<Canvas of={PTreeNodeStories.Basic} />
+
+## Tree Structure
+How to structure a tree by displaying parent and child nodes together.
+<Canvas of={PTreeNodeStories.TreeStructure} />
+
+## With Slots
+How to provide additional content to a node using slots.
+<Canvas of={PTreeNodeStories.WithSlots} />
+
+## Selectable
+How to implement a selectable node.
+<Canvas of={PTreeNodeStories.Selectable} />
+
+## Loading
+How to display a node in loading state.
+<Canvas of={PTreeNodeStories.Loading} />
+
+## Draggable
+How to make a node draggable.
+NOT implemented yet.
+<Canvas of={PTreeNodeStories.Draggable} />
+
+## With Link
+How to use a node as a router link.
+<Canvas of={PTreeNodeStories.WithLink} />
+
+## Display Type
+Different display types for tree nodes.
+<Canvas of={PTreeNodeStories.DisplayType} />
+
+## Icon Types
+Different ways to specify icons for tree nodes.
+<Canvas of={PTreeNodeStories.IconTypes} />
+
+## Depth
+How depth affects the indentation of tree nodes.
+<Canvas of={PTreeNodeStories.Depth} />
+
+## Default Slot
+How to customize the node text using the default slot.
+<Canvas of={PTreeNodeStories.DefaultSlot} />
+
+## Playground
+A playground where you can manipulate all properties.
+<Canvas of={PTreeNodeStories.Playground} />
+<Controls of={PTreeNodeStories.Playground} /> 

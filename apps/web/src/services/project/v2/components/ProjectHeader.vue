@@ -80,9 +80,9 @@ watch([project, projectGroup, hasProjectOrGroupId], ([prj, pg, exist]) => {
 }, { immediate: true });
 
 /* Event Handlers */
-const handleClickMembers = () => {
-    if (props.projectId) projectPageModalStore.openProjectManageMemberModal(props.projectId);
-    else if (props.projectGroupId) projectPageModalStore.openProjectGroupManageMemberModal(props.projectGroupId);
+const handleClickManageMember = () => {
+    if (props.projectId) projectPageModalStore.openProjectMemberModal(props.projectId);
+    else if (props.projectGroupId) projectPageModalStore.openProjectGroupMemberModal(props.projectGroupId);
 };
 
 /* icon */
@@ -127,7 +127,7 @@ const iconColor = computed(() => (project ? undefined : projectGroupIcon.iconCol
                         <p-button v-if="membersCount !== undefined"
                                   style-type="tertiary"
                                   size="sm"
-                                  @click="handleClickMembers"
+                                  @click="handleClickManageMember"
                         >
                             {{ $t('PROJECT.DETAIL.MEMBERS') }} ({{ membersCount }})
                         </p-button>

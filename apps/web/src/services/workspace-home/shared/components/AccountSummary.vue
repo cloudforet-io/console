@@ -88,7 +88,7 @@ const { data: serviceAccountData, isLoading: isLoadingServiceAccount } = useScop
 
 const state = reactive({
     accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
-    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
+    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
     emptyData: computed<EmptyData|undefined>(() => {
         let result: EmptyData|undefined;
         if (isEmpty(serviceAccountData.value?.results)) {

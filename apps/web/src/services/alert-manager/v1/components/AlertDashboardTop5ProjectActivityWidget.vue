@@ -15,11 +15,11 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -62,6 +62,7 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const allReferenceStore = useAllReferenceStore();
+const { getReferenceLocation } = useReferenceRouter();
 const state = reactive({
     loading: true,
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -208,7 +209,7 @@ watch(() => state.selectedPeriod, async () => {
                      :key="`table-row-${idx}`"
                      class="table-row"
                 >
-                    <p-link :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
+                    <p-link :to="getReferenceLocation(projectId,{ resource_type: 'identity.Project' })"
                             size="sm"
                             class="col-name"
                     >
