@@ -135,7 +135,6 @@ watch(() => [
     }
 
     if (planned_limits.length > 0) {
-        console.log(planned_limits);
         budgetCreatePageStore.setPlannedLimits(planned_limits);
     }
 }, { deep: true });
