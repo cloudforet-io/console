@@ -235,15 +235,22 @@ defineExpose({
 
 <template>
     <div class="dashboard-create-step2">
-        <div class="selected-ootb-wrapper">
-            <p-i name="ic_dashboard-template_others"
-                 width="3.5rem"
-                 height="3.5rem"
-            />
-            <div class="description-wrapper">
-                <p class="description-title">
+        <div class="left-part flex items-center gap-4">
+            <div>
+                <p-i name="ic_dashboard-template_blank"
+                     width="3.5rem"
+                     height="3.5rem"
+                />
+            </div>
+            <div>
+                <div class="board-item-title">
                     Blank
-                </p>
+                </div>
+                <div class="label-wrapper">
+                    <span class="blank-description">
+                        {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
+                    </span>
+                </div>
             </div>
         </div>
         <div class="input-form-wrapper">
@@ -298,6 +305,13 @@ defineExpose({
     display: flex;
     flex-direction: column;
     gap: 2rem;
+}
+.board-item-title {
+    @apply text-label-lg text-gray-900;
+    margin-bottom: 0.375rem;
+}
+.blank-description {
+    @apply text-paragraph-sm text-gray-500;
 }
 .selected-ootb-wrapper {
     display: flex;

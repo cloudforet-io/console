@@ -77,7 +77,7 @@ const handleCreateDashboard = async () => {
                       :loading="dashboardCreatePageState.loading"
                       @click="handleCreateDashboard"
             >
-                {{ $t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD') }}
+                {{ $t('DASHBOARDS.CREATE.CREATE') }}
             </p-button>
         </div>
     </div>

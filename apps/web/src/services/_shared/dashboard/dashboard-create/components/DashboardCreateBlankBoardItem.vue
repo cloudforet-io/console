@@ -31,14 +31,22 @@ const handleClickBlankBoardItem = () => {
     >
         <template #item-content>
             <div class="board-item-wrapper">
-                <div class="left-part">
-                    <div class="board-item-title">
-                        Blank
+                <div class="left-part flex items-center gap-3">
+                    <div>
+                        <p-i name="ic_dashboard-template_blank"
+                             width="2.5rem"
+                             height="2.5rem"
+                        />
                     </div>
-                    <div class="label-wrapper">
-                        <span class="blank-description">
-                            {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
-                        </span>
+                    <div>
+                        <div class="board-item-title">
+                            Blank
+                        </div>
+                        <div class="label-wrapper">
+                            <span class="blank-description">
+                                {{ $t('DASHBOARDS.CREATE.BLANK_DESC') }}
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="right-part">
@@ -73,7 +81,6 @@ const handleClickBlankBoardItem = () => {
 
     .board-item-title {
         @apply text-label-md flex items-center;
-        margin-bottom: 0.5rem;
         gap: 0.375rem;
     }
 }
