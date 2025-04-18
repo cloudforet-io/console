@@ -12,7 +12,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { ApiFilter, Query } from '@cloudforet/core-lib/space-connector/type';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolboxTable, PSelectDropdown, PButtonModal, PI, PProgressBar, PStatus, PLink,
 } from '@cloudforet/mirinae';
@@ -25,7 +25,6 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
@@ -40,6 +39,7 @@ import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToo
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 import { BUDGET_SEARCH_HANDLERS } from '../constants/budget-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '../routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 import type { Period } from '../types/cost-explorer-query-type';
@@ -60,7 +60,6 @@ interface BudgetMainListState {
     pageStart: number;
     pageLimit: number;
     period: Period;
-    sort: Query['sort'];
     query: any;
     isExpiredBudgetsHidden: boolean;
     selectedIndex: number[];
@@ -91,7 +90,6 @@ const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
 const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
 
@@ -107,10 +105,6 @@ const state = reactive<BudgetMainListState>({
     pageStart: 1,
     pageLimit: 24,
     period: {},
-    sort: [{
-        key: 'budget_usage',
-        desc: true,
-    }],
     query: undefined,
     isExpiredBudgetsHidden: false,
     selectedIndex: [],
@@ -145,10 +139,9 @@ const tableState = reactive({
             sortable: false,
         },
         {
-            name: 'budget',
+            name: 'limit',
             label: 'Budget',
             width: '10%',
-            sortable: false,
         },
         {
             name: 'actualSpend',
@@ -157,10 +150,9 @@ const tableState = reactive({
             sortable: false,
         },
         {
-            name: 'utilization',
+            name: 'utilization_rate',
             label: 'Utilization',
             width: '10%',
-            sortable: false,
         },
         {
             name: 'remaining',
@@ -172,6 +164,7 @@ const tableState = reactive({
             name: 'state',
             label: 'State',
             width: '7%',
+            sortable: false,
         },
     ]),
     items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
@@ -181,16 +174,21 @@ const tableState = reactive({
             name: budget.name,
             target: budget.service_account_id ? budget.service_account_id : budget.project_id,
             cycle: budget.time_unit,
-            period: budget.time_unit === 'MONTHLY' ? dayjs.utc().format('YYYY-MM')
-                : `${startDate.format('YYYY-MM')} ~ ${endDate.format('YYYY-MM')}`,
-            budget: budget.time_unit === 'MONTHLY' ? (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
-            && dayjs.utc(budgetUsage.date).format('YYYY-MM') === dayjs.utc().format('YYYY-MM'))
-                .map((budgetUsage) => budgetUsage.budget)[0] ?? 0 : budget.limit,
+            // eslint-disable-next-line no-nested-ternary
+            period: (budget.time_unit === 'TOTAL') || (budget.time_unit === 'MONTHLY' && endDate.isBefore(dayjs.utc(), 'month'))
+                ? `${startDate.format('YYYY-MM')} ~ ${endDate.format('YYYY-MM')}`
+                : (budget.time_unit === 'MONTHLY' && startDate.isAfter(dayjs.utc(), 'month'))
+                    ? startDate.format('YYYY-MM')
+                    : dayjs.utc().format('YYYY-MM'),
+            // budget: budget.time_unit === 'MONTHLY' ? (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
+            // && dayjs.utc(budgetUsage.date).format('YYYY-MM') === dayjs.utc().format('YYYY-MM'))
+            //     .map((budgetUsage) => budgetUsage.budget)[0] ?? 0 : budget.limit,
+            limit: budget.limit ?? 0,
             actualSpend: budget.time_unit === 'MONTHLY' ? state.budgetUsages
                 .filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM'))
                 .map((budgetUsage) => budgetUsage.actual_spend)[0] ?? 0
                 : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0),
-            utilization: budget.utilization_rate,
+            utilization_rate: budget.utilization_rate ? budget.utilization_rate : 0,
             remaining: 0,
             state: dayjs.utc().isSameOrAfter(startDate, 'month') && dayjs.utc().isSameOrBefore(endDate, 'month')
                 ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ACTIVE_TIL_DATE') : 'EXPIRED',
@@ -201,14 +199,15 @@ const tableState = reactive({
     ]),
     selectedActionItem: '',
     valueHandlerMap: computed(() => ({
-        name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
+        name: makeDistinctValueHandler('cost_analysis.Budget', 'name', 'string'),
         time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit', 'string'),
+        budget_manager_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_manager_id', 'string'),
     })),
 });
 
 const budgetApiQueryHelper = new ApiQueryHelper()
     .setPage(state.pageStart, state.pageLimit)
-    .setSort('name', true);
+    .setSort('utilization_rate', true);
 
 const queryTagHelper = useQueryTags({ keyItemSets: BUDGET_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
@@ -239,14 +238,14 @@ const getBudgetFilters = (): ApiFilter[] => {
         if (state.query?.target === 'project') {
             filters.push({
                 k: 'service_account_id',
-                v: false,
-                o: 'exists',
+                v: [null, ''],
+                o: 'in',
             });
         } else if (state.query?.target === 'serviceAccount') {
             filters.push({
                 k: 'service_account_id',
-                v: '',
-                o: 'not',
+                v: [null, ''],
+                o: 'not_in',
             });
         }
     }
@@ -267,7 +266,7 @@ const getBudgetFilters = (): ApiFilter[] => {
         });
     }
 
-    if (state.query?.projectList?.length) {
+    if (state.query?.projectList && state.query?.projectList?.length) {
         filters.push({
             k: 'project_id',
             v: state.query.projectList,
@@ -333,25 +332,6 @@ const fetchBudgetUsages = async () => {
                         operator: 'sum',
                     },
                 },
-                // select: {
-                //     budget_id: 'budget_id',
-                //     name: 'name',
-                //     actual_spend: 'actual_spend',
-                //     budget: 'budget',
-                //     utilization: {
-                //         operator: 'multiply',
-                //         fields: [
-                //             {
-                //                 operator: 'divide',
-                //                 fields: ['actual_spend', 'budget'],
-                //             },
-                //             100,
-                //         ],
-                //     },
-                //     date: 'date',
-                //     currency: 'currency',
-                // },
-                // sort: [{ key: 'utilization', desc: true }],
                 page: { limit: 200 },
                 ...budgetUsageApiQueryHelper.data,
             },
@@ -411,15 +391,10 @@ const handleChange = async (options: any = {}) => {
 
         if (key === 'actualSpend') {
             budgetSortKey = 'name';
-            usageSortKey = 'utilization';
+            usageSortKey = 'utilization_rate';
         } else if (key === 'cycle') {
             budgetSortKey = 'time_unit';
         }
-
-        state.sort = [{
-            key: key === 'actualSpend' ? 'budget_usage' : key,
-            desc,
-        }];
 
         budgetApiQueryHelper.setSort(budgetSortKey, desc);
         budgetUsageApiQueryHelper.setSort(usageSortKey, desc);
@@ -433,7 +408,7 @@ const handleChange = async (options: any = {}) => {
 /* Watcher */
 watch(() => state.query, async () => {
     state.addRequests = {
-        project_id: state.query.projectList,
+        project_id: state.query?.projectList ?? [],
     };
     await fetchBudgets();
 }, { deep: true, immediate: true });
@@ -446,6 +421,7 @@ watch(() => state.selectedIndex, () => {
         });
     }
 }, { immediate: true });
+
 /* Mounted */
 onMounted(async () => {
     await fetchBudgets();
@@ -466,7 +442,7 @@ onMounted(async () => {
                              selectable
                              sortable
                              sort-desc
-                             sort-by="name"
+                             sort-by="utilization_rate"
                              pagination-visible
                              exportable
                              search-type="query"
@@ -491,9 +467,8 @@ onMounted(async () => {
                     <div class="flex flex-col gap-5">
                         <p-link highlight
                                 :to="{
-                                    name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
+                                    name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME : COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                                     params: {
-                                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                                         budgetId: state.budgets[rowIndex].budget_id
                                     }
                                 }"
@@ -502,15 +477,11 @@ onMounted(async () => {
                         </p-link>
                     </div>
                 </template>
-                <template #col-budget-format="{item, value, rowIndex}">
-                    <div class="flex flex-col items-end"
-                         :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
-                    >
-                        <p>
-                            <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
-                            <span>{{ value.toLocaleString() }}</span>
-                        </p>
-                    </div>
+                <template #col-limit-format="{value, rowIndex}">
+                    <p class="flex gap-0.5">
+                        <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
+                        <span>{{ Number(value).toLocaleString() }}</span>
+                    </p>
                 </template>
                 <template #col-cycle-format="{value, item}">
                     <p class="flex gap-2 items-center"
@@ -540,7 +511,6 @@ onMounted(async () => {
                             :to="{
                                 name: SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
                                 params: {
-                                    workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
                                     serviceAccountId: value
                                 }
                             }"
@@ -556,9 +526,9 @@ onMounted(async () => {
                         {{ Number(value).toLocaleString() }}
                     </p>
                 </template>
-                <template #col-utilization-format="{item, value}">
+                <template #col-utilization_rate-format="{item, value}">
                     <div :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
-                        <div v-if="value">
+                        <div v-if="value > -1">
                             <p-progress-bar :percentage="value"
                                             :color="Number(value) < 100
                                                 && Number(value) > 0
@@ -566,13 +536,12 @@ onMounted(async () => {
                             />
                             <span>{{ Number(value).toFixed(2) }} %</span>
                         </div>
-                        <span v-else />
                     </div>
                 </template>
                 <template #col-remaining-format="{item, rowIndex}">
-                    <p :class="{exceeded: (Number(item.budget) - Number(item.actualSpend)) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                    <p :class="{exceeded: (Number(item.limit) - Number(item.actualSpend)) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
-                        {{ Math.abs(Number((Number(item.budget) - Number(item.actualSpend)).toFixed(2))).toLocaleString() }}
+                        {{ Math.abs(Number((Number(item.limit) - Number(item.actualSpend)).toFixed(2))).toLocaleString() }}
                     </p>
                 </template>
                 <template #col-state-format="{item}">
