@@ -430,7 +430,6 @@ watch([
                     <div v-if="budgetCreatePageState.time_unit === 'TOTAL'"
                          class="pt-4 pl-4"
                     >
-                        <!-- TODO: babel edit 확인 -->
                         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_AMOUNT')"
                                        required
                         >
@@ -516,7 +515,6 @@ watch([
                                     </div>
                                 </div>
                                 <div v-else-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually'">
-                                    <!-- TODO: translate -->
                                     <span class="text-xs mb-2">Enter each month manually.</span>
                                     <div class="allocation-enter-manually">
                                         <p-field-group v-for="(date, idx) in state.dateList"

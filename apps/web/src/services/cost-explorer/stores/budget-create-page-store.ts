@@ -100,7 +100,7 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
     const setEnd = (endMonth: []) => {
         state.endMonth = endMonth;
     };
-    const setExistingBudgetYear = (years: number[]) => {
+    const setExistingBudgetYear = (years: string[]) => {
         state.alreadyExistingBudgetYear = years;
     };
     const setBudgetYear = (year: string) => {
