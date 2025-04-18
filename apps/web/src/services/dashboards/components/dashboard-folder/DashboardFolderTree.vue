@@ -30,7 +30,10 @@ interface Props {
     buttonDisableMap?: Record<string, boolean>;
     // for dashboard create page
     disableLink?: boolean;
-    readonlyMode?: boolean;
+    disableFavorite?: boolean;
+    disableControlLabels?: boolean;
+    showAll?: boolean;
+    showSingleControlButtons?: boolean;
     showControlButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -38,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
     selectedIdMap: () => ({}),
     dashboardTreeData: () => ([]),
     buttonDisableMap: () => ({}),
+    showSingleControlButtons: true,
+    showAll: false,
 });
 
 
@@ -63,33 +68,29 @@ const state = reactive({
         return Object.values(state.proxySelectedIdMap).some((v) => v);
     }),
     childrenShowMap: {} as Record<string, boolean>,
-    controlButtons: computed<ControlButton[]>(() => {
-        if (props.readonlyMode) return [];
-        return [
-            {
-                name: 'clone',
-                icon: 'ic_clone',
-                clickEvent: () => emit('click-control-clone'),
-                disabled: !!props.buttonDisableMap?.clone,
-            },
-            {
-                name: 'move',
-                icon: 'ic_move',
-                clickEvent: () => emit('click-control-move'),
-                disabled: !!props.buttonDisableMap?.move,
-            },
-            {
-                name: 'delete',
-                icon: 'ic_delete',
-                clickEvent: () => emit('click-control-delete'),
-                disabled: !!props.buttonDisableMap?.delete,
-                styleType: 'negative-transparent',
-            },
-        ];
-    }),
-    showAll: false,
+    controlButtons: computed<ControlButton[]>(() => [
+        {
+            name: 'clone',
+            icon: 'ic_clone',
+            clickEvent: () => emit('click-control-clone'),
+            disabled: !!props.buttonDisableMap?.clone,
+        },
+        {
+            name: 'move',
+            icon: 'ic_move',
+            clickEvent: () => emit('click-control-move'),
+            disabled: !!props.buttonDisableMap?.move,
+        },
+        {
+            name: 'delete',
+            icon: 'ic_delete',
+            clickEvent: () => emit('click-control-delete'),
+            disabled: !!props.buttonDisableMap?.delete,
+            styleType: 'negative-transparent',
+        },
+    ]),
+    showAll: props.showAll,
     slicedTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
-        if (props.readonlyMode) return props.dashboardTreeData;
         if (state.showAll) return props.dashboardTreeData;
         return props.dashboardTreeData.slice(0, 10);
     }),
@@ -200,8 +201,10 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                 />
                 <dashboard-folder-tree-item :entry-point="props.entryPoint"
                                             :tree-data="treeData"
-                                            :readonly-mode="props.readonlyMode"
+                                            :disable-favorite="props.disableFavorite"
+                                            :disable-control-labels="props.disableControlLabels"
                                             :disable-link="props.disableLink"
+                                            :show-single-control-buttons="props.showSingleControlButtons"
                                             @toggle-folder="handleClickCollapseButton(treeData)"
                                             @select-control-actions="handleSelectControlActions"
                 />
@@ -218,7 +221,9 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                     <dashboard-folder-tree-item :entry-point="props.entryPoint"
                                                 :tree-data="child"
                                                 :disable-link="props.disableLink"
-                                                :readonly-mode="props.readonlyMode"
+                                                :disable-favorite="props.disableFavorite"
+                                                :disable-control-labels="props.disableControlLabels"
+                                                :show-single-control-buttons="props.showSingleControlButtons"
                                                 class="child-tree-item"
                                                 @select-control-actions="handleSelectControlActions"
                     />

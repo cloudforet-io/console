@@ -40,7 +40,7 @@ export const useDashboardControlMenuHelper = () => {
     const SHARE_WITH_CODE_MENU_ITEM = computed<MenuItem>(() => ({
         type: 'item',
         name: DASHBOARD_CONTROL_MENU_ACTION_TYPES.SHARE_WITH_CODE,
-        label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SHARE_WITH_CODE'),
+        label: i18n.t('DASHBOARDS.DETAIL.SHARE_WITH_CODE'),
         icon: 'ic_share-code',
     }));
 

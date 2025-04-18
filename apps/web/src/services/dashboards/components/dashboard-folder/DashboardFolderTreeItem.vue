@@ -40,7 +40,9 @@ interface Props {
     treeData: TreeNode<DashboardTreeDataType>;
     // for dashboard create page
     disableLink?: boolean;
-    readonlyMode?: boolean;
+    disableFavorite?: boolean;
+    disableControlLabels?: boolean;
+    showSingleControlButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     entryPoint: () => DASHBOARD_SHARED_ENTRY_POINT.NONE_ENTRY_POINT,
@@ -123,11 +125,6 @@ const handleClickTreeItem = (): void => {
             dashboardId: props.treeData.data.id || '',
         },
     };
-    const _target = props.readonlyMode ? '_blank' : '_self';
-    if (_target === '_blank') {
-        window.open(router.resolve(_location).href, _target);
-        return;
-    }
     router.push(_location).catch(() => {});
 };
 const handleClickLabel = (label: string) => {
@@ -161,25 +158,15 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                              width="1rem"
                              height="1rem"
                         />
-                        <p-i v-if="props.readonlyMode && node.id.startsWith('private')"
-                             name="ic_lock-filled"
-                             width="0.75rem"
-                             height="0.75rem"
-                             :color="gray[500]"
-                        />
                         <span class="text">{{ node.data.name }}</span>
                         <div v-if="node.data.isNew">
                             <new-mark class="new-mark" />
                         </div>
-                        <p-i v-if="!props.disableLink && node.data.type === 'DASHBOARD' && props.readonlyMode"
-                             name="ic_arrow-right-up"
-                             width="0.75rem"
-                             height="0.75rem"
-                        />
-                        <div v-if="!props.readonlyMode"
+                        <div v-if="props.showSingleControlButtons || !props.disableFavorite"
                              class="hidden-wrapper"
                         >
-                            <p-select-dropdown style-type="tertiary-icon-button"
+                            <p-select-dropdown v-if="props.showSingleControlButtons"
+                                               style-type="tertiary-icon-button"
                                                button-icon="ic_ellipsis-horizontal"
                                                :menu="getControlMenuItems(node)"
                                                :selected="[]"
@@ -189,7 +176,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                                use-fixed-menu-style
                                                @select="handleSelectControlButton(node.data.id, $event)"
                             />
-                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.readonlyMode"
+                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.disableFavorite"
                                              :item-id="node.data.id"
                                              :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                              scale="0.8"
@@ -206,7 +193,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                 <p-label v-for="label in node.data?.labels?.slice(0, LABELS_LIMIT)"
                                          :key="`${node.data.id}-label-${label}`"
                                          :text="label"
-                                         :clickable="!props.readonlyMode"
+                                         :clickable="!props.disableControlLabels"
                                          @item-click="handleClickLabel(label)"
                                 />
 
@@ -221,7 +208,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                             <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
                                                      :key="`${node.data.id}-label-${label}`"
                                                      :text="label"
-                                                     :clickable="!props.readonlyMode"
+                                                     :clickable="!props.disableControlLabels"
                                                      @item-click="handleClickLabel(label)"
                                             />
                                         </div>
