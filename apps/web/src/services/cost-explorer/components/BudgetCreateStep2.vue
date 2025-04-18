@@ -6,13 +6,17 @@ import {
 import dayjs from 'dayjs';
 
 import {
-    PFieldGroup, PSelectDropdown, PDatetimePicker, PButton, PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge,
+    PFieldGroup, PSelectDropdown, PDatetimePicker, PButton, PStatus,
+    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge, PToggleButton,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useDomainStore } from '@/store/domain/domain-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
 
@@ -24,8 +28,12 @@ const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
 const domainStore = useDomainStore();
 const domainState = domainStore.state;
+const allReferenceStore = useAllReferenceStore();
 
 const originUnifiedCostConfig = computed<UnifiedCostConfig|undefined>(() => domainState.config?.settings?.unified_cost_config);
+
+const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
+const serviceAccount = computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount);
 
 const state = reactive({
     selectedCurrency: originUnifiedCostConfig.value?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY,
@@ -50,6 +58,8 @@ const state = reactive({
     initialAmount: undefined,
     monthlyGrowthRate: undefined,
     analyzedCostData: undefined,
+    startSelectedForBudgetYear: false,
+    endSelectedForBudgetYear: false,
 });
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
@@ -125,7 +135,6 @@ watch(() => [
     }
 
     if (planned_limits.length > 0) {
-        console.log(planned_limits);
         budgetCreatePageStore.setPlannedLimits(planned_limits);
     }
 }, { deep: true });
@@ -139,6 +148,8 @@ watch(() => [
     state.initialAmount,
     state.monthlyGrowthRate,
     budgetCreatePageState.budgetEachDate,
+    state.startSelectedForBudgetYear,
+    state.endSelectedForBudgetYear,
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
@@ -147,9 +158,37 @@ watch(() => [
     }
 
     if (budgetCreatePageState.time_unit === 'TOTAL' && budgetCreatePageState.limit && budgetCreatePageState.limit > 0) {
+        const isDuplicatedBudgetYear = (
+            budgetCreatePageState.project
+            && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
+            && (
+                (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                || (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+            )
+        );
+
+        if (isDuplicatedBudgetYear) {
+            state.isContinueAble = false;
+            return;
+        }
+
         state.isContinueAble = true;
     } else if (budgetCreatePageState.time_unit === 'MONTHLY') {
         if (budgetCreatePageState.planned_limits && budgetCreatePageState.planned_limits.length > 0) {
+            const isDuplicatedBudgetYear = (
+                budgetCreatePageState.project
+                && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
+                && (
+                    (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                    || (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                )
+            );
+
+            if (isDuplicatedBudgetYear) {
+                state.isContinueAble = false;
+                return;
+            }
+
             state.isContinueAble = true;
         } else {
             state.isContinueAble = false;
@@ -166,6 +205,20 @@ watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
         budgetCreatePageState.budgetEachDate = [];
     }
 }, { immediate: true });
+
+watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], () => {
+    if (budgetCreatePageState.startMonth.length > 0 || budgetCreatePageState.endMonth.length > 0) {
+        if (budgetCreatePageState.startMonth.length > 0) {
+            state.startSelectedForBudgetYear = true;
+        } else if (budgetCreatePageState.endMonth.length > 0) {
+            state.endSelectedForBudgetYear = true;
+        }
+    }
+}, { deep: true, immediate: true });
+
+watch([() => state.startSelectedForBudgetYear, () => state.endSelectedForBudgetYear, () => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], () => {
+
+}, { deep: true, immediate: true });
 
 const isDateInRange = (index: number) => {
     if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) return false;
@@ -201,6 +254,45 @@ const handleUpdateInitialAmount = (value) => {
 const handleUpdateMonthlyGrowthRate = (value) => {
     budgetCreatePageStore.setMonthlyGrowthRate(value);
 };
+
+const handleUpdateStartSelectForBudgetYear = (value: boolean) => {
+    state.startSelectedForBudgetYear = value;
+    if (value) {
+        state.endSelectedForBudgetYear = false;
+    }
+};
+
+const handleUpdateEndSelectForBudgetYear = (value: boolean) => {
+    state.endSelectedForBudgetYear = value;
+    if (value) {
+        state.startSelectedForBudgetYear = false;
+    }
+};
+
+const isValidPositiveNumber = (value: any): boolean => {
+    const num = Number(value);
+    return value !== '' && !Number.isNaN(num) && num > 0;
+};
+watch([
+    () => budgetCreatePageState.startMonth,
+    () => budgetCreatePageState.endMonth,
+    () => state.startSelectedForBudgetYear,
+    () => state.endSelectedForBudgetYear,
+], () => {
+    if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
+        const startYear = dayjs.utc(budgetCreatePageState.startMonth[0]).year().toString();
+        const endYear = dayjs.utc(budgetCreatePageState.endMonth[0]).year().toString();
+
+        if (startYear === endYear) {
+            budgetCreatePageStore.setBudgetYear(startYear);
+        } else if (state.startSelectedForBudgetYear) {
+            budgetCreatePageStore.setBudgetYear(startYear);
+        } else if (state.endSelectedForBudgetYear) {
+            budgetCreatePageStore.setBudgetYear(endYear);
+        }
+    }
+}, { immediate: true });
+
 </script>
 
 <template>
@@ -220,7 +312,7 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                  style-type="indigo100"
                                  class="ml-1"
                         >
-                            Default
+                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.DEFAULT') }}
                         </p-badge>
                     </div>
                 </template>
@@ -265,6 +357,46 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                         />
                     </p-field-group>
                 </div>
+                <div class="flex gap-15 mb-6">
+                    <div class="flex gap-1">
+                        <p-toggle-button
+                            :value="state.startSelectedForBudgetYear"
+                            @update:value="handleUpdateStartSelectForBudgetYear"
+                        />
+                        <span class="text-sm font-normal"
+                              :class="{'start-selected': state.startSelectedForBudgetYear, 'end-selected': !state.startSelectedForBudgetYear}"
+                        >Base for 'period' filter</span>
+                    </div>
+                    <div class="flex gap-1">
+                        <p-toggle-button
+                            :value="state.endSelectedForBudgetYear"
+                            @update:value="handleUpdateEndSelectForBudgetYear"
+                        />
+                        <span class="text-sm font-normal"
+                              :class="{'start-selected': state.endSelectedForBudgetYear, 'end-selected': !state.endSelectedForBudgetYear}"
+                        >Base for 'period' filter</span>
+                    </div>
+                </div>
+                <p-status v-if="budgetCreatePageState.project
+                              && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
+                              && (
+                                  (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                                  ||
+                                  (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                              )"
+                          icon="ic_warning-filled"
+                          :text="budgetCreatePageState.scope.type === 'project'
+                              ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
+                                  project: project[budgetCreatePageState.project].name,
+                                  year_list: budgetCreatePageState.alreadyExistingBudgetYear.join(',').split(' ')
+                              }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
+                                  project: project[budgetCreatePageState.project].name,
+                                  serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
+                                  year_list: budgetCreatePageState.alreadyExistingBudgetYear.join(',')
+                              })"
+                          theme="red"
+                          class="text-sm mb-6"
+                />
                 <div class="flex">
                     <p-field-group
                         :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
@@ -277,7 +409,13 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                      :key="`budget-cycle-${idx}`"
                                      v-model="budgetCreatePageState.time_unit"
                                      :value="cycle.name"
-                                     :disabled="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0"
+                                     :disabled="(budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0 || budgetCreatePageState.project
+                                         && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
+                                         && (
+                                             (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                                             ||
+                                             (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
+                                         ))"
                             >
                                 <span>{{ cycle.label }}</span>
                             </p-radio>
@@ -295,6 +433,7 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                        required
                         >
                             <p-text-input :value="budgetCreatePageState.limit"
+                                          :invalid="!isValidPositiveNumber(budgetCreatePageState.limit)"
                                           @update:value="handleUpdateBudgetAmount"
                             >
                                 <template #input-right>
@@ -333,6 +472,7 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                                required
                                 >
                                     <p-text-input :value="budgetCreatePageState.budgetAppliedSameAmount"
+                                                  :invalid="!isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)"
                                                   @update:value="handleUpdateBudgetAppliedSameAmount"
                                     >
                                         <template #input-right>
@@ -350,6 +490,7 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                                        required
                                         >
                                             <p-text-input :value="budgetCreatePageState.initialAmount"
+                                                          :invalid="!isValidPositiveNumber(budgetCreatePageState.initialAmount)"
                                                           @update:value="handleUpdateInitialAmount"
                                             >
                                                 <template #input-right>
@@ -362,6 +503,7 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                                        required
                                         >
                                             <p-text-input :value="budgetCreatePageState.monthlyGrowthRate"
+                                                          :invalid="!isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate)"
                                                           @update:value="handleUpdateMonthlyGrowthRate"
                                             >
                                                 <template #input-right>
@@ -381,6 +523,7 @@ const handleUpdateMonthlyGrowthRate = (value) => {
                                         >
                                             <p-text-input :value="state.budgetEachDate[idx]"
                                                           :disabled="!isDateInRange(idx)"
+                                                          :invalid="isDateInRange(idx) && (!state.budgetEachDate[idx] || !isValidPositiveNumber(Number(state.budgetEachDate[idx])))"
                                                           @update:value="(value) => handleUpdatgeBudgetEachDate(value, idx)"
                                             >
                                                 <template #input-right>
@@ -452,6 +595,12 @@ const handleUpdateMonthlyGrowthRate = (value) => {
     @apply flex gap-8;
     .left-section {
         width: 30.5rem;
+        .start-selected {
+            @apply text-gray-900;
+        }
+        .end-selected {
+            @apply text-gray-300;
+        }
     }
     .right-section {
         margin-left: 3rem;

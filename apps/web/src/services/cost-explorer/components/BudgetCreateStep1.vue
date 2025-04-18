@@ -3,6 +3,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, reactive, watch, watchEffect,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -14,6 +15,7 @@ import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/sc
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -37,9 +39,11 @@ interface BudgetCreateStep1State {
     projectList: any[];
     selectedProject: string;
     serviceAccountList: string[];
+    budgetList: BudgetModel[];
     budgetNames: string[];
     existingProjectIds: string[];
-    projectInvalidText: ComputedRef<string>;
+    existingBudgetYears: number[];
+    projectInvalidText: ComputedRef<string|TranslateResult>;
     projectInvalid: ComputedRef<boolean>;
 }
 
@@ -52,11 +56,14 @@ const state = reactive<BudgetCreateStep1State>({
     projectList: [],
     selectedProject: '',
     serviceAccountList: [],
+    budgetList: [],
     budgetNames: [],
     existingProjectIds: [],
-    projectInvalidText: computed<string>(() => {
-        if (state.existingProjectIds.includes(budgetCreatePageState.project)) return '이미 존재하는 프로젝트입니다';
-        return '프로젝트를 선택하세요';
+    existingBudgetYears: [],
+    projectInvalidText: computed<string|TranslateResult>(() => {
+        if (budgetCreatePageState.scope.type === 'project'
+        && state.existingProjectIds.includes(budgetCreatePageState.project)) return i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_VALIDATION');
+        return '';
     }),
     projectInvalid: computed(() => !state.existingProjectIds.includes(budgetCreatePageState.project) && budgetCreatePageState.project.length > 0),
 });
@@ -65,10 +72,10 @@ const emit = defineEmits<{(e: 'click-next'): void, (e: 'click-cancel'): void }>(
 
 
 watch(() => budgetCreatePageState, () => {
-    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project' && budgetCreatePageState.budgetManager && state.projectInvalid) {
+    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project' && budgetCreatePageState.budgetManager) {
         state.isContinueAble = true;
     } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
-    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.budgetManager && state.projectInvalid
+    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.budgetManager
     ) {
         state.isContinueAble = true;
     } else {
@@ -124,13 +131,10 @@ const getServiceAccountIncludedinProjectInfo = async () => {
     }
 };
 
-watch(() => budgetCreatePageState.project, async () => {
-    await getServiceAccountIncludedinProjectInfo();
-}, { deep: true, immediate: true });
-
 const fetchBudget = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>();
+        state.budgetList = results;
         state.budgetNames = results?.map((result) => result.name) ?? [];
         state.existingProjectIds = results?.map((result) => result.project_id) ?? [];
     } catch (error) {
@@ -138,9 +142,29 @@ const fetchBudget = async () => {
     }
 };
 
+watch(() => budgetCreatePageState.project, async () => {
+    await getServiceAccountIncludedinProjectInfo();
+}, { deep: true, immediate: true });
+
 watchEffect(async () => {
     await fetchBudget();
 });
+
+watch([
+    () => state.budgetList,
+    () => budgetCreatePageState.project,
+    () => budgetCreatePageState.scope.serviceAccount,
+    () => budgetCreatePageState.scope.type,
+], () => {
+    const filteredList = state.budgetList.filter((result) => {
+        if (budgetCreatePageState.scope.type === 'project') {
+            return result.project_id === budgetCreatePageState.project && !result.service_account_id;
+        }
+        return result.project_id === budgetCreatePageState.project
+               && result.service_account_id === budgetCreatePageState.scope.serviceAccount;
+    });
+    budgetCreatePageState.alreadyExistingBudgetYear = filteredList.map((result) => result.budget_year);
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -148,8 +172,6 @@ watchEffect(async () => {
         <div class="contents-container">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
                            required
-                           :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.NAME_INVALID_TEXT')"
-                           :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
             >
                 <p-text-input block
                               :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
@@ -159,12 +181,13 @@ watchEffect(async () => {
             </p-field-group>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT')"
                            required
-                           :invalid="!state.projectInvalid"
-                           :invalid-text="state.projectInvalidText"
             >
+                <!-- :invalid="!state.projectInvalid"
+                           :invalid-text="state.projectInvalidText" -->
                 <project-select-dropdown
                     show-delete-all-button
                     :project-group-selectable="false"
+                    :selected-project-ids="budgetCreatePageState.project ? [budgetCreatePageState.project] : []"
                     hide-create-button
                     @update:selected-project-ids="handleProjectId"
                 />

@@ -15,6 +15,7 @@ const budgetData = computed(() => budgetPageState.budgetData);
 
 <template>
     <p-card size="lg"
+            style-type="white"
             :header="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.TITLE')"
     >
         <div v-if="budgetData?.time_unit === 'MONTHLY'">

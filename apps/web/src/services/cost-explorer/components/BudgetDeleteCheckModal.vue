@@ -6,6 +6,9 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { BudgetDeleteParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/delete';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
+import { i18n } from '@/translations';
+
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -44,8 +47,10 @@ const deleteBudgets = async (budgetIds: string[]) => {
                 budget_id: budgetId,
             });
         }));
-    } catch (error) {
+        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DELETE_SUCCESS'));
+    } catch (error: any) {
         ErrorHandler.handleError(error);
+        showErrorMessage(error.code, error.message);
     } finally {
         loading.value = false;
     }

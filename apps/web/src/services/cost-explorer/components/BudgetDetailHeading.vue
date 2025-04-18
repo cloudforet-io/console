@@ -99,7 +99,7 @@ const handleClickBackButton = () => {
                     <template v-if="!props.loading"
                               #title-right-extra
                     >
-                        <p-select-dropdown v-if="hasReadWriteAccess && (storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner))"
+                        <p-select-dropdown v-if="hasReadWriteAccess && (state.isProjectTarget && storeState.isWorkspaceOwner) && !storeState.isAdminMode"
                                            style-type="tertiary-icon-button"
                                            button-icon="ic_ellipsis-horizontal"
                                            size="sm"

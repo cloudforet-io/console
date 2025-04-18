@@ -41,8 +41,8 @@ const storeState = reactive({
 const state = reactive<BudgetMainToolsetState>({
     targetList: [
         { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ALL') },
-        { name: 'project', label: 'Project' },
-        { name: 'serviceAccount', label: 'Service Account' },
+        { name: 'project', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PROJECT') },
+        { name: 'serviceAccount', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SERVICE_ACCOUNT') },
     ],
     selectedTarget: 'all',
     yearList: [
@@ -81,7 +81,7 @@ const state = reactive<BudgetMainToolsetState>({
         { name: 'overSeventyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 70 }) },
         { name: 'overSixtyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 60 }) },
         { name: 'overFiftyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 50 }) },
-        { name: 'overFourtyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 40 }) },
+        { name: 'overFortyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 40 }) },
         { name: 'overThirtyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 30 }) },
         { name: 'overTwentyPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 20 }) },
         { name: 'overTenPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 10 }) },
@@ -118,8 +118,8 @@ watch(() => state.selectedServiceAccountList, () => {
 watch(() => state, () => {
     emit('update:query', {
         target: state.selectedTarget,
-        projectList: state.selectedProjectList,
-        serviceAccountList: state.selectedServiceAccountList.map((serviceAccount) => serviceAccount.name),
+        projectList: state.selectedProjectList ?? [],
+        serviceAccountList: state.selectedServiceAccountList.map((s) => s.name),
         year: state.selectedYear,
         cycle: state.selectedBudgetCycle,
         utilization: state.selectedUtilization,
@@ -143,7 +143,7 @@ const handleProjectList = (projectIds) => {
                  width="14"
                  height="14"
             />
-            <span class="font-bold text-sm">Filter:</span>
+            <span class="font-bold text-sm">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FILTER') }}:</span>
         </div>
         <project-select-dropdown style-type="rounded"
                                  appearance-type="badge"
@@ -179,14 +179,14 @@ const handleProjectList = (projectIds) => {
             class="divider"
         />
         <p-select-dropdown style-type="rounded"
-                           :menu="state.yearList"
-                           :selected.sync="state.selectedYear"
-                           selection-label="Year"
-        />
-        <p-select-dropdown style-type="rounded"
                            :menu="state.budgetCycleList"
                            :selected.sync="state.selectedBudgetCycle"
                            selection-label="Cycle"
+        />
+        <p-select-dropdown style-type="rounded"
+                           :menu="state.yearList"
+                           :selected.sync="state.selectedYear"
+                           selection-label="Period (Year)"
         />
         <p-select-dropdown style-type="rounded"
                            selection-label="Utilization"

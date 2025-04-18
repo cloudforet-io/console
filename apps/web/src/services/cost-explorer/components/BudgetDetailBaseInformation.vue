@@ -3,7 +3,6 @@ import { computed, reactive, watchEffect } from 'vue';
 
 import dayjs from 'dayjs';
 
-
 import {
     PCard, PDefinitionTable, PToggleButton, PLink, PButton, PPaneLayout, PTextInput,
 } from '@cloudforet/mirinae';
@@ -11,13 +10,14 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
@@ -29,11 +29,16 @@ import BudgetAlertsModal from './BudgetAlertsModal.vue';
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
 
 const getServiceAccountName = (serviceAccountId: string): string|undefined => serviceAccountReferenceStore.getters.serviceAccountItems[serviceAccountId]?.label;
 
-const budgetData = computed(() => budgetPageState.budgetData);
+const { hasReadWriteAccess } = usePageEditableStatus();
+
+const storeState = reactive({
+    budgetData: computed(() => budgetPageState.budgetData),
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+});
 
 const state = reactive({
     definitionFields: [
@@ -46,19 +51,19 @@ const state = reactive({
         { name: 'alertRecipients', label: 'Alert Recipients' },
     ],
     definitionData: computed(() => ({
-        cycle: budgetData.value?.time_unit === 'MONTHLY' ? 'Monthly' : 'Fixed Term',
-        totalPeriod: `${budgetData.value?.start} ~ ${budgetData.value?.end}`,
-        budgetScope: budgetData.value?.service_account_id ?? budgetData.value?.project_id,
-        budgetPlan: budgetData.value?.time_unit === 'MONTHLY' ? budgetData.value.planned_limits : budgetData.value?.limit,
-        budgetManager: budgetData.value?.budget_manager_id,
-        budgetAlerts: budgetData.value?.notification.plans
-            && budgetData.value?.notification.plans?.length > 0 ? budgetData.value?.notification : {
+        cycle: storeState.budgetData?.time_unit === 'MONTHLY' ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY') : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.FIXED_TERM'),
+        totalPeriod: `${storeState.budgetData?.start} ~ ${storeState.budgetData?.end}`,
+        budgetScope: storeState.budgetData?.service_account_id ?? storeState.budgetData?.project_id,
+        budgetPlan: storeState.budgetData?.time_unit === 'MONTHLY' ? storeState.budgetData.planned_limits : storeState.budgetData?.limit,
+        budgetManager: storeState.budgetData?.budget_manager_id,
+        budgetAlerts: storeState.budgetData?.notification.plans
+            && storeState.budgetData?.notification.plans?.length > 0 ? storeState.budgetData?.notification : {
                 state: 'DISABLED',
                 plans: [],
             },
-        alertRecipients: budgetData.value?.notification.recipients?.users,
+        alertRecipients: storeState.budgetData?.notification.recipients?.users,
     })),
-    isBudgetAlertsEnabled: computed(() => (budgetData.value?.notification.state === 'ENABLED')),
+    isBudgetAlertsEnabled: computed(() => (storeState.budgetData?.notification.state === 'ENABLED')),
     updateBudgetAlertsModalVisible: false,
     budgetAlertEdit: false,
     budgetEdit: false,
@@ -77,9 +82,9 @@ const handleUpdateBudgetAlerts = async (value: boolean) => {
 };
 
 const updateBudget = (updateParams: any) => {
-    if (budgetData.value?.budget_id) {
+    if (storeState.budgetData?.budget_id) {
         budgetPageStore.updateBudgetData({
-            budgetId: budgetData.value?.budget_id,
+            budgetId: storeState.budgetData?.budget_id,
             updateParams,
         });
     }
@@ -105,8 +110,8 @@ const updateBudgetInfo = (type: string, data: any) => {
     }
 };
 
-const handleSelectBudgetManager = (userId: string) => {
-    state.selectedBudgetManager = userId;
+const handleSelectBudgetManager = (userId: string|undefined) => {
+    if (userId) state.selectedBudgetManager = userId;
 };
 
 const handleSelectAlertRecipients = (userIds: string[]) => {
@@ -124,9 +129,9 @@ const handleselectedBudgetThresholds = (value) => {
 const handleUpdateAlertRecipients = async () => {
     try {
         await budgetPageStore.updateBudgetNotifications({
-            budget_id: budgetData.value?.budget_id ?? '',
+            budget_id: storeState.budgetData?.budget_id ?? '',
             notification: {
-                ...budgetData.value?.notification,
+                ...storeState.budgetData?.notification,
                 recipients: {
                     users: state.selectedAlertRecipients,
                 },
@@ -144,9 +149,9 @@ const handleUpdateAlertRecipients = async () => {
 const handleUpdateBudgetThresholds = async () => {
     try {
         await budgetPageStore.updateBudgetNotifications({
-            budget_id: budgetData.value?.budget_id ?? '',
+            budget_id: storeState.budgetData?.budget_id ?? '',
             notification: {
-                ...budgetData.value?.notification,
+                ...storeState.budgetData?.notification,
                 plans: state.selectedThresholds.map((threshold) => ({
                     unit: 'PERCENT',
                     threshold: Number(threshold),
@@ -164,9 +169,9 @@ const handleUpdateBudgetThresholds = async () => {
 };
 
 watchEffect(() => {
-    if (budgetData.value?.planned_limits && budgetData.value.time_unit === 'MONTHLY') {
+    if (storeState.budgetData?.planned_limits && storeState.budgetData.time_unit === 'MONTHLY') {
         const map: Record<string, number> = {};
-        budgetData.value.planned_limits.forEach((item: { date: string; limit: number }) => {
+        storeState.budgetData.planned_limits.forEach((item: { date: string; limit: number }) => {
             map[item.date] = item.limit;
         });
         state.editableBudgetPlan = map;
@@ -177,6 +182,7 @@ watchEffect(() => {
 <template>
     <div>
         <p-card size="lg"
+                style-type="white"
                 :header="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.TITLE')"
         >
             <p-definition-table class="mb-10"
@@ -227,7 +233,7 @@ watchEffect(() => {
                                           :placeholder="data"
                             />
                         </div>
-                        <p-button v-if="!state.budgetEdit"
+                        <p-button v-if="!state.budgetEdit && !storeState.isAdminMode && hasReadWriteAccess"
                                   class="tertiary"
                                   size="sm"
                                   @click="state.budgetEdit = true"
@@ -277,8 +283,7 @@ watchEffect(() => {
                                 :to="{
                                     name: SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
                                     params: {
-                                        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-                                        serviceAccountId: budgetPageState.budgetData?.service_account_id
+                                        serviceAccountId: budgetPageState.budgetData?.service_account_id ?? ''
                                     }
                                 }"
                                 highlight
@@ -298,14 +303,14 @@ watchEffect(() => {
                             :page-size="3"
                             @update:selected-id="handleSelectBudgetManager"
                         />
-                        <p-button v-if="!state.budgetManagerEdit"
+                        <p-button v-if="!state.budgetManagerEdit && !storeState.isAdminMode && hasReadWriteAccess"
                                   class="tertiary"
                                   size="sm"
                                   @click="state.budgetManagerEdit = true"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.EDIT') }}
                         </p-button>
-                        <div v-else
+                        <div v-else-if="state.budgetManagerEdit && !storeState.isAdminMode && hasReadWriteAccess"
                              class="flex gap-2"
                         >
                             <p-button size="sm"
@@ -361,14 +366,14 @@ watchEffect(() => {
                                 </div>
                             </div>
                         </div>
-                        <p-button v-if="!state.budgetAlertEdit"
+                        <p-button v-if="!state.budgetAlertEdit && !storeState.isAdminMode && hasReadWriteAccess"
                                   class="tertiary"
                                   size="sm"
                                   @click="state.budgetAlertEdit = true"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.EDIT') }}
                         </p-button>
-                        <div v-else
+                        <div v-else-if="state.budgetAlertEdit && !storeState.isAdminMode && hasReadWriteAccess"
                              class="flex gap-2 items-end"
                         >
                             <p-button size="sm"
@@ -405,14 +410,14 @@ watchEffect(() => {
                             :selected-ids="data"
                             @update:selected-ids="handleSelectAlertRecipients"
                         />
-                        <p-button v-if="!state.alertRecipientsEdit"
+                        <p-button v-if="!state.alertRecipientsEdit && !storeState.isAdminMode && hasReadWriteAccess"
                                   class="tertiary"
                                   size="sm"
                                   @click="state.alertRecipientsEdit = true"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.EDIT') }}
                         </p-button>
-                        <div v-else
+                        <div v-else-if="state.alertRecipientsEdit && !storeState.isAdminMode && hasReadWriteAccess"
                              class="flex gap-2"
                         >
                             <p-button size="sm"

@@ -136,10 +136,11 @@ const drawChart = (data: any) => {
             name: 'Budget Usage Trend',
             type: 'bar',
             data: state.data.map((item) => Number(((item.budget_usage / item.budget) * 100).toFixed(2))),
-            barMaxWidth: 240,
+            minBarHeight: 4,
             label: {
                 show: true,
-                position: 'insideBottom',
+                position: 'top',
+                distance: 4,
                 formatter: (params) => `${params.value}%`,
             },
             itemStyle: {

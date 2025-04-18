@@ -11,6 +11,7 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
+import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
 import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
 
 interface Props {
@@ -103,14 +104,14 @@ const tableState = reactive({
                 }, {}),
             },
             {
-                category: 'Usage Rate',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE'),
                 ...Object.entries(dataByMonth).reduce((acc, [month, data]: any) => {
                     acc[month] = Math.floor((data.budget_usage / data.budget) * 100);
                     return acc;
                 }, {}),
             },
             {
-                category: 'Budget Remaining',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.BUDGET_REMAINING'),
                 ...Object.entries(dataByMonth).reduce((acc, [month, data]: any) => {
                     acc[month] = data.budget - data.budget_usage;
                     return acc;
@@ -175,7 +176,9 @@ const handleToggleOriginalData = (value: boolean) => {
                 </template>
             </template>
         </p-data-table>
-        <p-link :to="{ path: `/workspace/${currentWorkspaceId}/cost-explorer/budget/${budgetData?.budget_id}` }"
+        <p-link :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME, params: {
+                    workspaceId: currentWorkspaceId,
+                } }"
                 highlight
                 class="link"
                 action-icon="external-link"
