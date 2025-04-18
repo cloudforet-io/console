@@ -7,6 +7,7 @@ import {
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PDivider, PFieldTitle, PLink, PSpinner, PStatus, screens,
 } from '@cloudforet/mirinae';
@@ -22,9 +23,12 @@ import { useUserStore } from '@/store/user/user-store';
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { objectToQueryString } from '@/lib/router-query-string';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { costStateSummaryFormatter } from '@/services/workspace-home/composables/use-workspace-home';
@@ -86,6 +90,25 @@ const { dataSource } = useCostDataSourceQuery();
 
 /* access link */
 const accessLink = computed<boolean>(() => !isEmpty(pageAccessPermissionMap.value[MENU_ID.COST_REPORT]));
+
+/* project filter for cost analysis page */
+const consoleFilters = computed<ConsoleFilter[]>(() => {
+    if (props.mode === 'workspace') {
+        if (isWorkspaceMember.value) {
+            return [
+                { k: 'project_id', v: selectedProjects.value, o: '=' },
+            ];
+        }
+        return [];
+    }
+    if (props.projectIds?.length) {
+        return [
+            { k: 'project_id', v: props.projectIds, o: '=' },
+        ];
+    }
+    return [];
+});
+const consoleFiltersQueryString = computed(() => objectToQueryString(consoleFilters.value));
 
 /* cost report config */
 const costReportEnabled = computed(() => {
@@ -244,7 +267,18 @@ const currentDateRangeText = computed<string>(() => {
                     <p-divider class="divider" />
                     <div class="link-footer">
                         <p-link highlight
-                                :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
+                                :to="consoleFiltersQueryString ? {
+                                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                                    params: {
+                                        dataSourceId: UNIFIED_COST_KEY,
+                                        costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+                                    },
+                                    query: {
+                                        filters: consoleFiltersQueryString
+                                    }
+                                } : {
+                                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                                }"
                                 action-icon="internal-link"
                                 class="link"
                         >

@@ -16,8 +16,10 @@ import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { objectToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import AssetSummaryDailyUpdates from '@/services/workspace-home/shared/components/AssetSummaryDailyUpdates.vue';
 import AssetSummaryProvider from '@/services/workspace-home/shared/components/AssetSummaryProvider.vue';
@@ -84,6 +86,15 @@ const enabled = computed(() => {
 const { isLoadingDailyUpdates, dailyUpdates } = useAssetDailyUpdates({ projectIds, enabled, mode: toRef(props, 'mode') });
 const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds, enabled, mode: toRef(props, 'mode') });
 
+/* metric exploerer page filters */
+const metricFilters = computed<MetricFilter|undefined>(() => {
+    if (props.mode === 'workspace' || projectIds.value.length === 0) { return undefined; }
+    return {
+        project_id: projectIds.value,
+    };
+});
+const metricFiltersQueryString = computed(() => objectToQueryString(metricFilters.value));
+
 </script>
 
 <template>
@@ -109,7 +120,12 @@ const { isLoadingProviders, providers } = useAssetSummaryProviders({ projectIds,
                     highlight
                     :to="{
                         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                        params: { metricId: METRIC_MANAGED_CREATED_COUNT },
+                        params: {
+                            metricId: METRIC_MANAGED_CREATED_COUNT,
+                        },
+                        query: {
+                            filters: metricFiltersQueryString
+                        }
                     }"
                     action-icon="internal-link"
                     class="link"

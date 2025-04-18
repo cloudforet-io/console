@@ -73,8 +73,12 @@ const handleSelectDashboardScope = (scopeType: 'WORKSPACE'|'PRIVATE') => {
 };
 
 onMounted(() => {
-    if (!storeState.isWorkspaceOwner) {
-        dashboardCreatePageStore.setDashboardScope('PRIVATE');
+    if (entryPoint.value === 'DASHBOARDS') {
+        if (storeState.isWorkspaceOwner) {
+            dashboardCreatePageStore.setDashboardScope('PRIVATE');
+        } else {
+            dashboardCreatePageStore.setDashboardScope('WORKSPACE');
+        }
     }
 });
 </script>

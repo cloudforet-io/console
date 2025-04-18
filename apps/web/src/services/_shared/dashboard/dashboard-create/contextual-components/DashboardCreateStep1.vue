@@ -150,8 +150,11 @@ onMounted(() => {
                 />
                 <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
                                        :dashboard-tree-data="state.ootbTemplateTreeData"
-                                       readonly-mode
+                                       :show-single-control-buttons="false"
+                                       show-all
                                        disable-link
+                                       disable-favorite
+                                       disable-control-labels
                                        @update:selectedIdMap="dashboardCreatePageStore.setSelectedOotbIdMap"
                 />
                 <p-empty v-if="!state.ootbTemplateTreeData.length"

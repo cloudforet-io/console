@@ -311,6 +311,8 @@ onUnmounted(() => {
                                                :dashboard-tree-data="refinedDashboardTreeData"
                                                :button-disable-map="publicTreeControlButtonDisableMap"
                                                disable-link
+                                               disable-favorite
+                                               show-all
                                                show-control-buttons
                                                @update:selectedIdMap="handleUpdateSelectedIdMap"
                                                @select-control-actions="handleSelectControlActions"
