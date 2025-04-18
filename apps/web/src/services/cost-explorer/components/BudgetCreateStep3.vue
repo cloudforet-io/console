@@ -101,7 +101,7 @@ const createBudget = async (type: 'skip' | 'set') => {
             time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
             start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
             end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
-            budget_year: '2025', // TODO: select between start and end.
+            budget_year: budgetCreatePageState.budgetYear,
             notification: type === 'set' ? {
                 state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
                     ? 'ENABLED' : 'DISABLED',
@@ -186,6 +186,7 @@ const createBudget = async (type: 'skip' | 'set') => {
         >
             <span class="font-normal text-sm">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADDITIONAL_RECIPIENTS') }}</span>
             <user-select-dropdown show-user-list
+                                  :show-user-group-list="false"
                                   selection-type="multiple"
                                   :selected-ids="budgetCreatePageState.recipients.users"
                                   :excluded-selected-ids="[budgetCreatePageState.budgetManager]"

@@ -51,6 +51,7 @@ watch(() => budgetCreatePageState.scope.serviceAccount, async () => {
     >
         <user-select-dropdown
             show-user-list
+            :show-user-group-list="false"
             :selected-id="budgetCreatePageState.budgetManager"
             @update:selected-id="handleSelectId"
             @formatted-selected-ids="handleFormatBudgetManager"

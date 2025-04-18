@@ -21,6 +21,7 @@ interface BudgetCreatePageState {
     time_unit: 'TOTAL' | 'MONTHLY' | '';
     startMonth: string[];
     endMonth: string[];
+    alreadyExistingBudgetYear: string[];
     budgetYear: string;
     temp: string;
     limit: number|undefined;
@@ -44,7 +45,7 @@ interface BudgetCreatePageState {
 export const useBudgetCreatePageStore = defineStore('page-budget-create', () => {
     const state = reactive<BudgetCreatePageState>({
         loading: false,
-        currentStep: 2,
+        currentStep: 1,
         name: '',
         project: '',
         scope: {
@@ -59,6 +60,7 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
         time_unit: '',
         startMonth: [],
         endMonth: [],
+        alreadyExistingBudgetYear: [],
         budgetYear: '',
         temp: '',
         limit: undefined,
@@ -97,6 +99,9 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
     };
     const setEnd = (endMonth: []) => {
         state.endMonth = endMonth;
+    };
+    const setExistingBudgetYear = (years: number[]) => {
+        state.alreadyExistingBudgetYear = years;
     };
     const setBudgetYear = (year: string) => {
         state.budgetYear = year;
@@ -141,6 +146,7 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
         setCurrency,
         setStart,
         setEnd,
+        setExistingBudgetYear,
         setBudgetYear,
         setTimeUnit,
         setTemp,
@@ -173,6 +179,7 @@ export const useBudgetCreatePageStore = defineStore('page-budget-create', () => 
         state.time_unit = '';
         state.startMonth = [];
         state.endMonth = [];
+        state.alreadyExistingBudgetYear = [];
         state.budgetYear = '';
         state.temp = '';
         state.limit = undefined;
