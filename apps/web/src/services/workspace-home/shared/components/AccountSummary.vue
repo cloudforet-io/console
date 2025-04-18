@@ -8,6 +8,7 @@ import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import { countBy, isEmpty, map } from 'lodash';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import {
     PStatus, PFieldTitle, PLazyImg, PDivider, PLink, PSpinner, PProgressBar,
 } from '@cloudforet/mirinae';
@@ -200,6 +201,18 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
     }
 }, { immediate: true });
 
+/* service account page filters */
+const queryHelper = new QueryHelper();
+const serviceAccountPageFiltersQueryString = computed(() => {
+    if (props.mode === 'workspace' || !props.projectIds?.length) return undefined;
+    queryHelper.setFilters([{
+        k: 'project_id',
+        v: props.projectIds,
+        o: '=',
+    }]);
+    return queryHelper.rawQueryStrings;
+});
+
 </script>
 
 <template>
@@ -288,7 +301,11 @@ watch([() => state.providerChartData, () => providerChartContext.value], ([, cha
                 >
                     <p-divider class="divider" />
                     <p-link highlight
-                            :to="{ name: SERVICE_ACCOUNT_ROUTE._NAME }"
+                            :to="{ name: SERVICE_ACCOUNT_ROUTE._NAME,
+                                   query: {
+                                       filters: serviceAccountPageFiltersQueryString,
+                                   }
+                            }"
                             action-icon="internal-link"
                             class="link"
                     >

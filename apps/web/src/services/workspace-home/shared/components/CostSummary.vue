@@ -93,6 +93,14 @@ const accessLink = computed<boolean>(() => !isEmpty(pageAccessPermissionMap.valu
 
 /* project filter for cost analysis page */
 const consoleFilters = computed<ConsoleFilter[]>(() => {
+    if (props.mode === 'workspace') {
+        if (isWorkspaceMember.value) {
+            return [
+                { k: 'project_id', v: selectedProjects.value, o: '=' },
+            ];
+        }
+        return [];
+    }
     if (props.projectIds?.length) {
         return [
             { k: 'project_id', v: props.projectIds, o: '=' },
