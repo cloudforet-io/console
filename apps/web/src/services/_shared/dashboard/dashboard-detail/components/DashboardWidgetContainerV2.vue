@@ -605,7 +605,7 @@ onBeforeUnmount(() => {
     gap: 0.5rem;
     .no-data-wrapper {
         width: 100%;
-        padding-top: 3.5rem;
+        padding: 3.5rem 0;
     }
     .widgets-wrapper {
         display: flex;

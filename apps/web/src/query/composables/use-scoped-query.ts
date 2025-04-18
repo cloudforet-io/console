@@ -85,7 +85,7 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
     // This usually indicates a configuration mistake in the query declaration.
     if (import.meta.env.DEV) {
         const currentScope = currentGrantScope.value;
-        if (isAppReady.value && currentScope && !requiredScopes.includes(currentScope)) {
+        if (isAppReady.value && currentScope && toValue(rawEnabled) && !requiredScopes.includes(currentScope)) {
             _warnOncePerTick(() => {
                 console.warn('[useScopedQuery] Invalid requiredScopes for current scope:', {
                     queryKey: _extractQueryKey((options as any).queryKey),
