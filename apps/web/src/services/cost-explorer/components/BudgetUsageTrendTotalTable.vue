@@ -7,9 +7,11 @@ import {
     PDataTable, PToggleButton, PLink, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
+import { ADMIN_COST_EXPLORER_ROUTE } from '../routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
 import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
 
 interface Props {
@@ -27,12 +29,12 @@ interface DataByMonth {
 
 const props = defineProps<Props>();
 
-const useWorkspaceStore = useUserWorkspaceStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+const appContextStore = useAppContextStore();
 
-const currentWorkspaceId = computed(() => useWorkspaceStore.getters.currentWorkspaceId);
 const budgetData = computed(() => budgetPageStore.$state.budgetData);
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
 
 
@@ -243,7 +245,8 @@ const handleToggleOriginalData = (value: boolean) => {
                 </template>
             </template>
         </p-data-table>
-        <p-link :to="{ host: 'cost-analysis', path: `/workspace/${currentWorkspaceId}/cost-explorer/budget/${budgetData?.budget_id}` }"
+        <p-link :to="{ name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME
+                    : COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME}"
                 highlight
                 class="link"
                 action-icon="external-link"
