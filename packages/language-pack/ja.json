@@ -1117,8 +1117,8 @@
 			}
 		},
 		"CONFIRM_BACK_MODAL": {
-			"CANNOT_CANCEL": "この操作は取り消すことができません。",
-			"TITLE": "中止してもよろしいですか？"
+			"CANNOT_CANCEL": "保存されていない変更は失われます。",
+			"TITLE": "プロセス終了"
 		},
 		"COST_REPORT": {
 			"COST_REPORT": "コストレポート",
@@ -2222,7 +2222,6 @@
 			}
 		},
 		"DETAIL": {
-			"1": "コードで共有",
 			"ADD_WIDGET": "ウィジェットを追加する",
 			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALL_WORKSPACE": "すべてのワークスペース",
