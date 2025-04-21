@@ -607,6 +607,7 @@
 					"TOTAL_AMOUNT": "Total Amount",
 					"TOTAL_BUDGET": "Total Budget",
 					"TOTAL_BUDGETED_AMOUNT": "Total Budgeted Amount (Period)",
+					"UPDATE_NAME_TITLE": "Update Budget Name",
 					"VIEW_ALL": "View All",
 					"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
 				},
@@ -760,6 +761,7 @@
 					"PROJECT": "Project",
 					"PROVIDER": "Provider",
 					"REMAINED": "remained",
+					"SCHEDULED": "Scheduled",
 					"SELECT_MONTH": "Select Month",
 					"SERVICE_ACCOUNT": "Service Account",
 					"SINGLE_BUDGET": "Single Budget",
