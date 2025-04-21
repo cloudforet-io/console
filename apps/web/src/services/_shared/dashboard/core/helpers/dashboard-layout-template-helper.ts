@@ -97,7 +97,7 @@ export const getSharedDashboardLayouts = async (
     costDataSource: CostDataSourceReferenceMap,
 ): Promise<SharedDashboardLayout[]> => {
     const widgetDataTablesMap = await _getWidgetDataTablesMap(dashboardLayouts, costDataSource);
-    return dashboardLayouts.map((layout) => {
+    return dashboardLayouts?.map((layout) => {
         const sharedWidgets = layout.widgets?.map((widgetId) => {
             const widget = dashboardWidgets.find((w) => w.widget_id === widgetId);
             if (widget) {
