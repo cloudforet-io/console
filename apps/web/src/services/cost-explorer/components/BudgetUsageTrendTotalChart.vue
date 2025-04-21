@@ -13,6 +13,7 @@ import type { Currency } from '@/store/display/type';
 
 import {
     gray, indigo, peacock, red,
+    white,
 } from '@/styles/colors';
 
 import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
@@ -46,6 +47,36 @@ const state = reactive({
             trigger: 'axis',
             axisPointer: {
                 type: 'shadow',
+            },
+            formatter: (params) => {
+                const tooltipLines = [`${params[0].axisValue}`];
+                let accumulatedValue: string | null = null;
+                let accumulatedColor = peacock[400];
+
+                params.forEach((param) => {
+                    const value = Number(param.data);
+                    const formatted = Number.isNaN(value) ? '-' : value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+                    if (param.seriesName === 'Accumulated Usage (under Planned Budget)' || param.seriesName === 'Accumulated Usage (over Planned Budget)') {
+                        if (accumulatedValue === null || value > Number(accumulatedValue.replace(/,/g, ''))) {
+                            accumulatedValue = formatted;
+                            if (param.seriesName.includes('over')) {
+                                accumulatedColor = red[400];
+                            } else {
+                                accumulatedColor = peacock[400];
+                            }
+                        }
+                    } else {
+                        tooltipLines.push(`${param.marker} ${param.seriesName}: ${formatted}`);
+                    }
+                });
+
+                if (accumulatedValue !== null) {
+                    const marker = `<span style="display:inline-block;margin-right:4px;border-radius:50%;width:10px;height:10px;background-color:${accumulatedColor};"></span>`;
+                    tooltipLines.push(`${marker} Accumulated Usage: ${accumulatedValue}`);
+                }
+
+                return tooltipLines.join('<br/>');
             },
         },
         legend: {
@@ -89,14 +120,17 @@ const state = reactive({
     })),
 });
 
-const drawChart = (data: {
+const drawChart = (rawData: {
     budget: number;
     budget_usage: number;
     currency: Currency;
     date: string;
     name: string;
 }[]) => {
+    const data = rawData.slice(0, 12);
     if (isEmpty(data)) return;
+
+    const xAxisData = data.map((d) => dayjs.utc(d.date).format('MMM YYYY'));
 
     let accumulatedValue = 0;
     const accumulatedData: number[] = [];
@@ -150,7 +184,7 @@ const drawChart = (data: {
                 width: 1,
                 color: gray[600],
             },
-            data: state.xAxisData.map(() => threshold),
+            data: data.map(() => threshold),
             legendHoverLink: false,
             emphasis: { disabled: true },
             itemStyle: {
@@ -166,7 +200,7 @@ const drawChart = (data: {
                 width: 3,
             },
             itemStyle: {
-                color: '#fff',
+                color: white[100],
                 borderColor: peacock[400],
                 borderWidth: 2,
             },
@@ -182,7 +216,7 @@ const drawChart = (data: {
                 width: 3,
             },
             itemStyle: {
-                color: '#fff',
+                color: white[100],
                 borderColor: red[400],
                 borderWidth: 2,
             },
@@ -191,8 +225,16 @@ const drawChart = (data: {
         },
     ];
 
+    state.chart?.dispose();
     state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
+    state.chart.setOption({
+        ...state.chartOptions,
+        xAxis: {
+            ...state.chartOptions.xAxis,
+            data: xAxisData,
+        },
+        series: state.chartData,
+    }, true);
 };
 
 watch([() => state.data, () => budgetPageState], () => {

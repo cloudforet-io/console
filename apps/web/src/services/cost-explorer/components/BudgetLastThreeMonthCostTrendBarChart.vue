@@ -16,6 +16,8 @@ import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { indigo } from '@/styles/colors';
+
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
@@ -39,7 +41,7 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
-        color: '#7F9CF5',
+        color: indigo[400],
         grid: {
             left: '3%',
             right: '3%',
@@ -128,12 +130,11 @@ const drawChart = (data: any) => {
     if (isEmpty(data)) return;
 
     state.chartData = {
-        // name: `Last ${state.xAxisData.length} Month Cost Trend`,
         type: 'bar',
         stack: false,
         barMaxWidth: 50,
         itemStyle: {
-            color: '#7F9CF5',
+            color: indigo[400],
         },
         label: {
             show: true,

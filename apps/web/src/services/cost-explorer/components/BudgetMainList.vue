@@ -180,9 +180,6 @@ const tableState = reactive({
                 : (budget.time_unit === 'MONTHLY' && startDate.isAfter(dayjs.utc(), 'month'))
                     ? startDate.format('YYYY-MM')
                     : dayjs.utc().format('YYYY-MM'),
-            // budget: budget.time_unit === 'MONTHLY' ? (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
-            // && dayjs.utc(budgetUsage.date).format('YYYY-MM') === dayjs.utc().format('YYYY-MM'))
-            //     .map((budgetUsage) => budgetUsage.budget)[0] ?? 0 : budget.limit,
             limit: budget.limit ?? 0,
             actualSpend: budget.time_unit === 'MONTHLY' ? state.budgetUsages
                 .filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM'))
