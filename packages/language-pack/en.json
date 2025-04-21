@@ -1231,8 +1231,8 @@
 			}
 		},
 		"CONFIRM_BACK_MODAL": {
-			"CANNOT_CANCEL": "You cannot undo this action.",
-			"TITLE": "Are you sure you want to quit?"
+			"CANNOT_CANCEL": "Unsaved changes will be lost.",
+			"TITLE": "Leave Process"
 		},
 		"COST_REPORT": {
 			"COST_REPORT": "Cost Report",
@@ -2336,7 +2336,6 @@
 			}
 		},
 		"DETAIL": {
-			"1": "Share with Code",
 			"ADD_WIDGET": "Add Widget",
 			"ALL_PROJECTS": "All Projects",
 			"ALL_WORKSPACE": "All Workspace",

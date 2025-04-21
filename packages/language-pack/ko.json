@@ -1231,8 +1231,8 @@
 			}
 		},
 		"CONFIRM_BACK_MODAL": {
-			"CANNOT_CANCEL": "이 작업은 취소 할 수 없습니다.",
-			"TITLE": "작업을 중단하시겠습니까? "
+			"CANNOT_CANCEL": "저장하지 않은 내용은 복구할 수 없습니다.",
+			"TITLE": "진행 중인 작업 종료"
 		},
 		"COST_REPORT": {
 			"COST_REPORT": "비용 리포트",
@@ -2336,7 +2336,6 @@
 			}
 		},
 		"DETAIL": {
-			"1": "코드로 공유",
 			"ADD_WIDGET": "위젯 추가",
 			"ALL_PROJECTS": "모든 프로젝트",
 			"ALL_WORKSPACE": "전체 워크스페이스",
