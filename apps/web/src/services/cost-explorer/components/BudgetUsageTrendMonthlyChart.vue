@@ -33,7 +33,6 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [],
     chartOptions: computed<BarSeriesOption>(() => ({
-        color: ['#83bff6', '#188df0'],
         grid: {
             left: '3%',
             right: '3%',
@@ -139,7 +138,7 @@ const drawChart = (data: any) => {
             minBarHeight: 4,
             label: {
                 show: true,
-                position: 'top',
+                position: 'insideBottom',
                 distance: 4,
                 formatter: (params) => `${params.value}%`,
             },

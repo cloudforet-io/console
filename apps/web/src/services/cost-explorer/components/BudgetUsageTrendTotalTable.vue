@@ -7,6 +7,8 @@ import {
     PDataTable, PToggleButton, PLink, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
+import { i18n } from '@/translations';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
@@ -115,35 +117,35 @@ const tableState = reactive({
 
         return [
             {
-                category: 'Planned Budget',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET'),
                 ...monthKeys.reduce((acc, month) => {
                     acc[month] = totalBudget;
                     return acc;
                 }, {}),
             },
             {
-                category: 'Actual Spend',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND'),
                 ...monthKeys.reduce((acc, month) => {
                     acc[month] = dataByMonth[month].budget_usage;
                     return acc;
                 }, {}),
             },
             {
-                category: 'Accumulated Usage',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACCUMULATED_USAGE'),
                 ...monthKeys.reduce((acc, month) => {
                     acc[month] = accumulatedSpend[month] || 0;
                     return acc;
                 }, {}),
             },
             {
-                category: 'Usage Rate',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE'),
                 ...monthKeys.reduce((acc, month) => {
                     acc[month] = (accumulatedSpend[month] / totalBudget) * 100;
                     return acc;
                 }, {}),
             },
             {
-                category: 'Budget Remaining',
+                category: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.BUDGET_REMAINING'),
                 ...monthKeys.reduce((acc, month) => {
                     acc[month] = totalBudget - accumulatedSpend[month];
                     return acc;
@@ -203,7 +205,7 @@ const handleToggleOriginalData = (value: boolean) => {
             <template #col-format="{ value, field, item }">
                 <template v-if="field.name !== 'category'">
                     <span class="block text-right px-4">
-                        <template v-if="item.category === 'Planned Budget'">
+                        <template v-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')">
                             <p class="font-bold text-gray-900">
                                 {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
                                 {{
@@ -212,13 +214,13 @@ const handleToggleOriginalData = (value: boolean) => {
                                 }}
                             </p>
                         </template>
-                        <template v-else-if="item.category === 'Actual Spend'">
+                        <template v-else-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND')">
                             {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
                             {{ state.isOriginalData
                                 ? value.toLocaleString()
                                 : formatNumberToShort(value) }}
                         </template>
-                        <template v-else-if="item.category ==='Accumulated Usage'">
+                        <template v-else-if="item.category ===$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACCUMULATED_USAGE')">
                             <p :class="{ exceeded: budgetPageState.budgetData
                                 && value > budgetPageState.budgetData?.limit }"
                             >
@@ -226,14 +228,14 @@ const handleToggleOriginalData = (value: boolean) => {
                                 {{ state.isOriginalData ? value.toLocaleString() : formatNumberToShort(value) }}
                             </p>
                         </template>
-                        <template v-else-if="item.category === 'Usage Rate'">
+                        <template v-else-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE')">
                             <span :class="{exceeded: value > 100}"
                                   class="italic"
                             >
                                 {{ value.toFixed(0) }}%
                             </span>
                         </template>
-                        <template v-else-if="item.category === 'Budget Remaining'">
+                        <template v-else-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.BUDGET_REMAINING')">
                             <p :class="{exceeded: value < 0, 'exceeded-budget': value < 0}">
                                 {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
                                 {{ !state.isOriginalData

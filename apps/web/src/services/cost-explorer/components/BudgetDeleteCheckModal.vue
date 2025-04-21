@@ -62,7 +62,7 @@ const deleteBudgets = async (budgetIds: string[]) => {
                     size="sm"
                     theme-color="alert"
                     hide-body
-                    header-title="Do you really want to delete Budget?"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_DELETE_DESC')"
                     :loading="loading"
                     @confirm="handleConfirm"
                     @close="handleClose"

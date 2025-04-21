@@ -365,7 +365,7 @@ watch([
                         />
                         <span class="text-sm font-normal"
                               :class="{'start-selected': state.startSelectedForBudgetYear, 'end-selected': !state.startSelectedForBudgetYear}"
-                        >Base for 'period' filter</span>
+                        >{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BASE_FOR_PERIOD_FILTER') }}</span>
                     </div>
                     <div class="flex gap-1">
                         <p-toggle-button
@@ -374,7 +374,7 @@ watch([
                         />
                         <span class="text-sm font-normal"
                               :class="{'start-selected': state.endSelectedForBudgetYear, 'end-selected': !state.endSelectedForBudgetYear}"
-                        >Base for 'period' filter</span>
+                        >{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BASE_FOR_PERIOD_FILTER') }}</span>
                     </div>
                 </div>
                 <p-status v-if="budgetCreatePageState.project

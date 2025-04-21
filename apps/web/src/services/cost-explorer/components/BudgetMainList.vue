@@ -180,9 +180,6 @@ const tableState = reactive({
                 : (budget.time_unit === 'MONTHLY' && startDate.isAfter(dayjs.utc(), 'month'))
                     ? startDate.format('YYYY-MM')
                     : dayjs.utc().format('YYYY-MM'),
-            // budget: budget.time_unit === 'MONTHLY' ? (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id
-            // && dayjs.utc(budgetUsage.date).format('YYYY-MM') === dayjs.utc().format('YYYY-MM'))
-            //     .map((budgetUsage) => budgetUsage.budget)[0] ?? 0 : budget.limit,
             limit: budget.limit ?? 0,
             actualSpend: budget.time_unit === 'MONTHLY' ? state.budgetUsages
                 .filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM'))
@@ -477,8 +474,10 @@ onMounted(async () => {
                         </p-link>
                     </div>
                 </template>
-                <template #col-limit-format="{value, rowIndex}">
-                    <p class="flex gap-0.5">
+                <template #col-limit-format="{item, value, rowIndex}">
+                    <p class="flex gap-0.5"
+                       :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
+                    >
                         <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
                         <span>{{ Number(value).toLocaleString() }}</span>
                     </p>

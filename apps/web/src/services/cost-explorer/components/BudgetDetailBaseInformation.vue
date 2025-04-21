@@ -81,18 +81,18 @@ const handleUpdateBudgetAlerts = async (value: boolean) => {
     await budgetPageStore.getBudgetData(budgetPageState.budgetData?.budget_id ?? '');
 };
 
-const updateBudget = (updateParams: any) => {
+const updateBudget = async (updateParams: any) => {
     if (storeState.budgetData?.budget_id) {
-        budgetPageStore.updateBudgetData({
+        await budgetPageStore.updateBudgetData({
             budgetId: storeState.budgetData?.budget_id,
             updateParams,
         });
     }
 };
 
-const updateBudgetInfo = (type: string, data: any) => {
+const updateBudgetInfo = async (type: string, data: any) => {
     try {
-        updateBudget({
+        await updateBudget({
             ...data,
         });
         showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {

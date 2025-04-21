@@ -127,10 +127,10 @@ const createBudget = async (type: 'skip' | 'set') => {
         router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_SUCCESS'));
+        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'));
     } catch (error: any) {
         ErrorHandler.handleError(error, true);
-        showErrorMessage(error?.code, error?.message);
+        showErrorMessage(error?.code ?? '', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));
     } finally {
         budgetCreatePageStore.reset();
     }
@@ -139,7 +139,7 @@ const createBudget = async (type: 'skip' | 'set') => {
 
 <template>
     <div>
-        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SET_ALERT_PERCENTAGE')"
+        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SET_ALERT_THRESHOLD')"
                        :help-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.EXCEEDS_AMOUNT_DESCRIPTION')"
                        required
                        :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.THRESHOLD_INVALID_TEXT')"
