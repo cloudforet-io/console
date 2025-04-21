@@ -11,7 +11,6 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 const emit = defineEmits<{(e: 'update:select-month-modal-visible', value: boolean): void; (e: 'update:query', value: any): void;}>();
 
@@ -118,7 +117,7 @@ watch(() => state.selectedServiceAccountList, () => {
 watch(() => state, () => {
     emit('update:query', {
         target: state.selectedTarget,
-        projectList: state.selectedProjectList ?? [],
+        projectList: state.selectedProjectList.map((p) => p.name) ?? [],
         serviceAccountList: state.selectedServiceAccountList.map((s) => s.name),
         year: state.selectedYear,
         cycle: state.selectedBudgetCycle,
@@ -126,13 +125,10 @@ watch(() => state, () => {
     });
 }, { deep: true, immediate: true });
 
-const handleProjectList = (projectIds) => {
-    state.selectedProjectList = projectIds;
-};
 </script>
 
 <template>
-    <div class="mt-3 flex gap-2 items-center">
+    <div class="budget-main-toolset">
         <p-select-dropdown selection-label="Target"
                            style-type="rounded"
                            :menu="state.targetList"
@@ -145,15 +141,26 @@ const handleProjectList = (projectIds) => {
             />
             <span class="font-bold text-sm">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FILTER') }}:</span>
         </div>
-        <project-select-dropdown style-type="rounded"
-                                 appearance-type="badge"
-                                 selection-label="Project"
-                                 :project-group-selectable="false"
-                                 multi-selectable
-                                 show-dropdown-left-area
-                                 show-delete-all-button
-                                 @update:selected-project-ids="handleProjectList"
-        />
+        <p-select-dropdown style-type="rounded"
+                           :menu="state.projectList"
+                           :selected.sync="state.selectedProjectList"
+                           selection-label="Project"
+                           appearance-type="badge"
+                           use-fixed-menu-style
+                           show-select-marker
+                           multi-selectable
+                           show-clear-selection
+                           show-delete-all-button
+                           selection-highlight
+                           :page-size="15"
+        >
+            <template #dropdown-left-area>
+                <p-i name="ic_project"
+                     width="1rem"
+                     height="1rem"
+                />
+            </template>
+        </p-select-dropdown>
         <p-select-dropdown style-type="rounded"
                            :menu="state.serviceAccountList"
                            :selected.sync="state.selectedServiceAccountList"
@@ -197,7 +204,13 @@ const handleProjectList = (projectIds) => {
     </div>
 </template>
 
-<style>
+<style scoped lang="postcss">
+.budget-main-toolset {
+    @apply mt-3 flex gap-2 items-center;
+    .p-select-dropdown {
+        min-width: unset;
+    }
+}
 .divider {
     height: 1rem;
     width: 0.0625rem;

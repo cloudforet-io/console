@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watchEffect } from 'vue';
+import {
+    computed, reactive, watch, watchEffect,
+} from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -74,6 +76,7 @@ const state = reactive({
     selectedBudgetManager: '',
     selectedThresholds: [] as MenuItem[],
     selectedAlertRecipients: [] as string[],
+    budgetManagerEditable: false,
 });
 
 const handleUpdateBudgetAlerts = async (value: boolean) => {
@@ -81,12 +84,12 @@ const handleUpdateBudgetAlerts = async (value: boolean) => {
     await budgetPageStore.getBudgetData(budgetPageState.budgetData?.budget_id ?? '');
 };
 
-const updateBudget = async (updateParams: any) => {
+const updateBudget = async (updateParams: any, type: string) => {
     if (storeState.budgetData?.budget_id) {
         await budgetPageStore.updateBudgetData({
             budgetId: storeState.budgetData?.budget_id,
             updateParams,
-        });
+        }, type);
     }
 };
 
@@ -94,13 +97,7 @@ const updateBudgetInfo = async (type: string, data: any) => {
     try {
         await updateBudget({
             ...data,
-        });
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
-            data: type.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
-        }));
-    } catch (error: any) {
-        ErrorHandler.handleError(error, true);
-        showErrorMessage(error?.code, error?.message);
+        }, type);
     } finally {
         if (type === 'budgetManager') {
             state.budgetManagerEdit = false;
@@ -136,35 +133,34 @@ const handleUpdateAlertRecipients = async () => {
                     users: state.selectedAlertRecipients,
                 },
             },
-        });
+        }, 'budgetThreshold');
         state.alertRecipientsEdit = false;
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
             data: 'alertRecipients'.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
-        }));
+        }), '');
     } catch (error: any) {
         ErrorHandler.handleError(error, true);
+        showErrorMessage(error.code, error.message);
     }
 };
 
 const handleUpdateBudgetThresholds = async () => {
-    try {
-        await budgetPageStore.updateBudgetNotifications({
-            budget_id: storeState.budgetData?.budget_id ?? '',
-            notification: {
-                ...storeState.budgetData?.notification,
-                plans: state.selectedThresholds.map((threshold) => ({
-                    unit: 'PERCENT',
-                    threshold: Number(threshold),
-                })),
-            },
-        });
-        state.budgetAlertEdit = false;
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
-            data: 'budgetThresholds'.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
-        }));
-    } catch (error: any) {
-        ErrorHandler.handleError(error, true);
-        showErrorMessage(error.code, error.message);
+    await budgetPageStore.updateBudgetNotifications({
+        budget_id: storeState.budgetData?.budget_id ?? '',
+        notification: {
+            ...storeState.budgetData?.notification,
+            plans: state.selectedThresholds.map((threshold) => ({
+                unit: 'PERCENT',
+                threshold: Number(threshold),
+            })),
+        },
+    });
+    state.budgetAlertEdit = false;
+};
+
+const handleFormatBudgetManager = (value: Record<string, any>) => {
+    if (Array.isArray(value.USER) && value.USER.length === 0) {
+        state.selectedBudgetManager = '';
     }
 };
 
@@ -177,6 +173,14 @@ watchEffect(() => {
         state.editableBudgetPlan = map;
     }
 });
+
+watch(() => state.selectedBudgetManager, (nv, ov) => {
+    if (state.selectedBudgetManager === '' || nv === ov) {
+        state.budgetManagerEditable = false;
+    } else if (state.selectedBudgetManager !== '' && nv !== ov) {
+        state.budgetManagerEditable = true;
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -299,8 +303,10 @@ watchEffect(() => {
                         <user-select-dropdown
                             v-else
                             show-user-list
+                            :show-delete-all-button="false"
                             :selected-id="data"
                             :page-size="3"
+                            @formatted-selected-ids="handleFormatBudgetManager"
                             @update:selected-id="handleSelectBudgetManager"
                         />
                         <p-button v-if="!state.budgetManagerEdit && !storeState.isAdminMode && hasReadWriteAccess"
@@ -321,6 +327,7 @@ watchEffect(() => {
                             </p-button>
                             <p-button
                                 size="sm"
+                                :disabled="!state.budgetManagerEditable"
                                 @click="handleUpdateBudgetManager"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SAVE_CHANGES') }}
@@ -346,7 +353,7 @@ watchEffect(() => {
                                     <span v-for="(plan, index) in [...data.plans].sort((a, b) => a.threshold - b.threshold)"
                                           :key="`plan-${index}`"
                                     >
-                                        {{ plan.threshold }} {{ plan.unit === 'PERCENT' ? '%' : '' }}
+                                        {{ plan.threshold }}{{ plan.unit === 'PERCENT' ? '%' : '' }}<template v-if="index !== data.plans.length - 1">, </template>
                                     </span>
                                 </p>
                                 <div v-if="state.budgetAlertEdit">

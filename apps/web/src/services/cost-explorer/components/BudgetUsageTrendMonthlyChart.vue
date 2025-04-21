@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref, watch, onMounted, onBeforeUnmount,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -163,6 +163,18 @@ watch(() => state.data, () => {
 watch(() => budgetData, async () => {
     await fetchBudgetUsageAnalyze();
 }, { deep: true, immediate: true });
+
+const handleResize = () => {
+    state.chart?.resize();
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize);
+});
 </script>
 
 <template>
@@ -176,9 +188,11 @@ watch(() => budgetData, async () => {
 <style scoped lang="postcss">
 .chart-wrapper {
     height: 17rem;
+    overflow-x: auto;
+
     .chart {
         height: 100%;
-        width: 100%;
+        min-width: 700px;
     }
 }
 </style>

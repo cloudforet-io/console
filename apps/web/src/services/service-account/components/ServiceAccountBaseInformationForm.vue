@@ -88,6 +88,7 @@ const state = reactive({
     })),
     isSameValueWithOrigin: computed(() => isEqual(state.formData, state.originForm)),
     isAllValid: computed(() => ((invalidState.serviceAccountName === false)
+        && (state.serviceAccountManagerId !== '')
         && !state.isSameValueWithOrigin
         && (serviceAccountPageGetters.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
@@ -136,6 +137,12 @@ const handleServiceAccountManagerId = (value: string) => {
     state.serviceAccountManagerId = value;
 };
 
+const handleFormatSelectedIds = (value: Record<string, any>) => {
+    if (Array.isArray(value.USER) && value.USER.length === 0) {
+        state.serviceAccountManagerId = '';
+    }
+};
+
 /* Init */
 (async () => {
     await listServiceAccounts();
@@ -182,6 +189,7 @@ watch(() => state.originForm, (originForm) => {
                                   :show-user-group-list="false"
                                   :selected-id="state.serviceAccountManagerId"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
+                                  @formatted-selected-ids="handleFormatSelectedIds"
                                   @update:selected-id="handleServiceAccountManagerId"
             />
         </p-field-group>
