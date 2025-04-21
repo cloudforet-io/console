@@ -158,7 +158,13 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                              width="1rem"
                              height="1rem"
                         />
-                        <span class="text">{{ node.data.name }}</span>
+                        <span class="text">
+                            <slot name="text"
+                                  v-bind="{node}"
+                            >
+                                {{ node.data.name }}
+                            </slot>
+                        </span>
                         <div v-if="node.data.isNew">
                             <new-mark class="new-mark" />
                         </div>

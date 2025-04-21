@@ -158,6 +158,12 @@ const state = reactive({
         private: false,
     } as Record<string, boolean>,
     searchFilters: [] as ConsoleFilter[],
+    searchText: computed<string>(() => {
+        if (!state.searchFilters.length) return '';
+        const filter = state.searchFilters.find((_filter) => !_filter.k && !!_filter.v);
+        if (!filter) return '';
+        return String(filter.v);
+    }),
 });
 
 const queryState = reactive({
@@ -366,6 +372,7 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPublicTreeData"
                                        :button-disable-map="state.publicTreeControlButtonDisableMap"
                                        :show-control-buttons="!storeState.isWorkspaceMember"
+                                       :search-text="state.searchText"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PUBLIC', $event)"
                                        @click-control-clone="dashboardPageControlStore.openBundleCloneModal('PUBLIC')"
                                        @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
@@ -385,6 +392,7 @@ onUnmounted(() => {
                                        :dashboard-tree-data="state.refinedPrivateTreeData"
                                        :button-disable-map="state.privateTreeControlButtonDisableMap"
                                        show-control-buttons
+                                       :search-text="state.searchText"
                                        @update:selectedIdMap="handleUpdateSelectedIdMap('PRIVATE', $event)"
                                        @click-control-clone="dashboardPageControlStore.openBundleCloneModal('PRIVATE')"
                                        @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"

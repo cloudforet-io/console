@@ -124,6 +124,7 @@ const handleDeleteConfirm = async () => {
                   :loading="bundleLoading"
                   :disabled="bundleLoading"
                   :enable-scroll="true"
+                  :confirm-text="$t('DASHBOARDS.DETAIL.DELETE')"
                   class="dashboard-folder-delete-modal"
                   @confirm="handleDeleteConfirm"
     >
