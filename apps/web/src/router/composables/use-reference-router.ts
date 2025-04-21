@@ -5,7 +5,7 @@ import { concat } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { useServiceRouter } from '@/router/helpers/use-service-router';
+import { useServiceRouter } from '@/router/composables/use-service-router';
 
 import { MENU_ID } from '@/lib/menu/config';
 import type { Reference, ResourceType } from '@/lib/reference/type';
