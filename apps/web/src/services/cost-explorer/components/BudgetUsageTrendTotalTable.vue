@@ -176,19 +176,19 @@ const handleToggleOriginalData = (value: boolean) => {
                 <span />
             </template>
             <template #col-category-format="{value}">
-                <div v-if="value === 'Actual Spend'"
+                <div v-if="value === i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND')"
                      class="flex items-center gap-2"
                 >
                     <div class="w-3 h-3 bg-indigo-400 rounded-lg" />
                     <span>{{ value }}</span>
                 </div>
-                <div v-else-if="value === 'Accumulated Usage'"
+                <div v-else-if="value === i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACCUMULATED_USAGE')"
                      class="flex items-center gap-2"
                 >
                     <div class="w-3 h-3 bg-peacock-400 rounded-lg" />
                     <span>{{ value }}</span>
                 </div>
-                <div v-else-if="value === 'Usage Rate'"
+                <div v-else-if="value === i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE')"
                      class="flex items-center gap-2"
                 >
                     <span>{{ value }}</span>
@@ -247,11 +247,18 @@ const handleToggleOriginalData = (value: boolean) => {
                 </template>
             </template>
         </p-data-table>
-        <p-link :to="{ name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME
-                    : COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME}"
+
+        <p-link :to="{
+                    name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    query: {
+                        project: budgetPageState.budgetData?.project_id,
+                        period_start: budgetPageState.budgetData?.start,
+                        period_end: budgetPageState.budgetData?.end,
+                    }
+                }"
                 highlight
                 class="link"
-                action-icon="external-link"
+                action-icon="internal-link"
         >
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.GO_TO_COST_ANALYSIS') }}
         </p-link>

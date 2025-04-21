@@ -145,8 +145,8 @@ watch(() => [
     budgetCreatePageState.planned_limits,
     budgetCreatePageState.selectedMonthlyBudgetAllocation,
     budgetCreatePageState.budgetAppliedSameAmount,
-    state.initialAmount,
-    state.monthlyGrowthRate,
+    budgetCreatePageState.initialAmount,
+    budgetCreatePageState.monthlyGrowthRate,
     budgetCreatePageState.budgetEachDate,
     state.startSelectedForBudgetYear,
     state.endSelectedForBudgetYear,
@@ -173,26 +173,31 @@ watch(() => [
         }
 
         state.isContinueAble = true;
+    } else if (budgetCreatePageState.time_unit === 'TOTAL' && budgetCreatePageState.limit === undefined) {
+        state.isContinueAble = false;
     } else if (budgetCreatePageState.time_unit === 'MONTHLY') {
-        if (budgetCreatePageState.planned_limits && budgetCreatePageState.planned_limits.length > 0) {
-            const isDuplicatedBudgetYear = (
-                budgetCreatePageState.project
-                && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
-                && (
-                    (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                    || (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                )
-            );
-
-            if (isDuplicatedBudgetYear) {
-                state.isContinueAble = false;
+        if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount') {
+            if (isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)) {
+                state.isContinueAble = true;
                 return;
             }
-
-            state.isContinueAble = true;
-        } else {
-            state.isContinueAble = false;
+        } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage') {
+            const isInitialValid = isValidPositiveNumber(budgetCreatePageState.initialAmount);
+            const isGrowthValid = isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate);
+            state.isContinueAble = isInitialValid && isGrowthValid;
+            return;
+        } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually') {
+            const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
+            const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
+            const length = endDate.diff(startDate, 'month') + 1;
+            const valid = budgetCreatePageState.budgetEachDate.length === length
+                && budgetCreatePageState.budgetEachDate.every((v, idx) => isDateInRange(idx) && isValidPositiveNumber(v));
+            if (valid) {
+                state.isContinueAble = true;
+                return;
+            }
         }
+        state.isContinueAble = false;
     }
 }, { deep: true, immediate: true });
 
@@ -240,19 +245,35 @@ const handlePrevious = () => {
 };
 
 const handleUpdateBudgetAmount = (value) => {
-    budgetCreatePageStore.setLimit(value);
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setLimit(undefined);
+    } else {
+        budgetCreatePageStore.setLimit(Number(value));
+    }
 };
 
 const handleUpdateBudgetAppliedSameAmount = (value) => {
-    budgetCreatePageStore.setBudgetAppliedSameAmount(value);
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+    } else {
+        budgetCreatePageStore.setBudgetAppliedSameAmount(Number(value));
+    }
 };
 
 const handleUpdateInitialAmount = (value) => {
-    budgetCreatePageStore.setInitialAmount(value);
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setInitialAmount(undefined);
+    } else {
+        budgetCreatePageStore.setInitialAmount(Number(value));
+    }
 };
 
 const handleUpdateMonthlyGrowthRate = (value) => {
-    budgetCreatePageStore.setMonthlyGrowthRate(value);
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+    } else {
+        budgetCreatePageStore.setMonthlyGrowthRate(Number(value));
+    }
 };
 
 const handleUpdateStartSelectForBudgetYear = (value: boolean) => {
@@ -273,6 +294,7 @@ const isValidPositiveNumber = (value: any): boolean => {
     const num = Number(value);
     return value !== '' && !Number.isNaN(num) && num > 0;
 };
+
 watch([
     () => budgetCreatePageState.startMonth,
     () => budgetCreatePageState.endMonth,
@@ -293,6 +315,11 @@ watch([
     }
 }, { immediate: true });
 
+watch(() => budgetCreatePageState.limit, () => {
+    if (budgetCreatePageState.limit === null) {
+        budgetCreatePageState.limit = undefined;
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -521,9 +548,10 @@ watch([
                                                        :label="date"
                                                        required
                                         >
-                                            <p-text-input :value="state.budgetEachDate[idx]"
+                                            <p-text-input :value="budgetCreatePageState.budgetEachDate[idx]"
                                                           :disabled="!isDateInRange(idx)"
-                                                          :invalid="isDateInRange(idx) && (!state.budgetEachDate[idx] || !isValidPositiveNumber(Number(state.budgetEachDate[idx])))"
+                                                          :invalid="isDateInRange(idx) && (!budgetCreatePageState.budgetEachDate[idx]
+                                                              || !isValidPositiveNumber(Number(budgetCreatePageState.budgetEachDate[idx])))"
                                                           @update:value="(value) => handleUpdatgeBudgetEachDate(value, idx)"
                                             >
                                                 <template #input-right>

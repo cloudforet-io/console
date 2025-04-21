@@ -47,7 +47,7 @@ const deleteBudgets = async (budgetIds: string[]) => {
                 budget_id: budgetId,
             });
         }));
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DELETE_SUCCESS'));
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DELETE_SUCCESS'), '');
     } catch (error: any) {
         ErrorHandler.handleError(error);
         showErrorMessage(error.code, error.message);

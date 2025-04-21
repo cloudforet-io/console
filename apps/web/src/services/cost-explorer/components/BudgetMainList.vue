@@ -14,7 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PToolboxTable, PSelectDropdown, PButtonModal, PI, PProgressBar, PStatus, PLink,
+    PToolboxTable, PSelectDropdown, PI, PProgressBar, PStatus, PLink,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -28,7 +28,10 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ListResponse } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -92,8 +95,11 @@ const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
 
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const timeZone = computed<string>(() => userState.timezone || '');
 
 const state = reactive<BudgetMainListState>({
     budgets: [],
@@ -115,7 +121,7 @@ const state = reactive<BudgetMainListState>({
 });
 
 const tableState = reactive({
-    fields: computed(() => [
+    fields: [
         {
             name: 'name',
             label: 'Name',
@@ -166,7 +172,7 @@ const tableState = reactive({
             width: '7%',
             sortable: false,
         },
-    ]),
+    ],
     items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
         const startDate = dayjs.utc(budget.start, 'YYYY-MM');
         const endDate = dayjs.utc(budget.end, 'YYYY-MM');
@@ -199,6 +205,7 @@ const tableState = reactive({
         name: makeDistinctValueHandler('cost_analysis.Budget', 'name', 'string'),
         time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit', 'string'),
         budget_manager_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_manager_id', 'string'),
+        'notification.recipients.users': makeDistinctValueHandler('cost_analysis.Budget', 'notification.recipients.users'),
     })),
 });
 
@@ -402,6 +409,33 @@ const handleChange = async (options: any = {}) => {
     await listBudgetUsages();
 };
 
+const handleExportToExcel = async () => {
+    await downloadExcel({
+        // url: '/cost-explorer/budget/list',
+        // param: {
+        //     query: {
+        //         // ...budgetApiQueryHelper.data,
+        //         only: [
+        //             // { key: 'name', name: 'Budget Name' },
+        //             // { key: 'target', name: 'Target' },
+        //             // { key: 'cycle', name: 'Cycle' },
+        //             // { key: 'limit', name: 'Budget' },
+        //         ],
+        //     },
+        // },
+        // fields: [
+        //     // { key: 'name', name: 'Budget Name' },
+        //     // { key: 'target', name: 'Target' },
+        //     // { key: 'cycle', name: 'Cycle' },
+        //     // { key: 'limit', name: 'Budget' },
+        // ],
+        data: tableState.items,
+        fields: tableState.fields,
+        file_name_prefix: FILE_NAME_PREFIX.budget,
+        timezone: timeZone.value,
+    });
+};
+
 /* Watcher */
 watch(() => state.query, async () => {
     state.addRequests = {
@@ -451,6 +485,7 @@ onMounted(async () => {
                              @update:select-index="handleUpdateSelectIndex"
                              @change="handleChange"
                              @refresh="handleChange()"
+                             @export="handleExportToExcel"
             >
                 <template #toolbox-left>
                     <p-select-dropdown placeholder="Action"
@@ -543,8 +578,12 @@ onMounted(async () => {
                         {{ Math.abs(Number((Number(item.limit) - Number(item.actualSpend)).toFixed(2))).toLocaleString() }}
                     </p>
                 </template>
+
                 <template #col-state-format="{item}">
-                    <div v-if="dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD')">
+                    <div v-if="dayjs().isBefore(dayjs(item.period.split('~')[0]).format('YYYY-MM-DD'))">
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SCHEDULED') }}
+                    </div>
+                    <div v-else-if="dayjs().isAfter(dayjs(item.period.split('~')[1]).format('YYYY-MM-DD'))">
                         {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.EXPIRED') }}
                     </div>
                     <p-status v-else
@@ -554,7 +593,6 @@ onMounted(async () => {
                 </template>
             </p-toolbox-table>
         </div>
-        <p-button-modal header-title="Do you want to On/Off your Alert?" />
         <budget-delete-check-modal
             :visible="state.modalVisible"
             :selected-indices="state.selectedBudgetIds"

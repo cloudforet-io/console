@@ -127,7 +127,7 @@ const createBudget = async (type: 'skip' | 'set') => {
         router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'));
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
     } catch (error: any) {
         ErrorHandler.handleError(error, true);
         showErrorMessage(error?.code ?? '', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));

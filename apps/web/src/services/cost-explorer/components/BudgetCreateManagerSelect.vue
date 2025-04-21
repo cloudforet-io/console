@@ -53,6 +53,7 @@ watch(() => budgetCreatePageState.scope.serviceAccount, async () => {
             show-user-list
             :show-user-group-list="false"
             :selected-id="budgetCreatePageState.budgetManager"
+            :show-delete-all-button="false"
             @update:selected-id="handleSelectId"
             @formatted-selected-ids="handleFormatBudgetManager"
         />
