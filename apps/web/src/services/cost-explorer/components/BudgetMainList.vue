@@ -477,8 +477,10 @@ onMounted(async () => {
                         </p-link>
                     </div>
                 </template>
-                <template #col-limit-format="{value, rowIndex}">
-                    <p class="flex gap-0.5">
+                <template #col-limit-format="{item, value, rowIndex}">
+                    <p class="flex gap-0.5"
+                       :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
+                    >
                         <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
                         <span>{{ Number(value).toLocaleString() }}</span>
                     </p>
