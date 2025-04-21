@@ -2,5 +2,5 @@ import type { BudgetNotification } from '@/api-clients/cost-analysis/budget/sche
 
 export interface BudgetSetNotificationParameters {
     budget_id: string;
-    notifications: BudgetNotification[];
+    notification: BudgetNotification;
 }

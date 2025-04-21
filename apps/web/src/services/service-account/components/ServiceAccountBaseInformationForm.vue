@@ -19,6 +19,7 @@ import { useUserStore } from '@/store/user/user-store';
 import TagsInput from '@/common/components/inputs/TagsInput.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { Tag } from '@/common/modules/tags/type';
+import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import ServiceAccountProjectForm from '@/services/service-account/components/ServiceAccountProjectForm.vue';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
@@ -65,6 +66,7 @@ const state = reactive({
         accountName: state.originServiceAccountData?.name,
         customSchemaForm: state.originServiceAccountData?.data,
         tags: state.originServiceAccountData?.tags,
+        serviceAccountManagerId: state.originServiceAccountData?.service_account_mgr_id,
         ...((!serviceAccountPageGetters.isTrustedAccount && state.originServiceAccountData && ('project_id' in state.originServiceAccountData)) && {
             projectForm: { selectedProjectId: state.originServiceAccountData?.project_id ?? '' },
         }),
@@ -75,10 +77,12 @@ const state = reactive({
     tags: {},
     isTagsValid: true,
     projectForm: {} as ProjectForm,
+    serviceAccountManagerId: '',
     isProjectFormValid: false,
     formData: computed<BaseInformationForm>(() => ({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
+        serviceAccountManagerId: state.serviceAccountManagerId,
         ...(!serviceAccountPageGetters.isTrustedAccount && { projectForm: state.projectForm }),
         tags: state.tags,
     })),
@@ -99,6 +103,7 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
     // init validation
     state.isCustomSchemaFormValid = true;
     state.projectForm.selectedProjectId = originForm?.projectForm?.selectedProjectId;
+    state.serviceAccountManagerId = originForm?.serviceAccountManagerId;
 };
 
 /* Api */
@@ -125,6 +130,10 @@ const handleChangeProjectForm = (projectForm) => {
 
 const handleUpdateServiceAccountName = (value: string) => {
     setForm('serviceAccountName', value);
+};
+
+const handleServiceAccountManagerId = (value: string) => {
+    state.serviceAccountManagerId = value;
 };
 
 /* Init */
@@ -165,6 +174,16 @@ watch(() => state.originForm, (originForm) => {
                               @update:value="handleUpdateServiceAccountName"
                 />
             </template>
+        </p-field-group>
+        <p-field-group v-if="!serviceAccountPageGetters.isTrustedAccount"
+                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
+        >
+            <user-select-dropdown class="account-name block"
+                                  :show-user-group-list="false"
+                                  :selected-id="state.serviceAccountManagerId"
+                                  :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
+                                  @update:selected-id="handleServiceAccountManagerId"
+            />
         </p-field-group>
         <p-json-schema-form v-if="props.schema"
                             class="p-json-schema-form"
@@ -210,6 +229,12 @@ watch(() => state.originForm, (originForm) => {
     /* custom design-system component - p-field-group */
     :deep(.project-field) {
         margin-bottom: 1.5rem;
+    }
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.dropdown-button-component) {
+        max-width: 30rem;
+        width: 100%;
     }
 
     /* custom design-system component - p-json-schema-form */
