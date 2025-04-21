@@ -2139,7 +2139,7 @@
 			"DASHBOARD": "대시보드",
 			"DASHBOARDS_TITLE": "대시보드",
 			"DELETE": "삭제",
-			"DELETE_DASHBOARD": "대시보드 삭제",
+			"DELETE_DASHBOARD": "대시보드 또는 폴더 삭제",
 			"DEPRECATED": "지원 중지된",
 			"DEPRECATED_DESCRIPTION": "이 대시보드는 더 이상 지원되지 않으며 새로운 대시보드가 적용되면 제거될 예정입니다.",
 			"EDIT_NAME": "이름 수정",

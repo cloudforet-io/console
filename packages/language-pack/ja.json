@@ -2139,7 +2139,7 @@
 			"DASHBOARD": "ダッシュボード",
 			"DASHBOARDS_TITLE": "ダッシュボード",
 			"DELETE": "削除",
-			"DELETE_DASHBOARD": "ダッシュボードを削除",
+			"DELETE_DASHBOARD": "ダッシュボードまたはフォルダの削除",
 			"DEPRECATED": "サポート終了",
 			"DEPRECATED_DESCRIPTION": "このダッシュボードはサポートが終了し、新しいダッシュボードが適用されるとすぐに削除される予定です。",
 			"EDIT_NAME": "名の編集",

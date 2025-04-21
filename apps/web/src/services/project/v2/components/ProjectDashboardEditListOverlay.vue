@@ -106,6 +106,12 @@ const queryState = reactive({
         labels: getDashboardValueHandler(),
     })),
     queryTags: computed<QueryTag[]>(() => queryTagsHelper.queryTags.value),
+    searchText: computed<string>(() => {
+        if (!searchFilters.value.length) return '';
+        const filter = searchFilters.value.find((_filter) => !_filter.k && !!_filter.v);
+        if (!filter) return '';
+        return String(filter.v);
+    }),
 });
 
 const dashboardItems = computed<PublicDashboardModel[]>(() => [...dashboardSharedList.value, ...dashboardList.value]);
@@ -181,7 +187,6 @@ const handleCreateDashboard = () => {
     dashboardTreeControlStore.reset();
 };
 const handleCreateFolder = () => {
-    projectDashboardModalStore.closeDashboardEditOverlay();
     dashboardTreeControlStore.reset();
     projectDashboardModalStore.openCreateFolderFormModal();
 };
@@ -252,7 +257,7 @@ onUnmounted(() => {
     >
         <template #default>
             <div class="dashboard-edit-list-overlay-body">
-                <div class="dashboard-tree-list-layout">
+                <div class="dashboard-tree-list-layout overflow-auto">
                     <div class="layout-header flex justify-between items-center pb-4">
                         <p class="text-label-lg text-gray-700 font-bold">
                             {{ i18n.t('Dashboard List') }}
@@ -310,6 +315,7 @@ onUnmounted(() => {
                                                :selected-id-map="dashboardTreeControlState.selectedPublicIdMap"
                                                :dashboard-tree-data="refinedDashboardTreeData"
                                                :button-disable-map="publicTreeControlButtonDisableMap"
+                                               :search-text="queryState.searchText"
                                                disable-link
                                                disable-favorite
                                                show-all

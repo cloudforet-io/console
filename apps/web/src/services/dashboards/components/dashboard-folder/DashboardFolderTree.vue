@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PI, PCheckbox, PButton, PIconButton,
+    PI, PCheckbox, PButton, PIconButton, PTextHighlighting,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
@@ -28,6 +28,7 @@ interface Props {
     selectedIdMap: Record<string, boolean>;
     dashboardTreeData: TreeNode<DashboardTreeDataType>[];
     buttonDisableMap?: Record<string, boolean>;
+    searchText?: string;
     // for dashboard create page
     disableLink?: boolean;
     disableFavorite?: boolean;
@@ -41,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectedIdMap: () => ({}),
     dashboardTreeData: () => ([]),
     buttonDisableMap: () => ({}),
+    searchText: '',
     showSingleControlButtons: true,
     showAll: false,
 });
@@ -207,7 +209,13 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                                             :show-single-control-buttons="props.showSingleControlButtons"
                                             @toggle-folder="handleClickCollapseButton(treeData)"
                                             @select-control-actions="handleSelectControlActions"
-                />
+                >
+                    <template #text="{node}">
+                        <p-text-highlighting :text="node.data.name"
+                                             :term="props.searchText"
+                        />
+                    </template>
+                </dashboard-folder-tree-item>
             </div>
             <template v-if="state.childrenShowMap[treeData.data.id]">
                 <div v-for="child in treeData.children"
@@ -226,7 +234,13 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                                                 :show-single-control-buttons="props.showSingleControlButtons"
                                                 class="child-tree-item"
                                                 @select-control-actions="handleSelectControlActions"
-                    />
+                    >
+                        <template #text="{node}">
+                            <p-text-highlighting :text="node.data.name"
+                                                 :term="props.searchText"
+                            />
+                        </template>
+                    </dashboard-folder-tree-item>
                 </div>
                 <div v-if="!treeData.children?.length"
                      class="folder-row-wrapper no-dashboard"
@@ -235,7 +249,7 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                 </div>
             </template>
         </div>
-        <div v-if="!props.readonlyMode && !state.showAll && props.dashboardTreeData.length > 10"
+        <div v-if="!state.showAll && props.dashboardTreeData.length > 10"
              class="show-all-wrapper"
         >
             <p-button style-type="transparent"

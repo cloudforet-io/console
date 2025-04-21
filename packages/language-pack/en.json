@@ -2139,7 +2139,7 @@
 			"DASHBOARD": "Dashboard",
 			"DASHBOARDS_TITLE": "Dashboard",
 			"DELETE": "Delete",
-			"DELETE_DASHBOARD": "Delete Dashboard",
+			"DELETE_DASHBOARD": "Delete Dashboard or Folder",
 			"DEPRECATED": "Deprecated",
 			"DEPRECATED_DESCRIPTION": "This dashboard is no longer supported and will be removed soon as the new dashboard is adopted.",
 			"EDIT_NAME": "Edit Name",
