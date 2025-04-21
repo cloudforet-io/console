@@ -187,7 +187,6 @@ const handleCreateDashboard = () => {
     dashboardTreeControlStore.reset();
 };
 const handleCreateFolder = () => {
-    projectDashboardModalStore.closeDashboardEditOverlay();
     dashboardTreeControlStore.reset();
     projectDashboardModalStore.openCreateFolderFormModal();
 };
