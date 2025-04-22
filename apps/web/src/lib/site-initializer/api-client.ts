@@ -424,14 +424,12 @@ export const initApiClient = async (config) => {
         mockConfig: getMockConfig(config),
         authConfig: getAuthConfig(config),
     };
-    const serviceConfig = config.get('SERVICES') || {};
     await SpaceConnector.init(
         endpoints,
         tokenApi,
         apiSettings,
         devConfig,
         getAfterCallApiMap(),
-        serviceConfig,
     );
     const existingRefreshToken = SpaceConnector.getRefreshToken();
 
