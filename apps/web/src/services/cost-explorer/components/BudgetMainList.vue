@@ -515,7 +515,7 @@ onMounted(async () => {
                 </template>
                 <template #col-limit-format="{item, value, rowIndex}">
                     <p class="flex gap-0.5"
-                       :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
+                       :class="{ expired: item.state === 'EXPIRED' }"
                     >
                         <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
                         <span>{{ Number(value).toLocaleString() }}</span>
@@ -523,14 +523,14 @@ onMounted(async () => {
                 </template>
                 <template #col-cycle-format="{value, item}">
                     <p class="flex gap-2 items-center"
-                       :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
+                       :class="{ expired: item.state === 'EXPIRED' }"
                     >
                         <span v-if="value === 'MONTHLY'">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY') }}</span>
                         <span v-else>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') }}</span>
                     </p>
                 </template>
                 <template #col-period-format="{value, item}">
-                    <span :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">{{ value }}</span>
+                    <span :class="{ expired: item.state === 'EXPIRED' }">{{ value }}</span>
                 </template>
                 <template #col-target-format="{value}">
                     <div v-if="value.startsWith('project-')"
@@ -559,13 +559,13 @@ onMounted(async () => {
                     </p-link>
                 </template>
                 <template #col-actualSpend-format="{item, value, rowIndex}">
-                    <p :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                    <p :class="{ expired: item.state === 'EXPIRED' }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
                         {{ Number(value).toLocaleString() }}
                     </p>
                 </template>
                 <template #col-utilization_rate-format="{item, value}">
-                    <div :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                    <div :class="{ expired: item.state === 'EXPIRED' }">
                         <div v-if="value > -1">
                             <p-progress-bar :percentage="value"
                                             :color="Number(value) < 100
@@ -577,7 +577,7 @@ onMounted(async () => {
                     </div>
                 </template>
                 <template #col-remaining-format="{item, value, rowIndex}">
-                    <p :class="{exceeded: Number(value) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                    <p :class="{exceeded: Number(value) < 0, expired: item.state === 'EXPIRED' }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
                         {{ Math.abs(value.toFixed(2)).toLocaleString() }}
                     </p>
