@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import APIClientManager from '@/api-clients/api-client-manager';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { WebhookModel as WebhookModelV1 } from '@/schema/monitoring/webhook/model';
 
@@ -12,6 +11,7 @@ import type {
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
 
+import APIClientManager from '@/lib/config/global-config/api-client-manager';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
