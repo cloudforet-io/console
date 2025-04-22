@@ -4,6 +4,7 @@ import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type {
     BudgetNotification,
     BudgetPlannedLimit,
+    BudgetState,
     BudgetTimeUnit,
 } from '@/api-clients/cost-analysis/budget/schema/type';
 
@@ -32,4 +33,5 @@ export interface BudgetModel {
   budget_year: string;
   notified_month: string;
   utilization_rate: number;
+  state: BudgetState;
 }

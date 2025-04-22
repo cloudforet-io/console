@@ -170,7 +170,6 @@ const tableState = reactive({
             name: 'state',
             label: 'State',
             width: '7%',
-            sortable: false,
         },
     ],
     items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
@@ -193,8 +192,7 @@ const tableState = reactive({
                 : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0),
             utilization_rate: budget.utilization_rate ? budget.utilization_rate : 0,
             remaining: 0,
-            state: dayjs.utc().isSameOrAfter(startDate, 'month') && dayjs.utc().isSameOrBefore(endDate, 'month')
-                ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ACTIVE_TIL_DATE') : 'EXPIRED',
+            state: budget.state,
         };
     })),
     actionMenus: computed<MenuItem[]>(() => [
@@ -579,11 +577,11 @@ onMounted(async () => {
                     </p>
                 </template>
 
-                <template #col-state-format="{item}">
-                    <div v-if="dayjs().isBefore(dayjs(item.period.split('~')[0]).format('YYYY-MM-DD'))">
+                <template #col-state-format="{value}">
+                    <div v-if="value === 'SCHEDULED'">
                         {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SCHEDULED') }}
                     </div>
-                    <div v-else-if="dayjs().isAfter(dayjs(item.period.split('~')[1]).format('YYYY-MM-DD'))">
+                    <div v-else-if="value === 'EXPIRED'">
                         {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.EXPIRED') }}
                     </div>
                     <p-status v-else
