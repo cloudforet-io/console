@@ -101,7 +101,6 @@ const createBudget = async (type: 'skip' | 'set') => {
             time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
             start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
             end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
-            budget_year: budgetCreatePageState.budgetYear,
             notification: type === 'set' ? {
                 state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
                     ? 'ENABLED' : 'DISABLED',

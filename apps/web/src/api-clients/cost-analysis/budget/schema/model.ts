@@ -30,7 +30,6 @@ export interface BudgetModel {
   domain_id: string;
   created_at: string;
   updated_at: string;
-  budget_year: string;
   notified_month: string;
   utilization_rate: number;
   state: BudgetState;

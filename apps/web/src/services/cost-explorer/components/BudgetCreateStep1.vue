@@ -149,22 +149,6 @@ watch(() => budgetCreatePageState.project, async () => {
 watchEffect(async () => {
     await fetchBudget();
 });
-
-watch([
-    () => state.budgetList,
-    () => budgetCreatePageState.project,
-    () => budgetCreatePageState.scope.serviceAccount,
-    () => budgetCreatePageState.scope.type,
-], () => {
-    const filteredList = state.budgetList.filter((result) => {
-        if (budgetCreatePageState.scope.type === 'project') {
-            return result.project_id === budgetCreatePageState.project && !result.service_account_id;
-        }
-        return result.project_id === budgetCreatePageState.project
-               && result.service_account_id === budgetCreatePageState.scope.serviceAccount;
-    });
-    budgetCreatePageState.alreadyExistingBudgetYear = filteredList.map((result) => result.budget_year);
-}, { deep: true, immediate: true });
 </script>
 
 <template>
