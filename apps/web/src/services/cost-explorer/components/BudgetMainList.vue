@@ -27,6 +27,7 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
+import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -42,6 +43,7 @@ import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToo
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 import { BUDGET_SEARCH_HANDLERS } from '../constants/budget-constant';
+import { BUDGET_EXCEL_FIELDS } from '../constants/budget-table-constant';
 import { ADMIN_COST_EXPLORER_ROUTE } from '../routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
 import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
@@ -97,6 +99,7 @@ const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
+const projectReferenceStore = useProjectReferenceStore();
 
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 const timeZone = computed<string>(() => userState.timezone || '');
@@ -191,7 +194,13 @@ const tableState = reactive({
                 .map((budgetUsage) => budgetUsage.actual_spend)[0] ?? 0
                 : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0),
             utilization_rate: budget.utilization_rate ? budget.utilization_rate : 0,
-            remaining: 0,
+            remaining: (budget.limit ?? 0) - (
+                budget.time_unit === 'MONTHLY'
+                    ? state.budgetUsages
+                        .filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM'))
+                        .map((budgetUsage) => budgetUsage.actual_spend)[0] ?? 0
+                    : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0)
+            ),
             state: budget.state,
         };
     })),
@@ -368,6 +377,7 @@ const listBudgetUsages = async () => {
     state.more = !!more;
 };
 
+const getProjectName = (projectId: string): string|undefined => projectReferenceStore.getters.projectItems[projectId]?.label;
 const getServiceAccountName = (serviceAccountId: string): string|undefined => serviceAccountReferenceStore.getters.serviceAccountItems[serviceAccountId]?.label;
 
 const handleUpdateSelectIndex = async (indicies: number[]) => {
@@ -409,26 +419,17 @@ const handleChange = async (options: any = {}) => {
 
 const handleExportToExcel = async () => {
     await downloadExcel({
-        // url: '/cost-explorer/budget/list',
-        // param: {
-        //     query: {
-        //         // ...budgetApiQueryHelper.data,
-        //         only: [
-        //             // { key: 'name', name: 'Budget Name' },
-        //             // { key: 'target', name: 'Target' },
-        //             // { key: 'cycle', name: 'Cycle' },
-        //             // { key: 'limit', name: 'Budget' },
-        //         ],
-        //     },
-        // },
-        // fields: [
-        //     // { key: 'name', name: 'Budget Name' },
-        //     // { key: 'target', name: 'Target' },
-        //     // { key: 'cycle', name: 'Cycle' },
-        //     // { key: 'limit', name: 'Budget' },
-        // ],
-        data: tableState.items,
-        fields: tableState.fields,
+        fields: BUDGET_EXCEL_FIELDS,
+        data: tableState.items.map((item, idx) => ({
+            ...item,
+            target: item.target.startsWith('project-') ? `Project: ${getProjectName(item.target)}` : `Service: ${getServiceAccountName(item.target)}`,
+            cycle: item.cycle === 'TOTAL' ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY'),
+            limit: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.limit}`,
+            actualSpend: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Number(item.actualSpend).toFixed(3)}`,
+            utilization_rate: `${item.utilization_rate}%`,
+            remaining: item.remaining < 0 ? `-${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Math.abs(item.remaining.toFixed(2)).toLocaleString()}`
+                : `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.remaining.toFixed(2).toLocaleString()}`,
+        })),
         file_name_prefix: FILE_NAME_PREFIX.budget,
         timezone: timeZone.value,
     });
@@ -570,10 +571,10 @@ onMounted(async () => {
                         </div>
                     </div>
                 </template>
-                <template #col-remaining-format="{item, rowIndex}">
-                    <p :class="{exceeded: (Number(item.limit) - Number(item.actualSpend)) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                <template #col-remaining-format="{item, value, rowIndex}">
+                    <p :class="{exceeded: Number(value) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
-                        {{ Math.abs(Number((Number(item.limit) - Number(item.actualSpend)).toFixed(2))).toLocaleString() }}
+                        {{ Math.abs(value.toFixed(2)).toLocaleString() }}
                     </p>
                 </template>
 
