@@ -1,7 +1,6 @@
 import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { pinia } from '@/store/pinia';
 
-
 import type {
     GeneratedMenuSchema,
     GeneratedRouteSchema,
@@ -29,7 +28,21 @@ export class DynamicSchemaManager {
         return DynamicSchemaManager.instance;
     }
 
-    // private initializeHandlers() {}
+    // private initializeHandlers() {
+    //     // Example
+    //     this.registerDynamicMenuHandler('OPS_FLOW', async (menuSchema: GeneratedMenuSchema) => {
+    //         const updatedMenu = { ...menuSchema };
+    //         if (!isEmpty(menuSchema?.OPS_FLOW)) {}
+    //         return updatedMenu;
+    //     });
+
+    //     watch(() => this.taskManagementTemplateStore.state, () => {
+    //         const currentMenuSchema = this.globalConfigSchemaStore.state.menuSchema;
+    //         if (!isEmpty(currentMenuSchema?.OPS_FLOW)) {
+    //             this.updateMenuSchema(currentMenuSchema);
+    //         }
+    //     }, { deep: true });
+    // }
 
     registerDynamicMenuHandler(serviceName: string, handler: DynamicMenuHandler) {
         this.dynamicMenuHandlers.set(serviceName, handler);
