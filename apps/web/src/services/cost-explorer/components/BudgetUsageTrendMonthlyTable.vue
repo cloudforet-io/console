@@ -159,7 +159,7 @@ const handleToggleOriginalData = (value: boolean) => {
             <template #col-format="{ value, field, item }">
                 <template v-if="field.name !== 'category'">
                     <span class="block text-right">
-                        <template v-if="item.category !== 'Usage Rate'">
+                        <template v-if="item.category !== i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE')">
                             <p>
                                 <span>{{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }} </span>
                                 <span :class="{bold: item.category === i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')}">
