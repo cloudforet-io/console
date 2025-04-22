@@ -16,6 +16,9 @@ class APIClientManagerError extends Error {
 }
 
 class APIClientManager {
+    // eslint-disable-next-line no-undef
+    [key: string]: any;
+
     private config: GlobalServiceConfig | null = null;
 
     private apiClientsSchema: ApiClientsSchemaType | null = null;
