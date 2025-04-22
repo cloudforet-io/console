@@ -10,13 +10,13 @@ import { useRouter } from 'vue-router/composables';
 
 import { useProjectGroupQuery } from '@/services/project/v-shared/composables/queries/use-project-group-query';
 import ProjectAndGroupListPanel from '@/services/project/v2/components/ProjectAndGroupListPanel.vue';
+import ProjectDashboardEditListOverlay from '@/services/project/v2/components/ProjectDashboardEditListOverlay.vue';
 import ProjectHeader from '@/services/project/v2/components/ProjectHeader.vue';
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectDashboardModalStore } from '@/services/project/v2/stores/Project-dashboard-modal-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
-
 
 /* modals */
 const ProjectDetailTab = () => import('@/services/project/v2/components/ProjectDetailTab.vue');
@@ -36,7 +36,6 @@ const ProjectDashboardNameEditModal = () => import('@/services/project/v2/compon
 const ProjectDashboardChangeFolderModal = () => import('@/services/project/v2/components/ProjectDashboardChangeFolderModal.vue');
 const ProjectDashboardDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardDeleteModal.vue');
 const ProjectDashboardCloneModal = () => import('@/services/project/v2/components/ProjectDashboardCloneModal.vue');
-const ProjectDashboardEditListOverlay = () => import('@/services/project/v2/components/ProjectDashboardEditListOverlay.vue');
 const ProjectDashboardBundleDeleteModal = () => import('@/services/project/v2/components/ProjectDashboardBundleDeleteModal.vue');
 const ProjectDashboardBundleMoveModal = () => import('@/services/project/v2/components/ProjectDashboardBundleMoveModal.vue');
 const ProjectDashboardBundleCloneModal = () => import('@/services/project/v2/components/ProjectDashboardBundleCloneModal.vue');
@@ -163,6 +162,9 @@ const handleUpdateDashboardId = (id?: string) => {
                                         @created="handleCreated"
             />
             <project-group-rename-modal v-if="projectPageModelStore.state.projectGroupRenameModalVisible" />
+            <project-dashboard-edit-list-overlay v-if="projectDashboardModalStore.state.dashboardEditOverlayVisible"
+                                                 :project-group-or-project-id="props.projectGroupOrProjectId"
+            />
         </keep-alive>
         <template v-if="mounted">
             <project-dashboard-folder-form-modal v-if="projectDashboardModalStore.state.folderFormModalVisible"
@@ -179,9 +181,6 @@ const handleUpdateDashboardId = (id?: string) => {
             />
             <project-dashboard-clone-modal v-if="projectDashboardModalStore.state.dashboardCloneModalVisible"
                                            :project-group-or-project-id="props.projectGroupOrProjectId"
-            />
-            <project-dashboard-edit-list-overlay v-if="projectDashboardModalStore.state.dashboardEditOverlayVisible"
-                                                 :project-group-or-project-id="props.projectGroupOrProjectId"
             />
             <project-dashboard-bundle-delete-modal v-if="projectDashboardModalStore.state.dashboardBundleDeleteModalVisible"
                                                    :project-group-or-project-id="props.projectGroupOrProjectId"

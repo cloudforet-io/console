@@ -234,6 +234,21 @@ const handleClickControlMove = () => {
 const handleClickControlClone = () => {
     projectDashboardModalStore.openDashboardBundleCloneModal();
 };
+const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>) => {
+    if (!props.projectGroupOrProjectId) {
+        console.error('projectGroupOrProjectId is not defined');
+        return;
+    }
+    if (node.data.type === 'DASHBOARD') {
+        router.push({
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: props.projectGroupOrProjectId,
+                dashboardId: node.data.id,
+            },
+        }).catch(() => {});
+    }
+};
 
 watch(() => dashboardTreeControlState.searchQueryTags, async (queryTags: QueryTag[]) => {
     queryTagsHelper.setQueryTags(queryTags || []);
@@ -316,7 +331,6 @@ onUnmounted(() => {
                                                :dashboard-tree-data="refinedDashboardTreeData"
                                                :button-disable-map="publicTreeControlButtonDisableMap"
                                                :search-text="queryState.searchText"
-                                               disable-link
                                                disable-favorite
                                                show-all
                                                show-control-buttons
@@ -325,6 +339,7 @@ onUnmounted(() => {
                                                @click-control-delete="handleClickControlDelete"
                                                @click-control-move="handleClickControlMove"
                                                @click-control-clone="handleClickControlClone"
+                                               @click-tree-item="handleClickTreeItem"
                         />
                     </p-data-loader>
                 </div>
