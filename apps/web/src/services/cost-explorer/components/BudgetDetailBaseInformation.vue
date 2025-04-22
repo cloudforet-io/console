@@ -18,7 +18,6 @@ import { useServiceAccountReferenceStore } from '@/store/reference/service-accou
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
@@ -139,7 +138,6 @@ const handleUpdateAlertRecipients = async () => {
             data: 'alertRecipients'.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
         }), '');
     } catch (error: any) {
-        ErrorHandler.handleError(error, true);
         showErrorMessage(error.code, error.message);
     }
 };
@@ -154,7 +152,7 @@ const handleUpdateBudgetThresholds = async () => {
                 threshold: Number(threshold),
             })),
         },
-    });
+    }, 'budgetAlerts');
     state.budgetAlertEdit = false;
 };
 
