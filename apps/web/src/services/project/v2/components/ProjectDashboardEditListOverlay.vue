@@ -316,7 +316,6 @@ onUnmounted(() => {
                                                :dashboard-tree-data="refinedDashboardTreeData"
                                                :button-disable-map="publicTreeControlButtonDisableMap"
                                                :search-text="queryState.searchText"
-                                               disable-link
                                                disable-favorite
                                                show-all
                                                show-control-buttons
