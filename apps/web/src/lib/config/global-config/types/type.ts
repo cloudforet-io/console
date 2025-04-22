@@ -68,6 +68,7 @@ type apiClientType = {
 export type ApiClientsSchemaType = {
     DASHBOARDS: apiClientType,
     PROJECT: apiClientType,
+    SERVICE_ACCOUNT: apiClientType,
     ASSET_INVENTORY: apiClientType,
     COST_ANALYSIS: apiClientType,
     OPS_FLOW: apiClientType,
