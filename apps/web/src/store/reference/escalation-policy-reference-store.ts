@@ -5,7 +5,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import APIClientManager from '@/api-clients/api-client-manager';
 import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
 import type { EscalationPolicyModel as EscalationPolicyModelV1 } from '@/schema/monitoring/escalation-policy/model';
 
@@ -13,6 +12,8 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
+
+import APIClientManager from '@/lib/config/global-config/api-client-manager';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

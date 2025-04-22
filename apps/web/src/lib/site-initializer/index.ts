@@ -2,7 +2,6 @@ import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import APIClientManager from '@/api-clients/api-client-manager';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
@@ -17,6 +16,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
+import APIClientManager from '@/lib/config/global-config/api-client-manager';
 import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
 import { mergeConfig } from '@/lib/config/global-config/helpers/merge-config';
 import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
