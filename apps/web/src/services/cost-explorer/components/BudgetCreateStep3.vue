@@ -121,12 +121,10 @@ const createBudget = async (type: 'skip' | 'set') => {
         };
         await SpaceConnector.clientV2.costAnalysis.budget.create<BudgetCreateParameters, BudgetModel>(params);
 
-        budgetCreatePageState.loading = false;
         router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-        budgetCreatePageStore.reset();
     } catch (error: any) {
         showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'), error.message);
         budgetCreatePageState.currentStep = 1;
