@@ -192,7 +192,8 @@ const handleToggleOriginalData = (value: boolean) => {
                      class="flex items-center gap-2"
                 >
                     <span>{{ value }}</span>
-                    <p-tooltip contents="Accumulated Usage vs. Planned Budget">
+                    <!-- eslint-disable-next-line max-len -->
+                    <p-tooltip :contents="`${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACCUMULATED_USAGE')} vs. ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')}`">
                         <template #default>
                             <p-i name="ic_info-circle"
                                  width="1rem"
