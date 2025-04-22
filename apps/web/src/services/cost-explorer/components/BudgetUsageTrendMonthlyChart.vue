@@ -46,7 +46,7 @@ const state = reactive({
                 type: 'shadow',
             },
             formatter: (params: any) => {
-                const usageData = params.find((p) => p.seriesName === 'Budget Usage Trend');
+                const usageData = params.find((p) => p.seriesName === 'Actual Spend');
                 if (!usageData) return '';
 
                 const index = usageData.dataIndex;
@@ -73,6 +73,13 @@ const state = reactive({
         },
         legend: {
             show: false,
+            icon: 'circle',
+            data: [
+                { name: 'Planned Budget', itemStyle: { color: indigo[100] } },
+                { name: 'Actual Spend (≤ 90%)', itemStyle: { color: indigo[400] } },
+                { name: 'Actual Spend (90–100%)', itemStyle: { color: yellow[500] } },
+                { name: 'Actual Spend (> 100%)', itemStyle: { color: red[400] } },
+            ],
         },
         xAxis: {
             type: 'category',
@@ -122,7 +129,7 @@ const drawChart = (data: any) => {
 
     state.chartData = [
         {
-            name: 'Budget Background (0~100%)',
+            name: 'Planned Budget',
             type: 'bar',
             data: state.data.map(() => 100),
             barGap: '-100%',
@@ -132,7 +139,7 @@ const drawChart = (data: any) => {
             silent: true,
         },
         {
-            name: 'Budget Usage Trend',
+            name: 'Actual Spend',
             type: 'bar',
             data: state.data.map((item) => Number(((item.budget_usage / item.budget) * 100).toFixed(2))),
             minBarHeight: 4,
@@ -145,8 +152,8 @@ const drawChart = (data: any) => {
             itemStyle: {
                 color: (params: any) => {
                     const value = Number(params.value);
-                    if (value >= 100) return red[400];
-                    if (value >= 90) return yellow[500];
+                    if (value > 100) return red[400];
+                    if (value > 90) return yellow[500];
                     return indigo[400];
                 },
             },
@@ -178,10 +185,30 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="chart-wrapper">
-        <div ref="chartContext"
-             class="chart"
-        />
+    <div>
+        <div class="chart-wrapper">
+            <div ref="chartContext"
+                 class="chart"
+            />
+        </div>
+        <div class="legend-custom flex gap-4 mb-6 ml-4 font-normal text-xs text-gray-700">
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 rounded-full bg-indigo-100" />
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET') }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 rounded-full bg-indigo-400" />
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND') }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 rounded-full bg-yellow-500" />
+                <span> 90% &lt; {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND') }} &gt; 100%</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 rounded-full bg-red-400" />
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND') }} &gt; 100%</span>
+            </div>
+        </div>
     </div>
 </template>
 

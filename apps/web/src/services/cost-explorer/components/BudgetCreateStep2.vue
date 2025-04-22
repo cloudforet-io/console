@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PSelectDropdown, PDatetimePicker, PButton, PStatus,
+    PFieldGroup, PSelectDropdown, PDatetimePicker, PButton,
     PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge,
 } from '@cloudforet/mirinae';
 
@@ -248,6 +248,11 @@ watch(() => [
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
+    if (state.existingBudgetUsageList.length > 0) {
+        state.isContinueAble = false;
+        return;
+    }
+
     if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) {
         state.isContinueAble = false;
     }
@@ -345,6 +350,17 @@ watch(() => budgetCreatePageState.limit, () => {
         budgetCreatePageState.limit = undefined;
     }
 }, { immediate: true });
+
+watch(() => state.existingBudgetUsageList, () => {
+    if (state.existingBudgetUsageList.length > 0) {
+        budgetCreatePageState.time_unit = '';
+        budgetCreatePageState.limit = undefined;
+        budgetCreatePageState.budgetAppliedSameAmount = undefined;
+        budgetCreatePageState.initialAmount = undefined;
+        budgetCreatePageState.monthlyGrowthRate = undefined;
+        budgetCreatePageState.budgetEachDate = [];
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -386,18 +402,22 @@ watch(() => budgetCreatePageState.limit, () => {
         <div class="bottom-section">
             <div class="left-section">
                 <p-divider />
-                <div class="flex gap-6 mt-6">
+                <div class="flex gap-6 mt-6 -mb-4">
                     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.START_MONTH')"
+                                   :invalid="state.existingBudgetUsageList.length > 0"
                                    required
+                                   class="flex flex-col "
                     >
                         <p-datetime-picker data-type="yearToMonth"
                                            :selected-dates.sync="budgetCreatePageState.startMonth"
                                            :min-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(11, 'month').format('YYYY-MM') : ''"
                                            :max-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'): ''"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
+                                           :invalid="state.existingBudgetUsageList.length > 0"
                         />
                     </p-field-group>
                     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.END_MONTH')"
+                                   :invalid="state.existingBudgetUsageList.length > 0"
                                    required
                     >
                         <p-datetime-picker data-type="yearToMonth"
@@ -406,31 +426,24 @@ watch(() => budgetCreatePageState.limit, () => {
                                            :min-date="budgetCreatePageState.startMonth.length > 0
                                                ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : ''"
                                            :max-date="budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(11, 'month').format('YYYY-MM') : ''"
+                                           :invalid="state.existingBudgetUsageList.length > 0"
                         />
                     </p-field-group>
                 </div>
-                <!-- TODO: Alert about duplicated Months -->
-                <p-status v-if="budgetCreatePageState.project
-                              && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
-                              && (
-                                  (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                                  ||
-                                  (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                              )"
-                          icon="ic_warning-filled"
-                          :text="budgetCreatePageState.scope.type === 'project'
-                              ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
-                                  project: project[budgetCreatePageState.project].name,
-                                  year_list: budgetCreatePageState.alreadyExistingBudgetYear.join(',').split(' ')
-                              }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
-                                  project: project[budgetCreatePageState.project].name,
-                                  serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
-                                  year_list: budgetCreatePageState.alreadyExistingBudgetYear.join(',')
-                              })"
-                          theme="red"
-                          class="text-sm mb-6"
-                />
-                <div class="flex">
+                <span v-if="state.existingBudgetUsageList.length > 0"
+                      class="text-red-500 font-normal text-xs"
+                >
+                    {{ budgetCreatePageState.scope.type === 'project'
+                        ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
+                            project: project[budgetCreatePageState.project].name,
+                            month_list: state.existingBudgetUsageList.map(d => d.date)
+                        }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
+                            project: project[budgetCreatePageState.project].name,
+                            serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
+                            month_list: state.existingBudgetUsageList.map(d => d.date)
+                        }) }}
+                </span>
+                <div class="flex mt-6">
                     <p-field-group
                         :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
                         :help-text="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0
@@ -442,13 +455,7 @@ watch(() => budgetCreatePageState.limit, () => {
                                      :key="`budget-cycle-${idx}`"
                                      v-model="budgetCreatePageState.time_unit"
                                      :value="cycle.name"
-                                     :disabled="(budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0 || budgetCreatePageState.project
-                                         && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
-                                         && (
-                                             (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                                             ||
-                                             (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                                         ))"
+                                     :disabled="state.existingBudgetUsageList.length > 0"
                             >
                                 <span>{{ cycle.label }}</span>
                             </p-radio>

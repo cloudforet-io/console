@@ -18,7 +18,6 @@ import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -101,7 +100,6 @@ const createBudget = async (type: 'skip' | 'set') => {
             time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
             start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
             end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
-            budget_year: budgetCreatePageState.budgetYear,
             notification: type === 'set' ? {
                 state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
                     ? 'ENABLED' : 'DISABLED',
@@ -128,11 +126,12 @@ const createBudget = async (type: 'skip' | 'set') => {
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-    } catch (error: any) {
-        ErrorHandler.handleError(error, true);
-        showErrorMessage(error?.code ?? '', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));
-    } finally {
         budgetCreatePageStore.reset();
+    } catch (error: any) {
+        showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'), error.message);
+        budgetCreatePageState.currentStep = 1;
+    } finally {
+        budgetCreatePageState.loading = false;
     }
 };
 </script>

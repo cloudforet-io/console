@@ -84,6 +84,7 @@ const state = reactive({
             show: true,
             left: '40px',
             bottom: 0,
+            selectedMode: false,
             formatter: (name) => name,
             textStyle: {
                 rich: {
