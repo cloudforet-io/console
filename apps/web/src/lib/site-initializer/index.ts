@@ -19,6 +19,7 @@ import { useUserStore } from '@/store/user/user-store';
 import config from '@/lib/config';
 import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
 import { mergeConfig } from '@/lib/config/global-config/helpers/merge-config';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
@@ -32,6 +33,8 @@ import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
+
+import { useTaskManagementTemplateStore } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
 const initQueryHelper = () => {
     const userStore = useUserStore(pinia);
@@ -75,6 +78,15 @@ const initI18n = () => {
     setI18nLocale(userStore.state.language || '');
 };
 
+const initOpsFlowTaskManagementTemplate = async (mergedConfig: GlobalServiceConfig) => {
+    if (!mergedConfig.OPS_FLOW.ENABLED) return;
+    const taskManagementTemplateStore = useTaskManagementTemplateStore(pinia);
+    await Promise.allSettled([
+        taskManagementTemplateStore.setInitialTemplateId(),
+        taskManagementTemplateStore.setInitialLandingData(),
+    ]);
+};
+
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
     if (el?.parentElement) el.parentElement.removeChild(el);
@@ -91,6 +103,7 @@ const init = async () => {
         initDomainSettings();
         await initModeSetting();
         await initWorkspace(userId);
+        await initOpsFlowTaskManagementTemplate(mergedConfig);
         await featureSchemaManager.initialize(mergedConfig);
         await APIClientManager.initialize(mergedConfig);
         initRouter(domainId);
