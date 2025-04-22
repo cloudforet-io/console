@@ -343,6 +343,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                             <p-toggle-button :value.sync="state.isBudgetAlertsEnabled"
                                              show-state-text
                                              position="left"
+                                             :disabled="storeState.isAdminMode"
                                              @change-toggle="() => {
                                                  state.updateBudgetAlertsModalVisible = true;
                                              }"
