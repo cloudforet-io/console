@@ -54,6 +54,7 @@ const emit = defineEmits<{(e: 'update:selectedIdMap', selectedIdMap: Record<stri
     (e: 'click-control-delete'): void;
     (e: 'click-control-move'): void;
     (e: 'click-control-clone'): void;
+    (e: 'click-tree-item', node: TreeNode<DashboardTreeDataType>): void;
 }>();
 const state = reactive({
     proxySelectedIdMap: useProxyValue('selectedIdMap', props, emit),
@@ -151,6 +152,14 @@ const handleClickCollapseButton = (node: TreeNode<DashboardTreeDataType>) => {
         state.childrenShowMap = { ...state.childrenShowMap, [node.data.id]: true };
     }
 };
+const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>) => {
+    if (node.data.type === 'FOLDER') {
+        handleClickCollapseButton(node);
+    } else {
+        emit('click-tree-item', node);
+    }
+};
+
 const handleClickShowAll = () => {
     state.showAll = true;
 };
@@ -207,8 +216,8 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                                             :disable-control-labels="props.disableControlLabels"
                                             :disable-link="props.disableLink"
                                             :show-single-control-buttons="props.showSingleControlButtons"
-                                            @toggle-folder="handleClickCollapseButton(treeData)"
                                             @select-control-actions="handleSelectControlActions"
+                                            @click-tree-item="handleClickTreeItem"
                 >
                     <template #text="{node}">
                         <p-text-highlighting :text="node.data.name"
@@ -234,6 +243,7 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
                                                 :show-single-control-buttons="props.showSingleControlButtons"
                                                 class="child-tree-item"
                                                 @select-control-actions="handleSelectControlActions"
+                                                @click-tree-item="handleClickTreeItem"
                     >
                         <template #text="{node}">
                             <p-text-highlighting :text="node.data.name"
