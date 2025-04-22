@@ -3,7 +3,8 @@ import { computed } from 'vue';
 
 import { PCard } from '@cloudforet/mirinae';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+
 import BudgetUsageTrendMonthly from './BudgetUsageTrendMonthly.vue';
 import BudgetUsageTrendTotal from './BudgetUsageTrendTotal.vue';
 

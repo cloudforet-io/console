@@ -21,5 +21,4 @@ export interface BudgetCreateParameters {
     project_id?: string;
     service_account_id?: string;
     budget_manager_id?: string;
-    budget_year?: string;
 }

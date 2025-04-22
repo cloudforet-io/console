@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref, watch, onMounted, onBeforeUnmount,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -13,10 +13,9 @@ import type { Currency } from '@/store/display/type';
 
 import {
     gray, indigo, peacock, red,
-    white,
 } from '@/styles/colors';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 const budgetpageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetpageStore.$state;
@@ -55,7 +54,7 @@ const state = reactive({
 
                 params.forEach((param) => {
                     const value = Number(param.data);
-                    const formatted = Number.isNaN(value) ? '-' : value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                    const formatted = Number.isNaN(value) ? '-' : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 
                     if (param.seriesName === 'Accumulated Usage (under Planned Budget)' || param.seriesName === 'Accumulated Usage (over Planned Budget)') {
                         if (accumulatedValue === null || value > Number(accumulatedValue.replace(/,/g, ''))) {
@@ -66,6 +65,8 @@ const state = reactive({
                                 accumulatedColor = peacock[400];
                             }
                         }
+                    } else if (param.seriesName === 'Actual Spend') {
+                        tooltipLines.push(`${param.marker} ${param.seriesName}: ${param.data}`);
                     } else {
                         tooltipLines.push(`${param.marker} ${param.seriesName}: ${formatted}`);
                     }
@@ -83,6 +84,7 @@ const state = reactive({
             show: true,
             left: '40px',
             bottom: 0,
+            selectedMode: false,
             formatter: (name) => name,
             textStyle: {
                 rich: {
@@ -118,6 +120,18 @@ const state = reactive({
         },
         series: state.chartData,
     })),
+});
+
+const handleResize = () => {
+    state.chart?.resize();
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize);
 });
 
 const drawChart = (rawData: {
@@ -172,7 +186,7 @@ const drawChart = (rawData: {
             label: {
                 show: false,
             },
-            data: data.map((item) => Number(item.budget_usage).toFixed(2)),
+            data: data.map((item) => Number(item.budget_usage).toFixed(3)),
             color: indigo[400],
         },
         {
@@ -195,33 +209,13 @@ const drawChart = (rawData: {
             name: 'Accumulated Usage (under Planned Budget)',
             type: 'line',
             data: accumulatedBelow,
-            lineStyle: {
-                color: peacock[400],
-                width: 3,
-            },
-            itemStyle: {
-                color: white[100],
-                borderColor: peacock[400],
-                borderWidth: 2,
-            },
-            symbol: 'circle',
-            symbolSize: 6,
+            color: peacock[400],
         },
         {
             name: 'Accumulated Usage (over Planned Budget)',
             type: 'line',
             data: accumulatedAbove,
-            lineStyle: {
-                color: red[400],
-                width: 3,
-            },
-            itemStyle: {
-                color: white[100],
-                borderColor: red[400],
-                borderWidth: 2,
-            },
-            symbol: 'circle',
-            symbolSize: 6,
+            color: red[400],
         },
     ];
 
@@ -254,8 +248,11 @@ watch([() => state.data, () => budgetPageState], () => {
 .chart-wrapper {
     @apply mb-6;
     height: 17rem;
+    overflow-x: auto;
+
     .chart {
         height: 100%;
+        min-width: 62.5rem;
         width: 100%;
     }
 }

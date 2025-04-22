@@ -11,8 +11,8 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
-import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     data: any;
@@ -159,7 +159,7 @@ const handleToggleOriginalData = (value: boolean) => {
             <template #col-format="{ value, field, item }">
                 <template v-if="field.name !== 'category'">
                     <span class="block text-right">
-                        <template v-if="item.category !== 'Usage Rate'">
+                        <template v-if="item.category !== i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE')">
                             <p>
                                 <span>{{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }} </span>
                                 <span :class="{bold: item.category === i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')}">

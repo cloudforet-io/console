@@ -23,9 +23,9 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
-import BudgetCreateManagerSelect from './BudgetCreateManagerSelect.vue';
-import BudgetCreateScopeSelect from './BudgetCreateScopeSelect.vue';
+import BudgetCreateManagerSelect from '@/services/cost-explorer/components/BudgetCreateManagerSelect.vue';
+import BudgetCreateScopeSelect from '@/services/cost-explorer/components/BudgetCreateScopeSelect.vue';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
@@ -149,22 +149,6 @@ watch(() => budgetCreatePageState.project, async () => {
 watchEffect(async () => {
     await fetchBudget();
 });
-
-watch([
-    () => state.budgetList,
-    () => budgetCreatePageState.project,
-    () => budgetCreatePageState.scope.serviceAccount,
-    () => budgetCreatePageState.scope.type,
-], () => {
-    const filteredList = state.budgetList.filter((result) => {
-        if (budgetCreatePageState.scope.type === 'project') {
-            return result.project_id === budgetCreatePageState.project && !result.service_account_id;
-        }
-        return result.project_id === budgetCreatePageState.project
-               && result.service_account_id === budgetCreatePageState.scope.serviceAccount;
-    });
-    budgetCreatePageState.alreadyExistingBudgetYear = filteredList.map((result) => result.budget_year);
-}, { deep: true, immediate: true });
 </script>
 
 <template>

@@ -5,11 +5,15 @@ import {
 
 import dayjs from 'dayjs';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PSelectDropdown, PDatetimePicker, PButton, PStatus,
-    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge, PToggleButton,
+    PFieldGroup, PSelectDropdown, PDatetimePicker, PButton,
+    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
+import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -18,11 +22,13 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
-import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DEFAULT_UNIFIED_COST_CURRENCY, YAHOO_FINANCE_ID } from '../constants/cost-explorer-constant';
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
-import BudgetLastThreeMonthCostTrendBarChart from './BudgetLastThreeMonthCostTrendBarChart.vue';
+import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
+import BudgetLastThreeMonthCostTrendBarChart from '@/services/cost-explorer/components/BudgetLastThreeMonthCostTrendBarChart.vue';
+import { DEFAULT_UNIFIED_COST_CURRENCY, YAHOO_FINANCE_ID } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -60,9 +66,98 @@ const state = reactive({
     analyzedCostData: undefined,
     startSelectedForBudgetYear: false,
     endSelectedForBudgetYear: false,
+    existingBudgetUsageList: [] as BudgetUsageModel[],
 });
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
+
+const isDateInRange = (index: number) => {
+    if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) return false;
+    const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
+    const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
+    const currentDate = startDate.add(index, 'month');
+    return currentDate.isSameOrBefore(endDate, 'month');
+};
+
+const handleUpdatgeBudgetEachDate = (value: string, index: number) => {
+    if (!isDateInRange(index)) return;
+    const newBudgetEachDate = [...budgetCreatePageState.budgetEachDate];
+    newBudgetEachDate[index] = value;
+    budgetCreatePageState.budgetEachDate = newBudgetEachDate;
+};
+
+const handlePrevious = () => {
+    budgetCreatePageStore.setCurrentStep(1);
+};
+
+const handleUpdateBudgetAmount = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setLimit(undefined);
+    } else {
+        budgetCreatePageStore.setLimit(Number(value));
+    }
+};
+
+const handleUpdateBudgetAppliedSameAmount = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+    } else {
+        budgetCreatePageStore.setBudgetAppliedSameAmount(Number(value));
+    }
+};
+
+const handleUpdateInitialAmount = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setInitialAmount(undefined);
+    } else {
+        budgetCreatePageStore.setInitialAmount(Number(value));
+    }
+};
+
+const handleUpdateMonthlyGrowthRate = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+    } else {
+        budgetCreatePageStore.setMonthlyGrowthRate(Number(value));
+    }
+};
+
+const isValidPositiveNumber = (value: any): boolean => {
+    const num = Number(value);
+    return value !== '' && !Number.isNaN(num) && num > 0;
+};
+
+const fetchBudgetUsage = async (params: BudgetUsageListParameters) => {
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.list<BudgetUsageListParameters, ListResponse<BudgetUsageModel>>(params);
+        state.existingBudgetUsageList = results ?? [];
+    } catch (error) {
+        ErrorHandler.handleError(error);
+    }
+};
+
+watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], async () => {
+    if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
+        await fetchBudgetUsage({
+            project_id: budgetCreatePageState.project,
+            service_account_id: budgetCreatePageState.scope.serviceAccount,
+            query: {
+                filter: [
+                    {
+                        k: 'date',
+                        v: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
+                        o: 'gte',
+                    },
+                    {
+                        k: 'date',
+                        v: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+                        o: 'lte',
+                    },
+                ],
+            },
+        });
+    }
+}, { deep: true, immediate: true });
 
 watch([() => state, () => budgetCreatePageState], () => {
     budgetCreatePageStore.setCurrency(state.selectedCurrency);
@@ -145,14 +240,19 @@ watch(() => [
     budgetCreatePageState.planned_limits,
     budgetCreatePageState.selectedMonthlyBudgetAllocation,
     budgetCreatePageState.budgetAppliedSameAmount,
-    state.initialAmount,
-    state.monthlyGrowthRate,
+    budgetCreatePageState.initialAmount,
+    budgetCreatePageState.monthlyGrowthRate,
     budgetCreatePageState.budgetEachDate,
     state.startSelectedForBudgetYear,
     state.endSelectedForBudgetYear,
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
+    if (state.existingBudgetUsageList.length > 0) {
+        state.isContinueAble = false;
+        return;
+    }
+
     if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) {
         state.isContinueAble = false;
     }
@@ -173,26 +273,31 @@ watch(() => [
         }
 
         state.isContinueAble = true;
+    } else if (budgetCreatePageState.time_unit === 'TOTAL' && budgetCreatePageState.limit === undefined) {
+        state.isContinueAble = false;
     } else if (budgetCreatePageState.time_unit === 'MONTHLY') {
-        if (budgetCreatePageState.planned_limits && budgetCreatePageState.planned_limits.length > 0) {
-            const isDuplicatedBudgetYear = (
-                budgetCreatePageState.project
-                && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
-                && (
-                    (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                    || (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                )
-            );
-
-            if (isDuplicatedBudgetYear) {
-                state.isContinueAble = false;
+        if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount') {
+            if (isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)) {
+                state.isContinueAble = true;
                 return;
             }
-
-            state.isContinueAble = true;
-        } else {
-            state.isContinueAble = false;
+        } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage') {
+            const isInitialValid = isValidPositiveNumber(budgetCreatePageState.initialAmount);
+            const isGrowthValid = isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate);
+            state.isContinueAble = isInitialValid && isGrowthValid;
+            return;
+        } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually') {
+            const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
+            const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
+            const length = endDate.diff(startDate, 'month') + 1;
+            const valid = budgetCreatePageState.budgetEachDate.length === length
+                && budgetCreatePageState.budgetEachDate.every((v, idx) => isDateInRange(idx) && isValidPositiveNumber(v));
+            if (valid) {
+                state.isContinueAble = true;
+                return;
+            }
         }
+        state.isContinueAble = false;
     }
 }, { deep: true, immediate: true });
 
@@ -220,59 +325,6 @@ watch([() => state.startSelectedForBudgetYear, () => state.endSelectedForBudgetY
 
 }, { deep: true, immediate: true });
 
-const isDateInRange = (index: number) => {
-    if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) return false;
-    const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
-    const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
-    const currentDate = startDate.add(index, 'month');
-    return currentDate.isSameOrBefore(endDate, 'month');
-};
-
-const handleUpdatgeBudgetEachDate = (value: string, index: number) => {
-    if (!isDateInRange(index)) return;
-    const newBudgetEachDate = [...budgetCreatePageState.budgetEachDate];
-    newBudgetEachDate[index] = value;
-    budgetCreatePageState.budgetEachDate = newBudgetEachDate;
-};
-
-const handlePrevious = () => {
-    budgetCreatePageStore.setCurrentStep(1);
-};
-
-const handleUpdateBudgetAmount = (value) => {
-    budgetCreatePageStore.setLimit(value);
-};
-
-const handleUpdateBudgetAppliedSameAmount = (value) => {
-    budgetCreatePageStore.setBudgetAppliedSameAmount(value);
-};
-
-const handleUpdateInitialAmount = (value) => {
-    budgetCreatePageStore.setInitialAmount(value);
-};
-
-const handleUpdateMonthlyGrowthRate = (value) => {
-    budgetCreatePageStore.setMonthlyGrowthRate(value);
-};
-
-const handleUpdateStartSelectForBudgetYear = (value: boolean) => {
-    state.startSelectedForBudgetYear = value;
-    if (value) {
-        state.endSelectedForBudgetYear = false;
-    }
-};
-
-const handleUpdateEndSelectForBudgetYear = (value: boolean) => {
-    state.endSelectedForBudgetYear = value;
-    if (value) {
-        state.startSelectedForBudgetYear = false;
-    }
-};
-
-const isValidPositiveNumber = (value: any): boolean => {
-    const num = Number(value);
-    return value !== '' && !Number.isNaN(num) && num > 0;
-};
 watch([
     () => budgetCreatePageState.startMonth,
     () => budgetCreatePageState.endMonth,
@@ -293,6 +345,22 @@ watch([
     }
 }, { immediate: true });
 
+watch(() => budgetCreatePageState.limit, () => {
+    if (budgetCreatePageState.limit === null) {
+        budgetCreatePageState.limit = undefined;
+    }
+}, { immediate: true });
+
+watch(() => state.existingBudgetUsageList, () => {
+    if (state.existingBudgetUsageList.length > 0) {
+        budgetCreatePageState.time_unit = '';
+        budgetCreatePageState.limit = undefined;
+        budgetCreatePageState.budgetAppliedSameAmount = undefined;
+        budgetCreatePageState.initialAmount = undefined;
+        budgetCreatePageState.monthlyGrowthRate = undefined;
+        budgetCreatePageState.budgetEachDate = [];
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -334,18 +402,22 @@ watch([
         <div class="bottom-section">
             <div class="left-section">
                 <p-divider />
-                <div class="flex gap-6 mt-6">
+                <div class="flex gap-6 mt-6 -mb-4">
                     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.START_MONTH')"
+                                   :invalid="state.existingBudgetUsageList.length > 0"
                                    required
+                                   class="flex flex-col "
                     >
                         <p-datetime-picker data-type="yearToMonth"
                                            :selected-dates.sync="budgetCreatePageState.startMonth"
                                            :min-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(11, 'month').format('YYYY-MM') : ''"
                                            :max-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'): ''"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
+                                           :invalid="state.existingBudgetUsageList.length > 0"
                         />
                     </p-field-group>
                     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.END_MONTH')"
+                                   :invalid="state.existingBudgetUsageList.length > 0"
                                    required
                     >
                         <p-datetime-picker data-type="yearToMonth"
@@ -354,50 +426,24 @@ watch([
                                            :min-date="budgetCreatePageState.startMonth.length > 0
                                                ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : ''"
                                            :max-date="budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(11, 'month').format('YYYY-MM') : ''"
+                                           :invalid="state.existingBudgetUsageList.length > 0"
                         />
                     </p-field-group>
                 </div>
-                <div class="flex gap-15 mb-6">
-                    <div class="flex gap-1">
-                        <p-toggle-button
-                            :value="state.startSelectedForBudgetYear"
-                            @update:value="handleUpdateStartSelectForBudgetYear"
-                        />
-                        <span class="text-sm font-normal"
-                              :class="{'start-selected': state.startSelectedForBudgetYear, 'end-selected': !state.startSelectedForBudgetYear}"
-                        >{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BASE_FOR_PERIOD_FILTER') }}</span>
-                    </div>
-                    <div class="flex gap-1">
-                        <p-toggle-button
-                            :value="state.endSelectedForBudgetYear"
-                            @update:value="handleUpdateEndSelectForBudgetYear"
-                        />
-                        <span class="text-sm font-normal"
-                              :class="{'start-selected': state.endSelectedForBudgetYear, 'end-selected': !state.endSelectedForBudgetYear}"
-                        >{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BASE_FOR_PERIOD_FILTER') }}</span>
-                    </div>
-                </div>
-                <p-status v-if="budgetCreatePageState.project
-                              && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
-                              && (
-                                  (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                                  ||
-                                  (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                              )"
-                          icon="ic_warning-filled"
-                          :text="budgetCreatePageState.scope.type === 'project'
-                              ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
-                                  project: project[budgetCreatePageState.project].name,
-                                  year_list: budgetCreatePageState.alreadyExistingBudgetYear.join(',').split(' ')
-                              }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
-                                  project: project[budgetCreatePageState.project].name,
-                                  serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
-                                  year_list: budgetCreatePageState.alreadyExistingBudgetYear.join(',')
-                              })"
-                          theme="red"
-                          class="text-sm mb-6"
-                />
-                <div class="flex">
+                <span v-if="state.existingBudgetUsageList.length > 0"
+                      class="text-red-500 font-normal text-xs"
+                >
+                    {{ budgetCreatePageState.scope.type === 'project'
+                        ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
+                            project: project[budgetCreatePageState.project].name,
+                            month_list: state.existingBudgetUsageList.map(d => d.date)
+                        }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
+                            project: project[budgetCreatePageState.project].name,
+                            serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
+                            month_list: state.existingBudgetUsageList.map(d => d.date)
+                        }) }}
+                </span>
+                <div class="flex mt-6">
                     <p-field-group
                         :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
                         :help-text="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0
@@ -409,13 +455,7 @@ watch([
                                      :key="`budget-cycle-${idx}`"
                                      v-model="budgetCreatePageState.time_unit"
                                      :value="cycle.name"
-                                     :disabled="(budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0 || budgetCreatePageState.project
-                                         && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
-                                         && (
-                                             (state.startSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                                             ||
-                                             (state.endSelectedForBudgetYear && budgetCreatePageState.alreadyExistingBudgetYear.includes(budgetCreatePageState.budgetYear))
-                                         ))"
+                                     :disabled="state.existingBudgetUsageList.length > 0"
                             >
                                 <span>{{ cycle.label }}</span>
                             </p-radio>
@@ -521,9 +561,10 @@ watch([
                                                        :label="date"
                                                        required
                                         >
-                                            <p-text-input :value="state.budgetEachDate[idx]"
+                                            <p-text-input :value="budgetCreatePageState.budgetEachDate[idx]"
                                                           :disabled="!isDateInRange(idx)"
-                                                          :invalid="isDateInRange(idx) && (!state.budgetEachDate[idx] || !isValidPositiveNumber(Number(state.budgetEachDate[idx])))"
+                                                          :invalid="isDateInRange(idx) && (!budgetCreatePageState.budgetEachDate[idx]
+                                                              || !isValidPositiveNumber(Number(budgetCreatePageState.budgetEachDate[idx])))"
                                                           @update:value="(value) => handleUpdatgeBudgetEachDate(value, idx)"
                                             >
                                                 <template #input-right>
