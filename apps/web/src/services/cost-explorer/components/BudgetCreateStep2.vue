@@ -454,7 +454,7 @@ watch(() => budgetCreatePageState.startMonth, () => {
                             ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
                         required
                     >
-                        <p-radio-group>
+                        <p-radio-group class="mt-2">
                             <p-radio v-for="(cycle, idx) in state.budgetCycleList"
                                      :key="`budget-cycle-${idx}`"
                                      v-model="budgetCreatePageState.time_unit"
