@@ -418,5 +418,11 @@ export const API_DOC = {
             'update',
         ],
     },
+    repository: {
+        'dashboard-template': [
+            'list',
+            'register',
+        ],
+    },
 } as const;
 export type APIDoc = typeof API_DOC;
