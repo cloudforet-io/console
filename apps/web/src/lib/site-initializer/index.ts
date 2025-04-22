@@ -100,12 +100,12 @@ const init = async () => {
         const domainId = await initDomain(config);
         const userId = await initUserAndAuth(config);
         const mergedConfig = await mergeConfig(config, domainId);
+        await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
         await initModeSetting();
         await initWorkspace(userId);
         await initOpsFlowTaskManagementTemplate(mergedConfig);
         await featureSchemaManager.initialize(mergedConfig);
-        await APIClientManager.initialize(mergedConfig);
         initRouter(domainId);
         // prefetchResources();
         initI18n();
