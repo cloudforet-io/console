@@ -59,17 +59,9 @@ const state = reactive<BudgetMainToolsetState>({
         { name: 'fixedTerm', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') },
     ],
     selectedBudgetCycle: 'all',
-    projectList: [{
-        type: 'item', name: 'all', label: 'All',
-    }, {
-        type: 'divider', name: 'divider',
-    }],
+    projectList: [],
     selectedProjectList: [],
-    serviceAccountList: [{
-        type: 'item', name: 'all', label: 'All',
-    }, {
-        type: 'divider', name: 'divider',
-    }],
+    serviceAccountList: [],
     selectedServiceAccountList: [],
     utilizationList: [
         { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ALL') },
@@ -100,18 +92,6 @@ watch(() => storeState.project, () => {
         name: Object.keys(storeState.project)[idx],
         label: project.label,
     }))];
-}, { deep: true, immediate: true });
-
-watch(() => state.selectedProjectList, () => {
-    if (state.selectedProjectList.map((project: any) => project.name).includes('all')) {
-        state.selectedProjectList = state.projectList.slice(2, state.projectList.length);
-    }
-}, { deep: true, immediate: true });
-
-watch(() => state.selectedServiceAccountList, () => {
-    if (state.selectedServiceAccountList.map((serviceAccount: any) => serviceAccount.name).includes('all')) {
-        state.selectedServiceAccountList = state.serviceAccountList.slice(2, state.serviceAccountList.length);
-    }
 }, { deep: true, immediate: true });
 
 watch(() => state, () => {

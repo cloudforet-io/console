@@ -245,14 +245,14 @@ const handleDeleteConfirm = async () => {
 const getBudgetFilters = (): ApiFilter[] => {
     const filters: ApiFilter[] = [];
 
-    if (state.query?.target && state.query?.target !== 'all') {
-        if (state.query?.target === 'project') {
+    if (state.query?.target) {
+        if (state.query.target === 'project') {
             filters.push({
                 k: 'service_account_id',
                 v: [null, ''],
                 o: 'in',
             });
-        } else if (state.query?.target === 'serviceAccount') {
+        } else if (state.query.target === 'serviceAccount') {
             filters.push({
                 k: 'service_account_id',
                 v: [null, ''],
