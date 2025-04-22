@@ -1,6 +1,4 @@
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
-import { pinia } from '@/store/pinia';
-
+import dynamicSchemaManager from '@/lib/config/global-config/dynamic-schema-manager';
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
 import type {
     FeatureConfigurator,
@@ -22,17 +20,23 @@ export class FeatureSchemaManager {
         },
     };
 
-    initialize(config: GlobalServiceConfig) {
-        const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
+    async initialize(config: GlobalServiceConfig) {
         this.config = {
             ...this.config,
             ...config,
         };
 
-        globalConfigSchemaStore.setMenuSchema(this.createMenuSchema());
-        globalConfigSchemaStore.setRouteSchema(this.createRouteSchema());
-        globalConfigSchemaStore.setRouteMetadataSchema(this.createRouteMetadata());
-        globalConfigSchemaStore.setUiAffectsSchema(this.createUiAffectsSchema());
+        const menuSchema = this.createMenuSchema();
+        const routeSchema = this.createRouteSchema();
+        const routeMetadataSchema = this.createRouteMetadata();
+        const uiAffectSchema = this.createUiAffectsSchema();
+
+        await dynamicSchemaManager.updateSchema(
+            menuSchema,
+            routeSchema,
+            routeMetadataSchema,
+            uiAffectSchema,
+        );
     }
 
     private forEachEnabledFeature<T>(callback: (feature: string, configurator: FeatureConfigurator, currentVersion: FeatureVersion) => T): T[] {
