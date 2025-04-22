@@ -264,12 +264,12 @@ const getBudgetFilters = (): ApiFilter[] => {
     if (state.query?.year && state.query?.year !== 'all') {
         filters.push({
             k: 'start',
-            v: `${state.query.year}-01`,
+            v: `${state.query.year}-12`,
             o: 'lte',
         });
         filters.push({
             k: 'end',
-            v: `${state.query.year}-12`,
+            v: `${state.query.year}-01`,
             o: 'gte',
         });
     }
