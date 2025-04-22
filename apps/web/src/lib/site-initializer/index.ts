@@ -18,6 +18,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
+import { mergeConfig } from '@/lib/config/global-config/helpers/merge-config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
@@ -27,7 +28,6 @@ import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
-import { mergeConfig } from '@/lib/site-initializer/merge-config';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
