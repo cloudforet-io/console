@@ -347,14 +347,11 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                              }"
                             />
                             <div class="flex gap-2 items-start">
-                                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.BUDGET_ALERTS_TEXT') }}:</span>
-                                <p v-if="!state.budgetAlertEdit">
-                                    <span v-for="(plan, index) in [...data.plans].sort((a, b) => a.threshold - b.threshold)"
-                                          :key="`plan-${index}`"
-                                    >
-                                        {{ plan.threshold }}{{ plan.unit === 'PERCENT' ? '%' : '' }}<template v-if="index !== data.plans.length - 1">, </template>
-                                    </span>
-                                </p>
+                                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.BUDGET_ALERTS_TEXT', {
+                                    threshold: [...data.plans].sort((a, b) => a.threshold - b.threshold).map(plan => {
+                                        return ` ${plan.threshold}${plan.unit === 'PERCENT' ? '%' : ''}`
+                                    })
+                                }) }}</span>
                                 <div v-if="state.budgetAlertEdit">
                                     <p-text-input appearance-type="stack"
                                                   multi-input
