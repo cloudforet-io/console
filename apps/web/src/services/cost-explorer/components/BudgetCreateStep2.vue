@@ -361,6 +361,12 @@ watch(() => state.existingBudgetUsageList, () => {
         budgetCreatePageState.budgetEachDate = [];
     }
 }, { deep: true, immediate: true });
+
+watch(() => budgetCreatePageState.startMonth, () => {
+    if (budgetCreatePageState.startMonth[0].length > 0) {
+        budgetCreatePageState.endMonth = [];
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -410,8 +416,6 @@ watch(() => state.existingBudgetUsageList, () => {
                     >
                         <p-datetime-picker data-type="yearToMonth"
                                            :selected-dates.sync="budgetCreatePageState.startMonth"
-                                           :min-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(11, 'month').format('YYYY-MM') : ''"
-                                           :max-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'): ''"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
                                            :invalid="state.existingBudgetUsageList.length > 0"
                         />
@@ -450,7 +454,7 @@ watch(() => state.existingBudgetUsageList, () => {
                             ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
                         required
                     >
-                        <p-radio-group>
+                        <p-radio-group class="mt-2">
                             <p-radio v-for="(cycle, idx) in state.budgetCycleList"
                                      :key="`budget-cycle-${idx}`"
                                      v-model="budgetCreatePageState.time_unit"
