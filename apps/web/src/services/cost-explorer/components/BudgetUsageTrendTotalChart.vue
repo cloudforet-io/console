@@ -15,7 +15,7 @@ import {
     gray, indigo, peacock, red,
 } from '@/styles/colors';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 const budgetpageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetpageStore.$state;
@@ -251,7 +251,7 @@ watch([() => state.data, () => budgetPageState], () => {
 
     .chart {
         height: 100%;
-        min-width: 700px;
+        min-width: 62.5rem;
         width: 100%;
     }
 }

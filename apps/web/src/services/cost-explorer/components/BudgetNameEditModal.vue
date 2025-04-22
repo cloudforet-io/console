@@ -15,7 +15,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     visible: boolean;

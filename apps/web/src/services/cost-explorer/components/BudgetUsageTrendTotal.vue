@@ -5,9 +5,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
-import BudgetUsageTrendTotalChart from './BudgetUsageTrendTotalChart.vue';
-import BudgetUsageTrendTotalTable from './BudgetUsageTrendTotalTable.vue';
+import BudgetUsageTrendTotalChart from '@/services/cost-explorer/components/BudgetUsageTrendTotalChart.vue';
+import BudgetUsageTrendTotalTable from '@/services/cost-explorer/components/BudgetUsageTrendTotalTable.vue';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;

@@ -11,8 +11,8 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
-import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     data: any;

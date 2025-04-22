@@ -12,9 +12,9 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
-import { ADMIN_COST_EXPLORER_ROUTE } from '../routes/admin/route-constant';
-import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     data: any;

@@ -19,7 +19,7 @@ import {
     indigo, red, yellow,
 } from '@/styles/colors';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetData = computed(() => budgetPageStore.$state.budgetData);
