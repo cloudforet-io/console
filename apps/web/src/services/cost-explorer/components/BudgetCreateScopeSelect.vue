@@ -39,7 +39,6 @@ const state = reactive({
     serviceAccountList: [] as string[],
     existingServiceAccountIds: [],
     refinedServiceAccountList: computed<SelectDropdownMenuItem[]>(() => state.serviceAccountList
-        .filter((serviceAccountId) => state.existingServiceAccountIds?.length > 0 && !state.existingServiceAccountIds.includes(serviceAccountId))
         .map((serviceAccountId) => ({
             name: serviceAccountId,
             label: serviceAccount.value[serviceAccountId].label,
