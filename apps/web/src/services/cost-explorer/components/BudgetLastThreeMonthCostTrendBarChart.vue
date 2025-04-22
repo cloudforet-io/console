@@ -18,7 +18,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo } from '@/styles/colors';
 
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;

@@ -3,7 +3,7 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     visible: boolean;
@@ -29,7 +29,7 @@ const setNotification = async () => {
                 ...budgetPageState.budgetData?.notification,
                 state: !props.budgetOnOffValue ? 'ENABLED' : 'DISABLED',
             },
-        });
+        }, 'budgetAlert');
     } catch (error) {
         ErrorHandler.handleError(error);
     }

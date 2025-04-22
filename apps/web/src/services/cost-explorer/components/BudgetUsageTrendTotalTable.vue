@@ -12,9 +12,9 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
-import { ADMIN_COST_EXPLORER_ROUTE } from '../routes/admin/route-constant';
-import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     data: any;
@@ -192,7 +192,8 @@ const handleToggleOriginalData = (value: boolean) => {
                      class="flex items-center gap-2"
                 >
                     <span>{{ value }}</span>
-                    <p-tooltip contents="Accumulated Usage vs. Planned Budget">
+                    <!-- eslint-disable-next-line max-len -->
+                    <p-tooltip :contents="`${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACCUMULATED_USAGE')} vs. ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')}`">
                         <template #default>
                             <p-i name="ic_info-circle"
                                  width="1rem"

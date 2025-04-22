@@ -5,11 +5,15 @@ import {
 
 import dayjs from 'dayjs';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PSelectDropdown, PDatetimePicker, PButton, PStatus,
-    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge, PToggleButton,
+    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge,
 } from '@cloudforet/mirinae';
 
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
+import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -18,11 +22,13 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
-import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DEFAULT_UNIFIED_COST_CURRENCY, YAHOO_FINANCE_ID } from '../constants/cost-explorer-constant';
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
-import BudgetLastThreeMonthCostTrendBarChart from './BudgetLastThreeMonthCostTrendBarChart.vue';
+import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
+import BudgetLastThreeMonthCostTrendBarChart from '@/services/cost-explorer/components/BudgetLastThreeMonthCostTrendBarChart.vue';
+import { DEFAULT_UNIFIED_COST_CURRENCY, YAHOO_FINANCE_ID } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -60,9 +66,98 @@ const state = reactive({
     analyzedCostData: undefined,
     startSelectedForBudgetYear: false,
     endSelectedForBudgetYear: false,
+    existingBudgetUsageList: [] as BudgetUsageModel[],
 });
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
+
+const isDateInRange = (index: number) => {
+    if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) return false;
+    const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
+    const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
+    const currentDate = startDate.add(index, 'month');
+    return currentDate.isSameOrBefore(endDate, 'month');
+};
+
+const handleUpdatgeBudgetEachDate = (value: string, index: number) => {
+    if (!isDateInRange(index)) return;
+    const newBudgetEachDate = [...budgetCreatePageState.budgetEachDate];
+    newBudgetEachDate[index] = value;
+    budgetCreatePageState.budgetEachDate = newBudgetEachDate;
+};
+
+const handlePrevious = () => {
+    budgetCreatePageStore.setCurrentStep(1);
+};
+
+const handleUpdateBudgetAmount = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setLimit(undefined);
+    } else {
+        budgetCreatePageStore.setLimit(Number(value));
+    }
+};
+
+const handleUpdateBudgetAppliedSameAmount = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+    } else {
+        budgetCreatePageStore.setBudgetAppliedSameAmount(Number(value));
+    }
+};
+
+const handleUpdateInitialAmount = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setInitialAmount(undefined);
+    } else {
+        budgetCreatePageStore.setInitialAmount(Number(value));
+    }
+};
+
+const handleUpdateMonthlyGrowthRate = (value) => {
+    if (value === '' || value === null || Number.isNaN(Number(value))) {
+        budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+    } else {
+        budgetCreatePageStore.setMonthlyGrowthRate(Number(value));
+    }
+};
+
+const isValidPositiveNumber = (value: any): boolean => {
+    const num = Number(value);
+    return value !== '' && !Number.isNaN(num) && num > 0;
+};
+
+const fetchBudgetUsage = async (params: BudgetUsageListParameters) => {
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.list<BudgetUsageListParameters, ListResponse<BudgetUsageModel>>(params);
+        state.existingBudgetUsageList = results ?? [];
+    } catch (error) {
+        ErrorHandler.handleError(error);
+    }
+};
+
+watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], async () => {
+    if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
+        await fetchBudgetUsage({
+            project_id: budgetCreatePageState.project,
+            service_account_id: budgetCreatePageState.scope.serviceAccount,
+            query: {
+                filter: [
+                    {
+                        k: 'date',
+                        v: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
+                        o: 'gte',
+                    },
+                    {
+                        k: 'date',
+                        v: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+                        o: 'lte',
+                    },
+                ],
+            },
+        });
+    }
+}, { deep: true, immediate: true });
 
 watch([() => state, () => budgetCreatePageState], () => {
     budgetCreatePageStore.setCurrency(state.selectedCurrency);
@@ -225,76 +320,6 @@ watch([() => state.startSelectedForBudgetYear, () => state.endSelectedForBudgetY
 
 }, { deep: true, immediate: true });
 
-const isDateInRange = (index: number) => {
-    if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) return false;
-    const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
-    const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
-    const currentDate = startDate.add(index, 'month');
-    return currentDate.isSameOrBefore(endDate, 'month');
-};
-
-const handleUpdatgeBudgetEachDate = (value: string, index: number) => {
-    if (!isDateInRange(index)) return;
-    const newBudgetEachDate = [...budgetCreatePageState.budgetEachDate];
-    newBudgetEachDate[index] = value;
-    budgetCreatePageState.budgetEachDate = newBudgetEachDate;
-};
-
-const handlePrevious = () => {
-    budgetCreatePageStore.setCurrentStep(1);
-};
-
-const handleUpdateBudgetAmount = (value) => {
-    if (value === '' || value === null || Number.isNaN(Number(value))) {
-        budgetCreatePageStore.setLimit(undefined);
-    } else {
-        budgetCreatePageStore.setLimit(Number(value));
-    }
-};
-
-const handleUpdateBudgetAppliedSameAmount = (value) => {
-    if (value === '' || value === null || Number.isNaN(Number(value))) {
-        budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
-    } else {
-        budgetCreatePageStore.setBudgetAppliedSameAmount(Number(value));
-    }
-};
-
-const handleUpdateInitialAmount = (value) => {
-    if (value === '' || value === null || Number.isNaN(Number(value))) {
-        budgetCreatePageStore.setInitialAmount(undefined);
-    } else {
-        budgetCreatePageStore.setInitialAmount(Number(value));
-    }
-};
-
-const handleUpdateMonthlyGrowthRate = (value) => {
-    if (value === '' || value === null || Number.isNaN(Number(value))) {
-        budgetCreatePageStore.setMonthlyGrowthRate(undefined);
-    } else {
-        budgetCreatePageStore.setMonthlyGrowthRate(Number(value));
-    }
-};
-
-const handleUpdateStartSelectForBudgetYear = (value: boolean) => {
-    state.startSelectedForBudgetYear = value;
-    if (value) {
-        state.endSelectedForBudgetYear = false;
-    }
-};
-
-const handleUpdateEndSelectForBudgetYear = (value: boolean) => {
-    state.endSelectedForBudgetYear = value;
-    if (value) {
-        state.startSelectedForBudgetYear = false;
-    }
-};
-
-const isValidPositiveNumber = (value: any): boolean => {
-    const num = Number(value);
-    return value !== '' && !Number.isNaN(num) && num > 0;
-};
-
 watch([
     () => budgetCreatePageState.startMonth,
     () => budgetCreatePageState.endMonth,
@@ -384,26 +409,7 @@ watch(() => budgetCreatePageState.limit, () => {
                         />
                     </p-field-group>
                 </div>
-                <div class="flex gap-15 mb-6">
-                    <div class="flex gap-1">
-                        <p-toggle-button
-                            :value="state.startSelectedForBudgetYear"
-                            @update:value="handleUpdateStartSelectForBudgetYear"
-                        />
-                        <span class="text-sm font-normal"
-                              :class="{'start-selected': state.startSelectedForBudgetYear, 'end-selected': !state.startSelectedForBudgetYear}"
-                        >{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BASE_FOR_PERIOD_FILTER') }}</span>
-                    </div>
-                    <div class="flex gap-1">
-                        <p-toggle-button
-                            :value="state.endSelectedForBudgetYear"
-                            @update:value="handleUpdateEndSelectForBudgetYear"
-                        />
-                        <span class="text-sm font-normal"
-                              :class="{'start-selected': state.endSelectedForBudgetYear, 'end-selected': !state.endSelectedForBudgetYear}"
-                        >{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BASE_FOR_PERIOD_FILTER') }}</span>
-                    </div>
-                </div>
+                <!-- TODO: Alert about duplicated Months -->
                 <p-status v-if="budgetCreatePageState.project
                               && budgetCreatePageState.alreadyExistingBudgetYear.length > 0
                               && (

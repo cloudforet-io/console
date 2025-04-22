@@ -23,10 +23,10 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import BudgetAlertsModal from '@/services/cost-explorer/components/BudgetAlertsModal.vue';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
-import BudgetAlertsModal from './BudgetAlertsModal.vue';
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -343,6 +343,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                             <p-toggle-button :value.sync="state.isBudgetAlertsEnabled"
                                              show-state-text
                                              position="left"
+                                             :disabled="storeState.isAdminMode"
                                              @change-toggle="() => {
                                                  state.updateBudgetAlertsModalVisible = true;
                                              }"

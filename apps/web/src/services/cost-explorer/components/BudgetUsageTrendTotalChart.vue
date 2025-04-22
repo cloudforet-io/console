@@ -15,7 +15,7 @@ import {
     gray, indigo, peacock, red,
 } from '@/styles/colors';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 const budgetpageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetpageStore.$state;
@@ -54,7 +54,7 @@ const state = reactive({
 
                 params.forEach((param) => {
                     const value = Number(param.data);
-                    const formatted = Number.isNaN(value) ? '-' : value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                    const formatted = Number.isNaN(value) ? '-' : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 
                     if (param.seriesName === 'Accumulated Usage (under Planned Budget)' || param.seriesName === 'Accumulated Usage (over Planned Budget)') {
                         if (accumulatedValue === null || value > Number(accumulatedValue.replace(/,/g, ''))) {
@@ -65,6 +65,8 @@ const state = reactive({
                                 accumulatedColor = peacock[400];
                             }
                         }
+                    } else if (param.seriesName === 'Actual Spend') {
+                        tooltipLines.push(`${param.marker} ${param.seriesName}: ${param.data}`);
                     } else {
                         tooltipLines.push(`${param.marker} ${param.seriesName}: ${formatted}`);
                     }
@@ -183,7 +185,7 @@ const drawChart = (rawData: {
             label: {
                 show: false,
             },
-            data: data.map((item) => Number(item.budget_usage).toFixed(2)),
+            data: data.map((item) => Number(item.budget_usage).toFixed(3)),
             color: indigo[400],
         },
         {
@@ -249,7 +251,7 @@ watch([() => state.data, () => budgetPageState], () => {
 
     .chart {
         height: 100%;
-        min-width: 700px;
+        min-width: 62.5rem;
         width: 100%;
     }
 }

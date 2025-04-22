@@ -23,9 +23,9 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
-import BudgetCreateManagerSelect from './BudgetCreateManagerSelect.vue';
-import BudgetCreateScopeSelect from './BudgetCreateScopeSelect.vue';
+import BudgetCreateManagerSelect from '@/services/cost-explorer/components/BudgetCreateManagerSelect.vue';
+import BudgetCreateScopeSelect from '@/services/cost-explorer/components/BudgetCreateScopeSelect.vue';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
