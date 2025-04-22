@@ -1,4 +1,6 @@
 // Menu Ids' Rule: All menu ids are dot-delimited in depth, up to two depths.
+import type { TranslateResult } from 'vue-i18n';
+
 import type { HighlightTagType } from '@/store/display/type';
 
 
@@ -54,6 +56,7 @@ export type MenuId = typeof MENU_ID[keyof typeof MENU_ID];
 
 export interface Menu {
     id: MenuId;
+    label?: string|TranslateResult;
     needPermissionByRole?: boolean;
     subMenuList?: Menu[];
     hideOnGNB?: boolean;
