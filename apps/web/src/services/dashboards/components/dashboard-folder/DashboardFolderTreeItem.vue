@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PI, PTreeItem, PLabel, PPopover, PSelectDropdown,
@@ -16,7 +15,6 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -30,8 +28,6 @@ import { useDashboardControlMenuHelper } from '@/services/_shared/dashboard/core
 import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
 import type { DashboardControlActionType } from '@/services/_shared/dashboard/core/types/dashboard-control-menu-type';
 import type { DashboardSharedEntryPoint } from '@/services/_shared/dashboard/core/types/dashboard-shared-type';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -47,13 +43,11 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     entryPoint: () => DASHBOARD_SHARED_ENTRY_POINT.NONE_ENTRY_POINT,
 });
-const emit = defineEmits<{(e: 'toggle-folder'): void;
+const emit = defineEmits<{(e: 'click-tree-item', node: TreeNode<DashboardTreeDataType>): void;
     (e: 'select-control-actions', type: DashboardControlActionType, id: string): void;
 }>();
 const LABELS_LIMIT = 2;
-const router = useRouter();
 const appContextStore = useAppContextStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
@@ -109,23 +103,8 @@ const getControlMenuItems = (node: TreeNode<DashboardTreeDataType>): MenuItem[] 
 };
 
 /* Event */
-const handleClickTreeItem = (): void => {
-    if (props.treeData.data.type === 'FOLDER') {
-        emit('toggle-folder');
-        return;
-    }
-    if (props.disableLink) return;
-    const dashboardDetailRouteName = storeState.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-        : DASHBOARDS_ROUTE.DETAIL._NAME;
-    const _location = {
-        name: dashboardDetailRouteName,
-        params: {
-            workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-            dashboardId: props.treeData.data.id || '',
-        },
-    };
-    router.push(_location).catch(() => {});
+const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>): void => {
+    emit('click-tree-item', node);
 };
 const handleClickLabel = (label: string) => {
     dashboardTreeControlStore.setSearchQueryTags([
@@ -148,7 +127,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
     >
         <template #content="{ node }">
             <div class="dashboard-folder-tree-item-content"
-                 @click="handleClickTreeItem"
+                 @click="handleClickTreeItem(node)"
             >
                 <div class="contents-wrapper">
                     <div :class="{'left-part': true, 'is-dashboard-item': !Array.isArray(node.children) && node.depth === 0 }">
