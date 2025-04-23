@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
+import type { RawLocation } from 'vue-router/types/router';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PBadge, PDefinitionTable, PPaneLayout, PLink, PTextButton,
@@ -29,7 +31,6 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-co
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
-
 type BadgeInfo = {
     badgeType: string;
     styleType: string;
@@ -44,6 +45,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
 
+const queryHelper = new QueryHelper();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -101,22 +103,58 @@ const getBadgeInfo = (value: AlertSeverityType): BadgeInfo => {
     }
 };
 
-const handleRouteViewButton = async (id: string) => {
+const createRouteParams = (params: {
+    provider: string;
+    group: string;
+    name: string;
+    id: string;
+}): RawLocation => ({
+    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+    params: {
+        provider: params.provider,
+        group: params.group,
+        name: params.name,
+        workspaceId: userWorkspaceStore.getters.currentWorkspaceId || '',
+    },
+    query: {
+        filters: queryHelper.setFilters([
+            { k: 'cloud_service_id', v: params.id, o: '=' },
+        ]).rawQueryStrings,
+    },
+});
+
+const handleRouteViewButton = async (id: string, type?: string) => {
+    const [provider, group, name] = type?.split('.') || [];
+
+    if (!type && !id) {
+        console.warn('Invalid parameters: both id and type are missing');
+        return;
+    }
+
     try {
-        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-            cloud_service_id: id,
-        });
-        window.open(router.resolve({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: {
+        const routeParams = type ? {
+            provider, group, name, id,
+        } : await (async () => {
+            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+                cloud_service_id: id,
+            });
+            return {
                 provider: response.provider,
                 group: response.cloud_service_group,
                 name: response.cloud_service_type,
-                workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-            },
-        }).href, '_blank');
-    } catch (e: any) {
-        ErrorHandler.handleError(e, true);
+                id: response.cloud_service_id,
+            };
+        })();
+
+        window.open(router.resolve(createRouteParams(routeParams)).href, '_blank');
+    } catch (e) {
+        if (!type) {
+            ErrorHandler.handleError(e, true);
+            return;
+        }
+        window.open(router.resolve(createRouteParams({
+            provider, group, name, id,
+        })).href, '_blank');
     }
 };
 </script>
@@ -162,7 +200,7 @@ const handleRouteViewButton = async (id: string) => {
                         <p-text-button v-if="item.asset_id"
                                        style-type="highlight"
                                        icon-right="ic_arrow-right-up"
-                                       @click="handleRouteViewButton(item.asset_id)"
+                                       @click="handleRouteViewButton(item.asset_id, item.asset_type)"
                         >
                             {{ $t('ALERT_MANAGER.ALERTS.VIEW_RESOURCE') }}
                         </p-text-button>
