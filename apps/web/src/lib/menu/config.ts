@@ -1,7 +1,7 @@
 // Menu Ids' Rule: All menu ids are dot-delimited in depth, up to two depths.
 import type { TranslateResult } from 'vue-i18n';
 
-import type { HighlightTagType } from '@/store/display/type';
+import type { HighlightTagType } from '@/store/menu/type';
 
 
 export const MENU_ID = Object.freeze({
