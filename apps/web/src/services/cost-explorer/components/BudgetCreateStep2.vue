@@ -69,6 +69,11 @@ const state = reactive({
     existingBudgetUsageList: [] as BudgetUsageModel[],
 });
 
+
+const isCycleEnabled = computed(() => budgetCreatePageState.startMonth.length > 0
+           && budgetCreatePageState.endMonth.length > 0
+           && state.existingBudgetUsageList.length === 0);
+
 const emit = defineEmits<{(e: 'click-next'): void}>();
 
 const isDateInRange = (index: number) => {
@@ -139,10 +144,24 @@ const fetchBudgetUsage = async (params: BudgetUsageListParameters) => {
 watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], async () => {
     if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
         await fetchBudgetUsage({
-            project_id: budgetCreatePageState.project,
-            service_account_id: budgetCreatePageState.scope.serviceAccount,
             query: {
                 filter: [
+                    budgetCreatePageState.scope.serviceAccount
+                        ? {
+                            k: 'service_account_id',
+                            v: budgetCreatePageState.scope.serviceAccount,
+                            o: 'eq',
+                        }
+                        : {
+                            k: 'service_account_id',
+                            v: [null, ''],
+                            o: 'in',
+                        },
+                    {
+                        k: 'project_id',
+                        v: budgetCreatePageState.project,
+                        o: 'eq',
+                    },
                     {
                         k: 'date',
                         v: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
@@ -176,6 +195,25 @@ watch(() => [budgetCreatePageState.startMonth, budgetCreatePageState.endMonth], 
     }
 }, { immediate: true });
 
+watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
+    if (nv !== ov) {
+        if (nv === 'applySameAmount') {
+            budgetCreatePageStore.setInitialAmount(undefined);
+            budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+            budgetCreatePageState.budgetEachDate = Array(12).fill('');
+        } else if (nv === 'increaseBySpecificPercentage') {
+            budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+            budgetCreatePageState.budgetEachDate = Array(12).fill('');
+        } else if (nv === 'enterManually') {
+            budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+            budgetCreatePageStore.setInitialAmount(undefined);
+            budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+        }
+
+        budgetCreatePageStore.setPlannedLimits([]);
+    }
+}, { immediate: true });
+
 watch(() => [
     budgetCreatePageState.selectedMonthlyBudgetAllocation,
     budgetCreatePageState.budgetAppliedSameAmount,
@@ -185,53 +223,59 @@ watch(() => [
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
+    const planned_limits: any[] = [];
+
     if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) {
+        budgetCreatePageStore.setPlannedLimits([]);
         return;
     }
 
-    const planned_limits: any = [];
     const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
     const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
     let currentDate = startDate;
 
+    const dateDiff = endDate.diff(startDate, 'month') + 1;
+
     if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount') {
-        while (currentDate.isSameOrBefore(endDate, 'month') && budgetCreatePageState.budgetAppliedSameAmount
-        && budgetCreatePageState.budgetAppliedSameAmount > 0) {
-            planned_limits.push({
-                date: currentDate.format('YYYY-MM'),
-                limit: budgetCreatePageState.budgetAppliedSameAmount,
-            });
-            currentDate = currentDate.add(1, 'month');
-        }
-    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage'
-        && budgetCreatePageState.initialAmount && budgetCreatePageState.monthlyGrowthRate
-    ) {
-        let currentAmount = budgetCreatePageState.initialAmount;
-        while (currentDate.isSameOrBefore(endDate, 'month')) {
-            planned_limits.push({
-                date: currentDate.format('YYYY-MM'),
-                limit: Math.round(currentAmount),
-            });
-            currentAmount *= (1 + ((budgetCreatePageState.monthlyGrowthRate || 0) / 100));
-            currentDate = currentDate.add(1, 'month');
-        }
-    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually'
-    && budgetCreatePageState.budgetEachDate.length === Number(endDate.month() - startDate.month() + 1)) {
-        const monthIndices = Array.from({ length: 12 }, (_, i) => i);
-        monthIndices.forEach((i) => {
-            if (currentDate.isSameOrBefore(endDate, 'month')) {
+        if (isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)) {
+            while (currentDate.isSameOrBefore(endDate, 'month')) {
                 planned_limits.push({
                     date: currentDate.format('YYYY-MM'),
-                    limit: Number(budgetCreatePageState.budgetEachDate[i]),
+                    limit: Number(budgetCreatePageState.budgetAppliedSameAmount),
                 });
                 currentDate = currentDate.add(1, 'month');
             }
-        });
+        }
+    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage') {
+        if (isValidPositiveNumber(budgetCreatePageState.initialAmount) && isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate)) {
+            let currentAmount = budgetCreatePageState.initialAmount;
+            while (currentDate.isSameOrBefore(endDate, 'month')) {
+                planned_limits.push({
+                    date: currentDate.format('YYYY-MM'),
+                    limit: Math.round(currentAmount),
+                });
+                currentAmount *= (1 + (budgetCreatePageState.monthlyGrowthRate / 100));
+                currentDate = currentDate.add(1, 'month');
+            }
+        }
+    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually') {
+        if (budgetCreatePageState.budgetEachDate.length === dateDiff) {
+            for (let i = 0; i < dateDiff; i++) {
+                const value = budgetCreatePageState.budgetEachDate[i];
+                if (!isValidPositiveNumber(value)) {
+                    budgetCreatePageStore.setPlannedLimits([]);
+                    return;
+                }
+                planned_limits.push({
+                    date: currentDate.format('YYYY-MM'),
+                    limit: Number(value),
+                });
+                currentDate = currentDate.add(1, 'month');
+            }
+        }
     }
 
-    if (planned_limits.length > 0) {
-        budgetCreatePageStore.setPlannedLimits(planned_limits);
-    }
+    budgetCreatePageStore.setPlannedLimits(planned_limits);
 }, { deep: true });
 
 watch(() => [
@@ -248,6 +292,10 @@ watch(() => [
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
+    if (!budgetCreatePageState.time_unit) {
+        state.isContinueAble = false;
+        return;
+    }
     if (state.existingBudgetUsageList.length > 0) {
         state.isContinueAble = false;
         return;
@@ -304,10 +352,6 @@ watch(() => [
 watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
     if (nv !== ov) {
         budgetCreatePageStore.setPlannedLimits([]);
-        budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
-        budgetCreatePageStore.setInitialAmount(undefined);
-        budgetCreatePageStore.setMonthlyGrowthRate(undefined);
-        budgetCreatePageState.budgetEachDate = [];
     }
 }, { immediate: true });
 
@@ -351,16 +395,15 @@ watch(() => budgetCreatePageState.limit, () => {
     }
 }, { immediate: true });
 
-watch(() => state.existingBudgetUsageList, () => {
-    if (state.existingBudgetUsageList.length > 0) {
-        budgetCreatePageState.time_unit = '';
-        budgetCreatePageState.limit = undefined;
-        budgetCreatePageState.budgetAppliedSameAmount = undefined;
-        budgetCreatePageState.initialAmount = undefined;
-        budgetCreatePageState.monthlyGrowthRate = undefined;
-        budgetCreatePageState.budgetEachDate = [];
+watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
+    if (newVal !== oldVal && budgetCreatePageState.currentStep === 2) {
+        const isValidationReturn = budgetCreatePageState.time_unit !== '' || budgetCreatePageState.endMonth.length > 0;
+        if (!isValidationReturn) {
+            budgetCreatePageState.endMonth = [];
+            budgetCreatePageState.time_unit = '';
+        }
     }
-}, { deep: true, immediate: true });
+}, { immediate: true });
 </script>
 
 <template>
@@ -410,8 +453,6 @@ watch(() => state.existingBudgetUsageList, () => {
                     >
                         <p-datetime-picker data-type="yearToMonth"
                                            :selected-dates.sync="budgetCreatePageState.startMonth"
-                                           :min-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(11, 'month').format('YYYY-MM') : ''"
-                                           :max-date="budgetCreatePageState.endMonth.length > 0 ? dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'): ''"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
                                            :invalid="state.existingBudgetUsageList.length > 0"
                         />
@@ -426,7 +467,8 @@ watch(() => state.existingBudgetUsageList, () => {
                                            :min-date="budgetCreatePageState.startMonth.length > 0
                                                ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : ''"
                                            :max-date="budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(11, 'month').format('YYYY-MM') : ''"
-                                           :invalid="state.existingBudgetUsageList.length > 0"
+                                           :invalid="state.existingBudgetUsageList.length > 0 || (budgetCreatePageState.startMonth.length > 0
+                                               && budgetCreatePageState.endMonth.length === 0)"
                         />
                     </p-field-group>
                 </div>
@@ -436,33 +478,36 @@ watch(() => state.existingBudgetUsageList, () => {
                     {{ budgetCreatePageState.scope.type === 'project'
                         ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
                             project: project[budgetCreatePageState.project].name,
-                            month_list: state.existingBudgetUsageList.map(d => d.date)
+                            month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                         }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
                             project: project[budgetCreatePageState.project].name,
                             serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
-                            month_list: state.existingBudgetUsageList.map(d => d.date)
+                            month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                         }) }}
                 </span>
+                <div class="mt-2">
+                    <budget-last-three-month-cost-trend-bar-chart />
+                </div>
                 <div class="flex mt-6">
                     <p-field-group
                         :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
-                        :help-text="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0
-                            ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
+                        :help-text="!isCycleEnabled ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
                         required
                     >
-                        <p-radio-group>
-                            <p-radio v-for="(cycle, idx) in state.budgetCycleList"
-                                     :key="`budget-cycle-${idx}`"
-                                     v-model="budgetCreatePageState.time_unit"
-                                     :value="cycle.name"
-                                     :disabled="state.existingBudgetUsageList.length > 0"
+                        <p-radio-group class="mt-2">
+                            <p-radio
+                                v-for="(cycle, idx) in state.budgetCycleList"
+                                :key="`budget-cycle-${idx}`"
+                                v-model="budgetCreatePageState.time_unit"
+                                :value="cycle.name"
+                                :disabled="!isCycleEnabled"
                             >
                                 <span>{{ cycle.label }}</span>
                             </p-radio>
                         </p-radio-group>
                     </p-field-group>
                 </div>
-                <p-pane-layout v-if="budgetCreatePageState.time_unit.length > 0"
+                <p-pane-layout v-if="budgetCreatePageState.time_unit.length > 0 && isCycleEnabled"
                                class="cycle-info-layout"
                                :class="{'fixed-term-layout': budgetCreatePageState.time_unit === 'TOTAL'}"
                 >
@@ -578,9 +623,6 @@ watch(() => state.existingBudgetUsageList, () => {
                         </div>
                     </div>
                 </p-pane-layout>
-            </div>
-            <div class="right-section">
-                <budget-last-three-month-cost-trend-bar-chart />
             </div>
         </div>
         <div class="mt-8 flex justify-end gap-4">

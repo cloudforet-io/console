@@ -42,9 +42,9 @@ export const useBudgetDetailPageStore = defineStore('page-budget-detail', {
                     ...params.updateParams,
                     budget_id: params.budgetId,
                 });
-                showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
                     data: type.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
-                }));
+                }), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, '');
             }

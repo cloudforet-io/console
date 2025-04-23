@@ -189,6 +189,7 @@ watch(() => state.originForm, (originForm) => {
                                   :show-user-group-list="false"
                                   :selected-id="state.serviceAccountManagerId"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
+                                  :show-delete-all-button="false"
                                   @formatted-selected-ids="handleFormatSelectedIds"
                                   @update:selected-id="handleServiceAccountManagerId"
             />

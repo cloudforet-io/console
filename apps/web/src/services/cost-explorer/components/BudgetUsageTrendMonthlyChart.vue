@@ -43,7 +43,7 @@ const state = reactive({
         tooltip: {
             trigger: 'axis',
             axisPointer: {
-                type: 'shadow',
+                type: 'none',
             },
             formatter: (params: any) => {
                 const usageData = params.find((p) => p.seriesName === 'Actual Spend');
@@ -131,7 +131,7 @@ const drawChart = (data: any) => {
         {
             name: 'Planned Budget',
             type: 'bar',
-            data: state.data.map(() => 100),
+            data: state.data.map(() => 99.5),
             barGap: '-100%',
             itemStyle: {
                 color: indigo[100],
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
             </div>
             <div class="flex items-center gap-1">
                 <div class="w-3 h-3 rounded-full bg-yellow-500" />
-                <span> 90% &lt; {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND') }} &gt; 100%</span>
+                <span> 90% &lt; {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND') }} &lt; 100%</span>
             </div>
             <div class="flex items-center gap-1">
                 <div class="w-3 h-3 rounded-full bg-red-400" />
@@ -214,8 +214,10 @@ onBeforeUnmount(() => {
 
 <style scoped lang="postcss">
 .chart-wrapper {
-    height: 17rem;
+    height: 20rem;
     overflow-x: auto;
+    overflow: visible;
+    position: relative;
 
     .chart {
         height: 100%;
