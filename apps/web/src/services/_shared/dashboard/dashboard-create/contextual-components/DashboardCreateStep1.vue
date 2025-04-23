@@ -88,8 +88,8 @@ const filterState = reactive({
 const getFilteredTemplates = (
     dashboards: Array<DashboardModel|DashboardTemplateModel>,
     inputValue: string,
-    selectedLabels: FilterLabelItem[],
-    selectedProviders: FilterLabelItem[],
+    selectedLabels: string[],
+    selectedProviders: string[],
 ): Array<DashboardModel|DashboardTemplateModel> => {
     const _inputValue = inputValue.toLowerCase();
     const _selectedLabels = selectedLabels;
