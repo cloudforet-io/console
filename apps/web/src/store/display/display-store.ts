@@ -20,15 +20,17 @@ import type {
     DisplayStoreState, SidebarProps, SidebarType,
     DisplayStoreGetters,
 } from '@/store/display/type';
+import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
 const verbose = false;
 
 export const useDisplayStore = defineStore('display-store', () => {
-    const userStore = useUserStore();
+    const userStore = useUserStore(pinia);
 
     const state = reactive<DisplayStoreState>({
         visibleSidebar: false,

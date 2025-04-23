@@ -27,7 +27,6 @@ export interface UserStoreState {
 export interface UserStoreGetters {
     isDomainAdmin: ComputedRef<boolean>;
     isSystemAdmin: ComputedRef<boolean>;
-    domainId: ComputedRef<string>;
     languageLabel: ComputedRef<string>;
     hasAdminOrWorkspaceOwnerRole: ComputedRef<boolean>;
 }

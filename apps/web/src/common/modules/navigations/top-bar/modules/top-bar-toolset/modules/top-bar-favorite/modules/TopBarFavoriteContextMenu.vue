@@ -27,7 +27,6 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
-import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import {
     convertCostAnalysisConfigToReferenceData,
@@ -240,6 +239,8 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
     return 0;
 };
+const isUserAccessibleToMenu = (menuId: MenuId, pageAccessList: MenuId[]): boolean => pageAccessList.some((id) => id === menuId);
+
 
 /* Event */
 const handleClickMenuButton = (type: FavoriteType) => {

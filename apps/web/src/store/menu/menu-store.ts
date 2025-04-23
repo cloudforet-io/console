@@ -41,8 +41,8 @@ const MENU_CUSTOMIZATIONS = new Map<MenuId, MenuCustomization>([
 ]);
 
 export const useMenuStore = defineStore('derived-menu', () => {
-    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
-    const appContextStore = useAppContextStore();
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
+    const appContextStore = useAppContextStore(pinia);
 
     const _isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 

@@ -10,6 +10,7 @@ import { i18n, type SupportLanguage } from '@/translations';
 
 
 import { usePublicConfigStore } from '@/store/config/public-config-store';
+import { pinia } from '@/store/pinia';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -46,7 +47,7 @@ interface UseTaskManagementTemplateStoreState {
 }
 
 export const useTaskManagementTemplateStore = defineStore('task-management-template', () => {
-    const publicConfigStore = usePublicConfigStore();
+    const publicConfigStore = usePublicConfigStore(pinia);
     const publicConfigStoreGetters = publicConfigStore.getters;
 
     const templateData = toRef(publicConfigStoreGetters, 'TASK_TEMPLATE') as unknown as Ref<TemplateData|undefined>;

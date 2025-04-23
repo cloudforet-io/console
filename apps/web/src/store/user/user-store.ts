@@ -10,16 +10,14 @@ import type { UserProfileUpdateParameters } from '@/api-clients/identity/user-pr
 import type { UserModel, UserMfa } from '@/api-clients/identity/user/schema/model';
 import { setI18nLocale } from '@/translations';
 
-import { useDomainStore } from '@/store/domain/domain-store';
 import { languages, USER_STORAGE_KEY } from '@/store/user/constant';
 import type {
     UserStoreGetters,
     UserStoreState,
 } from '@/store/user/type';
 
-export const useUserStore = defineStore('user-store', () => {
-    const domainStore = useDomainStore();
 
+export const useUserStore = defineStore('user-store', () => {
     let storedUserState: Partial<UserStoreState> = {};
     try {
         storedUserState = LocalStorageAccessor.getItem(USER_STORAGE_KEY) ?? {};
@@ -45,7 +43,6 @@ export const useUserStore = defineStore('user-store', () => {
     const getters = reactive<UserStoreGetters>({
         isDomainAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.DOMAIN_ADMIN),
         isSystemAdmin: computed<boolean>(() => state.roleType === ROLE_TYPE.SYSTEM_ADMIN),
-        domainId: computed<string>(() => domainStore.state.domainId),
         languageLabel: computed<string>(() => languages[state.language as string] || state.language),
         hasAdminOrWorkspaceOwnerRole: computed<boolean>(() => state.roleType === 'DOMAIN_ADMIN' || state.roleType === 'WORKSPACE_OWNER'),
     });
