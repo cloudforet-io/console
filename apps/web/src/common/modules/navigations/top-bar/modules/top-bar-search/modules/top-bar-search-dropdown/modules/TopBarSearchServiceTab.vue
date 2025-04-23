@@ -12,15 +12,15 @@ import { getTextHighlightRegex, PDataLoader, PDivider } from '@cloudforet/mirina
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDisplayStore } from '@/store/display/display-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
+
 import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -49,8 +49,8 @@ const props = withDefaults(defineProps<Props>(), {
 const userWorkspaceStore = useUserWorkspaceStore();
 const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
-const userStore = useUserStore();
-const displayStore = useDisplayStore();
+const authorizationStore = useAuthorizationStore();
+const { getAllMenuList } = useAllMenuList();
 
 const route = useRoute();
 const router = useRouter();
@@ -66,12 +66,11 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const state = reactive({
     allMenuList: computed<SuggestionMenu[]>(() => {
-        const allMenuList = displayStore.getAllMenuList(route);
+        const allMenuList = getAllMenuList(route, router);
         return getAllSuggestionMenuList(allMenuList);
     }),
     allMenuMap: computed(() => {
@@ -99,7 +98,7 @@ const state = reactive({
     recentMenuList: computed(() => {
         const _recentMenuList: RecentItem[] = [];
         recentStore.state.recentMenuList.forEach((i) => {
-            if (storeState.pageAccessPermissionMap[i.data.id]) {
+            if (authorizationStore.getters.pageAccessPermissionMap[i.data.id]) {
                 _recentMenuList.push(i);
             }
         });
