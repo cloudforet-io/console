@@ -72,10 +72,10 @@ const emit = defineEmits<{(e: 'click-next'): void, (e: 'click-cancel'): void }>(
 
 
 watch(() => budgetCreatePageState, () => {
-    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project' && budgetCreatePageState.budgetManager) {
+    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project') {
         state.isContinueAble = true;
     } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
-    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.budgetManager
+    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0
     ) {
         state.isContinueAble = true;
     } else {
@@ -166,8 +166,6 @@ watchEffect(async () => {
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT')"
                            required
             >
-                <!-- :invalid="!state.projectInvalid"
-                           :invalid-text="state.projectInvalidText" -->
                 <project-select-dropdown
                     show-delete-all-button
                     :project-group-selectable="false"
