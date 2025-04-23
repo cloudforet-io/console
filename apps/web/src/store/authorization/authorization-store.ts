@@ -23,7 +23,6 @@ import { MANAGED_ROLES } from '@/store/authorization/constant';
 import type {
     RoleInfo, JWTPayload, GrantInfo, SignInRequest,
 } from '@/store/authorization/type';
-import { useErrorStore } from '@/store/error/error-store';
 import { useMenuStore } from '@/store/menu/menu-store';
 import { pinia } from '@/store/pinia';
 
@@ -41,17 +40,18 @@ import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-acces
 interface AuthorizationStoreState {
     currentRoleInfo?: RoleInfo;
     currentGrantInfo?: GrantInfo;
+    grantAccessFailStatus: boolean;
 }
 
 export const useAuthorizationStore = defineStore('authorization', () => {
     const appContextStore = useAppContextStore(pinia);
     const userWorkspaceStore = useUserWorkspaceStore(pinia);
-    const errorStore = useErrorStore(pinia);
     const menuStore = useMenuStore(pinia);
 
     const state = reactive<AuthorizationStoreState>({
         currentRoleInfo: undefined,
         currentGrantInfo: undefined,
+        grantAccessFailStatus: false,
     });
 
     const getters = reactive({
@@ -114,6 +114,9 @@ export const useAuthorizationStore = defineStore('authorization', () => {
         },
         setCurrentGrantInfo: (grantInfo?: GrantInfo) => {
             state.currentGrantInfo = grantInfo;
+        },
+        setGrantAccessFailStatus: (status: boolean) => {
+            state.grantAccessFailStatus = status;
         },
     };
 
@@ -187,7 +190,7 @@ export const useAuthorizationStore = defineStore('authorization', () => {
                 if (currentRoleInfo) {
                     isGranted = true;
                 }
-                errorStore.setGrantAccessFailStatus(false);
+                state.grantAccessFailStatus = false;
             }
         } catch (error) {
             console.error(error);
@@ -206,11 +209,11 @@ export const useAuthorizationStore = defineStore('authorization', () => {
 
             if (isInstanceOfAPIError(error)) {
                 if (error.code === 'ERROR_WORKSPACE_STATE') {
-                    errorStore.setGrantAccessFailStatus(true);
+                    state.grantAccessFailStatus = true;
                 } else if (error.code === 'ERROR_NOT_FOUND') {
-                    errorStore.setGrantAccessFailStatus(true);
+                    state.grantAccessFailStatus = true;
                 } else if (error.code === 'ERROR_PERMISSION_DENIED') {
-                    errorStore.setGrantAccessFailStatus(true);
+                    state.grantAccessFailStatus = true;
                 } else if (error.code === 'ERROR_AUTHENTICATE_FAILURE') {
                     SpaceConnector.flushToken();
                 } else {

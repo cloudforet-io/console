@@ -23,7 +23,6 @@ import {
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
@@ -46,14 +45,12 @@ const grantAndLoadByCurrentScope = async (
         workspace_id: workspaceId,
     };
 
-    const errorStore = useErrorStore(pinia);
     const isGranted: boolean = await authorizationStore.grantRole(grantRequest);
     if (isGranted) {
         afterGrantedCallback();
     }
-    const grantAccessFailStatus = errorStore.state.grantAccessFailStatus;
     return {
-        failStatus: !!grantAccessFailStatus,
+        failStatus: !!authorizationStore.state.grantAccessFailStatus,
     };
 };
 export class SpaceRouter {

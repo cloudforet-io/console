@@ -19,7 +19,6 @@ import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -54,7 +53,6 @@ const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
-const dashboardStore = useDashboardStore();
 const userStore = useUserStore();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
@@ -206,7 +204,6 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 onUnmounted(() => {
     projectDetailPageStore.reset();
-    dashboardStore.reset();
 });
 </script>
 

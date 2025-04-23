@@ -11,7 +11,7 @@ import { pinia } from '@/store/pinia';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-const getSubMenuListByMenuId = (menuId: MenuId, flattenedMenu: FlattenedMenuMap): MenuId[] => {
+const _getSubMenuListByMenuId = (menuId: MenuId, flattenedMenu: FlattenedMenuMap): MenuId[] => {
     if (flattenedMenu[menuId]) return flattenedMenu[menuId] || [];
     return [];
 };
@@ -23,7 +23,7 @@ export const getRedirectRouteByPagePermission = (route: Route): Location => {
     const menuStore = useMenuStore(pinia);
     const authorizationStore = useAuthorizationStore(pinia);
 
-    const subMenuIdList = getSubMenuListByMenuId(menuId, menuStore.getters.generateFlattenedMenuMap);
+    const subMenuIdList = _getSubMenuListByMenuId(menuId, menuStore.getters.generateFlattenedMenuMap);
     let redirectMenuId: MenuId|undefined;
     subMenuIdList.some((subMenuId) => {
         if (authorizationStore.getters.pageAccessPermissionMap[subMenuId]) {
