@@ -99,7 +99,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
                 const dependentValue: string|string[]|undefined = allValueMap?.[formatRulesOptions.dependentField]?.value?.data;
                 if (!dependentValue) return !!fieldValue.field;
                 if (Array.isArray(dependentValue)) {
-                    return !dependentValue.includes(fieldValue.field as string);
+                    return typeof fieldValue.field === 'string' && !dependentValue.includes(fieldValue.field);
                 }
                 return dependentValue !== fieldValue.field;
             }
