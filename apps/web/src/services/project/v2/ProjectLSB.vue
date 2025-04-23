@@ -130,23 +130,26 @@ onMounted(() => {
         >
             <span class="font-normal">{{ $t('PROJECT.LANDING.ALL_PROJECTS') }}</span>
             <template #outer-right>
-                <p-button ref="buttonRef"
-                          name="ic_plus"
-                          size="sm"
-                          style-type="tertiary"
-                          class="cursor-pointer"
-                          @click.stop.prevent="toggleContextMenu"
+                <div v-on-click-outside="hideContextMenu"
+                     class="relative"
                 >
-                    {{ $t('COMMON.BUTTONS.CREATE') }}
-                </p-button>
-                <p-context-menu v-show="visibleMenu"
-                                ref="contextMenuRef"
-                                v-on-click-outside="hideContextMenu"
-                                class="z-10"
-                                no-select-indication
-                                :menu="createDropdownMenuItems"
-                                @select="handleSelectCreateMenu"
-                />
+                    <p-button ref="buttonRef"
+                              name="ic_plus"
+                              size="sm"
+                              style-type="tertiary"
+                              class="cursor-pointer"
+                              @click.stop.prevent="toggleContextMenu"
+                    >
+                        {{ $t('COMMON.BUTTONS.CREATE') }}
+                    </p-button>
+                    <p-context-menu v-show="visibleMenu"
+                                    ref="contextMenuRef"
+                                    class="z-10"
+                                    no-select-indication
+                                    :menu="createDropdownMenuItems"
+                                    @select="handleSelectCreateMenu"
+                    />
+                </div>
             </template>
         </l-s-b-title>
         <l-s-b-divider />
