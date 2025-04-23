@@ -6,20 +6,22 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
+import { useMenuStore } from '@/store/menu/menu-store';
+import type { DisplayMenu } from '@/store/menu/type';
+
 import { MENU_ID } from '@/lib/menu/config';
+import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { useAppContextStore } from '../app-context/app-context-store';
-import { useUserWorkspaceStore } from '../app-context/workspace/user-workspace-store';
-import { useAccessControlStore } from '../derived/access-control-store';
-import { useMenuStore } from '../derived/menu-store';
-import type { DisplayMenu } from './type';
 
 export const useAllMenuList = () => {
     const appContextStore = useAppContextStore();
     const menuStore = useMenuStore();
-    const accessControlStore = useAccessControlStore();
+    const authorizationStore = useAuthorizationStore();
     const userWorkspaceStore = useUserWorkspaceStore();
 
     const _isAdminMode = computed(() => appContextStore.getters.isAdminMode);
@@ -33,7 +35,7 @@ export const useAllMenuList = () => {
         _allGnbMenuList = _getDisplayMenuList(menuStore.getters.menuList, _isAdminMode.value, _currentWorkspaceId.value);
         _allGnbMenuList = _filterMenuByRoute(_allGnbMenuList, router, _currentWorkspaceId.value);
         if (!_isAdminMode.value) {
-            _allGnbMenuList = _filterMenuByAccessPermission(_allGnbMenuList, accessControlStore.getters.pageAccessPermissionList);
+            _allGnbMenuList = _filterMenuByAccessPermission(_allGnbMenuList, authorizationStore.getters.pageAccessPermissionList);
         }
 
         if (!isMyPage) {
