@@ -236,6 +236,10 @@ export const getDefaultSearchSchema = (fields: DynamicField[], isTrustedAccount:
                     type: 'text',
                 })),
                 {
+                    key: 'service_account_mgr_id',
+                    name: 'Service Account Manager',
+                },
+                {
                     key: 'project_id',
                     name: 'Project',
                     reference: 'identity.Project',
