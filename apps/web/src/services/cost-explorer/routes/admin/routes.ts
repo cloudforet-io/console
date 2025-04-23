@@ -67,12 +67,22 @@ const adminCostExplorerRoutes: RouteConfig = {
                             } else if (to.params.dataSourceId && to.params.costQuerySetId) {
                                 next();
                             } else {
+                                const normalizedQuery = { ...to.query };
+                                if (normalizedQuery.project) {
+                                    normalizedQuery.project_id = normalizedQuery.project;
+                                    delete normalizedQuery.project;
+                                }
+                                if (normalizedQuery.service_account) {
+                                    normalizedQuery.service_account_id = normalizedQuery.service_account;
+                                    delete normalizedQuery.service_account;
+                                }
                                 next({
                                     name: ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                                     params: {
                                         dataSourceId: UNIFIED_COST_KEY,
                                         costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
                                     },
+                                    query: normalizedQuery,
                                 });
                             }
                         } catch (e) {
