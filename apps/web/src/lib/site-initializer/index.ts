@@ -9,6 +9,7 @@ import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { pinia } from '@/store/pinia';
@@ -36,6 +37,7 @@ import { initWorkspace } from '@/lib/site-initializer/workspace';
 
 import { useTaskManagementTemplateStore } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
+
 const initQueryHelper = () => {
     const userStore = useUserStore(pinia);
     QueryHelper.init(computed(() => userStore.state.timezone));
@@ -43,9 +45,9 @@ const initQueryHelper = () => {
 
 let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
-    const userStore = useUserStore(pinia);
     const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
+    const authorizationStore = useAuthorizationStore(pinia);
     const afterGrantedCallback = () => allReferenceStore.flush();
 
     const adminChildren = integralRoutes[0].children?.find(
@@ -66,9 +68,9 @@ const initRouter = (domainId?: string) => {
     }
 
     if (!domainId) {
-        SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
+        SpaceRouter.init(errorRoutes, afterGrantedCallback, authorizationStore);
     } else {
-        SpaceRouter.init(integralRoutes, afterGrantedCallback, userStore);
+        SpaceRouter.init(integralRoutes, afterGrantedCallback, authorizationStore);
     }
     isRouterInitialized = true;
 };
@@ -106,6 +108,7 @@ const init = async () => {
         await initWorkspace(userId);
         await initOpsFlowTaskManagementTemplate(mergedConfig);
         await featureSchemaManager.initialize(mergedConfig);
+        initErrorHandler();
         initRouter(domainId);
         // prefetchResources();
         initI18n();
@@ -115,7 +118,6 @@ const init = async () => {
         initGtm(config);
         initAmcharts5(config);
         initEcharts();
-        initErrorHandler();
         initRequestIdleCallback();
         const results = await Promise.allSettled([
             checkSsoAccessToken(),
