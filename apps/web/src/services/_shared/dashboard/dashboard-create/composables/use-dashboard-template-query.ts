@@ -16,8 +16,7 @@ export const useDashboardTemplateQuery = () => {
     return useScopedQuery({
         queryKey: key,
         queryFn: () => dashboardTemplateAPI.list(params.value),
-        select: (data) => data.results,
-        initialData: { results: [] },
+        select: (data) => data?.results || [],
         staleTime: 1000 * 60 * 5,
     }, ['DOMAIN', 'WORKSPACE']);
 };
