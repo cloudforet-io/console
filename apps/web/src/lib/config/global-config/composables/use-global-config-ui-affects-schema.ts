@@ -7,7 +7,7 @@ import type { FeatureKeyType } from '@/lib/config/global-config/types/type';
 import { SERVICE_FEATURES } from '../constants/constants';
 
 export const useGlobalConfigUiAffectsSchema = (featureKey: FeatureKeyType) => {
-    if (!SERVICE_FEATURES[featureKey]) {
+    if (!Object.values(SERVICE_FEATURES).includes(featureKey)) {
         throw new Error(`Invalid feature key: ${featureKey}`);
     }
 

@@ -60,6 +60,10 @@ export const useFavoriteStore = defineStore('favorite', () => {
 
     const actions = {
         fetchFavorite: async () => {
+            if (!_getters.userId) {
+                console.error('userId is not found');
+                return;
+            }
             favoriteListApiQuery.setFilters([
                 { k: 'user_id', v: _getters.userId, o: '=' },
                 { k: 'name', v: 'console:favorite:', o: '' },
