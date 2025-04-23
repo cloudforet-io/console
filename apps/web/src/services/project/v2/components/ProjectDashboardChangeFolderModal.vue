@@ -41,6 +41,7 @@ const {
 });
 const {
     dashboardList,
+    invalidateAllQueries: invalidateDashboardList,
 } = useProjectDashboardQuery({
     projectId,
     projectGroupId,
@@ -71,6 +72,7 @@ const { mutate: changeFolder } = useDashboardChangeFolderMutation({
     onSuccess: () => {
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
         invalidateDashboardFolderList();
+        invalidateDashboardList();
     },
     onError: (e) => {
         showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);
