@@ -17,7 +17,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -56,7 +56,7 @@ const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const { getDashboardManageable, getFolderManageable } = useDashboardManageable();
 const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboardControlMenuHelper();
@@ -64,7 +64,7 @@ const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboard
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const state = reactive({
     slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, LABELS_LIMIT) || []),

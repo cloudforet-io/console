@@ -9,11 +9,10 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PublicFolderListParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/list';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
-
 
 interface PublicFolderResourceItemData {
     resourceGroup?: PublicFolderModel['resource_group'];
@@ -28,14 +27,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const usePublicFolderReferenceStore = defineStore('reference-folder', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as PublicFolderReferenceMap | null,
     });
 
     const getters = reactive({
         publicFolderItems: asyncComputed<PublicFolderReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

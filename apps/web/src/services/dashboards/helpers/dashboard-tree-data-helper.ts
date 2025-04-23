@@ -1,9 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 
 import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
@@ -22,7 +22,6 @@ export const getDashboardTreeData = (
             depth: 0,
             data: {
                 id: folder.folder_id,
-                name: folder.name,
                 type: 'FOLDER',
                 createdBy: folder.tags?.created_by,
                 isNew: newIdList?.includes(folder.folder_id),
@@ -40,7 +39,6 @@ export const getDashboardTreeData = (
             depth: 0,
             data: {
                 id: dashboard.dashboard_id,
-                name: dashboard.name,
                 type: 'DASHBOARD',
                 createdBy: dashboard.tags?.created_by,
                 isNew: newIdList?.includes(dashboard.dashboard_id),
@@ -52,7 +50,11 @@ export const getDashboardTreeData = (
 
         if (folderNode) {
             dashboardNode.depth = 1;
-            folderNode.children.push(dashboardNode);
+            if (Array.isArray(folderNode.children)) {
+                folderNode.children.push(dashboardNode);
+            } else {
+                folderNode.children = [dashboardNode];
+            }
         } else {
             rootNodes.push(dashboardNode);
         }
@@ -116,13 +118,13 @@ export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], 
         if (result) return;
         const _isFolder = id.includes('folder');
         if (_isFolder) {
-            const _folder = folderItems.find((f) => f.folder_id === id);
+            const _folder = folderItems.find((f) => f.folder_id === id) as PublicFolderModel;
             if (isProject) result = !!_folder?.shared;
             else if (_folder?.shared && _folder?.scope === 'WORKSPACE') {
                 result = true;
             }
         } else {
-            const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
+            const _dashboard = dashboardItems.find((d) => d.dashboard_id === id) as PublicDashboardModel;
             if (isProject) result = !!_dashboard?.shared;
             else if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
                 result = true;

@@ -15,6 +15,7 @@ import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useErrorStore } from '@/store/error/error-store';
@@ -37,6 +38,7 @@ import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
+
 const router = useRouter();
 const route = useRoute();
 
@@ -56,6 +58,7 @@ const state = reactive({
 });
 
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const appContextStore = useAppContextStore();
 const errorStore = useErrorStore();
 const globalUIStore = useGlobalUIStore();
@@ -74,7 +77,7 @@ const goToSignIn = async () => {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { previousPath: route.fullPath },
     };
-    userStore.setCurrentGrantInfo(undefined);
+    authorizationStore.setCurrentGrantInfo(undefined);
     errorStore.setVisibleSessionExpiredError(false);
 
     await router.push(to);

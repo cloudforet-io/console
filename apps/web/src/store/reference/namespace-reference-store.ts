@@ -13,10 +13,10 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap,
     ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useAuthorizationStore } from '../authorization/authorization-store';
 
 export type NamespaceReferenceItem = Required<Pick<ReferenceItem<Partial<NamespaceModel>>, 'key'|'label'|'name'|'data'>>;
 export type NamespaceReferenceMap = ReferenceMap<NamespaceReferenceItem>;
@@ -25,14 +25,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useNamespaceReferenceStore = defineStore('reference-namespace', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as NamespaceReferenceMap | null,
     });
 
     const getters = reactive({
         namespaceItems: asyncComputed<NamespaceReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

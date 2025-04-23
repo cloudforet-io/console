@@ -2,7 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PI } from '@cloudforet/mirinae';
 
@@ -12,7 +12,6 @@ import type { MetricExampleModel } from '@/schema/inventory/metric-example/model
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -34,6 +33,7 @@ import {
     convertWorkspaceConfigToReferenceData,
     convertServiceConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
+import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
@@ -57,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const route = useRoute();
+const router = useRouter();
 
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -66,7 +67,8 @@ const favoriteStore = useFavoriteStore();
 const favoriteStoreGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
-const displayStore = useDisplayStore();
+const { getAllMenuList } = useAllMenuList();
+
 
 /* Query */
 const {
@@ -152,7 +154,7 @@ const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): Referen
     if (itemType === FAVORITE_TYPE.SERVICE) {
         return convertServiceConfigToReferenceData([favoriteConfig], storeState.service)[0];
     }
-    const allMenuList = displayStore.getAllMenuList(route);
+    const allMenuList = getAllMenuList(route, router);
     return convertMenuConfigToReferenceData([favoriteConfig], allMenuList)[0];
 };
 </script>

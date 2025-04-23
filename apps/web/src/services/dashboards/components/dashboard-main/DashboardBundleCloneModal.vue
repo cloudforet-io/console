@@ -30,6 +30,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -89,6 +90,7 @@ const dashboardPageControlState = dashboardPageControlStore.state;
 const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const allReferenceStore = useAllReferenceStore();
 const { privateWidgetAPI } = usePrivateWidgetApi();
 const { publicWidgetAPI } = usePublicWidgetApi();
@@ -109,7 +111,7 @@ const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     userId: computed<string|undefined>(() => userStore.state.userId),
 });

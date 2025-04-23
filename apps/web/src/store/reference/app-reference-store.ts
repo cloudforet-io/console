@@ -13,9 +13,10 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap,
     ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
+import { useAuthorizationStore } from '../authorization/authorization-store';
 
 export type AppItem = Required<Pick<ReferenceItem<AppModel>, 'key'|'label'|'name'|'data'>>;
 export type AppReferenceMap = ReferenceMap<AppItem>;
@@ -24,7 +25,7 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useAppReferenceStore = defineStore('reference-app', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const state = reactive({
         items: null as AppReferenceMap | null,
@@ -32,7 +33,7 @@ export const useAppReferenceStore = defineStore('reference-app', () => {
 
     const getters = reactive({
         appItems: asyncComputed<AppReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

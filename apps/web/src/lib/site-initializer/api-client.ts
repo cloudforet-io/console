@@ -5,6 +5,7 @@ import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/spa
 import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
 import type { TokenGrantModel } from '@/api-clients/identity/token/schema/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -415,7 +416,7 @@ const getAuthConfig = (config): AuthConfig => ({
 });
 
 export const initApiClient = async (config) => {
-    const userStore = useUserStore(pinia);
+    const authorizationStore = useAuthorizationStore(pinia);
     const endpoints = getApiEndpoints(config);
     const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback());
     const apiSettings = getApiSettings(config);
@@ -443,8 +444,8 @@ export const initApiClient = async (config) => {
         };
         const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>(grantRequest);
         SpaceConnector.setToken(response.access_token);
-        userStore.setCurrentGrantInfo({ scope: 'USER' });
-        userStore.setCurrentRoleInfo(undefined);
+        authorizationStore.setCurrentGrantInfo({ scope: 'USER' });
+        authorizationStore.setCurrentRoleInfo(undefined);
     } catch (e) {
         console.error(e);
     }

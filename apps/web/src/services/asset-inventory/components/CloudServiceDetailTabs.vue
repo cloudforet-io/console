@@ -16,9 +16,9 @@ import { i18n } from '@/translations';
 
 import { useServiceRouter } from '@/router/helpers/use-service-router';
 
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
 
@@ -62,7 +62,8 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
-const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
+
 
 const router = useRouter();
 const serviceRouter = useServiceRouter(router);
@@ -71,7 +72,7 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
 
 /* Tabs */
 const state = reactive({
-    visibleAlertTab: computed(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAssetAlertTab),
+    visibleAlertTab: computed(() => alertManagerUiAffectsSchema.value?.visibleAssetAlertTab),
 });
 const singleItemTabState = reactive({
     tabs: computed(() => {

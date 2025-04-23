@@ -9,28 +9,30 @@ import type { EscalationPolicyModel as EscalationPolicyModelV1 } from '@/schema/
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import APIClientManager from '@/lib/config/global-config/api-client-manager';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export type EscalationPolicyItem = Required<Pick<ReferenceItem<EscalationPolicyModel>, 'key'|'label'|'name'|'data'>>;
+import { useAuthorizationStore } from '../authorization/authorization-store';
+
+
+export type EscalationPolicyItem = Required<Pick<ReferenceItem<EscalationPolicyModel|EscalationPolicyModelV1>, 'key'|'label'|'name'|'data'>>;
 export type EscalationPolicyReferenceMap = ReferenceMap<EscalationPolicyItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useEscalationPolicyReferenceStore = defineStore('reference-escalation-policy', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
+
     const state = reactive({
         items: null as EscalationPolicyReferenceMap | null,
     });
 
     const getters = reactive({
         escalationPolicyItems: asyncComputed<EscalationPolicyReferenceMap>(async () => {
-            if (userStore.state.currentGrantInfo?.scope !== 'WORKSPACE') return {};
+            if (authorizationStore.state.currentGrantInfo?.scope !== 'WORKSPACE') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

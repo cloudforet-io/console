@@ -14,13 +14,13 @@ import type { ContextMenuType } from '@cloudforet/mirinae/types/controls/context
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDisplayStore } from '@/store/display/display-store';
-import type { DisplayMenu } from '@/store/display/type';
+import type { DisplayMenu } from '@/store/menu/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -44,7 +44,7 @@ const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
-const displayStore = useDisplayStore();
+const { getAllMenuList } = useAllMenuList();
 
 const route = useRoute();
 const router = useRouter();
@@ -69,7 +69,7 @@ const state = reactive({
     isMenuDescription: undefined as boolean | undefined,
     gnbMenuList: computed<GNBMenuType[]|undefined>(() => {
         let results = [] as GNBMenuType[];
-        const allMenuList = displayStore.getAllMenuList(route);
+        const allMenuList = getAllMenuList(route, router);
         const menuList = allMenuList.filter((d) => !d.hideOnGNB);
         if (state.isInit && isEmpty(storeState.costDataSource)) {
             results = removeCostExplorerFromMenuList(menuList);

@@ -10,7 +10,7 @@ import { PPaneLayout } from '@cloudforet/mirinae';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
+import { useMenuStore } from '@/store/menu/menu-store';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getPageAccessMapFromRawData } from '@/lib/access-control/page-access-helper';
@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
     formType: FORM_TYPE.CREATE,
 });
 
-const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+const menuStore = useMenuStore();
 
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void,
     (e: 'update:is-page-access-valid', value: boolean): void,
@@ -96,7 +96,7 @@ const handleUpdateEditor = (value: string) => {
 const setPageAccessPermissionsData = () => {
     if (!props.initialPageAccess) return;
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: props.initialPageAccess, isRolePage: true, menuList: globalConfigSchemaStore.getters.menuList,
+        pageAccessPermissions: props.initialPageAccess, isRolePage: true, menuList: menuStore.getters.menuList,
     });
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {

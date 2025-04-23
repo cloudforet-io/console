@@ -15,10 +15,10 @@ import {
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 import { useProjectReferenceStore, type ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -64,9 +64,9 @@ const period = computed<Period>(() => {
 });
 
 /* permission */
-const userStore = useUserStore();
-const isWorkspaceMember = computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER);
-const pageAccessPermissionMap = computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap);
+const authorizationStore = useAuthorizationStore();
+const isWorkspaceMember = computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER);
+const pageAccessPermissionMap = computed<PageAccessMap>(() => authorizationStore.getters.pageAccessPermissionMap);
 
 /* project select dropdown */
 const showProjectSelectDropdown = computed(() => {
@@ -204,17 +204,16 @@ const currentDateRangeText = computed<string>(() => {
                            size="lg"
                            class="main-title"
             />
-            <project-select-dropdown
-                v-if="showProjectSelectDropdown && !isEmpty(projects)"
-                class="project-select-dropdown"
-                :selected-project-ids="selectedProjects"
-                :use-fixed-menu-style="false"
-                project-selectable
-                position="right"
-                hide-create-button
-                :selection-label="$t('HOME.COST_SUMMARY_BY_PROJECT')"
-                :project-group-selectable="false"
-                @update:selected-project-ids="handleSelectedProject"
+            <project-select-dropdown v-if="showProjectSelectDropdown && !isEmpty(projects)"
+                                     class="project-select-dropdown"
+                                     :selected-project-ids="selectedProjects"
+                                     :use-fixed-menu-style="false"
+                                     project-selectable
+                                     position="right"
+                                     hide-create-button
+                                     :selection-label="$t('HOME.COST_SUMMARY_BY_PROJECT')"
+                                     :project-group-selectable="false"
+                                     @update:selected-project-ids="handleSelectedProject"
             />
         </div>
         <div v-if="isLoading"

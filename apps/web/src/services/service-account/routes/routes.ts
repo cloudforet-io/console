@@ -1,8 +1,5 @@
 import type { RouteConfig } from 'vue-router';
 
-import { pinia } from '@/store/pinia';
-import { useUserStore } from '@/store/user/user-store';
-
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -18,11 +15,10 @@ const ServiceAccountDetailPage = () => import('@/services/service-account/pages/
 const ServiceAccountAddPage = () => import('@/services/service-account/pages/ServiceAccountAddPage.vue');
 
 
-const userStore = useUserStore(pinia);
 const serviceAccountRoute: RouteConfig = {
     path: 'service-account',
     meta: { menuId: MENU_ID.SERVICE_ACCOUNT, translationId: MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId },
-    redirect: (to) => getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap),
+    redirect: (to) => getRedirectRouteByPagePermission(to),
     component: ServiceAccountContainer,
     children: [
         {

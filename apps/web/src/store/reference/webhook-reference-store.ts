@@ -6,10 +6,10 @@ import { defineStore } from 'pinia';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
 import type { WebhookModel as WebhookModelV1 } from '@/schema/monitoring/webhook/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import APIClientManager from '@/lib/config/global-config/api-client-manager';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
@@ -23,14 +23,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as WebhookReferenceMap | null,
     });
 
     const getters = reactive({
         webhookItems: asyncComputed<WebhookReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

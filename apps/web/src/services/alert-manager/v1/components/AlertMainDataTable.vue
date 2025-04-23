@@ -25,13 +25,13 @@ import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants'
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -94,12 +94,12 @@ const emit = defineEmits<{(event: 'update', filters: Partial<AlertListTableFilte
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone || ''),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 /* Search Tags */
@@ -213,7 +213,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 /* formatters & autocomplete handlers */

@@ -23,7 +23,7 @@ import { SpaceRouter } from '@/router';
 
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -53,7 +53,7 @@ const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -80,8 +80,8 @@ const {
 } = useDashboardFolderQuery();
 
 const storeState = reactive({
-    isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceOwner: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
 

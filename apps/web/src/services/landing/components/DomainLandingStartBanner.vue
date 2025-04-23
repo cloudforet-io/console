@@ -8,22 +8,16 @@ import { screens, PTextButton } from '@cloudforet/mirinae';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useUserStore } from '@/store/user/user-store';
-
-import type { PageAccessMap } from '@/lib/access-control/config';
 
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
-const userStore = useUserStore();
-
 const router = useRouter();
 
 const { width } = useWindowSize();
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({

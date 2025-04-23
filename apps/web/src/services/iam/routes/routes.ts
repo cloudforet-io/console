@@ -1,8 +1,5 @@
 import type { RouteConfig } from 'vue-router';
 
-import { pinia } from '@/store/pinia';
-import { useUserStore } from '@/store/user/user-store';
-
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -62,10 +59,7 @@ const iamRoutes: RouteConfig = {
         menuId: MENU_ID.IAM,
         translationId: MENU_INFO_MAP[MENU_ID.IAM].translationId,
     },
-    redirect: (to) => {
-        const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
-    },
+    redirect: (to) => getRedirectRouteByPagePermission(to),
     component: IamContainer,
     children: iamRoutesChildren,
 };

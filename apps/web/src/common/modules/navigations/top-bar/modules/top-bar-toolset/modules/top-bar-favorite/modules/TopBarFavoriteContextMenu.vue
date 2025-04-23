@@ -19,17 +19,15 @@ import { i18n } from '@/translations';
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDisplayStore } from '@/store/display/display-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
-import type { PageAccessMap } from '@/lib/access-control/config';
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import {
     convertCostAnalysisConfigToReferenceData,
@@ -39,9 +37,10 @@ import {
     convertProjectGroupConfigToReferenceData, convertServiceConfigToReferenceData,
     getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
-import type { MenuInfo } from '@/lib/menu/config';
+import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
@@ -78,9 +77,8 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
-const userStore = useUserStore();
-const displayStore = useDisplayStore();
-
+const authorizationStore = useAuthorizationStore();
+const { getAllMenuList } = useAllMenuList();
 const { getReferenceLocation } = useReferenceRouter();
 
 /* Query */
@@ -102,13 +100,13 @@ const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     service: computed<ServiceReferenceMap>(() => allReferenceStore.getters.service),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+    pageAccessPermissionList: computed<MenuId[]>(() => authorizationStore.getters.pageAccessPermissionList),
 });
 const state = reactive({
     loading: true,
     showAll: false,
     showAllType: undefined as undefined|FavoriteType,
-    accessProject: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.PROJECT])),
+    accessProject: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.PROJECT])),
     items: computed<FavoriteMenuItem[]>(() => {
         const results: FavoriteMenuItem[] = [];
         if (state.favoriteMenuItems.length) {
@@ -186,14 +184,14 @@ const state = reactive({
     }),
     //
     favoriteMenuItems: computed<ReferenceData[]>(() => {
-        const allMenuList = displayStore.getAllMenuList(route);
+        const allMenuList = getAllMenuList(route, router);
         return convertMenuConfigToReferenceData(
             favoriteGetters.menuItems ?? [],
             allMenuList,
         );
     }),
     favoriteCostAnalysisItems: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, storeState.pageAccessPermissionList);
         return isUserAccessible
             ? convertCostAnalysisConfigToReferenceData(
                 favoriteGetters.costAnalysisItems ?? [],
@@ -203,7 +201,7 @@ const state = reactive({
             : [];
     }),
     favoriteDashboardItems: computed<ReferenceData[]>(() => {
-        const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, userStore.getters.pageAccessPermissionList);
+        const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, storeState.pageAccessPermissionList);
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
@@ -211,7 +209,7 @@ const state = reactive({
         );
     }),
     favoriteMetricItems: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, storeState.pageAccessPermissionList);
         if (!isUserAccessible) return [];
         const favoriteMetricItems = convertMetricConfigToReferenceData(favoriteGetters.metricItems ?? [], storeState.metrics);
         const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
@@ -221,14 +219,14 @@ const state = reactive({
         ];
     }),
     favoriteProjects: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, storeState.pageAccessPermissionList);
         if (!isUserAccessible) return [];
         const favoriteProjectItems = convertProjectConfigToReferenceData(favoriteGetters.projectItems ?? [], storeState.projects);
         const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
     favoriteServiceItems: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.SERVICE, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.SERVICE, storeState.pageAccessPermissionList);
         return isUserAccessible ? convertServiceConfigToReferenceData(favoriteGetters.serviceItems ?? [], storeState.service) : [];
     }),
 });

@@ -16,15 +16,14 @@ import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspa
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 interface UserResourceItemData {
     roleInfo?: Partial<RoleModel>;
@@ -60,7 +59,7 @@ const _listRole = async (roleIdList: string[]): Promise<RoleModel[]> => {
 };
 export const useUserReferenceStore = defineStore('reference-user', () => {
     const appContextStore = useAppContextStore();
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         roleList: [] as RoleModel[],
@@ -72,7 +71,7 @@ export const useUserReferenceStore = defineStore('reference-user', () => {
     const getters = reactive({
         loading: computed<boolean>(() => state.items === null),
         userItems: asyncComputed<UserReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
