@@ -10,7 +10,7 @@ export type ServiceConfig = {
     ENABLED: boolean;
     VERSION: FeatureVersion;
 };
-export type GlobalServiceConfig = Record<FeatureKeyType, ServiceConfig>;
+export type GlobalServiceConfig = Record<string, ServiceConfig>;
 
 export interface FeatureConfigurator {
     uiAffect: GeneratedUiAffectConfig[];

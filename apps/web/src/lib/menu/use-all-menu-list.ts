@@ -32,7 +32,7 @@ export const useAllMenuList = () => {
         const isMyPage = route?.path.startsWith('/my-page');
         let _allGnbMenuList: DisplayMenu[];
 
-        _allGnbMenuList = _getDisplayMenuList(menuStore.getters.menuList, _isAdminMode.value, _currentWorkspaceId.value);
+        _allGnbMenuList = _getDisplayMenuList(menuStore.getters.menuList, _isAdminMode.value);
         _allGnbMenuList = _filterMenuByRoute(_allGnbMenuList, router, _currentWorkspaceId.value);
         if (!_isAdminMode.value) {
             _allGnbMenuList = _filterMenuByAccessPermission(_allGnbMenuList, authorizationStore.getters.pageAccessPermissionList);
@@ -89,7 +89,7 @@ const _filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionLi
     return results;
 }, [] as DisplayMenu[]);
 
-const _getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWorkspaceId?: string): DisplayMenu[] => menuList.map((d) => {
+const _getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
     const label = d.label || i18n.t(menuInfo.translationId);
@@ -100,7 +100,7 @@ const _getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWor
         label,
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
-        to: { name: routeName, params: { workspaceId: currentWorkspaceId } },
-        subMenuList: d.subMenuList ? _getDisplayMenuList(d.subMenuList, isAdminMode, currentWorkspaceId) : [],
+        to: { name: routeName },
+        subMenuList: d.subMenuList ? _getDisplayMenuList(d.subMenuList, isAdminMode) : [],
     } as DisplayMenu;
 });

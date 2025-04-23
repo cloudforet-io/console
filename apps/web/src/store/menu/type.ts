@@ -1,4 +1,5 @@
 import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
 import type { Menu } from '@/lib/menu/config';
 

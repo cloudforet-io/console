@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue';
 
+import type { AxiosRequestConfig } from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
@@ -159,7 +160,7 @@ export const useAuthorizationStore = defineStore('authorization', () => {
                 scope: grantRequest.scope,
                 token: grantRequest.token,
                 workspace_id: grantRequest.workspace_id,
-            }, { skipAuthRefresh: true });
+            }, { skipAuthRefresh: true } as AxiosRequestConfig);
             if (status === 'succeed') {
                 SpaceConnector.setToken(response.access_token);
                 const currentRoleType = _getRoleTypeFromToken(response.access_token);

@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useAuthorizationStore } from '../authorization/authorization-store';
 
 
-export type EscalationPolicyItem = Required<Pick<ReferenceItem<EscalationPolicyModel>, 'key'|'label'|'name'|'data'>>;
+export type EscalationPolicyItem = Required<Pick<ReferenceItem<EscalationPolicyModel|EscalationPolicyModelV1>, 'key'|'label'|'name'|'data'>>;
 export type EscalationPolicyReferenceMap = ReferenceMap<EscalationPolicyItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
