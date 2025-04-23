@@ -9,6 +9,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
@@ -82,8 +83,18 @@ const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|u
             if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
-        if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
-        return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        if (props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS) {
+            if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        }
+        if (props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.PROJECT) {
+            if (node.data?.resource_group === RESOURCE_GROUP.DOMAIN) {
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+            }
+            if (node.data?.resource_group === RESOURCE_GROUP.WORKSPACE) {
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_WORKSPACE');
+            }
+        }
     }
     return undefined;
 };
