@@ -99,21 +99,26 @@ const {
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
-let fieldManager: WidgetFieldValueManager;
-
 const state = reactive({
     isPrivate: computed<boolean>(() => !!widgetGenerateState.widgetId?.startsWith('private')),
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     mounted: false,
-    fieldManager: computed<WidgetFieldValueManager>(() => {
-        if (!fieldManager) {
-            fieldManager = new WidgetFieldValueManager(
-                getWidgetConfig(widgetGenerateState.selectedWidgetName),
-                state.selectedDataTable,
-                cloneDeep(widget.value?.options) || {},
-            );
-        }
-        return fieldManager;
+    fieldManager: computed<WidgetFieldValueManager|undefined>(() => {
+        const _widgetConfig = getWidgetConfig(widgetGenerateState.selectedWidgetName);
+
+        if (
+            !widgetGenerateState.selectedWidgetName
+            || widgetLoading.value
+            || !widget.value
+            || !state.selectedDataTable
+            || !_widgetConfig
+        ) return undefined;
+
+        return new WidgetFieldValueManager(
+            _widgetConfig,
+            state.selectedDataTable,
+            cloneDeep(widget.value?.options) || {},
+        );
     }),
     value: computed(() => state.fieldManager?.data?.granularity),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
@@ -136,6 +141,7 @@ const state = reactive({
         return WIDGET_WIDTH_RANGE_LIST[state.widgetSize]?.[0] || 0;
     }),
     isWidgetFieldChanged: computed<boolean>(() => {
+        if (!state.fieldManager) return false;
         const _isOptionsChanged = !isEqual(cloneDeep(state.fieldManager.data), widget.value?.options);
         const _isTypeChanged = widgetGenerateState.selectedWidgetName !== widget.value?.widget_type;
         emit('watch-options-changed', _isOptionsChanged || _isTypeChanged);
@@ -385,7 +391,7 @@ onUnmounted(() => {
                 />
             </div>
         </div>
-        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!state.fieldManager && !widgetLoading"
+        <widget-form-overlay-step2-widget-form v-if="widgetGenerateState.overlayType !== 'EXPAND' && !!widget && !!state.fieldManager && !widgetLoading"
                                                :widget-validation-invalid="widgetOptionsInvalid"
                                                :widget-validation-invalid-text="widgetOptionsInvalidText"
                                                :field-manager="state.fieldManager"
