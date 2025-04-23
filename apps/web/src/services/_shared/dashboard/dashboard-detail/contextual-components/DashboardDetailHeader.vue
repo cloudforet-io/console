@@ -65,7 +65,12 @@ const state = reactive({
                     }
                     return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
                 }
-                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+                if (dashboard.value?.resource_group === RESOURCE_GROUP.DOMAIN) {
+                    return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+                }
+                if (dashboard.value?.scope === 'PROJECT') {
+                    return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+                }
             }
             if (entryPoint.value === 'PROJECT') {
                 if (dashboard.value?.resource_group === RESOURCE_GROUP.DOMAIN) return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
