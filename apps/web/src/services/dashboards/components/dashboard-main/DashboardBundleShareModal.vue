@@ -2,8 +2,6 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useQueryClient } from '@tanstack/vue-query';
-
 import {
     PDataTable, PI, PButtonModal, PRadioGroup, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
@@ -56,14 +54,11 @@ const dashboardTreeControlStore = useDashboardTreeControlStore();
 const {
     publicDashboardList,
     privateDashboardList,
-    keys: dashboardKeys,
 } = useDashboardQuery();
 const {
     publicFolderList,
     privateFolderList,
-    keys: folderKeys,
 } = useDashboardFolderQuery();
-const queryClient = useQueryClient();
 
 const queryState = reactive({
     publicDashboardItems: computed(() => {
@@ -189,8 +184,6 @@ const unshareDashboard = () => {
 const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFolderShareMutation({
     isShared: computed(() => state.isShared),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
-        queryClient.invalidateQueries({ queryKey: dashboardKeys.privateDashboardListQueryKey.value });
         if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
         else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
     },
@@ -209,7 +202,6 @@ const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFold
 const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useDashboardShareMutation({
     isShared: computed(() => state.isShared),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });
         if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
         else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
     },
