@@ -22,8 +22,10 @@ export const useDashboardFolderShareMutation = (options: UseDashboardFolderShare
     const { publicFolderAPI } = usePublicFolderApi();
     const { publicDashboardAPI } = usePublicDashboardApi();
     const queryClient = useQueryClient();
-    const { withSuffix: publicFolderGetQueryKey } = useServiceQueryKey('dashboard', 'public-folder', 'get');
-    const { withSuffix: publicDashboardGetQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
+    const { withSuffix: publicFolderGetQueryKeyWithSuffix } = useServiceQueryKey('dashboard', 'public-folder', 'get');
+    const { withSuffix: publicDashboardGetQueryKeyWithSuffix } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
+    const { key: publicFolderListQueryKey } = useServiceQueryKey('dashboard', 'public-folder', 'list');
+    const { key: publicDashboardListQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'list');
     const {
         isShared, onSuccess, onError, onSettled,
     } = options;
@@ -54,16 +56,18 @@ export const useDashboardFolderShareMutation = (options: UseDashboardFolderShare
         mutationFn: shareFolderFn,
         onSuccess: async (data, variables) => {
             const _folderId = variables.folder_id;
-            queryClient.invalidateQueries({ queryKey: publicFolderGetQueryKey(_folderId) });
+            queryClient.invalidateQueries({ queryKey: publicFolderGetQueryKeyWithSuffix(_folderId) });
             if (!isShared.value) {
                 const _dashboardList = await listPublicDashboard(_folderId);
                 const _dashboardIds = _dashboardList.results?.map((dashboard) => dashboard.dashboard_id);
                 if (_dashboardIds) {
                     await Promise.all(
-                        _dashboardIds.map((dashboardId) => queryClient.invalidateQueries({ queryKey: publicDashboardGetQueryKey(dashboardId) })),
+                        _dashboardIds.map((dashboardId) => queryClient.invalidateQueries({ queryKey: publicDashboardGetQueryKeyWithSuffix(dashboardId) })),
                     );
                 }
             }
+            queryClient.invalidateQueries({ queryKey: publicFolderListQueryKey });
+            queryClient.invalidateQueries({ queryKey: publicDashboardListQueryKey });
             if (onSuccess) await onSuccess(data, variables);
         },
         onError: (error, variables) => {
