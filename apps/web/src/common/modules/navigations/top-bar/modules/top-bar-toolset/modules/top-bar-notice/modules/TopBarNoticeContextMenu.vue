@@ -17,7 +17,7 @@ import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import { i18n } from '@/translations';
 
-import { useNoticeStore } from '@/store/notice';
+import { useNoticeStore } from '@/store/notice/notice-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';

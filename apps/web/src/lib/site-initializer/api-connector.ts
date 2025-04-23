@@ -391,8 +391,8 @@ const getApiEndpoints = (config) => {
         return [ENDPOINT_V1, ENDPOINT_V2];
     }
     if (!ENDPOINT_V1) {
-        throw new Error('ApiClient init failed: There are no endpoint v1.');
-    } else throw new Error('ApiClient init failed: There are no endpoint v2.');
+        throw new Error('ApiConnector init failed: There are no endpoint v1.');
+    } else throw new Error('ApiConnector init failed: There are no endpoint v2.');
 };
 const getApiSettings = (config) => {
     const apiV1Timeout = config.get('CONSOLE_API.TIMEOUT');
@@ -415,7 +415,7 @@ const getAuthConfig = (config): AuthConfig => ({
     apiKey: config.get('DEV.AUTH.API_KEY'),
 });
 
-export const initApiClient = async (config) => {
+export const initApiConnectorAndAuth = async (config) => {
     const authorizationStore = useAuthorizationStore(pinia);
     const endpoints = getApiEndpoints(config);
     const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback());

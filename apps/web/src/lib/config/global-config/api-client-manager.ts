@@ -1,3 +1,6 @@
+import camelCase from 'lodash/camelCase';
+import kebabCase from 'lodash/kebabCase';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ApiClientEndpoint } from '@/lib/config/global-config/schema/api-client-schema';
@@ -26,6 +29,7 @@ class APIClientManager {
     private serviceEndpoints: Map<string, ServiceEndpoint> = new Map();
 
     async initialize(mergedConfig: GlobalServiceConfig): Promise<void> {
+        console.log('initialize', mergedConfig);
         this.config = mergedConfig;
         this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientEndpoint));
         await this.initializeServiceConfig();
@@ -56,7 +60,7 @@ class APIClientManager {
     }
 
     private static formatEndpoint(endpoint: string): string {
-        return endpoint.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+        return kebabCase(endpoint);
     }
 
     private defineDynamicServices(): void {
@@ -75,8 +79,7 @@ class APIClientManager {
     }
 
     private static formatPropertyName(serviceName: string): string {
-        return serviceName.toLowerCase()
-            .replace(/_([a-z])/g, (_, char) => char.toUpperCase());
+        return camelCase(serviceName);
     }
 
     private getServiceEndpoint(serviceName: string): ServiceEndpoint | null {

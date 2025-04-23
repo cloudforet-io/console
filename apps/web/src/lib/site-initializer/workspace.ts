@@ -17,15 +17,6 @@ export const initWorkspace = async (userId?: string): Promise<void> => {
 
     /* Set Default Workspace */
     const { pathname } = window.location;
-    // let workspaceId: string | undefined;
-    // const workspacePath = pathname?.split('/')[1];
-    // if (workspacePath === 'admin') {
-    //     workspaceId = undefined;
-    // } else if (workspacePath) {
-    //     workspaceId = workspacePath;
-    // } else workspaceId = lastAccessedWorkspaceId;
-    // userWorkspaceStore.setCurrentWorkspace(workspaceId);
-    //
 
     if (!USER_PAGE_FIRST_PATH_LIST.includes(pathname?.split('/')[1])) {
         userWorkspaceStore.setCurrentWorkspace(lastAccessedWorkspaceId);

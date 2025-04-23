@@ -24,7 +24,7 @@ import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type'
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
-import { initApiClient } from '@/lib/site-initializer/api-client';
+import { initApiConnectorAndAuth } from '@/lib/site-initializer/api-connector';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
@@ -32,7 +32,7 @@ import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
-import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
+import { initUserAndToken } from '@/lib/site-initializer/user-token';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
 
 import { useTaskManagementTemplateStore } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
@@ -98,9 +98,9 @@ const init = async () => {
     /* Init SpaceONE Console */
     try {
         await config.init();
-        await initApiClient(config);
+        await initApiConnectorAndAuth(config);
         const domainId = await initDomain(config);
-        const userId = await initUserAndAuth(config);
+        const userId = await initUserAndToken(config);
         const mergedConfig = await mergeConfig(config, domainId);
         await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
