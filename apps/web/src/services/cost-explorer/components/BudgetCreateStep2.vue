@@ -335,15 +335,20 @@ watch(() => [
             state.isContinueAble = isInitialValid && isGrowthValid;
             return;
         } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually') {
-            const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
-            const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
-            const length = endDate.diff(startDate, 'month') + 1;
-            const valid = budgetCreatePageState.budgetEachDate.length === length
-                && budgetCreatePageState.budgetEachDate.every((v, idx) => isDateInRange(idx) && isValidPositiveNumber(v));
-            if (valid) {
+            const allValuesFilled = budgetCreatePageState.budgetEachDate.length === 12 && budgetCreatePageState.budgetEachDate
+                .every((v, idx) => {
+                    if (isDateInRange(idx)) {
+                        return isValidPositiveNumber(v);
+                    }
+                    return true; // skip validation for disabled months
+                });
+
+            if (allValuesFilled) {
                 state.isContinueAble = true;
                 return;
             }
+            state.isContinueAble = false;
+            return;
         }
         state.isContinueAble = false;
     }
