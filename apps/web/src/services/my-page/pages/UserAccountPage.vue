@@ -19,6 +19,7 @@ import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-memb
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -32,13 +33,13 @@ import UserAccountNotificationEmail from '@/services/my-page/components/UserAcco
 
 
 
-
 const domainStore = useDomainStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const storeState = reactive({
     authType: computed<AuthType|undefined>(() => userStore.state.authType),
     baseRoleType: computed<RoleType|undefined>(() => userStore.state.roleType),
-    currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
+    currentRoleType: computed(() => authorizationStore.state.currentRoleInfo?.roleType),
     userId: computed<string|undefined>(() => userStore.state.userId),
 });
 const state = reactive({

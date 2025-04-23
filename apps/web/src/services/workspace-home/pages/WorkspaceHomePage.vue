@@ -9,13 +9,12 @@ import type { UserConfigModel } from '@/api-clients/config/user-config/schema/mo
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
+import type { RoleInfo } from '@/store/authorization/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
-import type { RoleInfo } from '@/store/user/type';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -34,26 +33,25 @@ const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const { dataSource } = useCostDataSourceQuery({
     enabled: computed(() => !!userWorkspaceGetters.currentWorkspaceId),
 });
 
 const storeState = reactive({
-    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.state.currentRoleInfo),
+    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => authorizationStore.state.currentRoleInfo),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     loading: false,
     isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isWorkspaceMember: computed<boolean>(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    accessUserMenu: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.USER]) && state.isWorkspaceOwner),
-    accessAppMenu: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.APP]) && state.isWorkspaceOwner),
+    accessUserMenu: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.USER]) && state.isWorkspaceOwner),
+    accessAppMenu: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.APP]) && state.isWorkspaceOwner),
     isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
     isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
 });

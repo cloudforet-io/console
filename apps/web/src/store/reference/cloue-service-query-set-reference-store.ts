@@ -16,11 +16,12 @@ import type {
     ReferenceMap,
     ReferenceLoadOptions, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useAuthorizationStore } from '../authorization/authorization-store';
 
 
 type PickedQuerySetModel = Pick<CloudServiceQuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
@@ -31,14 +32,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useCloudServiceQuerySetReferenceStore = defineStore('reference-cloud-service-query-set', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as CloudServiceQuerySetReferenceMap|null,
     });
 
     const getters = reactive({
         cloudServiceQuerySetItems: asyncComputed<CloudServiceQuerySetReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),

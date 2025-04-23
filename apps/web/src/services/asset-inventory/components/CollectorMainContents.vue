@@ -21,11 +21,11 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
@@ -45,7 +45,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
 
 /** * @function
  *   @name makePluginReferenceValueHandler
@@ -82,6 +81,7 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const appContextStore = useAppContextStore();
 const router = useRouter();
 const route = useRoute();
@@ -90,7 +90,6 @@ const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const keyItemSets: KeyItemSet[] = [{
@@ -137,7 +136,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     searchTags: computed(() => {
         const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
         return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {

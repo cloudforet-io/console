@@ -23,10 +23,9 @@ import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -53,7 +52,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -62,7 +61,6 @@ const storeState = reactive({
     namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
@@ -74,7 +72,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),

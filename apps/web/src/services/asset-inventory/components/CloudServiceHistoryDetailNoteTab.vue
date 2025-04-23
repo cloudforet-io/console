@@ -20,9 +20,9 @@ import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list'
 import type { NoteModel } from '@/schema/inventory/note/model';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -30,7 +30,6 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
 
 interface Props {
     recordId: string;
@@ -47,9 +46,7 @@ const emit = defineEmits<{(e: 'refresh-note-count'): void}>();
 const route = useRoute();
 
 const userStore = useUserStore();
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
+const authorizationStore = useAuthorizationStore();
 const state = reactive({
     id: '',
     noteInput: '',
@@ -72,7 +69,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
 });
 
 const handleChangeNoteInput = (e) => {

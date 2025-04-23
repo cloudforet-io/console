@@ -6,11 +6,11 @@ import { defineStore } from 'pinia';
 import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap,
     ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import APIClientManager from '@/lib/config/global-config/api-client-manager';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
@@ -24,7 +24,7 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useServiceReferenceStore = defineStore('reference-service', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const state = reactive({
         items: null as ServiceReferenceMap | null,
@@ -32,7 +32,7 @@ export const useServiceReferenceStore = defineStore('reference-service', () => {
 
     const getters = reactive({
         serviceItems: asyncComputed<ServiceReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

@@ -21,6 +21,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -53,6 +54,7 @@ const dashboardCreatePageStore = useDashboardCreatePageStore();
 const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
+const authorizationStore = useAuthorizationStore();
 const userStore = useUserStore();
 const router = useRouter();
 const {
@@ -60,7 +62,7 @@ const {
 } = useDashboardSharedContext();
 
 const storeState = reactive({
-    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: false,

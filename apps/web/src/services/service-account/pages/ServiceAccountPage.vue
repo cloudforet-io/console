@@ -33,13 +33,13 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -83,6 +83,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -90,7 +91,6 @@ const { referenceFieldFormatter } = useReferenceFieldFormatter();
 
 
 const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
     currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
 });
 const state = reactive({
@@ -107,7 +107,7 @@ const state = reactive({
     selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
     timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     grantLoading: computed(() => appContextStore.getters.globalGrantLoading),
-    currentGrantInfo: computed(() => userStore.state.currentGrantInfo),
+    currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
     isAgentModeAccount: computed(() => state.selectedProvider === 'kubernetes'),
 });
 
@@ -130,7 +130,7 @@ const typeOptionState = reactive({
 });
 
 const tableState = reactive({
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: computed<QuerySearchTableLayout|undefined>(() => (tableState.isTrustedAccount
         ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),

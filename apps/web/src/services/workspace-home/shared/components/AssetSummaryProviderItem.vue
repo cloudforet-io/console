@@ -7,9 +7,8 @@ import { isEmpty } from 'lodash';
 import { PLazyImg, PTextButton } from '@cloudforet/mirinae';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -27,12 +26,10 @@ const props = defineProps<AssetProviderItem>();
 
 const router = useRouter();
 
-const userStore = useUserStore();
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
+const authorizationStore = useAuthorizationStore();
+
 const state = reactive({
-    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
+    accessLink: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
 });
 const handleClickButton = (type: string) => {
     if (!state.accessLink) return;

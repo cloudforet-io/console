@@ -9,15 +9,14 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 export type SecretItem = Required<Pick<ReferenceItem<SecretModel>, 'key'|'label'|'name'>>;
 export type SecretReferenceMap = ReferenceMap<SecretItem>;
@@ -26,14 +25,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useSecretReferenceStore = defineStore('reference-secret', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as SecretReferenceMap | null,
     });
 
     const getters = reactive({
         secretItems: asyncComputed<SecretReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

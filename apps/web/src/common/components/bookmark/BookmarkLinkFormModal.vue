@@ -15,7 +15,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -47,14 +47,14 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const emit = defineEmits<{(e: 'confirm', selectedFolder?: BookmarkItem, scope?: BookmarkType): void; }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
