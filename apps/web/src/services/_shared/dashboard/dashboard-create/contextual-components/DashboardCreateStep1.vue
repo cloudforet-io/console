@@ -53,7 +53,7 @@ const state = reactive({
     }])),
     ootbTemplateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         const results: TreeNode<DashboardTreeDataType>[] = [];
-        const _filteredTemplates = getFilteredTemplates(dashboardTemplateQuery.data.value || [], filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        const _filteredTemplates = getFilteredTemplates(dashboardTemplateQuery.data?.value || [], filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
         _filteredTemplates.forEach((d) => {
             results.push({
                 id: d.template_id,
@@ -69,7 +69,7 @@ const state = reactive({
         return results;
     }),
     allExistingLabels: computed<string[]>(() => {
-        const _ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
+        const _ootbTemplates = getFilteredTemplates(dashboardTemplateQuery.data?.value || [], '', [], []);
         const _existingTemplates = getFilteredTemplates(props.dashboardItems, '', [], []);
 
         const _ootbLabels = flatMapDeep(_ootbTemplates.map((d) => d.labels ?? []));
@@ -88,8 +88,8 @@ const filterState = reactive({
 const getFilteredTemplates = (
     dashboards: Array<DashboardModel|DashboardTemplateModel>,
     inputValue: string,
-    selectedLabels: FilterLabelItem[],
-    selectedProviders: FilterLabelItem[],
+    selectedLabels: string[],
+    selectedProviders: string[],
 ): Array<DashboardModel|DashboardTemplateModel> => {
     const _inputValue = inputValue.toLowerCase();
     const _selectedLabels = selectedLabels;
@@ -153,6 +153,7 @@ const handleClickCancel = () => {
                 <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
                                        :dashboard-tree-data="state.ootbTemplateTreeData"
                                        :show-single-control-buttons="false"
+                                       :search-text="filterState.inputValue"
                                        show-all
                                        disable-link
                                        disable-favorite
