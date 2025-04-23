@@ -1,16 +1,24 @@
-import type { RouteConfig } from 'vue-router';
-
-import type { FeatureConfiguratorType, FeatureMenuConfig, FeatureUiAffect } from '@/lib/config/global-config/types/type';
+import type {
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import costExplorerRoutes from '@/services/cost-explorer/routes/routes';
 
-class CostExplorerConfigurator implements FeatureConfiguratorType {
-    private version: 'V1' | 'V2' = 'V1';
+class CostExplorerConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
 
-    readonly uiAffect: FeatureUiAffect[] = [
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [
         {
             feature: 'ALERT_MANAGER',
             affects: [
@@ -22,16 +30,20 @@ class CostExplorerConfigurator implements FeatureConfiguratorType {
         },
     ];
 
-    initialize(version: 'V1' | 'V2'): void {
+
+    initialize(version: FeatureVersion): void {
         this.version = version;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    getRoutes(isAdmin?: boolean): RouteConfig | null {
-        return isAdmin ? adminCostExplorerRoutes : costExplorerRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: costExplorerRoutes,
+            adminRoutes: adminCostExplorerRoutes,
+            version: this.version,
+        };
     }
 
-    getMenu(): FeatureMenuConfig {
+    getMenu(): GeneratedMenuConfig {
         const baseMenu: Menu = {
             id: MENU_ID.COST_EXPLORER,
             needPermissionByRole: true,
@@ -60,6 +72,22 @@ class CostExplorerConfigurator implements FeatureConfiguratorType {
             },
             version: this.version,
         };
+    }
+
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 

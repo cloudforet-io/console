@@ -2,7 +2,7 @@
 
 import { computed, reactive } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -17,7 +17,8 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -47,13 +48,20 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     widget,
-    dataTableList,
-    fetcher,
-    keys,
-    queryClient,
-} = useWidgetFormQuery({
+    fetcher: widgetFetcher,
+    keys: widgetKeys,
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const {
+    dataTableList,
+    keys: dataTableKeys,
+    fetcher: dataTableFetcher,
+} = useWidgetDataTableListQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const queryClient = useQueryClient();
+
 
 const storeState = reactive({
     currentDataTable: computed(() => dataTableList.value.find((dataTable) => dataTable.data_table_id === props.dataTableId)),
@@ -79,7 +87,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
     const _widgetOptions = cloneDeep(widget.value?.options);
     const sanitizedOptions = sanitizeWidgetOptions(_widgetOptions, widget.value?.widget_type, storeState.currentDataTable);
     await updateWidget({
-        widget_id: widgetGenerateState.widgetId,
+        widget_id: widgetGenerateState.widgetId as string,
         state: 'INACTIVE',
         options: sanitizedOptions,
     });
@@ -121,11 +129,11 @@ const handleClickNameConfirm = async () => {
 
 /* Api */
 const { mutateAsync: updateWidget } = useMutation({
-    mutationFn: fetcher.updateWidgetFn,
+    mutationFn: widgetFetcher.updateWidgetFn,
     onSuccess: (data) => {
         const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? keys.privateWidgetQueryKey
-            : keys.publicWidgetQueryKey;
+            ? widgetKeys.privateWidgetGetQueryKey
+            : widgetKeys.publicWidgetGetQueryKey;
         queryClient.setQueryData(widgetQueryKey.value, () => data);
     },
     onError: (e) => {
@@ -134,7 +142,7 @@ const { mutateAsync: updateWidget } = useMutation({
     },
 });
 const { mutate: updateDataTable } = useMutation({
-    mutationFn: fetcher.updateDataTableFn,
+    mutationFn: dataTableFetcher.updateDataTableFn,
     onSuccess: async (data) => {
         await syncDataTableList(data);
         showSuccessMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.DATA_TABLE_NAME_SUCCESS'), '');
@@ -147,7 +155,7 @@ const { mutate: updateDataTable } = useMutation({
 });
 const syncDataTableList = async (data: DataTableModel) => {
     const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
-    const dataTableListQueryKey = _isPrivate ? keys.privateDataTableListQueryKey : keys.publicDataTableListQueryKey;
+    const dataTableListQueryKey = _isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
     await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
         if (oldData.results) {
             return {
@@ -206,10 +214,10 @@ const syncDataTableList = async (data: DataTableModel) => {
                  height="1.25rem"
             />
             <p-tooltip class="data-table-name"
-                       :contents="storeState.currentDataTable.name"
+                       :contents="storeState.currentDataTable?.name"
             >
                 <p>
-                    {{ storeState.currentDataTable.name }}
+                    {{ storeState.currentDataTable?.name }}
                 </p>
             </p-tooltip>
             <p-icon-button class="edit-button"

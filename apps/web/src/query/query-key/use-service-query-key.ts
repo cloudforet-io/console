@@ -47,30 +47,31 @@ type ContextKeyType = string|unknown[]|object;
 
 type UseServiceQueryKeyResult<T extends object = object> = {
     key: ComputedRef<QueryKeyArray>;
-    params: T extends undefined ? undefined : Readonly<T>;
+    params: ComputedRef<T>;
     withSuffix: (arg: ContextKeyType) => QueryKeyArray;
 };
 
-export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
+export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
     service: S,
     resource: R,
     verb: V,
     options: UseServiceQueryKeyOptions<T> = {},
 ): UseServiceQueryKeyResult<T> => {
+    const { params, contextKey } = options;
+
     // Runtime validation for development environment
     if (import.meta.env.DEV) {
         if (!service || !resource || !verb) {
             console.warn('Required parameters (service, resource, verb) must be provided');
         }
-        if (options.params) {
-            const rawParams = toValue(options.params);
+        if (params) {
+            const rawParams = toValue(params);
             if (rawParams === null || typeof rawParams !== 'object') {
                 console.warn('params must be a non-null object');
             }
         }
     }
 
-    const { params, contextKey } = options;
     const queryKeyAppContext = useQueryKeyAppContext();
 
 
@@ -83,7 +84,6 @@ export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceNam
 
     const queryKey = computed(() => {
         const resolvedParams = toValue(params);
-
         return [
             ...queryKeyAppContext.value,
             service, resource, verb,
@@ -101,9 +101,10 @@ export const _useServiceQueryKey = <S extends ServiceName, R extends ResourceNam
     const suffixCache = new WeakMap<object, QueryKeyArray>();
     return {
         key: queryKey,
-        params: params
-            ? Object.freeze(toValue(params)) as Readonly<T>
-            : undefined,
+        params: computed(() => {
+            const resolvedParams = toValue(params);
+            return createImmutableObjectKeyItem(resolvedParams);
+        }),
         withSuffix: (arg) => {
             if (typeof arg === 'object' && arg !== null) {
                 const cached = suffixCache.get(arg);

@@ -34,6 +34,8 @@ import { SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/sc
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -46,7 +48,6 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { green, red } from '@/styles/colors';
 
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { getAccountFields, stateFormatter } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
@@ -67,6 +68,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
@@ -142,6 +145,7 @@ const getAttachedGeneralAccountList = async () => {
         state.loading = false;
     }
 };
+const getProjectDetailLocation = (id: string) => getReferenceLocation(id, { resource_type: 'identity.Project' });
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
@@ -358,9 +362,9 @@ watch(() => state.trustedAccountId, async (ta) => {
                               class="capitalize"
                     />
                 </template>
-                <template #col-project_id-format="{value, item}">
+                <template #col-project_id-format="{value}">
                     <span class="project-id-wrapper">
-                        <router-link :to="{ name: PROJECT_ROUTE_V1.DETAIL._NAME, params: { id: value, workspaceId: item.workspace_id } }"
+                        <router-link :to="getProjectDetailLocation(value)"
                                      target="_blank"
                         >
                             <span>{{ state.project[value]?.label }}</span>

@@ -2,18 +2,14 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import {
     PDataTable, PI, PButtonModal, PRadioGroup, PRadio, PFieldGroup,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { PublicDashboardShareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/share';
-import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/unshare';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import type { PublicFolderShareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/share';
-import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/unshare';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
@@ -26,8 +22,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useDashboardFolderShareMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-folder-share-mutation';
+import { useDashboardShareMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-share-mutation';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
@@ -50,17 +50,20 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void,
 }>();
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
+const dashboardTreeControlStore = useDashboardTreeControlStore();
 
 /* Query */
 const {
     publicDashboardList,
     privateDashboardList,
+    keys: dashboardKeys,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-    api,
-    keys,
-    queryClient,
-} = useDashboardQuery();
+    keys: folderKeys,
+} = useDashboardFolderQuery();
+const queryClient = useQueryClient();
 
 const queryState = reactive({
     publicDashboardItems: computed(() => {
@@ -182,23 +185,12 @@ const unshareDashboard = () => {
         dashboard_id: props.dashboardId || '',
     });
 };
-const folderSharefetcher = (params: PublicFolderShareParameters|PublicFolderUnshareParameters) => {
-    if (!state.isShared) {
-        return api.publicFolderAPI.share(params as PublicFolderShareParameters);
-    }
-    return api.publicFolderAPI.unshare(params as PublicFolderUnshareParameters);
-};
-const dashboardShareFetcher = (params: PublicDashboardShareParameters|PublicDashboardUnshareParameters) => {
-    if (!state.isShared) {
-        return api.publicDashboardAPI.share(params as PublicDashboardShareParameters);
-    }
-    return api.publicDashboardAPI.unshare(params as PublicDashboardUnshareParameters);
-};
 
-const { mutate: folderShareMutate, isPending: folderLoading } = useMutation({
-    mutationFn: folderSharefetcher,
+const { mutate: folderShareMutate, isPending: folderLoading } = useDashboardFolderShareMutation({
+    isShared: computed(() => state.isShared),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: keys.publicFolderListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: folderKeys.publicFolderListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: dashboardKeys.privateDashboardListQueryKey.value });
         if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
         else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
     },
@@ -208,14 +200,16 @@ const { mutate: folderShareMutate, isPending: folderLoading } = useMutation({
     },
     onSettled: () => {
         dashboardPageControlStore.reset();
+        dashboardTreeControlStore.reset();
         state.proxyVisible = false;
     },
 });
 
-const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useMutation({
-    mutationFn: dashboardShareFetcher,
+
+const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useDashboardShareMutation({
+    isShared: computed(() => state.isShared),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: dashboardKeys.publicDashboardListQueryKey.value });
         if (state.isShared) showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_SHARE_DASHBOARD'), '');
         else showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_UNSHARE_DASHBOARD'), '');
     },
@@ -225,6 +219,7 @@ const { mutate: dashboardShareMutate, isPending: dashboardLoading } = useMutatio
     },
     onSettled: () => {
         dashboardPageControlStore.reset();
+        dashboardTreeControlStore.reset();
         state.proxyVisible = false;
     },
 });

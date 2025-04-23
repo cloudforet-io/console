@@ -15,20 +15,20 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 import { useFormValidator } from '@/common/composables/form-validator';
+import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import EscalationPolicyFormRulesInput from '@/services/alert-manager/v1/components/EscalationPolicyFormRulesInput.vue';
 import { ACTION } from '@/services/alert-manager/v1/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/v1/stores/escalation-policy-form-store';
 import type { ActionMode } from '@/services/alert-manager/v1/types/alert-type';
-import type { ProjectTreeNodeData } from '@/services/project/v-shared/types/project-tree-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = withDefaults(defineProps<{
@@ -46,6 +46,9 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const userStore = useUserStore();
+
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
@@ -165,7 +168,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link action-icon="internal-link"
                                  new-tab
-                                 :to="referenceRouter(escalationPolicyFormState.projectId,{
+                                 :to="getReferenceLocation(escalationPolicyFormState.projectId,{
                                      resource_type: 'identity.Project',
                                      workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                                  })"

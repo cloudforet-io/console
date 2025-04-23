@@ -24,4 +24,5 @@ export interface PublicDashboardCreateParameters {
     workspace_id?: string;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id?: string;
+    project_group_id?: string;
 }

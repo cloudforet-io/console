@@ -10,6 +10,9 @@ import type { BudgetGetParameters } from '@/api-clients/cost-analysis/budget/sch
 import type { BudgetSetNotificationParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/set-notification';
 import type { BudgetUpdateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/update';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
+import { i18n } from '@/translations';
+
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -33,24 +36,30 @@ export const useBudgetDetailPageStore = defineStore('page-budget-detail', {
                 this.loading = false;
             }
         },
-        async updateBudgetData(params: { budgetId: string; updateParams: any }): Promise<void> {
+        async updateBudgetData(params: { budgetId: string; updateParams: any }, type: string): Promise<void> {
             try {
                 this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.update<BudgetUpdateParameters, BudgetModel>({
                     ...params.updateParams,
                     budget_id: params.budgetId,
                 });
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
+                    data: type.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
+                }), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, '');
             }
         },
-        async updateBudgetNotifications(params: { budgetId: string; notifications: BudgetModel['notifications'] }): Promise<void> {
+        async updateBudgetNotifications(params: BudgetSetNotificationParameters, type: string): Promise<void> {
             try {
                 this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.setNotification<BudgetSetNotificationParameters, BudgetModel>({
-                    notifications: params.notifications,
-                    budget_id: params.budgetId,
+                    notification: params.notification,
+                    budget_id: params.budget_id,
                 });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, '');
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
+                    data: type.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
+                }), '');
+            } catch (e: any) {
+                showErrorMessage(e.code, e.message);
             }
         },
         async getBudgetUsageData(budgetId: string): Promise<void> {

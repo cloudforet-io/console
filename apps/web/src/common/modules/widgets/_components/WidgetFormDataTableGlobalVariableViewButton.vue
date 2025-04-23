@@ -2,26 +2,21 @@
 
 import { computed, reactive } from 'vue';
 
-
 import { PButton, PPopover, PCopyButton } from '@cloudforet/mirinae';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { getOrderedGlobalVariables } from '@/services/dashboards/helpers/dashboard-global-variables-helper';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+import { getOrderedGlobalVariables } from '@/services/_shared/dashboard/dashboard-detail/helpers/dashboard-global-variables-helper';
 
-const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
-});
+const widgetContextStore = useWidgetContextStore();
+const widgetContextState = widgetContextStore.state;
 
 const state = reactive({
     popperVisible: false,
     variableItems: computed<DashboardGlobalVariable[]>(() => {
-        const _refinedProperties: DashboardGlobalVariable[] = Object.values(dashboard.value?.vars_schema?.properties || {})
+        const _refinedProperties: DashboardGlobalVariable[] = Object.values(widgetContextState.dashboard?.vars_schema?.properties || {})
             .map((property) => ({
                 key: property.key,
                 name: property.name,

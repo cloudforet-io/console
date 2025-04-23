@@ -44,5 +44,5 @@ export const getWidgetLoadApiQuerySort = (xAxisField: string, dataField: string[
     if (isPivot) {
         return [{ key: SUB_TOTAL_NAME, desc: true }];
     }
-    return dataField.map((field) => ({ key: field, desc: true }));
+    return dataField?.map((field) => ({ key: field, desc: true }));
 };

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, defineEmits, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { cloneDeep } from 'lodash';

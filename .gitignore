@@ -13,6 +13,10 @@ node_modules.nosync/
 *.swp
 *.bak
 
+## Cursor rules : Ignore all files in .cursor directory except specific file (rules)
+.cursor/*
+!.cursor/generate-new-api-clients.mdc
+
 # Turborepo
 .turbo
 out/

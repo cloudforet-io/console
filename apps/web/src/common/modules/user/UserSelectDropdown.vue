@@ -52,6 +52,9 @@ const props = withDefaults(defineProps<{
      showCategoryTitle?: boolean;
      placeholder?: string;
      excludedSelectedIds?: string[];
+     size?: 'sm'|'md';
+     pageSize?: number;
+     showDeleteAllButton?: boolean;
 }>(), {
     selectedId: undefined,
     selectedIds: undefined,
@@ -71,6 +74,9 @@ const props = withDefaults(defineProps<{
     showCategoryTitle: true,
     placeholder: 'Select',
     excludedSelectedIds: undefined,
+    size: 'md',
+    pageSize: 10,
+    showDeleteAllButton: true,
 });
 
 const emit = defineEmits<{(event: 'update:selected-id', value?: string): void;
@@ -267,10 +273,9 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
 
 <template>
     <p-select-dropdown class="user-select-dropdown"
-                       page-size="10"
                        show-select-marker
                        is-filterable
-                       show-delete-all-button
+                       :show-delete-all-button="props.showDeleteAllButton"
                        :selected="state.selectedItems"
                        :handler="menuItemsHandler()"
                        :selection-label="props.selectionLabel"
@@ -283,6 +288,8 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
                        :style-type="props.styleType"
                        :placeholder="props.placeholder"
                        :block="props.block"
+                       :size="props.size"
+                       :page-size="props.pageSize"
                        @update:selected="handleUpdateSelectedUserItems"
     >
         <template v-if="props.appearanceType === 'stack'"

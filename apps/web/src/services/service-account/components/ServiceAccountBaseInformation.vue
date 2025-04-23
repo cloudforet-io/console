@@ -79,6 +79,7 @@ const updateServiceAccount = async () => {
         } else {
             await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
                 service_account_id: props.serviceAccountId ?? '',
+                service_account_mgr_id: state.baseInformationForm.serviceAccountManagerId,
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,

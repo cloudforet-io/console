@@ -4,7 +4,6 @@ import {
     computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import type { GaugeSeriesOption } from 'echarts/charts';
 import type {
     EChartsType,
@@ -13,18 +12,14 @@ import { init } from 'echarts/core';
 import { isEmpty, orderBy, throttle } from 'lodash';
 
 
-import type { WidgetLoadParams, WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
+import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import {
-    normalizeAndSerializeVars,
-} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import { getFormattedNumber } from '@/common/modules/widgets/_helpers/widget-helper';
 import type { DataFieldValue } from '@/common/modules/widgets/_widget-fields/data-field/type';
 import type { DateRangeValue } from '@/common/modules/widgets/_widget-fields/date-range/type';
@@ -33,7 +28,6 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { MaxValue } from '@/common/modules/widgets/_widget-fields/max/type';
 import type { MinValue } from '@/common/modules/widgets/_widget-fields/min/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     WidgetProps, WidgetEmit,
     WidgetExpose,
@@ -46,11 +40,9 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
-
-const { keys, api } = useWidgetFormQuery({
-    widgetId: computed(() => props.widgetId),
-    preventLoad: true,
-});
+const { data: dataTable, isFetching: dataTableLoading } = useWidgetDataTableQuery(
+    computed(() => props.dataTableId),
+);
 
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
@@ -59,13 +51,12 @@ const { dateRange } = useWidgetDateRange({
 });
 const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
-    dataTable: undefined as DataTableModel|undefined,
 
     unit: computed<string|undefined>(() => {
         if (!widgetOptionsState.dataFieldInfo?.data) return undefined;
         return widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo.data as string];
     }),
-    data: computed<WidgetLoadResponse | null>(() => queryResult?.data?.value || null),
+    data: computed<WidgetLoadResponse | null>(() => loadQuery.data?.value || null),
     chart: null as EChartsType | null,
     chartData: undefined as undefined|number,
     chartOptions: computed<{series: GaugeSeriesOption[]}>(() => ({
@@ -129,7 +120,6 @@ const state = reactive({
         });
         return _color;
     }),
-    dataTableLoading: false,
 });
 
 const widgetOptionsState = reactive({
@@ -143,47 +133,26 @@ const widgetOptionsState = reactive({
 
 
 /* Api */
-const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResponse> => {
-    const defaultFetcher = state.isPrivateWidget
-        ? api.privateWidgetAPI.load
-        : api.publicWidgetAPI.load;
-    const res = await defaultFetcher(params);
-    return res;
-};
-
-const queryKey = computed(() => [
-    ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-    props.dashboardId,
-    props.widgetId,
-    props.widgetName,
-    {
-        start: dateRange.value.start,
-        end: dateRange.value.end,
-        granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: props.dataTableId,
-        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
-        vars: normalizeAndSerializeVars(props.dashboardVars),
-    },
-]);
-
-const queryResult = useQuery({
-    queryKey,
-    queryFn: () => fetchWidgetData({
+const loadQuery = useWidgetLoadQuery({
+    widgetId: computed(() => props.widgetId),
+    params: computed(() => ({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
         start: dateRange.value.start,
         end: dateRange.value.end,
         vars: props.dashboardVars,
-    }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
-    staleTime: WIDGET_LOAD_STALE_TIME,
+    })),
+    additionalDeps: computed(() => ({
+        widgetName: props.widgetName,
+        dataTableId: props.dataTableId,
+    })),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isFetching.value || state.dataTableLoading);
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || dataTableLoading.value);
 const errorMessage = computed<string|undefined>(() => {
-    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
-    return queryResult.error?.value?.message;
+    if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
+    return loadQuery.error?.value?.message as string;
 });
 
 /* Util */
@@ -205,27 +174,14 @@ watch([() => state.chartData, () => chartContext.value, () => props.widgetOption
         state.chart.setOption(state.chartOptions, true);
     }
 });
-watch([() => state.data, () => props.widgetOptions, () => state.dataTable], ([newData,, _dataTable]) => {
+watch([() => state.data, () => props.widgetOptions, dataTable], ([newData,, _dataTable]) => {
     if (!_dataTable) return;
     drawChart(newData);
 }, { immediate: true });
-watch(() => props.dataTableId, async (newDataTableId) => {
-    if (!newDataTableId) return;
-    state.dataTableLoading = true;
-    const fetcher = state.isPrivateWidget
-        ? api.privateDataTableAPI.get
-        : api.publicDataTableAPI.get;
-    try {
-        state.dataTable = await fetcher({ data_table_id: newDataTableId });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.dataTableLoading = false;
-    }
-}, { immediate: true });
+
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResult.refetch();
+        loadQuery.refetch();
     },
 });
 onMounted(() => {

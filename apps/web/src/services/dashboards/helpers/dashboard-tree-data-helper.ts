@@ -8,73 +8,58 @@ import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import type { DashboardTreeDataType, DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
 
 
-export const getDashboardTreeData = (folderList: FolderModel[], dashboardList: DashboardModel[], newIdList?: string[]): TreeNode<DashboardTreeDataType>[] => {
-    const nodes: Record<string, TreeNode<DashboardTreeDataType>> = {};
-    folderList.forEach((d) => {
-        nodes[d.folder_id] = {
-            id: d.folder_id,
+export const getDashboardTreeData = (
+    folderList: FolderModel[],
+    dashboardList: DashboardModel[],
+    newIdList?: string[],
+): TreeNode<DashboardTreeDataType>[] => {
+    const folderNodeMap: Record<string, TreeNode<DashboardTreeDataType>> = {};
+    const rootNodes: TreeNode<DashboardTreeDataType>[] = [];
+
+    folderList.forEach((folder) => {
+        const folderNode: TreeNode<DashboardTreeDataType> = {
+            id: folder.folder_id,
             depth: 0,
             data: {
-                name: d.name,
+                id: folder.folder_id,
+                name: folder.name,
                 type: 'FOLDER',
-                id: d.folder_id,
-                shared: d?.shared,
-                scope: d?.scope,
-                projectId: d?.project_id,
-                workspaceId: d?.workspace_id,
-                createdBy: d.tags?.created_by,
-                isNew: newIdList?.includes(d.folder_id),
+                createdBy: folder.tags?.created_by,
+                isNew: newIdList?.includes(folder.folder_id),
+                ...folder,
             },
             children: [],
         };
-    });
-    dashboardList.forEach((d) => {
-        nodes[d.dashboard_id] = {
-            id: d.dashboard_id,
-            depth: 0,
-            data: {
-                name: d.name,
-                id: d.dashboard_id,
-                type: 'DASHBOARD',
-                folderId: d.folder_id,
-                shared: d?.shared,
-                scope: d?.scope,
-                projectId: d?.project_id,
-                workspaceId: d?.workspace_id,
-                userId: d?.user_id,
-                createdBy: d.tags?.created_by,
-                isNew: newIdList?.includes(d.dashboard_id),
-                labels: d?.labels,
-            },
-        };
+        folderNodeMap[folder.folder_id] = folderNode;
+        rootNodes.push(folderNode);
     });
 
-    const rootNodes: TreeNode<DashboardTreeDataType>[] = [];
-    const setDepth = (node, depth) => {
-        node.depth = depth;
-        if (!node.children) return;
-        node.children.forEach((child) => {
-            setDepth(child, depth + 1);
-        });
-    };
-    Object.values(nodes).forEach((node) => {
-        const folderId = node.data?.folderId;
-        if (!folderId) {
-            rootNodes.push(node);
-            setDepth(node, 0);
+    dashboardList.forEach((dashboard) => {
+        const dashboardNode: TreeNode<DashboardTreeDataType> = {
+            id: dashboard.dashboard_id,
+            depth: 0,
+            data: {
+                id: dashboard.dashboard_id,
+                name: dashboard.name,
+                type: 'DASHBOARD',
+                createdBy: dashboard.tags?.created_by,
+                isNew: newIdList?.includes(dashboard.dashboard_id),
+                ...dashboard,
+            },
+        };
+
+        const folderNode = dashboard.folder_id ? folderNodeMap[dashboard.folder_id] : undefined;
+
+        if (folderNode) {
+            dashboardNode.depth = 1;
+            folderNode.children.push(dashboardNode);
         } else {
-            const parentNode = nodes[folderId];
-            if (parentNode) {
-                parentNode.children = parentNode.children || [];
-                parentNode.children.push(node);
-                setDepth(node, parentNode.depth + 1);
-            }
+            rootNodes.push(dashboardNode);
         }
     });
 
     return rootNodes;
 };
-
 export const getSelectedDataTableItems = (folderItems: FolderModel[], dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): DashboardDataTableItem[] => {
     const _results: DashboardDataTableItem[] = [];
     const _selectedIdList: string[] = Object.keys(selectedIdMap).filter((key) => selectedIdMap[key]);
@@ -123,7 +108,7 @@ export const getSelectedDataTableItems = (folderItems: FolderModel[], dashboardI
     return _results;
 };
 
-export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], selectedIdMap: Record<string, boolean>): boolean => {
+export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], folderItems: FolderModel[], selectedIdMap: Record<string, boolean>, isProject = false): boolean => {
     const _selectedIdList: string[] = Object.entries(selectedIdMap).filter(([, isSelected]) => isSelected).map(([id]) => id);
     if (_selectedIdList.length === 0) return true;
     let result = false;
@@ -131,15 +116,15 @@ export const isPublicControlButtonDisabled = (dashboardItems: DashboardModel[], 
         if (result) return;
         const _isFolder = id.includes('folder');
         if (_isFolder) {
-            const _childrenDashboards = dashboardItems.filter((d) => d.folder_id === id);
-            _childrenDashboards?.forEach((child) => {
-                if (child?.shared && child?.scope === 'WORKSPACE') {
-                    result = true;
-                }
-            });
+            const _folder = folderItems.find((f) => f.folder_id === id);
+            if (isProject) result = !!_folder?.shared;
+            else if (_folder?.shared && _folder?.scope === 'WORKSPACE') {
+                result = true;
+            }
         } else {
             const _dashboard = dashboardItems.find((d) => d.dashboard_id === id);
-            if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
+            if (isProject) result = !!_dashboard?.shared;
+            else if (_dashboard?.shared && _dashboard?.scope === 'WORKSPACE') {
                 result = true;
             }
         }

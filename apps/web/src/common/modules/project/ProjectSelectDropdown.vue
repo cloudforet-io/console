@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -17,16 +18,16 @@ import type { ReferenceMap } from '@/store/reference/type';
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { indigo, peacock } from '@/styles/colors';
-
-import type { ProjectTreeOptions } from '@/services/project/v-shared/composables/use-project-tree';
-import { useProjectTree } from '@/services/project/v-shared/composables/use-project-tree';
 import type {
     ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
     ProjectTreeNode,
-} from '@/services/project/v-shared/types/project-tree-type';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+} from '@/common/modules/project/project-tree-type';
+import type { ProjectTreeOptions } from '@/common/modules/project/use-project-tree';
+import { useProjectTree } from '@/common/modules/project/use-project-tree';
+
+import { indigo, peacock } from '@/styles/colors';
+
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 interface ProjectGroupSelectOptions {
     id: string;
@@ -44,7 +45,7 @@ interface Props {
     useFixedMenuStyle?: boolean;
     projectGroupSelectOptions?: ProjectGroupSelectOptions;
     position?: 'left' | 'right';
-    selectionLabel?: string;
+    selectionLabel?: TranslateResult;
     hideCreateButton?: boolean;
     workspaceId?: string;
     isInitSelectedItem?: boolean;
@@ -52,6 +53,7 @@ interface Props {
     styleType?: string;
     appearanceType?: 'stack'|'badge';
     showDeleteAllButton?: boolean;
+    showDropdownLeftArea?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -72,6 +74,7 @@ const props = withDefaults(defineProps<Props>(), {
     styleType: undefined,
     appearanceType: undefined,
     showDeleteAllButton: undefined,
+    showDropdownLeftArea: false,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -80,6 +83,7 @@ const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -253,7 +257,7 @@ const refreshProjectTree = async () => {
 
 const handleClickCreateButton = () => {
     window.open(SpaceRouter.router.resolve({
-        name: PROJECT_ROUTE_V1._NAME,
+        name: PROJECT_ROUTE_V2._NAME,
         ...(props.workspaceId ? { params: { workspaceId: props.workspaceId } } : {}),
     }).href);
     state.visibleMenu = false;
@@ -319,6 +323,14 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
+            <template v-if="props.showDropdownLeftArea"
+                      #dropdown-left-area
+            >
+                <p-i name="ic_project"
+                     width="1rem"
+                     height="1rem"
+                />
+            </template>
             <template #menu-no-data-format>
                 <div />
             </template>

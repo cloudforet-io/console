@@ -3,8 +3,8 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { useQuery } from '@tanstack/vue-query';
 import bytes from 'bytes';
 import { sortBy } from 'lodash';
 
@@ -24,23 +24,21 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useDataTableLoadQuery } from '@/common/modules/widgets/_composables/use-data-table-load-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { REFERENCE_FIELD_MAP, WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import {
-    normalizeAndSerializeVars,
-} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
 import { sortWidgetTableFields } from '@/common/modules/widgets/_helpers/widget-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, white } from '@/styles/colors';
 
+import { useDashboardRefinedVars } from '@/services/_shared/dashboard/dashboard-detail/contextual-composables/use-dashboard-refined-vars';
 import { SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 
 
@@ -57,19 +55,15 @@ type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const route = useRoute();
+const dashboardId = computed(() => route.params.dashboardId);
+const { refinedVars } = useDashboardRefinedVars(dashboardId);
 
 /* Query */
 const {
     dataTableList,
-    api,
-    keys,
-} = useWidgetFormQuery({
+} = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
-});
-const { dashboard } = useDashboardDetailQuery({
-    dashboardId: computed(() => dashboardDetailState.dashboardId),
 });
 
 const storeState = reactive({
@@ -252,50 +246,16 @@ const getSortIcon = (field: PreviewTableField) => {
     // return '';
 };
 
-// const getTimeDiffSubText = (field: PreviewTableField): string => {
-//     if (!state.dataInfo?.[field.name]) return '';
-//     const { timediff } = state.dataInfo[field.name];
-//     if (!timediff || !Object.entries(timediff ?? {}).length) return '';
-//     const [key, value] = Object.entries(timediff)[0];
-//     return `( ${value} ${key} )`;
-// };
-
-const fetchWidgetData = async (params: DataTableLoadParameters): Promise<DataTableLoadResponse> => {
-    const defaultFetcher = state.isPrivate
-        ? api.privateDataTableAPI.load
-        : api.publicDataTableAPI.load;
-    const res = await defaultFetcher(params);
-    return res;
-};
-
-const queryKey = computed(() => [
-    ...(state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
-    storeState.selectedDataTableId,
-    {
-        granularity: state.selectedGranularity,
-        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.selectedDataTable?.options),
-        // dataTables: normalizeAndSerializeDataTableOptions((dataTableList.value || []).map((d) => d?.options || {})),
-        sortBy: state.sortBy,
-        thisPage: state.thisPage,
-        pageSize: state.pageSize,
-        vars: normalizeAndSerializeVars(dashboard.value?.vars ?? {}),
-    },
-]);
-
-const queryResult = useQuery({
-    queryKey,
-    queryFn: () => fetchWidgetData({
-        data_table_id: storeState.selectedDataTableId,
+const queryResult = useDataTableLoadQuery({
+    dataTableId: computed(() => storeState.selectedDataTableId),
+    params: computed<DataTableLoadParameters>(() => ({
+        data_table_id: storeState.selectedDataTableId as string,
         granularity: state.selectedGranularity,
         sort: state.sortBy,
         page: state.page,
-        vars: dashboard.value?.vars,
-    }),
-    enabled: computed(() => storeState.selectedDataTableId !== undefined && state.selectedDataTable !== undefined),
-    staleTime: WIDGET_LOAD_STALE_TIME,
-    retry: 2,
+        vars: refinedVars.value,
+    })),
 });
-
 const dataTableLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isFetching.value);
 const isError = computed<boolean>(() => queryResult.isError.value);
 const errorMessage = computed<string>(() => queryResult.error?.value?.message);

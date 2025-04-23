@@ -1,89 +1,117 @@
 <script setup lang="ts">
-import { computed, onUnmounted, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { computed, onUnmounted, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
-import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { i18n } from '@/translations';
 
+import { MENU_ID } from '@/lib/menu/config';
+
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import ProjectFormModal from '@/services/project/v-shared/components/ProjectFormModal.vue';
-import ProjectMainProjectGroupFormModal from '@/services/project/v-shared/components/ProjectMainProjectGroupFormModal.vue';
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
-import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
+import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import ProjectLSB from '@/services/project/v2/ProjectLSB.vue';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 
+/* project list store */
+const projectListStore = useProjectListStore();
+const projectMap = computed(() => projectListStore.projectMap);
+const projectGroupMap = computed(() => projectListStore.projectGroupMap);
 
-
+/* routed project or project group */
 const route = useRoute();
-const router = useRouter();
-const gnbStore = useGnbStore();
-const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
-const projectTreeStore = useProjectTreeStore();
+const { projectGroupId, projectId } = useProjectOrGroupId(computed(() => route.params.projectGroupOrProjectId));
 
-const state = reactive({
-    currentProjectGroupId: computed(() => route.params.projectGroupId),
-    // TODO: check route
-    isProjectRootPage: computed(() => route.name === PROJECT_ROUTE_V2._NAME && !state.currentProjectGroupId),
+/* selected paths */
+const parentIds = computed<string[]>(() => {
+    const pids: string[] = [];
+    let currentGroupId: string|undefined;
+    if (projectId.value) currentGroupId = projectMap.value[projectId.value]?.data.groupInfo?.id;
+    else currentGroupId = projectGroupId.value;
+    while (currentGroupId) {
+        pids.unshift(currentGroupId);
+        currentGroupId = projectGroupMap.value[currentGroupId]?.data.parentGroupInfo?.id;
+    }
+    return pids;
+});
+const selectedPaths = computed<string[]>(() => {
+    const paths = parentIds.value.slice();
+    if (projectId.value) paths.push(projectId.value);
+    return paths;
 });
 
-/* Event */
-const handleUpdateProjectFormModalVisible = (visible: boolean) => {
-    projectPageStore.setProjectFormModalVisible(visible);
-    if (projectPageState.currentSelectedProjectId && !visible) {
-        projectPageStore.setCurrentSelectedProjectId(undefined);
-        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
+/* breadcrumbs */
+const gnbStore = useGnbStore();
+const projectGroupBreadcrumbs = computed<Breadcrumb[]>(() => {
+    const breadcrumbs: Breadcrumb[] = [
+        { name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE_V2._NAME } },
+    ];
+    breadcrumbs.push(...parentIds.value.map((id) => ({
+        name: projectGroupMap.value[id]?.name ?? id,
+        to: {
+            name: PROJECT_ROUTE_V2._NAME,
+            params: {
+                projectGroupOrProjectId: id,
+            },
+        },
+    })));
+    if (projectId.value) {
+        breadcrumbs.push({
+            name: projectMap.value[projectId.value]?.name ?? projectId.value,
+            to: {
+                name: PROJECT_ROUTE_V2._NAME,
+                params: {
+                    projectGroupOrProjectId: projectId.value,
+                },
+            },
+        });
     }
-};
-const handleUpdateProjectGroupFormModalVisible = (visible: boolean) => {
-    projectPageStore.setProjectGroupFormVisible(visible);
-    if (projectPageState.currentSelectedProjectGroupId && !visible) {
-        projectPageStore.setCurrentSelectedProjectGroupId(undefined);
-        projectPageStore.setProjectGroupFormUpdateMode(false);
+    return breadcrumbs;
+});
+const favoriteOptions = computed<FavoriteOptions>(() => {
+    if (projectId.value) {
+        return {
+            type: FAVORITE_TYPE.PROJECT,
+            id: projectId.value,
+        };
     }
-};
-const refreshProejctTree = () => {
-    projectTreeStore.refreshProjectTree();
-};
-
-const handleConfirmProjectFormModal = (isCreating: boolean, result: ProjectModel) => {
-    refreshProejctTree();
-    if (isCreating && !result.project_group_id && !state.isProjectRootPage) {
-        // TODO: check route
-        router.push({ name: PROJECT_ROUTE_V2._NAME });
+    if (projectGroupId.value) {
+        return {
+            type: FAVORITE_TYPE.PROJECT_GROUP,
+            id: projectGroupId.value,
+        };
     }
-};
-const handleConfirmProjectGroupFormModal = (isCreating: boolean, result: ProjectGroupModel) => {
-    refreshProejctTree();
-    if (isCreating && !result.parent_group_id && !state.isProjectRootPage) {
-        // TODO: check route
-        router.push({ name: PROJECT_ROUTE_V2._NAME });
-    }
-};
-
-/* Lifecycle */
+    return {
+        type: FAVORITE_TYPE.MENU,
+        id: MENU_ID.PROJECT,
+    };
+});
+watch(projectGroupBreadcrumbs, (bc) => {
+    gnbStore.setBreadcrumbs(bc);
+    gnbStore.setFavoriteItemId(favoriteOptions.value);
+});
 onUnmounted(() => {
     gnbStore.initState();
-    projectPageStore.reset();
 });
 </script>
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lsbVisible">
+        <vertical-page-layout v-if="route.meta?.lsbVisible">
             <template #sidebar>
-                <project-l-s-b />
+                <project-l-s-b :selected-paths="selectedPaths" />
             </template>
             <template #default>
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-else-if="$route.meta.centeredLayout"
+        <centered-page-layout v-else-if="route.meta?.centeredLayout"
                               has-nav-bar
         >
             <router-view />
@@ -91,20 +119,5 @@ onUnmounted(() => {
         <general-page-layout v-else>
             <router-view />
         </general-page-layout>
-        <project-form-modal v-if="projectPageState.projectFormModalVisible"
-                            :visible="projectPageState.projectFormModalVisible"
-                            :project-id="projectPageState.currentSelectedProjectId"
-                            :project-group-id="projectPageState.currentSelectedProjectGroupId"
-                            @update:visible="handleUpdateProjectFormModalVisible"
-                            @confirm="handleConfirmProjectFormModal"
-        />
-        <project-main-project-group-form-modal v-if="projectPageState.projectGroupFormVisible"
-                                               :visible="projectPageState.projectGroupFormVisible"
-                                               :update-mode="projectPageState.projectGroupFormUpdateMode"
-                                               :parent-group-id="projectPageState.currentSelectedProjectGroupId"
-                                               :project-group-id="projectPageState.currentSelectedProjectGroupId || state.currentProjectGroupId"
-                                               @update:visible="handleUpdateProjectGroupFormModalVisible"
-                                               @confirm="handleConfirmProjectGroupFormModal"
-        />
     </fragment>
 </template>

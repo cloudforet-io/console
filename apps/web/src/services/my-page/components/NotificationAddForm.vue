@@ -15,7 +15,7 @@ import type { ChannelSchedule } from '@/schema/notification/type';
 import type { UserChannelCreateParameters as UserChannelCreateParametersV1 } from '@/schema/notification/user-channel/api-verbs/create';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -38,10 +38,10 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleUserNotification ?? false),
+    visibleUserNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
     isDataValid: false,
     notificationLevel: 'LV1' as NotificationLevel,
     //

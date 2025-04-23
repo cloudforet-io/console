@@ -4,7 +4,7 @@ import {
     describe, it, expect, vi,
 } from 'vitest';
 
-import { _useServiceQueryKey } from '../use-service-query-key';
+import { useServiceQueryKey } from '../use-service-query-key';
 
 // Mock useQueryKeyAppContext
 vi.mock('@/query/query-key/_composable/use-app-context-query-key', () => ({
@@ -13,9 +13,9 @@ vi.mock('@/query/query-key/_composable/use-app-context-query-key', () => ({
     }),
 }));
 
-describe('_useServiceQueryKey', () => {
+describe('useServiceQueryKey', () => {
     it('should generate correct query key structure for basic usage', () => {
-        const { key } = _useServiceQueryKey(
+        const { key } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'list',
@@ -40,7 +40,7 @@ describe('_useServiceQueryKey', () => {
     });
 
     it('should generate correct query key structure with contextKey', () => {
-        const { key } = _useServiceQueryKey(
+        const { key } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
@@ -69,7 +69,7 @@ describe('_useServiceQueryKey', () => {
         const params = computed(() => ({ id: 'table-123' }));
         const contextKey = computed(() => 'table-123');
 
-        const { key } = _useServiceQueryKey(
+        const { key } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
@@ -95,7 +95,7 @@ describe('_useServiceQueryKey', () => {
     });
 
     it('should handle function getters correctly', () => {
-        const { key } = _useServiceQueryKey(
+        const { key } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
@@ -124,14 +124,14 @@ describe('_useServiceQueryKey', () => {
         const params = computed(() => ({ id: 'table-123' }));
         const contextKey = computed(() => 'table-123');
 
-        const { key: key1 } = _useServiceQueryKey(
+        const { key: key1 } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
             { contextKey, params },
         );
 
-        const { key: key2 } = _useServiceQueryKey(
+        const { key: key2 } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'get',
@@ -155,7 +155,7 @@ describe('_useServiceQueryKey', () => {
     });
 
     it('should handle withSuffix correctly', () => {
-        const { withSuffix } = _useServiceQueryKey(
+        const { withSuffix } = useServiceQueryKey(
             'dashboard',
             'public-data-table',
             'load',

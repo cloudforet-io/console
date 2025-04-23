@@ -18,9 +18,9 @@ export interface BudgetUsageAnalyzeResult {
     project_id?: string;
     workspace_id?: string;
     data_source_id?: string;
-    provider_filter?: {
-        state?: string;
-        providers?: string[];
-    };
+    // provider_filter?: {
+    //     state?: string;
+    //     providers?: string[];
+    // };
     resource_group: Extract<ResourceGroupType, 'WORKSPACE' | 'PROJECT'>;
 }

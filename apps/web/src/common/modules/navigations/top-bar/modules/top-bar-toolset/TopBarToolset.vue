@@ -7,7 +7,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { useGlobalConfigStore } from '@/store/global-config/global-config-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import TopBarAdminToggleButton from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
@@ -32,13 +32,13 @@ const emit = defineEmits<{(event: 'hide-menu'): void;
 const appContextStore = useAppContextStore();
 const domainStore = useDomainStore();
 const userStore = useUserStore();
-const globalConfigStore = useGlobalConfigStore();
+const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
 const state = reactive({
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
-    visibleAlertIcon: computed(() => globalConfigStore.state.schema.ALERT_MANAGER?.uiAffects?.visibleAlertIcon),
+    visibleAlertIcon: computed(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleAlertIcon),
     tooltipTexts: computed<Record<string, string>>(() => ({
         adminToggle: (state.isAdminMode ? i18n.t('COMMON.GNB.TOOLTIP.EXIT_ADMIN_MODE') : i18n.t('COMMON.GNB.TOOLTIP.ENABLE_ADMIN_MODE')) as string,
     })),

@@ -6,7 +6,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-co
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import type { StarredServiceItem } from '@/services/workspace-home/types/workspace-home-type';
 
 // Bookmark
@@ -28,7 +28,7 @@ export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [
     {
         icon: 'ic_service_project',
         label: i18n.t('MENU.PROJECT'),
-        to: PROJECT_ROUTE_V1._NAME,
+        to: PROJECT_ROUTE_V2._NAME,
     },
     {
         icon: 'ic_service_cloud-service',
@@ -55,16 +55,6 @@ export const WORKSPACE_HOME_DATA_TYPE = {
     BILLING: 'Billing',
 } as const;
 
-export const SUMMARY_DATA_TYPE = {
-    ASSET: 'Asset',
-    COST: 'Cost',
-    ACCOUNT: 'Account',
-} as const;
-export const COST_SUMMARY_STATE_TYPE = {
-    AGGREGATING: 'AGGREGATING',
-    CONFIRM: 'CONFIRM',
-    ESTIMATED: 'ESTIMATED',
-} as const;
 export const SERVICE_ACCOUNT_SUMMARY_STATE_COLOR = {
     ACTIVE: {
         iconColor: styles.green[600],

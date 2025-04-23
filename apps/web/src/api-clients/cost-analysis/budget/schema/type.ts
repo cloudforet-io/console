@@ -1,11 +1,21 @@
 export type BudgetTimeUnit = 'MONTHLY' | 'TOTAL';
-type BudgetNotificationType = 'CRITICAL' | 'WARNING';
-type BudgetNotificationUnit = 'PERCENT' | 'ACTUAL_COST';
+export type BudgetState = 'ACTIVE' | 'SCHEDULED' | 'EXPIRED';
+type BudgetNotificationUnit = 'PERCENT';
+type BudgetNotificationState = 'ENABLED' | 'DISABLED';
 
-export interface BudgetNotification {
+interface BudgetNotificationPlan {
     threshold: number;
     unit: BudgetNotificationUnit;
-    notification_type: BudgetNotificationType;
+}
+
+export interface BudgetNotificationRecipients {
+    users: string[];
+}
+
+export interface BudgetNotification {
+    state: BudgetNotificationState;
+    plans?: BudgetNotificationPlan[];
+    recipients?: BudgetNotificationRecipients;
 }
 
 export interface BudgetPlannedLimit {

@@ -10,12 +10,12 @@ import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import ProjectFormModal from '@/services/project/v-shared/components/ProjectFormModal.vue';
-import ProjectMainProjectGroupFormModal from '@/services/project/v-shared/components/ProjectMainProjectGroupFormModal.vue';
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
-import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
+import ProjectFormModal from '@/services/project/v1/components/ProjectFormModal.vue';
+import ProjectMainProjectGroupFormModal from '@/services/project/v1/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectLSB from '@/services/project/v1/ProjectLSB.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
+import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 
 
 

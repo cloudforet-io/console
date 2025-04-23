@@ -54,6 +54,11 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
             })),
             ...((!options.isTrustedAccount && [
                 {
+                    key: 'service_account_mgr_id',
+                    name: 'Service Account Manager',
+                    type: 'text',
+                },
+                {
                     key: 'state',
                     name: 'State',
                     type: 'text',
@@ -159,6 +164,11 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                         resource_type: 'identity.Project',
                         reference_key: 'project_id',
                     },
+                },
+                {
+                    key: 'service_account_mgr_id',
+                    name: 'Service Account Manager',
+                    type: 'text',
                 },
                 {
                     key: 'state',

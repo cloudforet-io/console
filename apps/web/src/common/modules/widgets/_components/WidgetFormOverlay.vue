@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -21,17 +21,13 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import { UNSUPPORTED_CHARTS_IN_PIVOT } from '@/common/modules/widgets/_constants/widget-constant';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
-
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateGetters = widgetGenerateStore.getters;
 const widgetGenerateState = widgetGenerateStore.state;
@@ -39,14 +35,18 @@ const widgetGenerateState = widgetGenerateStore.state;
 /* Query */
 const {
     widget,
-    dataTableList,
     api,
     keys,
     fetcher,
-    queryClient,
-} = useWidgetFormQuery({
+} = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
+const {
+    dataTableList,
+} = useWidgetDataTableListQuery({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
+const queryClient = useQueryClient();
 
 const state = reactive({
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value?.find((item) => item.data_table_id === widgetGenerateState.selectedDataTableId)),
@@ -95,7 +95,7 @@ const state = reactive({
 /* Api */
 const deleteWidget = async (widgetId: string) => {
     if (!widgetId) return;
-    const isPrivate = dashboardDetailState.dashboardId?.startsWith('private');
+    const isPrivate = widgetId?.startsWith('private');
     const _fetcher = isPrivate
         ? api.privateWidgetAPI.delete
         : api.publicWidgetAPI.delete;

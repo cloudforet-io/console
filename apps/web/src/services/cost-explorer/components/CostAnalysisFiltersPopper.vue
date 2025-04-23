@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { cloneDeep } from 'lodash';
 
@@ -59,6 +60,9 @@ interface VariableOption {
     key: ManagedVariableModelKey;
     dataKey?: string;
 }
+
+const route = useRoute();
+const router = useRouter();
 
 const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
@@ -199,10 +203,21 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: MenuItem[])
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
 
-    costAnalysisPageStore.setFilters({
+    const newFilters = {
         ...costAnalysisPageState.filters,
         [groupBy]: selectedItems.map((d) => d.name as string),
-    });
+    };
+    costAnalysisPageStore.setFilters(newFilters);
+
+    const currentQuery = { ...route.query };
+    if (groupBy === GROUP_BY.PROJECT || groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+        if (selectedItems.length > 0) {
+            currentQuery[groupBy === GROUP_BY.PROJECT ? 'project' : 'service_account_id'] = selectedItems.map((d) => d.name)[0];
+        } else {
+            delete currentQuery[groupBy === GROUP_BY.PROJECT ? 'project' : 'service_account_id'];
+        }
+        router.replace({ query: currentQuery });
+    }
 };
 const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     if (all) {

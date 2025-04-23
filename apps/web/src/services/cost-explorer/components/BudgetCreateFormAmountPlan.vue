@@ -99,7 +99,7 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
     <p-pane-layout class="budget-create-form-amount-plan">
         <p-heading class="pt-8 px-4 pb-4"
                    heading-type="sub"
-                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING')"
+                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BUDGET_DETAILS.TITLE')"
         />
         <div class="p-4">
             <budget-create-period-select

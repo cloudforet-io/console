@@ -11,13 +11,13 @@ import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
 
 import { useDisplayStore } from '@/store/display/display-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
-import { generateRoutes } from '@/lib/config/global-config/generate-routes';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
@@ -41,6 +41,7 @@ const initQueryHelper = () => {
 let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
     const userStore = useUserStore(pinia);
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
     const afterGrantedCallback = () => allReferenceStore.flush();
 
@@ -52,14 +53,13 @@ const initRouter = (domainId?: string) => {
         (route) => route.name === ROOT_ROUTE.WORKSPACE._NAME,
     )?.children;
 
+    const featureRoutes = globalConfigSchemaStore.state.routeSchema;
     if (adminChildren) {
-        const dynamicAdminRoutes = generateRoutes('admin');
-        adminChildren.push(...dynamicAdminRoutes);
+        adminChildren.push(...featureRoutes.adminRoutes);
     }
 
     if (workspaceChildren) {
-        const dynamicWorkspaceRoutes = generateRoutes('workspace');
-        workspaceChildren.push(...dynamicWorkspaceRoutes);
+        workspaceChildren.push(...featureRoutes.routes);
     }
 
     if (!domainId) {
