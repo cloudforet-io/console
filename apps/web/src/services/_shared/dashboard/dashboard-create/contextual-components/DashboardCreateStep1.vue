@@ -153,6 +153,7 @@ const handleClickCancel = () => {
                 <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
                                        :dashboard-tree-data="state.ootbTemplateTreeData"
                                        :show-single-control-buttons="false"
+                                       :search-text="filterState.inputValue"
                                        show-all
                                        disable-link
                                        disable-favorite

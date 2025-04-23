@@ -82,7 +82,7 @@ const state = reactive({
     }),
     // template
     ootbItems: computed<DashboardDataTableItem[]>(() => {
-        const _selectedOotbList = dashboardTemplateQuery.data.value?.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]) || [];
+        const _selectedOotbList = dashboardTemplateQuery.data?.value?.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]) || [];
         return _selectedOotbList.map((d) => ({
             id: d.template_id,
             name: d.name,
@@ -110,7 +110,7 @@ const { key: privateDashboardListQueryKey } = useServiceQueryKey('dashboard', 'p
 
 const createBundleOotb = async () => {
     const _promises: Promise<DashboardModel>[] = [];
-    const _selectedOotbList = dashboardCreatePageState.dashboardTemplates.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]);
+    const _selectedOotbList = dashboardTemplateQuery.data?.value?.filter((d) => dashboardCreatePageState.selectedOotbIdMap[d.template_id]) || [];
     await Promise.allSettled(_selectedOotbList.map(async (ootb) => {
         const _isPrivate = state.privateMap[ootb.template_id];
         const _dashboard = ootb.dashboards[0];
