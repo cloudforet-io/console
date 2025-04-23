@@ -7,7 +7,7 @@ import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-ty
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
-import type { DisplayMenu } from '@/store/menu/type';
+import type { DisplayMenu } from '@/store/display/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';

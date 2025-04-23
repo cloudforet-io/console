@@ -34,6 +34,7 @@ import { useRegionReferenceStore } from '@/store/reference/region-reference-stor
 import { useRoleReferenceStore } from '@/store/reference/role-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import { useServiceReferenceStore } from '@/store/reference/service-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import type { ReferenceLoadOptions } from '@/store/reference/type';
@@ -140,7 +141,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
         metric: computed<MetricReferenceMap>(() => metricReferenceStore.getters.metricItems),
         role: computed(() => roleReferenceStore.getters.roleItems),
-        service: computed(() => serviceReferenceStore.getters.serviceItems),
+        service: computed<ServiceReferenceMap>(() => serviceReferenceStore.getters.serviceItems),
         app: computed(() => appReferenceStore.getters.appItems),
     };
 
