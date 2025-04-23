@@ -4,7 +4,13 @@ import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-
 
 import type { FeatureKeyType } from '@/lib/config/global-config/types/type';
 
-export const useUiAffectsSchema = (featureKey: FeatureKeyType) => {
+import { SERVICE_FEATURES } from '../constants/constants';
+
+export const useGlobalConfigUiAffectsSchema = (featureKey: FeatureKeyType) => {
+    if (!SERVICE_FEATURES[featureKey]) {
+        throw new Error(`Invalid feature key: ${featureKey}`);
+    }
+
     const globalConfigSchemaStore = useGlobalConfigSchemaStore();
 
     return computed(() => globalConfigSchemaStore.state.uiAffectsSchema[featureKey]);

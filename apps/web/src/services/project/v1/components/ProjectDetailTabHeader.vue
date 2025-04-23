@@ -34,11 +34,11 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { arrayToQueryString } from '@/lib/router-query-string';
@@ -62,7 +62,6 @@ import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-
 import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
-
 const ROLE_INFO_MAP = {
     [ROLE_TYPE.SYSTEM_ADMIN]: { icon: SystemAdminImage, label: 'System Admin' },
     [ROLE_TYPE.DOMAIN_ADMIN]: { icon: DomainAdminImage, label: 'Domain Admin' },
@@ -85,7 +84,7 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const projectTreeStore = useProjectTreeStore();
-const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
@@ -98,7 +97,7 @@ const queryHelper = new QueryHelper();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     projects: computed(() => allReferenceStore.getters.project),
-    visibleAlertTab: computed<boolean>(() => visibleContents.value && (globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleProjectAlertTab ?? false)),
+    visibleAlertTab: computed<boolean>(() => visibleContents.value && (alertManagerUiAffectsSchema.value?.visibleProjectAlertTab ?? false)),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({

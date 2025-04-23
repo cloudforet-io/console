@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { cloneDeep } from 'lodash';
@@ -13,8 +11,7 @@ import type { ProjectChannelUpdateParameters } from '@/schema/notification/proje
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
-
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -31,10 +28,10 @@ type Emit<Data> = {
 };
 
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
-    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+    const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
     const state = reactive({
-        visibleUserNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
+        visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
         isEditMode: _state.isEditMode,
         dataForEdit: _state.dataForEdit,
         userChannelId: _state.userChannelId,
