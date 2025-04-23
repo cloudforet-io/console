@@ -3,15 +3,16 @@ import { computed, reactive } from 'vue';
 import { orderBy } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { Menu, MenuId } from '@/lib/menu/config';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
+import type { DisplayMenu } from '@/store/menu/type';
+import { pinia } from '@/store/pinia';
+
 import { MENU_ID } from '@/lib/menu/config';
+import type { Menu, MenuId } from '@/lib/menu/config';
 import { DEFAULT_ADMIN_MENU_LIST, DEFAULT_MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import { useTaskManagementTemplateStore } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
-
-import { useAppContextStore } from '../app-context/app-context-store';
-import type { DisplayMenu } from '../display/type';
-import { useGlobalConfigSchemaStore } from '../global-config-schema/global-config-schema-store';
 
 export type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
 
@@ -41,11 +42,11 @@ const MENU_CUSTOMIZATIONS = new Map<MenuId, MenuCustomization>([
 
 export const useMenuStore = defineStore('derived-menu', () => {
     const globalConfigSchemaStore = useGlobalConfigSchemaStore();
-    const taskManagementTemplateStore = useTaskManagementTemplateStore();
     const appContextStore = useAppContextStore();
 
     const _isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
+    const taskManagementTemplateStore = useTaskManagementTemplateStore(pinia);
     const _menuContext = computed<MenuContext>(() => ({
         templateName: taskManagementTemplateStore.templates.TemplateName,
         taskBoardName: taskManagementTemplateStore.templates.TaskBoard,
