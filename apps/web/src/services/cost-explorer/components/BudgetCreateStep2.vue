@@ -67,8 +67,12 @@ const state = reactive({
     startSelectedForBudgetYear: false,
     endSelectedForBudgetYear: false,
     existingBudgetUsageList: [] as BudgetUsageModel[],
-    isCycleSelectAble: false,
 });
+
+
+const isCycleEnabled = computed(() => budgetCreatePageState.startMonth.length > 0
+           && budgetCreatePageState.endMonth.length > 0
+           && state.existingBudgetUsageList.length === 0);
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
 
@@ -191,6 +195,25 @@ watch(() => [budgetCreatePageState.startMonth, budgetCreatePageState.endMonth], 
     }
 }, { immediate: true });
 
+watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
+    if (nv !== ov) {
+        if (nv === 'applySameAmount') {
+            budgetCreatePageStore.setInitialAmount(undefined);
+            budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+            budgetCreatePageState.budgetEachDate = Array(12).fill('');
+        } else if (nv === 'increaseBySpecificPercentage') {
+            budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+            budgetCreatePageState.budgetEachDate = Array(12).fill('');
+        } else if (nv === 'enterManually') {
+            budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
+            budgetCreatePageStore.setInitialAmount(undefined);
+            budgetCreatePageStore.setMonthlyGrowthRate(undefined);
+        }
+
+        budgetCreatePageStore.setPlannedLimits([]);
+    }
+}, { immediate: true });
+
 watch(() => [
     budgetCreatePageState.selectedMonthlyBudgetAllocation,
     budgetCreatePageState.budgetAppliedSameAmount,
@@ -200,53 +223,59 @@ watch(() => [
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
+    const planned_limits: any[] = [];
+
     if (budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0) {
+        budgetCreatePageStore.setPlannedLimits([]);
         return;
     }
 
-    const planned_limits: any = [];
     const startDate = dayjs.utc(budgetCreatePageState.startMonth[0]);
     const endDate = dayjs.utc(budgetCreatePageState.endMonth[0]);
     let currentDate = startDate;
 
+    const dateDiff = endDate.diff(startDate, 'month') + 1;
+
     if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount') {
-        while (currentDate.isSameOrBefore(endDate, 'month') && budgetCreatePageState.budgetAppliedSameAmount
-        && budgetCreatePageState.budgetAppliedSameAmount > 0) {
-            planned_limits.push({
-                date: currentDate.format('YYYY-MM'),
-                limit: budgetCreatePageState.budgetAppliedSameAmount,
-            });
-            currentDate = currentDate.add(1, 'month');
-        }
-    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage'
-        && budgetCreatePageState.initialAmount && budgetCreatePageState.monthlyGrowthRate
-    ) {
-        let currentAmount = budgetCreatePageState.initialAmount;
-        while (currentDate.isSameOrBefore(endDate, 'month')) {
-            planned_limits.push({
-                date: currentDate.format('YYYY-MM'),
-                limit: Math.round(currentAmount),
-            });
-            currentAmount *= (1 + ((budgetCreatePageState.monthlyGrowthRate || 0) / 100));
-            currentDate = currentDate.add(1, 'month');
-        }
-    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually'
-    && budgetCreatePageState.budgetEachDate.length === Number(endDate.month() - startDate.month() + 1)) {
-        const monthIndices = Array.from({ length: 12 }, (_, i) => i);
-        monthIndices.forEach((i) => {
-            if (currentDate.isSameOrBefore(endDate, 'month')) {
+        if (isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)) {
+            while (currentDate.isSameOrBefore(endDate, 'month')) {
                 planned_limits.push({
                     date: currentDate.format('YYYY-MM'),
-                    limit: Number(budgetCreatePageState.budgetEachDate[i]),
+                    limit: Number(budgetCreatePageState.budgetAppliedSameAmount),
                 });
                 currentDate = currentDate.add(1, 'month');
             }
-        });
+        }
+    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage') {
+        if (isValidPositiveNumber(budgetCreatePageState.initialAmount) && isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate)) {
+            let currentAmount = budgetCreatePageState.initialAmount;
+            while (currentDate.isSameOrBefore(endDate, 'month')) {
+                planned_limits.push({
+                    date: currentDate.format('YYYY-MM'),
+                    limit: Math.round(currentAmount),
+                });
+                currentAmount *= (1 + (budgetCreatePageState.monthlyGrowthRate / 100));
+                currentDate = currentDate.add(1, 'month');
+            }
+        }
+    } else if (budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually') {
+        if (budgetCreatePageState.budgetEachDate.length === dateDiff) {
+            for (let i = 0; i < dateDiff; i++) {
+                const value = budgetCreatePageState.budgetEachDate[i];
+                if (!isValidPositiveNumber(value)) {
+                    budgetCreatePageStore.setPlannedLimits([]);
+                    return;
+                }
+                planned_limits.push({
+                    date: currentDate.format('YYYY-MM'),
+                    limit: Number(value),
+                });
+                currentDate = currentDate.add(1, 'month');
+            }
+        }
     }
 
-    if (planned_limits.length > 0) {
-        budgetCreatePageStore.setPlannedLimits(planned_limits);
-    }
+    budgetCreatePageStore.setPlannedLimits(planned_limits);
 }, { deep: true });
 
 watch(() => [
@@ -263,6 +292,10 @@ watch(() => [
     budgetCreatePageState.startMonth,
     budgetCreatePageState.endMonth,
 ], () => {
+    if (!budgetCreatePageState.time_unit) {
+        state.isContinueAble = false;
+        return;
+    }
     if (state.existingBudgetUsageList.length > 0) {
         state.isContinueAble = false;
         return;
@@ -319,10 +352,6 @@ watch(() => [
 watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
     if (nv !== ov) {
         budgetCreatePageStore.setPlannedLimits([]);
-        budgetCreatePageStore.setBudgetAppliedSameAmount(undefined);
-        budgetCreatePageStore.setInitialAmount(undefined);
-        budgetCreatePageStore.setMonthlyGrowthRate(undefined);
-        budgetCreatePageState.budgetEachDate = [];
     }
 }, { immediate: true });
 
@@ -366,30 +395,13 @@ watch(() => budgetCreatePageState.limit, () => {
     }
 }, { immediate: true });
 
-watch([
-    () => budgetCreatePageState.startMonth,
-    () => budgetCreatePageState.endMonth,
-    () => state.existingBudgetUsageList,
-], () => {
-    const isAble = (
-        budgetCreatePageState.startMonth.length > 0
-        && budgetCreatePageState.endMonth.length > 0
-        && state.existingBudgetUsageList.length === 0
-    );
-    state.isCycleSelectAble = isAble;
-
-    if (!isAble && budgetCreatePageState.time_unit !== '') {
-        budgetCreatePageState.time_unit = '';
-    }
-}, { immediate: true });
-
 watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
-    if (
-        newVal !== oldVal
-        && budgetCreatePageState.endMonth.length > 0
-        && dayjs(newVal).isAfter(dayjs(budgetCreatePageState.endMonth[0]), 'month')
-    ) {
-        budgetCreatePageState.endMonth = [];
+    if (newVal !== oldVal && budgetCreatePageState.currentStep === 2) {
+        const isValidationReturn = budgetCreatePageState.time_unit !== '' || budgetCreatePageState.endMonth.length > 0;
+        if (!isValidationReturn) {
+            budgetCreatePageState.endMonth = [];
+            budgetCreatePageState.time_unit = '';
+        }
     }
 }, { immediate: true });
 </script>
@@ -479,23 +491,23 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                 <div class="flex mt-6">
                     <p-field-group
                         :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
-                        :help-text="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0
-                            ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
+                        :help-text="!isCycleEnabled ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
                         required
                     >
                         <p-radio-group class="mt-2">
-                            <p-radio v-for="(cycle, idx) in state.budgetCycleList"
-                                     :key="`budget-cycle-${idx}`"
-                                     v-model="budgetCreatePageState.time_unit"
-                                     :value="cycle.name"
-                                     :disabled="!state.isCycleSelectAble"
+                            <p-radio
+                                v-for="(cycle, idx) in state.budgetCycleList"
+                                :key="`budget-cycle-${idx}`"
+                                v-model="budgetCreatePageState.time_unit"
+                                :value="cycle.name"
+                                :disabled="!isCycleEnabled"
                             >
                                 <span>{{ cycle.label }}</span>
                             </p-radio>
                         </p-radio-group>
                     </p-field-group>
                 </div>
-                <p-pane-layout v-if="budgetCreatePageState.time_unit.length > 0"
+                <p-pane-layout v-if="budgetCreatePageState.time_unit.length > 0 && isCycleEnabled"
                                class="cycle-info-layout"
                                :class="{'fixed-term-layout': budgetCreatePageState.time_unit === 'TOTAL'}"
                 >
