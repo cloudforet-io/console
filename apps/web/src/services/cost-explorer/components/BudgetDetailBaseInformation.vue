@@ -411,6 +411,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                             show-user-list
                             selection-type="multiple"
                             :selected-ids="data"
+                            :excluded-selected-ids="[budgetPageState.budgetData?.budget_manager_id ?? '']"
                             @update:selected-ids="handleSelectAlertRecipients"
                         />
                         <p-button v-if="!state.alertRecipientsEdit && !storeState.isAdminMode && hasReadWriteAccess"
