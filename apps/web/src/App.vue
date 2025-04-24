@@ -43,7 +43,11 @@ import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 if (import.meta.env.DEV) {
     const queryClient = useQueryClient();
-    import('@/_dev-tools/vue-query-console-debug').then((mod) => mod.initVueQueryConsoleDebug(queryClient));
+    import('@/_dev-tools/vue-query-console-debug').then((mod) => mod.initVueQueryConsoleDebug(queryClient))
+        .catch((error) => {
+            console.error('Failed to load vue-query-console-debug module:', error);
+            console.error('Ensure the module exists and the path is correct.');
+        });
 }
 
 
