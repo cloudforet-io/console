@@ -118,7 +118,7 @@ export const initVueQueryConsoleDebug = (client: QueryClient) => {
 
 const _isActive = (query: Query) => {
     const data = query.state.data;
-    return (data !== undefined && query.state.dataUpdatedAt > 0) || query.options?.enabled === true;
+    return (data !== undefined && query.state.dataUpdatedAt > 0) || (query.options as { enabled?: boolean })?.enabled === true;
 };
 
 /* --------------------- Extractors --------------------- */
