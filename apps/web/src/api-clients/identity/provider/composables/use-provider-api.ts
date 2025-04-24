@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProviderCreateParameters } from '@/api-clients/identity/provider/schema/api-verbs/create';
 import type { ProviderDeleteParameters } from '@/api-clients/identity/provider/schema/api-verbs/delete';
@@ -12,9 +11,6 @@ import type { ProviderModel } from '@/api-clients/identity/provider/schema/model
 
 
 export const useProviderApi = () => {
-    const providerQueryKey = useAPIQueryKey('identity', 'provider', 'get');
-    const providerListQueryKey = useAPIQueryKey('identity', 'provider', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.provider.create<ProviderCreateParameters, ProviderModel>,
         update: SpaceConnector.clientV2.identity.provider.update<ProviderUpdateParameters, ProviderModel>,
@@ -25,8 +21,6 @@ export const useProviderApi = () => {
     };
 
     return {
-        providerQueryKey,
-        providerListQueryKey,
         providerAPI: actions,
     };
 };

@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SchemaCreateParameters } from '@/api-clients/identity/schema/schema/api-verbs/create';
 import type { SchemaDeleteParameters } from '@/api-clients/identity/schema/schema/api-verbs/delete';
@@ -11,9 +10,6 @@ import type { SchemaUpdateParameters } from '@/api-clients/identity/schema/schem
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 
 export const useSchemaApi = () => {
-    const schemaQueryKey = useAPIQueryKey('identity', 'schema', 'get');
-    const schemaListQueryKey = useAPIQueryKey('identity', 'schema', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.schema.create<SchemaCreateParameters, SchemaModel>,
         update: SpaceConnector.clientV2.identity.schema.update<SchemaUpdateParameters, SchemaModel>,
@@ -24,8 +20,6 @@ export const useSchemaApi = () => {
     };
 
     return {
-        schemaQueryKey,
-        schemaListQueryKey,
         schemaAPI: actions,
     };
 };

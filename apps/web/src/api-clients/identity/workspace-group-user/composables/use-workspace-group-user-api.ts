@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceGroupUserAddParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/add';
 import type { WorkspaceGroupUserFindParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/find';
@@ -11,9 +10,6 @@ import type { WorkspaceGroupUserUpdateRoleParameters } from '@/api-clients/ident
 import type { WorkspaceGroupUserModel } from '@/api-clients/identity/workspace-group-user/schema/model';
 
 export const useWorkspaceGroupUserApi = () => {
-    const workspaceGroupUserQueryKey = useAPIQueryKey('identity', 'workspace-group-user', 'get');
-    const workspaceGroupUserListQueryKey = useAPIQueryKey('identity', 'workspace-group-user', 'list');
-
     const actions = {
         add: SpaceConnector.clientV2.identity.workspaceGroupUser.add<WorkspaceGroupUserAddParameters, WorkspaceGroupUserModel>,
         remove: SpaceConnector.clientV2.identity.workspaceGroupUser.remove<WorkspaceGroupUserRemoveParameters>,
@@ -25,8 +21,6 @@ export const useWorkspaceGroupUserApi = () => {
     };
 
     return {
-        workspaceGroupUserQueryKey,
-        workspaceGroupUserListQueryKey,
         workspaceGroupUserAPI: actions,
     };
 };

@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/api-clients/config/user-config/schema/api-verbs/create';
 import type { UserConfigDeleteParameters } from '@/api-clients/config/user-config/schema/api-verbs/delete';
@@ -11,9 +10,6 @@ import type { UserConfigUpdateParameters } from '@/api-clients/config/user-confi
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 
 export const useUserConfigApi = () => {
-    const userConfigQueryKey = useAPIQueryKey('config', 'user-config', 'get');
-    const userConfigListQueryKey = useAPIQueryKey('config', 'user-config', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.config.userConfig.create<UserConfigCreateParameters, UserConfigModel>,
         update: SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>,
@@ -24,8 +20,6 @@ export const useUserConfigApi = () => {
     };
 
     return {
-        userConfigQueryKey,
-        userConfigListQueryKey,
         userConfigAPI: actions,
     };
 };

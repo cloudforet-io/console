@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountCreateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/create';
 import type { ServiceAccountDeleteParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele';
@@ -14,9 +13,6 @@ import type { ServiceAccountModel } from '@/api-clients/identity/service-account
 
 
 export const useServiceAccountApi = () => {
-    const serviceAccountQueryKey = useAPIQueryKey('identity', 'service-account', 'get');
-    const serviceAccountListQueryKey = useAPIQueryKey('identity', 'service-account', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>,
         update: SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>,
@@ -29,8 +25,6 @@ export const useServiceAccountApi = () => {
     };
 
     return {
-        serviceAccountQueryKey,
-        serviceAccountListQueryKey,
         serviceAccountAPI: actions,
     };
 };

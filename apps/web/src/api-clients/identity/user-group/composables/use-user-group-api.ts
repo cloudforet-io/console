@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserGroupAddUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/add-users';
 import type { UserGroupCreateParameters } from '@/api-clients/identity/user-group/schema/api-verbs/create';
@@ -13,9 +12,6 @@ import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/mo
 
 
 export const useUserGroupApi = () => {
-    const userGroupQueryKey = useAPIQueryKey('identity', 'user-group', 'get');
-    const userGroupListQueryKey = useAPIQueryKey('identity', 'user-group', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>,
         update: SpaceConnector.clientV2.identity.userGroup.update<UserGroupUpdateParameters, UserGroupModel>,
@@ -27,8 +23,6 @@ export const useUserGroupApi = () => {
     };
 
     return {
-        userGroupQueryKey,
-        userGroupListQueryKey,
         userGroupAPI: actions,
     };
 };
