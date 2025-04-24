@@ -29,7 +29,6 @@ class APIClientManager {
     private serviceEndpoints: Map<string, ServiceEndpoint> = new Map();
 
     async initialize(mergedConfig: GlobalServiceConfig): Promise<void> {
-        console.log('initialize', mergedConfig);
         this.config = mergedConfig;
         this.apiClientsSchema = JSON.parse(JSON.stringify(ApiClientEndpoint));
         await this.initializeServiceConfig();
