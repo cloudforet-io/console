@@ -6,6 +6,7 @@ import { useInfiniteQuery } from '@tanstack/vue-query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useEventApi } from '@/api-clients/opsflow/event/composables/use-event-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -16,9 +17,17 @@ export const useTaskEventsQuery = ({
   taskId: Ref<string|undefined>;
   fetchOnCreation: boolean;
 }) => {
-    const { eventAPI, eventListQueryKey } = useEventApi();
+    const { eventAPI } = useEventApi();
     const listEventsQueryHelper = new ApiQueryHelper()
         .setMultiSortV2([{ key: 'created_at', desc: true }]);
+
+    const { key: taskEventsQueryKey, params: taskEventsParams } = useServiceQueryKey('opsflow', 'event', 'list', {
+        contextKey: taskId,
+        params: computed(() => ({
+            task_id: taskId.value as string,
+            query: listEventsQueryHelper.dataV2,
+        })),
+    });
 
     const {
         data,
@@ -28,17 +37,11 @@ export const useTaskEventsQuery = ({
         isLoading,
         refetch,
     } = useInfiniteQuery({
-        queryKey: computed(() => [
-            ...eventListQueryKey.value,
-            taskId.value,
-        ]),
+        queryKey: taskEventsQueryKey,
         queryFn: async ({ pageParam = 1 }) => {
             try {
                 listEventsQueryHelper.setPage((pageParam - 1) * EVENT_PAGE_SIZE + 1, EVENT_PAGE_SIZE);
-                const res = await eventAPI.list({
-                    task_id: taskId.value,
-                    query: listEventsQueryHelper.dataV2,
-                });
+                const res = await eventAPI.list(taskEventsParams.value);
                 return {
                     results: res.results ?? [],
                     totalCount: res.total_count ?? 0,

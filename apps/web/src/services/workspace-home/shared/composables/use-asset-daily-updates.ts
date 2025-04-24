@@ -41,6 +41,7 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
     const metricId = `metric-managed-${label}-count`;
 
     const { key, params } = useServiceQueryKey('inventory', 'metric-data', 'analyze', {
+        contextKey: [mode?.value, metricId],
         params: computed(() => {
             const today = dayjs.utc().format('YYYY-MM-DD');
             const filter = projectIds?.value?.length ? [{
@@ -66,7 +67,6 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
                 },
             };
         }),
-        contextKey: [mode?.value, metricId],
     });
 
 

@@ -12,6 +12,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -149,7 +150,8 @@ const {
     categoryId: computed(() => currentCategory.value?.category_id),
 });
 const getStatusTypeLabel = (statusType?: TaskStatusType) => (statusType ? TASK_STATUS_LABELS[statusType] : '--');
-const { taskAPI, taskListQueryKey } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey } = useServiceQueryKey('opsflow', 'task', 'list');
 const queryClient = useQueryClient();
 const { mutateAsync: changeStatus } = useMutation({
     mutationFn: ({ taskId, statusId }: {

@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { getParticle, i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,7 +24,8 @@ const emit = defineEmits<{(event: 'deleted'): void;
 const taskDetailPageStore = useTaskDetailPageStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 
-const { taskAPI, taskListQueryKey } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey } = useServiceQueryKey('opsflow', 'task', 'list');
 const queryClient = useQueryClient();
 const { mutate: deleteTask, isSuccess: hasDeleted, isPending } = useMutation({
     mutationFn: ({ taskId }: { taskId: string }) => taskAPI.delete({ task_id: taskId }),
