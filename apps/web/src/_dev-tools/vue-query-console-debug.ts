@@ -17,7 +17,7 @@ interface DumpOptions {
 }
 
 
-export function initVueQueryConsoleDebug(client: QueryClient) {
+export const initVueQueryConsoleDebug = (client: QueryClient) => {
     const _summarizeQueries = (): QuerySummary[] => client.getQueryCache().getAll()
         .sort((a, b) => {
             const isActiveA = _isActive(a);
@@ -113,7 +113,7 @@ export function initVueQueryConsoleDebug(client: QueryClient) {
     };
 
     (window as any).__QUERY_DEBUG__ = debugObject;
-}
+};
 
 
 const _isActive = (query: Query) => {
