@@ -30,28 +30,18 @@ const userReferenceStore = useUserReferenceStore();
 
 const router = useRouter();
 
-const invalidThreshold = ref<boolean>(false);
+const invalidThreshold = ref<boolean[]>([]);
 
 const isAlertRecipientsSelected = ref<boolean>(false);
 
 watch(() => budgetCreatePageState.thresholds, () => {
-    const filteredThresholdInvalidState = budgetCreatePageState.thresholds.filter((threshold) => {
-        if (threshold.value) {
-            if (Number(threshold.value) > 0 && Number(threshold.value) < 101) {
-                return false;
-            } if (Number(threshold.value) <= 0 || typeof threshold.value !== 'number') {
-                return true;
-            }
-            return true;
-        }
-        return true;
+    const values = budgetCreatePageState.thresholds.map((t) => Number(t.value));
+    invalidThreshold.value = budgetCreatePageState.thresholds.map((threshold, idx) => {
+        const val = values[idx];
+        const isValidNumber = val > 0 && val < 101;
+        const isDuplicate = values.indexOf(val) !== idx;
+        return !(isValidNumber && !isDuplicate);
     });
-
-    if (filteredThresholdInvalidState.length === 0) {
-        invalidThreshold.value = true;
-    } else {
-        invalidThreshold.value = false;
-    }
 }, { deep: true, immediate: true });
 
 watch(() => budgetCreatePageState.recipients.users, () => {
@@ -140,7 +130,7 @@ const createBudget = async (type: 'skip' | 'set') => {
                        :help-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.EXCEEDS_AMOUNT_DESCRIPTION')"
                        required
                        :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.THRESHOLD_INVALID_TEXT')"
-                       :invalid="!invalidThreshold"
+                       :invalid="invalidThreshold.some(v => v)"
         >
             <div class="flex flex-col gap-2">
                 <div v-for="(threshold, idx) in budgetCreatePageState.thresholds"
@@ -149,7 +139,7 @@ const createBudget = async (type: 'skip' | 'set') => {
                 >
                     <p-text-input
                         :value="threshold.value"
-                        :invalid="!invalidThreshold"
+                        :invalid="invalidThreshold[idx]"
                         @update:value="(value) => handleUpdateThreshold(value, idx)"
                     >
                         <template #input-right>
@@ -199,7 +189,7 @@ const createBudget = async (type: 'skip' | 'set') => {
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SKIP_FOR_LATER') }}
             </p-button>
             <p-button class="substitutive"
-                      :disabled="!invalidThreshold || !isAlertRecipientsSelected"
+                      :disabled="invalidThreshold.includes(true) || !isAlertRecipientsSelected"
                       :loading="budgetCreatePageState.loading"
                       @click="createBudget('set')"
             >
