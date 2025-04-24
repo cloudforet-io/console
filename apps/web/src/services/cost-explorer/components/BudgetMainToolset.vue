@@ -128,11 +128,13 @@ watch(() => state, () => {
                            appearance-type="badge"
                            use-fixed-menu-style
                            show-select-marker
+                           is-filterable
                            multi-selectable
                            show-clear-selection
                            show-delete-all-button
                            selection-highlight
                            :page-size="15"
+                           class="project-select-dropdown"
         >
             <template #dropdown-left-area>
                 <p-i name="ic_project"
@@ -186,11 +188,17 @@ watch(() => state, () => {
 
 <style scoped lang="postcss">
 .budget-main-toolset {
-    @apply mt-3 flex gap-2 items-center;
+    @apply mt-3 flex items-center gap-2;
+
     .p-select-dropdown {
         min-width: unset;
     }
 }
+
+.project-select-dropdown {
+    max-width: 6.625rem;
+}
+
 .divider {
     height: 1rem;
     width: 0.0625rem;
