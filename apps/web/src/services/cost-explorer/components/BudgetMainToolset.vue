@@ -136,7 +136,8 @@ watch(() => state, () => {
             />
             <span class="font-bold text-sm">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FILTER') }}:</span>
         </div>
-        <p-select-dropdown selection-label="Workspace"
+        <p-select-dropdown v-if="storeState.isAdminMode"
+                           selection-label="Workspace"
                            style-type="rounded"
                            show-select-marker
                            multi-selectable
