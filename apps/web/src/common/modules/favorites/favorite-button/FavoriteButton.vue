@@ -35,12 +35,12 @@ import {
     convertServiceConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 
+import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 interface Props {
     itemId: string;
@@ -70,14 +70,14 @@ const displayStore = useDisplayStore();
 
 /* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
+    publicDashboardListQuery,
+    privateDashboardListQuery,
+} = useGlobalDashboardQuery();
 
 const emit = defineEmits<{(e: 'click-favorite'): void;
 }>();
 
-const dashboardList = computed(() => [...publicDashboardList.value, ...privateDashboardList.value]);
+const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
     favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
     favoriteWorkspaceMenuList: computed(() => favoriteStoreGetters.workspaceItems),

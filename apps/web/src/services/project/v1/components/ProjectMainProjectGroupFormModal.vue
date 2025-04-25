@@ -9,6 +9,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -86,7 +87,9 @@ watch(() => props.projectGroupId, async (after) => {
 }, { immediate: true });
 
 
-const { projectGroupAPI, projectGroupQueryKey, projectGroupListQueryKey } = useProjectGroupApi();
+const { projectGroupAPI } = useProjectGroupApi();
+const { key: projectGroupListQueryKey } = useServiceQueryKey('identity', 'project-group', 'list');
+const { withSuffix: projectGroupQueryKeyWithSuffix } = useServiceQueryKey('identity', 'project-group', 'get');
 const queryClient = useQueryClient();
 const { mutateAsync: createProjectGroup, isPending: isCreating } = useMutation({
     mutationFn: projectGroupAPI.create,
@@ -103,7 +106,7 @@ const { mutateAsync: updateProjectGroup, isPending: isUpdating } = useMutation({
     mutationFn: projectGroupAPI.update,
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
-        queryClient.invalidateQueries({ queryKey: [...projectGroupQueryKey.value, data.project_group_id] });
+        queryClient.invalidateQueries({ queryKey: projectGroupQueryKeyWithSuffix(data.project_group_id) });
         queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
     },
     onError: (e) => {

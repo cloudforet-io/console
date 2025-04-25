@@ -61,6 +61,7 @@ export const useCostChartData = ({
 
     // Use service query key for analyze
     const { key, params } = useServiceQueryKey('cost-analysis', 'unified-cost', 'analyze', {
+        contextKey: mode,
         params: computed<UnifiedCostAnalyzeParameters>(() => ({
             query: {
                 start: period.value.start,
@@ -79,7 +80,6 @@ export const useCostChartData = ({
                 ] : undefined,
             },
         })),
-        contextKey: mode,
     });
 
     const {

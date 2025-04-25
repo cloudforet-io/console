@@ -18,18 +18,10 @@ interface UseDataSourceApiReturn {
 
 export const useDataSourceApi = (): UseDataSourceApiReturn => {
     const actions = {
-        async get(params: CostDataSourceGetParameters) {
-            return SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
-        },
-        async list(params: CostDataSourceListParameters) {
-            return SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
-        },
-        async sync(params: CostDataSourceSyncParameters) {
-            return SpaceConnector.clientV2.costAnalysis.dataSource.sync<CostDataSourceSyncParameters>(params);
-        },
-        async updatePermissions(params: CostDataSourceUpdatePermissionsParameters) {
-            return SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters, CostDataSourceModel>(params);
-        },
+        get: SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>,
+        list: SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>,
+        sync: SpaceConnector.clientV2.costAnalysis.dataSource.sync<CostDataSourceSyncParameters>,
+        updatePermissions: SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters, CostDataSourceModel>,
     };
 
     return {

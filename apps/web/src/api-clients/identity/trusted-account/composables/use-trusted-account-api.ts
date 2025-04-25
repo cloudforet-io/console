@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TrustedAccountCreateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/create';
 import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
@@ -13,9 +12,6 @@ import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account
 
 
 export const useTrustedAccountApi = () => {
-    const trustedAccountQueryKey = useAPIQueryKey('identity', 'trusted-account', 'get');
-    const trustedAccountListQueryKey = useAPIQueryKey('identity', 'trusted-account', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>,
         update: SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>,
@@ -27,8 +23,6 @@ export const useTrustedAccountApi = () => {
     };
 
     return {
-        trustedAccountQueryKey,
-        trustedAccountListQueryKey,
         trustedAccountAPI: actions,
     };
 };

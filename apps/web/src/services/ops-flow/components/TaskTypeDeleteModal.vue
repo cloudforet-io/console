@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { PButtonModal, PIconButton } from '@cloudforet/mirinae';
 
 import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -28,7 +29,7 @@ const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const {
     tasks, isLoading, refetch,
 } = useAssociatedTasksQuery({
-    queryKey: computed(() => ({ task_type_id: taskCategoryPageState.targetTaskTypeId })),
+    params: computed(() => ({ task_type_id: taskCategoryPageState.targetTaskTypeId })),
     enabled: computed(() => !!taskCategoryPageState.visibleTaskTypeDeleteModal && !!taskCategoryPageState.targetTaskTypeId),
 });
 
@@ -45,7 +46,8 @@ const headerTitle = computed(() => {
 });
 
 /* delete task type */
-const { taskTypeAPI, taskTypeListQueryKey } = useTaskTypeApi();
+const { taskTypeAPI } = useTaskTypeApi();
+const { key: taskTypeListQueryKey } = useServiceQueryKey('opsflow', 'task-type', 'list');
 const queryClient = useQueryClient();
 const { mutateAsync: deleteTaskType, isPending: isDeleting } = useMutation({
     mutationFn: async () => {

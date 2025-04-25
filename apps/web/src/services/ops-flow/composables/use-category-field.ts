@@ -42,7 +42,7 @@ export const useCategoryField = ({
     };
 
     const { taskTypes } = useTaskTypesQuery({
-        queryKey: computed(() => ({
+        params: computed(() => ({
             query: { filter: [{ k: 'category_id', v: categories.value?.map((c) => c.category_id), o: 'in' }] },
         })),
         enabled: computed(() => !!categories.value),

@@ -34,6 +34,7 @@ const useResourceMetricQuery = (resourceType: ResourceLabel, opts: {
     const metricId = `metric-managed-${resourceType}-${metricType}`;
 
     const { key, params } = useServiceQueryKey('inventory', 'metric-data', 'analyze', {
+        contextKey: [mode.value, metricId],
         params: computed(() => {
             const today = dayjs.utc().format('YYYY-MM-DD');
             const filter = projectIds?.value?.length ? [{
@@ -59,7 +60,6 @@ const useResourceMetricQuery = (resourceType: ResourceLabel, opts: {
                 },
             };
         }),
-        contextKey: [mode.value, metricId],
     });
 
     return useScopedQuery({
