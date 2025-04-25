@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { flatMapDeep, uniq } from 'lodash';
@@ -11,7 +11,7 @@ import type { BoardSet } from '@cloudforet/mirinae/types/data-display/board/type
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
+import type { DashboardTemplateModel } from '@/api-clients/repository/dashboard-template/schema/model';
 import { i18n } from '@/translations';
 
 
@@ -19,12 +19,15 @@ import { useDashboardSharedContext } from '@/services/_shared/dashboard/core/com
 import DashboardCreateBlankBoardItem from '@/services/_shared/dashboard/dashboard-create/components/DashboardCreateBlankBoardItem.vue';
 import type { FilterLabelItem } from '@/services/_shared/dashboard/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/_shared/dashboard/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
+import { useDashboardTemplateQuery } from '@/services/_shared/dashboard/dashboard-create/composables/use-dashboard-template-query';
 import { useDashboardCreatePageStore } from '@/services/_shared/dashboard/dashboard-create/stores/dashboard-create-page-store';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+
+
 
 interface Props {
     dashboardItems: Array<DashboardModel>;
@@ -40,6 +43,8 @@ const dashboardCreatePageState = dashboardCreatePageStore.state;
 const dashboardCreatePageGetters = dashboardCreatePageStore.getters;
 const { isAdminMode, entryPoint, projectGroupOrProjectId } = useDashboardSharedContext();
 
+const dashboardTemplateQuery = useDashboardTemplateQuery();
+
 const state = reactive({
     templates: [] as DashboardTemplateModel[],
     blankTemplate: computed<BoardSet[]>(() => ([{
@@ -48,7 +53,7 @@ const state = reactive({
     }])),
     ootbTemplateTreeData: computed<TreeNode<DashboardTreeDataType>[]>(() => {
         const results: TreeNode<DashboardTreeDataType>[] = [];
-        const _filteredTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
+        const _filteredTemplates = getFilteredTemplates(dashboardTemplateQuery.data?.value || [], filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders);
         _filteredTemplates.forEach((d) => {
             results.push({
                 id: d.template_id,
@@ -64,7 +69,7 @@ const state = reactive({
         return results;
     }),
     allExistingLabels: computed<string[]>(() => {
-        const _ootbTemplates = getFilteredTemplates(dashboardCreatePageState.dashboardTemplates, '', [], []);
+        const _ootbTemplates = getFilteredTemplates(dashboardTemplateQuery.data?.value || [], '', [], []);
         const _existingTemplates = getFilteredTemplates(props.dashboardItems, '', [], []);
 
         const _ootbLabels = flatMapDeep(_ootbTemplates.map((d) => d.labels ?? []));
@@ -83,8 +88,8 @@ const filterState = reactive({
 const getFilteredTemplates = (
     dashboards: Array<DashboardModel|DashboardTemplateModel>,
     inputValue: string,
-    selectedLabels: FilterLabelItem[],
-    selectedProviders: FilterLabelItem[],
+    selectedLabels: string[],
+    selectedProviders: string[],
 ): Array<DashboardModel|DashboardTemplateModel> => {
     const _inputValue = inputValue.toLowerCase();
     const _selectedLabels = selectedLabels;
@@ -125,9 +130,6 @@ const handleClickCancel = () => {
     }
 };
 
-onMounted(() => {
-    dashboardCreatePageStore.listDashboardTemplates();
-});
 </script>
 
 <template>
@@ -151,6 +153,7 @@ onMounted(() => {
                 <dashboard-folder-tree :selected-id-map="dashboardCreatePageState.selectedOotbIdMap"
                                        :dashboard-tree-data="state.ootbTemplateTreeData"
                                        :show-single-control-buttons="false"
+                                       :search-text="filterState.inputValue"
                                        show-all
                                        disable-link
                                        disable-favorite

@@ -231,7 +231,20 @@ const handleSelectControlActions = (type: DashboardControlActionType, id: string
     if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.SHARE_WITH_CODE) dashboardPageControlStore.openShareWithCodeModal(id);
     if (type === DASHBOARD_CONTROL_MENU_ACTION_TYPES.DELETE) dashboardPageControlStore.openDeleteModal(id);
 };
-
+const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>) => {
+    if (node.data.type === 'DASHBOARD') {
+        const dashboardDetailRouteName = storeState.isAdminMode
+            ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+            : DASHBOARDS_ROUTE.DETAIL._NAME;
+        const _location = {
+            name: dashboardDetailRouteName,
+            params: {
+                dashboardId: node.data.id || '',
+            },
+        };
+        router.push(_location).catch(() => {});
+    }
+};
 /* init */
 let urlQueryStringWatcherStop;
 const init = async () => {
@@ -378,6 +391,7 @@ onUnmounted(() => {
                                        @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PUBLIC')"
                                        @click-control-move="dashboardPageControlStore.openBundleMoveModal('PUBLIC')"
                                        @select-control-actions="handleSelectControlActions"
+                                       @click-tree-item="handleClickTreeItem"
                 />
             </div>
             <div v-if="!storeState.isAdminMode && state.refinedPrivateTreeData.length"
@@ -398,6 +412,7 @@ onUnmounted(() => {
                                        @click-control-delete="dashboardPageControlStore.openBundleDeleteModal('PRIVATE')"
                                        @click-control-move="dashboardPageControlStore.openBundleMoveModal('PRIVATE')"
                                        @select-control-actions="handleSelectControlActions"
+                                       @click-tree-item="handleClickTreeItem"
                 />
             </div>
             <dashboard-main-board-list v-if="state.deprecatedDashboardItems.length"

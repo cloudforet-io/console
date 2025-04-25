@@ -19,6 +19,7 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -106,7 +107,7 @@ const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
 
 /* task types */
 const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery({
-    queryKey: computed(() => ({
+    params: computed(() => ({
         query: {
             filter: [{ k: 'category_id', v: categories.value?.map((c) => c.category_id) ?? [], o: 'in' }],
         },
@@ -123,19 +124,19 @@ const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
 });
 
 /* tasks */
-const { taskListQueryKey, taskAPI } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey, params: taskListQueryParams } = useServiceQueryKey('opsflow', 'task', 'list', {
+    contextKey: props.categoryId ?? 'all',
+    params: computed(() => ({
+        query: taskListApiQuery.value,
+    })),
+});
 const {
     data, error, refetch, isLoading,
 } = useQuery({
-    queryKey: computed(() => [
-        ...taskListQueryKey.value,
-        props.categoryId ?? 'all',
-        taskListApiQuery.value,
-    ]),
+    queryKey: taskListQueryKey.value,
     queryFn: async () => {
-        const res = await taskAPI.list({
-            query: taskListApiQuery.value,
-        });
+        const res = await taskAPI.list(taskListQueryParams.value);
         return {
             results: res.results ?? [],
             totalCount: res.total_count,

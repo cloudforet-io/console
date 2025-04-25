@@ -30,22 +30,20 @@ api-clients/
 // use-{resource}-api.ts template
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { {Resource}CreateParameters } from '@/api-clients/{service}/{resource}/schema/api-verbs/create';
+import type { {Resource}{Verb}Parameters } from '@/api-clients/{service}/{resource}/schema/api-verbs/{verb}';
+import type { {Resource}{Verb = list}Parameters } from '@/api-clients/{service}/{resource}/schema/api-verbs/list';
 import type { {Resource}Model } from '@/api-clients/{service}/{resource}/schema/model';
 
 export const use{Resource}Api = () => {
     // Define API actions
     const actions = {
-        create: SpaceConnector.clientV2.{service}.{resource}.create<{Resource}CreateParameters, {Resource}Model>,
-        list: SpaceConnector.clientV2.{service}.{resource}.list<{Resource}ListParameters, ListResponse<{Resource}Model>>,
+        {verb}: SpaceConnector.clientV2.{service}.{resource}.{verb}<{Resource}{Verb}Parameters, {Resource}Model>,
+        {verb = list}: SpaceConnector.clientV2.{service}.{resource}.list<{Resource}ListParameters, ListResponse<{Resource}Model>>,
         // ... other actions
     };
 
     return {
-        {resource}QueryKey,
-        {resource}ListQueryKey,
         {resource}API: actions,
     };
 };
@@ -66,14 +64,14 @@ export interface {Resource}Model {
 
 ### API Verb Parameters
 ```typescript
-// create.ts template
+// create.ts template example
 export interface {Resource}CreateParameters {
     // Define create operation parameters
     name: string;
     // ... other parameters
 }
 
-// list.ts template
+// list.ts template example
 export interface {Resource}ListParameters {
     query?: {
         filter?: Array<{
@@ -117,7 +115,7 @@ export interface {Resource}ListParameters {
 ```typescript
 const { {resource}API } = use{Resource}Api();
 
-const { key, params } = useServiceKey(service, resource, verb, {
+const { key, params } = useServiceQueryKey(service, resource, verb, {
   params: ...
 })
 

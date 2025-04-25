@@ -10,7 +10,7 @@ import type { ServiceAccountModel } from '@/api-clients/identity/service-account
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -53,6 +53,7 @@ watch(() => budgetCreatePageState.scope.serviceAccount, async () => {
             show-user-list
             :show-user-group-list="false"
             :selected-id="budgetCreatePageState.budgetManager"
+            :show-delete-all-button="false"
             @update:selected-id="handleSelectId"
             @formatted-selected-ids="handleFormatBudgetManager"
         />

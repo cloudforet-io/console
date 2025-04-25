@@ -15,7 +15,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 interface Props {
     visible: boolean;
@@ -60,7 +60,7 @@ const updateBudgetName = async (params: BudgetUpdateParameters) => {
     try {
         state.loading = true;
         await SpaceConnector.clientV2.costAnalysis.budget.update<BudgetUpdateParameters, BudgetModel>(params);
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'));
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'), '');
         emit('update:visible', false);
     } catch (error) {
         ErrorHandler.handleError(error, true);
@@ -86,7 +86,7 @@ const handleConfirm = async () => {
 <template>
     <p-button-modal :visible="props.visible"
                     size="sm"
-                    header-title="Update Budget Name"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.UPDATE_NAME_TITLE')"
                     :loading="state.loading"
                     :disabled="invalidState.budgetName"
                     @cancel="handleCancel"

@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { DashboardTemplateState, DashboardTemplateType } from '@/schema/repository/dashboard-template/type';
+import type { DashboardTemplateState, DashboardTemplateType } from '@/api-clients/repository/dashboard-template/schema/type';
 
 
 export interface DashboardTemplateListParameters {

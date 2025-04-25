@@ -54,6 +54,7 @@ const props = withDefaults(defineProps<{
      excludedSelectedIds?: string[];
      size?: 'sm'|'md';
      pageSize?: number;
+     showDeleteAllButton?: boolean;
 }>(), {
     selectedId: undefined,
     selectedIds: undefined,
@@ -75,6 +76,7 @@ const props = withDefaults(defineProps<{
     excludedSelectedIds: undefined,
     size: 'md',
     pageSize: 10,
+    showDeleteAllButton: true,
 });
 
 const emit = defineEmits<{(event: 'update:selected-id', value?: string): void;
@@ -273,7 +275,7 @@ watch([() => props.selectedId, () => props.selectedIds], ([newUserId, newUserIds
     <p-select-dropdown class="user-select-dropdown"
                        show-select-marker
                        is-filterable
-                       show-delete-all-button
+                       :show-delete-all-button="props.showDeleteAllButton"
                        :selected="state.selectedItems"
                        :handler="menuItemsHandler()"
                        :selection-label="props.selectionLabel"

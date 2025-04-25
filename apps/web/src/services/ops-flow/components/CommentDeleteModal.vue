@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useCommentApi } from '@/api-clients/opsflow/comment/composables/use-comment-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { getParticle, i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -25,12 +26,14 @@ const { refetch: refetchEvents } = useTaskEventsQuery({
 
 /* delete comment */
 const queryClient = useQueryClient();
-const { commentAPI, commentListQueryKey } = useCommentApi();
+const { commentAPI } = useCommentApi();
+const { withSuffix: withCommentListQueryKeySuffix } = useServiceQueryKey('opsflow', 'comment', 'list');
+
 const { mutateAsync: deleteComment, isPending: isDeleting } = useMutation({
     mutationFn: ({ commentId }: {commentId: string; taskId: string}) => commentAPI.delete({ comment_id: commentId }),
     onSuccess: (data, { taskId }) => {
         queryClient.invalidateQueries({
-            queryKey: [...commentListQueryKey.value, taskId],
+            queryKey: withCommentListQueryKeySuffix(taskId),
         });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');
         refetchEvents();

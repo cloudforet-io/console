@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -34,7 +35,8 @@ const { categoryStatusOptions } = useCategoryStatusOptions({ categoryId });
 const { defaultStatusOption } = useDefaultStatusOption({ categoryStatusOptions, targetStatusType });
 
 /* delete status option */
-const { taskCategoryAPI, taskCategoryListQueryKey } = useTaskCategoryApi();
+const { taskCategoryAPI } = useTaskCategoryApi();
+const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
 const queryClient = useQueryClient();
 const { mutateAsync: deleteStatusOption, isPending: isDeleting } = useMutation({
     mutationFn: () => {

@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TaskCategoryCreateParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/create';
 import type { TaskCategoryDeleteParameters } from '@/api-clients/opsflow/task-category/schema/api-verbs/delete';
@@ -10,9 +9,6 @@ import type { TaskCategoryUpdateParameters } from '@/api-clients/opsflow/task-ca
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 
 export const useTaskCategoryApi = () => {
-    const taskCategoryQueryKey = useAPIQueryKey('opsflow', 'task-category', 'get');
-    const taskCategoryListQueryKey = useAPIQueryKey('opsflow', 'task-category', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.opsflow.taskCategory.create<TaskCategoryCreateParameters, TaskCategoryModel>,
         update: SpaceConnector.clientV2.opsflow.taskCategory.update<TaskCategoryUpdateParameters, TaskCategoryModel>,
@@ -22,8 +18,6 @@ export const useTaskCategoryApi = () => {
     };
 
     return {
-        taskCategoryQueryKey,
-        taskCategoryListQueryKey,
         taskCategoryAPI: actions,
     };
 };

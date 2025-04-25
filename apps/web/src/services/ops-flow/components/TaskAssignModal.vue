@@ -12,6 +12,7 @@ import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { UserReferenceItem } from '@/store/reference/user-reference-store';
@@ -94,7 +95,8 @@ interface AssignVariables {
     taskId?: string;
     assignee?: string;
 }
-const { taskAPI, taskListQueryKey } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey } = useServiceQueryKey('opsflow', 'task', 'list');
 const queryClient = useQueryClient();
 const { mutate: updateTaskAssignee, isPending: updating } = useMutation({
     mutationFn: async ({ taskId, assignee }: AssignVariables) => {

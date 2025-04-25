@@ -14,7 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PToolboxTable, PSelectDropdown, PButtonModal, PI, PProgressBar, PStatus, PLink,
+    PToolboxTable, PSelectDropdown, PI, PProgressBar, PStatus, PLink,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -27,23 +27,28 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
+import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ListResponse } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
+import BudgetDeleteCheckModal from '@/services/cost-explorer/components/BudgetDeleteCheckModal.vue';
 import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToolset.vue';
+import { BUDGET_SEARCH_HANDLERS } from '@/services/cost-explorer/constants/budget-constant';
+import { BUDGET_EXCEL_FIELDS } from '@/services/cost-explorer/constants/budget-table-constant';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
-import { BUDGET_SEARCH_HANDLERS } from '../constants/budget-constant';
-import { ADMIN_COST_EXPLORER_ROUTE } from '../routes/admin/route-constant';
-import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
-import type { Period } from '../types/cost-explorer-query-type';
-import BudgetDeleteCheckModal from './BudgetDeleteCheckModal.vue';
 
 
 interface Props {
@@ -92,8 +97,12 @@ const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
+const userStore = useUserStore();
+const userState = userStore.state;
+const projectReferenceStore = useProjectReferenceStore();
 
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const timeZone = computed<string>(() => userState.timezone || '');
 
 const state = reactive<BudgetMainListState>({
     budgets: [],
@@ -115,7 +124,7 @@ const state = reactive<BudgetMainListState>({
 });
 
 const tableState = reactive({
-    fields: computed(() => [
+    fields: [
         {
             name: 'name',
             label: 'Name',
@@ -164,9 +173,8 @@ const tableState = reactive({
             name: 'state',
             label: 'State',
             width: '7%',
-            sortable: false,
         },
-    ]),
+    ],
     items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
         const startDate = dayjs.utc(budget.start, 'YYYY-MM');
         const endDate = dayjs.utc(budget.end, 'YYYY-MM');
@@ -186,9 +194,14 @@ const tableState = reactive({
                 .map((budgetUsage) => budgetUsage.actual_spend)[0] ?? 0
                 : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0),
             utilization_rate: budget.utilization_rate ? budget.utilization_rate : 0,
-            remaining: 0,
-            state: dayjs.utc().isSameOrAfter(startDate, 'month') && dayjs.utc().isSameOrBefore(endDate, 'month')
-                ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ACTIVE_TIL_DATE') : 'EXPIRED',
+            remaining: (budget.limit ?? 0) - (
+                budget.time_unit === 'MONTHLY'
+                    ? state.budgetUsages
+                        .filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id && dayjs.utc().format('YYYY-MM') === dayjs.utc(budgetUsage.date).format('YYYY-MM'))
+                        .map((budgetUsage) => budgetUsage.actual_spend)[0] ?? 0
+                    : (state.budgetUsages || []).filter((budgetUsage) => budgetUsage.budget_id === budget.budget_id).map((budgetUsage) => budgetUsage.actual_spend).reduce((acc, cur) => acc + cur, 0)
+            ),
+            state: budget.state,
         };
     })),
     actionMenus: computed<MenuItem[]>(() => [
@@ -199,6 +212,7 @@ const tableState = reactive({
         name: makeDistinctValueHandler('cost_analysis.Budget', 'name', 'string'),
         time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit', 'string'),
         budget_manager_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_manager_id', 'string'),
+        'notification.recipients.users': makeDistinctValueHandler('cost_analysis.Budget', 'notification.recipients.users'),
     })),
 });
 
@@ -231,14 +245,14 @@ const handleDeleteConfirm = async () => {
 const getBudgetFilters = (): ApiFilter[] => {
     const filters: ApiFilter[] = [];
 
-    if (state.query?.target && state.query?.target !== 'all') {
-        if (state.query?.target === 'project') {
+    if (state.query?.target) {
+        if (state.query.target === 'project') {
             filters.push({
                 k: 'service_account_id',
                 v: [null, ''],
                 o: 'in',
             });
-        } else if (state.query?.target === 'serviceAccount') {
+        } else if (state.query.target === 'serviceAccount') {
             filters.push({
                 k: 'service_account_id',
                 v: [null, ''],
@@ -249,9 +263,14 @@ const getBudgetFilters = (): ApiFilter[] => {
 
     if (state.query?.year && state.query?.year !== 'all') {
         filters.push({
-            k: 'budget_year',
-            v: state.query?.year,
-            o: 'eq',
+            k: 'start',
+            v: `${state.query.year}-12`,
+            o: 'lte',
+        });
+        filters.push({
+            k: 'end',
+            v: `${state.query.year}-01`,
+            o: 'gte',
         });
     }
 
@@ -363,6 +382,7 @@ const listBudgetUsages = async () => {
     state.more = !!more;
 };
 
+const getProjectName = (projectId: string): string|undefined => projectReferenceStore.getters.projectItems[projectId]?.label;
 const getServiceAccountName = (serviceAccountId: string): string|undefined => serviceAccountReferenceStore.getters.serviceAccountItems[serviceAccountId]?.label;
 
 const handleUpdateSelectIndex = async (indicies: number[]) => {
@@ -400,6 +420,24 @@ const handleChange = async (options: any = {}) => {
     budgetApiQueryHelper.setFilters(state.queryFilters);
     await fetchBudgets();
     await listBudgetUsages();
+};
+
+const handleExportToExcel = async () => {
+    await downloadExcel({
+        fields: BUDGET_EXCEL_FIELDS,
+        data: tableState.items.map((item, idx) => ({
+            ...item,
+            target: item.target.startsWith('project-') ? `Project: ${getProjectName(item.target)}` : `Service: ${getServiceAccountName(item.target)}`,
+            cycle: item.cycle === 'TOTAL' ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY'),
+            limit: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.limit}`,
+            actualSpend: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Number(item.actualSpend).toFixed(3)}`,
+            utilization_rate: `${item.utilization_rate}%`,
+            remaining: item.remaining < 0 ? `-${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Math.abs(item.remaining.toFixed(2)).toLocaleString()}`
+                : `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.remaining.toFixed(2).toLocaleString()}`,
+        })),
+        file_name_prefix: FILE_NAME_PREFIX.budget,
+        timezone: timeZone.value,
+    });
 };
 
 /* Watcher */
@@ -451,6 +489,7 @@ onMounted(async () => {
                              @update:select-index="handleUpdateSelectIndex"
                              @change="handleChange"
                              @refresh="handleChange()"
+                             @export="handleExportToExcel"
             >
                 <template #toolbox-left>
                     <p-select-dropdown placeholder="Action"
@@ -476,7 +515,7 @@ onMounted(async () => {
                 </template>
                 <template #col-limit-format="{item, value, rowIndex}">
                     <p class="flex gap-0.5"
-                       :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
+                       :class="{ expired: item.state === 'EXPIRED' }"
                     >
                         <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
                         <span>{{ Number(value).toLocaleString() }}</span>
@@ -484,14 +523,14 @@ onMounted(async () => {
                 </template>
                 <template #col-cycle-format="{value, item}">
                     <p class="flex gap-2 items-center"
-                       :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }"
+                       :class="{ expired: item.state === 'EXPIRED' }"
                     >
                         <span v-if="value === 'MONTHLY'">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY') }}</span>
                         <span v-else>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') }}</span>
                     </p>
                 </template>
                 <template #col-period-format="{value, item}">
-                    <span :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">{{ value }}</span>
+                    <span :class="{ expired: item.state === 'EXPIRED' }">{{ value }}</span>
                 </template>
                 <template #col-target-format="{value}">
                     <div v-if="value.startsWith('project-')"
@@ -520,13 +559,13 @@ onMounted(async () => {
                     </p-link>
                 </template>
                 <template #col-actualSpend-format="{item, value, rowIndex}">
-                    <p :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                    <p :class="{ expired: item.state === 'EXPIRED' }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
                         {{ Number(value).toLocaleString() }}
                     </p>
                 </template>
                 <template #col-utilization_rate-format="{item, value}">
-                    <div :class="{ expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                    <div :class="{ expired: item.state === 'EXPIRED' }">
                         <div v-if="value > -1">
                             <p-progress-bar :percentage="value"
                                             :color="Number(value) < 100
@@ -537,14 +576,18 @@ onMounted(async () => {
                         </div>
                     </div>
                 </template>
-                <template #col-remaining-format="{item, rowIndex}">
-                    <p :class="{exceeded: (Number(item.limit) - Number(item.actualSpend)) < 0, expired: dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD') }">
+                <template #col-remaining-format="{item, value, rowIndex}">
+                    <p :class="{exceeded: Number(value) < 0, expired: item.state === 'EXPIRED' }">
                         {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
-                        {{ Math.abs(Number((Number(item.limit) - Number(item.actualSpend)).toFixed(2))).toLocaleString() }}
+                        {{ Math.abs(value.toFixed(2)).toLocaleString() }}
                     </p>
                 </template>
-                <template #col-state-format="{item}">
-                    <div v-if="dayjs(item.period.split('~')[1]).format('YYYY-MM-DD') < dayjs().format('YYYY-MM-DD')">
+
+                <template #col-state-format="{value}">
+                    <div v-if="value === 'SCHEDULED'">
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SCHEDULED') }}
+                    </div>
+                    <div v-else-if="value === 'EXPIRED'">
                         {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.EXPIRED') }}
                     </div>
                     <p-status v-else
@@ -554,7 +597,6 @@ onMounted(async () => {
                 </template>
             </p-toolbox-table>
         </div>
-        <p-button-modal header-title="Do you want to On/Off your Alert?" />
         <budget-delete-check-modal
             :visible="state.modalVisible"
             :selected-indices="state.selectedBudgetIds"

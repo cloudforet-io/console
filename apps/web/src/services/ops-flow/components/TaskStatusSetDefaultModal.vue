@@ -8,6 +8,7 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -36,11 +37,14 @@ const { targetStatusOption } = useTargetStatusOption({ categoryStatusOptions, ta
 const name = computed(() => targetStatusOption.value?.name ?? '');
 
 /* set default status */
-const { taskCategoryAPI, taskCategoryListQueryKey, taskCategoryQueryKey } = useTaskCategoryApi();
+const { taskCategoryAPI } = useTaskCategoryApi();
+const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
+const { withSuffix: taskCategoryWithSuffix } = useServiceQueryKey('opsflow', 'task-category', 'get');
 const queryClient = useQueryClient();
 const { mutate: setAsDefaultStatus, isPending } = useMutation({
     mutationFn: ({ categoryId, statusType, statusId }: { categoryId: string; statusType: TaskStatusType; statusId: string }) => {
         const newStatusOptions = cloneDeep(categoryStatusOptions.value);
+        if (!newStatusOptions) throw new Error('Status options not found');
         const prevDefault = newStatusOptions[statusType].find((p) => p.is_default);
         if (prevDefault) prevDefault.is_default = false;
         const newDefault = newStatusOptions[statusType].find((p) => p.status_id === statusId);
@@ -55,12 +59,7 @@ const { mutate: setAsDefaultStatus, isPending } = useMutation({
     },
     onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
-        queryClient.invalidateQueries({
-            queryKey: [
-                ...taskCategoryQueryKey.value,
-                { category_id: data.category_id },
-            ],
-        });
+        queryClient.invalidateQueries({ queryKey: taskCategoryWithSuffix(data.category_id) });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }), '');
         taskCategoryPageStore.closeSetDefaultStatusModal();
     },

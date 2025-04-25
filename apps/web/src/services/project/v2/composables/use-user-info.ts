@@ -20,14 +20,14 @@ export const useUserInfo = () => {
         [ROLE_TYPE.USER]: { icon: UserImage, label: 'User' },
     } as const;
     const getUserIcon = (userId: string): string => {
-        const roleType = userItems[userId]?.data.roleInfo.role_type;
-        return ROLE_INFO_MAP[roleType]?.icon;
+        const roleType = userItems.value[userId]?.data.roleInfo?.role_type;
+        return roleType ? ROLE_INFO_MAP[roleType]?.icon : UserImage;
     };
-    const getUserName = (userId: string): string|undefined => userItems[userId]?.name;
-    const getUserLabel = (userId: string): string|undefined => userItems[userId]?.label;
+    const getUserName = (userId: string): string|undefined => userItems.value[userId]?.name;
+    const getUserLabel = (userId: string): string|undefined => userItems.value[userId]?.label;
     const getUserRole = (userId: string): string|undefined => {
-        const roleType = userItems[userId]?.data.roleInfo.role_type;
-        return ROLE_INFO_MAP[roleType]?.label;
+        const roleType = userItems.value[userId]?.data.roleInfo?.role_type;
+        return roleType ? ROLE_INFO_MAP[roleType]?.label : undefined;
     };
 
     return {

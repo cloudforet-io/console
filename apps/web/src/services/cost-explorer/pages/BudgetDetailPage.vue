@@ -15,10 +15,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import BudgetDetailBaseInformation from '@/services/cost-explorer/components/BudgetDetailBaseInformation.vue';
 import BudgetDetailHeading from '@/services/cost-explorer/components/BudgetDetailHeading.vue';
+import BudgetUsageTrend from '@/services/cost-explorer/components/BudgetUsageTrend.vue';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
-import BudgetUsageTrend from '../components/BudgetUsageTrend.vue';
 
 interface Props {
   budgetId: string;

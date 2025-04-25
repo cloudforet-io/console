@@ -27,10 +27,10 @@ import {
 } from '@/lib/helper/config-data-helper';
 import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
+import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
@@ -49,11 +49,11 @@ const { getAllMenuList } = useAllMenuList();
 
 /* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
+    publicDashboardListQuery,
+    privateDashboardListQuery,
+} = useGlobalDashboardQuery();
 
-const dashboardList = computed(() => [...publicDashboardList.value, ...privateDashboardList.value]);
+const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),

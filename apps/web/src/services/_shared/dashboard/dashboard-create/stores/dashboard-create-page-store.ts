@@ -2,14 +2,9 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { DashboardType, AdminDashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { DashboardTemplateListParameters } from '@/schema/repository/dashboard-template/api-verbs/list';
-import type { DashboardTemplateModel } from '@/schema/repository/dashboard-template/model';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 
@@ -19,7 +14,6 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         createType: 'SINGLE' as 'SINGLE' | 'BUNDLE',
         currentStep: 1 as number,
         dashboardCreated: false as boolean,
-        dashboardTemplates: [] as DashboardTemplateModel[],
         // single case
         dashboardScope: 'WORKSPACE' as 'WORKSPACE' | 'PRIVATE',
         // bundle case
@@ -69,17 +63,8 @@ export const useDashboardCreatePageStore = defineStore('page-dashboard-create', 
         state.dashboardCreated = false;
         state.adminDashboardType = 'WORKSPACE';
     };
-    const listDashboardTemplates = async () => {
-        try {
-            const { results } = await SpaceConnector.clientV2.repository.dashboardTemplate.list<DashboardTemplateListParameters, ListResponse<DashboardTemplateModel>>({
-            });
-            state.dashboardTemplates = results || [];
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    };
+
     const actions = {
-        listDashboardTemplates,
         reset,
     };
 

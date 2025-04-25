@@ -103,7 +103,7 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
     // init validation
     state.isCustomSchemaFormValid = true;
     state.projectForm.selectedProjectId = originForm?.projectForm?.selectedProjectId;
-    state.serviceAccountManagerId = originForm?.serviceAccountManagerId;
+    state.serviceAccountManagerId = originForm?.serviceAccountManagerId ?? '';
 };
 
 /* Api */
@@ -134,6 +134,12 @@ const handleUpdateServiceAccountName = (value: string) => {
 
 const handleServiceAccountManagerId = (value: string) => {
     state.serviceAccountManagerId = value;
+};
+
+const handleFormatSelectedIds = (value: Record<string, any>) => {
+    if (Array.isArray(value.USER) && value.USER.length === 0) {
+        state.serviceAccountManagerId = '';
+    }
 };
 
 /* Init */
@@ -182,6 +188,8 @@ watch(() => state.originForm, (originForm) => {
                                   :show-user-group-list="false"
                                   :selected-id="state.serviceAccountManagerId"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
+                                  :show-delete-all-button="false"
+                                  @formatted-selected-ids="handleFormatSelectedIds"
                                   @update:selected-id="handleServiceAccountManagerId"
             />
         </p-field-group>

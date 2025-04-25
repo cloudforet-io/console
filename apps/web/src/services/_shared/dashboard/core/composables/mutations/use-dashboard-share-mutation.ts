@@ -21,6 +21,7 @@ export const useDashboardShareMutation = (options: UseDashboardShareMutationOpti
     const { publicDashboardAPI } = usePublicDashboardApi();
     const queryClient = useQueryClient();
     const { withSuffix: publicDashboardGetQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'get');
+    const { key: publicDashboardListQueryKey } = useServiceQueryKey('dashboard', 'public-dashboard', 'list');
 
     const {
         isShared, onSuccess, onError, onSettled,
@@ -37,6 +38,7 @@ export const useDashboardShareMutation = (options: UseDashboardShareMutationOpti
         onSuccess: async (data, variables) => {
             const _dashboardId = variables.dashboard_id;
             queryClient.invalidateQueries({ queryKey: publicDashboardGetQueryKey(_dashboardId) });
+            queryClient.invalidateQueries({ queryKey: publicDashboardListQueryKey });
             if (onSuccess) await onSuccess(data, variables);
         },
         onError: (error, variables) => {

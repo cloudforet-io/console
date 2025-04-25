@@ -1,17 +1,20 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const useWorkspaceMutations = () => {
-    const { workspaceAPI, workspaceQueryKey, workspaceListQueryKey } = useWorkspaceApi();
+    const { workspaceAPI } = useWorkspaceApi();
+    const { key: workspaceListQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+    const { withSuffix: workspaceWithSuffix } = useServiceQueryKey('identity', 'workspace', 'get');
     const queryClient = useQueryClient();
     const { mutateAsync: addPackageToWorkspace } = useMutation({
         mutationFn: workspaceAPI.addPackage,
         onSuccess: (updatedWorkspace) => {
-            queryClient.setQueryData([...workspaceQueryKey.value, { workspace_id: updatedWorkspace.workspace_id }], updatedWorkspace);
+            queryClient.setQueryData(workspaceWithSuffix(updatedWorkspace.workspace_id), updatedWorkspace);
         },
         onError: (error) => {
             ErrorHandler.handleError(error);
@@ -21,14 +24,14 @@ const useWorkspaceMutations = () => {
     const { mutateAsync: removePackageFromWorkspace } = useMutation({
         mutationFn: workspaceAPI.removePackage,
         onSuccess: (updatedWorkspace) => {
-            queryClient.setQueryData([...workspaceQueryKey.value, { workspace_id: updatedWorkspace.workspace_id }], updatedWorkspace);
+            queryClient.setQueryData(workspaceWithSuffix(updatedWorkspace.workspace_id), updatedWorkspace);
         },
         onError: (error) => {
             ErrorHandler.handleError(error);
         },
     });
     return {
-        addPackageToWorkspace, removePackageFromWorkspace, workspaceQueryKey, workspaceListQueryKey,
+        addPackageToWorkspace, removePackageFromWorkspace, workspaceListQueryKey,
     };
 };
 

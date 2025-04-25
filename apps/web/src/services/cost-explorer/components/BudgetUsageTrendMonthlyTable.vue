@@ -8,11 +8,15 @@ import { PDataTable, PToggleButton, PLink } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
-import { COST_EXPLORER_ROUTE } from '../routes/route-constant';
-import { useBudgetDetailPageStore } from '../stores/budget-detail-page-store';
+import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
+
+import { MANAGED_COST_QUERY_SET_IDS } from '../constants/managed-cost-analysis-query-sets';
 
 interface Props {
     data: any;
@@ -20,13 +24,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const userWorkspaceStore = useUserWorkspaceStore();
-const currentWorkspaceId = computed(() => userWorkspaceStore.getters.currentWorkspaceId);
-
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+const appContextStore = useAppContextStore();
+const costQuerySetStore = useCostQuerySetStore();
 
 const budgetData = computed(() => budgetPageState.budgetData);
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
 const formatNumberToShort = (number: number) => {
     if (number >= 1000000000) {
@@ -159,7 +163,7 @@ const handleToggleOriginalData = (value: boolean) => {
             <template #col-format="{ value, field, item }">
                 <template v-if="field.name !== 'category'">
                     <span class="block text-right">
-                        <template v-if="item.category !== 'Usage Rate'">
+                        <template v-if="item.category !== i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.USAGE_RATE')">
                             <p>
                                 <span>{{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }} </span>
                                 <span :class="{bold: item.category === i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')}">
@@ -176,9 +180,18 @@ const handleToggleOriginalData = (value: boolean) => {
                 </template>
             </template>
         </p-data-table>
-        <p-link :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME, params: {
-                    workspaceId: currentWorkspaceId,
-                } }"
+        <p-link :to="{
+                    name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    params: {
+                        costQuerySetId: costQuerySetStore.state.costQuerySetList
+                            .filter(c => c.name === MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT)
+                            .map(c => c.cost_query_set_id)[0]
+                    },
+                    query: {
+                        project_id: budgetPageState.budgetData?.project_id,
+                        service_account_id: budgetPageState.budgetData?.service_account_id,
+                    }
+                }"
                 highlight
                 class="link"
                 action-icon="external-link"

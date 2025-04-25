@@ -20,7 +20,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 const allReferenceStore = useAllReferenceStore();
 const budgetCreatePageStore = useBudgetCreatePageStore();
@@ -39,7 +39,6 @@ const state = reactive({
     serviceAccountList: [] as string[],
     existingServiceAccountIds: [],
     refinedServiceAccountList: computed<SelectDropdownMenuItem[]>(() => state.serviceAccountList
-        .filter((serviceAccountId) => state.existingServiceAccountIds?.length > 0 && !state.existingServiceAccountIds.includes(serviceAccountId))
         .map((serviceAccountId) => ({
             name: serviceAccountId,
             label: serviceAccount.value[serviceAccountId].label,

@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TaskChangeAssigneeParameters } from '@/api-clients/opsflow/task/schema/api-verbs/change-assignee';
 import type { TaskChangeStatusParameters } from '@/api-clients/opsflow/task/schema/api-verbs/change-status';
@@ -13,9 +12,6 @@ import type { TaskUpdateDescriptionParameters } from '@/api-clients/opsflow/task
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 
 export const useTaskApi = () => {
-    const taskQueryKey = useAPIQueryKey('opsflow', 'task', 'get');
-    const taskListQueryKey = useAPIQueryKey('opsflow', 'task', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.opsflow.task.create<TaskCreateParameters, TaskModel>,
         update: SpaceConnector.clientV2.opsflow.task.update<TaskUpdateParameters, TaskModel>,
@@ -28,8 +24,6 @@ export const useTaskApi = () => {
     };
 
     return {
-        taskQueryKey,
-        taskListQueryKey,
         taskAPI: actions,
     };
 };

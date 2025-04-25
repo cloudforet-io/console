@@ -5,6 +5,7 @@ import { isEqual } from 'lodash';
 
 import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -39,8 +40,12 @@ interface TaskTypeFormUpdateVariables {
 
 export const useTaskTypeFormMutations = () => {
     const taskManagementTemplateStore = useTaskManagementTemplateStore();
-    const { taskTypeAPI, taskTypeListQueryKey, taskTypeQueryKey } = useTaskTypeApi();
+    const { taskTypeAPI } = useTaskTypeApi();
     const queryClient = useQueryClient();
+
+    const { key: taskTypeListQueryKey } = useServiceQueryKey('opsflow', 'task-type', 'list');
+    const { withSuffix: taskTypeWithSuffix } = useServiceQueryKey('opsflow', 'task-type', 'get');
+
     /* create task type */
     const { mutateAsync: createTaskType, isPending: isCreating } = useMutation({
         mutationFn: ({ categoryId, form, fields }: TaskTypeFormCreateVariables) => taskTypeAPI.create({
@@ -64,18 +69,18 @@ export const useTaskTypeFormMutations = () => {
     /* update task type */
     const { mutateAsync: updateTaskTypeMutation, isPending: isUpdating } = useMutation({
         mutationFn: taskTypeAPI.update,
-        onSuccess: () => {
+        onSuccess: (data) => {
             // Invalidate task type detail and list queries
-            queryClient.invalidateQueries({ queryKey: taskTypeQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: taskTypeWithSuffix(data.task_type_id) });
             queryClient.invalidateQueries({ queryKey: taskTypeListQueryKey.value });
         },
         throwOnError: true,
     });
     const { mutateAsync: updateTaskTypeFieldsMutation } = useMutation({
         mutationFn: taskTypeAPI.updateFields,
-        onSuccess: () => {
+        onSuccess: (data) => {
             // Only invalidate task type detail query
-            queryClient.invalidateQueries({ queryKey: taskTypeQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: taskTypeWithSuffix(data.task_type_id) });
         },
         throwOnError: true,
     });

@@ -15,12 +15,8 @@ interface UseCostReportConfigApiReturn {
 
 export const useCostReportConfigApi = (): UseCostReportConfigApiReturn => {
     const actions = {
-        async update(params: CostReportConfigUpdateParameters) {
-            return SpaceConnector.clientV2.costAnalysis.costReportConfig.update<CostReportConfigUpdateParameters, CostReportConfigModel>(params);
-        },
-        async list(params: CostReportConfigListParameters) {
-            return SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>(params);
-        },
+        update: SpaceConnector.clientV2.costAnalysis.costReportConfig.update<CostReportConfigUpdateParameters, CostReportConfigModel>,
+        list: SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>,
     };
 
     return {

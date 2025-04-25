@@ -18,7 +18,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo } from '@/styles/colors';
 
-import { useBudgetCreatePageStore } from '../stores/budget-create-page-store';
+import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -29,11 +29,11 @@ const state = reactive({
     data: {},
     xAxisData: computed(() => {
         const startDate = budgetCreatePageState.startMonth.length > 0
-            ? dayjs.utc(budgetCreatePageState.startMonth[0])
-            : dayjs.utc().subtract(3, 'month');
+            ? dayjs.utc(budgetCreatePageState.startMonth[0]).subtract(1, 'year')
+            : dayjs.utc().subtract(1, 'year').subtract(3, 'month');
         const endDate = budgetCreatePageState.endMonth.length > 0
-            ? dayjs.utc(budgetCreatePageState.endMonth[0])
-            : dayjs.utc().subtract(1, 'month');
+            ? dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(1, 'year')
+            : dayjs.utc().subtract(1, 'year').subtract(1, 'month');
         const monthDiff = endDate.diff(startDate, 'month');
 
         return Array.from({ length: monthDiff + 1 }, (_, i) => startDate.add(i, 'month').format('YYYY-MM'));
@@ -102,8 +102,8 @@ const fetchBudgetUsageAnalyze = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze({
             query: {
-                start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
-                end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+                start: dayjs.utc(budgetCreatePageState.startMonth[0]).subtract(1, 'year').format('YYYY-MM'),
+                end: dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(1, 'year').format('YYYY-MM'),
                 group_by: !budgetCreatePageState.scope.serviceAccount ? ['project_id', 'is_confirmed'] : ['project_id', 'service_account_id', 'is_confirmed'],
                 fields: {
                     cost_trend: {
@@ -173,7 +173,7 @@ watch(() => budgetCreatePageState, async () => {
 
 <style scoped lang="postcss">
 .chart-wrapper {
-    width: 25rem;
+    width: 56rem;
     height: 17rem;
     .chart {
         height: 100%;

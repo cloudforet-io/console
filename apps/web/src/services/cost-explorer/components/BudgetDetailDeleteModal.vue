@@ -38,7 +38,7 @@ const handleConfirm = async () => {
         });
         emit('update:visible', false);
         emit('confirm');
-        showSuccessMessage('', i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_SUCCESS'));
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_SUCCESS'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
