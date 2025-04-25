@@ -72,10 +72,10 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
 
     const { data, isLoading } = useScopedQuery({
         queryKey: key,
-        queryFn: () => metricDataAPI.analyze<AnalyzeResult>(params.value),
+        queryFn: () => metricDataAPI.analyze(params.value),
         select: (response): SelectResult[] => {
             const results = response.results ?? [];
-            return results.map((i) => ({
+            return results.map((i: AnalyzeResult) => ({
                 cloudServiceGroup: i['Cloud Service Group'],
                 cloudServiceType: i['Cloud Service Type'],
                 provider: i.Provider,
