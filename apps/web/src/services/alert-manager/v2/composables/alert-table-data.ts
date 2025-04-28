@@ -4,8 +4,6 @@ import type { TranslateResult } from 'vue-i18n';
 
 import dayjs from 'dayjs';
 
-import { iso8601Formatter } from '@cloudforet/utils';
-
 import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
 import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
 import { i18n } from '@/translations';
@@ -46,24 +44,16 @@ export const alertStatusBadgeStyleTypeFormatter = (alertState) => {
 };
 
 export const calculateTime = (time: string, timezone: string): string => {
-    const today = dayjs().toISOString();
-    const createdTime = iso8601Formatter(time, timezone);
-    const todayTime = iso8601Formatter(today, timezone);
-    const timeForCalculate = dayjs(todayTime).diff(createdTime, 'minute');
-    const days = Math.floor((timeForCalculate / 1440) % 365);
-    const hours = Math.floor((timeForCalculate / 60) % 24);
-    const minutes = Math.floor(timeForCalculate % 60);
-    let result = '';
+    const createdTime = dayjs.tz(time, timezone);
+    const todayTime = dayjs().tz(timezone);
+    const timeForCalculate = todayTime.diff(createdTime, 'minute');
+    const days = Math.floor(timeForCalculate / 1440);
+    const hours = Math.floor((timeForCalculate % 1440) / 60);
+    const minutes = timeForCalculate % 60;
+    const parts: string[] = [];
+    if (days) parts.push(`${days}d`);
+    if (hours) parts.push(`${hours}h`);
+    if (minutes) parts.push(`${minutes}m`);
 
-    if (days > 0) {
-        result += `${days}d `;
-    }
-    if (hours > 0) {
-        result += `${hours}h `;
-    }
-    if (minutes > 0) {
-        result += `${minutes}m`;
-    }
-
-    return result.trim();
+    return parts.join(' ') || '0m';
 };
