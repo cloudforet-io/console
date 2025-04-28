@@ -683,7 +683,7 @@
 						"FIXED_TERM": "Fixed term",
 						"INCRASE_BY_SPECIFIC_PERCENTAGE": "Increase by a specific % each month",
 						"INITIAL_AMOUNT": "Initial Amount",
-						"LAST_COST_TREND": "Last {count} Month Cost Trend",
+						"LAST_COST_TREND": "Previous Period Spending",
 						"MONTHLY": "Monthly",
 						"MONTHLY_BUDGET_ALLOCATION": "Monthly Budget Allocation",
 						"MONTHLY_GROWTH_RATE": "Monthly Growth Rate",

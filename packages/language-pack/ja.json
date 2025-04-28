@@ -683,7 +683,7 @@
 						"FIXED_TERM": "固定期間",
 						"INCRASE_BY_SPECIFIC_PERCENTAGE": "",
 						"INITIAL_AMOUNT": "",
-						"LAST_COST_TREND": "過去{count}か月のコスト推移",
+						"LAST_COST_TREND": "過去の同期間の費用推移",
 						"MONTHLY": "月次",
 						"MONTHLY_BUDGET_ALLOCATION": "",
 						"MONTHLY_GROWTH_RATE": "",

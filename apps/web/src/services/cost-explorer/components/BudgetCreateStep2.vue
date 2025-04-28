@@ -490,7 +490,7 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                             month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                         }) }}
                 </span>
-                <div class="mt-2">
+                <div class="mt-2 ml-6">
                     <budget-last-three-month-cost-trend-bar-chart />
                 </div>
                 <div class="flex mt-6">
