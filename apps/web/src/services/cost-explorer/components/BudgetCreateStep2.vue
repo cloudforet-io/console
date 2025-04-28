@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, watch, ref,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -30,8 +30,15 @@ import { DEFAULT_UNIFIED_COST_CURRENCY, YAHOO_FINANCE_ID } from '@/services/cost
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 
+
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
+
+const isStartMonthManuallyChanged = ref(false);
+
+const handleStartMonthPickerClosed = () => {
+    isStartMonthManuallyChanged.value = true;
+};
 const domainStore = useDomainStore();
 const domainState = domainStore.state;
 const allReferenceStore = useAllReferenceStore();
@@ -71,8 +78,8 @@ const state = reactive({
 
 
 const isCycleEnabled = computed(() => budgetCreatePageState.startMonth.length > 0
-           && budgetCreatePageState.endMonth.length > 0
-           && state.existingBudgetUsageList.length === 0);
+    && budgetCreatePageState.endMonth.length > 0
+    && state.existingBudgetUsageList.length === 0);
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
 
@@ -193,7 +200,7 @@ watch(() => [budgetCreatePageState.startMonth, budgetCreatePageState.endMonth], 
         );
         budgetCreatePageState.budgetEachDate = Array(12).fill('');
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 
 watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
     if (nv !== ov) {
@@ -212,7 +219,7 @@ watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
 
         budgetCreatePageStore.setPlannedLimits([]);
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 
 watch(() => [
     budgetCreatePageState.selectedMonthlyBudgetAllocation,
@@ -340,7 +347,7 @@ watch(() => [
                     if (isDateInRange(idx)) {
                         return isValidPositiveNumber(v);
                     }
-                    return true; // skip validation for disabled months
+                    return true;
                 });
 
             if (allValuesFilled) {
@@ -358,7 +365,7 @@ watch(() => budgetCreatePageState.selectedMonthlyBudgetAllocation, (nv, ov) => {
     if (nv !== ov) {
         budgetCreatePageStore.setPlannedLimits([]);
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 
 watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], () => {
     if (budgetCreatePageState.startMonth.length > 0 || budgetCreatePageState.endMonth.length > 0) {
@@ -392,19 +399,28 @@ watch([
             budgetCreatePageStore.setBudgetYear(endYear);
         }
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 
 watch(() => budgetCreatePageState.limit, () => {
     if (budgetCreatePageState.limit === null) {
         budgetCreatePageState.limit = undefined;
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 
 watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
     if (newVal !== oldVal && budgetCreatePageState.currentStep === 2) {
-        const isValidationReturn = budgetCreatePageState.time_unit !== '' || budgetCreatePageState.endMonth.length > 0;
-        if (!isValidationReturn) {
-            budgetCreatePageState.endMonth = [];
+        if (isStartMonthManuallyChanged.value) {
+            budgetCreatePageStore.setEnd([]);
+            budgetCreatePageState.selectedMonthlyBudgetAllocation = '';
+            budgetCreatePageState.budgetAppliedSameAmount = undefined;
+            budgetCreatePageState.initialAmount = undefined;
+            budgetCreatePageState.monthlyGrowthRate = undefined;
+            budgetCreatePageState.budgetEachDate = Array(12).fill('');
+            isStartMonthManuallyChanged.value = false;
+        }
+        if (budgetCreatePageState.startMonth.length === 0
+            || budgetCreatePageState.endMonth.length === 0
+            || state.existingBudgetUsageList.length > 0) {
             budgetCreatePageState.time_unit = '';
         }
     }
@@ -460,6 +476,7 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                                            :selected-dates.sync="budgetCreatePageState.startMonth"
                                            :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
                                            :invalid="state.existingBudgetUsageList.length > 0"
+                                           @close="handleStartMonthPickerClosed"
                         />
                     </p-field-group>
                     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.END_MONTH')"
