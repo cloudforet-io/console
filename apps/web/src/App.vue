@@ -7,6 +7,7 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
+import { ConsoleVueQueryDevtools } from 'console-vue-query-devtools-sdk';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
@@ -40,8 +41,6 @@ import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
-
-
 if (import.meta.env.DEV) {
     const queryClient = useQueryClient();
     import('@/_dev-tools/vue-query-console-debug').then((mod) => mod.initVueQueryConsoleDebug(queryClient))
@@ -50,7 +49,6 @@ if (import.meta.env.DEV) {
             console.error('Ensure the module exists and the path is correct.');
         });
 }
-
 
 const router = useRouter();
 const route = useRoute();
@@ -120,6 +118,7 @@ watch(() => state.userId, (userId) => {
     <div v-cloak
          id="app"
     >
+        <console-vue-query-devtools />
         <template v-if="displayStore.state.isInitialized">
             <p-notice-alert group="noticeTopLeft" />
             <p-notice-alert group="noticeTopRight" />
