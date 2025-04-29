@@ -56,8 +56,8 @@ export const useDataTableCascadeUpdate = ({ widgetId }: UseDataTableCascadeUpdat
     };
 
     const cascadeUpdateDataTable = async (dataTableId: string) => {
-        const children = _state.dataTableReferenceMap[dataTableId].children;
-        return children.reduce((chain, childId) => chain.then(async () => {
+        const children = _state.dataTableReferenceMap[dataTableId]?.children;
+        return children?.reduce((chain, childId) => chain.then(async () => {
             try {
                 widgetGenerateStore.setDataTableCasCadeUpdateLoadingMap({
                     ...widgetGenerateState.dataTableCasCadeUpdateLoadingMap,
