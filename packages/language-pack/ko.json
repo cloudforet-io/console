@@ -311,6 +311,7 @@
 		"SET_UP": "설정",
 		"SHOW_MORE": "더보기",
 		"STATUS": "상태",
+		"TIMEZONE": "타임존: {timezone}",
 		"UPDATE": "수정",
 		"WEBHOOK": {
 			"ALT_S_CREATE_WEBHOOK": "웹훅 생성 완료",

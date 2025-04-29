@@ -311,6 +311,7 @@
 		"SET_UP": "設定",
 		"SHOW_MORE": "もっと見る",
 		"STATUS": "ステータス",
+		"TIMEZONE": "タイムゾーン: {timezone}",
 		"UPDATE": "編集",
 		"WEBHOOK": {
 			"ALT_S_CREATE_WEBHOOK": "ウェプフク追加に成功",

@@ -155,6 +155,9 @@ onMounted(() => {
 
 <template>
     <div class="schedule-setting-form flex flex-col">
+        <p class="pb-4 text-paragraph-sm">
+            {{ $t('ALERT_MANAGER.TIMEZONE', { timezone: storeState.timezone }) }}
+        </p>
         <p-field-group :label="$t('COMMON.SCHEDULE_SETTING.SCHEDULE_SETTING')"
                        required
         >
