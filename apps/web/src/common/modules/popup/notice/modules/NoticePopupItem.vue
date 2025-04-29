@@ -8,7 +8,7 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { PostModel } from '@/schema/board/post/model';
 
-import { useNoticeStore } from '@/store/notice';
+import { useNoticeStore } from '@/store/notice/notice-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';

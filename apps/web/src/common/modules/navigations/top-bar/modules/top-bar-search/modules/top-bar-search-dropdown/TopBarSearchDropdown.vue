@@ -13,10 +13,9 @@ import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -54,8 +53,8 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
-const userStore = useUserStore();
 const windowSize = useWindowSize();
+const authorizationStore = useAuthorizationStore();
 
 const { getReferenceLocation } = useReferenceRouter();
 
@@ -73,7 +72,6 @@ const getTabHeaderHeight = () => {
 const storeState = reactive({
     activeTab: computed(() => topBarSearchStore.state.activeTab),
     cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const state = reactive({
@@ -86,7 +84,7 @@ const state = reactive({
     tabs: computed(() => {
         const accessMenuList: ValueItem[] = [];
         state.defaultServiceTabs.forEach((i) => {
-            if (storeState.pageAccessPermissionMap[i.id]) {
+            if (authorizationStore.getters.pageAccessPermissionMap[i.id]) {
                 accessMenuList.push({ label: i.label, name: i.name });
             }
         });

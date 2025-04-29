@@ -19,7 +19,7 @@ import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 
 const DEFAULT_LIST_DATA = { results: [] };
@@ -35,12 +35,12 @@ export const useDashboardSearchQuery = ({ searchFilters }: UseDashboardSearchQue
     const { privateDashboardAPI } = usePrivateDashboardApi();
 
     const appContextStore = useAppContextStore();
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const searchApiQueryHelper = new ApiQueryHelper();
 
     const _state = reactive({
         isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-        isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        isWorkspaceOwner: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
     const searchQuery = ref<Query>({});
 

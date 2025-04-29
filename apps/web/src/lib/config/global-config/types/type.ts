@@ -1,9 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
-import type { FEATURES } from '@/lib/config/global-config/constants/constants';
+import type { SERVICE_FEATURES } from '@/lib/config/global-config/constants/constants';
 import type { Menu } from '@/lib/menu/config';
 
-export type FeatureKeyType = typeof FEATURES[keyof typeof FEATURES];
+export type FeatureKeyType = typeof SERVICE_FEATURES[keyof typeof SERVICE_FEATURES];
 export type FeatureVersion = 'V1' | 'V2';
 
 export type ServiceConfig = {
@@ -25,7 +25,7 @@ export interface GeneratedMenuConfig {
     menu: Menu;
     adminMenu?: Menu|null;
 }
-export type GeneratedMenuSchema = Record<string, GeneratedMenuConfig>;
+export type GeneratedMenuSchema = Record<FeatureKeyType, GeneratedMenuConfig>;
 
 type UiAffectConfig = {
     method: string;
@@ -35,7 +35,7 @@ export interface GeneratedUiAffectConfig {
     feature: string;
     affects: UiAffectConfig[];
 }
-export type GeneratedUiAffectSchema = Record<string, Record<string, boolean>>;
+export type GeneratedUiAffectSchema = Record<FeatureKeyType, Record<string, boolean>>;
 
 export interface RouteVersionInfo {
     name: string;
@@ -68,6 +68,7 @@ type apiClientType = {
 export type ApiClientsSchemaType = {
     DASHBOARDS: apiClientType,
     PROJECT: apiClientType,
+    SERVICE_ACCOUNT: apiClientType,
     ASSET_INVENTORY: apiClientType,
     COST_ANALYSIS: apiClientType,
     OPS_FLOW: apiClientType,

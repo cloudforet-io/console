@@ -5,9 +5,8 @@ import { isEmpty } from 'lodash';
 
 import { PLazyImg, PI } from '@cloudforet/mirinae';
 
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -23,13 +22,10 @@ interface Props extends DailyUpdateItem {
 
 const props = defineProps<Props>();
 
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 const state = reactive({
-    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
+    accessLink: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
     // dailyUpdateItem: computed<CloudServiceItem>(() => ({
     //     cloudServiceGroup: props.item.cloudServiceGroup,
     //     cloudServiceType: props.item.cloudServiceType,

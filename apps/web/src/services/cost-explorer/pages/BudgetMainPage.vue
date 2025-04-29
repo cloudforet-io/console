@@ -8,7 +8,7 @@ import {
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { SpaceRouter } from '@/router';
 
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
@@ -16,12 +16,12 @@ import BudgetListPeriodCustomModal from '@/services/cost-explorer/components/Bud
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 
 const state = reactive({

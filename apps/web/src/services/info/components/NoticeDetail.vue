@@ -20,7 +20,7 @@ import type { PostModel } from '@/schema/board/post/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useNoticeStore } from '@/store/notice';
+import { useNoticeStore } from '@/store/notice/notice-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';

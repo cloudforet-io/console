@@ -15,8 +15,7 @@ import type { ChannelSchedule } from '@/schema/notification/type';
 import type { UserChannelCreateParameters as UserChannelCreateParametersV1 } from '@/schema/notification/user-channel/api-verbs/create';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
-
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
@@ -38,10 +37,10 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
 const state = reactive({
-    visibleUserNotification: computed<boolean>(() => globalConfigSchemaStore.state.uiAffectsSchema.ALERT_MANAGER?.visibleUserNotification ?? false),
+    visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
     isDataValid: false,
     notificationLevel: 'LV1' as NotificationLevel,
     //

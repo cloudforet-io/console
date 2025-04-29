@@ -22,14 +22,14 @@ import type { WorkspaceUserGetParameters } from '@/api-clients/identity/workspac
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
 
 export const useUserPageStore = defineStore('page-user', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const state = reactive({
         isAdminMode: false,
@@ -53,7 +53,7 @@ export const useUserPageStore = defineStore('page-user', () => {
         } as ModalState,
     });
     const getters = reactive({
-        isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
         selectedUsers: computed(():UserListItemType[] => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];

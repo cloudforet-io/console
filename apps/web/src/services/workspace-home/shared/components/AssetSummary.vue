@@ -9,10 +9,10 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -42,12 +42,12 @@ const props = withDefaults(defineProps<{
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const storeState = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+    pageAccessPermissionMap: computed<PageAccessMap>(() => authorizationStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
