@@ -110,7 +110,7 @@ const state = reactive({
         label: d.name,
         icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
-    selectedDataTableId: computed<string>(() => widgetGenerateState.selectedDataTableId),
+    selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
     errorModalCurrentType: undefined as 'default'|'geoMap'|undefined,
 });
 

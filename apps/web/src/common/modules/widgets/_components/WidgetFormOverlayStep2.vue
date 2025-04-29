@@ -99,26 +99,21 @@ const {
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
+let fieldManager: WidgetFieldValueManager;
+
 const state = reactive({
     isPrivate: computed<boolean>(() => !!widgetGenerateState.widgetId?.startsWith('private')),
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === widgetGenerateState.selectedDataTableId)),
     mounted: false,
     fieldManager: computed<WidgetFieldValueManager|undefined>(() => {
-        const _widgetConfig = getWidgetConfig(widgetGenerateState.selectedWidgetName);
-
-        if (
-            !widgetGenerateState.selectedWidgetName
-            || widgetLoading.value
-            || !widget.value
-            || !state.selectedDataTable
-            || !_widgetConfig
-        ) return undefined;
-
-        return new WidgetFieldValueManager(
-            _widgetConfig,
-            state.selectedDataTable,
-            cloneDeep(widget.value?.options) || {},
-        );
+        if (!fieldManager && widget.value) {
+            fieldManager = new WidgetFieldValueManager(
+                state.widgetConfig,
+                state.selectedDataTable,
+                cloneDeep(widget.value?.options) || {},
+            );
+        }
+        return fieldManager;
     }),
     value: computed(() => state.fieldManager?.data?.granularity),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
