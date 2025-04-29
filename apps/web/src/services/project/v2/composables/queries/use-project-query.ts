@@ -18,6 +18,7 @@ enabled?: Ref<boolean>|boolean;
 }) => {
     const { projectAPI } = useProjectApi();
     const { key: projectQueryKey, params } = useServiceQueryKey('identity', 'project', 'get', {
+        contextKey: projectId,
         params: computed<ProjectGetParameters>(() => ({ project_id: projectId.value as string })),
     });
 

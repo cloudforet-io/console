@@ -33,7 +33,7 @@ const targetStatusId = computed(() => taskCategoryPageState.targetStatus?.status
 const { targetStatusOption } = useTargetStatusOption({ categoryStatusOptions, targetStatusType, targetStatusId });
 
 /* status types */
-const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(categoryStatusOptions.value).flat().map((p) => [p.status_id, p.name]));
+const statusIdAndNames = computed<[id: string, name: string][]>(() => Object.values(categoryStatusOptions?.value ?? {}).flat().map((p) => [p.status_id, p.name]));
 const { statusTypeItems } = useStatusTypeDropdownItems();
 
 /* form */

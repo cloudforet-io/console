@@ -43,6 +43,7 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -52,7 +53,6 @@ import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/T
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
@@ -85,14 +85,14 @@ const { getReferenceLocation } = useReferenceRouter();
 
 /* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
+    publicDashboardListQuery,
+    privateDashboardListQuery,
+} = useGlobalDashboardQuery();
 
 const router = useRouter();
 const route = useRoute();
 
-const dashboardList = computed(() => [...publicDashboardList.value, ...privateDashboardList.value]);
+const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),

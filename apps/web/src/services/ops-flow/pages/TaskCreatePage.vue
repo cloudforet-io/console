@@ -25,6 +25,7 @@ import {
 } from 'vue';
 import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router/composables';
 
+
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
@@ -33,6 +34,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -103,7 +105,8 @@ const { currentTaskType, isLoading } = useCurrentTaskType({
 });
 
 /* create task */
-const { taskAPI, taskListQueryKey } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey } = useServiceQueryKey('opsflow', 'task', 'list');
 const queryClient = useQueryClient();
 interface CreateTaskVariables {
     taskTypeId: string;

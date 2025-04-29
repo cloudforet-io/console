@@ -532,7 +532,7 @@
 					"ACTUAL_COST": "실 사용액",
 					"AMOUNT_PLANNING_TYPE": "예산 설정 타입",
 					"BASE_INFORMATION": {
-						"BUDGET_ALERTS_TEXT": "실제 지출이 초과되면 예산 관리자에게 알림 전송",
+						"BUDGET_ALERTS_TEXT": "실제 지출이 {threshold}를 초과하면 예산 관리자와 알림 수신자에게 알림을 보냅니다.",
 						"EDIT": "편집",
 						"NAME_INVALID_TEXT": "이름을 입력하지 않았거나, 이미 존재하는 이름입니다.",
 						"SERVICE_ACCOUNT_MANAGERS": "서비스 어카운트 관리자",
@@ -691,7 +691,7 @@
 						"OTHERS": "이외 사용자",
 						"PREVIOUS": "뒤로가기",
 						"PROJECT": "프로젝트",
-						"PROJECT_DUPLICATED_WARNING1": " {project} 프로젝트에는 이미 해당 월에 대한 예산이 설정되어 있습니다: {month_list}",
+						"PROJECT_DUPLICATED_WARNING1": " {project} 프로젝트에는 이미 해당 월들에 대한 예산이 설정되어 있습니다: {month_list}",
 						"PROJECT_DUPLICATED_WARNING2": "프로젝트 {project} 의 서비스 어카운트 {serviceAccount} 에는 이미 해당 월(들)에 대한 예산이 설정되어 있습니다: {month_list}",
 						"PROJECT_MEMBER": "프로젝트 멤버",
 						"PROJECT_VALIDATION": "",

@@ -41,11 +41,12 @@ const dashboardPageControlStore = useDashboardPageControlStore();
 /* Query */
 const queryClient = useQueryClient();
 const {
-    keys,
+    keys: dashboardKeys,
 } = useDashboardQuery();
 const {
     publicFolderList,
     privateFolderList,
+    keys: dashboardFolderKeys,
 } = useDashboardFolderQuery();
 
 const storeState = reactive({
@@ -88,8 +89,10 @@ const { mutate: changeFolder } = useDashboardChangeFolderMutation({
     onSuccess: () => {
         showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
         const isPrivate = props.dashboardId.startsWith('private');
-        const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+        const dashboardListQueryKey = isPrivate ? dashboardKeys.privateDashboardListQueryKey : dashboardKeys.publicDashboardListQueryKey;
+        const dashboardFolderListQueryKey = isPrivate ? dashboardFolderKeys.privateFolderListQueryKey : dashboardFolderKeys.publicFolderListQueryKey;
         queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: dashboardFolderListQueryKey.value });
     },
     onError: (e) => {
         showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);

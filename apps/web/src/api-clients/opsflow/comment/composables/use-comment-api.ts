@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CommentCreateParameters } from '@/api-clients/opsflow/comment/schema/api-verbs/create';
 import type { CommentDeleteParameters } from '@/api-clients/opsflow/comment/schema/api-verbs/delete';
@@ -10,9 +9,6 @@ import type { CommentUpdateParameters } from '@/api-clients/opsflow/comment/sche
 import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
 
 export const useCommentApi = () => {
-    const commentQueryKey = useAPIQueryKey('opsflow', 'comment', 'get');
-    const commentListQueryKey = useAPIQueryKey('opsflow', 'comment', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.opsflow.comment.create<CommentCreateParameters, CommentModel>,
         update: SpaceConnector.clientV2.opsflow.comment.update<CommentUpdateParameters, CommentModel>,
@@ -22,8 +18,6 @@ export const useCommentApi = () => {
     };
 
     return {
-        commentQueryKey,
-        commentListQueryKey,
         commentAPI: actions,
     };
 };

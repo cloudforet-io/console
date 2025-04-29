@@ -88,7 +88,6 @@ const state = reactive({
     })),
     isSameValueWithOrigin: computed(() => isEqual(state.formData, state.originForm)),
     isAllValid: computed(() => ((invalidState.serviceAccountName === false)
-        && (state.serviceAccountManagerId !== '')
         && !state.isSameValueWithOrigin
         && (serviceAccountPageGetters.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
@@ -104,7 +103,7 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
     // init validation
     state.isCustomSchemaFormValid = true;
     state.projectForm.selectedProjectId = originForm?.projectForm?.selectedProjectId;
-    state.serviceAccountManagerId = originForm?.serviceAccountManagerId;
+    state.serviceAccountManagerId = originForm?.serviceAccountManagerId ?? '';
 };
 
 /* Api */
@@ -189,6 +188,7 @@ watch(() => state.originForm, (originForm) => {
                                   :show-user-group-list="false"
                                   :selected-id="state.serviceAccountManagerId"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
+                                  :show-delete-all-button="false"
                                   @formatted-selected-ids="handleFormatSelectedIds"
                                   @update:selected-id="handleServiceAccountManagerId"
             />

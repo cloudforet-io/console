@@ -532,7 +532,7 @@
 					"ACTUAL_COST": "費用",
 					"AMOUNT_PLANNING_TYPE": "予算設定タイプ",
 					"BASE_INFORMATION": {
-						"BUDGET_ALERTS_TEXT": "実際の支出が超過した場合に予算管理者へ通知",
+						"BUDGET_ALERTS_TEXT": "実際の支出が {threshold} を超えた場合、予算管理者とアラート受信者に通知されます。",
 						"EDIT": "編集",
 						"NAME_INVALID_TEXT": "名前が入力されていないか、すでに使用されています。",
 						"SERVICE_ACCOUNT_MANAGERS": "サービスアカウント管理者",

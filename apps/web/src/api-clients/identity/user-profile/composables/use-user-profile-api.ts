@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { UserProfileConfirmEmailParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/confirm-email';
 import type { UserProfileConfirmMfaParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/confirm-mfa';
 import type { UserProfileEnableMfaParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/enable-mfa';
@@ -12,8 +11,6 @@ import type { UserProfileVerifyEmailParameters } from '@/api-clients/identity/us
 
 
 export const useUserProfileApi = () => {
-    const userProfileQueryKey = useAPIQueryKey('identity', 'user-profile', 'get');
-
     const actions = {
         update: SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters, any>,
         updatePassword: SpaceConnector.clientV2.identity.userProfile.updatePassword<UserProfileUpdatePasswordParameters, any>,
@@ -26,7 +23,6 @@ export const useUserProfileApi = () => {
     };
 
     return {
-        userProfileQueryKey,
         userProfileAPI: actions,
     };
 };

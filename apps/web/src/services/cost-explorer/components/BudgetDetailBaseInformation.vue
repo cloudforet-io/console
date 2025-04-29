@@ -18,7 +18,6 @@ import { useServiceAccountReferenceStore } from '@/store/reference/service-accou
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
@@ -139,7 +138,6 @@ const handleUpdateAlertRecipients = async () => {
             data: 'alertRecipients'.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
         }), '');
     } catch (error: any) {
-        ErrorHandler.handleError(error, true);
         showErrorMessage(error.code, error.message);
     }
 };
@@ -154,7 +152,7 @@ const handleUpdateBudgetThresholds = async () => {
                 threshold: Number(threshold),
             })),
         },
-    });
+    }, 'budgetAlerts');
     state.budgetAlertEdit = false;
 };
 
@@ -349,14 +347,11 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                              }"
                             />
                             <div class="flex gap-2 items-start">
-                                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.BUDGET_ALERTS_TEXT') }}:</span>
-                                <p v-if="!state.budgetAlertEdit">
-                                    <span v-for="(plan, index) in [...data.plans].sort((a, b) => a.threshold - b.threshold)"
-                                          :key="`plan-${index}`"
-                                    >
-                                        {{ plan.threshold }}{{ plan.unit === 'PERCENT' ? '%' : '' }}<template v-if="index !== data.plans.length - 1">, </template>
-                                    </span>
-                                </p>
+                                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.BUDGET_ALERTS_TEXT', {
+                                    threshold: [...data.plans].sort((a, b) => a.threshold - b.threshold).map(plan => {
+                                        return ` ${plan.threshold}${plan.unit === 'PERCENT' ? '%' : ''}`
+                                    })
+                                }) }}</span>
                                 <div v-if="state.budgetAlertEdit">
                                     <p-text-input appearance-type="stack"
                                                   multi-input
@@ -416,6 +411,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                             show-user-list
                             selection-type="multiple"
                             :selected-ids="data"
+                            :excluded-selected-ids="[budgetPageState.budgetData?.budget_manager_id ?? '']"
                             @update:selected-ids="handleSelectAlertRecipients"
                         />
                         <p-button v-if="!state.alertRecipientsEdit && !storeState.isAdminMode && hasReadWriteAccess"

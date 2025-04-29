@@ -532,7 +532,7 @@
 					"ACTUAL_COST": "Actual Cost",
 					"AMOUNT_PLANNING_TYPE": "Amount Planning Type",
 					"BASE_INFORMATION": {
-						"BUDGET_ALERTS_TEXT": "Notify budget managers when actual spending exceeds",
+						"BUDGET_ALERTS_TEXT": "Notify the budget manager and alert recipients when actual spending exceeds {threshold}.",
 						"EDIT": "Edit",
 						"NAME_INVALID_TEXT": "The name is either missing or already in use.",
 						"SERVICE_ACCOUNT_MANAGERS": "Service Account Managers",

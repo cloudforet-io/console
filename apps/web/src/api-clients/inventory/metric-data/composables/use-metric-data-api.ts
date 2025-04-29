@@ -11,12 +11,8 @@ import type { MetricDataModel } from '@/schema/inventory/metric-data/model';
 
 export const useMetricDataApi = () => {
     const actions = {
-        async list(params: MetricDataListParameters) {
-            return SpaceConnector.clientV2.inventory.metricData.list<MetricDataListParameters, ListResponse<MetricDataModel>>(params);
-        },
-        async analyze<T = any>(params: MetricDataAnalyzeParameters) {
-            return SpaceConnector.clientV2.inventory.metricData.analyze<MetricDataAnalyzeParameters, AnalyzeResponse<T>>(params);
-        },
+        list: SpaceConnector.clientV2.inventory.metricData.list<MetricDataListParameters, ListResponse<MetricDataModel>>,
+        analyze: SpaceConnector.clientV2.inventory.metricData.analyze<MetricDataAnalyzeParameters, AnalyzeResponse<any>>,
     };
 
     return {

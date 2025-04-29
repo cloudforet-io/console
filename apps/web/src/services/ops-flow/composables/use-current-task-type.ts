@@ -9,7 +9,8 @@ export const useCurrentTaskType = ({ taskTypeId }: {
 
 }) => {
     const { taskType, error, isLoading } = useTaskTypeQuery({
-        queryKey: computed(() => ({
+        taskTypeId: computed(() => taskTypeId.value),
+        params: computed(() => ({
             task_type_id: taskTypeId.value as string,
             include_category_fields: true,
         })),

@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -65,13 +66,16 @@ const handleConfirmDelete = async () => {
 };
 
 const queryClient = useQueryClient();
-const { projectAPI, projectListQueryKey, projectQueryKey } = useProjectApi();
+const { projectAPI } = useProjectApi();
+const { key: projectListQueryKey } = useServiceQueryKey('identity', 'project', 'list');
+const { withSuffix: projectQueryKeyWithSuffix } = useServiceQueryKey('identity', 'project', 'get');
+
 const deleteProject = async (projectId: string) => {
     await projectAPI.delete({
         project_id: projectId,
     });
     queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
-    queryClient.removeQueries({ queryKey: [...projectQueryKey.value, projectId] });
+    queryClient.removeQueries({ queryKey: projectQueryKeyWithSuffix(projectId) });
     await recentStore.deleteRecent({
         type: RECENT_TYPE.PROJECT,
         itemId: projectId,
@@ -86,13 +90,15 @@ const deleteProject = async (projectId: string) => {
         });
     }
 };
-const { projectGroupAPI, projectGroupListQueryKey, projectGroupQueryKey } = useProjectGroupApi();
+const { projectGroupAPI } = useProjectGroupApi();
+const { key: projectGroupListQueryKey } = useServiceQueryKey('identity', 'project-group', 'list');
+const { withSuffix: projectGroupQueryKeyWithSuffix } = useServiceQueryKey('identity', 'project-group', 'get');
 const deleteProjectGroup = async (projectGroupId: string) => {
     await projectGroupAPI.delete({
         project_group_id: projectGroupId,
     });
     queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
-    queryClient.removeQueries({ queryKey: [...projectGroupQueryKey.value, projectGroupId] });
+    queryClient.removeQueries({ queryKey: projectGroupQueryKeyWithSuffix(projectGroupId) });
     showSuccessMessage(_i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
     const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === projectGroupId);
     if (isFavoriteItem) {
