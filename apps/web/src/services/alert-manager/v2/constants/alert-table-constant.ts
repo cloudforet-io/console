@@ -29,6 +29,7 @@ export const ALERT_MANAGEMENT_TABLE_FIELDS: DataTableFieldType[] = [
     { name: 'duration', label: 'Duration', sortable: false },
     { name: 'created_at', label: 'Created' },
     { name: 'resolved_at', label: 'Resolved' },
+    { name: 'resources', label: 'Resource' },
 ];
 export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
@@ -55,6 +56,7 @@ export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [
     { key: 'triggered_by', name: 'Triggered by', reference: { reference_key: 'webhook_id', resource_type: 'alert_manager.Webhook' } },
     { key: 'created_at', name: 'Created', type: 'datetime' },
     { key: 'resolved_at', name: 'Resolved', type: 'datetime' },
+    { key: 'resources', name: 'Resource' },
 ];
 
 export const ALERT_CHANNEL_TABLE_FIELDS: DataTableFieldType[] = [

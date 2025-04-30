@@ -3,7 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+import type { RawLocation } from 'vue-router/types/router';
 
 import dayjs from 'dayjs';
 
@@ -20,8 +21,11 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { AppReferenceMap } from '@/store/reference/app-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
@@ -60,6 +64,7 @@ import type {
     AlertFilterType, AlertPeriodItemType,
     AlertPeriodDropdownMenuType,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -70,8 +75,11 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
+const router = useRouter();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -85,6 +93,7 @@ const storeState = reactive({
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
     selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
     timezone: computed<string>(() => userState.timezone || ''),
+    currentWorkspaceId: computed<string>(() => userWorkspaceGetters.currentWorkspaceId || ''),
 });
 const state = reactive({
     loading: false,
@@ -288,7 +297,63 @@ const handleCustomRangeModalConfirm = (start: string, end: string) => {
     state.customRangeModalVisible = false;
     fetchAlertsList();
 };
+const createRouteParams = (params: {
+    provider: string;
+    group: string;
+    name: string;
+    id: string;
+}): RawLocation => {
+    const queryHelper = new QueryHelper();
+    return {
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        params: {
+            provider: params.provider,
+            group: params.group,
+            name: params.name,
+            workspaceId: storeState.currentWorkspaceId || '',
+        },
+        query: {
+            filters: queryHelper.setFilters([
+                { k: 'cloud_service_id', v: params.id, o: '=' },
+            ]).rawQueryStrings,
+        },
+    };
+};
 
+const handleRouteViewButton = async (id: string, type?: string) => {
+    const [provider, group, name] = type?.split('.') || [];
+
+    if (!type && !id) {
+        console.warn('Invalid parameters: both id and type are missing');
+        return;
+    }
+
+    try {
+        const routeParams = type ? {
+            provider, group, name, id,
+        } : await (async () => {
+            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+                cloud_service_id: id,
+            });
+            return {
+                provider: response.provider,
+                group: response.cloud_service_group,
+                name: response.cloud_service_type,
+                id: response.cloud_service_id,
+            };
+        })();
+
+        window.open(router.resolve(createRouteParams(routeParams)).href, '_blank');
+    } catch (e) {
+        if (!type) {
+            ErrorHandler.handleError(e, true);
+            return;
+        }
+        window.open(router.resolve(createRouteParams({
+            provider, group, name, id,
+        })).href, '_blank');
+    }
+};
 const fetchAlertsList = async () => {
     state.loading = true;
     try {
@@ -315,7 +380,6 @@ const fetchAlertsList = async () => {
                 filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.end, o: '<=' });
             }
         }
-
 
         if (state.isServicePage) {
             filterQueryHelper.addFilter({ k: 'service_id', v: storeState.serviceId, o: '=' });
@@ -531,6 +595,28 @@ watch(() => storeState.serviceId, async (serviceId) => {
             <template #col-triggered_by-format="{ value }">
                 <span>{{ getCreatedByNames(value) }}</span>
             </template>
+            <template #col-resources-format="{ value }">
+                <div v-for="(item, idx) in value"
+                     :key="`resource-item-${idx}`"
+                >
+                    <component :is="item.asset_id ? PLink : 'p'"
+                               class="resource-item"
+                               :class="{ 'link': item.asset_id }"
+                               @click="item.asset_id ? handleRouteViewButton(item.asset_id, item.asset_type) : null"
+                    >
+                        <span class="flex items-center">
+                            <span class="text inline-block truncate">{{ item?.name }}</span>
+                            <p-i v-if="item.asset_id"
+                                 name="ic_arrow-right-up"
+                                 class="ml-0.5"
+                                 height="0.875rem"
+                                 width="0.875rem"
+                                 color="inherit"
+                            />
+                        </span>
+                    </component>
+                </div>
+            </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
                             :resource-type="state.isServicePage ? 'service.alert' : 'alertManager.alert'"
@@ -597,6 +683,14 @@ watch(() => storeState.serviceId, async (serviceId) => {
                     padding-bottom: 0;
                 }
             }
+        }
+    }
+    .resource-item {
+        .text {
+            max-width: 20rem;
+        }
+        &.link {
+            @apply text-secondary truncate cursor-pointer;
         }
     }
 }
