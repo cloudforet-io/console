@@ -11,6 +11,7 @@ import { getParsedKeysWithManagedCostQueryFavoriteKey } from '@/lib/helper/confi
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useServiceNavigation } from '@/common/composables/service-query';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
@@ -18,20 +19,21 @@ import { gray, indigo, peacock } from '@/styles/colors';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 interface Props {
     item?: ReferenceData;
+    isHiddenFavoriteButton?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
+    isHiddenFavoriteButton: false,
 });
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 
-
+const { navigate } = useServiceNavigation();
 const router = useRouter();
 
 const { getReferenceLocation } = useReferenceRouter();
@@ -76,13 +78,10 @@ const handleClickItem = () => {
     }
     if (props.item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
-        router.push({
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-            params: {
-                dataSourceId: props.item.dataSourceId,
-                costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
-            },
-        }).catch(() => {});
+        navigate('cost-analysis', {
+            dataSourceId: props.item.dataSourceId as string,
+            costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
+        }, {});
         return;
     }
     if (props.item.itemType === FAVORITE_TYPE.SECURITY) {

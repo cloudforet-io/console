@@ -23,8 +23,8 @@ import { useProjectReferenceStore, type ProjectReferenceMap } from '@/store/refe
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { MENU_ID } from '@/lib/menu/config';
-import { objectToQueryString } from '@/lib/router-query-string';
 
+import { useServiceNavigation } from '@/common/composables/service-query';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -51,6 +51,7 @@ const props = withDefaults(defineProps<{
     mode: 'workspace',
 });
 
+const { getLocation } = useServiceNavigation();
 
 /* period */
 const { width } = useWindowSize();
@@ -108,7 +109,6 @@ const consoleFilters = computed<ConsoleFilter[]>(() => {
     }
     return [];
 });
-const consoleFiltersQueryString = computed(() => objectToQueryString(consoleFilters.value));
 
 /* cost report config */
 const costReportEnabled = computed(() => {
@@ -266,16 +266,12 @@ const currentDateRangeText = computed<string>(() => {
                     <p-divider class="divider" />
                     <div class="link-footer">
                         <p-link highlight
-                                :to="consoleFiltersQueryString ? {
-                                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                                    params: {
-                                        dataSourceId: UNIFIED_COST_KEY,
-                                        costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-                                    },
-                                    query: {
-                                        filters: consoleFiltersQueryString
-                                    }
-                                } : {
+                                :to="consoleFilters.length ? getLocation('cost-analysis', {
+                                    dataSourceId: UNIFIED_COST_KEY,
+                                    costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+                                }, {
+                                    filters: consoleFilters,
+                                }) : {
                                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                                 }"
                                 action-icon="internal-link"

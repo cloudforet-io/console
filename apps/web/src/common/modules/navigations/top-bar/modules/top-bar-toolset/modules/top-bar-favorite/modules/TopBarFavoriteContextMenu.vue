@@ -43,6 +43,7 @@ import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
 import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+import { useServiceNavigation } from '@/common/composables/service-query';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
@@ -50,7 +51,6 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
@@ -88,6 +88,7 @@ const {
 
 const router = useRouter();
 const route = useRoute();
+const { navigate } = useServiceNavigation();
 
 const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
@@ -298,13 +299,10 @@ const handleSelect = (item: FavoriteMenuItem) => {
     } else if (item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
-        router.push({
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-            params: {
-                dataSourceId,
-                costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
-            },
-        }).catch(() => {});
+        navigate('cost-analysis', {
+            dataSourceId,
+            costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
+        }, {});
     }
     emit('close');
 };
