@@ -193,12 +193,12 @@ const handleToggleOriginalData = (value: boolean) => {
                         filters: arrayToQueryString([
                             {
                                 k: 'project_id',
-                                v: [budgetPageState.budgetData?.project_id],
+                                v: budgetPageState.budgetData?.project_id ? [budgetPageState.budgetData.project_id] : [],
                                 o: '',
                             },
                             {
                                 k: 'service_account_id',
-                                v: [budgetPageState.budgetData?.service_account_id],
+                                v: budgetPageState.budgetData?.service_account_id ? [budgetPageState.budgetData.service_account_id] : [],
                                 o: '',
                             },
                         ]),
