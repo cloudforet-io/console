@@ -282,6 +282,14 @@ const getBudgetFilters = (): ApiFilter[] => {
         });
     }
 
+    if (state.query?.workspaceList && state.query.workspaceList.length > 0) {
+        filters.push({
+            k: 'workspace_id',
+            v: state.query.workspaceList,
+            o: 'contain_in',
+        });
+    }
+
     if (state.query?.projectList && state.query?.projectList?.length) {
         filters.push({
             k: 'project_id',

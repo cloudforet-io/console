@@ -26,8 +26,14 @@ const budgetData = computed(() => budgetPageStore.$state.budgetData);
 
 const chartContext = ref<HTMLElement|null>(null);
 
+interface Props {
+    data: any;
+}
+
+const props = defineProps<Props>();
+
 const state = reactive({
-    data: [],
+    data: props.data,
     xAxisData: computed(() => state.data.map((d) => dayjs.utc(d.date).format('MMM YYYY'))),
     yAxisData: computed(() => [0, 25, 50, 75, 100]),
     chart: null as EChartsType | null,
