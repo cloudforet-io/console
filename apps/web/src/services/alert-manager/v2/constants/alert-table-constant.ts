@@ -43,7 +43,6 @@ export const ALERT_MANAGEMENT_TABLE_HANDLER: AlertManagementTableHandlerType = {
     valueHandlerMap: {
         title: makeDistinctValueHandler('alert_manager.Alert', 'title'),
         labels: makeDistinctValueHandler('alert_manager.Alert', 'labels'),
-        triggered_by: makeDistinctValueHandler('alert_manager.Alert', 'triggered_by'),
     },
 };
 export const ALERT_EXCEL_FIELDS: ExcelDataField[] = [

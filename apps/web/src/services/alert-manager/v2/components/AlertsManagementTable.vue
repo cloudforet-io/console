@@ -15,6 +15,7 @@ import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
@@ -46,6 +47,7 @@ import {
     alertStatusBadgeStyleTypeFormatter, calculateTime,
     getAlertStateI18n,
     getAlertUrgencyI18n,
+    makeTriggeredValueHandler,
 } from '@/services/alert-manager/v2/composables/alert-table-data';
 import {
     ALERT_EXCEL_FIELDS,
@@ -113,6 +115,13 @@ const state = reactive({
     defaultFields: computed<DataTableFieldType[]>(() => (state.isServicePage ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS])),
     fields: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS],
     customRangeModalVisible: false,
+    tableHandler: computed<ValueHandlerMap>(() => ({
+        ...ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap,
+        triggered_by: makeTriggeredValueHandler({
+            webhooks: storeState.webhook,
+            apps: storeState.app,
+        }),
+    })),
 });
 const filterState = reactive({
     urgencyFields: computed<SelectDropdownMenuItem[]>(() => ([
@@ -444,7 +453,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                          :fields="state.fields"
                          :items="state.refinedAlertList"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                         :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :value-handler-map="state.tableHandler"
                          settings-visible
                          @change="handleChange"
                          @click-settings="handleClickSettings"
