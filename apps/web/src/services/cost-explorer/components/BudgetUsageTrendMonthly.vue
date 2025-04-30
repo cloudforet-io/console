@@ -51,7 +51,7 @@ watch(() => state.budgetData, async () => {
 
 <template>
     <div>
-        <budget-usage-trend-monthly-chart />
+        <budget-usage-trend-monthly-chart :data="state.data" />
         <budget-usage-trend-monthly-table :data="state.data" />
     </div>
 </template>

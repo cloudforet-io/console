@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import type { ComputedRef } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -8,6 +11,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -16,6 +20,7 @@ const emit = defineEmits<{(e: 'update:select-month-modal-visible', value: boolea
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const appContextStore = useAppContextStore();
 
 interface BudgetMainToolsetState {
     targetList: SelectDropdownMenuItem[];
@@ -30,11 +35,15 @@ interface BudgetMainToolsetState {
     selectedServiceAccountList: SelectDropdownMenuItem[];
     utilizationList: SelectDropdownMenuItem[];
     selectedUtilization: string;
+    workspaceList: ComputedRef<SelectDropdownMenuItem[]>;
+    selectedWorkspaceList: SelectDropdownMenuItem[];
 }
 
 const storeState = reactive({
     serviceAccount: computed(() => allReferenceGetters.serviceAccount),
     project: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+    workspace: computed(() => allReferenceGetters.workspace),
 });
 
 const state = reactive<BudgetMainToolsetState>({
@@ -78,6 +87,11 @@ const state = reactive<BudgetMainToolsetState>({
         { name: 'overTenPercentSpent', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_SPENT_USAGE', { percent: 10 }) },
     ],
     selectedUtilization: 'all',
+    workspaceList: computed(() => Object.values(storeState.workspace).map((c: any) => ({
+        name: c.key,
+        label: c.label,
+    }))),
+    selectedWorkspaceList: [],
 });
 
 watch(() => storeState.serviceAccount, () => {
@@ -97,6 +111,7 @@ watch(() => storeState.project, () => {
 watch(() => state, () => {
     emit('update:query', {
         target: state.selectedTarget,
+        workspaceList: state.selectedWorkspaceList.map((w) => w.name) ?? [],
         projectList: state.selectedProjectList.map((p) => p.name) ?? [],
         serviceAccountList: state.selectedServiceAccountList.map((s) => s.name),
         year: state.selectedYear,
@@ -121,6 +136,19 @@ watch(() => state, () => {
             />
             <span class="font-bold text-sm">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FILTER') }}:</span>
         </div>
+        <p-select-dropdown v-if="storeState.isAdminMode"
+                           selection-label="Workspace"
+                           style-type="rounded"
+                           show-select-marker
+                           multi-selectable
+                           show-clear-selection
+                           appearance-type="badge"
+                           is-filterable
+                           selection-highlight
+                           :menu="state.workspaceList"
+                           :selected.sync="state.selectedWorkspaceList"
+                           class="filterable-select-dropdown"
+        />
         <p-select-dropdown style-type="rounded"
                            :menu="state.projectList"
                            :selected.sync="state.selectedProjectList"
@@ -128,11 +156,13 @@ watch(() => state, () => {
                            appearance-type="badge"
                            use-fixed-menu-style
                            show-select-marker
+                           is-filterable
                            multi-selectable
                            show-clear-selection
                            show-delete-all-button
                            selection-highlight
                            :page-size="15"
+                           class="filterable-select-dropdown"
         >
             <template #dropdown-left-area>
                 <p-i name="ic_project"
@@ -149,11 +179,13 @@ watch(() => state, () => {
                            appearance-type="badge"
                            use-fixed-menu-style
                            show-select-marker
+                           is-filterable
                            multi-selectable
                            show-clear-selection
                            show-delete-all-button
                            selection-highlight
                            :page-size="15"
+                           class="filterable-select-dropdown"
         >
             <template #dropdown-left-area>
                 <p-i name="ic_service_service-account"
@@ -186,11 +218,17 @@ watch(() => state, () => {
 
 <style scoped lang="postcss">
 .budget-main-toolset {
-    @apply mt-3 flex gap-2 items-center;
+    @apply mt-3 flex items-center gap-2;
+
     .p-select-dropdown {
         min-width: unset;
     }
 }
+
+.filterable-select-dropdown {
+    width: initial;
+}
+
 .divider {
     height: 1rem;
     width: 0.0625rem;
