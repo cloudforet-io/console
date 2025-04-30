@@ -120,7 +120,7 @@
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",
     "tsconfig": "*",
-    "vite": "^4.5.13",
+    "vite": "^4.5.14",
     "vite-plugin-stylelint": "^3.3.3",
     "vue-router": "^3.6.5",
     "vue-tsc": "^2.2.8"
