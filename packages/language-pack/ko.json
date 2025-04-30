@@ -2126,6 +2126,7 @@
 		"CURRENCY_CONVERTER": "환율 설정",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "집계 날짜",
+			"CURRENCY_CONVERTER": "환율 설정",
 			"EXCHANGE_RATE_SOURCE": "환율 기준",
 			"LAST_DAY_OF_THE_MONTH": "매월 마지막일 ",
 			"NOTIFICATION": "비용 분석 페이지에서 Unified Cost에 대한 환율을 설정할 수 있습니다. 비용 집계가 완료되면, 날짜 변경은 다음 달부터 적용됩니다.",
