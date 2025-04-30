@@ -8,7 +8,6 @@ import type { RawLocation } from 'vue-router/types/router';
 
 import dayjs from 'dayjs';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -91,6 +90,7 @@ const storeState = reactive({
     selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
+    selectedLabels: computed<SelectDropdownMenuItem[]>(() => alertPageState.selectedLabels),
     selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
     timezone: computed<string>(() => userState.timezone || ''),
     currentWorkspaceId: computed<string>(() => userWorkspaceGetters.currentWorkspaceId || ''),
@@ -177,8 +177,6 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS_FILTERS.IGNORED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
     ])),
-    labelHandler: computed(() => makeDistinctValueHandler('alert_manager.Alert', 'labels')),
-    selectedLabels: [] as SelectDropdownMenuItem[],
 });
 
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -228,8 +226,9 @@ const getServiceName = (id: string): TranslateResult => {
     if (filterState.serviceDropdownList.length === 0) return '';
     return filterState.serviceDropdownList.find((i) => i.name === id)?.label || '';
 };
-const handleSelectLabelsItem = (value: SelectDropdownMenuItem[]) => {
-    filterState.selectedLabels = value;
+const handleSelectLabelsItem = async (value: SelectDropdownMenuItem[]) => {
+    await alertPageStore.setSelectedLabels(value[0]?.name);
+    await replaceUrlQuery('labels', value[0]?.name);
     fetchAlertsList();
 };
 const handleSelectServiceDropdownItem = async (id: string) => {
@@ -366,8 +365,8 @@ const fetchAlertsList = async () => {
         } else if (storeState.selectedStatus !== 'ALL') {
             filterQueryHelper.addFilter({ k: 'status', v: storeState.selectedStatus, o: '=' });
         }
-        if (filterState.selectedLabels.length > 0) {
-            filterQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
+        if (storeState.selectedLabels?.length > 0) {
+            filterQueryHelper.addFilter({ k: 'labels', v: storeState.selectedLabels.map((i) => i.name), o: '=' });
         }
 
         if (filterState.period.start && filterState.period.end && (filterState.period.start === filterState.period.end)) {
@@ -413,13 +412,14 @@ watch(() => storeState.serviceId, async (serviceId) => {
 
 (async () => {
     const {
-        serviceId, status, urgency, filters,
+        serviceId, status, urgency, filters, labels,
     } = route.query;
     if (!state.isServicePage) {
         await alertPageStore.setSelectedServiceId(serviceId as string);
     }
     await alertPageStore.setSelectedStatus(status as string || 'OPEN');
     await alertPageStore.setSelectedUrgency(urgency as string || 'ALL');
+    await alertPageStore.setSelectedLabels(labels as string);
     if (filters) {
         await queryTagHelper.setURLQueryStringFilters(route.query.filters);
     }
@@ -508,11 +508,10 @@ watch(() => storeState.serviceId, async (serviceId) => {
                     <p-select-dropdown :selection-label="$t('ALERT_MANAGER.ALERTS.LABEL')"
                                        :handler="labelMenuItemsHandler()"
                                        style-type="rounded"
-                                       appearance-type="stack"
                                        show-delete-all-button
                                        selection-highlight
                                        use-fixed-menu-style
-                                       :selected="filterState.selectedLabels"
+                                       :selected="storeState.selectedLabels"
                                        class="service-dropdown"
                                        @update:selected="handleSelectLabelsItem"
                     />

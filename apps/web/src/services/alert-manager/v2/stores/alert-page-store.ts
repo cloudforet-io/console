@@ -23,6 +23,7 @@ interface AlertPageStoreState {
     selectedServiceId: string;
     selectedStatus: string;
     selectedUrgency: string;
+    selectedLabels: SelectDropdownMenuItem[];
     selectedSearchFilter?: string[];
 }
 
@@ -36,6 +37,7 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         selectedServiceId: '',
         selectedStatus: 'OPEN',
         selectedUrgency: 'ALL',
+        selectedLabels: [],
         selectedSearchFilter: undefined,
     });
     const getters = {
@@ -56,6 +58,13 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         },
         setSelectedUrgency(urgency: string) {
             state.selectedUrgency = urgency;
+        },
+        setSelectedLabels(labels?: string) {
+            if (!labels) {
+                state.selectedLabels = [];
+                return;
+            }
+            state.selectedLabels = [{ name: labels, label: labels }];
         },
         setSelectedSearchFilter(searchFilter?: string[]) {
             state.selectedSearchFilter = searchFilter;

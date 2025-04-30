@@ -34,6 +34,7 @@ const storeState = reactive({
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
     selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
+    selectedLabels: computed<string|undefined>(() => (alertPageState.selectedLabels.length > 0 ? alertPageState.selectedLabels[0].name : undefined)),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
@@ -66,6 +67,7 @@ const handleRouteBackButton = () => {
                 status: storeState.selectedStatus,
                 urgency: storeState.selectedUrgency,
                 filters: storeState.selectedSearchFilter,
+                labels: storeState.selectedLabels,
             },
         }).catch(() => {});
     }
