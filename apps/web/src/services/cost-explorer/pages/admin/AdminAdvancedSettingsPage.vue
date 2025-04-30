@@ -2,12 +2,16 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 
 import {
     PFieldGroup, PCheckbox, PRadioGroup, PRadio, PBadge,
     PPaneLayout, PTextInput, PSelectDropdown, PButton, PScopedNotification,
+
+    PHeading,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -28,14 +32,17 @@ import {
     YAHOO_FINANCE_ID,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
-const DEFAULT_AGGREGATION_DATE = 15;
+const route = useRoute();
 
 const domainConfigStore = useDomainConfigStore();
 const domainConfigGetters = domainConfigStore.getters;
 
+const DEFAULT_AGGREGATION_DATE = 15;
+
 const exchangeRateSourceOptions = [YAHOO_FINANCE_ID];
 
 const state = reactive({
+    headingTitle: computed<TranslateResult>(() => i18n.t(route.meta?.translationId)),
     loading: false,
     originUnifiedCostConfig: computed<UnifiedCostConfig|undefined>(() => domainConfigGetters?.unifiedCostConfig),
     isSaveChangesButtonDisabled: computed<boolean>(() => {
@@ -111,98 +118,106 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
     formState.lastDayOfMonth = unifiedCostConfig?.is_last_day ?? false;
 });
 
+(async () => {
+    await domainConfigStore.fetchPreferences();
+})();
 </script>
 
 <template>
-    <p-pane-layout class="admin-domain-settings-currency-converter-page">
-        <div class="content-wrapper">
-            <p-scoped-notification type="information"
-                                   icon="ic_info-circle"
-                                   layout="in-section"
-                                   class="mb-6"
-            >
-                {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.NOTIFICATION') }}
-            </p-scoped-notification>
-            <p-field-group :label="$t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY')"
-                           required
-            >
-                <p-select-dropdown class="currency-dropdown"
-                                   :menu="Object.values(CURRENCY).map((currency) => ({ label: `${CURRENCY_SYMBOL[currency]} ${currency}`, name: currency }))"
-                                   :selected="formState.currency"
-                                   use-fixed-menu-style
-                                   @update:selected="formState.currency = $event"
+    <section class="cost-advanced-settings-page">
+        <p-heading class="mb-6"
+                   :title="state.headingTitle"
+        />
+        <p-pane-layout>
+            <div class="content-wrapper">
+                <p-scoped-notification type="information"
+                                       icon="ic_info-circle"
+                                       layout="in-section"
+                                       class="mb-6"
                 >
-                    <template #dropdown-button="item">
-                        {{ item.label }}<p-badge v-if="item.label === DEFAULT_UNIFIED_COST_CURRENCY"
-                                                 badge-type="subtle"
-                                                 style-type="indigo100"
-                        >
-                            Default
-                        </p-badge>
-                    </template>
-                    <template #menu-item--format="{item}">
-                        <div class="menu-item">
-                            <span>{{ item?.label }}</span>
-                            <p-badge v-if="item.name === CURRENCY.KRW"
-                                     class="ml-1"
-                                     badge-type="subtle"
-                                     style-type="indigo100"
+                    {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.NOTIFICATION') }}
+                </p-scoped-notification>
+                <p-field-group :label="$t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY')"
+                               required
+                >
+                    <p-select-dropdown class="currency-dropdown"
+                                       :menu="Object.values(CURRENCY).map((currency) => ({ label: `${CURRENCY_SYMBOL[currency]} ${currency}`, name: currency }))"
+                                       :selected="formState.currency"
+                                       use-fixed-menu-style
+                                       @update:selected="formState.currency = $event"
+                    >
+                        <template #dropdown-button="item">
+                            {{ item.label }}<p-badge v-if="item.label === DEFAULT_UNIFIED_COST_CURRENCY"
+                                                     badge-type="subtle"
+                                                     style-type="indigo100"
                             >
                                 Default
                             </p-badge>
-                        </div>
-                    </template>
-                </p-select-dropdown>
-            </p-field-group>
-            <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.AGGREGATION_DATE')"
-                           required
-            >
-                <div class="aggregation-field-wrapper">
-                    <p-text-input
-                        v-model="formState.aggregationDate"
-                        class="aggregation-field"
-                        type="number"
-                        min="1"
-                        max="31"
-                        :disabled="formState.lastDayOfMonth"
-                    />
-                    <p-checkbox
-                        :selected="formState.lastDayOfMonth"
-                        class="ml-2"
-                        @change="handleUpdateLastDayOfMonth"
-                    >
-                        {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.LAST_DAY_OF_THE_MONTH') }}
-                    </p-checkbox>
-                </div>
-            </p-field-group>
-            <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.EXCHANGE_RATE_SOURCE')"
-                           required
-            >
-                <p-radio-group direction="vertical">
-                    <p-radio v-for="source in exchangeRateSourceOptions"
-                             :key="source"
-                             v-model="formState.exchangeRateSource"
-                             :label="source"
-                             :value="source"
-                    >
-                        {{ source }}
-                    </p-radio>
-                </p-radio-group>
-            </p-field-group>
+                        </template>
+                        <template #menu-item--format="{item}">
+                            <div class="menu-item">
+                                <span>{{ item?.label }}</span>
+                                <p-badge v-if="item.name === CURRENCY.KRW"
+                                         class="ml-1"
+                                         badge-type="subtle"
+                                         style-type="indigo100"
+                                >
+                                    Default
+                                </p-badge>
+                            </div>
+                        </template>
+                    </p-select-dropdown>
+                </p-field-group>
+                <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.AGGREGATION_DATE')"
+                               required
+                >
+                    <div class="aggregation-field-wrapper">
+                        <p-text-input
+                            v-model="formState.aggregationDate"
+                            class="aggregation-field"
+                            type="number"
+                            min="1"
+                            max="31"
+                            :disabled="formState.lastDayOfMonth"
+                        />
+                        <p-checkbox
+                            :selected="formState.lastDayOfMonth"
+                            class="ml-2"
+                            @change="handleUpdateLastDayOfMonth"
+                        >
+                            {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.LAST_DAY_OF_THE_MONTH') }}
+                        </p-checkbox>
+                    </div>
+                </p-field-group>
+                <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.EXCHANGE_RATE_SOURCE')"
+                               required
+                >
+                    <p-radio-group direction="vertical">
+                        <p-radio v-for="source in exchangeRateSourceOptions"
+                                 :key="source"
+                                 v-model="formState.exchangeRateSource"
+                                 :label="source"
+                                 :value="source"
+                        >
+                            {{ source }}
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
 
-            <p-button :disabled="state.isSaveChangesButtonDisabled"
-                      class="mt-4"
-                      :loading="state.loading"
-                      @click="handleSaveChanges"
-            >
-                {{ $t('LADING.SAVE_CHANGES') }}
-            </p-button>
-        </div>
-    </p-pane-layout>
+                <p-button :disabled="state.isSaveChangesButtonDisabled"
+                          class="mt-4"
+                          :loading="state.loading"
+                          @click="handleSaveChanges"
+                >
+                    {{ $t('LADING.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </p-pane-layout>
+    </section>
 </template>
 
 <style lang="postcss" scoped>
-.admin-domain-settings-currency-converter-page {
+.cost-advanced-settings-page {
     .content-wrapper {
         padding: 1.5rem 1rem;
 
