@@ -2113,6 +2113,7 @@
 		"CURRENCY_CONVERTER": "為替レート設定",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "集計日",
+			"CURRENCY_CONVERTER": "為替レート設定",
 			"EXCHANGE_RATE_SOURCE": "為替基準",
 			"LAST_DAY_OF_THE_MONTH": "月末",
 			"NOTIFICATION": "データソースページで、Unified Costの為替レートを設定できます。費用集計が完了すると、日付の変更は翌月から適用されます。",
