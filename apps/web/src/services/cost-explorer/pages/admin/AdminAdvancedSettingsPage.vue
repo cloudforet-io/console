@@ -11,6 +11,9 @@ import { i18n } from '@/translations';
 
 import { useDomainConfigStore } from '@/store/config/domain-config-store';
 
+import AdvancedSettingsCurrencyConverter from '@/services/cost-explorer/components/AdvancedSettingsCurrencyConverter.vue';
+
+
 const domainConfigStore = useDomainConfigStore();
 
 const route = useRoute();
@@ -25,18 +28,16 @@ const state = reactive({
 </script>
 
 <template>
-    <section class="cost-advanced-settings-container">
+    <section class="cost-advanced-settings-page">
         <p-heading class="mb-6"
                    :title="state.headingTitle"
         />
-        <div class="page-content-wrapper">
-            <router-view />
-        </div>
+        <advanced-settings-currency-converter />
     </section>
 </template>
 
 <style lang="postcss" scoped>
-.cost-advanced-settings-container {
+.cost-advanced-settings-page {
     .page-content-wrapper {
         display: flex;
         flex-direction: column;

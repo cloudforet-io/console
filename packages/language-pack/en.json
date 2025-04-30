@@ -2125,6 +2125,7 @@
 		"CURRENCY_CONVERTER": "Currency Converter",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "Aggregation Date",
+			"CURRENCY_CONVERTER": "Currency Converter",
 			"EXCHANGE_RATE_SOURCE": "Exchange Rate Source",
 			"LAST_DAY_OF_THE_MONTH": "Last day of the month",
 			"NOTIFICATION": "The currency for Unified Cost can be set on the Cost Analysis page. Once aggregated, date changes will take effect starting next month.",
