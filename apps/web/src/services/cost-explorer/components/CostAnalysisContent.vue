@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    onUnmounted, watch, watchEffect,
+    onUnmounted, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -41,30 +41,6 @@ const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQu
 
 onUnmounted(() => {
     costAnalysisPageStore.reset();
-});
-
-
-watchEffect(() => {
-    const { project_id, service_account_id } = route.query;
-    if (project_id || service_account_id) {
-        const filters: Record<string, string[]> = {
-            ...costAnalysisPageStore.state.filters,
-        };
-
-        if (project_id) {
-            filters.project_id = Array.isArray(project_id)
-                ? project_id.filter((id): id is string => id !== null)
-                : [project_id as string];
-        }
-
-        if (service_account_id) {
-            filters.service_account_id = Array.isArray(service_account_id)
-                ? service_account_id.filter((id): id is string => id !== null)
-                : [service_account_id as string];
-        }
-
-        costAnalysisPageStore.setFilters(filters);
-    }
 });
 
 watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) => {
