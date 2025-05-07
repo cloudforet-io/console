@@ -41,9 +41,9 @@ import type { CollectorGetParameters } from '@/schema/inventory/collector/api-ve
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -87,6 +87,7 @@ const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDetailPageStore = useCollectorDetailPageStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 
@@ -100,9 +101,6 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 
 const queryHelper = new QueryHelper();
 
-const storeState = reactive({
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
-});
 const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -113,7 +111,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     loading: true,

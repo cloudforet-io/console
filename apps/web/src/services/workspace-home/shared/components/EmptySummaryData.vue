@@ -8,10 +8,10 @@ import { PI, PTextButton } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
+import type { RoleInfo } from '@/store/authorization/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { RoleInfo } from '@/store/user/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import {
     green, indigo, peacock, violet,
@@ -39,12 +39,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const router = useRouter();
 
 const storeState = reactive({
-    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => userStore.state.currentRoleInfo),
+    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => authorizationStore.state.currentRoleInfo),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
 });
 const state = reactive({

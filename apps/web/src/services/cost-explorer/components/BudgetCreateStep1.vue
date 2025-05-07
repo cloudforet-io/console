@@ -72,10 +72,10 @@ const emit = defineEmits<{(e: 'click-next'): void, (e: 'click-cancel'): void }>(
 
 
 watch(() => budgetCreatePageState, () => {
-    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project' && budgetCreatePageState.budgetManager) {
+    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project') {
         state.isContinueAble = true;
     } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
-    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0 && budgetCreatePageState.budgetManager
+    && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0
     ) {
         state.isContinueAble = true;
     } else {

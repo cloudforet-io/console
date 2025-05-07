@@ -105,8 +105,8 @@ const state = reactive({
     refinedAlertList: computed<AlertModel[]>(() => storeState.alertList.map((alert) => ({
         ...alert,
         duration: alert.status === ALERT_STATUS.RESOLVED
-            ? calculateTime(alert?.resolved_at, storeState.timezone) || '0m'
-            : calculateTime(alert?.created_at, storeState.timezone) || '0m',
+            ? calculateTime(alert?.resolved_at, storeState.timezone)
+            : calculateTime(alert?.created_at, storeState.timezone),
         created_at: iso8601Formatter(alert.created_at, storeState.timezone),
         resolved_at: iso8601Formatter(alert.resolved_at, storeState.timezone) || '-',
     }))),

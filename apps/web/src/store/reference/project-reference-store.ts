@@ -10,15 +10,14 @@ import type { ProjectListParameters } from '@/api-clients/identity/project/schem
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-
 
 
 interface ProjectResourceItemData {
@@ -38,7 +37,7 @@ let lastLoadedTime = 0;
 
 export const useProjectReferenceStore = defineStore('reference-project', () => {
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as ProjectReferenceMap | null,
     });
@@ -49,7 +48,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
 
     const getters = reactive({
         projectItems: asyncComputed<ProjectReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

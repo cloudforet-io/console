@@ -15,6 +15,7 @@ import type { PostModel } from '@/schema/board/post/model';
 import type { NoticeConfigData } from '@/schema/board/post/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -22,9 +23,10 @@ import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupIt
 
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const state = reactive({
     isSessionExpired: computed<boolean>(() => !!userStore.state.isSessionExpired),
-    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
+    isNoRoleUser: computed<boolean>(() => authorizationStore.getters.isNoRoleUser),
     popupList: [] as PostModel[],
     hasLoaded: false,
 });
@@ -79,7 +81,7 @@ watch([
     () => state.isSessionExpired,
     () => state.isNoRoleUser,
     () => appContextStore.getters.globalGrantLoading,
-    () => userStore.state.currentGrantInfo,
+    () => authorizationStore.state.currentGrantInfo,
 ], async ([hasLoaded, isSessionExpired, isNoRoleUser, globalGrantLoading, grantInfo]) => {
     if (hasLoaded) return;
     if (isNoRoleUser || isSessionExpired) {

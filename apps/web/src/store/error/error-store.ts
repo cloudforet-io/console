@@ -7,7 +7,6 @@ export const useErrorStore = defineStore('error-store', () => {
     const state = reactive({
         visibleSessionExpiredError: false,
         visibleAuthorizationError: false,
-        grantAccessFailStatus: false,
     });
 
     /* Mutation */
@@ -17,15 +16,11 @@ export const useErrorStore = defineStore('error-store', () => {
     const setVisibleAuthorizationError = (val: boolean) => {
         state.visibleAuthorizationError = val;
     };
-    const setGrantAccessFailStatus = (val: boolean) => {
-        state.grantAccessFailStatus = val;
-    };
 
     /* Action */
     const reset = () => {
         state.visibleSessionExpiredError = false;
         state.visibleAuthorizationError = false;
-        state.grantAccessFailStatus = false;
     };
     const showSessionExpiredError = (): void => {
         state.visibleSessionExpiredError = true;
@@ -37,7 +32,6 @@ export const useErrorStore = defineStore('error-store', () => {
     const mutations = {
         setVisibleSessionExpiredError,
         setVisibleAuthorizationError,
-        setGrantAccessFailStatus,
     };
     const actions = {
         reset,

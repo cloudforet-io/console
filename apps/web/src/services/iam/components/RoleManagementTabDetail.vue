@@ -16,7 +16,7 @@ import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-v
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
+import { useMenuStore } from '@/store/menu/menu-store';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
@@ -41,7 +41,7 @@ interface DetailMenuItems {
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
-const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+const menuStore = useMenuStore();
 
 const detailMenuItems = computed<DetailMenuItems[]>(() => [
     { name: 'page_access', label: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS') as string },
@@ -145,7 +145,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
     state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type);
 
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: state.pageAccess, isRolePage: true, menuList: globalConfigSchemaStore.getters.menuList,
+        pageAccessPermissions: state.pageAccess, isRolePage: true, menuList: menuStore.getters.menuList,
     });
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {

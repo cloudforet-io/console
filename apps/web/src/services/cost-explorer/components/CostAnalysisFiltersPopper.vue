@@ -2,7 +2,6 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
 
 import { cloneDeep } from 'lodash';
 
@@ -13,7 +12,6 @@ import {
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -47,6 +45,8 @@ import CostAnalysisFiltersAddMoreButton
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
@@ -60,9 +60,6 @@ interface VariableOption {
     key: ManagedVariableModelKey;
     dataKey?: string;
 }
-
-const route = useRoute();
-const router = useRouter();
 
 const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
@@ -203,21 +200,10 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: MenuItem[])
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
 
-    const newFilters = {
+    costAnalysisPageStore.setFilters({
         ...costAnalysisPageState.filters,
         [groupBy]: selectedItems.map((d) => d.name as string),
-    };
-    costAnalysisPageStore.setFilters(newFilters);
-
-    const currentQuery = { ...route.query };
-    if (groupBy === GROUP_BY.PROJECT || groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-        if (selectedItems.length > 0) {
-            currentQuery[groupBy === GROUP_BY.PROJECT ? 'project' : 'service_account_id'] = selectedItems.map((d) => d.name)[0];
-        } else {
-            delete currentQuery[groupBy === GROUP_BY.PROJECT ? 'project' : 'service_account_id'];
-        }
-        router.replace({ query: currentQuery });
-    }
+    });
 };
 const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     if (all) {

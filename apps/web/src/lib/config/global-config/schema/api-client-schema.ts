@@ -8,6 +8,9 @@ export const ApiClientEndpoint: ApiClientsSchemaType = {
     PROJECT: {
         V1: 'identity',
     },
+    SERVICE_ACCOUNT: {
+        V1: 'identity',
+    },
     ASSET_INVENTORY: {
         V1: 'inventory',
     },

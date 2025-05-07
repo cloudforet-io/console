@@ -3,8 +3,8 @@ import { computed, reactive, watch } from 'vue';
 import type { GrantScope } from '@/api-clients/identity/token/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { GrantInfo } from '@/store/user/type';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
+import type { GrantInfo } from '@/store/authorization/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -14,10 +14,10 @@ interface GrantScopeGuardReturnType {
 }
 export const useGrantScopeGuard = (requiredScopes: GrantScope[], apiFunction: () => Promise<void>): GrantScopeGuardReturnType => {
     const appContextStore = useAppContextStore();
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const state = reactive({
-        currentGrantInfo: computed<GrantInfo>(() => userStore.state.currentGrantInfo || { scope: 'USER' }),
+        currentGrantInfo: computed<GrantInfo>(() => authorizationStore.state.currentGrantInfo || { scope: 'USER' }),
         isLoading: computed(() => appContextStore.getters.globalGrantLoading),
         isValidScope: computed(() => requiredScopes.includes(state.currentGrantInfo.scope)),
     });

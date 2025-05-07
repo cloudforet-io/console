@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import { computed, reactive, toRef } from 'vue';
 
-import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
+import { useMenuStore } from '@/store/menu/menu-store';
 
 import type { MenuId } from '@/lib/menu/config';
 
@@ -10,10 +10,10 @@ interface UseContentsAccessibilityReturnType {
 }
 
 export const useContentsAccessibility = (menuId: MenuId): UseContentsAccessibilityReturnType => {
-    const globalConfigSchemaStore = useGlobalConfigSchemaStore();
+    const menuStore = useMenuStore();
 
     const state = reactive({
-        visibleContents: computed<boolean>(() => globalConfigSchemaStore.getters.menuList.findIndex((menu) => menu.id === menuId) !== -1),
+        visibleContents: computed<boolean>(() => menuStore.getters.menuList.findIndex((menu) => menu.id === menuId) !== -1),
     });
 
     return {

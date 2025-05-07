@@ -15,7 +15,7 @@ import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/sc
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -43,11 +43,11 @@ const route = useRoute();
 const router = useRouter();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 
 const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboardControlMenuHelper();

@@ -22,11 +22,10 @@ import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -50,7 +49,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const totalChartContext = ref<HTMLElement|null>(null);
 const providerChartContext = ref<HTMLElement|null>(null);
@@ -58,7 +57,6 @@ const providerChartContext = ref<HTMLElement|null>(null);
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const { serviceAccountAPI } = useServiceAccountApi();
@@ -89,8 +87,8 @@ const { data: serviceAccountData, isLoading: isLoadingServiceAccount } = useScop
 }, ['WORKSPACE']);
 
 const state = reactive({
-    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
-    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
+    accessLink: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT])),
+    writableServiceAccount: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
     emptyData: computed<EmptyData|undefined>(() => {
         let result: EmptyData|undefined;
         if (isEmpty(serviceAccountData.value?.results)) {

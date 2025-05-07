@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { every } from 'lodash';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
@@ -101,7 +99,7 @@ export const widgetValidatorRegistry: WidgetValidatorRegistry = {
                 const dependentValue: string|string[]|undefined = allValueMap?.[formatRulesOptions.dependentField]?.value?.data;
                 if (!dependentValue) return !!fieldValue.field;
                 if (Array.isArray(dependentValue)) {
-                    return !dependentValue.includes(fieldValue.field);
+                    return typeof fieldValue.field === 'string' && !dependentValue.includes(fieldValue.field);
                 }
                 return dependentValue !== fieldValue.field;
             }

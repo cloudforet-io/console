@@ -5,6 +5,7 @@ import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/spa
 import type { TokenGrantParameters } from '@/api-clients/identity/token/schema/api-verbs/grant';
 import type { TokenGrantModel } from '@/api-clients/identity/token/schema/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -390,8 +391,8 @@ const getApiEndpoints = (config) => {
         return [ENDPOINT_V1, ENDPOINT_V2];
     }
     if (!ENDPOINT_V1) {
-        throw new Error('ApiClient init failed: There are no endpoint v1.');
-    } else throw new Error('ApiClient init failed: There are no endpoint v2.');
+        throw new Error('ApiConnector init failed: There are no endpoint v1.');
+    } else throw new Error('ApiConnector init failed: There are no endpoint v2.');
 };
 const getApiSettings = (config) => {
     const apiV1Timeout = config.get('CONSOLE_API.TIMEOUT');
@@ -414,8 +415,8 @@ const getAuthConfig = (config): AuthConfig => ({
     apiKey: config.get('DEV.AUTH.API_KEY'),
 });
 
-export const initApiClient = async (config) => {
-    const userStore = useUserStore(pinia);
+export const initApiConnectorAndAuth = async (config) => {
+    const authorizationStore = useAuthorizationStore(pinia);
     const endpoints = getApiEndpoints(config);
     const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback());
     const apiSettings = getApiSettings(config);
@@ -424,14 +425,12 @@ export const initApiClient = async (config) => {
         mockConfig: getMockConfig(config),
         authConfig: getAuthConfig(config),
     };
-    const serviceConfig = config.get('SERVICES') || {};
     await SpaceConnector.init(
         endpoints,
         tokenApi,
         apiSettings,
         devConfig,
         getAfterCallApiMap(),
-        serviceConfig,
     );
     const existingRefreshToken = SpaceConnector.getRefreshToken();
 
@@ -445,8 +444,8 @@ export const initApiClient = async (config) => {
         };
         const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>(grantRequest);
         SpaceConnector.setToken(response.access_token);
-        userStore.setCurrentGrantInfo({ scope: 'USER' });
-        userStore.setCurrentRoleInfo(undefined);
+        authorizationStore.setCurrentGrantInfo({ scope: 'USER' });
+        authorizationStore.setCurrentRoleInfo(undefined);
     } catch (e) {
         console.error(e);
     }

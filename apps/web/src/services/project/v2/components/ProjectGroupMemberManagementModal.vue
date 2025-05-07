@@ -13,10 +13,11 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import type { ProjectGroupRemoveUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/remove-users';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -31,8 +32,8 @@ const visible = computed(() => projectPageModalStore.state.projectGroupMemberMod
 const targetId = computed(() => projectPageModalStore.state.targetId);
 
 /* mode */
-const userStore = useUserStore();
-const readonlyMode = computed<boolean>(() => userStore.state.currentRoleInfo?.roleType !== 'WORKSPACE_OWNER');
+const authorizationStore = useAuthorizationStore();
+const readonlyMode = computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType !== ROLE_TYPE.WORKSPACE_OWNER);
 
 /* project group users */
 const { projectGroupAPI } = useProjectGroupApi();
