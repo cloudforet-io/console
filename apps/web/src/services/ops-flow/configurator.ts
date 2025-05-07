@@ -1,47 +1,78 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type {
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminOpsFlowRoutes from '@/services/ops-flow/routes/admin/routes';
 import opsFlowRoutes from '@/services/ops-flow/routes/routes';
 
-class OpsFlowConfigurator {
-    static getAdminRoutes() {
-        return adminOpsFlowRoutes;
+class OpsFlowConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
+
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
+
+    initialize(version: FeatureVersion): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return opsFlowRoutes;
-    }
-
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
+    getRoutes(): FeatureRouteConfig {
         return {
-            id: MENU_ID.OPS_FLOW,
-            subMenuList: subMenuIds,
+            routes: opsFlowRoutes,
+            adminRoutes: adminOpsFlowRoutes,
+            version: this.version,
         };
     }
 
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): GeneratedMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.OPS_FLOW,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 7,
+        };
+
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.OPS_FLOW_LANDING, needPermissionByRole: true },
+                    { id: MENU_ID.TASK_BOARD, needPermissionByRole: true },
+                ],
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.TASK_MANAGEMENT },
+                ],
+            },
+            version: this.version,
         };
     }
 
-    static applyUiAffects(): void|null {
-        return null;
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 
-export default OpsFlowConfigurator;
+export default new OpsFlowConfigurator();

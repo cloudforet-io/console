@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
@@ -11,14 +11,6 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { DashboardChangeFolderParams } from '@/api-clients/dashboard/_types/dashboard-type';
-import type {
-    PrivateDashboardChangeFolderParameters,
-} from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/change-folder';
-import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/schema/model';
-import type {
-    PublicDashboardChangeFolderParameters,
-} from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/change-folder';
-import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -27,13 +19,12 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardChangeFolderMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-change-folder-mutation';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
 
 
-
-
-type DashboardModel = PrivateFolderModel | PublicFolderModel;
 interface Props {
     visible: boolean;
     dashboardId: string;
@@ -48,13 +39,15 @@ const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 
 /* Query */
+const queryClient = useQueryClient();
+const {
+    keys: dashboardKeys,
+} = useDashboardQuery();
 const {
     publicFolderList,
     privateFolderList,
-    keys,
-    api,
-    queryClient,
-} = useDashboardQuery();
+    keys: dashboardFolderKeys,
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -92,30 +85,22 @@ const state = reactive({
 });
 
 /* Api */
-const changeFolderFn = (params: PrivateDashboardChangeFolderParameters | PublicDashboardChangeFolderParameters): Promise<DashboardModel> => {
-    const _isPrivate = props.dashboardId.startsWith('private');
-    if (_isPrivate) {
-        return api.privateDashboardAPI.changeFolder(params as PrivateDashboardChangeFolderParameters);
-    }
-    return api.publicDashboardAPI.changeFolder(params as PublicDashboardChangeFolderParameters);
-};
-const { mutate: changeFolder } = useMutation(
-    {
-        mutationFn: changeFolderFn,
-        onSuccess: () => {
-            showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
-            const isPrivate = props.dashboardId.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-        },
-        onError: (e) => {
-            showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);
-        },
-        onSettled: () => {
-            state.proxyVisible = false;
-        },
+const { mutate: changeFolder } = useDashboardChangeFolderMutation({
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('DASHBOARDS.DETAIL.ALT_S_MOVE_DASHBOARD'), '');
+        const isPrivate = props.dashboardId.startsWith('private');
+        const dashboardListQueryKey = isPrivate ? dashboardKeys.privateDashboardListQueryKey : dashboardKeys.publicDashboardListQueryKey;
+        const dashboardFolderListQueryKey = isPrivate ? dashboardFolderKeys.privateFolderListQueryKey : dashboardFolderKeys.publicFolderListQueryKey;
+        queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: dashboardFolderListQueryKey.value });
     },
-);
+    onError: (e) => {
+        showErrorMessage(i18n.t('DASHBOARDS.DETAIL.ALT_E_MOVE_DASHBOARD'), e);
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
 
 /* Event */
 const handleFormConfirm = async () => {

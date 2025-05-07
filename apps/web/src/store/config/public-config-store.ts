@@ -13,7 +13,7 @@ import type { PublicConfigModel } from '@/api-clients/config/public-config/schem
 import type { PublicConfigKey } from '@/api-clients/config/public-config/schema/type';
 
 import { useDomainStore } from '@/store/domain/domain-store';
-
+import { pinia } from '@/store/pinia';
 
 
 interface UsePublicConfigStoreState {
@@ -22,7 +22,7 @@ interface UsePublicConfigStoreState {
 type UsePublicConfigStoreGetters = Record<PublicConfigKey, Ref<PublicConfigModel|undefined>>;
 
 export const usePublicConfigStore = defineStore('public-config', () => {
-    const domainStore = useDomainStore();
+    const domainStore = useDomainStore(pinia);
     const state = reactive<UsePublicConfigStoreState>({
         publicConfigMap: {},
     });

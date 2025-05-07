@@ -1,49 +1,95 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type {
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 
-class AssetInventoryConfigurator {
-    static getAdminRoutes() {
-        return adminAssetInventoryRoutes;
+class AssetInventoryConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
+
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [
+        {
+            feature: 'ALERT_MANAGER',
+            affects: [
+                {
+                    method: 'visibleAssetAlertTab',
+                    version: 'V2',
+                },
+            ],
+        },
+    ];
+
+    initialize(version: FeatureVersion): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return assetInventoryRoute;
-    }
-
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
+    getRoutes(): FeatureRouteConfig {
         return {
-            id: MENU_ID.ASSET_INVENTORY,
-            subMenuList: subMenuIds,
+            routes: assetInventoryRoute,
+            adminRoutes: adminAssetInventoryRoutes,
+            version: this.version,
         };
     }
 
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(): GeneratedMenuConfig {
+        const baseMenu: Menu = {
             id: MENU_ID.ASSET_INVENTORY,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 4,
+        };
+
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.CLOUD_SERVICE, needPermissionByRole: true },
+                    { id: MENU_ID.SERVER, needPermissionByRole: true },
+                    { id: MENU_ID.SECURITY, needPermissionByRole: true },
+                    { id: MENU_ID.METRIC_EXPLORER, needPermissionByRole: true },
+                    { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
+                ],
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: [
+                    { id: MENU_ID.CLOUD_SERVICE },
+                    { id: MENU_ID.SERVER },
+                    { id: MENU_ID.SECURITY },
+                    { id: MENU_ID.METRIC_EXPLORER },
+                    { id: MENU_ID.COLLECTOR },
+                ],
+            },
+            version: this.version,
         };
     }
 
-    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
-        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-        cloudServiceDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 
-export default AssetInventoryConfigurator;
+export default new AssetInventoryConfigurator();

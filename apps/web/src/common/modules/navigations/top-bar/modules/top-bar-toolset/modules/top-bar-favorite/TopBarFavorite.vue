@@ -1,8 +1,5 @@
 <script lang="ts" setup>
 import { vOnClickOutside } from '@vueuse/components';
-import {
-    defineEmits,
-} from 'vue';
 
 import {
     PI, PTooltip,

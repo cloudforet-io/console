@@ -35,6 +35,15 @@ export const adminIamRoutesChildren = [
         component: UserMainPage as any,
     },
     {
+        path: 'user-group',
+        name: ADMIN_IAM_ROUTE.USER_GROUP._NAME,
+        meta: {
+            menuId: MENU_ID.USER_GROUP,
+            translationId: MENU_INFO_MAP[MENU_ID.USER_GROUP].translationId,
+        },
+        component: UserGroupMainPage as any,
+    },
+    {
         path: 'app',
         name: ADMIN_IAM_ROUTE.APP._NAME,
         meta: {

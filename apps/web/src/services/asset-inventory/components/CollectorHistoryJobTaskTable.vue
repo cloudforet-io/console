@@ -18,6 +18,7 @@ import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verb
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -26,8 +27,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -38,7 +37,6 @@ import {
     statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
 import { JOB_SELECTED_STATUS, JOB_TASK_STATE } from '@/services/asset-inventory/types/collector-history-page-type';
-
 
 interface Props {
     jobId: string;
@@ -86,6 +84,8 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspaces: computed(() => allReferenceStore.getters.workspace),
 });
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const state = reactive({
     loading: false,
@@ -255,11 +255,11 @@ onDeactivated(() => {
                 />
             </div>
         </template>
-        <template #col-service_account_id-format="{ value }">
+        <template #col-service_account_id-format="{ value, item }">
             <p-link v-if="storeState.serviceAccounts[value]"
                     action-icon="internal-link"
                     new-tab
-                    :to="referenceRouter(
+                    :to="getReferenceLocation(
                         value,
                         {
                             resource_type: 'identity.ServiceAccount',
@@ -289,7 +289,7 @@ onDeactivated(() => {
             <p-link v-if="storeState.projects[value]"
                     action-icon="internal-link"
                     new-tab
-                    :to="referenceRouter(
+                    :to="getReferenceLocation(
                         value,
                         { resource_type: 'identity.Project', workspace_id: item.workspace_id })"
             >

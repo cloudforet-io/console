@@ -26,7 +26,6 @@ export interface AlertCount {
 }
 
 interface ProjectDetailPageState {
-    visibleAlertTab?: boolean,
     loading: boolean,
     projectId?: string,
     currentProject?: ProjectModel,
@@ -36,7 +35,6 @@ interface ProjectDetailPageState {
 }
 export const useProjectDetailPageStore = defineStore('page-project-detail', () => {
     const state = reactive<ProjectDetailPageState>({
-        visibleAlertTab: false,
         loading: false,
         projectId: undefined,
         currentProject: undefined,
@@ -54,9 +52,6 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     });
 
     /* mutations */
-    const setVisibleAlertTab = (val?: boolean) => {
-        state.visibleAlertTab = val;
-    };
     const setProjectId = (projectId?: string) => {
         state.projectId = projectId;
     };
@@ -125,7 +120,6 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     };
 
     const mutations = {
-        setVisibleAlertTab,
         setProjectId,
         setProject,
         setWebhookList,

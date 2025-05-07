@@ -11,10 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -31,7 +32,6 @@ import TopBarSearchServiceTab
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-
 
 interface Props {
     isFocused: boolean;
@@ -53,8 +53,10 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
-const userStore = useUserStore();
 const windowSize = useWindowSize();
+const authorizationStore = useAuthorizationStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
@@ -70,7 +72,6 @@ const getTabHeaderHeight = () => {
 const storeState = reactive({
     activeTab: computed(() => topBarSearchStore.state.activeTab),
     cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 
 const state = reactive({
@@ -83,7 +84,7 @@ const state = reactive({
     tabs: computed(() => {
         const accessMenuList: ValueItem[] = [];
         state.defaultServiceTabs.forEach((i) => {
-            if (storeState.pageAccessPermissionMap[i.id]) {
+            if (authorizationStore.getters.pageAccessPermissionMap[i.id]) {
                 accessMenuList.push({ label: i.label, name: i.name });
             }
         });
@@ -133,7 +134,13 @@ const handleSelect = (item) => {
                 label: item?.name,
             },
         });
-    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) {
+        if (topBarSearchStore.state.activeTab === SEARCH_TAB.PROJECT) {
+            router.push(getReferenceLocation(item.resource_id, { resource_type: 'identity.Project' })).catch(() => {});
+        } else {
+            router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+        }
+    }
 
     topBarSearchStore.setIsActivated(false);
 };

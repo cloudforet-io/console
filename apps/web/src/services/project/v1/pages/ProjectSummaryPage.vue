@@ -11,6 +11,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
@@ -26,21 +27,19 @@ import ProjectSummaryBillingWidget from '@/services/project/v1/components/Projec
 import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/v1/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
 import ProjectSummaryServiceAccountsWidget from '@/services/project/v1/components/ProjectSummaryServiceAccountsWidget.vue';
 import ProjectSummaryTrustedAdvisorWidget from '@/services/project/v1/components/ProjectSummaryTrustedAdvisorWidget.vue';
-import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
 
 interface Props {
     id: string;
 }
 const props = defineProps<Props>();
 
-const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.state;
+const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
 const { visibleContents: visibleAssetContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 const { visibleContents: visibleAlertContents } = useContentsAccessibility(MENU_ID.ALERT_MANAGER);
 
 const state = reactive({
-    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && projectDetailPageState.visibleAlertTab),
+    visibleAlertTab: computed<boolean>(() => visibleAlertContents.value && (alertManagerUiAffectsSchema.value?.visibleProjectAlertTab ?? false)),
     hasAlertConfig: false,
     deprecatedNotiVisible: true,
 });

@@ -11,10 +11,9 @@ interface UseContentsAccessibilityReturnType {
 
 export const useContentsAccessibility = (menuId: MenuId): UseContentsAccessibilityReturnType => {
     const menuStore = useMenuStore();
-    const menuState = menuStore.state;
 
     const state = reactive({
-        visibleContents: computed<boolean>(() => menuState.menuList.findIndex((menu) => menu.id === menuId) !== -1),
+        visibleContents: computed<boolean>(() => menuStore.getters.menuList.findIndex((menu) => menu.id === menuId) !== -1),
     });
 
     return {

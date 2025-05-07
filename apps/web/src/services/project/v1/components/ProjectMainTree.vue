@@ -8,6 +8,7 @@ import { useRoute } from 'vue-router/composables';
 import { isEqual } from 'lodash';
 
 import { PI, PTreeView } from '@cloudforet/mirinae';
+import type { TreeData, TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
 import { i18n } from '@/translations';
 
@@ -22,9 +23,8 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import { useProjectTreeStore } from '@/services/project/v-shared/stores/project-tree-store';
-import type { TreeNode, TreeDisplayMap, TreeData } from '@/services/project/v-shared/tree/type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { useProjectTreeStore } from '@/services/project/v1/stores/project-tree-store';
 
 interface ProjectDataType extends TreeData {
     name: string;

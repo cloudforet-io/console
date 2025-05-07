@@ -13,11 +13,10 @@ import type { ProjectChannelUpdateParameters } from '@/schema/notification/proje
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
 import { i18n } from '@/translations';
 
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useMyPageStore } from '@/services/my-page/stores/my-page-store';
 
 interface NotificationItemState<Data> {
     visibleUserNotification: boolean;
@@ -30,11 +29,11 @@ type Emit<Data> = {
     (event: 'edit', value?: Data): void;
 };
 
-const myPageStore = useMyPageStore();
-
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
+    const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
+
     const state = reactive({
-        visibleUserNotification: computed<boolean>(() => myPageStore.state.visibleUserNotification),
+        visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
         isEditMode: _state.isEditMode,
         dataForEdit: _state.dataForEdit,
         userChannelId: _state.userChannelId,

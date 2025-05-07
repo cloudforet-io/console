@@ -19,6 +19,7 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -79,6 +80,7 @@ const handleUpdateFilters = (values: TaskFilters) => {
     if (values.project.length) _taskFilterHelper.addFilter({ k: 'project_id', v: values.project, o: '=' });
     if (values.createdBy.length) _taskFilterHelper.addFilter({ k: 'created_by', v: values.createdBy, o: '=' });
     if (values.assignee.length) _taskFilterHelper.addFilter({ k: 'assignee', v: values.assignee, o: '=' });
+    if (values.taskId.length) _taskFilterHelper.addFilter({ k: 'task_id', v: values.taskId, o: '=' });
     taskFilters.value = _taskFilterHelper.filters;
 };
 const _taskListQueryHelper = new ApiQueryHelper();
@@ -105,7 +107,7 @@ const categoriesById = computed<Record<string, TaskCategoryModel>>(() => {
 
 /* task types */
 const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery({
-    queryKey: computed(() => ({
+    params: computed(() => ({
         query: {
             filter: [{ k: 'category_id', v: categories.value?.map((c) => c.category_id) ?? [], o: 'in' }],
         },
@@ -122,19 +124,19 @@ const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
 });
 
 /* tasks */
-const { taskListQueryKey, taskAPI } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey, params: taskListQueryParams } = useServiceQueryKey('opsflow', 'task', 'list', {
+    contextKey: props.categoryId ?? 'all',
+    params: computed(() => ({
+        query: taskListApiQuery.value,
+    })),
+});
 const {
     data, error, refetch, isLoading,
 } = useQuery({
-    queryKey: computed(() => [
-        ...taskListQueryKey.value,
-        props.categoryId ?? 'all',
-        taskListApiQuery.value,
-    ]),
+    queryKey: taskListQueryKey.value,
     queryFn: async () => {
-        const res = await taskAPI.list({
-            query: taskListApiQuery.value,
-        });
+        const res = await taskAPI.list(taskListQueryParams.value);
         return {
             results: res.results ?? [],
             totalCount: res.total_count,
@@ -158,6 +160,10 @@ watch(data, (d) => {
 
 /* table fields */
 const fields = computed<DataTableField[] >(() => [
+    {
+        name: 'task_id',
+        label: i18n.t('OPSFLOW.FIELD_ID', { field: taskManagementTemplateStore.templates.task }) as string,
+    },
     {
         name: 'name',
         label: i18n.t('OPSFLOW.TITLE') as string,

@@ -1,33 +1,106 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
-import type { Menu } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import type {
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
+} from '@/lib/config/global-config/types/type';
+import { MENU_ID } from '@/lib/menu/config';
 
+import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import projectRoutesV1 from '@/services/project/v1/routes/routes';
-import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import projectRoutes from '@/services/project/v2/routes/routes';
 
-class ProjectConfigurator {
-    static getAdminRoutes() {
-        return null;
+class ProjectConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
+
+    private routeMetadata: GeneratedRouteMetadata = {
+        detail: {
+            V1: {
+                name: PROJECT_ROUTE_V1.DETAIL._NAME,
+                params: {
+                    id: 'id',
+                },
+            },
+            V2: {
+                name: PROJECT_ROUTE_V2._NAME,
+                params: {
+                    id: 'projectGroupOrProjectId',
+                    dashboardId: 'dashboardId',
+                },
+            },
+        },
+        projectGroup: {
+            V1: {
+                name: PROJECT_ROUTE_V1._NAME,
+                params: {
+                    id: 'projectGroupId',
+                },
+            },
+            V2: {
+                name: PROJECT_ROUTE_V2._NAME,
+                params: {
+                    id: 'projectGroupOrProjectId',
+                },
+            },
+        },
+    };
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [
+        {
+            feature: 'ALERT_MANAGER',
+            affects: [
+                {
+                    method: 'visibleProjectAlertTab',
+                    version: 'V1',
+                },
+            ],
+        },
+    ];
+
+    initialize(version: FeatureVersion): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes(version: string) {
-        return version === 'V1' ? projectRoutesV1 : projectRoutes;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: this.version === 'V1' ? projectRoutesV1 : projectRoutes,
+            adminRoutes: null,
+            version: this.version,
+        };
     }
 
-    static getAdminMenu(): Menu|null {
-        return null;
+    getMenu(): GeneratedMenuConfig {
+        return {
+            version: this.version,
+            menu: {
+                id: MENU_ID.PROJECT,
+                needPermissionByRole: true,
+                subMenuList: [],
+                order: 2,
+            },
+            adminMenu: null,
+        };
     }
 
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menuId = Object.keys(settings.menu)[0];
-        return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
-    }
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
 
-    static applyUiAffects(settings: FeatureVersionSettingsType): void|null {
-        const projectDetailPageStore = useProjectDetailPageStore();
-        projectDetailPageStore.setVisibleAlertTab(settings.uiAffects?.visibleAlertTabAtDetail);
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 
-export default ProjectConfigurator;
+export default new ProjectConfigurator();

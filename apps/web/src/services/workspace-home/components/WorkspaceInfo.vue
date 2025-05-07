@@ -15,9 +15,8 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -51,7 +50,7 @@ const appPageStore = useAppPageStore();
 const appContextStore = useAppContextStore();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const router = useRouter();
 
@@ -61,7 +60,6 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
     appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
@@ -183,7 +181,7 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                         </div>
                     </div>
                 </template>
-                <template v-if="props.accessUserMenu && storeState.pageAccessPermissionMap[MENU_ID.USER].write"
+                <template v-if="props.accessUserMenu && authorizationStore.getters.pageAccessPermissionMap[MENU_ID.USER]?.write"
                           #extra
                 >
                     <p-button style-type="tertiary"

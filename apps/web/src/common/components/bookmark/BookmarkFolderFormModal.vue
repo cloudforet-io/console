@@ -10,7 +10,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
@@ -38,13 +38,13 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const emit = defineEmits<{(e: 'confirm', isEdit?: boolean, name?: string): void; }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
-    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),

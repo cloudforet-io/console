@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown,
 } from '@cloudforet/mirinae';
@@ -20,9 +22,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
-
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 
 interface Props {
     visible?: boolean;
@@ -36,15 +39,19 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const appContextStore = useAppContextStore();
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 
 /* Query */
 const {
-    publicFolderList,
-    privateFolderList,
     api,
     keys,
-    queryClient,
 } = useDashboardQuery();
+const {
+    publicFolderList,
+    privateFolderList,
+} = useDashboardFolderQuery();
+const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -58,9 +65,9 @@ const state = reactive({
     privateFolderItems: computed(() => privateFolderList.value),
     selectedIdMap: computed<Record<string, boolean>>(() => {
         if (dashboardPageControlState.folderModalType === 'PUBLIC') {
-            return dashboardPageControlState.selectedPublicIdMap;
+            return dashboardTreeControlState.selectedPublicIdMap;
         }
-        return dashboardPageControlState.selectedPrivateIdMap;
+        return dashboardTreeControlState.selectedPrivateIdMap;
     }),
     targetDashboardIdList: computed<string[]>(() => Object.entries(state.selectedIdMap)
         .filter(([, value]) => value)
@@ -130,6 +137,7 @@ const handleFormConfirm = async () => {
     await queryClient.invalidateQueries({ queryKey: keys.publicDashboardListQueryKey.value });
     await queryClient.invalidateQueries({ queryKey: keys.privateDashboardListQueryKey.value });
     dashboardPageControlStore.reset();
+    dashboardTreeControlStore.reset();
     state.proxyVisible = false;
 };
 

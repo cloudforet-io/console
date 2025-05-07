@@ -1,55 +1,91 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type {
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
+    GlobalServiceConfig,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import adminIamRoutes, { ADMIN_USER_GROUP_ROUTE } from '@/services/iam/routes/admin/routes';
-import iamRoutes, { USER_GROUP_ROUTE } from '@/services/iam/routes/routes';
+import adminIamRoutes from '@/services/iam/routes/admin/routes';
+import iamRoutes from '@/services/iam/routes/routes';
 
-class IamConfigurator {
-    static getAdminRoutes(version: string) {
-        const adminRoutes = adminIamRoutes;
-        if (version === 'V1') {
-            adminRoutes.children?.push(ADMIN_USER_GROUP_ROUTE);
-        }
-        return adminRoutes;
+class IamConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
+
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
+
+    initialize(version: FeatureVersion): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes(version: string) {
-        const routes = iamRoutes;
-        if (version === 'V1') {
-            routes.children?.push(USER_GROUP_ROUTE);
-        }
-        return routes;
-    }
-
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.adminMenu || settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({ id: MENU_INFO_MAP[menuId].menuId }));
+    getRoutes(): FeatureRouteConfig {
         return {
-            id: MENU_ID.IAM,
-            subMenuList: subMenuIds,
+            routes: iamRoutes,
+            adminRoutes: adminIamRoutes,
+            version: this.version,
         };
     }
 
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menu = settings.menu;
-        const subMenuIds = Object.keys(menu).filter((menuId) => (menu)[menuId])
-            .map((menuId) => ({
-                id: MENU_INFO_MAP[menuId].menuId,
-                needPermissionByRole: true,
-            }));
-        return {
+    getMenu(config?: GlobalServiceConfig): GeneratedMenuConfig {
+        const alertManagerVersion = config?.ALERT_MANAGER?.VERSION;
+        const baseMenu: Menu = {
             id: MENU_ID.IAM,
             needPermissionByRole: true,
-            subMenuList: subMenuIds,
+            subMenuList: [],
+            order: 8,
+        };
+
+        const workspaceSubMenuList: Menu[] = [
+            { id: MENU_ID.USER, needPermissionByRole: true },
+            { id: MENU_ID.APP, needPermissionByRole: true },
+        ];
+
+        const adminSubMenuList: Menu[] = [
+            { id: MENU_ID.USER },
+            { id: MENU_ID.APP },
+            { id: MENU_ID.ROLE },
+        ];
+
+        if (alertManagerVersion === 'V2') {
+            workspaceSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP, needPermissionByRole: true });
+            adminSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP });
+        }
+
+        return {
+            menu: {
+                ...baseMenu,
+                subMenuList: workspaceSubMenuList,
+            },
+            adminMenu: {
+                ...baseMenu,
+                subMenuList: adminSubMenuList,
+            },
+            version: this.version,
         };
     }
 
-    static applyUiAffects(): void|null {
-        return null;
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
+
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 
-export default IamConfigurator;
+export default new IamConfigurator();

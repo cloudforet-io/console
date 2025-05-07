@@ -2,8 +2,6 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
-
 export const useDashboardPageControlStore = defineStore('page-dashboard-control', () => {
     const state = reactive({
         // folder
@@ -23,11 +21,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         bundleMoveModalVisible: false,
         bundleCloneModalVisible: false,
         bundleDeleteModalVisible: false,
-        //
-        selectedPublicIdMap: {} as Record<string, boolean>,
-        selectedPrivateIdMap: {} as Record<string, boolean>,
-        newIdList: [] as string[],
-        searchQueryTags: [] as QueryTag[],
     });
 
     /* Mutations */
@@ -40,20 +33,8 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     const setSelectedFolderId = (folderId: string | undefined) => {
         state.selectedFolderId = folderId;
     };
-    const setSelectedPublicIdMap = (idMap: Record<string, boolean>) => {
-        state.selectedPublicIdMap = idMap;
-    };
-    const setSelectedPrivateIdMap = (idMap: Record<string, boolean>) => {
-        state.selectedPrivateIdMap = idMap;
-    };
     const setFolderModalType = (type: 'PUBLIC' | 'PRIVATE') => {
         state.folderModalType = type;
-    };
-    const setNewIdList = (newIdList: string[]) => {
-        state.newIdList = newIdList;
-    };
-    const setSearchQueryTags = (queryTags: QueryTag[] = []) => {
-        state.searchQueryTags = queryTags;
     };
     const setDashboardNameEditModalVisible = (visible: boolean) => { state.dashboardNameEditModalVisible = visible; };
     const setDashboardDeleteModalVisible = (visible: boolean) => { state.dashboardDeleteModalVisible = visible; };
@@ -70,13 +51,9 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         setFolderFormModalType,
         setSelectedFolderId,
         setBundleDeleteModalVisible,
-        setSelectedPublicIdMap,
-        setSelectedPrivateIdMap,
         setFolderModalType,
         setBundleCloneModalVisible,
-        setNewIdList,
         setBundleShareModalVisible,
-        setSearchQueryTags,
         setDashboardNameEditModalVisible,
         setDashboardDeleteModalVisible,
         setDashboardCloneModalVisible,
@@ -100,19 +77,8 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
         state.bundleDeleteModalVisible = false;
         state.selectedFolderId = undefined;
         state.selectedDashboardId = undefined;
-        state.selectedPublicIdMap = {};
-        state.selectedPrivateIdMap = {};
     };
-    const resetSelectedIdMap = (type?: 'PUBLIC'|'PRIVATE') => {
-        if (type === 'PUBLIC') {
-            state.selectedPublicIdMap = {};
-        } else if (type === 'PRIVATE') {
-            state.selectedPrivateIdMap = {};
-        } else {
-            state.selectedPublicIdMap = {};
-            state.selectedPrivateIdMap = {};
-        }
-    };
+
 
     // Single (Folder or Dashboard)
     const openEditNameModal = (id: string) => {
@@ -184,7 +150,6 @@ export const useDashboardPageControlStore = defineStore('page-dashboard-control'
     };
     const actions = {
         reset,
-        resetSelectedIdMap,
         openEditNameModal,
         openShareModal,
         openShareWithCodeModal,

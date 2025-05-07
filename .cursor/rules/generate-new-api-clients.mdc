@@ -1,0 +1,138 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+
+## Directory Structure
+```
+api-clients/
+├── _common/
+│   ├── composables/
+│   │   └── use-api-query-key.ts
+│   └── schema/
+│       ├── api-verbs/
+│       └── model.ts
+└── {service-name}/
+    ├── {resource}/
+    │   ├── composables/
+    │   │   └── use-{resource}-api.ts
+    │   └── schema/
+    │       ├── api-verbs/
+    │       │   ├── {verb}.ts
+    │       └── model.ts
+    └── index.ts
+```
+
+## API Client Composable Template
+```typescript
+// use-{resource}-api.ts template
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { {Resource}{Verb}Parameters } from '@/api-clients/{service}/{resource}/schema/api-verbs/{verb}';
+import type { {Resource}{Verb = list}Parameters } from '@/api-clients/{service}/{resource}/schema/api-verbs/list';
+import type { {Resource}Model } from '@/api-clients/{service}/{resource}/schema/model';
+
+export const use{Resource}Api = () => {
+    // Define API actions
+    const actions = {
+        {verb}: SpaceConnector.clientV2.{service}.{resource}.{verb}<{Resource}{Verb}Parameters, {Resource}Model>,
+        {verb = list}: SpaceConnector.clientV2.{service}.{resource}.list<{Resource}ListParameters, ListResponse<{Resource}Model>>,
+        // ... other actions
+    };
+
+    return {
+        {resource}API: actions,
+    };
+};
+```
+
+## Schema Templates
+
+### Model Definition
+```typescript
+// model.ts template
+export interface {Resource}Model {
+    // Define resource properties
+    resource_id: string;
+    name: string;
+    // ... other properties
+}
+```
+
+### API Verb Parameters
+```typescript
+// create.ts template example
+export interface {Resource}CreateParameters {
+    // Define create operation parameters
+    name: string;
+    // ... other parameters
+}
+
+// list.ts template example
+export interface {Resource}ListParameters {
+    query?: {
+        filter?: Array<{
+            k: string;
+            v: any;
+            o: string;
+        }>;
+        // ... other query parameters
+    };
+}
+```
+
+## Usage Rules
+
+1. **Naming Conventions**
+   - Use PascalCase for interface names: `{Resource}Model`, `{Resource}{Verb}Parameters`
+   - Use camelCase for variables and functions: `use{Resource}Api`
+   - Follow existing naming patterns in the codebase
+
+2. **Type Safety**
+   - Always define proper TypeScript interfaces for all parameters and responses
+   - Use generics with SpaceConnector client methods
+   - Define all possible API parameters in schema files
+
+3. **Query Key Management**
+   - Use `useAPIQueryKey` for generating consistent query keys
+   - Create separate query keys for different operations
+   - Include contextual information in query keys when needed
+
+4. **Code Organization**
+   - Keep schema definitions separate from API logic
+   - Group related files in appropriate directories
+   - Follow the established directory structure
+
+5. **Documentation**
+   - Add JSDoc comments for public interfaces and functions
+   - Document any special behaviors or requirements
+   - Include examples for complex parameter structures
+
+## Example Usage in Components
+```typescript
+const { {resource}API } = use{Resource}Api();
+
+const { key, params } = useServiceQueryKey(service, resource, verb, {
+  params: ...
+})
+
+// In composables
+const query = useScopedQuery({
+    queryKey: {resource}QueryKey.value,
+    queryFn: () => {resource}API.{verb}(params.value),
+    // ... other options
+}, ['WORKSPACE', 'ADMIN']);
+```
+
+## Notes
+- Always check existing API clients for consistent patterns
+- Consider reusability and maintainability
+- Follow the service's API documentation for accurate parameter definitions
+- Use appropriate error handling and loading states
+- Consider implementing proper caching strategies 
+- Add comments only when it is really complex. (English only)
+
+

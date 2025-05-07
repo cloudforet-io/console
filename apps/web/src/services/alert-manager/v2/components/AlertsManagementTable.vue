@@ -5,6 +5,8 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
 
+import dayjs from 'dayjs';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -21,6 +23,8 @@ import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { AppReferenceMap } from '@/store/reference/app-reference-store';
+import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -28,6 +32,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
@@ -43,12 +48,18 @@ import {
     ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
     ALERT_MANAGEMENT_TABLE_HANDLER,
-    ALERT_STATUS_FILTERS,
+    ALERT_STATUS_FILTERS, ALERT_PERIOD_DROPDOWN_MENU,
 } from '@/services/alert-manager/v2/constants/alert-table-constant';
+import {
+    convertRelativePeriodToPeriod,
+} from '@/services/alert-manager/v2/helpers/alert-period-helper';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { AlertFilterType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type {
+    AlertFilterType, AlertPeriodItemType,
+    AlertPeriodDropdownMenuType,
+} from '@/services/alert-manager/v2/types/alert-manager-type';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -64,6 +75,8 @@ const route = useRoute();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
+    app: computed<AppReferenceMap>(() => allReferenceGetters.app),
+    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
     totalCount: computed<number>(() => alertPageState.totalAlertCount),
     alertList: computed<AlertModel[]>(() => alertPageState.alertList),
@@ -81,16 +94,71 @@ const state = reactive({
     refinedAlertList: computed<AlertModel[]>(() => storeState.alertList.map((alert) => ({
         ...alert,
         duration: alert.status === ALERT_STATUS.RESOLVED
-            ? calculateTime(alert?.resolved_at, storeState.timezone) || '0m'
-            : calculateTime(alert?.created_at, storeState.timezone) || '0m',
+            ? calculateTime(alert?.resolved_at, storeState.timezone)
+            : calculateTime(alert?.created_at, storeState.timezone),
         created_at: iso8601Formatter(alert.created_at, storeState.timezone),
+        resolved_at: iso8601Formatter(alert.resolved_at, storeState.timezone) || '-',
     }))),
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
     defaultFields: computed<DataTableFieldType[]>(() => (state.isServicePage ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS])),
     fields: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS],
+    customRangeModalVisible: false,
 });
 const filterState = reactive({
+    urgencyFields: computed<SelectDropdownMenuItem[]>(() => ([
+        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
+        { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
+    ])),
+    period: { start: undefined, end: undefined },
+    periodMenuItems: computed<AlertPeriodItemType[]>(() => [
+        {
+            type: 'item',
+            name: 'ALL',
+            label: i18n.t('ALERT_MANAGER.ALERTS.ALL'),
+        },
+        {
+            name: ALERT_PERIOD_DROPDOWN_MENU.LAST_1_MONTH,
+            relativePeriod: { value: 1 },
+            label: i18n.t('ALERT_MANAGER.ALERTS.LAST_1_MONTHS'),
+        },
+        {
+            name: ALERT_PERIOD_DROPDOWN_MENU.LAST_3_MONTHS,
+            relativePeriod: { value: 3 },
+            label: i18n.t('ALERT_MANAGER.ALERTS.LAST_3_MONTHS'),
+        },
+        {
+            name: ALERT_PERIOD_DROPDOWN_MENU.LAST_6_MONTHS,
+            relativePeriod: { value: 6 },
+            label: i18n.t('ALERT_MANAGER.ALERTS.LAST_6_MONTHS'),
+        },
+        {
+            name: ALERT_PERIOD_DROPDOWN_MENU.LAST_12_MONTHS,
+            relativePeriod: { value: 12 },
+            label: i18n.t('ALERT_MANAGER.ALERTS.LAST_12_MONTHS'),
+        },
+        {
+            type: 'divider',
+        }, {
+            type: 'item',
+            name: ALERT_PERIOD_DROPDOWN_MENU.CUSTOM,
+            label: i18n.t('ALERT_MANAGER.ALERTS.CUSTOM'),
+        },
+    ]),
+    isPeriodInvalid: computed<boolean>(() => {
+        const now = dayjs().utc();
+        const checkPeriod = (limit:number):{isStartInvalid:boolean, isEndInvalid:boolean} => {
+            const isStartInvalid = now.diff(filterState.period?.start, 'month') >= limit;
+            const isEndInvalid = now.diff(filterState.period?.end, 'month') >= limit;
+            return { isStartInvalid, isEndInvalid };
+        };
+        const LIMIT_MONTH = 36;
+        const { isStartInvalid, isEndInvalid } = checkPeriod(LIMIT_MONTH);
+        return isStartInvalid || isEndInvalid;
+    }),
+    selectedPeriod: ALERT_PERIOD_DROPDOWN_MENU.ALL as string,
+    showPeriodBadge: computed<boolean>(() => filterState.selectedPeriod === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM && filterState.period.start && filterState.period.end),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
@@ -99,11 +167,6 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'), name: ALERT_STATUS_FILTERS.RESOLVED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS_FILTERS.IGNORED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
-    ])),
-    urgencyFields: computed<SelectDropdownMenuItem[]>(() => ([
-        { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
-        { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
     ])),
     labelHandler: computed(() => makeDistinctValueHandler('alert_manager.Alert', 'labels')),
     selectedLabels: [] as SelectDropdownMenuItem[],
@@ -147,6 +210,9 @@ const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
         return storeState.webhook[id]?.label || id;
     }
+    if (id.includes('app')) {
+        return storeState.app[id]?.label || id;
+    }
     return id;
 };
 const getServiceName = (id: string): TranslateResult => {
@@ -170,6 +236,19 @@ const handleSelectFilter = async (type: 'status' | 'urgency', value: string) => 
         await alertPageStore.setSelectedUrgency(value);
         await replaceUrlQuery('urgency', value);
     }
+    await fetchAlertsList();
+};
+const handleSelectPeriod = async (periodMenuName: AlertPeriodDropdownMenuType) => {
+    if (periodMenuName === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM) {
+        state.customRangeModalVisible = true;
+        return;
+    }
+    if (periodMenuName === ALERT_PERIOD_DROPDOWN_MENU.ALL) {
+        filterState.period = { start: undefined, end: undefined };
+    }
+    filterState.selectedPeriod = periodMenuName;
+    const selectedPeriodItem = filterState.periodMenuItems.find((d) => d.name === periodMenuName) || {} as AlertPeriodItemType;
+    filterState.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : filterState.period;
     await fetchAlertsList();
 };
 const handleChange = async (options: any = {}) => {
@@ -203,21 +282,40 @@ const handleExportToExcel = async () => {
         timezone: storeState.timezone,
     });
 };
+const handleCustomRangeModalConfirm = (start: string, end: string) => {
+    filterState.period = { start, end };
+    filterState.selectedPeriod = ALERT_PERIOD_DROPDOWN_MENU.CUSTOM;
+    state.customRangeModalVisible = false;
+    fetchAlertsList();
+};
 
 const fetchAlertsList = async () => {
+    state.loading = true;
     try {
         filterQueryHelper.setFilters([]);
+        if (storeState.selectedUrgency !== 'ALL') {
+            filterQueryHelper.addFilter({ k: 'urgency', v: storeState.selectedUrgency, o: '=' });
+        }
         if (storeState.selectedStatus === ALERT_STATUS_FILTERS.OPEN) {
             filterQueryHelper.addFilter({ k: 'status', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
         } else if (storeState.selectedStatus !== 'ALL') {
             filterQueryHelper.addFilter({ k: 'status', v: storeState.selectedStatus, o: '=' });
         }
-        if (storeState.selectedUrgency !== 'ALL') {
-            filterQueryHelper.addFilter({ k: 'urgency', v: storeState.selectedUrgency, o: '=' });
-        }
         if (filterState.selectedLabels.length > 0) {
             filterQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
         }
+
+        if (filterState.period.start && filterState.period.end && (filterState.period.start === filterState.period.end)) {
+            filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+        } else {
+            if (filterState.period.start) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+            }
+            if (filterState.period.end) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.end, o: '<=' });
+            }
+        }
+
 
         if (state.isServicePage) {
             filterQueryHelper.addFilter({ k: 'service_id', v: storeState.serviceId, o: '=' });
@@ -237,6 +335,8 @@ const fetchAlertsList = async () => {
         await alertPageStore.fetchAlertsList(params);
     } catch (e) {
         ErrorHandler.handleError(e, true);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -260,12 +360,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
         await queryTagHelper.setURLQueryStringFilters(route.query.filters);
     }
 
-    try {
-        state.loading = true;
-        await fetchAlertsList();
-    } finally {
-        state.loading = false;
-    }
+    await fetchAlertsList();
 })();
 </script>
 
@@ -315,6 +410,24 @@ watch(() => storeState.serviceId, async (serviceId) => {
                             <span>{{ item.label }}</span>
                         </template>
                     </p-select-dropdown>
+                    <div>
+                        <p-select-dropdown :menu="filterState.periodMenuItems"
+                                           :selection-label="$t('ALERT_MANAGER.ALERTS.PERIOD')"
+                                           disable-proxy
+                                           style-type="rounded"
+                                           use-fixed-menu-style
+                                           :selected="filterState.selectedPeriod"
+                                           :invalid="filterState.isPeriodInvalid"
+                                           @select="handleSelectPeriod"
+                        />
+                        <p-badge v-if="filterState.showPeriodBadge"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                                 class="ml-2"
+                        >
+                            {{ `${dayjs.utc(filterState.period.start).format('MMM D, YYYY')} ~ ${dayjs.utc(filterState.period.end).format('MMM D, YYYY')}` }}
+                        </p-badge>
+                    </div>
                     <p-divider vertical
                                class="divider"
                     />
@@ -425,6 +538,13 @@ watch(() => storeState.serviceId, async (serviceId) => {
                             @update:visible="handleVisibleCustomFieldModal"
                             @complete="fetchAlertsList"
                             @custom-field-loaded="handleCustomFieldUpdate"
+        />
+        <custom-date-modal :visible.sync="state.customRangeModalVisible"
+                           :start="filterState.period?.start"
+                           :end="filterState.period?.end"
+                           :datetime-picker-data-type="'yearToDate'"
+                           use-restricted-mode
+                           @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>

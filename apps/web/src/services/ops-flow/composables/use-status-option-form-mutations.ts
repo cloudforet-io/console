@@ -6,6 +6,7 @@ import { cloneDeep } from 'lodash';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -33,8 +34,10 @@ export const useStatusOptionFormMutations = ({
 }) => {
     const { categoryStatusOptions } = useCategoryStatusOptions({ categoryId });
 
-    const { taskCategoryAPI, taskCategoryListQueryKey, taskCategoryQueryKey } = useTaskCategoryApi();
+    const { taskCategoryAPI } = useTaskCategoryApi();
     const queryClient = useQueryClient();
+    const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
+    const { withSuffix: taskCategoryWithSuffix } = useServiceQueryKey('opsflow', 'task-category', 'get');
 
     /* create status options */
     const { mutateAsync: createStatusOptions, isPending: isCreating } = useMutation({
@@ -97,12 +100,7 @@ export const useStatusOptionFormMutations = ({
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
-            queryClient.invalidateQueries({
-                queryKey: [
-                    ...taskCategoryQueryKey.value,
-                    { category_id: data.category_id },
-                ],
-            });
+            queryClient.invalidateQueries({ queryKey: taskCategoryWithSuffix(data.category_id) });
             showSuccessMessage('Task status option updated successfully', '');
         },
         onError: (e) => {

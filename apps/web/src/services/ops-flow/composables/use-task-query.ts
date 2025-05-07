@@ -7,6 +7,7 @@ import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 export const useTaskQuery = ({
     taskId, enabled,
@@ -14,12 +15,17 @@ export const useTaskQuery = ({
   taskId: Ref<string|undefined>;
   enabled?: Ref<boolean>;
 }) => {
-    const { taskQueryKey, taskAPI } = useTaskApi();
-    const queryKey = computed(() => [...taskQueryKey.value, taskId.value]);
+    const { taskAPI } = useTaskApi();
+
+    const { key: taskQueryKey, params: taskParams } = useServiceQueryKey('opsflow', 'task', 'get', {
+        contextKey: taskId,
+        params: computed(() => ({ task_id: taskId.value as string })),
+    });
+
     const { data, isLoading, error } = useQuery({
-        queryKey,
+        queryKey: taskQueryKey,
         queryFn: async () => {
-            const result = await taskAPI.get({ task_id: taskId.value as string });
+            const result = await taskAPI.get(taskParams.value);
             return result;
         },
         enabled: computed(() => (enabled ? (enabled.value && !!taskId.value) : !!taskId.value)),
@@ -35,15 +41,15 @@ export const useTaskQuery = ({
 
     const queryClient = useQueryClient();
     const setQueryData = (newTask: TaskModel) => {
-        queryClient.setQueryData(queryKey.value, newTask);
+        queryClient.setQueryData(taskQueryKey.value, newTask);
     };
     const removeQuery = () => {
-        queryClient.removeQueries({ queryKey: queryKey.value });
+        queryClient.removeQueries({ queryKey: taskQueryKey.value });
     };
     return {
         data,
         isLoading,
-        queryKey,
+        queryKey: taskQueryKey,
         setQueryData,
         error,
         removeQuery,

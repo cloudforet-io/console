@@ -3,13 +3,18 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
 import { createDataTableReferenceMap } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel, DataTableReference } from '@/common/modules/widgets/types/widget-data-table-type';
+
+
 
 
 interface UseDataTableCascadeUpdateOptions {
@@ -26,31 +31,33 @@ export const useDataTableCascadeUpdate = ({ widgetId }: UseDataTableCascadeUpdat
 
     /* Query */
     const {
-        dataTableList,
-        fetcher,
         keys,
-        queryClient,
-    } = useWidgetFormQuery({
+        fetcher,
+        dataTableList,
+    } = useWidgetDataTableListQuery({
         widgetId: computed(() => widgetId.value),
     });
+    const queryClient = useQueryClient();
 
     const _state = reactive({
         isPrivate: computed(() => !!widgetId.value?.startsWith('private')),
         dataTableReferenceMap: computed<Record<string, DataTableReference>>(() => createDataTableReferenceMap(dataTableList.value)),
     });
 
+    const { withSuffix: privateDataTableLoadWithSuffix } = useServiceQueryKey('dashboard', 'private-data-table', 'load');
+    const { withSuffix: publicDataTableLoadWithSuffix } = useServiceQueryKey('dashboard', 'public-data-table', 'load');
+    const { withSuffix: privateDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'get');
+    const { withSuffix: publicDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'get');
+
     const _invalidateLoadQueries = async (data: DataTableModel) => {
         await queryClient.invalidateQueries({
-            queryKey: [
-                ...(_state.isPrivate ? keys.privateDataTableLoadQueryKey.value : keys.publicDataTableLoadQueryKey.value),
-                data.data_table_id,
-            ],
+            queryKey: _state.isPrivate ? privateDataTableLoadWithSuffix(data.data_table_id) : publicDataTableLoadWithSuffix(data.data_table_id),
         });
     };
 
     const cascadeUpdateDataTable = async (dataTableId: string) => {
-        const children = _state.dataTableReferenceMap[dataTableId].children;
-        return children.reduce((chain, childId) => chain.then(async () => {
+        const children = _state.dataTableReferenceMap[dataTableId]?.children;
+        return children?.reduce((chain, childId) => chain.then(async () => {
             try {
                 widgetGenerateStore.setDataTableCasCadeUpdateLoadingMap({
                     ...widgetGenerateState.dataTableCasCadeUpdateLoadingMap,
@@ -82,6 +89,7 @@ export const useDataTableCascadeUpdate = ({ widgetId }: UseDataTableCascadeUpdat
                     }
                     return oldData;
                 });
+                await queryClient.invalidateQueries({ queryKey: _state.isPrivate ? privateDataTableGetQueryKey(result.data_table_id) : publicDataTableGetQueryKey(result.data_table_id) });
 
                 await _invalidateLoadQueries(result);
                 await cascadeUpdateDataTable(childId);

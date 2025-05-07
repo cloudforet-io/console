@@ -10,12 +10,11 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
@@ -31,7 +30,7 @@ import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-c
 const allReferenceStore = useAllReferenceStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 
@@ -41,7 +40,6 @@ const storeState = reactive({
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const state = reactive({
     pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
@@ -70,8 +68,8 @@ const state = reactive({
         }
         return result;
     }),
-    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
-    writableCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR].write),
+    writableServiceAccount: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
+    writableCollector: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[MENU_ID.COLLECTOR]?.write),
 });
 
 const initData = async () => {

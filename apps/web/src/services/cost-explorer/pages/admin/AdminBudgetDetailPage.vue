@@ -5,12 +5,10 @@ import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/mode
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import BudgetDetailBaseInformation from '@/services/cost-explorer/components/BudgetDetailBaseInformation.vue';
 import BudgetDetailHeading from '@/services/cost-explorer/components/BudgetDetailHeading.vue';
-import BudgetDetailInfo from '@/services/cost-explorer/components/BudgetDetailInfo.vue';
-import BudgetDetailSummary
-    from '@/services/cost-explorer/components/BudgetDetailSummary.vue';
+import BudgetUsageTrend from '@/services/cost-explorer/components/BudgetUsageTrend.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-
 
 interface Props {
     budgetId: string;
@@ -46,11 +44,13 @@ const state = reactive({
     <div>
         <budget-detail-heading :loading="state.loading" />
         <section class="content">
-            <budget-detail-info class="summary" />
+            <budget-detail-base-information />
+            <budget-usage-trend />
+            <!-- <budget-detail-info class="summary" />
             <budget-detail-summary
                 :budget-loading="state.loading"
                 class="summary"
-            />
+            /> -->
         </section>
     </div>
 </template>

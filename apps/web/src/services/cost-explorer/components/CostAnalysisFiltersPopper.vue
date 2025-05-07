@@ -12,7 +12,6 @@ import {
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -45,6 +44,8 @@ import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();

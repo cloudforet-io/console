@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
@@ -19,6 +19,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,8 +28,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 
 interface Props {
     visible: boolean;
@@ -42,23 +44,27 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const appContextStore = useAppContextStore();
+const authorizationStore = useAuthorizationStore();
 const userStore = useUserStore();
+
 const dashboardPageControlStore = useDashboardPageControlStore();
 const dashboardPageControlState = dashboardPageControlStore.state;
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
 
 /* Query */
+const queryClient = useQueryClient();
 const {
     publicFolderList,
     privateFolderList,
     keys,
     api,
     fetcher,
-    queryClient,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -142,8 +148,8 @@ const { mutate: createFolder } = useMutation(
     {
         mutationFn: createFolderFn,
         onSuccess: (folder: PublicFolderModel|PrivateFolderModel) => {
-            dashboardPageControlStore.setNewIdList([
-                ...dashboardPageControlState.newIdList,
+            dashboardTreeControlStore.setNewIdList([
+                ...dashboardTreeControlState.newIdList,
                 folder.folder_id,
             ]);
             showSuccessMessage(i18n.t('DASHBOARDS.ALL_DASHBOARDS.FOLDER.ALT_S_CREATE_FOLDER'), '');
@@ -184,6 +190,7 @@ watch(() => state.proxyVisible, (visible) => {
     } else {
         initForm();
         dashboardPageControlStore.reset();
+        dashboardTreeControlStore.reset();
         state.isPrivate = false;
     }
 });

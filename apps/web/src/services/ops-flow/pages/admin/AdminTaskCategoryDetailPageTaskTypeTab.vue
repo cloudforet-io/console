@@ -42,7 +42,7 @@ const taskTypeFields = computed<DataTableField[]>(() => [
 ]);
 
 const { taskTypes, isLoading, refetch } = useTaskTypesQuery({
-    queryKey: computed(() => ({
+    params: computed(() => ({
         query: {
             filter: [{ k: 'category_id', v: taskCategoryPageStore.state.currentCategoryId, o: 'eq' }],
         },

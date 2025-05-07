@@ -376,6 +376,11 @@ export const API_DOC = {
             'list',
         ],
     },
+    inventory: {
+        'metric-data': [
+            'analyze',
+        ],
+    },
     opsflow: {
         comment: [
             'create',
@@ -411,6 +416,12 @@ export const API_DOC = {
             'list',
             'update-fields',
             'update',
+        ],
+    },
+    repository: {
+        'dashboard-template': [
+            'list',
+            'register',
         ],
     },
 } as const;

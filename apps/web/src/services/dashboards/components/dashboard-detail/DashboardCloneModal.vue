@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PToggleButton,
@@ -11,30 +11,22 @@ import { getClonedName } from '@cloudforet/utils';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { DashboardCreateParams, DashboardModel, DashboardType } from '@/api-clients/dashboard/_types/dashboard-type';
-import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
-import type { PrivateDashboardCreateParameters } from '@/api-clients/dashboard/private-dashboard/schema/api-verbs/create';
-import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/composables/use-private-widget-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
-import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useDashboardCloneMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-clone-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
-import { getSharedDashboardLayouts } from '@/services/dashboards/helpers/dashboard-share-helper';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-
 
 
 interface Props {
@@ -47,22 +39,19 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
-const { privateWidgetAPI } = usePrivateWidgetApi();
-const { publicWidgetAPI } = usePublicWidgetApi();
 
 /* Query */
 const {
     publicDashboardList,
     privateDashboardList,
     keys,
-    api,
-    queryClient,
 } = useDashboardQuery();
+const queryClient = useQueryClient();
 
 const router = useRouter();
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
+
 const {
     forms: {
         name,
@@ -85,9 +74,8 @@ const {
 });
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    isWorkspaceOwner: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -111,22 +99,6 @@ const state = reactive({
     }),
 });
 
-/* Api */
-const listDashboardWidgets = async (dashboardId: string): Promise<WidgetModel[]> => {
-    try {
-        const isPrivate = dashboardId.startsWith('private');
-        const fetcher = isPrivate
-            ? privateWidgetAPI.list
-            : publicWidgetAPI.list;
-        const res = await fetcher({
-            dashboard_id: dashboardId,
-        });
-        return res.results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 
 const handleUpdateVisible = (visible) => {
     state.proxyVisible = visible;
@@ -138,62 +110,50 @@ const handleChangePrivate = (val: boolean) => {
 };
 const handleConfirm = async () => {
     if (!isAllValid) return;
-    const _dashboardWidgets = await listDashboardWidgets(props.dashboardId);
 
-    const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, _dashboardWidgets, storeState.costDataSource);
     const _sharedDashboard: DashboardCreateParams = {
         name: name.value,
-        layouts: _sharedLayouts,
-        options: state.targetDashboard.options || {},
-        labels: state.targetDashboard.labels || [],
-        tags: { created_by: userStore.state.userId },
-        vars: state.targetDashboard.vars,
-        vars_schema: state.targetDashboard.vars_schema,
     };
     if (storeState.isWorkspaceMember) {
         state.isPrivate = true;
     } else if (storeState.isAdminMode) {
         state.isPrivate = false;
-        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
-    } else if (!state.isPrivate) {
-        (_sharedDashboard as PublicDashboardCreateParameters).resource_group = state.targetDashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
     }
 
-    mutate(_sharedDashboard as PrivateDashboardCreateParameters);
-};
-
-const createDashboard = (params: DashboardCreateParams): Promise<DashboardModel> => {
-    if (state.isPrivate) {
-        return api.privateDashboardAPI.create(params as PrivateDashboardCreateParameters);
+    if (!state.isPrivate) {
+        if (storeState.isAdminMode) {
+            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.DOMAIN;
+        } else {
+            (_sharedDashboard as PublicDashboardCreateParameters).resource_group = RESOURCE_GROUP.WORKSPACE;
+        }
     }
-    return api.publicDashboardAPI.create(params as PublicDashboardCreateParameters);
+
+    cloneDashboard(_sharedDashboard as DashboardCreateParams, props.dashboardId);
 };
 
-const { mutate, isPending: dashboardCloneLoading } = useMutation(
-    {
-        mutationFn: createDashboard,
-        onSuccess: (dashboard: DashboardModel) => {
-            const isPrivate = dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-        },
-        onError: (e) => {
-            showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
-        },
-        onSettled(data) {
-            state.proxyVisible = false;
-            if (data?.dashboard_id) {
-                const dashboardDetailRouteName = storeState.isAdminMode
-                    ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-                    : DASHBOARDS_ROUTE.DETAIL._NAME;
-                router.push({
-                    name: dashboardDetailRouteName,
-                    params: { dashboardId: data.dashboard_id },
-                }).catch(() => {});
-            }
-        },
+const { mutate: cloneDashboard, isPending: dashboardCloneLoading } = useDashboardCloneMutation({
+    isPrivate: computed(() => state.isPrivate),
+    onSuccess: (dashboard: DashboardModel) => {
+        const isPrivate = dashboard.dashboard_id.startsWith('private');
+        const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+        queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
     },
-);
+    onError: (e) => {
+        showErrorMessage(i18n.t('DASHBOARDS.FORM.ALT_E_CLONE_DASHBOARD'), e);
+    },
+    onSettled(data) {
+        state.proxyVisible = false;
+        if (data?.dashboard_id) {
+            const dashboardDetailRouteName = storeState.isAdminMode
+                ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
+                : DASHBOARDS_ROUTE.DETAIL._NAME;
+            router.push({
+                name: dashboardDetailRouteName,
+                params: { dashboardId: data.dashboard_id },
+            }).catch(() => {});
+        }
+    },
+});
 
 watch(() => props.visible, (visible) => {
     if (visible) {

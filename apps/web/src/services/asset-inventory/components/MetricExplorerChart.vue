@@ -14,7 +14,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
+import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
 import MetricExplorerHorizontalColumnChart

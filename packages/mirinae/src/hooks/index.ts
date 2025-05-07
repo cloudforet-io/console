@@ -9,3 +9,4 @@ export * from './use-markdown/use-markdown';
 export * from './use-proxy-state/use-proxy-state';
 export * from './use-select/use-select';
 export * from './use-tab/use-tab';
+export * from './use-text-ellipsis/use-text-ellipsis';

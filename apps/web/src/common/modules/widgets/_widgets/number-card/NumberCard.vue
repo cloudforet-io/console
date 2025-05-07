@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useElementSize, useResizeObserver } from '@vueuse/core';
 import {
-    computed, defineExpose, onMounted, reactive, ref, watch,
+    computed, defineExpose, onMounted, reactive, ref,
 } from 'vue';
 
-import { useQueries } from '@tanstack/vue-query';
 import { debounce, throttle } from 'lodash';
 
 import {
@@ -12,20 +11,16 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { WidgetLoadResponse, WidgetLoadSumParams } from '@/api-clients/dashboard/_types/widget-type';
+import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
+import { useWidgetLoadSumQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
-import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
 import { SUB_TOTAL_NAME } from '@/common/modules/widgets/_constants/widget-field-constant';
-import {
-    normalizeAndSerializeVars,
-} from '@/common/modules/widgets/_helpers/global-variable-helper';
 import {
     getPreviousDateRange,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -37,7 +32,6 @@ import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/g
 import type { IconValue } from '@/common/modules/widgets/_widget-fields/icon/type';
 import type { NumberFormatValue } from '@/common/modules/widgets/_widget-fields/number-format/type';
 import type { WidgetHeightValue } from '@/common/modules/widgets/_widget-fields/widget-height/type';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DateRange } from '@/common/modules/widgets/types/widget-data-type';
 import type {
     WidgetProps, WidgetEmit, WidgetExpose,
@@ -52,10 +46,11 @@ const emit = defineEmits<WidgetEmit>();
 const topPartRef = ref<null | HTMLElement>(null);
 const valueTextRef = ref<null | HTMLElement>(null);
 
-const { keys, api } = useWidgetFormQuery({
-    widgetId: computed(() => props.widgetId),
-    preventLoad: true,
-});
+const { data: dataTable, isFetching: dataTableLoading } = useWidgetDataTableQuery(
+    computed(() => props.dataTableId),
+);
+const isPivotDataTable = computed<boolean>(() => dataTable.value?.operator === DATA_TABLE_OPERATOR.PIVOT);
+
 
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
@@ -64,19 +59,17 @@ const { dateRange } = useWidgetDateRange({
 });
 const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
-    dataTable: undefined as DataTableModel|undefined,
     previousLoading: false,
-    isPivotDataTable: computed<boolean>(() => state.dataTable?.operator === DATA_TABLE_OPERATOR.PIVOT),
 
-    data: computed<WidgetLoadResponse | null>(() => queryResults.value?.[0].data || null),
-    previousData: computed<WidgetLoadResponse | null>(() => queryResults.value?.[1]?.data || null),
+    data: computed<WidgetLoadResponse | null>(() => loadQuery.data?.value || null),
+    previousData: computed<WidgetLoadResponse | null>(() => comparisonQuery.data?.value || null),
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     previousValue: computed<number>(() => {
-        if (state.isPivotDataTable) return state.previousData?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
+        if (isPivotDataTable.value) return state.previousData?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
         return state.previousData?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0;
     }),
     currentValue: computed<number>(() => {
-        if (state.isPivotDataTable) return state.data?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
+        if (isPivotDataTable.value) return state.data?.results?.[0]?.[SUB_TOTAL_NAME] ?? 0;
         return state.data?.results?.[0]?.[widgetOptionsState.dataFieldInfo?.data as string] ?? 0;
     }),
     valueText: computed<string|undefined>(() => getFormattedNumber(state.currentValue, widgetOptionsState.numberFormatInfo?.[widgetOptionsState.dataFieldInfo?.data as string], state.unit)),
@@ -128,7 +121,6 @@ const state = reactive({
         const _previousDateRange = getPreviousDateRange(widgetOptionsState.granularityInfo?.granularity, dateRange.value);
         return _previousDateRange;
     }),
-    dataTableLoading: false,
 });
 
 const widgetOptionsState = reactive({
@@ -157,80 +149,45 @@ const setValueTextFontSize = debounce(() => {
 }, 300);
 
 /* Api */
-const fetchWidgetData = async (params: WidgetLoadSumParams): Promise<WidgetLoadResponse> => {
-    const defaultFetcher = state.isPrivateWidget
-        ? api.privateWidgetAPI.loadSum
-        : api.publicWidgetAPI.loadSum;
-    const res = await defaultFetcher(params);
-    return res;
-};
-
-const baseQueryKey = computed(() => [
-    ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
-    props.dashboardId,
-    props.widgetId,
-    props.widgetName,
-    {
+const loadQuery = useWidgetLoadSumQuery({
+    widgetId: computed(() => props.widgetId),
+    params: computed(() => ({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
         start: dateRange.value.start,
         end: dateRange.value.end,
-        granularity: widgetOptionsState.granularityInfo?.granularity,
+        vars: props.dashboardVars,
+    })),
+    additionalDeps: computed(() => ({
+        widgetName: props.widgetName,
         dataTableId: props.dataTableId,
-        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
-        vars: normalizeAndSerializeVars(props.dashboardVars),
-    },
-]);
-
-const comparisonQueryKey = computed(() => [
-    ...(state.isPrivateWidget ? keys.privateWidgetLoadSumQueryKey.value : keys.publicWidgetLoadSumQueryKey.value),
-    props.dashboardId,
-    props.widgetId,
-    props.widgetName,
-    {
-        start: state.comparisonDateRange.start,
-        end: state.comparisonDateRange.end,
-        granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: props.dataTableId,
-        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options || {}),
-        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
-        vars: normalizeAndSerializeVars(props.dashboardVars),
-    },
-]);
-
-const queryResults = useQueries({
-    queries: [
-        {
-            queryKey: baseQueryKey,
-            queryFn: () => fetchWidgetData({
-                widget_id: props.widgetId,
-                granularity: widgetOptionsState.granularityInfo?.granularity,
-                start: dateRange.value.start,
-                end: dateRange.value.end,
-                vars: props.dashboardVars,
-            }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
-            staleTime: WIDGET_LOAD_STALE_TIME,
-        },
-        {
-            queryKey: comparisonQueryKey,
-            queryFn: () => fetchWidgetData({
-                widget_id: props.widgetId,
-                granularity: widgetOptionsState.granularityInfo?.granularity,
-                start: state.comparisonDateRange.start,
-                end: state.comparisonDateRange.end,
-                vars: props.dashboardVars,
-            }),
-            enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && widgetOptionsState.comparisonInfo?.toggleValue && !props.loadDisabled),
-            staleTime: WIDGET_LOAD_STALE_TIME,
-        },
-    ],
+    })),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
 });
 
-const widgetLoading = computed<boolean>(() => queryResults.value?.[0].isFetching || state.dataTableLoading);
-const previousLoading = computed<string>(() => queryResults.value?.[1].isFetching || state.dataTableLoading);
-const errorMessage = computed<string>(() => {
-    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
-    return queryResults.value?.[0].error?.message;
+
+const comparisonQuery = useWidgetLoadSumQuery({
+    widgetId: computed(() => props.widgetId),
+    params: computed(() => ({
+        widget_id: props.widgetId,
+        granularity: widgetOptionsState.granularityInfo?.granularity,
+        start: state.comparisonDateRange.start,
+        end: state.comparisonDateRange.end,
+        vars: props.dashboardVars,
+    })),
+    additionalDeps: computed(() => ({
+        widgetName: props.widgetName,
+        dataTableId: props.dataTableId,
+    })),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && widgetOptionsState.comparisonInfo?.toggleValue && !props.loadDisabled),
+});
+
+
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || dataTableLoading.value);
+const previousLoading = computed<boolean>(() => comparisonQuery.isFetching.value || dataTableLoading.value);
+const errorMessage = computed<string|undefined>(() => {
+    if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
+    return loadQuery.error?.value?.message as string;
 });
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
@@ -244,24 +201,10 @@ useResizeObserver(valueTextRef, throttle(() => {
     setValueTextFontSize();
 }, 500));
 
-watch(() => props.dataTableId, async (newDataTableId) => {
-    if (!newDataTableId) return;
-    state.dataTableLoading = true;
-    const fetcher = state.isPrivateWidget
-        ? api.privateDataTableAPI.get
-        : api.publicDataTableAPI.get;
-    try {
-        state.dataTable = await fetcher({ data_table_id: newDataTableId });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.dataTableLoading = false;
-    }
-}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResults.value?.[0].refetch();
-        queryResults.value?.[1].refetch();
+        loadQuery.refetch();
+        comparisonQuery.refetch();
     },
 });
 onMounted(() => {

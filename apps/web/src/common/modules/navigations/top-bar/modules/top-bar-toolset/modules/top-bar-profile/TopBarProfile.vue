@@ -23,6 +23,7 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { RoleReferenceMap } from '@/store/reference/role-reference-store';
@@ -38,7 +39,6 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
-
 interface Props {
     visible: boolean
 }
@@ -49,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const domainStore = useDomainStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
@@ -69,7 +70,7 @@ const state = reactive({
         return UserImage;
     }),
     baseRoleType: computed(() => userStore.state.roleType),
-    currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
+    currentRoleType: computed(() => authorizationStore.state.currentRoleInfo?.roleType),
     visibleRoleType: computed(() => {
         if (state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN) return 'Admin';
         if (state.currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'Workspace Owner';

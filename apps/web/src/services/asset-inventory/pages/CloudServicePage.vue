@@ -23,14 +23,13 @@ import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 import {
     arrayToQueryString,
@@ -69,7 +68,7 @@ const allReferenceStore = useAllReferenceStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const storeState = reactive({
     projects: computed(() => allReferenceStore.getters.project),
@@ -77,7 +76,6 @@ const storeState = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
 });
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -150,8 +148,8 @@ const state = reactive({
         }
         return result;
     }),
-    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT].write),
-    writableCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR].write),
+    writableServiceAccount: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
+    writableCollector: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[MENU_ID.COLLECTOR]?.write),
 });
 
 /* api */

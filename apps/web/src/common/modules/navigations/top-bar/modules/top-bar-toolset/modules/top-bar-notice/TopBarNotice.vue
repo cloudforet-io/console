@@ -8,7 +8,7 @@ import {
     PI, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { useNoticeStore } from '@/store/notice';
+import { useNoticeStore } from '@/store/notice/notice-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';

@@ -6,21 +6,25 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { PSkeleton } from '@cloudforet/mirinae';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardLabelsButton from '@/services/dashboards/components/dashboard-detail/DashboardLabelsButton.vue';
-import DashboardRefreshDropdown from '@/services/dashboards/components/dashboard-detail/DashboardRefreshDropdown.vue';
+import DashboardLabelsButton from '@/services/_shared/dashboard/dashboard-detail/components/DashboardLabelsButton.vue';
+import DashboardRefreshDropdown from '@/services/_shared/dashboard/dashboard-detail/components/DashboardRefreshDropdown.vue';
 import DashboardToolsetDateDropdown
-    from '@/services/dashboards/components/dashboard-detail/DashboardToolsetDateDropdown.vue';
-import DashboardVariablesV2 from '@/services/dashboards/components/dashboard-detail/DashboardVariablesV2.vue';
+    from '@/services/_shared/dashboard/dashboard-detail/components/DashboardToolsetDateDropdown.vue';
 import DashboardWidgetContainerV2
-    from '@/services/dashboards/components/dashboard-detail/DashboardWidgetContainerV2.vue';
+    from '@/services/_shared/dashboard/dashboard-detail/components/DashboardWidgetContainerV2.vue';
+import { useDashboardGetQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-get-query';
+import { useDashboardWidgetListQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-widget-list-query';
+import DashboardVariablesV2
+    from '@/services/_shared/dashboard/dashboard-detail/contextual-components/DashboardVariablesV2.vue';
+import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
 import type DashboardWidgetContainer from '@/services/dashboards/components/legacy/DashboardWidgetContainer.vue';
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 
@@ -40,17 +44,23 @@ const router = useRouter();
 /* Query */
 const {
     dashboard,
-    widgetList,
-    isError,
-    isLoading,
-    keys,
-    queryClient,
-} = useDashboardDetailQuery({
+    isError: dashboardError,
+    isLoading: dashboardLoading,
+} = useDashboardGetQuery({
     dashboardId: computed(() => route.params.dashboardId),
 });
+const {
+    widgetList,
+    isLoading: widgetLoading,
+    isError: widgetError,
+    keys: widgetListKeys,
+} = useDashboardWidgetListQuery({
+    dashboardId: computed(() => route.params.dashboardId),
+});
+const queryClient = useQueryClient();
 
 const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: keys.publicWidgetListQueryKey.value });
+    await queryClient.invalidateQueries({ queryKey: widgetListKeys.publicWidgetListQueryKey.value });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
@@ -69,9 +79,9 @@ watch(widgetList, (_widgetList) => {
         dashboardDetailStore.setDashboardWidgets(_widgetList);
     }
 });
-watch(isError, (error) => {
-    if (error) {
-        ErrorHandler.handleError(error);
+watch([dashboardError, widgetError], ([_dashboardError, _widgetError]) => {
+    if (_dashboardError || _widgetError) {
+        ErrorHandler.handleError(_dashboardError || _widgetError);
         router.push({ name: PROJECT_ROUTE_V1.DETAIL._NAME });
     }
 });
@@ -105,21 +115,24 @@ onUnmounted(() => {
                 <div class="toolset">
                     <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
                     <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                                :loading="isLoading"
+                                                :loading="dashboardLoading || widgetLoading"
                                                 disable-interval
                                                 @refresh="handleRefresh"
                     />
                 </div>
-                <div v-if="!isLoading"
+                <div v-if="!dashboardLoading && !widgetLoading"
                      class="selectors"
                 >
                     <dashboard-variables-v2 class="variable-selector-wrapper"
                                             is-project-dashboard
                                             disable-save-button
-                                            :loading="isLoading"
+                                            :loading="dashboardLoading || widgetLoading"
+                                            :dashboard-id="props.dashboardId"
                     />
                 </div>
-                <dashboard-widget-container-v2 ref="widgetContainerRef" />
+                <dashboard-widget-container-v2 ref="widgetContainerRef"
+                                               :dashboard-id="props.dashboardId"
+                />
             </div>
         </div>
     </div>

@@ -5,4 +5,5 @@ export interface PrivateDashboardListParameters {
     query?: Query;
     dashboard_id?: string;
     name?: string;
+    folder_id?: string;
 }

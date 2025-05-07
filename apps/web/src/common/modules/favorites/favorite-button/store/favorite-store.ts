@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive, watch } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -62,6 +60,10 @@ export const useFavoriteStore = defineStore('favorite', () => {
 
     const actions = {
         fetchFavorite: async () => {
+            if (!_getters.userId) {
+                console.error('userId is not found');
+                return;
+            }
             favoriteListApiQuery.setFilters([
                 { k: 'user_id', v: _getters.userId, o: '=' },
                 { k: 'name', v: 'console:favorite:', o: '' },
@@ -79,6 +81,10 @@ export const useFavoriteStore = defineStore('favorite', () => {
             }
         },
         fetchWorkspaceFavorite: async () => {
+            if (!_getters.userId) {
+                console.error('userId is not found');
+                return;
+            }
             favoriteListApiQuery.setFilters([
                 { k: 'user_id', v: _getters.userId, o: '=' },
                 { k: 'name', v: `console:favorite:${FAVORITE_TYPE.WORKSPACE}`, o: '' },

@@ -7,6 +7,7 @@ import { PButtonModal } from '@cloudforet/mirinae/';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';
@@ -54,7 +55,9 @@ const { categories } = useCategoriesQuery({ enabled });
 const targetCategory = computed(() => categories.value?.find((c) => c.category_id === taskManagementPageState.targetCategoryId));
 
 /* delete category */
-const { taskCategoryAPI, taskCategoryListQueryKey } = useTaskCategoryApi();
+const { taskCategoryAPI } = useTaskCategoryApi();
+const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
+
 const queryClient = useQueryClient();
 const { mutate: deleteCategory, isPending: isDeleting } = useMutation({
     mutationFn: ({ categoryId }: {categoryId?: string}) => {
@@ -89,7 +92,7 @@ const handleClosed = () => {
 const {
     tasks, isLoading,
 } = useAssociatedTasksQuery({
-    queryKey: computed(() => ({ category_id: taskManagementPageState.targetCategoryId })),
+    params: computed(() => ({ category_id: taskManagementPageState.targetCategoryId })),
     enabled: computed(() => !!taskManagementPageState.visibleDeleteCategoryModal && !!taskManagementPageState.targetCategoryId),
 });
 

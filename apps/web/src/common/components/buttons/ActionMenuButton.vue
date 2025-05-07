@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
-import { ref, computed } from 'vue';
+import { ref, computed, toRef } from 'vue';
 
 import { PIconButton, PContextMenu, useContextMenuStyle } from '@cloudforet/mirinae';
+import type { IconButtonSize, IconButtonStyleType } from '@cloudforet/mirinae/types/controls/buttons/icon-button/type';
+import type { ContextMenuPosition } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -12,12 +14,14 @@ import type { ActionMenuItem } from './type';
 type SupportMenu = 'edit' | 'delete';
 const props = withDefaults(defineProps<{
     menu?: Array<SupportMenu|ActionMenuItem>;
-    styleType?: string;
-    size?: string;
+    styleType?: IconButtonStyleType;
+    size?: IconButtonSize;
+    position?: ContextMenuPosition;
 }>(), {
     menu: undefined,
     styleType: 'transparent',
     size: 'md',
+    position: 'right',
 });
 const emit = defineEmits<{(event: 'edit'): void;
     (event: 'delete'): void;
@@ -33,7 +37,7 @@ useContextMenuStyle({
     menuRef,
     visibleMenu,
     useFixedMenuStyle: true,
-    position: 'right',
+    position: toRef(props, 'position'),
     menuWidth: props.size === 'sm' ? '113px' : '192px',
 });
 const menuMap = computed<Record<SupportMenu, ActionMenuItem>>(() => ({

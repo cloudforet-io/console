@@ -12,12 +12,11 @@ import {
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ReferenceItem } from '@/store/reference/type';
 import { useUserStore } from '@/store/user/user-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 import { red } from '@/styles/colors';
 
@@ -47,6 +46,8 @@ const props = withDefaults(defineProps<{
 
 const userStore = useUserStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     timezone: computed(() => userStore.state.timezone),
     alertStateI18n: useAlertStateI18n(),
@@ -94,7 +95,7 @@ const projectNameFormatter = (projectId) => props.projectReference?.label || pro
                         class="project-link"
                         action-icon="internal-link"
                         new-tab
-                        :to="referenceRouter(props.item.project_id,{
+                        :to="getReferenceLocation(props.item.project_id,{
                             resource_type: 'identity.Project',
                             workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                         })"

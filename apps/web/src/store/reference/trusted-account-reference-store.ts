@@ -9,10 +9,10 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -24,14 +24,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useTrustedAccountReferenceStore = defineStore('reference-trusted-account', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as TrustedAccountReferenceMap | null,
     });
 
     const getters = reactive({
         trustedAccountItems: asyncComputed<TrustedAccountReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

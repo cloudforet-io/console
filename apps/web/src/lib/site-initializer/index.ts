@@ -2,7 +2,6 @@ import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import APIClientManager from '@/api-clients/api-client-manager';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
@@ -10,29 +9,34 @@ import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { integralRoutes } from '@/router/integral-routes';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDisplayStore } from '@/store/display/display-store';
+import { useGlobalConfigSchemaStore } from '@/store/global-config-schema/global-config-schema-store';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
+import APIClientManager from '@/lib/config/global-config/api-client-manager';
+import featureSchemaManager from '@/lib/config/global-config/feature-schema-manager';
+import { mergeConfig } from '@/lib/config/global-config/helpers/merge-config';
+import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
-import { initApiClient } from '@/lib/site-initializer/api-client';
+import { initApiConnectorAndAuth } from '@/lib/site-initializer/api-connector';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
-import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
-import { mergeConfig } from '@/lib/site-initializer/merge-config';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
-import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
+import { initUserAndToken } from '@/lib/site-initializer/user-token';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
 
-import ServiceConfigurator from '@/services/configurator';
+import { useTaskManagementTemplateStore } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
 
 const initQueryHelper = () => {
     const userStore = useUserStore(pinia);
@@ -41,8 +45,9 @@ const initQueryHelper = () => {
 
 let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
-    const userStore = useUserStore(pinia);
+    const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
+    const authorizationStore = useAuthorizationStore(pinia);
     const afterGrantedCallback = () => allReferenceStore.flush();
 
     const adminChildren = integralRoutes[0].children?.find(
@@ -53,20 +58,19 @@ const initRouter = (domainId?: string) => {
         (route) => route.name === ROOT_ROUTE.WORKSPACE._NAME,
     )?.children;
 
+    const featureRoutes = globalConfigSchemaStore.state.routeSchema;
     if (adminChildren) {
-        const dynamicAdminRoutes = ServiceConfigurator.getRoutes('admin');
-        adminChildren.push(...dynamicAdminRoutes);
+        adminChildren.push(...featureRoutes.adminRoutes);
     }
 
     if (workspaceChildren) {
-        const dynamicWorkspaceRoutes = ServiceConfigurator.getRoutes('workspace');
-        workspaceChildren.push(...dynamicWorkspaceRoutes);
+        workspaceChildren.push(...featureRoutes.routes);
     }
 
     if (!domainId) {
-        SpaceRouter.init(errorRoutes, afterGrantedCallback, userStore);
+        SpaceRouter.init(errorRoutes, afterGrantedCallback, authorizationStore);
     } else {
-        SpaceRouter.init(integralRoutes, afterGrantedCallback, userStore);
+        SpaceRouter.init(integralRoutes, afterGrantedCallback, authorizationStore);
     }
     isRouterInitialized = true;
 };
@@ -74,6 +78,15 @@ const initRouter = (domainId?: string) => {
 const initI18n = () => {
     const userStore = useUserStore(pinia);
     setI18nLocale(userStore.state.language || '');
+};
+
+const initOpsFlowTaskManagementTemplate = async (mergedConfig: GlobalServiceConfig) => {
+    if (!mergedConfig.OPS_FLOW.ENABLED) return;
+    const taskManagementTemplateStore = useTaskManagementTemplateStore(pinia);
+    await Promise.allSettled([
+        taskManagementTemplateStore.setInitialTemplateId(),
+        taskManagementTemplateStore.setInitialLandingData(),
+    ]);
 };
 
 const removeInitializer = () => {
@@ -85,15 +98,17 @@ const init = async () => {
     /* Init SpaceONE Console */
     try {
         await config.init();
-        await initApiClient(config);
+        await initApiConnectorAndAuth(config);
         const domainId = await initDomain(config);
-        const userId = await initUserAndAuth(config);
+        const userId = await initUserAndToken(config);
         const mergedConfig = await mergeConfig(config, domainId);
-        await ServiceConfigurator.initialize(mergedConfig);
         await APIClientManager.initialize(mergedConfig);
         initDomainSettings();
-        initModeSetting();
+        await initModeSetting();
         await initWorkspace(userId);
+        await initOpsFlowTaskManagementTemplate(mergedConfig);
+        await featureSchemaManager.initialize(mergedConfig);
+        initErrorHandler();
         initRouter(domainId);
         // prefetchResources();
         initI18n();
@@ -103,11 +118,9 @@ const init = async () => {
         initGtm(config);
         initAmcharts5(config);
         initEcharts();
-        initErrorHandler();
         initRequestIdleCallback();
         const results = await Promise.allSettled([
             checkSsoAccessToken(),
-            initTaskManagementTemplate(),
         ]);
         const errors: any[] = [];
         results.forEach((result) => {

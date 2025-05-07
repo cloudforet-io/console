@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
@@ -8,7 +8,6 @@ import type { UserConfigModel } from '@/api-clients/config/user-config/schema/mo
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDisplayStore } from '@/store/display/display-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -26,15 +25,17 @@ import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
+import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
+import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const route = useRoute();
+const router = useRouter();
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
@@ -44,14 +45,15 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
-const displayStore = useDisplayStore();
+const { getAllMenuList } = useAllMenuList();
 
 /* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
+    publicDashboardListQuery,
+    privateDashboardListQuery,
+} = useGlobalDashboardQuery();
 
+const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
@@ -76,7 +78,7 @@ const state = reactive({
 const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([recentConfig], [...publicDashboardList.value, ...privateDashboardList.value])[0];
+        return convertDashboardConfigToReferenceData([recentConfig], dashboardList.value)[0];
     }
     if (itemType === RECENT_TYPE.PROJECT) {
         return convertProjectConfigToReferenceData([recentConfig], storeState.projects)[0];
@@ -87,7 +89,7 @@ const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData =
     if (itemType === RECENT_TYPE.COST_ANALYSIS) {
         return convertCostAnalysisConfigToReferenceData([recentConfig], storeState.costQuerySets, storeState.costDataSource)[0];
     }
-    const allMenuList = displayStore.getAllMenuList(route);
+    const allMenuList = getAllMenuList(route, router);
     return convertMenuConfigToReferenceData([recentConfig], allMenuList)[0];
 };
 </script>

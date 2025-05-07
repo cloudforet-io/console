@@ -13,6 +13,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import {
     DAILY_ENABLED_VALUES,
     DATE_RANGE_ADVANCED_OPERATOR_MAP,
@@ -34,7 +35,6 @@ import type {
     WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 const GRANULARITY_UNIT_MAP = {
     MONTHLY: { singular: 'Month', plural: 'Months' },
@@ -51,13 +51,12 @@ const getCommonDateRangeValueLabel = (value: string): string => {
 const FIELD_KEY = 'dateRange';
 
 const props = defineProps<WidgetFieldComponentProps<DateRangeOptions>>();
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-
+const widgetContextStore = useWidgetContextStore();
+const widgetContextState = widgetContextStore.state;
 const state = reactive({
     fieldValue: computed<DateRangeValue>(() => props.fieldManager.data[FIELD_KEY].value),
     granularity: computed<GranularityValue['granularity']>(() => (props.fieldManager.data.granularity?.value?.granularity || 'MONTHLY')),
-    baseDateRange: computed<DateRange|undefined>(() => dashboardDetailState.options.date_range),
+    baseDateRange: computed<DateRange|undefined>(() => widgetContextState.dashboard?.options?.date_range),
     valueMenuItems: computed<MenuItem[]>(() => {
         if (state.granularity === 'MONTHLY') return MONTHLY_ENABLED_VALUES.map((value) => ({ label: DATE_RANGE_MONTHLY_VALUE_MAP[value] || getCommonDateRangeValueLabel(value), name: value }));
         if (state.granularity === 'DAILY') return DAILY_ENABLED_VALUES.map((value) => ({ label: DATE_RANGE_DAILY_VALUE_MAP[value] || getCommonDateRangeValueLabel(value), name: value }));

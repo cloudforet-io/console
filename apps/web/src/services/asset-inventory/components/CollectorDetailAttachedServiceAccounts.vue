@@ -18,14 +18,14 @@ import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list
 import type { SecretModel } from '@/schema/secret/secret/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -35,7 +35,6 @@ import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-
 
 const props = defineProps<{
     manageDisabled?: boolean;
@@ -50,6 +49,8 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const userStore = useUserStore();
+
+const { getReferenceLocation } = useReferenceRouter();
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -217,7 +218,7 @@ watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFi
                 <p-link v-if="state.projects[value]"
                         action-icon="internal-link"
                         new-tab
-                        :to="referenceRouter(value,{
+                        :to="getReferenceLocation(value,{
                             resource_type: 'identity.Project',
                             workspace_id: userWorkspaceStore.getters.currentWorkspaceId
                         })"

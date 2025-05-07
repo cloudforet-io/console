@@ -12,6 +12,7 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, '../../packages/mirinae/src'),
             'vue/dist/vue.esm': path.resolve(__dirname, '../../node_modules/vue/dist/vue.esm.js'),
+            'vue-router/composables': path.resolve(__dirname, './mock/vue-router-composables.ts'),
         },
     },
     optimizeDeps: {

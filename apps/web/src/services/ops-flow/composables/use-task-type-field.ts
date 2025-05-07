@@ -44,7 +44,7 @@ export const useTaskTypeField = ({
     };
 
     const { taskTypes } = useTaskTypesQuery({
-        queryKey: computed(() => ({
+        params: computed(() => ({
             query: { filter: [{ k: 'category_id', v: categoryId.value, o: 'eq' }] },
         })),
         enabled: computed(() => !!categoryId.value),

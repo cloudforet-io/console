@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PI, PTreeItem, PLabel, PPopover, PSelectDropdown,
@@ -10,12 +9,14 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 
+import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
+import type { FolderModel } from '@/api-clients/dashboard/_types/folder-type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -23,39 +24,42 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { gray, indigo, violet } from '@/styles/colors';
 
-import { useDashboardControlMenuItems } from '@/services/dashboards/composables/use-dashboard-control-menu-items';
-import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { useDashboardPageControlStore } from '@/services/dashboards/stores/dashboard-page-control-store';
+import { useDashboardManageable } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-manageable';
+import { useDashboardControlMenuHelper } from '@/services/_shared/dashboard/core/composables/use-dashboard-control-menu-helper';
+import { DASHBOARD_SHARED_ENTRY_POINT } from '@/services/_shared/dashboard/core/constants/dashboard-shared-constant';
+import type { DashboardControlActionType } from '@/services/_shared/dashboard/core/types/dashboard-control-menu-type';
+import type { DashboardSharedEntryPoint } from '@/services/_shared/dashboard/core/types/dashboard-shared-type';
+import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardTreeDataType } from '@/services/dashboards/types/dashboard-folder-type';
 
-
 interface Props {
+    entryPoint?: DashboardSharedEntryPoint;
     treeData: TreeNode<DashboardTreeDataType>;
     // for dashboard create page
     disableLink?: boolean;
-    readonlyMode?: boolean;
+    disableFavorite?: boolean;
+    disableControlLabels?: boolean;
+    showSingleControlButtons?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
+    entryPoint: () => DASHBOARD_SHARED_ENTRY_POINT.NONE_ENTRY_POINT,
 });
-const emit = defineEmits<{(e: 'toggle-folder'): void;
+const emit = defineEmits<{(e: 'click-tree-item', node: TreeNode<DashboardTreeDataType>): void;
+    (e: 'select-control-actions', type: DashboardControlActionType, id: string): void;
 }>();
 const LABELS_LIMIT = 2;
-const router = useRouter();
 const appContextStore = useAppContextStore();
-const userWorkspaceStore = useUserWorkspaceStore();
-const dashboardPageControlStore = useDashboardPageControlStore();
-const dashboardPageControlState = dashboardPageControlStore.state;
-const userStore = useUserStore();
+const dashboardTreeControlStore = useDashboardTreeControlStore();
+const dashboardTreeControlState = dashboardTreeControlStore.state;
+const authorizationStore = useAuthorizationStore();
 
-const { getControlMenuItems } = useDashboardControlMenuItems({
-    isAdminMode: computed(() => storeState.isAdminMode),
-    isWorkspaceOwner: computed(() => storeState.isWorkspaceOwner),
-});
+const { getDashboardManageable, getFolderManageable } = useDashboardManageable();
+const { getControlDashboardMenuItems, getControlFolderMenuItems } = useDashboardControlMenuHelper();
+
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const state = reactive({
     slicedLabels: computed(() => props.treeData.data?.labels?.slice(0, LABELS_LIMIT) || []),
@@ -67,51 +71,55 @@ const state = reactive({
 
 /* Util */
 const getSharedColor = (node: TreeNode<DashboardTreeDataType>): string|undefined => {
-    if (node.data.shared) {
-        if (node.data.scope === 'PROJECT') return violet[500];
+    if (node.data?.shared) {
+        if (node.data?.scope === 'PROJECT') return violet[500];
         return indigo[500];
     }
     return undefined;
 };
 const getSharedText = (node: TreeNode<DashboardTreeDataType>): TranslateResult|undefined => {
-    if (node.data.shared) {
+    if (node.data?.shared) {
         if (storeState.isAdminMode) {
-            if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
             return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_WORKSPACES');
         }
-        if (node.data.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
-        return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        if (props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.DASHBOARDS) {
+            if (node.data?.scope === 'PROJECT') return i18n.t('DASHBOARDS.DETAIL.SHARED_TO_ALL_PROJECTS');
+            return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+        }
+        if (props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.PROJECT) {
+            if (node.data?.resource_group === RESOURCE_GROUP.DOMAIN) {
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_ADMIN');
+            }
+            if (node.data?.resource_group === RESOURCE_GROUP.WORKSPACE) {
+                return i18n.t('DASHBOARDS.DETAIL.SHARED_BY_WORKSPACE');
+            }
+        }
     }
     return undefined;
 };
 
+const getControlMenuItems = (node: TreeNode<DashboardTreeDataType>): MenuItem[] => {
+    if (node.data.type === 'DASHBOARD') {
+        const _dashboard = node.data as DashboardModel;
+        const _manageable = getDashboardManageable(_dashboard, props.entryPoint);
+        return getControlDashboardMenuItems(node.data.id, _manageable, _dashboard, props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.PROJECT);
+    }
+    if (node.data.type === 'FOLDER') {
+        const _folder = node.data as FolderModel;
+        const _manageable = getFolderManageable(_folder, props.entryPoint);
+        return getControlFolderMenuItems(node.data.id, _manageable, _folder, props.entryPoint === DASHBOARD_SHARED_ENTRY_POINT.PROJECT);
+    }
+    return [];
+};
+
 /* Event */
-const handleClickTreeItem = (): void => {
-    if (props.treeData.data.type === 'FOLDER') {
-        emit('toggle-folder');
-        return;
-    }
-    if (props.disableLink) return;
-    const dashboardDetailRouteName = storeState.isAdminMode
-        ? ADMIN_DASHBOARDS_ROUTE.DETAIL._NAME
-        : DASHBOARDS_ROUTE.DETAIL._NAME;
-    const _location = {
-        name: dashboardDetailRouteName,
-        params: {
-            workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
-            dashboardId: props.treeData.data.id || '',
-        },
-    };
-    const _target = props.readonlyMode ? '_blank' : '_self';
-    if (_target === '_blank') {
-        window.open(router.resolve(_location).href, _target);
-        return;
-    }
-    router.push(_location).catch(() => {});
+const handleClickTreeItem = (node: TreeNode<DashboardTreeDataType>): void => {
+    emit('click-tree-item', node);
 };
 const handleClickLabel = (label: string) => {
-    dashboardPageControlStore.setSearchQueryTags([
-        ...dashboardPageControlState.searchQueryTags,
+    dashboardTreeControlStore.setSearchQueryTags([
+        ...dashboardTreeControlState.searchQueryTags,
         {
             key: { name: 'labels', label: 'Label' },
             value: { name: label, label },
@@ -120,12 +128,7 @@ const handleClickLabel = (label: string) => {
     ]);
 };
 const handleSelectControlButton = (id: string, item: MenuItem) => {
-    if (item.name === 'edit') dashboardPageControlStore.openEditNameModal(id);
-    if (item.name === 'clone') dashboardPageControlStore.openCloneModal(id);
-    if (item.name === 'move') dashboardPageControlStore.openMoveModal(id);
-    if (item.name === 'share') dashboardPageControlStore.openShareModal(id);
-    if (item.name === 'shareWithCode') dashboardPageControlStore.openShareWithCodeModal(id);
-    if (item.name === 'delete') dashboardPageControlStore.openDeleteModal(id);
+    emit('select-control-actions', item.name as DashboardControlActionType, id);
 };
 </script>
 
@@ -135,7 +138,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
     >
         <template #content="{ node }">
             <div class="dashboard-folder-tree-item-content"
-                 @click="handleClickTreeItem"
+                 @click="handleClickTreeItem(node)"
             >
                 <div class="contents-wrapper">
                     <div :class="{'left-part': true, 'is-dashboard-item': !Array.isArray(node.children) && node.depth === 0 }">
@@ -145,27 +148,23 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                              width="1rem"
                              height="1rem"
                         />
-                        <p-i v-if="props.readonlyMode && node.id.startsWith('private')"
-                             name="ic_lock-filled"
-                             width="0.75rem"
-                             height="0.75rem"
-                             :color="gray[500]"
-                        />
-                        <span class="text">{{ node.data.name }}</span>
+                        <span class="text">
+                            <slot name="text"
+                                  v-bind="{node}"
+                            >
+                                {{ node.data.name }}
+                            </slot>
+                        </span>
                         <div v-if="node.data.isNew">
                             <new-mark class="new-mark" />
                         </div>
-                        <p-i v-if="!props.disableLink && node.data.type === 'DASHBOARD' && props.readonlyMode"
-                             name="ic_arrow-right-up"
-                             width="0.75rem"
-                             height="0.75rem"
-                        />
-                        <div v-if="!props.readonlyMode"
+                        <div v-if="props.showSingleControlButtons || !props.disableFavorite"
                              class="hidden-wrapper"
                         >
-                            <p-select-dropdown style-type="tertiary-icon-button"
+                            <p-select-dropdown v-if="props.showSingleControlButtons"
+                                               style-type="tertiary-icon-button"
                                                button-icon="ic_ellipsis-horizontal"
-                                               :menu="getControlMenuItems(node.data.id)"
+                                               :menu="getControlMenuItems(node)"
                                                :selected="[]"
                                                size="sm"
                                                menu-position="left"
@@ -173,7 +172,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                                use-fixed-menu-style
                                                @select="handleSelectControlButton(node.data.id, $event)"
                             />
-                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.readonlyMode"
+                            <favorite-button v-if="node.data.type === 'DASHBOARD' && !props.disableFavorite"
                                              :item-id="node.data.id"
                                              :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                              scale="0.8"
@@ -190,7 +189,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                 <p-label v-for="label in node.data?.labels?.slice(0, LABELS_LIMIT)"
                                          :key="`${node.data.id}-label-${label}`"
                                          :text="label"
-                                         :clickable="!props.readonlyMode"
+                                         :clickable="!props.disableControlLabels"
                                          @item-click="handleClickLabel(label)"
                                 />
 
@@ -205,7 +204,7 @@ const handleSelectControlButton = (id: string, item: MenuItem) => {
                                             <p-label v-for="label in node.data.labels.slice(LABELS_LIMIT)"
                                                      :key="`${node.data.id}-label-${label}`"
                                                      :text="label"
-                                                     :clickable="!props.readonlyMode"
+                                                     :clickable="!props.disableControlLabels"
                                                      @item-click="handleClickLabel(label)"
                                             />
                                         </div>

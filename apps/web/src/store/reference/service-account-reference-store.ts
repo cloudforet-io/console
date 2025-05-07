@@ -9,15 +9,14 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 export type ServiceAccountItem = Required<Pick<ReferenceItem<{
     account_id?: string;
@@ -30,14 +29,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useServiceAccountReferenceStore = defineStore('reference-service-account', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as ServiceAccountReferenceMap | null,
     });
 
     const getters = reactive({
         serviceAccountItems: asyncComputed<ServiceAccountReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

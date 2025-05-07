@@ -15,20 +15,20 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import EscalationPolicyFormRulesInput from '@/services/alert-manager/v1/components/EscalationPolicyFormRulesInput.vue';
 import { ACTION } from '@/services/alert-manager/v1/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/v1/stores/escalation-policy-form-store';
 import type { ActionMode } from '@/services/alert-manager/v1/types/alert-type';
-import type { ProjectTreeNodeData } from '@/services/project/v-shared/types/project-tree-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
 const props = withDefaults(defineProps<{
@@ -45,7 +45,9 @@ const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
+const { getReferenceLocation } = useReferenceRouter();
+
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
@@ -54,7 +56,7 @@ const state = reactive({
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
     resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyModel['resource_group']}[]>(() => {
-        const currentRoleType = userStore.state.currentRoleInfo?.roleType;
+        const currentRoleType = authorizationStore.state.currentRoleInfo?.roleType;
         const resGroup: {label: TranslateResult; value: EscalationPolicyModel['resource_group']}[] = [
             { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
         ];
@@ -165,7 +167,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link action-icon="internal-link"
                                  new-tab
-                                 :to="referenceRouter(escalationPolicyFormState.projectId,{
+                                 :to="getReferenceLocation(escalationPolicyFormState.projectId,{
                                      resource_type: 'identity.Project',
                                      workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                                  })"

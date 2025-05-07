@@ -5,19 +5,24 @@ import { useQuery } from '@tanstack/vue-query';
 
 import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
 import type { TaskTypeListParameters } from '@/api-clients/opsflow/task-type/schema/api-verbs/list';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 export const useTaskTypesQuery = ({
-    queryKey,
+    params,
     enabled,
 }: {
-  queryKey: Ref<TaskTypeListParameters>;
+  params: Ref<TaskTypeListParameters>;
   enabled?: Ref<boolean>;
 }) => {
-    const { taskTypeAPI, taskTypeListQueryKey } = useTaskTypeApi();
+    const { taskTypeAPI } = useTaskTypeApi();
+    const { key: taskTypeListQueryKey, params: taskTypeListParams } = useServiceQueryKey('opsflow', 'task-type', 'list', {
+        params: computed(() => params.value),
+    });
+
     const { data: taskTypes, isLoading, refetch } = useQuery({
-        queryKey: computed(() => [...taskTypeListQueryKey.value, queryKey.value]),
+        queryKey: taskTypeListQueryKey,
         queryFn: async () => {
-            const { results } = await taskTypeAPI.list(queryKey.value);
+            const { results } = await taskTypeAPI.list(taskTypeListParams.value);
             return results ?? [];
         },
         enabled,

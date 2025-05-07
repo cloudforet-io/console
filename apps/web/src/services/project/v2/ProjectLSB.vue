@@ -1,256 +1,168 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core/index';
-import { computed, reactive, ref } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-
+import { vOnClickOutside } from '@vueuse/components';
+import type Vue from 'vue';
+import {
+    computed, nextTick, onMounted, ref, watch,
+} from 'vue';
 
 import {
-    PTextInput, PTextHighlighting, PEmpty, PContextMenu, PIconButton,
+    PButton, PContextMenu, useContextMenuController,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { TreeNodeRoutePredicate } from '@cloudforet/mirinae/types/data-display/tree/new-tree/type';
 
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
-
-import { MENU_ID } from '@/lib/menu/config';
-
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import LSB from '@/common/modules/navigations/lsb/LSB.vue';
-import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
-import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
+import { type FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
+import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
+import LSBStarredTree from '@/common/modules/navigations/new-lsb/LSBStarredTree.vue';
+import LSBTitle from '@/common/modules/navigations/new-lsb/LSBTitle.vue';
 
 import { indigo, peacock } from '@/styles/colors';
 
-import { useProjectPageStore } from '@/services/project/v-shared/stores/project-page-store';
-import ProjectMainTree from '@/services/project/v2/components/ProjectMainTree.vue';
+import ProjectLSBSearch from '@/services/project/v2/components/ProjectLSBSearch.vue';
+import ProjectLSBTree from '@/services/project/v2/components/ProjectLSBTree.vue';
+import { useProjectStarredTree } from '@/services/project/v2/composables/use-project-starred-tree';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
+import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
-const route = useRoute();
-const allReferenceStore = useAllReferenceStore();
+const props = defineProps<{
+    selectedPaths?: string[];
+}>();
+
+/* starred */
 const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
-const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreGetters = userWorkspaceStore.getters;
-const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
-const menuRef = ref<any|null>(null);
-
-
-const storeState = reactive({
-    projectItems: computed<ProjectReferenceItem[]>(() => Object.values(allReferenceStore.getters.project)),
-    favoriteItems: computed(() => favoriteGetters.favoriteMenuList.filter((favoriteMenu) => {
-        if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT) return true;
-        if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT_GROUP) return true;
-        return false;
-    })),
-    currentWorkspaceId: computed(() => workspaceStoreGetters.currentWorkspaceId as string),
+const { starredItems } = useProjectStarredTree({
+    favoriteItems: computed(() => favoriteStore.getters.favoriteMenuList as FavoriteItem[]),
 });
 
-const state = reactive({
-    projectKeyword: '',
-    currentPath: computed(() => route.fullPath),
-    starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => {
-        if (d.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-            return {
-                type: MENU_ITEM_TYPE.ITEM,
-                label: d.label,
-                id: d.name,
-                icon: { name: 'ic_folder-filled', color: indigo[500] },
-                to: {
-                    // TODO: check route
-                    name: PROJECT_ROUTE_V2._NAME,
-                    params: { projectGroupId: d.itemId },
-                },
-                favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.name },
-            };
-        }
-        return {
-            type: MENU_ITEM_TYPE.ITEM,
-            label: d.label,
-            id: d.name,
-            icon: { name: 'ic_document-filled', color: peacock[600] },
-            to: {
-                // TODO: check route
-                name: PROJECT_ROUTE_V2._NAME,
-                params: { id: d.itemId },
-            },
-            favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
-        };
-    })),
-    // TODO: check route
-    isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE_V2._NAME),
-    projectLandingMenuSet: computed(() => [
-        {
-            type: MENU_ITEM_TYPE.SLOT,
-            label: i18n.t('PROJECT.LANDING.ALL_PROJECTS'),
-            id: MENU_ID.PROJECT,
-            icon: 'ic_dots-4-square',
-            // TODO: check route
-            to: { name: PROJECT_ROUTE_V2._NAME },
-            hideFavorite: true,
-        },
-        {
-            type: MENU_ITEM_TYPE.DIVIDER,
-        },
-        {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('PROJECT.LANDING.PROJECT'),
-            id: 'project',
-        },
-    ]),
-    menuSet: computed<LSBMenu[]>(() => {
-        const baseMenuSet = [
-            {
-                type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuItems,
-                currentPath: state.currentPath,
-            },
-            { type: MENU_ITEM_TYPE.DIVIDER },
-        ];
-        return [
-            ...baseMenuSet,
-            ...state.projectLandingMenuSet,
-        ];
-    }),
-    projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name?.toLowerCase()?.includes(state.projectKeyword?.toLowerCase()))
-        .map((project) => ({
-            type: MENU_ITEM_TYPE.ITEM,
-            label: project.name,
-            id: project.key,
-            icon: { name: 'ic_document-filled', color: peacock[600] },
-            to: {
-                name: PROJECT_ROUTE_V2._NAME,
-                params: { id: project.key, workspaceId: storeState.currentWorkspaceId },
-            },
-            favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
-        }))),
-    createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
-        {
-            name: 'project',
-            label: i18n.t('PROJECT.LANDING.PROJECT') as string,
-            icon: 'ic_document-filled',
-            iconColor: peacock[600],
-        },
-        {
-            name: 'projectGroup',
-            label: i18n.t('PROJECT.LANDING.PROJECT_GROUP') as string,
-            icon: 'ic_folder-filled',
-            iconColor: indigo[500],
-        },
-    ])),
-    createMenuVisible: false,
+/* create button */
+const projectPageModalStore = useProjectPageModalStore();
+const createDropdownMenuItems = computed<SelectDropdownMenuItem[]>(() => ([
+    {
+        name: 'project',
+        label: i18n.t('PROJECT.LANDING.PROJECT'),
+        icon: 'ic_document-filled',
+        iconColor: peacock[600],
+    },
+    {
+        name: 'projectGroup',
+        label: i18n.t('PROJECT.LANDING.PROJECT_GROUP'),
+        icon: 'ic_folder-filled',
+        iconColor: indigo[500],
+    },
+]));
+const buttonRef = ref<any|null>(null);
+const contextMenuRef = ref<any|null>(null);
+const { visibleMenu, toggleContextMenu, hideContextMenu } = useContextMenuController({
+    targetRef: buttonRef,
+    contextMenuRef,
+    position: 'right',
+    menuWidth: 'max-content',
 });
-
-const handleClickAddButton = () => {
-    state.createMenuVisible = !state.createMenuVisible;
-};
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        projectPageStore.setProjectFormModalVisible(true);
+        projectPageModalStore.openProjectCreateModal();
     } else if (item.name === 'projectGroup') {
-        projectPageStore.setProjectGroupFormVisible(true);
+        projectPageModalStore.openProjectGroupCreateModal();
     }
+    hideContextMenu();
 };
 
-onClickOutside(menuRef, () => {
-    state.createMenuVisible = false;
+/* all projects */
+const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupOrProjectId === curr.params.projectGroupOrProjectId;
+
+/* search */
+const projectKeyword = ref<string>('');
+
+/* auto scroll */
+const treeRef = ref<Vue | null>(null);
+
+watch([() => props.selectedPaths, treeRef], ([paths, treeComponent]) => {
+    if (!paths?.length || !treeComponent?.$el) return;
+
+    nextTick(() => {
+        const selectedNode = treeComponent.$el.querySelector(`[data-node-id="${paths[paths.length - 1]}"]`);
+        if (selectedNode) {
+            const rect = selectedNode.getBoundingClientRect();
+            const isVisible = (
+                rect.top >= 0
+                && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+            );
+
+            if (!isVisible) {
+                selectedNode.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
+            }
+        }
+    });
 });
+
+/* init */
+const mounted = ref(false);
+onMounted(() => {
+    nextTick(() => {
+        mounted.value = true;
+    });
+});
+
 </script>
 
 <template>
-    <l-s-b class="project-l-s-b"
-           :menu-set="state.menuSet"
-    >
-        <template #slot-project="item">
-            <l-s-b-router-menu-item :current-path="state.currentPath"
-                                    :item="item"
-            >
-                <template #right-extra>
-                    <div v-if="projectPageState.isWorkspaceOwner"
-                         ref="menuRef"
-                         class="create-button-wrapper"
+    <l-s-b-container>
+        <l-s-b-starred-tree expanded
+                            :items="starredItems"
+        />
+        <l-s-b-divider />
+        <l-s-b-title id="all-projects"
+                     icon="ic_dots-4-square"
+                     selectable
+                     :link="{
+                         to: {
+                             name: PROJECT_ROUTE_V2._NAME,
+                         },
+                         predicate,
+                     }"
+        >
+            <span class="font-normal">{{ $t('PROJECT.LANDING.ALL_PROJECTS') }}</span>
+            <template #outer-right>
+                <div v-on-click-outside="hideContextMenu"
+                     class="relative"
+                >
+                    <p-button ref="buttonRef"
+                              name="ic_plus"
+                              size="sm"
+                              style-type="tertiary"
+                              class="cursor-pointer"
+                              @click.stop.prevent="toggleContextMenu"
                     >
-                        <p-icon-button name="ic_plus"
-                                       size="sm"
-                                       style-type="tertiary"
-                                       shape="square"
-                                       class="dashboard-create-button"
-                                       @click.prevent="handleClickAddButton"
-                        />
-                        <p-context-menu v-show="state.createMenuVisible"
-                                        class="create-context-menu"
-                                        no-select-indication
-                                        :menu="state.createDropdownMenuItems"
-                                        @select="handleSelectCreateMenu"
-                        />
-                    </div>
-                </template>
-            </l-s-b-router-menu-item>
-        </template>
-        <template #collapsible-contents-project>
-            <p-text-input v-model="state.projectKeyword"
-                          class="project-search"
-                          placeholder="Search project"
-            />
-            <template v-if="state.projectKeyword">
-                <l-s-b-router-menu-item v-for="(_item, idx) of state.projectFilteredByKeyword"
-                                        :key="idx"
-                                        :item="_item"
-                                        :idx="`search-${idx}`"
-                                        :current-path="state.currentPath"
-                                        is-hide-favorite
-                >
-                    <p-text-highlighting class="search-result-text"
-                                         :term="state.projectKeyword"
-                                         :text="_item.label"
+                        {{ $t('COMMON.BUTTONS.CREATE') }}
+                    </p-button>
+                    <p-context-menu v-show="visibleMenu"
+                                    ref="contextMenuRef"
+                                    class="z-10"
+                                    no-select-indication
+                                    :menu="createDropdownMenuItems"
+                                    @select="handleSelectCreateMenu"
                     />
-                </l-s-b-router-menu-item>
-                <p-empty v-if="state.projectKeyword && !state.projectFilteredByKeyword.length"
-                         class="search-empty"
-                >
-                    <span>
-                        {{ $t('PROJECT.LANDING.SEARCH_EMPTY_TEXT') }}
-                    </span>
-                </p-empty>
+                </div>
             </template>
-            <project-main-tree v-else />
-        </template>
-    </l-s-b>
+        </l-s-b-title>
+        <l-s-b-divider />
+        <l-s-b-title id="project-search"
+                     :name="i18n.t('PROJECT.LANDING.PROJECT')"
+        />
+        <project-l-s-b-search :keyword="projectKeyword"
+                              @update:keyword="projectKeyword = $event"
+        />
+        <project-l-s-b-tree v-if="mounted && !projectKeyword.length"
+                            ref="treeRef"
+                            :selected-paths="props.selectedPaths"
+        />
+    </l-s-b-container>
 </template>
 
-<style scoped lang="postcss">
-.project-l-s-b {
-
-    .create-button-wrapper {
-        @apply relative inline-block;
-
-        .create-context-menu {
-            @apply absolute;
-            top: 100%;
-            right: 0;
-            z-index: 10;
-            width: max-content;
-        }
-    }
-
-    .project-search {
-        @apply w-full;
-        margin-bottom: 0.5rem;
-    }
-    .search-result-text {
-        @apply overflow-hidden whitespace-nowrap;
-        text-overflow: ellipsis;
-    }
-    .search-empty {
-        @apply text-paragraph-md;
-        white-space: pre;
-        margin-top: 0.75rem;
-    }
-}
-</style>

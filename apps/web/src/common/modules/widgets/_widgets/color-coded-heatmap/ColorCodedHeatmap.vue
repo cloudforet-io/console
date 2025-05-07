@@ -3,7 +3,6 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
 import { orderBy } from 'lodash';
 
 import {
@@ -11,19 +10,14 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { WidgetLoadParams, WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetCustomLegend from '@/common/modules/widgets/_components/WidgetCustomLegend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
-import { useWidgetFormQuery } from '@/common/modules/widgets/_composables/use-widget-form-query';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';
-import {
-    normalizeAndSerializeVars,
-} from '@/common/modules/widgets/_helpers/global-variable-helper';
+import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';
@@ -34,7 +28,6 @@ import type {
 } from '@/common/modules/widgets/_widget-fields/format-rules/type';
 import type { GranularityValue } from '@/common/modules/widgets/_widget-fields/granularity/type';
 import type { GroupByValue } from '@/common/modules/widgets/_widget-fields/group-by/type';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetLegend } from '@/common/modules/widgets/types/widget-legend-typs';
 
@@ -45,10 +38,9 @@ const MAX_COUNT = 80;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { keys, api } = useWidgetFormQuery({
-    widgetId: computed(() => props.widgetId),
-    preventLoad: true,
-});
+const { data: dataTable, isFetching: dataTableLoading } = useWidgetDataTableQuery(
+    computed(() => props.dataTableId),
+);
 
 const { dateRange } = useWidgetDateRange({
     dateRangeFieldValue: computed(() => (props.widgetOptions?.dateRange?.value as DateRangeValue)),
@@ -57,7 +49,6 @@ const { dateRange } = useWidgetDateRange({
 });
 const state = reactive({
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
-    dataTable: undefined as DataTableModel|undefined,
     boxWidth: computed<number>(() => {
         if (!props.width) return BOX_MIN_WIDTH;
         const widgetContentWidth = props.width;
@@ -65,7 +56,6 @@ const state = reactive({
         return widgetContentWidth / 8 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 8;
     }),
     legendList: [] as WidgetLegend[],
-    dataTableLoading: false,
 });
 
 const widgetOptionsState = reactive({
@@ -76,37 +66,14 @@ const widgetOptionsState = reactive({
 });
 
 /* Api */
-const fetchWidgetData = async (params: WidgetLoadParams): Promise<WidgetLoadResponse> => {
-    const defaultFetcher = state.isPrivateWidget
-        ? api.privateWidgetAPI.load
-        : api.publicWidgetAPI.load;
-    const res = await defaultFetcher(params);
-    return res;
-};
-
-const queryKey = computed(() => [
-    ...(state.isPrivateWidget ? keys.privateWidgetLoadQueryKey.value : keys.publicWidgetLoadQueryKey.value),
-    props.dashboardId,
-    props.widgetId,
-    props.widgetName,
-    {
-        start: dateRange.value.start,
-        end: dateRange.value.end,
-        granularity: widgetOptionsState.granularityInfo?.granularity,
-        dataTableId: props.dataTableId,
-        // dataTableOptions: normalizeAndSerializeDataTableOptions(state.dataTable?.options as DataTableOptions),
-        // dataTables: normalizeAndSerializeDataTableOptions((props.dataTables || []).map((d) => d?.options || {})),
-        groupBy: [widgetOptionsState.groupByInfo?.data as string, widgetOptionsState.formatRulesInfo?.field as string],
-        vars: normalizeAndSerializeVars(props.dashboardVars),
-    },
-]);
-
-const queryResult = useQuery({
-    queryKey,
-    queryFn: () => fetchWidgetData({
+const loadQuery = useWidgetLoadQuery({
+    widgetId: computed(() => props.widgetId),
+    params: computed(() => ({
         widget_id: props.widgetId,
         granularity: widgetOptionsState.granularityInfo?.granularity,
-        group_by: (widgetOptionsState.groupByInfo?.data && widgetOptionsState.formatRulesInfo?.field) ? [widgetOptionsState.groupByInfo?.data, widgetOptionsState.formatRulesInfo?.field] : [],
+        group_by: (widgetOptionsState.groupByInfo?.data && widgetOptionsState.formatRulesInfo?.field)
+            ? [widgetOptionsState.groupByInfo?.data as string, widgetOptionsState.formatRulesInfo?.field as string]
+            : [],
         start: dateRange.value.start,
         end: dateRange.value.end,
         vars: props.dashboardVars,
@@ -114,19 +81,23 @@ const queryResult = useQuery({
             start: 1,
             limit: MAX_COUNT,
         },
-    }),
-    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!state.dataTable && !props.loadDisabled),
-    staleTime: WIDGET_LOAD_STALE_TIME,
+    })),
+    additionalDeps: computed(() => ({
+        widgetName: props.widgetName,
+        dataTableId: props.dataTableId,
+    })),
+    enabled: computed(() => props.widgetState !== 'INACTIVE' && !!dataTable.value && !props.loadDisabled),
 });
 
-const widgetLoading = computed<boolean>(() => queryResult.isFetching.value || state.dataTableLoading);
+
+const widgetLoading = computed<boolean>(() => loadQuery.isFetching.value || dataTableLoading.value);
 const errorMessage = computed<string|undefined>(() => {
-    if (!state.dataTable) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE');
-    return queryResult.error?.value?.message;
+    if (!dataTable.value) return i18n.t('COMMON.WIDGETS.NO_DATA_TABLE_ERROR_MESSAGE') as string;
+    return loadQuery.error?.value?.message as string;
 });
 
 const refinedData = computed(() => {
-    const data = queryResult.data?.value;
+    const data = loadQuery.data?.value;
     if (!data?.results || !widgetOptionsState.groupByInfo?.data || !widgetOptionsState.formatRulesInfo?.field) return [];
     const groupByField = widgetOptionsState.groupByInfo.data as string;
     const formatRulesField = widgetOptionsState.formatRulesInfo.field as string;
@@ -160,7 +131,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 /* Util */
 const getColor = (val: string, field: string): string => {
     const _label = getReferenceLabel(props.allReferenceTypeInfo, field, val);
-    return (widgetOptionsState.formatRulesInfo?.rules ?? []).find((d) => d.text === _label || _label.includes(d.text) || val.includes(d.text))?.color
+    return (widgetOptionsState.formatRulesInfo?.rules ?? []).find((d) => d.text && (d.text === _label || _label.includes(d.text) || val.includes(d.text)))?.color
         ?? widgetOptionsState.formatRulesInfo.baseColor as string;
 };
 
@@ -173,24 +144,9 @@ watch(() => widgetOptionsState.formatRulesInfo, async () => {
     }));
 }, { immediate: true });
 
-
-watch(() => props.dataTableId, async (newDataTableId) => {
-    if (!newDataTableId) return;
-    state.dataTableLoading = true;
-    const fetcher = state.isPrivateWidget
-        ? api.privateDataTableAPI.get
-        : api.publicDataTableAPI.get;
-    try {
-        state.dataTable = await fetcher({ data_table_id: newDataTableId });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.dataTableLoading = false;
-    }
-}, { immediate: true });
 defineExpose<WidgetExpose>({
     loadWidget: () => {
-        queryResult.refetch();
+        loadQuery.refetch();
     },
 });
 onMounted(() => {

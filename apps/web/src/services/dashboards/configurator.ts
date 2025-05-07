@@ -1,32 +1,66 @@
-import type { FeatureVersionSettingsType } from '@/lib/config/global-config/type';
+import type {
+    FeatureConfigurator,
+    FeatureRouteConfig,
+    FeatureVersion,
+    GeneratedMenuConfig,
+    GeneratedRouteMetadata,
+    GeneratedRouteMetadataConfig,
+    GeneratedUiAffectConfig,
+} from '@/lib/config/global-config/types/type';
 import type { Menu } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { MENU_ID } from '@/lib/menu/config';
 
 import adminDashboardsRoute from '@/services/dashboards/routes/admin/routes';
 import dashboardsRoute from '@/services/dashboards/routes/routes';
 
-class DashboardConfigurator {
-    static getAdminRoutes() {
-        return adminDashboardsRoute;
+class DashboardConfigurator implements FeatureConfigurator {
+    private version: FeatureVersion = 'V1';
+
+    private routeMetadata: GeneratedRouteMetadata = {};
+
+    readonly uiAffect: GeneratedUiAffectConfig[] = [];
+
+    initialize(version: FeatureVersion): void {
+        this.version = version;
     }
 
-    static getWorkspaceRoutes() {
-        return dashboardsRoute;
+    getRoutes(): FeatureRouteConfig {
+        return {
+            routes: dashboardsRoute,
+            adminRoutes: adminDashboardsRoute,
+            version: this.version,
+        };
     }
 
-    static getAdminMenu(settings: FeatureVersionSettingsType): Menu {
-        const menuId = Object.keys(settings.adminMenu || settings.menu)[0];
-        return { id: MENU_INFO_MAP[menuId].menuId };
+    getMenu(): GeneratedMenuConfig {
+        const baseMenu: Menu = {
+            id: MENU_ID.DASHBOARDS,
+            needPermissionByRole: true,
+            subMenuList: [],
+            order: 1,
+        };
+
+        return {
+            menu: baseMenu,
+            version: this.version,
+        };
     }
 
-    static getWorkspaceMenu(settings: FeatureVersionSettingsType): Menu {
-        const menuId = Object.keys(settings.menu)[0];
-        return { id: MENU_INFO_MAP[menuId].menuId, needPermissionByRole: true };
-    }
+    getRouteMetadata(): GeneratedRouteMetadataConfig {
+        const versionedMetadata: GeneratedRouteMetadataConfig = {};
 
-    static applyUiAffects(): void|null {
-        return null;
+        Object.entries(this.routeMetadata).forEach(([routeKey, routeConfig]) => {
+            const versionConfig = routeConfig[this.version];
+            if (versionConfig) {
+                versionedMetadata[routeKey] = {
+                    name: versionConfig.name,
+                    ...(versionConfig.params && { params: versionConfig.params }),
+                };
+            }
+        });
+
+        return versionedMetadata;
     }
 }
 
-export default DashboardConfigurator;
+export default new DashboardConfigurator();

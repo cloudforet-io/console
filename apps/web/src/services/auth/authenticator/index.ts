@@ -4,13 +4,12 @@ import type { AuthType } from '@/api-clients/identity/user/schema/type';
 import { SpaceRouter } from '@/router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
-
-import { initTaskManagementTemplate } from '@/lib/site-initializer/initTaskManagementTemplate';
 
 
 abstract class Authenticator {
@@ -19,26 +18,27 @@ abstract class Authenticator {
         const errorStore = useErrorStore();
         const domainStore = useDomainStore();
         const userStore = useUserStore();
+        const authorizationStore = useAuthorizationStore();
         const displayStore = useDisplayStore(pinia);
-        await userStore.signIn({
+        await authorizationStore.signIn({
             domainId: domainStore.state.domainId,
             credentials,
             authType,
             verify_code: verifyCode,
         });
+        await userStore.getUserInfo();
         await userWorkspaceStore.load();
         displayStore.setIsSignInFailed(false);
         errorStore.reset();
-        await initTaskManagementTemplate();
     }
 
     static async signOut(): Promise<void> {
         const errorStore = useErrorStore();
-        const userStore = useUserStore();
+        const authorizationStore = useAuthorizationStore();
         const displayStore = useDisplayStore(pinia);
         try {
             if (SpaceRouter.router) {
-                userStore.signOut();
+                authorizationStore.signOut();
                 const userWorkspaceStore = useUserWorkspaceStore();
                 userWorkspaceStore.reset();
                 displayStore.setIsSignInFailed(false);

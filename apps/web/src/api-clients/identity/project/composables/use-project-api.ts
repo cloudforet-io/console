@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectAddUsersParameters } from '@/api-clients/identity/project/schema/api-verbs/add-users';
 import type { ProjectChangeProjectGroupParameters } from '@/api-clients/identity/project/schema/api-verbs/change-project-group';
@@ -15,9 +14,6 @@ import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
 
 export const useProjectApi = () => {
-    const projectQueryKey = useAPIQueryKey('identity', 'project', 'get');
-    const projectListQueryKey = useAPIQueryKey('identity', 'project', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>,
         update: SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>,
@@ -31,8 +27,6 @@ export const useProjectApi = () => {
     };
 
     return {
-        projectQueryKey,
-        projectListQueryKey,
         projectAPI: actions,
     };
 };

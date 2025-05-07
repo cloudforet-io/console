@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
-import type { QueryKey } from '@tanstack/vue-query';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
@@ -11,6 +10,7 @@ import type { CollapsibleItem } from '@cloudforet/mirinae/types/data-display/col
 
 import { useCommentApi } from '@/api-clients/opsflow/comment/composables/use-comment-api';
 import type { CommentModel } from '@/api-clients/opsflow/comment/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -50,16 +50,20 @@ const { getTimezoneDate } = useTimezoneDate();
 
 /* comments */
 const queryClient = useQueryClient();
-const { commentAPI, commentListQueryKey } = useCommentApi();
+const { commentAPI } = useCommentApi();
+const { key: commentListQueryKey, params: commentListParams } = useServiceQueryKey('opsflow', 'comment', 'list', {
+    contextKey: props.taskId,
+    params: computed(() => ({
+        task_id: props.taskId,
+        query: {
+            sort: [{ key: 'created_at', desc: true }],
+        },
+    })),
+});
 const { data: comments } = useQuery({
-    queryKey: computed<QueryKey>(() => [...commentListQueryKey.value, props.taskId]),
+    queryKey: commentListQueryKey,
     queryFn: async () => {
-        const response = await commentAPI.list({
-            task_id: props.taskId,
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        });
+        const response = await commentAPI.list(commentListParams.value);
         return response.results ?? [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -80,7 +84,7 @@ const { refetch: refetchEvents } = useTaskEventsQuery({
 const { mutateAsync: createComment, isPending: isCreating } = useMutation({
     mutationFn: commentAPI.create,
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [...commentListQueryKey.value, props.taskId] });
+        queryClient.invalidateQueries({ queryKey: commentListQueryKey.value });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_ADD_TARGET', { target: i18n.t('OPSFLOW.TASK_BOARD.COMMENT') }) as string, '');
     },
     onError: (error) => {

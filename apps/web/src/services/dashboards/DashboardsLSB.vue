@@ -14,7 +14,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -32,6 +32,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { gray } from '@/styles/colors';
 
 import DashboardLSBTree from '@/services/dashboards/components/dashboard-main/DashboardLSBTree.vue';
+import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -39,7 +40,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -50,12 +51,14 @@ const route = useRoute();
 const {
     publicDashboardList,
     privateDashboardList,
+} = useDashboardQuery();
+const {
     publicFolderList,
     privateFolderList,
-} = useDashboardQuery();
+} = useDashboardFolderQuery();
 
 const storeState = reactive({
-    isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     favoriteItems: computed(() => favoriteGetters.dashboardItems),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });

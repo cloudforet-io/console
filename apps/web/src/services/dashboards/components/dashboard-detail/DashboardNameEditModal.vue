@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useDashboardDetailQuery } from '@/services/dashboards/composables/use-dashboard-detail-query';
+import { useDashboardUpdateMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-update-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 
 
@@ -39,14 +39,8 @@ const {
     publicDashboardList,
     privateDashboardList,
     keys,
-    queryClient,
 } = useDashboardQuery();
-const {
-    fetcher,
-    keys: dashboardDetailKeys,
-} = useDashboardDetailQuery({
-    dashboardId: computed(() => props.dashboardId),
-});
+const queryClient = useQueryClient();
 const route = useRoute();
 
 const appContextStore = useAppContextStore();
@@ -92,29 +86,22 @@ const state = reactive({
     isDetailPage: computed(() => route.params.dashboardId !== undefined),
 });
 
-const { mutate, isPending: loading } = useMutation(
-    {
-        mutationFn: fetcher.updateDashboardFn,
-        onSuccess: (_dashboard: DashboardModel) => {
-            const isPrivate = _dashboard.dashboard_id.startsWith('private');
-            const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
-            queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-            if (state.isDetailPage) {
-                const dashboardQueryKey = isPrivate ? dashboardDetailKeys.privateDashboardGetQueryKey : dashboardDetailKeys.publicDashboardGetQueryKey;
-                queryClient.invalidateQueries({ queryKey: dashboardQueryKey.value });
-            }
-        },
-        onError: (e) => {
-            ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
-        },
-        onSettled() {
-            state.proxyVisible = false;
-        },
+const { mutate: updateDashboard, isPending: loading } = useDashboardUpdateMutation({
+    onSuccess: (_dashboard: DashboardModel) => {
+        const isPrivate = _dashboard.dashboard_id.startsWith('private');
+        const dashboardListQueryKey = isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
+        queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
     },
-);
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
+    },
+    onSettled() {
+        state.proxyVisible = false;
+    },
+});
 
 const handleConfirm = async () => {
-    mutate({
+    updateDashboard({
         dashboard_id: props.dashboardId,
         name: _name.value,
     });

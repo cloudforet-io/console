@@ -76,7 +76,7 @@ export default {
             default: '',
         },
         confirmText: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         loading: {

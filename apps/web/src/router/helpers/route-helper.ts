@@ -2,6 +2,7 @@ import type { Route, NavigationGuardNext } from 'vue-router';
 
 import type { JwtPayload } from 'jwt-decode';
 import { jwtDecode } from 'jwt-decode';
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -10,11 +11,8 @@ import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/mod
 import {
     ERROR_ROUTE, EXTERNAL_PAGES, ROOT_ROUTE, ROUTE_SCOPE,
 } from '@/router/constant';
-import type { RouteScopeType } from '@/router/type';
+import type { RouteScopeType } from '@/router/types';
 
-
-
-import { calculateIsAccessibleRoute } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
 import { getLastAccessedWorkspaceId, setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
@@ -22,6 +20,16 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { ADMIN_WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/admin/route-constant';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
+
+
+const _getValidWorkspaceId = (workspaceId: string|undefined, workspaceList: WorkspaceModel[]): string|undefined => workspaceList.find((w) => w.workspace_id === workspaceId)?.workspace_id;
+
+const _calculateIsAccessibleRoute = (route: Route, pagePermissions: MenuId[]): boolean => {
+    const closetMenuRoute = clone(route?.matched)?.reverse().find((match) => !!match.meta.menuId);
+    const menuId = closetMenuRoute?.meta.menuId;
+    return pagePermissions.some((id) => id === menuId);
+};
+
 
 export const makeAdminRouteName = (routeName: string): string => {
     if (routeName.startsWith('admin.')) return routeName;
@@ -51,9 +59,6 @@ export const getDecodedDataFromAccessToken = (): {rol: string, wid: string} => {
         return { rol: '', wid: '' };
     }
 };
-
-export const getValidWorkspaceId = (workspaceId: string|undefined, workspaceList: WorkspaceModel[]): string|undefined => workspaceList.find((w) => w.workspace_id === workspaceId)?.workspace_id;
-
 
 
 // Router BeforeEach Guard - Route-Validation-and-Verification Process
@@ -124,7 +129,7 @@ export const processWorkspaceAccessValidation = async (to: Route, next: Navigati
     const targetWorkspaceId = to.params.workspaceId;
     if (!targetWorkspaceId) {
         let lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
-        if (!getValidWorkspaceId(lastAccessedWorkspaceId, workspaceList)) {
+        if (!_getValidWorkspaceId(lastAccessedWorkspaceId, workspaceList)) {
             await setCurrentAccessedWorkspaceId(undefined);
             lastAccessedWorkspaceId = undefined;
         }
@@ -140,7 +145,7 @@ export const processWorkspaceAccessValidation = async (to: Route, next: Navigati
         return false;
     }
 
-    if (!getValidWorkspaceId(targetWorkspaceId, workspaceList)) {
+    if (!_getValidWorkspaceId(targetWorkspaceId, workspaceList)) {
         next({
             name: ERROR_ROUTE._NAME, params: { statusCode: '404' },
         });
@@ -157,7 +162,7 @@ export const shouldUpdateScope = (prevRole: string, routeScope: RouteScopeType, 
     return isScopeChanged || isWorkspaceChanged;
 };
 export const verifyPageAccessAndRedirect = (to: Route, next: NavigationGuardNext, workspaceId: string, pageAccessPermissionList: MenuId[]): void => {
-    const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
+    const isAccessibleRoute = _calculateIsAccessibleRoute(to, pageAccessPermissionList);
     if (isAccessibleRoute) {
         next({
             ...to,

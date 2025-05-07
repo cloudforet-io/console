@@ -7,7 +7,6 @@ import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
 const queryHelper = new QueryHelper();
@@ -18,11 +17,6 @@ export const topBarSearchReferenceRouter = (type: Exclude<SearchTab, 'service'>,
         return {
             name: SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
             params: { serviceAccountId: resourceId, workspaceId },
-        };
-    case SEARCH_TAB.PROJECT:
-        return {
-            name: PROJECT_ROUTE_V1.DETAIL._NAME,
-            params: { id: resourceId, workspaceId },
         };
     case SEARCH_TAB.DASHBOARD:
         return {

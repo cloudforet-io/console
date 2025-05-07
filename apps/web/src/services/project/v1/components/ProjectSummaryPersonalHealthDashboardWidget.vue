@@ -16,6 +16,8 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
@@ -23,14 +25,10 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
-
 
 enum EVENT_CATEGORY {
     accountNotification = 'accountNotification',
@@ -52,6 +50,9 @@ const userStore = useUserStore();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
+
+const { getReferenceLocation } = useReferenceRouter();
+
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
@@ -172,7 +173,7 @@ const getEvents = async () => {
             return {
                 event: {
                     name: d.event_title,
-                    to: referenceRouter(d.resource_id, {
+                    to: getReferenceLocation(d.resource_id, {
                         resource_type: 'inventory.CloudService',
                         workspace_id: storeState.currentWorkspaceId,
                     }),
@@ -279,7 +280,7 @@ watch(() => tabState.activeTab, () => {
                                     <p-tooltip :contents="resource.entity_value">
                                         <p-link action-icon="internal-link"
                                                 new-tab
-                                                :to="referenceRouter(resource.entity_value, {
+                                                :to="getReferenceLocation(resource.entity_value, {
                                                     resource_type: 'inventory.CloudService',
                                                     workspace_id: storeState.currentWorkspaceId,
                                                 })"

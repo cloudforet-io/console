@@ -16,18 +16,17 @@ import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-s
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { i18n } from '@/translations';
 
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useDisplayStore } from '@/store/display/display-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import { isUserAccessibleToMenu } from '@/lib/access-control';
-import type { PageAccessMap } from '@/lib/access-control/config';
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import {
     convertCostAnalysisConfigToReferenceData,
@@ -37,11 +36,12 @@ import {
     convertProjectGroupConfigToReferenceData, convertServiceConfigToReferenceData,
     getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
-import type { MenuInfo } from '@/lib/menu/config';
+import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
+import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -51,9 +51,8 @@ import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/T
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
 const FAVORITE_LIMIT = 5;
 
@@ -77,18 +76,20 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
-const userStore = useUserStore();
-const displayStore = useDisplayStore();
+const authorizationStore = useAuthorizationStore();
+const { getAllMenuList } = useAllMenuList();
+const { getReferenceLocation } = useReferenceRouter();
 
 /* Query */
 const {
-    publicDashboardList,
-    privateDashboardList,
-} = useDashboardQuery();
+    publicDashboardListQuery,
+    privateDashboardListQuery,
+} = useGlobalDashboardQuery();
 
 const router = useRouter();
 const route = useRoute();
 
+const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
@@ -98,13 +99,13 @@ const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     service: computed<ServiceReferenceMap>(() => allReferenceStore.getters.service),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+    pageAccessPermissionList: computed<MenuId[]>(() => authorizationStore.getters.pageAccessPermissionList),
 });
 const state = reactive({
     loading: true,
     showAll: false,
     showAllType: undefined as undefined|FavoriteType,
-    accessProject: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.PROJECT])),
+    accessProject: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.PROJECT])),
     items: computed<FavoriteMenuItem[]>(() => {
         const results: FavoriteMenuItem[] = [];
         if (state.favoriteMenuItems.length) {
@@ -182,14 +183,14 @@ const state = reactive({
     }),
     //
     favoriteMenuItems: computed<ReferenceData[]>(() => {
-        const allMenuList = displayStore.getAllMenuList(route);
+        const allMenuList = getAllMenuList(route, router);
         return convertMenuConfigToReferenceData(
             favoriteGetters.menuItems ?? [],
             allMenuList,
         );
     }),
     favoriteCostAnalysisItems: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, storeState.pageAccessPermissionList);
         return isUserAccessible
             ? convertCostAnalysisConfigToReferenceData(
                 favoriteGetters.costAnalysisItems ?? [],
@@ -199,15 +200,15 @@ const state = reactive({
             : [];
     }),
     favoriteDashboardItems: computed<ReferenceData[]>(() => {
-        const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, userStore.getters.pageAccessPermissionList);
+        const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, storeState.pageAccessPermissionList);
         if (!isUserAccessibleToDashboards) return [];
         return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
-            [...publicDashboardList.value, ...privateDashboardList.value],
+            dashboardList.value,
         );
     }),
     favoriteMetricItems: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, storeState.pageAccessPermissionList);
         if (!isUserAccessible) return [];
         const favoriteMetricItems = convertMetricConfigToReferenceData(favoriteGetters.metricItems ?? [], storeState.metrics);
         const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
@@ -217,14 +218,14 @@ const state = reactive({
         ];
     }),
     favoriteProjects: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, storeState.pageAccessPermissionList);
         if (!isUserAccessible) return [];
         const favoriteProjectItems = convertProjectConfigToReferenceData(favoriteGetters.projectItems ?? [], storeState.projects);
         const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
     favoriteServiceItems: computed<ReferenceData[]>(() => {
-        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.SERVICE, userStore.getters.pageAccessPermissionList);
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.SERVICE, storeState.pageAccessPermissionList);
         return isUserAccessible ? convertServiceConfigToReferenceData(favoriteGetters.serviceItems ?? [], storeState.service) : [];
     }),
 });
@@ -238,13 +239,15 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
     return 0;
 };
+const isUserAccessibleToMenu = (menuId: MenuId, pageAccessList: MenuId[]): boolean => pageAccessList.some((id) => id === menuId);
+
 
 /* Event */
 const handleClickMenuButton = (type: FavoriteType) => {
     // Dashboard and Cost Analysis are added after (Planning).
     if (type === FAVORITE_TYPE.PROJECT) {
         router.replace({
-            name: PROJECT_ROUTE_V1._NAME,
+            name: PROJECT_ROUTE_V2._NAME,
         });
     }
     emit('close');
@@ -272,9 +275,9 @@ const handleSelect = (item: FavoriteMenuItem) => {
             },
         }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.PROJECT) {
-        router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
+        router.push(getReferenceLocation(itemName, { resource_type: 'identity.Project' })).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-        router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
+        router.push(getReferenceLocation(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.METRIC) {
         router.push({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
