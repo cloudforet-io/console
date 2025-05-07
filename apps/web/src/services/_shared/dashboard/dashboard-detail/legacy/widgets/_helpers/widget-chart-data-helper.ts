@@ -1,6 +1,7 @@
-import {
-    keyBy, merge, sortBy, values,
-} from 'lodash';
+import keyBy from 'lodash/keyBy';
+import merge from 'lodash/merge';
+import sortBy from 'lodash/sortBy';
+import values from 'lodash/values';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 

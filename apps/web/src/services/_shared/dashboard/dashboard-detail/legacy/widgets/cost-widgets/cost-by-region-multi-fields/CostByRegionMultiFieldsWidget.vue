@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router/composables';
 
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
-import { uniqBy } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 

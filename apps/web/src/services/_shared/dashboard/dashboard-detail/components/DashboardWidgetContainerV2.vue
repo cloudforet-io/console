@@ -5,7 +5,9 @@ import {
 } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { cloneDeep, debounce, flattenDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import flattenDeep from 'lodash/flattenDeep';
 
 import {
     PDataLoader, PEmpty, PButton,

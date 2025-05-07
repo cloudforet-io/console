@@ -1,7 +1,7 @@
 import { createClient } from '@vercel/edge-config';
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 class Config {
     config: any;

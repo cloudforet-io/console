@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import {
     PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown,

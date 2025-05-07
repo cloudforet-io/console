@@ -7,7 +7,8 @@ import { useRouter } from 'vue-router/composables';
 import { Root } from '@amcharts/amcharts5';
 import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { cloneDeep, uniqBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

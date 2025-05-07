@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import { clone } from 'lodash';
+import clone from 'lodash/clone';
 
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';

@@ -5,7 +5,7 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PDataTable, PI, PToggleButton,

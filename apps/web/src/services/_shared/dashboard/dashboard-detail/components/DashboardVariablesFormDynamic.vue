@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import {
     PContextMenu, PDivider, PFieldGroup, PFieldTitle, PRadio, PRadioGroup, PSelectDropdown,

@@ -12,9 +12,8 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import type { EChartsOption } from 'echarts/types/dist/shared';
-import {
-    isEmpty, throttle,
-} from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import throttle from 'lodash/throttle';
 
 import { numberFormatter } from '@cloudforet/utils';
 

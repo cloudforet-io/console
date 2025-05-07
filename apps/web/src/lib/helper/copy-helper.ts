@@ -1,4 +1,5 @@
-import { toString } from 'lodash';
+import toString from 'lodash/toString';
+
 /** @function
  * @name copyTextToClipboard
  * @description copy given text to clipboard

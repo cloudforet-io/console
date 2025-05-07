@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { map } from 'lodash';
+import map from 'lodash/map';
 
 import { PDefinitionTable } from '@cloudforet/mirinae';
 

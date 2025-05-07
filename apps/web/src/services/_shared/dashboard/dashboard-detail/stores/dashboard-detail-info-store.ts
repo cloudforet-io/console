@@ -2,7 +2,9 @@
 // @ts-nocheck
 import { computed, reactive } from 'vue';
 
-import { cloneDeep, isEmpty, isEqual } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import { defineStore } from 'pinia';
 
 import type {
