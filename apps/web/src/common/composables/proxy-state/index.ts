@@ -3,7 +3,7 @@ import {
     computed, ref, watch,
 } from 'vue';
 
-import { kebabCase } from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 
 /**
  * @description It detects changes in prop and creates a state that is automatically reflected.

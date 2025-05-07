@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
     PButton, PButtonModal, POverlayLayout, PTextButton,

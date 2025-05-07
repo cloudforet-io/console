@@ -109,9 +109,13 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import {
-    debounce, find, capitalize, chain, range, sortBy, get,
-} from 'lodash';
+import capitalize from 'lodash/capitalize';
+import chain from 'lodash/chain';
+import debounce from 'lodash/debounce';
+import find from 'lodash/find';
+import get from 'lodash/get';
+import range from 'lodash/range';
+import sortBy from 'lodash/sortBy';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

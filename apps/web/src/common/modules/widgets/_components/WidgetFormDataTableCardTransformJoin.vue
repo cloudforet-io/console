@@ -3,7 +3,7 @@ import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
 
-import { random } from 'lodash';
+import random from 'lodash/random';
 
 import {
     PFieldGroup, PI, PSelectDropdown, PFieldTitle, PButton, PIconButton,

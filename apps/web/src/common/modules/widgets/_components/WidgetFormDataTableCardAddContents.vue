@@ -4,9 +4,10 @@ import {
 } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import {
-    cloneDeep, isArray, isEqual, uniq,
-} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isArray from 'lodash/isArray';
+import isEqual from 'lodash/isEqual';
+import uniq from 'lodash/uniq';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
