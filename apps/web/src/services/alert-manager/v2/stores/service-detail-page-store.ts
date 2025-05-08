@@ -11,6 +11,8 @@ import type { EventRuleListParameters } from '@/schema/alert-manager/event-rule/
 import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
+import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api-verbs/delete';
 import type { ServiceGetParameters } from '@/schema/alert-manager/service/api-verbs/get';
 import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
@@ -44,6 +46,7 @@ interface ServiceFormStoreState {
     selectedWebhookId?: string;
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
+    serviceChannelList: ServiceChannelModel[];
     eventRuleList: EventRuleModel[];
     eventRuleInfo: EventRuleModel;
     eventRuleScopeModalVisible: boolean;
@@ -76,6 +79,7 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
+        serviceChannelList: [],
         eventRuleList: [],
         eventRuleInfo: {} as EventRuleModel,
         eventRuleScopeModalVisible: false,
@@ -238,6 +242,20 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 state.eventRuleInfo = {} as EventRuleModel;
             } finally {
                 state.eventRuleInfoLoading = false;
+            }
+        },
+        async fetchServiceChannelList(serviceId: string) {
+            try {
+                const { results } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
+                    service_id: serviceId,
+                    query: {
+                        sort: [{ key: 'created_at', desc: true }],
+                    },
+                });
+                state.serviceChannelList = results || [];
+            } catch (e) {
+                state.serviceChannelList = [];
+                throw e;
             }
         },
     };

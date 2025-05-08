@@ -278,6 +278,13 @@
 			"LABEL_SERVICE_NAME": "サービス名",
 			"MEMBER": "構成員",
 			"MEMBERS": "構成員",
+			"MODAL": {
+				"DELETE_MEMBER_DESC": "[{name}]メンバーを削除する前に、接続されている各「通知」の接続を解除する必要があります。",
+				"DELETE_MEMBER_DESC_BOLD": "Please remove all [{name}] Members from the 'Notification' and try again.\" → \"「通知」から[{name}]メンバーをすべて削除してから、もう一度お試しください。",
+				"DELETE_MEMBER_TITLE": "サービスメンバー削除",
+				"NOTIFICATION_LINK_TEXT": "接続された通知へ移動",
+				"REMOVE": "削除"
+			},
 			"MODAL_DELETE_DESC": "サービスの接続されたウェブフックとアラートを確認してください。",
 			"MODAL_DELETE_NO_DATA": "このサービスを削除してもよろしいですか？",
 			"MODAL_DELETE_TITLE": "このサービスを削除してもよろしいですか？",

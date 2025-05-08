@@ -278,6 +278,13 @@
 			"LABEL_SERVICE_NAME": "서비스 이름",
 			"MEMBER": "멤버",
 			"MEMBERS": "멤버",
+			"MODAL": {
+				"DELETE_MEMBER_DESC": "[{name}] 멤버를 삭제하기 전에 연결된 각 '알림'의 연결을 해제해야 합니다.",
+				"DELETE_MEMBER_DESC_BOLD": "'알림'에서 [{name}] 멤버를 모두 제거한 후 다시 시도해주세요.",
+				"DELETE_MEMBER_TITLE": "서비스 멤버 제거",
+				"NOTIFICATION_LINK_TEXT": "연결된 알림으로 이동",
+				"REMOVE": "제거"
+			},
 			"MODAL_DELETE_DESC": "서비스의 연결된 웹훅과 알림을 확인하세요.",
 			"MODAL_DELETE_NO_DATA": "이 서비스를 삭제하시겠습니까?",
 			"MODAL_DELETE_TITLE": "이 서비스를 삭제하시겠습니까?",
