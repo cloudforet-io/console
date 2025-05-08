@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, toRef } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PDivider, PFieldTitle, PLink, PSpinner,

@@ -5,7 +5,8 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { cloneDeep, isEqual } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 
 import { PButton, PTag, PTextInput } from '@cloudforet/mirinae';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';

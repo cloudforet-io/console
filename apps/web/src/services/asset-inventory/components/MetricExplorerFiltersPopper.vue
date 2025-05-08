@@ -2,7 +2,8 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { cloneDeep, isEmpty } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
 
 import { PSelectDropdown, PTextButton } from '@cloudforet/mirinae';
 import type {

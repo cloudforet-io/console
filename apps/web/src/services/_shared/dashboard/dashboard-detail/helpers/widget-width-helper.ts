@@ -1,4 +1,5 @@
-import { sum, max } from 'lodash';
+import max from 'lodash/max';
+import sum from 'lodash/sum';
 
 import { WIDGET_SIZE } from '@/api-clients/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/api-clients/dashboard/_types/widget-type';

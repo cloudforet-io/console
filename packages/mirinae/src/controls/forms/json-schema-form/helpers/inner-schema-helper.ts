@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';
 import { NUMERIC_TYPES } from '@/controls/forms/json-schema-form/helpers/form-data-refine-helper';

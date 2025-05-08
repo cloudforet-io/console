@@ -3,7 +3,7 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     makeDistinctValueHandler,

@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';

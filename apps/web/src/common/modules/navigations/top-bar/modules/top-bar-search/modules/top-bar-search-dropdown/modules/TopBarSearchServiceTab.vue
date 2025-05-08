@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import { getTextHighlightRegex, PDataLoader, PDivider } from '@cloudforet/mirinae';
 

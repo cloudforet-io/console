@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataTable } from '@cloudforet/mirinae';

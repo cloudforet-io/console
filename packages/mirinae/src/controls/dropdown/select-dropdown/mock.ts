@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import type { SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';
 import { getTextHighlightRegex } from '@/utils';

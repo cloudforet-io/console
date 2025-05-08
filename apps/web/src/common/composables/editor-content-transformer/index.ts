@@ -4,7 +4,7 @@ import {
     ref, isRef, watch, isReadonly,
 } from 'vue';
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

@@ -1,4 +1,5 @@
-import { cloneDeep, isArray } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isArray from 'lodash/isArray';
 
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 

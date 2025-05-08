@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
     PButtonModal, PDefinitionTable, PI, PStatus,

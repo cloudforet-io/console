@@ -4,7 +4,7 @@ import { reactive, toRefs } from 'vue';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/vue';
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import range from 'lodash/range';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import PButton from '@/controls/buttons/button/PButton.vue';

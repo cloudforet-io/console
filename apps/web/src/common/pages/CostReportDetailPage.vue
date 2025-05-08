@@ -5,9 +5,8 @@ import { useRouter } from 'vue-router/composables';
 import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
-import {
-    sortBy, sum,
-} from 'lodash';
+import sortBy from 'lodash/sortBy';
+import sum from 'lodash/sum';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PLink, PDataTable, PIconButton } from '@cloudforet/mirinae';

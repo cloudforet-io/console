@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {

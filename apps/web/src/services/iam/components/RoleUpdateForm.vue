@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleCreateParameters } from '@/api-clients/identity/role/schema/api-verbs/create';

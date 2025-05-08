@@ -5,7 +5,8 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { cloneDeep, sortBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import sortBy from 'lodash/sortBy';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PButtonModal, PTooltip,

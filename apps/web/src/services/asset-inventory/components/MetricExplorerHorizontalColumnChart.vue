@@ -7,9 +7,10 @@ import {
 import type { LineSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import {
-    isEmpty, orderBy, sum, throttle,
-} from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
+import sum from 'lodash/sum';
+import throttle from 'lodash/throttle';
 
 import { numberFormatter } from '@cloudforet/utils';
 

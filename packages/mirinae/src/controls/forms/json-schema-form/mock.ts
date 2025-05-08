@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import Fuse from 'fuse.js';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import type { SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';
 import type { ReferenceHandler } from '@/controls/forms/json-schema-form/type';

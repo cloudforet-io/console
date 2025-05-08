@@ -4,7 +4,7 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 

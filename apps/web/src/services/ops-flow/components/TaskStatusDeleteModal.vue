@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 

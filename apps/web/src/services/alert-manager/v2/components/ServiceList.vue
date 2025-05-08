@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

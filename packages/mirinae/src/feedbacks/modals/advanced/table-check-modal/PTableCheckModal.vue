@@ -47,7 +47,7 @@ import {
     reactive, computed, toRefs, defineComponent,
 } from 'vue';
 
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import type { TranslateResult } from 'vue-i18n';
 
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';

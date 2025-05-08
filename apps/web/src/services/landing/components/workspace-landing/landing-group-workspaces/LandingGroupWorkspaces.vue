@@ -2,7 +2,8 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { partition, sortBy } from 'lodash';
+import partition from 'lodash/partition';
+import sortBy from 'lodash/sortBy';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

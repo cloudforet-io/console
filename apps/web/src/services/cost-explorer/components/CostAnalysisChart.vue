@@ -5,7 +5,9 @@ import {
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, isEmpty } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

@@ -1,7 +1,7 @@
 import type { Ref, AsyncComponent } from 'vue';
 import { computed, reactive, toRef } from 'vue';
 
-import { flattenDeep } from 'lodash';
+import flattenDeep from 'lodash/flattenDeep';
 
 import type { DashboardLayoutWidgetInfo } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { WidgetConfig, WidgetSize } from '@/api-clients/dashboard/_types/widget-type';

@@ -3,7 +3,8 @@ import {
     defineAsyncComponent, computed, onBeforeMount, ref, watch,
 } from 'vue';
 
-import { isEqual, cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 
 import {
     PFieldGroup, PTextInput, PToggleButton, PCheckbox, PButton, PSelectButton, PCodeEditor,

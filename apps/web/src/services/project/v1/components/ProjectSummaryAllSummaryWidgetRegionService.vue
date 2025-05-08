@@ -7,7 +7,9 @@ import type { Location } from 'vue-router';
 import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import { range, orderBy, isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
+import range from 'lodash/range';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
