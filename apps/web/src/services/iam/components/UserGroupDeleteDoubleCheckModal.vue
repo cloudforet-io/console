@@ -4,7 +4,9 @@ import {
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PDataTable, PButtonModal, PBadge } from '@cloudforet/mirinae';
+import {
+    PDataTable, PButtonModal, PLink, PScopedNotification,
+} from '@cloudforet/mirinae';
 
 import type { UserGroupDeleteUserGroupParameters } from '@/api-clients/identity/user-group/schema/api-verbs/delete';
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
@@ -18,8 +20,15 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
+type TableItemType = {
+    user_group: string;
+    service?: string[];
+    description?: string;
+};
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -39,6 +48,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
+    isVisibleScopedNotification: computed<boolean>(() => tableState.filteredItems.filter((item) => item.service && item.service.length > 0).length > 0),
 });
 
 const tableState = reactive({
@@ -47,7 +57,7 @@ const tableState = reactive({
         { name: 'service', label: 'Service' },
         { name: 'description', label: 'Description' },
     ],
-    filteredItems: [],
+    filteredItems: [] as TableItemType[],
 });
 
 /* Component */
@@ -73,6 +83,21 @@ const handleCancel = () => {
         title: '',
         themeColor: 'primary',
     };
+};
+const getServicePageLocation = (service: string) => ({
+    name: ALERT_MANAGER_ROUTE.SERVICE._NAME,
+    query: {
+        serviceId: service,
+    },
+});
+const getServiceNames = (): string => {
+    const uniqueServices = new Set<string>();
+
+    tableState.filteredItems.forEach((item) => {
+        item.service?.forEach((svc) => uniqueServices.add(svc));
+    });
+
+    return Array.from(uniqueServices).join(', ');
 };
 
 /* API */
@@ -142,36 +167,41 @@ watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([
                     :loading="state.loading"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.DELETE"
                     :theme-color="userGroupPageState.modal.themeColor"
+                    :disabled="state.isVisibleScopedNotification"
                     @confirm="handleConfirm"
+                    @close="handleCancel"
                     @cancel="handleCancel"
     >
         <template #body>
-            <p-data-table :fields="tableState.fields"
-                          :items="tableState.filteredItems"
-            >
-                <template #col-service-format="{value}">
-                    <div v-if="value.length > 0">
-                        <span v-for="(service, i) in value"
-                              :key="i"
-                              class="mr-2"
+            <div class="flex flex-col gap-8">
+                <p-scoped-notification v-if="state.isVisibleScopedNotification"
+                                       type="danger"
+                                       layout="in-section"
+                >
+                    <span>{{ $t('IAM.USER_GROUP.MODAL.DELETE.SCOPED_NOTIFICATION_DESC', { name: getServiceNames()}) }} </span>
+                    <span class="font-bold">{{ $t('IAM.USER_GROUP.MODAL.DELETE.SCOPED_NOTIFICATION_DESC_BOLD', { name: getServiceNames()}) }}</span>
+                </p-scoped-notification>
+                <p-data-table :fields="tableState.fields"
+                              :items="tableState.filteredItems"
+                >
+                    <template #col-service-format="{value}">
+                        <div v-if="value.length > 0"
+                             class="flex flex-col"
                         >
-                            <p-badge v-if="i < 3"
-                                     badge-type="gray200"
-                                     shape="square"
+                            <p-link v-for="(service, i) in value"
+                                    :key="`${service}-${i}`"
+                                    highlight
+                                    action-icon="internal-link"
+                                    new-tab
+                                    :to="getServicePageLocation(service)"
                             >
                                 {{ service }}
-                            </p-badge>
-                            <p-badge v-else-if="i === 3"
-                                     badge-type="blue700"
-                                     shape="round"
-                            >
-                                {{ service.length - i }}
-                            </p-badge>
-                        </span>
-                    </div>
-                    <div v-else />
-                </template>
-            </p-data-table>
+                            </p-link>
+                        </div>
+                        <div v-else />
+                    </template>
+                </p-data-table>
+            </div>
         </template>
     </p-button-modal>
 </template>

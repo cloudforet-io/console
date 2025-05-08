@@ -3399,8 +3399,10 @@
 					"UPDATE_TITLE": "ユーザーグループの編集"
 				},
 				"DELETE": {
+					"SCOPED_NOTIFICATION_DESC": "[{name}]ユーザーグループを削除する前に、接続されている各「サービス」の接続を解除する必要があります。",
+					"SCOPED_NOTIFICATION_DESC_BOLD": "각 '서비스' 페이지에서 [{name}] 사용자 그룹을 모두 제거한 후 다시 시도해주세요.",
 					"SHOW_SUCCESS_MESSAGE": "ユーザーグループの削除が完了しました",
-					"TITLE": "ユーザーグループを削除してもよろしいですか？"
+					"TITLE": "ユーザーグループ削除"
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "削除",

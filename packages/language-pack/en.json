@@ -3399,8 +3399,10 @@
 					"UPDATE_TITLE": "Update User Group"
 				},
 				"DELETE": {
+					"SCOPED_NOTIFICATION_DESC": "You must first disconnect each connected ‘Service' before deleting the [{name}] User Group.",
+					"SCOPED_NOTIFICATION_DESC_BOLD": "Please remove all [{name}] User Group from the each 'Service' Page and try again.",
 					"SHOW_SUCCESS_MESSAGE": "User Group successfully Deleted",
-					"TITLE": "Are you sure you want to Delete User Group?"
+					"TITLE": "Delete User Group"
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "Delete",
