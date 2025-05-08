@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 

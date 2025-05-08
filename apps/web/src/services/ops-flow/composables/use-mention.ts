@@ -3,7 +3,8 @@ import {
     reactive, ref, onMounted, onUnmounted, computed,
 } from 'vue';
 
-import { debounce, throttle } from 'lodash';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 
 import { useIgnoreWindowArrowKeydownEvents } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';

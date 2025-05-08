@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import PairsForm from '@/common/components/forms/pairs-form/PairsForm.vue';
 import type { Tag } from '@/common/modules/tags/type';

@@ -2,7 +2,7 @@ import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import dayjs from 'dayjs';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import { useUnifiedCostApi } from '@/api-clients/cost-analysis/unified-cost/composables/use-unified-cost-api';
 import type { UnifiedCostAnalyzeParameters } from '@/api-clients/cost-analysis/unified-cost/schema/api-verbs/analyze';

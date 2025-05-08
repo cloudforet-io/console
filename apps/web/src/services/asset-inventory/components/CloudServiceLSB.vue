@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import {
     PRadioGroup, PRadio, PLazyImg,

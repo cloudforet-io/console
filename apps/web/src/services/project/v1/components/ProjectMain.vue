@@ -3,7 +3,7 @@
 import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

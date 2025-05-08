@@ -2,7 +2,7 @@
 // @ts-nocheck
 import { computed, reactive } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

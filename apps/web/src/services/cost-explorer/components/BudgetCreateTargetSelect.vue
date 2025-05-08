@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PFieldGroup, PSelectDropdown, PStatus } from '@cloudforet/mirinae';

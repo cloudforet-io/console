@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';
 

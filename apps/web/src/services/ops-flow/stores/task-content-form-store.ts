@@ -1,6 +1,6 @@
 import { reactive, computed } from 'vue';
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { defineStore } from 'pinia';
 
 import { APIError } from '@cloudforet/core-lib/space-connector/error';

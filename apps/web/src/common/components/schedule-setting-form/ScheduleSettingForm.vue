@@ -3,7 +3,9 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import { map, range, zipObject } from 'lodash';
+import map from 'lodash/map';
+import range from 'lodash/range';
+import zipObject from 'lodash/zipObject';
 
 import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,

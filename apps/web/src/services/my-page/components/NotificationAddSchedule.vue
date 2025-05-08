@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import {
     PRadio, PSelectButton, PSelectDropdown, PRadioGroup,

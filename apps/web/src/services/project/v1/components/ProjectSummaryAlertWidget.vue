@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import { find } from 'lodash';
+import find from 'lodash/find';
 
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

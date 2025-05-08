@@ -10,7 +10,7 @@ import { init, registerMap } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 
 import { numberFormatter } from '@cloudforet/utils';
 

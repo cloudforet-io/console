@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import bytes from 'bytes';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import {
     PToolbox, PI, PSelectDropdown, PEmpty, PSpinner,

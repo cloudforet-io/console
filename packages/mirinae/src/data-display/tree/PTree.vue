@@ -99,7 +99,7 @@ import {
     defineComponent, computed, onMounted, reactive, toRefs, watch,
 } from 'vue';
 
-import { unionBy } from 'lodash';
+import unionBy from 'lodash/unionBy';
 import { focus } from 'vue-focus';
 
 import PTextInput from '@/controls/input/text-input/PTextInput.vue';

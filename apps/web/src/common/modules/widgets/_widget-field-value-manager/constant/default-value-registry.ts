@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import {

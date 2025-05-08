@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import {
     PFieldTitle, PFieldGroup, PSelectDropdown, PPaneLayout, PButton, PBadge, PSkeleton,

@@ -4,7 +4,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep, difference } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import difference from 'lodash/difference';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PButton, PDataLoader, PEmpty, PI, PIconButton,

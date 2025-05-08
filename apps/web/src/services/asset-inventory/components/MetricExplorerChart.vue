@@ -4,7 +4,9 @@ import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { cloneDeep, debounce, isEmpty } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

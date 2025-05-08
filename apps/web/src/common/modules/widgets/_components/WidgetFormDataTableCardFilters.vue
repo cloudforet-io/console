@@ -4,12 +4,11 @@ import {
     computed, onMounted, reactive, ref, toRef, watch,
 } from 'vue';
 
-import {
-    cloneDeep,
-    debounce,
-    isArray,
-    isEmpty, unset,
-} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import isArray from 'lodash/isArray';
+import isEmpty from 'lodash/isEmpty';
+import unset from 'lodash/unset';
 
 import {
     PFieldGroup, PButton, PContextMenu, useContextMenuController,

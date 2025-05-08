@@ -5,7 +5,8 @@ import {
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
-import { isEmpty, sum } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import sum from 'lodash/sum';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

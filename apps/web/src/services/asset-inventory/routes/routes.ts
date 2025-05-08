@@ -1,6 +1,6 @@
 import type { RouteConfig } from 'vue-router';
 
-import { upperCase } from 'lodash';
+import upperCase from 'lodash/upperCase';
 
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';

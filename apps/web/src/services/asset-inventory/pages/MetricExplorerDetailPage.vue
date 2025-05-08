@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PDivider,

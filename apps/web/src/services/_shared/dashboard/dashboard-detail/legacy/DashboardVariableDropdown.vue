@@ -3,9 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import {
-    cloneDeep, flattenDeep,
-} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import flattenDeep from 'lodash/flattenDeep';
 
 import {
     PSelectDropdown,

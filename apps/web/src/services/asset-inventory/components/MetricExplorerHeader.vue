@@ -4,7 +4,7 @@ import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
+import clone from 'lodash/clone';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

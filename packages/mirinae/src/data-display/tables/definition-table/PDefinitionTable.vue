@@ -68,8 +68,9 @@ import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
-import { every, get, range } from 'lodash';
-
+import every from 'lodash/every';
+import get from 'lodash/get';
+import range from 'lodash/range';
 
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';

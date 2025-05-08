@@ -4,7 +4,7 @@ import {
     computed, ref,
 } from 'vue';
 
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import {
     PFieldTitle, PEmpty, PPaneLayout, PI, PButton,

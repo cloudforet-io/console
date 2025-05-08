@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import getRandomId from '@/lib/random-id-generator';
 

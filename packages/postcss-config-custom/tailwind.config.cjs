@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const fromPairs = require('lodash/fromPairs');
 const defaultTheme = require('tailwindcss/defaultTheme');
 const plugin = require('tailwindcss/plugin');
 const colors = require('mirinae-foundation/colors.cjs');
@@ -8,18 +8,18 @@ const semanticFont = require('mirinae-foundation/font-size.cjs');
 const tailwindColors = {
     ...colors.semanticColors,
     ...colors.kebabColors,
-}
+};
 
 const rawSize = Array(32)
     .fill('')
     .map((value, idx) => [`${idx}`, `${idx * 0.25}rem`]);
-const size = _.fromPairs(rawSize);
+const size = fromPairs(rawSize);
 
 const rawPercent = [
     '1/2',
 ];
 
-const percent = _.fromPairs(rawPercent.map((value) => [value, `${eval(value) * 100}%`]));
+const percent = fromPairs(rawPercent.map((value) => [value, `${eval(value) * 100}%`]));
 module.exports = {
     theme: {
         borderRadius: {
@@ -45,7 +45,7 @@ module.exports = {
             ...defaultTheme.minWidth,
             ...theme('spacing'),
             ...percent,
-            'full': '100%',
+            full: '100%',
             '2xs': theme('screens.2xs.min'),
             xs: theme('screens.xs.min'),
             sm: theme('screens.sm.min'),
@@ -79,36 +79,36 @@ module.exports = {
             serif: ['Roboto'],
         },
         screens: {
-            '2xs': '375px' ,
-            xs: '478px' ,
-            sm: '576px' ,
-            md: '768px' ,
-            lg: '1024px' ,
-            xl: '1440px' ,
-            '2xl': '1920px' ,
-            '3xl': '2560px' ,
-            mobile: { max:`${screens.mobile.max}px`},
-            tablet: { max:`${screens.tablet.max}px`},
-            laptop: { max:`${screens.laptop.max}px`},
-            desktop: { max:`${screens.desktop.max}px`},
+            '2xs': '375px',
+            xs: '478px',
+            sm: '576px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1440px',
+            '2xl': '1920px',
+            '3xl': '2560px',
+            mobile: { max: `${screens.mobile.max}px` },
+            tablet: { max: `${screens.tablet.max}px` },
+            laptop: { max: `${screens.laptop.max}px` },
+            desktop: { max: `${screens.desktop.max}px` },
         },
         fontSize: {
             ...defaultTheme.fontSize,
-            'display-2xl': semanticFont.semanticFontSize["display-2xl"],
-            'display-xl': semanticFont.semanticFontSize["display-xl"],
-            'display-lg': semanticFont.semanticFontSize["display-lg"],
-            'display-md': semanticFont.semanticFontSize["display-md"],
-            'display-sm': semanticFont.semanticFontSize["display-sm"],
-            'label-xl': semanticFont.semanticFontSize["label-xl"],
-            'label-lg': semanticFont.semanticFontSize["label-lg"],
-            'label-md': semanticFont.semanticFontSize["label-md"],
-            'label-sm': semanticFont.semanticFontSize["label-sm"],
-            'label-xs': semanticFont.semanticFontSize["label-xs"],
-            'paragraph-lg': semanticFont.semanticFontSize["paragraph-lg"],
-            'paragraph-md': semanticFont.semanticFontSize["paragraph-md"],
-            'paragraph-sm': semanticFont.semanticFontSize["paragraph-sm"],
-            'code-lg': semanticFont.semanticFontSize["code-lg"],
-            'code-md': semanticFont.semanticFontSize["code-md"],
+            'display-2xl': semanticFont.semanticFontSize['display-2xl'],
+            'display-xl': semanticFont.semanticFontSize['display-xl'],
+            'display-lg': semanticFont.semanticFontSize['display-lg'],
+            'display-md': semanticFont.semanticFontSize['display-md'],
+            'display-sm': semanticFont.semanticFontSize['display-sm'],
+            'label-xl': semanticFont.semanticFontSize['label-xl'],
+            'label-lg': semanticFont.semanticFontSize['label-lg'],
+            'label-md': semanticFont.semanticFontSize['label-md'],
+            'label-sm': semanticFont.semanticFontSize['label-sm'],
+            'label-xs': semanticFont.semanticFontSize['label-xs'],
+            'paragraph-lg': semanticFont.semanticFontSize['paragraph-lg'],
+            'paragraph-md': semanticFont.semanticFontSize['paragraph-md'],
+            'paragraph-sm': semanticFont.semanticFontSize['paragraph-sm'],
+            'code-lg': semanticFont.semanticFontSize['code-lg'],
+            'code-md': semanticFont.semanticFontSize['code-md'],
         },
     },
     variants: ['responsive', 'important', 'hover'],

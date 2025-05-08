@@ -4,7 +4,8 @@ import {
     computed, defineExpose, onMounted, reactive, ref, watch,
 } from 'vue';
 
-import { cloneDeep, throttle } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import throttle from 'lodash/throttle';
 
 import { PTooltip } from '@cloudforet/mirinae';
 import { getContrastingColor, numberFormatter } from '@cloudforet/utils';

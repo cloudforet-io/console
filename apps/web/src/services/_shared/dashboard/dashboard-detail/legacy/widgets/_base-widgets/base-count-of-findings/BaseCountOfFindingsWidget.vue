@@ -5,7 +5,7 @@ import {
 
 import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

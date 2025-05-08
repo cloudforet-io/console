@@ -3,7 +3,7 @@ import {
     defineExpose, reactive, computed, onMounted,
 } from 'vue';
 
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 import { PPagination } from '@cloudforet/mirinae';

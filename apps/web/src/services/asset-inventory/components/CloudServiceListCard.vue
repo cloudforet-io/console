@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

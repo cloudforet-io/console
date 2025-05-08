@@ -6,7 +6,7 @@ import {
 import type { Series } from '@amcharts/amcharts5';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';

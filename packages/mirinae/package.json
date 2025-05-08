@@ -34,7 +34,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build && npm run css",
+    "build": "vite build --debug && npm run css",
     "transpile": "npm run vue-tsc && npm run tsc-alias",
     "dev": "concurrently \"npm run build:watch\" \"npm run tsc:watch\"",
     "build:watch": "vite build --watch",

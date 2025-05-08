@@ -4,7 +4,7 @@ import type Vue from 'vue';
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import {
     PTab, screens, PLazyImg, PI,

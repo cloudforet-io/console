@@ -1,7 +1,8 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { cloneDeep, isEmpty } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
 
 import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-type';
 

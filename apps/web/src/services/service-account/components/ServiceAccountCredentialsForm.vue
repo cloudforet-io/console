@@ -4,7 +4,7 @@ import {
     computed, reactive, watch, onMounted,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';

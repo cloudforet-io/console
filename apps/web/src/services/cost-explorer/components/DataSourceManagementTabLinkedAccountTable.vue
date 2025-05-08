@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { isObject } from 'lodash';
+import isObject from 'lodash/isObject';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

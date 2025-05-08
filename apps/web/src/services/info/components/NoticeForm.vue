@@ -3,7 +3,7 @@ import {
     computed, reactive, watch, toRef, ref,
 } from 'vue';
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import {
     PButton,

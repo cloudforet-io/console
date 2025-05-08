@@ -3,7 +3,7 @@ import {
     computed, onUnmounted, reactive, ref, useSlots, watch,
 } from 'vue';
 
-import { reduce } from 'lodash';
+import reduce from 'lodash/reduce';
 
 import PButton from '@/controls/buttons/button/PButton.vue';
 import PTextButton from '@/controls/buttons/text-button/PTextButton.vue';

@@ -30,7 +30,7 @@ import {
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 import type { ServiceChannelDataType } from '@/schema/alert-manager/service-channel/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import { i18n, i18n as _i18n } from '@/translations';
+import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -80,26 +80,26 @@ const tableState = reactive({
         {
             type: 'item',
             name: 'ENABLE',
-            label: _i18n.t('ALERT_MANAGER.ENABLE'),
+            label: i18n.t('ALERT_MANAGER.ENABLE'),
             disabled: !state.selectedItem || state.selectedItem?.state === SERVICE_CHANNEL_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'DISABLE',
-            label: _i18n.t('ALERT_MANAGER.DISABLED'),
+            label: i18n.t('ALERT_MANAGER.DISABLED'),
             disabled: !state.selectedItem || state.selectedItem?.state === SERVICE_CHANNEL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
             type: 'item',
             name: 'UPDATE',
-            label: _i18n.t('ALERT_MANAGER.UPDATE'),
+            label: i18n.t('ALERT_MANAGER.UPDATE'),
             disabled: !state.selectedItem,
         },
         {
             type: 'item',
             name: 'DELETE',
-            label: _i18n.t('ALERT_MANAGER.DELETE'),
+            label: i18n.t('ALERT_MANAGER.DELETE'),
             disabled: !state.selectedItem,
         },
     ])),

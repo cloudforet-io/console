@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { SBType } from '@storybook/types';
 import type { Args, ArgTypes, Parameters } from '@storybook/vue';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';

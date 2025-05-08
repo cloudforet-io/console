@@ -1,7 +1,7 @@
 import { computed } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { partition, sortBy } from 'lodash';
+import partition from 'lodash/partition';
+import sortBy from 'lodash/sortBy';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PIconModal, PDefinitionTable, PButton, PStatus, PMarkdown,

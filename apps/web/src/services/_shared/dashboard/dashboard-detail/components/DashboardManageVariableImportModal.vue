@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
     PButton, PButtonModal, PCheckbox, PSearch, PScopedNotification,
