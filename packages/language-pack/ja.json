@@ -1567,10 +1567,12 @@
 			"MON": "月",
 			"SAT": "土",
 			"SCHEDULE_SETTING": "スケジュール設定",
+			"SET_TIMEZONE": "タイムゾーン設定",
 			"SUN": "日",
 			"THU": "木",
 			"TO": "から",
 			"TUE": "火",
+			"USER_TIMEZONE": "現在のユーザータイムゾーン : {timezone}",
 			"WED": "水",
 			"WEEKDAYS": "平日"
 		},

@@ -1567,10 +1567,12 @@
 			"MON": "Mon",
 			"SAT": "Sat",
 			"SCHEDULE_SETTING": "Schedule Setting",
+			"SET_TIMEZONE": "Set Time Zone",
 			"SUN": "Sun",
 			"THU": "Thu",
 			"TO": "to",
 			"TUE": "Tue",
+			"USER_TIMEZONE": "Current User Time Zone : {timezone}",
 			"WED": "Wed",
 			"WEEKDAYS": "Weekdays"
 		},

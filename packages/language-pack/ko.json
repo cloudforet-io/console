@@ -1567,10 +1567,12 @@
 			"MON": "월",
 			"SAT": "토",
 			"SCHEDULE_SETTING": "스케줄 설정",
+			"SET_TIMEZONE": "시간대 설정",
 			"SUN": "일",
 			"THU": "목",
 			"TO": "부터",
 			"TUE": "화",
+			"USER_TIMEZONE": "현재 사용자 시간대 : {timezone}",
 			"WED": "수",
 			"WEEKDAYS": "주중"
 		},
