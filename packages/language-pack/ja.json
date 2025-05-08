@@ -311,7 +311,7 @@
 		"SET_UP": "設定",
 		"SHOW_MORE": "もっと見る",
 		"STATUS": "ステータス",
-		"TIMEZONE": "タイムゾーン: {timezone}",
+		"TIMEZONE": "タイムゾーン",
 		"UPDATE": "編集",
 		"WEBHOOK": {
 			"ALT_S_CREATE_WEBHOOK": "ウェプフク追加に成功",
@@ -1572,7 +1572,6 @@
 			"THU": "木",
 			"TO": "から",
 			"TUE": "火",
-			"USER_TIMEZONE": "現在のユーザータイムゾーン : {timezone}",
 			"WED": "水",
 			"WEEKDAYS": "平日"
 		},

@@ -311,7 +311,7 @@
 		"SET_UP": "Set Up",
 		"SHOW_MORE": "show more",
 		"STATUS": "Status",
-		"TIMEZONE": "Time Zone: {timezone}",
+		"TIMEZONE": "Time Zone",
 		"UPDATE": "Update",
 		"WEBHOOK": {
 			"ALT_S_CREATE_WEBHOOK": "Webhook successfully created",
@@ -1572,7 +1572,6 @@
 			"THU": "Thu",
 			"TO": "to",
 			"TUE": "Tue",
-			"USER_TIMEZONE": "Current User Time Zone : {timezone}",
 			"WED": "Wed",
 			"WEEKDAYS": "Weekdays"
 		},

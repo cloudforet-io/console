@@ -311,7 +311,7 @@
 		"SET_UP": "설정",
 		"SHOW_MORE": "더보기",
 		"STATUS": "상태",
-		"TIMEZONE": "타임존: {timezone}",
+		"TIMEZONE": "타임존",
 		"UPDATE": "수정",
 		"WEBHOOK": {
 			"ALT_S_CREATE_WEBHOOK": "웹훅 생성 완료",
@@ -1572,7 +1572,6 @@
 			"THU": "목",
 			"TO": "부터",
 			"TUE": "화",
-			"USER_TIMEZONE": "현재 사용자 시간대 : {timezone}",
 			"WED": "수",
 			"WEEKDAYS": "주중"
 		},
