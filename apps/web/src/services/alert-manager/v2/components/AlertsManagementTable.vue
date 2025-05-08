@@ -64,6 +64,7 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/se
 import type {
     AlertFilterType, AlertPeriodItemType,
     AlertPeriodDropdownMenuType,
+    Period,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -94,6 +95,8 @@ const storeState = reactive({
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
     selectedLabels: computed<SelectDropdownMenuItem[]>(() => alertPageState.selectedLabels),
     selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
+    period: computed<Period>(() => alertPageState.selectedPeriod),
+    selectedPeriodRange: computed<string>(() => alertPageState.selectedPeriodRange),
     timezone: computed<string>(() => userState.timezone || ''),
     currentWorkspaceId: computed<string>(() => userWorkspaceGetters.currentWorkspaceId || ''),
 });
@@ -129,7 +132,6 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
     ])),
-    period: { start: undefined, end: undefined },
     periodMenuItems: computed<AlertPeriodItemType[]>(() => [
         {
             type: 'item',
@@ -167,16 +169,15 @@ const filterState = reactive({
     isPeriodInvalid: computed<boolean>(() => {
         const now = dayjs().utc();
         const checkPeriod = (limit:number):{isStartInvalid:boolean, isEndInvalid:boolean} => {
-            const isStartInvalid = now.diff(filterState.period?.start, 'month') >= limit;
-            const isEndInvalid = now.diff(filterState.period?.end, 'month') >= limit;
+            const isStartInvalid = now.diff(storeState.period?.start, 'month') >= limit;
+            const isEndInvalid = now.diff(storeState.period?.end, 'month') >= limit;
             return { isStartInvalid, isEndInvalid };
         };
         const LIMIT_MONTH = 36;
         const { isStartInvalid, isEndInvalid } = checkPeriod(LIMIT_MONTH);
         return isStartInvalid || isEndInvalid;
     }),
-    selectedPeriod: ALERT_PERIOD_DROPDOWN_MENU.ALL as string,
-    showPeriodBadge: computed<boolean>(() => filterState.selectedPeriod === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM && filterState.period.start && filterState.period.end),
+    showPeriodBadge: computed<boolean>(() => storeState.selectedPeriodRange === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM && storeState.period?.start && storeState.period?.end),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
@@ -261,11 +262,16 @@ const handleSelectPeriod = async (periodMenuName: AlertPeriodDropdownMenuType) =
         return;
     }
     if (periodMenuName === ALERT_PERIOD_DROPDOWN_MENU.ALL) {
-        filterState.period = { start: undefined, end: undefined };
+        alertPageStore.setSelectedPeriod({ start: undefined, end: undefined });
     }
-    filterState.selectedPeriod = periodMenuName;
     const selectedPeriodItem = filterState.periodMenuItems.find((d) => d.name === periodMenuName) || {} as AlertPeriodItemType;
-    filterState.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : filterState.period;
+    alertPageStore.setSelectedPeriodRange(periodMenuName);
+    alertPageStore.setSelectedPeriod(selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : storeState.period);
+    replaceUrlQuery({
+        range: periodMenuName,
+        period: undefined,
+    });
+
     await fetchAlertsList();
 };
 const handleChange = async (options: any = {}) => {
@@ -300,9 +306,11 @@ const handleExportToExcel = async () => {
     });
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
-    filterState.period = { start, end };
-    filterState.selectedPeriod = ALERT_PERIOD_DROPDOWN_MENU.CUSTOM;
+    alertPageStore.setSelectedPeriodRange(ALERT_PERIOD_DROPDOWN_MENU.CUSTOM);
+    alertPageStore.setSelectedPeriod({ start, end });
     state.customRangeModalVisible = false;
+    replaceUrlQuery('period', `start=${start}&end=${end}`);
+    replaceUrlQuery('range', ALERT_PERIOD_DROPDOWN_MENU.CUSTOM);
     fetchAlertsList();
 };
 const createRouteParams = (params: {
@@ -378,14 +386,14 @@ const fetchAlertsList = async () => {
             filterQueryHelper.addFilter({ k: 'labels', v: storeState.selectedLabels.map((i) => i.name), o: '=' });
         }
 
-        if (filterState.period.start && filterState.period.end && (filterState.period.start === filterState.period.end)) {
-            filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+        if (storeState.period.start && storeState.period.end && (storeState.period.start === storeState.period.end)) {
+            filterQueryHelper.addFilter({ k: 'created_at', v: storeState.period.start, o: '>=' });
         } else {
-            if (filterState.period.start) {
-                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+            if (storeState.period.start) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: storeState.period.start, o: '>=' });
             }
-            if (filterState.period.end) {
-                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.end, o: '<=' });
+            if (storeState.period.end) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: storeState.period.end, o: '<=' });
             }
         }
 
@@ -421,7 +429,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
 
 (async () => {
     const {
-        serviceId, status, urgency, filters, labels,
+        serviceId, status, urgency, filters, labels, period, range,
     } = route.query;
     if (!state.isServicePage) {
         await alertPageStore.setSelectedServiceId(serviceId as string);
@@ -429,6 +437,20 @@ watch(() => storeState.serviceId, async (serviceId) => {
     await alertPageStore.setSelectedStatus(status as string || 'OPEN');
     await alertPageStore.setSelectedUrgency(urgency as string || 'ALL');
     await alertPageStore.setSelectedLabels(labels as string);
+
+    const params = new URLSearchParams(period as string);
+
+    alertPageStore.setSelectedPeriodRange(range as string || ALERT_PERIOD_DROPDOWN_MENU.ALL);
+    if (range === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM) {
+        await alertPageStore.setSelectedPeriod({
+            start: params.get('start') || undefined,
+            end: params.get('end') || undefined,
+        });
+    } else {
+        const selectedPeriodItem = filterState.periodMenuItems.find((d) => d.name === range) || {} as AlertPeriodItemType;
+        alertPageStore.setSelectedPeriod(selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : storeState.period);
+    }
+
     if (filters) {
         await queryTagHelper.setURLQueryStringFilters(route.query.filters);
     }
@@ -489,7 +511,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                                            disable-proxy
                                            style-type="rounded"
                                            use-fixed-menu-style
-                                           :selected="filterState.selectedPeriod"
+                                           :selected="storeState.selectedPeriodRange"
                                            :invalid="filterState.isPeriodInvalid"
                                            @select="handleSelectPeriod"
                         />
@@ -498,7 +520,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                                  style-type="gray200"
                                  class="ml-2"
                         >
-                            {{ `${dayjs.utc(filterState.period.start).format('MMM D, YYYY')} ~ ${dayjs.utc(filterState.period.end).format('MMM D, YYYY')}` }}
+                            {{ `${dayjs.utc(storeState.period.start).format('MMM D, YYYY')} ~ ${dayjs.utc(storeState.period.end).format('MMM D, YYYY')}` }}
                         </p-badge>
                     </div>
                     <p-divider vertical
@@ -634,8 +656,8 @@ watch(() => storeState.serviceId, async (serviceId) => {
                             @custom-field-loaded="handleCustomFieldUpdate"
         />
         <custom-date-modal :visible.sync="state.customRangeModalVisible"
-                           :start="filterState.period?.start"
-                           :end="filterState.period?.end"
+                           :start="storeState.period?.start"
+                           :end="storeState.period?.end"
                            :datetime-picker-data-type="'yearToDate'"
                            use-restricted-mode
                            @confirm="handleCustomRangeModalConfirm"
