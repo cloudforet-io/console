@@ -87,7 +87,7 @@ const handleCancel = () => {
 const getServicePageLocation = (service: string) => ({
     name: ALERT_MANAGER_ROUTE.SERVICE._NAME,
     query: {
-        serviceId: service,
+        serviceName: service,
     },
 });
 const getServiceNames = (): string => {

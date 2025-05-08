@@ -75,7 +75,10 @@ const handleActionModal = (type: ModalType) => {
 };
 const handleGoBackButton = () => {
     if (state.isSettingMode) {
-        router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
+        router.push({
+            name: ALERT_MANAGER_ROUTE.SERVICE._NAME,
+            query: { serviceName: route.query.filterService },
+        }).catch(() => {});
         return;
     }
     replaceUrlQuery({

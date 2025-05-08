@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import isEmpty from 'lodash/isEmpty';
 
@@ -29,6 +31,7 @@ const pageSizeOptions = [15, 30, 45];
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
+const route = useRoute();
 
 const SERVICE_SEARCH_HANDLER: AlertManagementTableHandlerType = {
     keyItemSets: [{
@@ -87,6 +90,18 @@ const fetchServiceList = async () => {
         state.loading = false;
     }
 };
+
+watch(() => route.query.serviceName, async (serviceName) => {
+    if (!serviceName) return;
+    queryTagHelper.setQueryTags([
+        {
+            key: { name: 'name', label: 'Name' },
+            operator: '=',
+            value: { label: serviceName as string, name: serviceName },
+        },
+    ]);
+    await fetchServiceList();
+}, { immediate: true });
 
 onMounted(async () => {
     await fetchServiceList();
