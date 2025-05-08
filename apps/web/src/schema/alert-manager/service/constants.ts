@@ -19,3 +19,8 @@ export const SERVICE_ALERTS_TYPE = {
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
 } as const;
+
+export const SERVICE_HEALTHY_TYPE = {
+    HEALTHY: 'HEALTHY',
+    UNHEALTHY: 'UNHEALTHY',
+};
