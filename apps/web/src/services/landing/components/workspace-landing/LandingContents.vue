@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import {
     PButton, PDataLoader, PDivider, screens,

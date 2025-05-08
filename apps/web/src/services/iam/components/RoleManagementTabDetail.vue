@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { find } from 'lodash';
+import find from 'lodash/find';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

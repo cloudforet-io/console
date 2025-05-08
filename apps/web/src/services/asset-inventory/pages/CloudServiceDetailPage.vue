@@ -3,7 +3,9 @@ import { debouncedWatch } from '@vueuse/core';
 import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { isEmpty, get, cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';

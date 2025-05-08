@@ -9,9 +9,10 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
-import {
-    cloneDeep, forEach, orderBy, range,
-} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import forEach from 'lodash/forEach';
+import orderBy from 'lodash/orderBy';
+import range from 'lodash/range';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';

@@ -61,7 +61,7 @@ import {
     defineProps, computed, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

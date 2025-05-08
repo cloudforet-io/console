@@ -4,7 +4,8 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { clone, isEmpty } from 'lodash';
+import clone from 'lodash/clone';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,

@@ -3,7 +3,7 @@ import {
     computed, isRef, reactive, ref, toRef,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import type { MenuItem } from '@/controls/context-menu/type';
 import { getTextHighlightRegex } from '@/utils/helpers';

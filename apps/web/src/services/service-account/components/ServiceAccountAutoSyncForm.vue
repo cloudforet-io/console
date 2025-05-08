@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import {
     PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup,

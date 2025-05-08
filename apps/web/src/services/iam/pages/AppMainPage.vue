@@ -3,7 +3,7 @@ import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
     PHorizontalLayout, PHeading, PButton, PTab, PHeadingLayout,

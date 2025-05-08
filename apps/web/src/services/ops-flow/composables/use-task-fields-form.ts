@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';

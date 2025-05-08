@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import { PFieldGroup, PFieldTitle } from '@cloudforet/mirinae';
 

@@ -4,7 +4,7 @@ import Vue, {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
     PButton, PHeading, PI, PTextButton, PHeadingLayout,

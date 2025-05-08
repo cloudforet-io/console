@@ -36,7 +36,8 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { map, replace } from 'lodash';
+import map from 'lodash/map';
+import replace from 'lodash/replace';
 
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import type { DynamicLayoutFetchOptions, DynamicLayoutFieldHandler, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';

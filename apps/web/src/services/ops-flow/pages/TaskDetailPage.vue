@@ -32,7 +32,7 @@ import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables'
 
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 import {

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import { onClickOutside, useResizeObserver } from '@vueuse/core';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 
 import PTextButton from '@/controls/buttons/text-button/PTextButton.vue';
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
