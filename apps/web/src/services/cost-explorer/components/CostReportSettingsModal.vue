@@ -36,7 +36,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
 }>();
 
-const { data: costReportConfig } = useCostReportConfigQuery();
+const { costReportConfig } = useCostReportConfigQuery();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     selectedCurrency: undefined as undefined|Currency,
