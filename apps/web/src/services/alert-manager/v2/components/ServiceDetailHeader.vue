@@ -22,6 +22,7 @@ import ServiceDetailEditModal from '@/services/alert-manager/v2/components/Servi
 import ServiceDetailMemberModal from '@/services/alert-manager/v2/components/ServiceDetailMemberModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
+import { useServiceListPageStore } from '@/services/alert-manager/v2/stores/service-list-page-store';
 import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 type ModalType = 'edit' | 'delete' | 'member' | 'alert';
@@ -29,6 +30,8 @@ type ModalType = 'edit' | 'delete' | 'member' | 'alert';
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const serviceListPageStore = useServiceListPageStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -75,7 +78,19 @@ const handleActionModal = (type: ModalType) => {
 };
 const handleGoBackButton = () => {
     if (state.isSettingMode) {
-        router.push({ name: ALERT_MANAGER_ROUTE.SERVICE._NAME }).catch(() => {});
+        const validUnhealthyPage = (!Number.isNaN(serviceListPageStore.unhealthyThisPage) && serviceListPageStore.unhealthyThisPage > 0)
+            ? serviceListPageStore.unhealthyThisPage
+            : 1;
+        const validHealthyPage = (!Number.isNaN(serviceListPageStore.healthyThisPage) && serviceListPageStore.healthyThisPage > 0)
+            ? serviceListPageStore.healthyThisPage
+            : 1;
+        router.push({
+            name: ALERT_MANAGER_ROUTE.SERVICE._NAME,
+            query: {
+                unhealthyPage: validUnhealthyPage.toString(),
+                healthyPage: validHealthyPage.toString(),
+            },
+        }).catch(() => {});
         return;
     }
     replaceUrlQuery({
