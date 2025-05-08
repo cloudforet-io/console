@@ -117,17 +117,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         highlightTag: 'new',
         icon: 'ic_service_advanced-settings',
     },
-    [MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION]: {
-        menuId: MENU_ID.ANOMALY_DETECTION_DOMAIN_CONFIGURATION,
-        routeName: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
-        translationId: 'COST_EXPLORER.ANOMALY_DETECTION_CONFIGURATION',
-    },
-    [MENU_ID.CURRENCY_CONVERTER]: {
-        menuId: MENU_ID.CURRENCY_CONVERTER,
-        routeName: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME,
-        translationId: 'COST_EXPLORER.CURRENCY_CONVERTER',
-        highlightTag: 'new',
-    },
     // NOTE: v1 menu
     [MENU_ID.ALERT_MANAGER_DASHBOARD]: {
         menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
