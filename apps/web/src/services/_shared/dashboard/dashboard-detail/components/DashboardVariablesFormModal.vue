@@ -2,7 +2,8 @@
 import { computed, reactive, watch } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { cloneDeep, isEmpty } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio, PScopedNotification,

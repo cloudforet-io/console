@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

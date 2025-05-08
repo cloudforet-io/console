@@ -5,7 +5,9 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import { isEmpty, isEqual, range } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import range from 'lodash/range';
 
 import { PSelectDropdown, PBadge } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';

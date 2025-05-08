@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import { defineStore } from 'pinia';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

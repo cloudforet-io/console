@@ -56,7 +56,7 @@ import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';

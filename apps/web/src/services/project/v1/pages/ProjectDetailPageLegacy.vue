@@ -5,7 +5,8 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { find, isEmpty } from 'lodash';
+import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

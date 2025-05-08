@@ -7,7 +7,9 @@ import {
 import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import { isEmpty, orderBy, throttle } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
+import throttle from 'lodash/throttle';
 
 import { numberFormatter } from '@cloudforet/utils';
 

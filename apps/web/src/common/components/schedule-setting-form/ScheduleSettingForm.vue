@@ -3,7 +3,8 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import { range, zipObject } from 'lodash';
+import range from 'lodash/range';
+import zipObject from 'lodash/zipObject';
 
 import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,

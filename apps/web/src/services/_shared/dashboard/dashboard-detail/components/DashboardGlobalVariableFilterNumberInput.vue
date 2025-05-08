@@ -6,7 +6,8 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute } from 'vue-router/composables';
 
-import { cloneDeep, isEqual } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 
 import {
     PIconButton, PTextInput, PPopover, PButton, PI,

@@ -76,7 +76,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
-import { debounce, isEmpty } from 'lodash';
+import debounce from 'lodash/debounce';
+import isEmpty from 'lodash/isEmpty';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

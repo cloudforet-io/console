@@ -4,7 +4,7 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

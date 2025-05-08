@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

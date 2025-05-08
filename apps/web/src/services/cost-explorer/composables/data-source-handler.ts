@@ -1,4 +1,5 @@
-import { cloneDeep, map } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import map from 'lodash/map';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';

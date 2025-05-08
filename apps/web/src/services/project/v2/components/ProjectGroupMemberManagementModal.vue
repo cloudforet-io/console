@@ -4,7 +4,8 @@ import {
 } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
-import { cloneDeep, difference } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import difference from 'lodash/difference';
 
 import {
     PButtonModal, PDataLoader, PEmpty, PFieldGroup, PTextInput, PIconButton,

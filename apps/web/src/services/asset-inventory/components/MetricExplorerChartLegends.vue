@@ -3,7 +3,7 @@ import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,

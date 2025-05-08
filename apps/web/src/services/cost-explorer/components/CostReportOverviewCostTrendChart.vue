@@ -9,9 +9,11 @@ import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import {
-    cloneDeep, find, isEmpty, sortBy, throttle,
-} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
+import sortBy from 'lodash/sortBy';
+import throttle from 'lodash/throttle';
 
 import {
     PCollapsibleToggle, PDataTable,

@@ -5,7 +5,7 @@ import {
     computed, onMounted, reactive, ref,
 } from 'vue';
 
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 
 import {
     PSelectDropdown, PContextMenu, PIconButton, PI, PTextInput,

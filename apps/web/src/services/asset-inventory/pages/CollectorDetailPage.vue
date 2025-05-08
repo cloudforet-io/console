@@ -27,7 +27,7 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
-import { clone } from 'lodash';
+import clone from 'lodash/clone';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

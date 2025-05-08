@@ -1,6 +1,6 @@
 import type { Location } from 'vue-router';
 
-import { forEach } from 'lodash';
+import forEach from 'lodash/forEach';
 
 import { SpaceRouter } from '@/router';
 

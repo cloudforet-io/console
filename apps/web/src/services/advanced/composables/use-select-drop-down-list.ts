@@ -4,7 +4,7 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';

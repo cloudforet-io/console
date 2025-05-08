@@ -1,6 +1,7 @@
-import {
-    cloneDeep, isEmpty, isEqual, union,
-} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import union from 'lodash/union';
 
 import type { DashboardLayoutWidgetInfo, DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {

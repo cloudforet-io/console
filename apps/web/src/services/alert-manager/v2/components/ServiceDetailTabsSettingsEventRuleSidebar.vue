@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 import draggable from 'vuedraggable';
 
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

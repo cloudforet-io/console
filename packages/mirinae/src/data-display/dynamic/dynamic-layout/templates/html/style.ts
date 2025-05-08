@@ -1,4 +1,5 @@
-import { forEach, map } from 'lodash';
+import forEach from 'lodash/forEach';
+import map from 'lodash/map';
 
 import colors from '@/styles/colors.cjs';
 

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { clone } from 'lodash';
+import clone from 'lodash/clone';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';

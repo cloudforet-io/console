@@ -2,7 +2,7 @@
 import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';

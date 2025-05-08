@@ -2,9 +2,12 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import {
-    isEmpty, flatten, sortBy, isEqualWith, isEqual, union,
-} from 'lodash';
+import flatten from 'lodash/flatten';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import isEqualWith from 'lodash/isEqualWith';
+import sortBy from 'lodash/sortBy';
+import union from 'lodash/union';
 import { format } from 'numfmt';
 
 dayjs.extend(tz);

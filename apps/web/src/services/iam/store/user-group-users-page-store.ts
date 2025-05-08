@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

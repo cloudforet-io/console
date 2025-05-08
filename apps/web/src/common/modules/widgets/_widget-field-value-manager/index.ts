@@ -2,7 +2,7 @@
 // @ts-nocheck
 import { ref } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';

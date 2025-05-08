@@ -6,7 +6,9 @@ import {
 import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import { countBy, isEmpty, map } from 'lodash';
+import countBy from 'lodash/countBy';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import {

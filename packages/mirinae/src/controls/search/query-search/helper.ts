@@ -1,4 +1,4 @@
-import { find } from 'lodash';
+import find from 'lodash/find';
 
 import type {
     KeyItem, KeyItemSet, KeyMenuItem, ValueHandler, ValueItem, ValueMenuItem, MenuFormatterArgs,

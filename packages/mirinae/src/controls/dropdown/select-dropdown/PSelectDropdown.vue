@@ -4,7 +4,8 @@ import {
 } from 'vue';
 
 import { onClickOutside, useFocus } from '@vueuse/core';
-import { debounce, reduce } from 'lodash';
+import debounce from 'lodash/debounce';
+import reduce from 'lodash/reduce';
 
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
 import type { ContextMenuType } from '@/controls/context-menu/type';

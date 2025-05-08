@@ -1,4 +1,4 @@
-import { forEach } from 'lodash';
+import forEach from 'lodash/forEach';
 
 import type { DynamicFieldOptions, ListOptions, DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 

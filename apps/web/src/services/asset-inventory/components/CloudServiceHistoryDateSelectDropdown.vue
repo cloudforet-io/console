@@ -16,7 +16,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import {
     PSelectDropdown,

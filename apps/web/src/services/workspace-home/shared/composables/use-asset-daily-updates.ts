@@ -2,9 +2,9 @@ import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import dayjs from 'dayjs';
-import {
-    groupBy, map, sumBy,
-} from 'lodash';
+import groupBy from 'lodash/groupBy';
+import map from 'lodash/map';
+import sumBy from 'lodash/sumBy';
 
 import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composables/use-metric-data-api';
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
