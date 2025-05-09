@@ -130,16 +130,6 @@ const { mutate: updateCostReportConfig } = useCostReportUpdateMutation({
 const handleSave = () => {
     if (!costReportConfig.value?.cost_report_config_id) return;
 
-    console.log({
-        cost_report_config_id: costReportConfig.value?.cost_report_config_id,
-        language: state.selectedLanguage,
-        issue_day: issueDate.value,
-        is_last_day: state.lastDayOfMonth,
-        adjustment_options: {
-            enabled: state.enableAdjustments,
-            period: manualAdjustablePeriod.value,
-        },
-    });
     updateCostReportConfig({
         cost_report_config_id: costReportConfig.value?.cost_report_config_id,
         language: state.selectedLanguage,
