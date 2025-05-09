@@ -2107,13 +2107,20 @@
 	},
 	"COST_EXPLORER": {
 		"ADVANCED_SETTINGS": {
+			"ADD_ADJUSTMENT": "Add Adjustment",
+			"ADD_ADJUSTMENT_GROUP": "Add Adjustment Group",
+			"ADJUSTMENT": "Adjustment",
 			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "Failed to update Cost Report Configuration",
 			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "Cost Report Configuration successfully updated",
+			"AMOUNT": "Amount",
 			"AUTO_APPLY_ADJUSTMENTS": "Auto-Apply Adjustments",
+			"CANCEL": "Cancel",
 			"CONFIRM_DATE_EXCEEDS_MONTH_END": "The confirmation date cannot exceed the last day of the month.",
+			"COST_REPORT_ADJUSTMENTS": "Cost Report Adjustments",
 			"COST_REPORT_CONFIGURATION": "Cost Report Configuration",
 			"CURRENCY_CONVERTER": "Currency Converter",
 			"DAYS_AFTER_REPORT": "Days After Report Issuance",
+			"DESCRIPTION": "Description",
 			"GREATER_THAN_OR_EQUAL_TO_1": "Must be greater than or equal to 1",
 			"ISSUE_DATE": "Issue Date",
 			"LANGUAGE": "Language",
@@ -2121,10 +2128,15 @@
 			"LESS_THAN_OR_EQUAL_TO_31": "Must be less than or equal to 31",
 			"MANUAL_ADJUSTABLE_PERIOD": "Manual Adjustable Period",
 			"MANUAL_ADJUSTABLE_PERIOD_HELP_TEXT": "Enter the number of days after the report date during which manual adjustments are permitted.",
+			"PROVIDER": "Provider",
 			"REPORT_CONFIGURATION_DATE": "Report Confirmation Date",
 			"REQUIRED_FIELD": "Required field",
+			"SAVE_CHANGES": "Save Changes",
+			"SELECT_WORKSPACE": "Select Workspace",
 			"SET_ADJUSTMENTS": "Set Adjustments",
-			"UPCOMING_REPORT_DATE": "Upcoming Report Date"
+			"TITLE": "Title",
+			"UPCOMING_REPORT_DATE": "Upcoming Report Date",
+			"WORKSPACE": "Workspace"
 		},
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
