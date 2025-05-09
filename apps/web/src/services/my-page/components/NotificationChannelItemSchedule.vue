@@ -18,6 +18,7 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
+import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { DayType, ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
@@ -46,7 +47,9 @@ const emit = defineEmits<{(event: 'change'): void;
 
 const userStore = useUserStore();
 const timezoneForFormatter = computed<string|undefined>(() => userStore.state.timezone).value;
+const alertManagerUiAffectSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 const state = reactive({
+    visibleUserNotification: computed<boolean>(() => alertManagerUiAffectSchema.value?.visibleUserNotification ?? false),
     scheduleModeForEdit: props.channelData.is_scheduled,
     scheduleForEdit: props.channelData.schedule,
     isScheduleValid: false,
@@ -198,6 +201,7 @@ const getScheduleInfo = (schedule: ScheduleSettingFormType) => {
         >
             <notification-add-schedule :schedule="props.channelData.schedule"
                                        :is-scheduled="props.channelData.is_scheduled"
+                                       :visible-user-notification="state.visibleUserNotification"
                                        @changeV1="onChangeScheduleV1"
                                        @change="onChangeSchedule"
             />
