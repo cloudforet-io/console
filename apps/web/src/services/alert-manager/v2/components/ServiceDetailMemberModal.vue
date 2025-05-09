@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import map from 'lodash/map';
@@ -204,6 +204,10 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
         ErrorHandler.handleError(e, true);
     }
 };
+
+onMounted(() => {
+    serviceDetailPageStore.fetchServiceChannelList(storeState.serviceInfo.service_id);
+});
 </script>
 
 <template>
