@@ -282,6 +282,10 @@
 				"DELETE_MEMBER_DESC": "You must first disconnect each connected 'Notification' before deleting the [{name}] Member.",
 				"DELETE_MEMBER_DESC_BOLD": "Please remove all [{name}] Members from the 'Notification' and try again.",
 				"DELETE_MEMBER_TITLE": "Remove Service Member",
+				"DELETE_NOTIFICATION_DESC": "You must first disconnect each connected 'Escalation Policy' before deleting the [{name}] Notification.",
+				"DELETE_NOTIFICATION_DESC_BOLD": "Please remove all [{name}] Notifications from the 'Escalation Policy' and try again.",
+				"DELETE_NOTIFICATION_TITLE": "Delete Notification Channel",
+				"ESCALATION_LINK_TEXT": "Go to Escalation Policy",
 				"NOTIFICATION_LINK_TEXT": "Go to Connected Notifications",
 				"REMOVE": "Remove"
 			},

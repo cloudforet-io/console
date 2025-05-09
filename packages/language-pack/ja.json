@@ -282,6 +282,10 @@
 				"DELETE_MEMBER_DESC": "[{name}]メンバーを削除する前に、接続されている各「通知」の接続を解除する必要があります。",
 				"DELETE_MEMBER_DESC_BOLD": "Please remove all [{name}] Members from the 'Notification' and try again.\" → \"「通知」から[{name}]メンバーをすべて削除してから、もう一度お試しください。",
 				"DELETE_MEMBER_TITLE": "サービスメンバー削除",
+				"DELETE_NOTIFICATION_DESC": "[{name}]通知を削除する前に、接続されている各「エスカレーションポリシー」の接続を解除する必要があります。",
+				"DELETE_NOTIFICATION_DESC_BOLD": "「エスカレーションポリシー」から[{name}]通知をすべて削除してから、もう一度お試しください。",
+				"DELETE_NOTIFICATION_TITLE": "通知チャネル削除",
+				"ESCALATION_LINK_TEXT": "エスカレーションポリシーへ移動",
 				"NOTIFICATION_LINK_TEXT": "接続された通知へ移動",
 				"REMOVE": "削除"
 			},
