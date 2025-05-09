@@ -2106,6 +2106,26 @@
 		}
 	},
 	"COST_EXPLORER": {
+		"ADVANCED_SETTINGS": {
+			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "Failed to update Cost Report Configuration",
+			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "Cost Report Configuration successfully updated",
+			"AUTO_APPLY_ADJUSTMENTS": "Auto-Apply Adjustments",
+			"CONFIRM_DATE_EXCEEDS_MONTH_END": "The confirmation date cannot exceed the last day of the month.",
+			"COST_REPORT_CONFIGURATION": "Cost Report Configuration",
+			"CURRENCY_CONVERTER": "Currency Converter",
+			"DAYS_AFTER_REPORT": "Days After Report Issuance",
+			"GREATER_THAN_OR_EQUAL_TO_1": "Must be greater than or equal to 1",
+			"ISSUE_DATE": "Issue Date",
+			"LANGUAGE": "Language",
+			"LAST_DAY_OF_MONTH": "Last day of the month",
+			"LESS_THAN_OR_EQUAL_TO_31": "Must be less than or equal to 31",
+			"MANUAL_ADJUSTABLE_PERIOD": "Manual Adjustable Period",
+			"MANUAL_ADJUSTABLE_PERIOD_HELP_TEXT": "Enter the number of days after the report date during which manual adjustments are permitted.",
+			"REPORT_CONFIGURATION_DATE": "Report Confirmation Date",
+			"REQUIRED_FIELD": "Required field",
+			"SET_ADJUSTMENTS": "Set Adjustments",
+			"UPCOMING_REPORT_DATE": "Upcoming Report Date"
+		},
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
 				"AMOUNT": "Amount",
