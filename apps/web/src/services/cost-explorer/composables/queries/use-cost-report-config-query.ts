@@ -18,7 +18,7 @@ export const useCostReportConfigQuery = () => {
         select: (d) => d.results?.[0] ?? null,
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 1, // 1 minutes
-    }, ['WORKSPACE']);
+    }, ['DOMAIN', 'WORKSPACE']);
 
     return {
         costReportConfig: data, isLoading, error,
