@@ -4,6 +4,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -19,7 +20,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
+import type { DayType, ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification-timezone-helper';
@@ -49,6 +50,15 @@ const state = reactive({
     scheduleModeForEdit: props.channelData.is_scheduled,
     scheduleForEdit: props.channelData.schedule,
     isScheduleValid: false,
+    dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
+        MON: i18n.t('ALERT_MANAGER.NOTIFICATIONS.MONDAY'),
+        TUE: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TUESDAY'),
+        WED: i18n.t('ALERT_MANAGER.NOTIFICATIONS.WEDNESDAY'),
+        THU: i18n.t('ALERT_MANAGER.NOTIFICATIONS.THURSDAY'),
+        FRI: i18n.t('ALERT_MANAGER.NOTIFICATIONS.FRIDAY'),
+        SAT: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SATURDAY'),
+        SUN: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SUNDAY'),
+    })),
     displayStartHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.start_hour || 0), timezoneForFormatter)),
     displayEndHour: computed(() => utcToTimezoneFormatter((props.channelData.schedule?.end_hour || 0), timezoneForFormatter)),
     scheduleSettingFormType: {} as ScheduleSettingFormType,
@@ -120,37 +130,58 @@ const onClickSave = async () => {
     emit('change');
 };
 
-const SCHEDULE_TYPE_OPTIONS = {
-    ALL_DAY: 'Every Day',
-    CUSTOM: 'Custom',
-    WEEK_DAY: 'Weekdays',
-    WEEKEND: 'Weekend',
-};
 const getScheduleInfo = (schedule: ScheduleSettingFormType) => {
-    const { SCHEDULE_TYPE } = schedule;
-    let styleType: string;
-    let label;
-    switch (SCHEDULE_TYPE) {
-    case 'ALL_DAY':
-        styleType = 'indigo500';
-        label = SCHEDULE_TYPE_OPTIONS.ALL_DAY;
-        break;
-    case 'CUSTOM':
-        styleType = 'coral500';
-        label = SCHEDULE_TYPE_OPTIONS.CUSTOM;
-        break;
+    const scheduleInfo = {
+        styleType: '', value: '' as TranslateResult, days: [] as TranslateResult[], time: '', timezone: '',
+    };
+
+
+    const formatTime = (time: number | undefined, defaultTime: number): string => `${String(time ?? defaultTime).padStart(2, '0')}:00`;
+    Object.entries(schedule).forEach(([day, s]) => {
+        if (day === 'SCHEDULE_TYPE') return;
+
+        if (day === 'TIMEZONE') {
+            scheduleInfo.timezone = s as string;
+            return;
+        }
+        const scheduleDay = s;
+        if (!scheduleDay) return;
+
+        const startTime = formatTime(scheduleDay.start, 0);
+        const endTime = formatTime(scheduleDay.end, 24);
+        if (schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
+            scheduleInfo.days = Object.values(state.dayMapping).slice(0, 5).map((d) => d as TranslateResult);
+            if (scheduleDay?.is_scheduled) {
+                scheduleInfo.time = `${startTime} ~ ${endTime}`;
+            }
+        } else if (schedule.SCHEDULE_TYPE === 'ALL_DAY') {
+            scheduleInfo.days = Object.values(state.dayMapping).map((d) => d as TranslateResult);
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
+        } else if (scheduleDay?.is_scheduled) {
+            scheduleInfo.days.push(state.dayMapping[day]);
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
+        }
+    });
+
+    switch (schedule.SCHEDULE_TYPE) {
     case 'WEEK_DAY':
-        styleType = 'secondary1';
-        label = SCHEDULE_TYPE_OPTIONS.WEEK_DAY;
+        scheduleInfo.styleType = 'secondary1';
+        scheduleInfo.value = i18n.t('COMMON.SCHEDULE_SETTING.WEEKDAYS');
+        break;
+    case 'ALL_DAY':
+        scheduleInfo.styleType = 'primary1';
+        scheduleInfo.value = i18n.t('COMMON.SCHEDULE_SETTING.EVERYDAY');
         break;
     default:
-        styleType = 'gray900';
-        label = SCHEDULE_TYPE_OPTIONS.WEEKEND;
+        scheduleInfo.styleType = 'coral500';
+        scheduleInfo.value = i18n.t('COMMON.SCHEDULE_SETTING.CUSTOM');
         break;
     }
+
+
     return {
-        styleType,
-        label,
+        ...scheduleInfo,
+        days: scheduleInfo.days.join(', '),
     };
 };
 </script>
@@ -200,12 +231,20 @@ const getScheduleInfo = (schedule: ScheduleSettingFormType) => {
                 <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
             </div>
             <div v-else-if="props.visibleUserNotification">
-                <div class="inline-flex items-center gap-2">
-                    <p-badge badge-type="solid-outline"
-                             :style-type="getScheduleInfo(props.channelData.schedule).styleType"
-                    >
-                        {{ getScheduleInfo(props.channelData.schedule).label }}
-                    </p-badge>
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2">
+                        <p>{{ $t('ALERT_MANAGER.NOTIFICATIONS.DAY') }}:</p>
+                        <p-badge badge-type="solid-outline"
+                                 :style-type="getScheduleInfo(props.channelData.schedule).styleType"
+                        >
+                            {{ getScheduleInfo(props.channelData.schedule).value }}
+                        </p-badge>
+                        <p>{{ getScheduleInfo(props.channelData.schedule).days }}</p>
+                    </div>
+                    <p>{{ $t('ALERT_MANAGER.NOTIFICATIONS.TIME') }}: {{ getScheduleInfo(props.channelData.schedule).time }}</p>
+                    <p class="text-gray-500">
+                        {{ $t('ALERT_MANAGER.TIMEZONE') }}: {{ getScheduleInfo(props.channelData.schedule).timezone }}
+                    </p>
                 </div>
             </div>
             <button class="edit-button"
