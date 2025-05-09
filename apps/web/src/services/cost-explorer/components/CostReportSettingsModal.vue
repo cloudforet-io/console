@@ -4,14 +4,13 @@ import { computed, reactive, watch } from 'vue';
 import dayjs from 'dayjs';
 import map from 'lodash/map';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PBadge, PTextInput, PCheckbox, PI,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useCostReportUpdateMutation } from '@/api-clients/cost-analysis/cost-report-config/composables/mutations/use-cost-report-update-mutation';
 import type { CostReportConfigUpdateParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/update';
-import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -25,9 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-
-
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
 
 interface Props {
     visible: boolean;
@@ -38,8 +35,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
 }>();
-const costReportPageStore = useCostReportPageStore();
-const costReportPageState = costReportPageStore.state;
+
+const { costReportConfig } = useCostReportConfigQuery();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     selectedCurrency: undefined as undefined|Currency,
@@ -54,6 +51,7 @@ const state = reactive({
     })) as SelectDropdownMenuItem[],
     upcomingIssueDateText: computed<string>(() => getUpcomingIssueDate(state.enableLastDay, issueDay.value)),
 });
+
 const {
     forms: { issueDay },
     setForm,
@@ -63,7 +61,7 @@ const {
 } = useFormValidator({
     issueDay: undefined as number | undefined,
 }, {
-    issueDay(value: number) {
+    issueDay(value: number | undefined) {
         if (state.enableLastDay) return true;
         if (!value) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.REQUIRED_FIELD');
         if (value < 1) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.GREATER_THAN_OR_EQUAL_TO_1');
@@ -100,21 +98,14 @@ const getUpcomingIssueDate = (enableLastDay: boolean, _issueDay?: number): strin
 };
 
 /* Api */
-const updateCostReportConfig = async () => {
-    try {
-        const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.update<CostReportConfigUpdateParameters, CostReportConfigModel>({
-            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
-            currency: state.selectedCurrency,
-            issue_day: state.enableLastDay ? undefined : Number(issueDay.value),
-            language: state.selectedLanguage,
-            is_last_day: state.enableLastDay,
-        });
-        costReportPageStore.setCostReportConfig(updatedConfig);
+const { mutate: updateCostReportConfig } = useCostReportUpdateMutation({
+    onSuccess: () => {
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_UPDATE_SETTINGS'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_UPDATE_SETTINGS'));
-    }
-};
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_UPDATE_SETTINGS'));
+    },
+});
 
 /* Event */
 const handleChangeEnableLastDay = () => {
@@ -123,22 +114,30 @@ const handleChangeEnableLastDay = () => {
         setForm('issueDay', getLastDay());
     }
 };
-const handleSelectCurrency = (currency: Currency) => {
-    state.selectedCurrency = currency;
+const handleSelectCurrency = (item: string | number | SelectDropdownMenuItem) => {
+    state.selectedCurrency = item as Currency;
 };
 const handleConfirm = () => {
-    updateCostReportConfig();
+    const params: CostReportConfigUpdateParameters = {
+        cost_report_config_id: costReportConfig.value?.cost_report_config_id ?? '',
+        currency: state.selectedCurrency,
+        language: state.selectedLanguage,
+        is_last_day: state.enableLastDay,
+        issue_day: state.enableLastDay ? undefined : Number(issueDay.value),
+    };
+
+    updateCostReportConfig(params);
     state.proxyVisible = false;
 };
 
 /* Watcher */
 watch(() => props.visible, (visible) => {
-    if (visible && costReportPageState.costReportConfig) {
-        state.selectedCurrency = costReportPageState.costReportConfig?.currency;
-        state.enableLastDay = costReportPageState.costReportConfig?.is_last_day;
-        state.selectedLanguage = costReportPageState.costReportConfig?.language;
-        if (!costReportPageState.costReportConfig?.is_last_day) {
-            setForm('issueDay', costReportPageState.costReportConfig?.issue_day);
+    if (visible && costReportConfig.value) {
+        state.selectedCurrency = costReportConfig.value?.currency;
+        state.enableLastDay = costReportConfig.value?.is_last_day;
+        state.selectedLanguage = costReportConfig.value?.language;
+        if (!costReportConfig.value?.is_last_day) {
+            setForm('issueDay', costReportConfig.value?.issue_day);
         } else {
             setForm('issueDay', getLastDay());
         }
