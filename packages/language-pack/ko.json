@@ -3399,6 +3399,7 @@
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
 					"DESCRIPTION": "설명",
+					"DUPLICATED_INVALID_TEXT": "이미 존재하는 그룹 이름입니다. 다른 이름을 입력해주세요.",
 					"GROUP_NAME": "그룹 이름",
 					"NOTIFICATION_CHANNEL": "알림 채널",
 					"PROTOCOL": "Protocol",

@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -20,7 +21,7 @@ import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user
 import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
 import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
 import type {
-    UserGroupChannelScheduleType,
+    UserGroupChannelScheduleInfoType,
 } from '@/schema/alert-manager/user-group-channel/type';
 import { i18n } from '@/translations';
 
@@ -29,6 +30,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import type { DayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -66,9 +68,9 @@ const { queryTags } = queryTagHelper;
 interface ChannelItem {
   name: string;
   channel_id: string;
-  // schedule: UserGroupChannelScheduleInfoType;
-  SCHEDULE_TYPE: UserGroupChannelScheduleType;
-  details?: any;
+  day: UserGroupChannelScheduleInfoType;
+  time: UserGroupChannelScheduleInfoType;
+  timeZone: string;
 }
 
 const isDeleteAble = ref<boolean>(false);
@@ -81,16 +83,20 @@ const storeState = reactive({
 
 const tableState = reactive({
     fields: computed(() => [
-        { name: 'name', label: 'Name' },
-        { name: 'channel_id', label: 'Channel' },
-        { name: 'schedule', label: 'Schedule' },
+        { name: 'name', label: 'Name', width: '350px' },
+        { name: 'channel_id', label: 'Channel', width: '240px' },
+        { name: 'day', label: 'Day', width: '327px' },
+        { name: 'time', label: 'Time', width: '116px' },
+        { name: 'timeZone', label: 'Time Zone', width: '250px' },
     ]),
     items: computed<ChannelItem[]>(() => {
         const channels = userGroupPageState.userGroupChannels.list ?? [];
         return channels.map((channel) => ({
             name: channel.name,
             channel_id: channel.protocol_id,
-            schedule: channel.schedule.SCHEDULE_TYPE,
+            day: channel.schedule,
+            time: channel.schedule,
+            timeZone: channel.schedule.TIMEZONE,
         }));
     }),
     valueHandlerMap: computed(() => ({
@@ -111,16 +117,35 @@ const tableState = reactive({
 const state = reactive({
     loading: false,
     channelName: '',
-    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
+    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList?.map((protocol) => ({
         icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
         label: protocol.name,
         value: protocol.protocol_id,
-    }))),
+    })) ?? []),
+    dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
+        MON: i18n.t('COMMON.SCHEDULE_SETTING.MON'),
+        TUE: i18n.t('COMMON.SCHEDULE_SETTING.TUE'),
+        WED: i18n.t('COMMON.SCHEDULE_SETTING.WED'),
+        THU: i18n.t('COMMON.SCHEDULE_SETTING.THU'),
+        FRI: i18n.t('COMMON.SCHEDULE_SETTING.FRI'),
+        SAT: i18n.t('COMMON.SCHEDULE_SETTING.SAT'),
+        SUN: i18n.t('COMMON.SCHEDULE_SETTING.SUN'),
+    })),
 });
 
 const totalCount = ref(0);
 
 /* Component */
+const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
+    try {
+        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
+        userGroupPageState.userGroupChannels.list = results;
+        totalCount.value = results?.length ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e, true);
+    }
+};
+
 const handleChange = async (options: any = {}) => {
     let value;
     if (options.queryTags) {
@@ -211,6 +236,61 @@ const handleUpdateModal = async (modalType: string) => {
     }
 };
 
+const getScheduleInfo = (schedule: UserGroupChannelScheduleInfoType) => {
+    const scheduleInfo = {
+        styleType: '', value: '' as TranslateResult, days: [] as TranslateResult[], time: '', timezone: '',
+    };
+
+
+    const formatTime = (time: number | undefined, defaultTime: number): string => `${String(time ?? defaultTime).padStart(2, '0')}:00`;
+    Object.entries(schedule).forEach(([day, s]) => {
+        if (day === 'SCHEDULE_TYPE') return;
+
+        if (day === 'TIMEZONE') {
+            scheduleInfo.timezone = s as string;
+            return;
+        }
+        const scheduleDay = s;
+        if (!scheduleDay || typeof scheduleDay === 'string') return;
+
+        const startTime = formatTime(scheduleDay.start, 0);
+        const endTime = formatTime(scheduleDay.end, 24);
+        if (schedule.SCHEDULE_TYPE === 'WEEK_DAY') {
+            scheduleInfo.days = Object.values(state.dayMapping).slice(0, 5).map((d) => d as TranslateResult);
+            if (scheduleDay.is_scheduled) {
+                scheduleInfo.time = `${startTime} ~ ${endTime}`;
+            }
+        } else if (schedule.SCHEDULE_TYPE === 'ALL_DAY') {
+            scheduleInfo.days = Object.values(state.dayMapping).map((d) => d as TranslateResult);
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
+        } else if (scheduleDay?.is_scheduled) {
+            scheduleInfo.days.push(state.dayMapping[day]);
+            scheduleInfo.time = `${startTime} ~ ${endTime}`;
+        }
+    });
+
+    switch (schedule.SCHEDULE_TYPE) {
+    case 'WEEK_DAY':
+        scheduleInfo.styleType = 'secondary1';
+        scheduleInfo.value = i18n.t('COMMON.SCHEDULE_SETTING.WEEKDAYS');
+        break;
+    case 'ALL_DAY':
+        scheduleInfo.styleType = 'primary1';
+        scheduleInfo.value = i18n.t('COMMON.SCHEDULE_SETTING.EVERYDAY');
+        break;
+    default:
+        scheduleInfo.styleType = 'coral500';
+        scheduleInfo.value = i18n.t('COMMON.SCHEDULE_SETTING.CUSTOM');
+        break;
+    }
+
+
+    return {
+        ...scheduleInfo,
+        days: scheduleInfo.days.join(', '),
+    };
+};
+
 /* Watcher */
 watch(isScheduleTagged, (nv_scheduled_tag) => {
     if (nv_scheduled_tag) {
@@ -248,25 +328,12 @@ watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChann
 const fetchGetNotificationProtocol = async (params: NotificationProtocolGetParameters) => {
     try {
         return await SpaceConnector.clientV2.alertManager.notificationProtocol.get<NotificationProtocolGetParameters, NotificationProtocolModel>(params);
-        // notificationChannelCreateFormStore.$patch((_state) => {
-        //     _state.state.selectedProtocol.icon = result.plugin_info.plugin_id;
-        //     _state.state.selectedProtocol.name = result.name;
-        // });
     } catch (e) {
         ErrorHandler.handleError(e, true);
         return null;
     }
 };
 
-const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
-        userGroupPageState.userGroupChannels.list = results;
-        totalCount.value = results.length;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
-};
 
 const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): Promise<UserGroupChannelModel | undefined> => {
     try {
@@ -316,7 +383,7 @@ onMounted(async () => {
             >
                 <div class="toolbox-wrapper">
                     <div class="toolbox">
-                        <p-button style-type="tertiary"
+                        <p-button style-type="secondary"
                                   icon-left="ic_plus"
                                   @click="handleUpdateModal('create')"
                         >
@@ -373,31 +440,39 @@ onMounted(async () => {
                     </div>
                 </div>
             </template>
-            <template #col-schedule-format="{value}">
-                <p-badge v-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
-                         badge-type="solid-outline"
-                         style-type="alert"
-                >
-                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.CUSTOM') }}
-                </p-badge>
-                <p-badge v-else-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.ALL_DAY"
-                         badge-type="solid-outline"
-                         style-type="indigo500"
-                >
-                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.EVERYDAY') }}
-                </p-badge>
-                <p-badge v-else-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEK_DAY"
-                         badge-type="solid-outline"
-                         style-type="secondary1"
-                >
-                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKDAYS') }}
-                </p-badge>
-                <p-badge v-else-if="value === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEKEND"
-                         badge-type="solid-outline"
-                         style-type="gray500"
-                >
-                    {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKEND') }}
-                </p-badge>
+            <template #col-day-format="{value}">
+                <div class="flex gap-2 items-center">
+                    <p-badge v-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.CUSTOM"
+                             badge-type="solid-outline"
+                             style-type="alert"
+                    >
+                        {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.CUSTOM') }}
+                    </p-badge>
+                    <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.ALL_DAY"
+                             badge-type="solid-outline"
+                             style-type="indigo500"
+                    >
+                        {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.EVERYDAY') }}
+                    </p-badge>
+                    <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEK_DAY"
+                             badge-type="solid-outline"
+                             style-type="secondary1"
+                    >
+                        {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKDAYS') }}
+                    </p-badge>
+                    <p-badge v-else-if="value.SCHEDULE_TYPE === USER_GROUP_CHANNEL_SCHEDULE_TYPE.WEEKEND"
+                             badge-type="solid-outline"
+                             style-type="gray500"
+                    >
+                        {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.WEEKEND') }}
+                    </p-badge>
+                    <span>
+                        {{ getScheduleInfo(value)['days'] }}
+                    </span>
+                </div>
+            </template>
+            <template #col-time-format="{value}">
+                {{ getScheduleInfo(value)['time'] }}
             </template>
         </p-toolbox-table>
     </div>

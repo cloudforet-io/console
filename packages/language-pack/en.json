@@ -3399,6 +3399,7 @@
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
 					"DESCRIPTION": "Description",
+					"DUPLICATED_INVALID_TEXT": "This group name already exists. Please enter a different name.",
 					"GROUP_NAME": "Group Name",
 					"NOTIFICATION_CHANNEL": "Notification Channel",
 					"PROTOCOL": "Protocol",
