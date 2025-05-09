@@ -1,12 +1,13 @@
 <script setup lang="ts">
 
 import { vOnClickOutside } from '@vueuse/components';
+import type { TranslateResult } from 'vue-i18n';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 
 interface Props {
     visible: boolean;
-    title?: string;
+    title?: string | TranslateResult;
     styleType?: 'primary' | 'secondary';
     size?: 'sm' | 'md' | 'lg' | 'full';
     isFixedSize?: boolean;
