@@ -12,4 +12,8 @@ export interface CostReportConfigUpdateParameters {
         state: string;
         data_sources: string[];
     };
+    adjustment_options?: {
+        enabled: boolean;
+        period: number;
+    };
 }
