@@ -2106,13 +2106,20 @@
 	},
 	"COST_EXPLORER": {
 		"ADVANCED_SETTINGS": {
+			"ADD_ADJUSTMENT": "조정 추가",
+			"ADD_ADJUSTMENT_GROUP": "조정 그룹 추가",
+			"ADJUSTMENT": "조정",
 			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "비용 리포트 설정 수정 실패",
 			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "비용 리포트 설정 수정 완료",
+			"AMOUNT": "금액",
 			"AUTO_APPLY_ADJUSTMENTS": "조정 자동 반영",
+			"CANCEL": "취소",
 			"CONFIRM_DATE_EXCEEDS_MONTH_END": "확정일은 해당 월의 마지막 일을 초과할 수 없습니다.",
+			"COST_REPORT_ADJUSTMENTS": "비용 리포트 조정",
 			"COST_REPORT_CONFIGURATION": "비용 리포트 설정",
 			"CURRENCY_CONVERTER": "환율 설정",
 			"DAYS_AFTER_REPORT": "일 (리포트 발행일 이후)",
+			"DESCRIPTION": "설명",
 			"GREATER_THAN_OR_EQUAL_TO_1": "1 이상으로 설정해주세요",
 			"ISSUE_DATE": "발행일자",
 			"LANGUAGE": "언어",
@@ -2120,10 +2127,15 @@
 			"LESS_THAN_OR_EQUAL_TO_31": "31 이하로 설정해주세요",
 			"MANUAL_ADJUSTABLE_PERIOD": "수동 조정 기간",
 			"MANUAL_ADJUSTABLE_PERIOD_HELP_TEXT": "리포트 발행일 이후 수동 조정이 허용되는 기간(일수)을 입력하세요.",
+			"PROVIDER": "프로바이더",
 			"REPORT_CONFIGURATION_DATE": "리포트 확정일",
 			"REQUIRED_FIELD": "필수 입력 항목입니다.",
+			"SAVE_CHANGES": "변경사항 저장",
+			"SELECT_WORKSPACE": "워크스페이스 선택",
 			"SET_ADJUSTMENTS": "조정값 설정",
-			"UPCOMING_REPORT_DATE": "다음 리포트 발행일"
+			"TITLE": "제목",
+			"UPCOMING_REPORT_DATE": "다음 리포트 발행일",
+			"WORKSPACE": "워크스페이스"
 		},
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
