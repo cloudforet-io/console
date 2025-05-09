@@ -6,6 +6,7 @@ import {
 import { onClickOutside, useFocus } from '@vueuse/core';
 import debounce from 'lodash/debounce';
 import reduce from 'lodash/reduce';
+import type { TranslateResult } from 'vue-i18n';
 
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';
 import type { ContextMenuType } from '@/controls/context-menu/type';
@@ -34,7 +35,7 @@ interface SelectDropdownProps {
     size?: SelectDropdownSize;
     disabled?: boolean;
     invalid?: boolean;
-    placeholder?: string;
+    placeholder?: string | TranslateResult;
     selectionLabel?: string;
     selectionHighlight?: boolean;
     showAlertDot?: boolean;
