@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import xor from 'lodash/xor';
+import { xor } from 'lodash';
 
 import {
     PSelectButton,

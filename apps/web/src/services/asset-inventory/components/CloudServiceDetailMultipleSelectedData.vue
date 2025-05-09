@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import find from 'lodash/find';
+import { find } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

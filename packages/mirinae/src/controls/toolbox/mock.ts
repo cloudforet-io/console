@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import { getQuerySearchTags } from '@/controls/search/query-search-tags/mock';
 

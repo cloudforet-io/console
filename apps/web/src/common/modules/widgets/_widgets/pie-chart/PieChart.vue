@@ -12,9 +12,9 @@ import type {
     EChartsType,
 } from 'echarts/core';
 import type { LegendOption, EChartsOption } from 'echarts/types/dist/shared';
-import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
-import throttle from 'lodash/throttle';
+import {
+    isEmpty, orderBy, throttle,
+} from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 

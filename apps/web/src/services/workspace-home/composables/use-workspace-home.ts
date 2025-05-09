@@ -1,4 +1,4 @@
-import mapKeys from 'lodash/mapKeys';
+import { mapKeys } from 'lodash';
 
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 import {

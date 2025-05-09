@@ -1,4 +1,4 @@
-import orderBy from 'lodash/orderBy';
+import { orderBy } from 'lodash';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 

@@ -1,7 +1,7 @@
 import type { Ref, UnwrapRef } from 'vue';
 import { watch } from 'vue';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import type { TaskField, TaskFieldType } from '@/api-clients/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';

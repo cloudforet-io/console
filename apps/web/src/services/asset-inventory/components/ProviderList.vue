@@ -33,7 +33,7 @@
 import { useElementSize } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import { PLazyImg, PButton } from '@cloudforet/mirinae';
 

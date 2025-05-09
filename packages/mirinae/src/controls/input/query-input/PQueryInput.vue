@@ -98,7 +98,7 @@ import {
 
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import PContextMenu from '@/controls/context-menu/PContextMenu.vue';

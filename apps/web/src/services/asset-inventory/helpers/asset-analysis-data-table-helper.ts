@@ -2,9 +2,7 @@
 // @ts-nocheck
 import type { OpUnitType } from 'dayjs';
 import dayjs from 'dayjs';
-import cloneDeep from 'lodash/cloneDeep';
-import find from 'lodash/find';
-import sortBy from 'lodash/sortBy';
+import { cloneDeep, find, sortBy } from 'lodash';
 
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 

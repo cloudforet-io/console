@@ -14,9 +14,7 @@ import {
 
 import type { EditorConfiguration } from 'codemirror';
 import CodeMirror from 'codemirror';
-import debounce from 'lodash/debounce';
-import forEach from 'lodash/forEach';
-import isEqual from 'lodash/isEqual';
+import { forEach, isEqual, debounce } from 'lodash';
 
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 

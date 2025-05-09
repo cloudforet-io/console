@@ -265,8 +265,7 @@ import {
     defineComponent,
 } from 'vue';
 
-import get from 'lodash/get';
-import range from 'lodash/range';
+import { get, range } from 'lodash';
 
 import {
     DATA_TABLE_CELL_TEXT_ALIGN,

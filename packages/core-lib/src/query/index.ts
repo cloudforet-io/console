@@ -8,8 +8,7 @@ import type {
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import flatten from 'lodash/flatten';
-import forEach from 'lodash/forEach';
+import { flatten, forEach } from 'lodash';
 
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,

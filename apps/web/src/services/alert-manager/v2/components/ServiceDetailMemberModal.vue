@@ -3,9 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, onMounted, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import map from 'lodash/map';
-import partition from 'lodash/partition';
-import reject from 'lodash/reject';
+import { partition, reject, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

@@ -4,10 +4,9 @@ import {
 } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import cloneDeep from 'lodash/cloneDeep';
-import intersection from 'lodash/intersection';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import {
+    cloneDeep, intersection, isEmpty, isEqual,
+} from 'lodash';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';

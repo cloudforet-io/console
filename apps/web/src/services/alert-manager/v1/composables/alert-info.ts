@@ -1,6 +1,6 @@
 import { reactive } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import { i18n } from '@/translations';

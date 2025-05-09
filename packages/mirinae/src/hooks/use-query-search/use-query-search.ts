@@ -3,10 +3,9 @@ import {
     computed, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
-import debounce from 'lodash/debounce';
-import find from 'lodash/find';
-import throttle from 'lodash/throttle';
+import {
+    cloneDeep, debounce, find, throttle,
+} from 'lodash';
 
 import {
     defaultHandlerMap, formatterMap,

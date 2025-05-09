@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import throttle from 'lodash/throttle';
+import { throttle } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 

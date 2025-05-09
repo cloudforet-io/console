@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
-import isEmpty from 'lodash/isEmpty';
+import { cloneDeep, isEmpty } from 'lodash';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';

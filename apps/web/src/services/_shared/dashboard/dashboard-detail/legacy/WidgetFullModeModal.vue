@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PButton, PBadge, PI,

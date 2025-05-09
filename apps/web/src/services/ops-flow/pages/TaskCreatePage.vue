@@ -27,7 +27,7 @@ import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router/composables'
 
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import {
     PHeadingLayout, PHeading, PButton, PPaneLayout, PSkeleton,

@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import find from 'lodash/find';
+import { find } from 'lodash';
 
 import { PTab, PBadge } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';

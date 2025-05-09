@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PSelectDropdown, PStatus } from '@cloudforet/mirinae';

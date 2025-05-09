@@ -1,4 +1,4 @@
-import every from 'lodash/every';
+import { every } from 'lodash';
 
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/_constants/widget-field-constant';

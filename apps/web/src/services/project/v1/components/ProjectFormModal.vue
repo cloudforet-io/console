@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

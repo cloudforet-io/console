@@ -4,8 +4,7 @@ import {
     computed, reactive, ref, toRef, watch,
 } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
-import debounce from 'lodash/debounce';
+import { cloneDeep, debounce } from 'lodash';
 
 import {
     PButton, PContextMenu, useContextMenuController,

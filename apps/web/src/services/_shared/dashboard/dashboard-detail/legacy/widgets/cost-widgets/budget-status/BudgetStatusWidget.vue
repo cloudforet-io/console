@@ -3,7 +3,7 @@ import {
     computed, defineProps, reactive,
 } from 'vue';
 
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

@@ -3,7 +3,7 @@ import {
     defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

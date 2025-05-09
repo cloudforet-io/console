@@ -4,7 +4,7 @@ import {
     computed, reactive, ref,
 } from 'vue';
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash';
 
 import { PIconButton } from '@cloudforet/mirinae';
 

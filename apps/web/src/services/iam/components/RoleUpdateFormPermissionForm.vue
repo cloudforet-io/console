@@ -3,8 +3,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import find from 'lodash/find';
-import isEqual from 'lodash/isEqual';
+import { find, isEqual } from 'lodash';
 
 import { PPaneLayout } from '@cloudforet/mirinae';
 

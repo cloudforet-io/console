@@ -4,7 +4,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 
-import find from 'lodash/find';
+import { find } from 'lodash';
 
 import {
     PTextInput, PTextHighlighting, PEmpty, PBadge, PContextMenu, PIconButton,

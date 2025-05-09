@@ -4,8 +4,7 @@ import {
 } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import cloneDeep from 'lodash/cloneDeep';
-import isEqual from 'lodash/isEqual';
+import { cloneDeep, isEqual } from 'lodash';
 
 import {
     PDivider, PSelectButton, PButton,

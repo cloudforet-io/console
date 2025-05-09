@@ -1,7 +1,7 @@
 import type { InternalAxiosRequestConfig, CreateAxiosDefaults, Axios } from 'axios';
 import axios from 'axios';
 import type { CustomAxiosRequestConfig } from 'axios-auth-refresh/dist/utils';
-import camelCase from 'lodash/camelCase';
+import { camelCase } from 'lodash';
 
 import type {
     APIInfo, MockConfig, AxiosPostResponse, AuthConfig, DevConfig,

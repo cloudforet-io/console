@@ -4,7 +4,7 @@ import {
     computed,
 } from 'vue';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PButton, PRadioGroup, PRadio,

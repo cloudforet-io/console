@@ -6,7 +6,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import sumBy from 'lodash/sumBy';
+import { sumBy } from 'lodash';
 
 import {
     PButton,

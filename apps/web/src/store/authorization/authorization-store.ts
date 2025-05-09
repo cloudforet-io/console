@@ -2,7 +2,7 @@ import { computed, reactive } from 'vue';
 
 import type { AxiosRequestConfig } from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

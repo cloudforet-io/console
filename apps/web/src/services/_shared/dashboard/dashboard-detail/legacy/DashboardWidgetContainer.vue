@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash';
 
 import { PDataLoader } from '@cloudforet/mirinae';
 

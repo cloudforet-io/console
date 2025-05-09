@@ -3,8 +3,7 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import pull from 'lodash/pull';
-import remove from 'lodash/remove';
+import { pull, remove } from 'lodash';
 
 export interface SelectionPredicate {
     (value: any, current: any): boolean;

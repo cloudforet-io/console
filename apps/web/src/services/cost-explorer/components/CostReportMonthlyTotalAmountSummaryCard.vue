@@ -9,11 +9,9 @@ import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import debounce from 'lodash/debounce';
-import isEmpty from 'lodash/isEmpty';
-import sum from 'lodash/sum';
-import sumBy from 'lodash/sumBy';
-import throttle from 'lodash/throttle';
+import {
+    debounce, isEmpty, sum, sumBy, throttle,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

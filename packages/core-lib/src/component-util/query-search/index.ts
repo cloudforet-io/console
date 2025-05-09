@@ -5,12 +5,9 @@ import type {
     ValueItem,
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { SearchEnums, SearchEnumItem } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import cloneDeep from 'lodash/cloneDeep';
-import flatMap from 'lodash/flatMap';
-import flatten from 'lodash/flatten';
-import map from 'lodash/map';
-import size from 'lodash/size';
-import uniq from 'lodash/uniq';
+import {
+    map, size, flatMap, flatten, uniq, cloneDeep,
+} from 'lodash';
 
 import { SpaceConnector } from '@/space-connector';
 import type { ApiFilter } from '@/space-connector/type';

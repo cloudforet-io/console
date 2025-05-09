@@ -6,8 +6,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
-import cloneDeep from 'lodash/cloneDeep';
-import range from 'lodash/range';
+import { cloneDeep, range } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';

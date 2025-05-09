@@ -7,8 +7,9 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import cloneDeep from 'lodash/cloneDeep';
-import debounce from 'lodash/debounce';
+import {
+    cloneDeep, debounce,
+} from 'lodash';
 
 import { PButton, PContextMenu, useContextMenuController } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';

@@ -3,7 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import {
     PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton, screens,

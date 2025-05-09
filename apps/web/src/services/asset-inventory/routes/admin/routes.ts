@@ -1,6 +1,6 @@
 import type { RouteConfig } from 'vue-router';
 
-import upperCase from 'lodash/upperCase';
+import { upperCase } from 'lodash';
 
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';

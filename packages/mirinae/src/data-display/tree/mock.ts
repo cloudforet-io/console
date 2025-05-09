@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { faker } from '@faker-js/faker';
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 export const getTreeData = () => {
     const res = {

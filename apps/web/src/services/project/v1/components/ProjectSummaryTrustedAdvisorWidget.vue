@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import findKey from 'lodash/findKey';
+import { findKey } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

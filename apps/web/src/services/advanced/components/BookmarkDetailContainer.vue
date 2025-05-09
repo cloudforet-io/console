@@ -6,7 +6,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import at from 'lodash/at';
+import { at } from 'lodash';
 
 import {
     PHeading, PButton, PContextMenu, PI, PIconButton, PStatus, PHeadingLayout,

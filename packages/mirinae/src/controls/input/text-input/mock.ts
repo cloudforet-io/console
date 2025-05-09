@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import type { MenuItem } from '@/controls/context-menu/type';
 

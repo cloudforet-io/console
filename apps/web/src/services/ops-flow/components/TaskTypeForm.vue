@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, watch, computed } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     POverlayLayout, PFieldGroup, PTextInput, PButton, PTextarea, PRadioGroup, PRadio,

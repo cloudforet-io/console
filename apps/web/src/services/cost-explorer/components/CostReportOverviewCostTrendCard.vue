@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

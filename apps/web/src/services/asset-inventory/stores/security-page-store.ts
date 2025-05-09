@@ -1,9 +1,8 @@
 import { computed, reactive } from 'vue';
 
-import find from 'lodash/find';
-import flatMap from 'lodash/flatMap';
-import groupBy from 'lodash/groupBy';
-import uniqBy from 'lodash/uniqBy';
+import {
+    find, flatMap, groupBy, uniqBy,
+} from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

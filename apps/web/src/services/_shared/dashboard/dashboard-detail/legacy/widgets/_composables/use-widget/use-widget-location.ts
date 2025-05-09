@@ -2,7 +2,7 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, isRef, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import flattenDeep from 'lodash/flattenDeep';
+import { flattenDeep } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 

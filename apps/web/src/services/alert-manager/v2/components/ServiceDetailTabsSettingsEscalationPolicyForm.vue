@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PBadge, PIconButton, PI, PTextInput, PFieldGroup, PTextButton,

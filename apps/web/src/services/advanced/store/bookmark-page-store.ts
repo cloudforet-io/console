@@ -1,10 +1,8 @@
 import { computed, reactive } from 'vue';
 
-import at from 'lodash/at';
-import filter from 'lodash/filter';
-import forEach from 'lodash/forEach';
-import indexOf from 'lodash/indexOf';
-import sortBy from 'lodash/sortBy';
+import {
+    at, filter, forEach, indexOf, sortBy,
+} from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

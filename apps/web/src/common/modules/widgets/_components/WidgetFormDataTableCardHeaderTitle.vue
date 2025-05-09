@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PIconButton, PI, PTextInput, PTooltip,

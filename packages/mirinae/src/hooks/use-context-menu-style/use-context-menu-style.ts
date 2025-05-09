@@ -7,7 +7,7 @@ import type Vue from 'vue';
 import {
     computePosition, autoUpdate, offset, flip, size, hide, shift,
 } from '@floating-ui/dom';
-import throttle from 'lodash/throttle';
+import { throttle } from 'lodash';
 
 // HACK: This is the type definition of the context menu. Only defined exposed methods. This is to prevent type error due to vue2-vue3 incompatibility.
 export interface ISimpleContextMenu {

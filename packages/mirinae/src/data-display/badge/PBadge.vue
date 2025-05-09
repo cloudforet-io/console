@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import get from 'lodash/get';
+import { get } from 'lodash';
 
 import type {
     BadgeFontWeight,

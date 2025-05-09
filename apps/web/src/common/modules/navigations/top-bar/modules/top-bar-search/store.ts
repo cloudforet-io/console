@@ -1,6 +1,6 @@
 import { computed, reactive, watch } from 'vue';
 
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

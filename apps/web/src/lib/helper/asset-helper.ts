@@ -1,5 +1,4 @@
-import isEmpty from 'lodash/isEmpty';
-import some from 'lodash/some';
+import { isEmpty, some } from 'lodash';
 
 import config from '@/lib/config';
 

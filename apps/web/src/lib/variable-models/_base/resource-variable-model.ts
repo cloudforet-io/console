@@ -1,5 +1,6 @@
-import camelCase from 'lodash/camelCase';
-import get from 'lodash/get';
+import {
+    camelCase, get,
+} from 'lodash';
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

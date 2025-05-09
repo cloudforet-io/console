@@ -5,9 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import isEmpty from 'lodash/isEmpty';
-import startCase from 'lodash/startCase';
-import toLower from 'lodash/toLower';
+import { isEmpty, startCase, toLower } from 'lodash';
 
 import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,

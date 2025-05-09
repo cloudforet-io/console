@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
-import map from 'lodash/map';
+import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

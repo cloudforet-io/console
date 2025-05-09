@@ -3,8 +3,7 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import flattenDeep from 'lodash/flattenDeep';
-import union from 'lodash/union';
+import { flattenDeep, union } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { DashboardLayoutWidgetInfo } from '@/api-clients/dashboard/_types/dashboard-type';

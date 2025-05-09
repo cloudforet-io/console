@@ -5,10 +5,9 @@ import {
 import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import cloneDeep from 'lodash/cloneDeep';
-import find from 'lodash/find';
-import lowerCase from 'lodash/lowerCase';
-import sortBy from 'lodash/sortBy';
+import {
+    cloneDeep, find, lowerCase, sortBy,
+} from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';

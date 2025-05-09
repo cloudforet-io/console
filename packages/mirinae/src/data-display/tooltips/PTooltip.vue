@@ -13,7 +13,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import merge from 'lodash/merge';
+import { merge } from 'lodash';
 import { VTooltip } from 'v-tooltip';
 import type { TranslateResult } from 'vue-i18n';
 

@@ -3,7 +3,7 @@ import {
     reactive, computed, ref,
 } from 'vue';
 
-import includes from 'lodash/includes';
+import { includes } from 'lodash';
 
 import { ROOT_ROUTE } from '@/router/constant';
 

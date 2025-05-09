@@ -6,7 +6,7 @@ import {
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import type Ajv from 'ajv';
 import type { Localize } from 'ajv-i18n/localize/types';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import type { JsonSchemaFormProps, InnerJsonSchema, CustomErrorMap } from '@/controls/forms/json-schema-form/type';
 

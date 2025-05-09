@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive, watch } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

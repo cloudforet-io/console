@@ -1,7 +1,7 @@
 import { reactive, toRefs } from 'vue';
 
 import type { Meta, StoryObj } from '@storybook/vue';
-import range from 'lodash/range';
+import { range } from 'lodash';
 import type { ComponentProps } from 'vue-component-type-helpers';
 
 import { getSelectCardParameters, getSelectCardArgs, getSelectCardArgTypes } from '@/controls/select-card/story-helper';

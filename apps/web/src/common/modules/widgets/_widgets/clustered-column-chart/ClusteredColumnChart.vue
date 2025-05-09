@@ -10,9 +10,9 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import isEmpty from 'lodash/isEmpty';
-import sortBy from 'lodash/sortBy';
-import throttle from 'lodash/throttle';
+import {
+    isEmpty, sortBy, throttle,
+} from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 

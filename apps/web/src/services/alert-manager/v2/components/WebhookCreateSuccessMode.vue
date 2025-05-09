@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import {
     PDefinitionTable, PButton, PStatus, PMarkdown, PLazyImg, PLink,

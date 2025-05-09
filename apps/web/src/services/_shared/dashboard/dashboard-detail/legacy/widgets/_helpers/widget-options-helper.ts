@@ -1,5 +1,4 @@
-import isEqual from 'lodash/isEqual';
-import merge from 'lodash/merge';
+import { isEqual, merge } from 'lodash';
 
 import type { DashboardVariables } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {

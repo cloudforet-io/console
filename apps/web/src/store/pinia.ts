@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 import { createPinia } from 'pinia';
 
 const resetStore = ({ store }) => {

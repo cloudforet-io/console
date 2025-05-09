@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { SBType } from '@storybook/types';
 import type { ArgTypes, Parameters, Args } from '@storybook/vue';
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import {
     COLLAPSIBLE_LIST_THEME,

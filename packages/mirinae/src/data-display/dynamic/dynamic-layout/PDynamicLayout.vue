@@ -26,7 +26,7 @@ import {
 import type { ImportedComponent } from 'vue/types/options';
 import type { PropType } from 'vue/types/v3-component-props';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import type { DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { dynamicLayoutTypes } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';

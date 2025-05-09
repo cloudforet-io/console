@@ -4,7 +4,7 @@
 <script lang="ts">
 import type { Vue } from 'vue/types/vue';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
