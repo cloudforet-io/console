@@ -278,6 +278,17 @@
 			"LABEL_SERVICE_NAME": "サービス名",
 			"MEMBER": "構成員",
 			"MEMBERS": "構成員",
+			"MODAL": {
+				"DELETE_MEMBER_DESC": "[{name}]メンバーを削除する前に、接続されている各「通知」の接続を解除する必要があります。",
+				"DELETE_MEMBER_DESC_BOLD": "Please remove all [{name}] Members from the 'Notification' and try again.\" → \"「通知」から[{name}]メンバーをすべて削除してから、もう一度お試しください。",
+				"DELETE_MEMBER_TITLE": "サービスメンバー削除",
+				"DELETE_NOTIFICATION_DESC": "[{name}]通知を削除する前に、接続されている各「エスカレーションポリシー」の接続を解除する必要があります。",
+				"DELETE_NOTIFICATION_DESC_BOLD": "「エスカレーションポリシー」から[{name}]通知をすべて削除してから、もう一度お試しください。",
+				"DELETE_NOTIFICATION_TITLE": "通知チャネル削除",
+				"ESCALATION_LINK_TEXT": "エスカレーションポリシーへ移動",
+				"NOTIFICATION_LINK_TEXT": "接続された通知へ移動",
+				"REMOVE": "削除"
+			},
 			"MODAL_DELETE_DESC": "サービスの接続されたウェブフックとアラートを確認してください。",
 			"MODAL_DELETE_NO_DATA": "このサービスを削除してもよろしいですか？",
 			"MODAL_DELETE_TITLE": "このサービスを削除してもよろしいですか？",
@@ -311,6 +322,7 @@
 		"SET_UP": "設定",
 		"SHOW_MORE": "もっと見る",
 		"STATUS": "ステータス",
+		"TIMEZONE": "タイムゾーン",
 		"UPDATE": "編集",
 		"WEBHOOK": {
 			"ALT_S_CREATE_WEBHOOK": "ウェプフク追加に成功",
@@ -1566,6 +1578,7 @@
 			"MON": "月",
 			"SAT": "土",
 			"SCHEDULE_SETTING": "スケジュール設定",
+			"SET_TIMEZONE": "タイムゾーン設定",
 			"SUN": "日",
 			"THU": "木",
 			"TO": "から",
@@ -3397,8 +3410,10 @@
 					"UPDATE_TITLE": "ユーザーグループの編集"
 				},
 				"DELETE": {
+					"SCOPED_NOTIFICATION_DESC": "[{name}]ユーザーグループを削除する前に、接続されている各「サービス」の接続を解除する必要があります。",
+					"SCOPED_NOTIFICATION_DESC_BOLD": "각 '서비스' 페이지에서 [{name}] 사용자 그룹을 모두 제거한 후 다시 시도해주세요.",
 					"SHOW_SUCCESS_MESSAGE": "ユーザーグループの削除が完了しました",
-					"TITLE": "ユーザーグループを削除してもよろしいですか？"
+					"TITLE": "ユーザーグループ削除"
 				},
 				"DELETE_CHANNEL": {
 					"DELETE": "削除",

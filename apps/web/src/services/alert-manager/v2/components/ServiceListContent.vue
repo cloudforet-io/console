@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PSelectCard, PI, PLazyImg, PDivider, PTextButton,
@@ -36,7 +36,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 
-
+const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
@@ -72,6 +72,7 @@ const handleClickServiceItem = (id: string) => {
         },
         query: {
             tab: SERVICE_DETAIL_TABS.OVERVIEW,
+            filterService: route.query.serviceName,
         },
     }).catch(() => {});
 };

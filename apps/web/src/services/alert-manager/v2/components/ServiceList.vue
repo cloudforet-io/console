@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, reactive, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import {
+    useRoute, useRouter,
+} from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -167,6 +169,17 @@ onMounted(async () => {
     await fetchBothLists();
 });
 
+watch(() => route.query.serviceName, async (serviceName) => {
+    if (!serviceName) return;
+    queryTagHelper.setQueryTags([
+        {
+            key: { name: 'name', label: 'Name' },
+            operator: '=',
+            value: { label: serviceName as string, name: serviceName },
+        },
+    ]);
+    await fetchBothLists();
+}, { immediate: true });
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
     replaceUrlQuery({
         unhealthyPage: String(val),

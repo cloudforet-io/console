@@ -4,13 +4,10 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader, PI,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
 
@@ -29,6 +26,7 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
+const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
@@ -36,13 +34,13 @@ const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
     notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
+    serviceChannelList: computed<ServiceChannelModel[]>(() => serviceDetailPageState.serviceChannelList.slice(0, 15)),
 });
 const state = reactive({
     loading: true,
     pageStart: 0,
-    items: [] as ServiceChannelModel[],
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
-    pageMax: computed<number>(() => Math.max(state.items.length - state.visibleCount, 0)),
+    pageMax: computed<number>(() => Math.max(storeState.serviceChannelList.length - state.visibleCount, 0)),
 });
 
 const handleClickArrowButton = (increment: number) => {
@@ -68,19 +66,12 @@ const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS)
 );
 
-const fetchServiceChannelList = async () => {
+const fetchServiceChannelList = async (serviceId: string) => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
-            service_id: storeState.serviceId,
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        });
-        state.items = (results || []).slice(0, 15);
+        await serviceDetailPageStore.fetchServiceChannelList(serviceId);
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.items = [];
     } finally {
         state.loading = false;
     }
@@ -88,7 +79,7 @@ const fetchServiceChannelList = async () => {
 
 watch(() => storeState.serviceId, (serviceId) => {
     if (!serviceId) return;
-    fetchServiceChannelList();
+    fetchServiceChannelList(serviceId);
 }, { immediate: true });
 </script>
 
@@ -100,9 +91,9 @@ watch(() => storeState.serviceId, (serviceId) => {
                        font-weight="regular"
         />
         <p-data-loader :loading="state.loading"
-                       :data="state.items"
+                       :data="storeState.serviceChannelList"
                        class="content flex-1 pt-2"
-                       :class="{ 'empty': !state.items.length }"
+                       :class="{ 'empty': !storeState.serviceChannelList.length }"
         >
             <div ref="rowItemsWrapperRef"
                  class="row-items-wrapper"
@@ -110,7 +101,7 @@ watch(() => storeState.serviceId, (serviceId) => {
                 <div ref="itemEl"
                      class="row-items-container"
                 >
-                    <div v-for="(item, idx) in state.items"
+                    <div v-for="(item, idx) in storeState.serviceChannelList"
                          :key="`service-detail-notification-item-${idx}`"
                          class="item"
                     >

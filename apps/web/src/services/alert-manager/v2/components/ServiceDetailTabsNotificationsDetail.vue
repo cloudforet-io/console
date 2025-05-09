@@ -37,6 +37,7 @@ type ScheduleInfo = {
     value: TranslateResult;
     days: string;
     time: string;
+    timezone: string;
 };
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -111,14 +112,18 @@ const getUserGroupName = (userGroup: string[] = []): string => userGroup.map((gr
 }).join(', ');
 const getScheduleInfo = (schedule: ServiceChannelScheduleInfoType): ScheduleInfo => {
     const scheduleInfo = {
-        styleType: '', value: '' as TranslateResult, days: [] as TranslateResult[], time: '',
+        styleType: '', value: '' as TranslateResult, days: [] as TranslateResult[], time: '', timezone: '',
     };
 
     const formatTime = (time: number | undefined, defaultTime: number): string => `${String(time ?? defaultTime).padStart(2, '0')}:00`;
 
     Object.entries(schedule).forEach(([day, s]) => {
-        if (day === 'SCHEDULE_TYPE' || day === 'TIMEZONE') return;
+        if (day === 'SCHEDULE_TYPE') return;
 
+        if (day === 'TIMEZONE') {
+            scheduleInfo.timezone = s as string;
+            return;
+        }
         const scheduleDay = s as ServiceChannelScheduleDayType;
         if (!scheduleDay) return;
 
@@ -223,17 +228,21 @@ watch(() => storeState.selectedNotificationId, async (selectedId) => {
                     </span>
                 </template>
                 <template #data-schedule="{value}">
-                    <div class="inline-flex items-center gap-2">
-                        <p-badge class="selected-item-badge"
-                                 badge-type="solid-outline"
-                                 :style-type="getScheduleInfo(value).styleType"
-                        >
-                            {{ getScheduleInfo(value).value }}
-                        </p-badge>
-                        <div class="flex flex-col">
-                            <p>{{ $t('ALERT_MANAGER.NOTIFICATIONS.DAY') }} - {{ getScheduleInfo(value).days }}</p>
-                            <p>{{ $t('ALERT_MANAGER.NOTIFICATIONS.TIME') }} - {{ getScheduleInfo(value).time }}</p>
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <p>{{ $t('ALERT_MANAGER.NOTIFICATIONS.DAY') }}:</p>
+                            <p-badge class="selected-item-badge"
+                                     badge-type="solid-outline"
+                                     :style-type="getScheduleInfo(value).styleType"
+                            >
+                                {{ getScheduleInfo(value).value }}
+                            </p-badge>
+                            <p>{{ getScheduleInfo(value).days }}</p>
                         </div>
+                        <p>{{ $t('ALERT_MANAGER.NOTIFICATIONS.TIME') }}: {{ getScheduleInfo(value).time }}</p>
+                        <p class="text-gray-500">
+                            {{ $t('ALERT_MANAGER.TIMEZONE') }}: {{ getScheduleInfo(value).timezone }}
+                        </p>
                     </div>
                 </template>
             </p-definition-table>

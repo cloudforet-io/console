@@ -23,14 +23,12 @@ import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
 import {
-    SERVICE_CHANNEL_FORWARD_TYPE,
     SERVICE_CHANNEL_STATE,
     SERVICE_CHANNEL_TYPE,
 } from '@/schema/alert-manager/service-channel/constants';
 import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceChannelDataType } from '@/schema/alert-manager/service-channel/type';
 import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import { i18n, i18n as _i18n } from '@/translations';
+import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -46,7 +44,7 @@ import ServiceDetailTabsNotificationsTableModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsNotificationsTableModal.vue';
 import ServiceDetailTabsNotificationsUpdateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsNotificationsUpdateModal.vue';
-import { alertManagerStateFormatter } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -56,7 +54,7 @@ import {
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolInfo, NotificationsModalType, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { NotificationsModalType, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     tableHeight: number;
@@ -80,26 +78,26 @@ const tableState = reactive({
         {
             type: 'item',
             name: 'ENABLE',
-            label: _i18n.t('ALERT_MANAGER.ENABLE'),
+            label: i18n.t('ALERT_MANAGER.ENABLE'),
             disabled: !state.selectedItem || state.selectedItem?.state === SERVICE_CHANNEL_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'DISABLE',
-            label: _i18n.t('ALERT_MANAGER.DISABLED'),
+            label: i18n.t('ALERT_MANAGER.DISABLED'),
             disabled: !state.selectedItem || state.selectedItem?.state === SERVICE_CHANNEL_STATE.DISABLED,
         },
         { type: 'divider' },
         {
             type: 'item',
             name: 'UPDATE',
-            label: _i18n.t('ALERT_MANAGER.UPDATE'),
+            label: i18n.t('ALERT_MANAGER.UPDATE'),
             disabled: !state.selectedItem,
         },
         {
             type: 'item',
             name: 'DELETE',
-            label: _i18n.t('ALERT_MANAGER.DELETE'),
+            label: i18n.t('ALERT_MANAGER.DELETE'),
             disabled: !state.selectedItem,
         },
     ])),
@@ -140,25 +138,6 @@ const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at
 const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
-const getProtocolInfo = (id: string, data?: ServiceChannelDataType): ProtocolInfo => {
-    if (id === 'forward') {
-        if (data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
-        }
-        if (data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
-        }
-        if (data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
-        }
-        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
-    }
-    const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    return {
-        name: protocol?.name || '',
-        icon: protocol?.icon || '',
-    };
-};
 const handleCloseModal = () => {
     state.selectIndex = undefined;
     fetchNotificationList();
@@ -298,11 +277,11 @@ onUnmounted(() => {
                          height="1rem"
                     />
                     <p-lazy-img v-else
-                                :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                                :src="assetUrlConverter(getProtocolInfo(value, storeState.notificationProtocolList).icon || '')"
                                 width="1rem"
                                 height="1rem"
                     />
-                    <span>{{ getProtocolInfo(value, item.data).name }}</span>
+                    <span>{{ getProtocolInfo(value, storeState.notificationProtocolList, item.data).name }}</span>
                 </div>
             </template>
         </p-toolbox-table>
