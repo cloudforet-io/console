@@ -2105,6 +2105,26 @@
 		}
 	},
 	"COST_EXPLORER": {
+		"ADVANCED_SETTINGS": {
+			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "コストレポート設定の修正に失敗しました",
+			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "コストレポート設定の更新が完了しました",
+			"AUTO_APPLY_ADJUSTMENTS": "調整自動反映",
+			"CONFIRM_DATE_EXCEEDS_MONTH_END": "確定日はその月の最終日を超えることはできません。",
+			"COST_REPORT_CONFIGURATION": "コストレポート設定",
+			"CURRENCY_CONVERTER": "為替レート設定",
+			"DAYS_AFTER_REPORT": "日 (レポート発行日後)",
+			"GREATER_THAN_OR_EQUAL_TO_1": "1以上で設定してください",
+			"ISSUE_DATE": "発行日",
+			"LANGUAGE": "言語",
+			"LAST_DAY_OF_MONTH": "月末",
+			"LESS_THAN_OR_EQUAL_TO_31": "31以内で設定してください",
+			"MANUAL_ADJUSTABLE_PERIOD": "手動調整期間",
+			"MANUAL_ADJUSTABLE_PERIOD_HELP_TEXT": "レポート発行日から手動調整が許可される日数を入力してください。",
+			"REPORT_CONFIGURATION_DATE": "レポート確定日",
+			"REQUIRED_FIELD": "必須入力項目です。",
+			"SET_ADJUSTMENTS": "調整を設定",
+			"UPCOMING_REPORT_DATE": "今後のレポート発行日"
+		},
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
 				"AMOUNT": "アカウント",
