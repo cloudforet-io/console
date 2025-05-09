@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { toRef } from 'vue';
 
+import type { TranslateResult } from 'vue-i18n';
+
 import {
     useSelectDropdownButtonDisplay,
 } from '@/controls/dropdown/select-dropdown/composables/select-dropdown-button-display';
@@ -23,7 +25,7 @@ interface Props {
     buttonIcon?: string;
     invalid?: boolean;
     disabled?: boolean;
-    placeholder?: string;
+    placeholder?: string | TranslateResult;
     selectionLabel?: string;
     showAlertDot?: boolean;
     showDeleteAllButton?: boolean;
