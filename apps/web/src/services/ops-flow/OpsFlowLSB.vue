@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import clone from 'lodash/clone';
+import { clone } from 'lodash';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';

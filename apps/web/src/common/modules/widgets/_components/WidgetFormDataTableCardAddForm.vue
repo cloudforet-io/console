@@ -4,8 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import cloneDeep from 'lodash/cloneDeep';
-import range from 'lodash/range';
+import { cloneDeep, range } from 'lodash';
 
 import {
     makeDistinctValueHandler,

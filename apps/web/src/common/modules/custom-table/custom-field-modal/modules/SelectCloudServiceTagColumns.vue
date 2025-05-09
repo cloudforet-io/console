@@ -17,7 +17,7 @@ import {
     ref, watch,
 } from 'vue';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

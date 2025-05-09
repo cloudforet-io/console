@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PDataTable, PI, PToggleButton, PButtonModal, PTextInput, PFieldGroup, PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,

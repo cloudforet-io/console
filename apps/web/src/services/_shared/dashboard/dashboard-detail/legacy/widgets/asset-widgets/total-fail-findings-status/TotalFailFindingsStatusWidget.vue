@@ -3,7 +3,7 @@ import {
     computed, defineProps, reactive, toRef,
 } from 'vue';
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';

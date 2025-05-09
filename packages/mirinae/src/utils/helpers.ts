@@ -1,7 +1,6 @@
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import sortBy from 'lodash/sortBy';
-import toString from 'lodash/toString';
+import {
+    isEmpty, get, toString, sortBy,
+} from 'lodash';
 
 import colors from '@/styles/colors.cjs';
 

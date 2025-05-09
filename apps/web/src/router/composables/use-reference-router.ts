@@ -1,7 +1,7 @@
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
-import concat from 'lodash/concat';
+import { concat } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 

@@ -105,7 +105,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';

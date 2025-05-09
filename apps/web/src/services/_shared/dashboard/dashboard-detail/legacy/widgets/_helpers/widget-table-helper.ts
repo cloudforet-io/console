@@ -1,7 +1,6 @@
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
-import cloneDeep from 'lodash/cloneDeep';
-import sortBy from 'lodash/sortBy';
+import { cloneDeep, sortBy } from 'lodash';
 
 import { GRANULARITY } from '@/api-clients/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';

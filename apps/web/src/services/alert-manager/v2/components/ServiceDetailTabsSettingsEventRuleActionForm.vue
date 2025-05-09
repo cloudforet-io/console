@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
-import isUndefined from 'lodash/isUndefined';
-import omitBy from 'lodash/omitBy';
+import { isUndefined, omitBy } from 'lodash';
 
 import type { EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
 

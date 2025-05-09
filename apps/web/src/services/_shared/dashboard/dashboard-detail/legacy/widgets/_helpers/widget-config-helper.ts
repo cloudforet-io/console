@@ -1,4 +1,4 @@
-import mergeWith from 'lodash/mergeWith';
+import { mergeWith } from 'lodash';
 
 import type { WidgetConfig, BaseConfigInfo } from '@/api-clients/dashboard/_types/widget-type';
 

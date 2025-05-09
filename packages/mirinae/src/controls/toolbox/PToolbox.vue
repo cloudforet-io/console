@@ -106,7 +106,7 @@ import {
     computed, defineComponent, nextTick, reactive, toRefs,
 } from 'vue';
 
-import groupBy from 'lodash/groupBy';
+import { groupBy } from 'lodash';
 
 import PIconButton from '@/controls/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/controls/dropdown/select-dropdown/PSelectDropdown.vue';

@@ -1,4 +1,4 @@
-import flatten from 'lodash/flatten';
+import { flatten } from 'lodash';
 
 const getObjectValue = (target: Record<string, any>|Array<any>, currentPath: string) => {
     if (Array.isArray(target)) {

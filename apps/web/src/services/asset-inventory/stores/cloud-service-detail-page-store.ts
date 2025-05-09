@@ -1,5 +1,4 @@
-import find from 'lodash/find';
-import uniqBy from 'lodash/uniqBy';
+import { find, uniqBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

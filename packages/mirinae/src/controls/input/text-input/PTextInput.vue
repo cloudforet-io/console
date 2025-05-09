@@ -128,7 +128,7 @@ import {
 
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import unionBy from 'lodash/unionBy';
+import { unionBy } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';
 
 import PButton from '@/controls/buttons/button/PButton.vue';

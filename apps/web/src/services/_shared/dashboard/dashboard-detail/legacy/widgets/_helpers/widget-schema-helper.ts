@@ -1,6 +1,4 @@
-import chain from 'lodash/chain';
-import get from 'lodash/get';
-import union from 'lodash/union';
+import { chain, get, union } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';
 import type {

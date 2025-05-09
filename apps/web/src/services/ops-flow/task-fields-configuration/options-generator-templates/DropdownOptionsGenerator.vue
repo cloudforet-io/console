@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import {
     PFieldTitle, PButton, PIconButton, PI,

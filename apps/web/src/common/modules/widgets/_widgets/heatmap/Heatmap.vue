@@ -8,9 +8,7 @@ import dayjs from 'dayjs';
 import type { HeatmapSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import isEmpty from 'lodash/isEmpty';
-import max from 'lodash/max';
-import throttle from 'lodash/throttle';
+import { isEmpty, max, throttle } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 

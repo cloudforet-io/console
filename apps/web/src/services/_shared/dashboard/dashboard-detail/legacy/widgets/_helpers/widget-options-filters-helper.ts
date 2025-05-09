@@ -1,7 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import cloneDeep from 'lodash/cloneDeep';
-import union from 'lodash/union';
+import { cloneDeep, union } from 'lodash';
 
 import type { WidgetFiltersMap, WidgetFilterKey } from '@/api-clients/dashboard/_types/widget-type';
 

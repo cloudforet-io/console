@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import find from 'lodash/find';
+import { find } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
 import { QueryHelper } from '@cloudforet/core-lib/query';

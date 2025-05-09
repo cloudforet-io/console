@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
-import map from 'lodash/map';
+import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

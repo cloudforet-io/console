@@ -164,7 +164,7 @@ import {
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import PToggleButton from '@/controls/buttons/toggle-button/PToggleButton.vue';
 import PCodeEditor from '@/controls/code-editor/PCodeEditor.vue';

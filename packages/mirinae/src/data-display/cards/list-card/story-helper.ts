@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { SBType } from '@storybook/types';
 import type { ArgTypes, Parameters, Args } from '@storybook/vue';
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 import { getCardArgTypes } from '@/data-display/cards/card/story-helper';

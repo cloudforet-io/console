@@ -4,7 +4,7 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import {
     PBadge, PLazyImg, PDefinitionTable, PHeading, PHorizontalLayout, PMarkdown, PStatus, PTab,

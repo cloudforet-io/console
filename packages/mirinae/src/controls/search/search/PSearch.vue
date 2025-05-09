@@ -67,7 +67,7 @@ import {
 
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash';
 
 import type { MenuItem } from '@/controls/context-menu/type';
 import type { SelectDropdownMenuItem } from '@/controls/dropdown/select-dropdown/type';

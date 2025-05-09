@@ -5,7 +5,7 @@ import {
     defineProps, reactive, ref, watch,
 } from 'vue';
 
-import throttle from 'lodash/throttle';
+import { throttle } from 'lodash';
 
 import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,

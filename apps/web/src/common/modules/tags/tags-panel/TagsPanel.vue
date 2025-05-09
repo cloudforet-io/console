@@ -4,8 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import camelCase from 'lodash/camelCase';
-import get from 'lodash/get';
+import { get, camelCase } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

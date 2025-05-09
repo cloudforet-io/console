@@ -1,7 +1,6 @@
 import { reactive } from 'vue';
 
-import constant from 'lodash/constant';
-import mapValues from 'lodash/mapValues';
+import { constant, mapValues } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';

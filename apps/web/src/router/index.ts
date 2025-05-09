@@ -2,7 +2,7 @@ import Vue from 'vue';
 import type { NavigationGuardNext, Route, RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
-import clone from 'lodash/clone';
+import { clone } from 'lodash';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

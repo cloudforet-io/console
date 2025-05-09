@@ -144,7 +144,7 @@ import {
 import type { Location } from 'vue-router';
 
 import dayjs from 'dayjs';
-import range from 'lodash/range';
+import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

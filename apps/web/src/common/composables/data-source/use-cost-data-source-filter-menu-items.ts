@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive, watch } from 'vue';
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 

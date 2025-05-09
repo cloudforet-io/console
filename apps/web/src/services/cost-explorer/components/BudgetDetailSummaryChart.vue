@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import throttle from 'lodash/throttle';
+import { throttle } from 'lodash';
 
 import { PDataLoader, PSkeleton } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';

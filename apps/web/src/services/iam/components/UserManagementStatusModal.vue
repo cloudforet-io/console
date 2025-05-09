@@ -3,8 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
-import map from 'lodash/map';
+import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

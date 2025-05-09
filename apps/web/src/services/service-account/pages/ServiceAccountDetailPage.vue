@@ -5,7 +5,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { render } from 'ejs';
-import clone from 'lodash/clone';
+import { clone } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

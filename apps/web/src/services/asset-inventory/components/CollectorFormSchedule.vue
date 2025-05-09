@@ -48,8 +48,7 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import range from 'lodash/range';
-import size from 'lodash/size';
+import { range, size } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {

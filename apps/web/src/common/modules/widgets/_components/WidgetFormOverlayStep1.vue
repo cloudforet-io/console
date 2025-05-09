@@ -3,7 +3,7 @@ import {
     computed, onMounted, onUnmounted, reactive, ref,
 } from 'vue';
 
-import orderBy from 'lodash/orderBy';
+import { orderBy } from 'lodash';
 
 import {
     PI, PTooltip, PButton,

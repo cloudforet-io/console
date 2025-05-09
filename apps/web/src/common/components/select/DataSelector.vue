@@ -3,7 +3,7 @@ import {
     ref, toRef, watch,
 } from 'vue';
 
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash';
 
 import { PFieldTitle, PContextMenu, useContextMenuItems } from '@cloudforet/mirinae';
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';

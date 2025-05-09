@@ -5,8 +5,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
-import isEqual from 'lodash/isEqual';
-import range from 'lodash/range';
+import { isEqual, range } from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';

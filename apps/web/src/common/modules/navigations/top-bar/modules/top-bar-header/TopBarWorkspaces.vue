@@ -5,7 +5,7 @@ import {
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash';
 
 import {
     PSelectDropdown, PTooltip, PI, PButton, PTextHighlighting, PEmpty,

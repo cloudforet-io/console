@@ -16,7 +16,7 @@
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 
-import get from 'lodash/get';
+import { get } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';
 
 import type { StateTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/state/type';

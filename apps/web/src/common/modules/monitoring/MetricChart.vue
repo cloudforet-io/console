@@ -10,8 +10,7 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import isEmpty from 'lodash/isEmpty';
-import throttle from 'lodash/throttle';
+import { isEmpty, throttle } from 'lodash';
 
 import {
     PDataLoader, PSkeleton, PSpinner, PTooltip,

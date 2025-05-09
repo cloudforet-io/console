@@ -2,8 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import isEqual from 'lodash/isEqual';
-import xor from 'lodash/xor';
+import { isEqual, xor } from 'lodash';
 
 import { PI, PTextButton, PDivider } from '@cloudforet/mirinae';
 

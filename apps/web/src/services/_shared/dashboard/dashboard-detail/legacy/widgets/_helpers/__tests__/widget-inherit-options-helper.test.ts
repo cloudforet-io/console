@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 import { describe, expect, it } from 'vitest';
 
 import type { DashboardVariablesSchema } from '@/api-clients/dashboard/_types/dashboard-type';

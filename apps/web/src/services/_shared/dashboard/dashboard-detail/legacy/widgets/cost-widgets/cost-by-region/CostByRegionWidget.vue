@@ -4,8 +4,9 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import isEqual from 'lodash/isEqual';
-import uniqWith from 'lodash/uniqWith';
+import {
+    isEqual, uniqWith,
+} from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

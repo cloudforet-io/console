@@ -1,8 +1,7 @@
 import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
-import cloneDeep from 'lodash/cloneDeep';
-import isEmpty from 'lodash/isEmpty';
+import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';

@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 

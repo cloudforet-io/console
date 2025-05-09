@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import type { EChartsType } from 'echarts/core';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

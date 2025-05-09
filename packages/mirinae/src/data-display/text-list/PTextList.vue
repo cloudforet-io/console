@@ -31,7 +31,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import get from 'lodash/get';
+import { get } from 'lodash';
 
 import type { TextListItem } from '@/data-display/text-list/type';
 import PLink from '@/navigation/link/PLink.vue';

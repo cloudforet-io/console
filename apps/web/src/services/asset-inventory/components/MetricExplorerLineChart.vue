@@ -8,10 +8,9 @@ import dayjs from 'dayjs';
 import type { LineSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
-import throttle from 'lodash/throttle';
-import zipWith from 'lodash/zipWith';
+import {
+    isEmpty, orderBy, throttle, zipWith,
+} from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 

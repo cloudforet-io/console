@@ -1,8 +1,7 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, isRef, reactive } from 'vue';
 
-import flattenDeep from 'lodash/flattenDeep';
-import isEmpty from 'lodash/isEmpty';
+import { flattenDeep, isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

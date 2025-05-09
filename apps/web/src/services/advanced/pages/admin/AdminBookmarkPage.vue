@@ -4,7 +4,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import at from 'lodash/at';
+import { at } from 'lodash';
 
 import {
     PHeading, PButton, PContextMenu, PHeadingLayout,

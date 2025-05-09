@@ -3,7 +3,7 @@ import {
     toRef, computed, ref, watch,
 } from 'vue';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import { PSelectDropdown, PBadge } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';

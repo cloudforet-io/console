@@ -3,7 +3,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PButton, PIconButton, PTextInput, PFieldTitle, PLink,

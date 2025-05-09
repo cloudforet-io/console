@@ -3,9 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import sortBy from 'lodash/sortBy';
-import startCase from 'lodash/startCase';
-import toLower from 'lodash/toLower';
+import { sortBy, startCase, toLower } from 'lodash';
 
 import {
     PFieldTitle, PContextMenu,

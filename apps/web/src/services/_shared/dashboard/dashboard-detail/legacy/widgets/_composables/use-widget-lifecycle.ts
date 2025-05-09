@@ -6,8 +6,10 @@ import {
     watch,
 } from 'vue';
 
-import debounce from 'lodash/debounce';
-import isEqual from 'lodash/isEqual';
+import {
+    debounce,
+    isEqual,
+} from 'lodash';
 
 import type { DashboardVariables } from '@/api-clients/dashboard/_types/dashboard-type';
 import type { InheritOptions } from '@/api-clients/dashboard/_types/widget-type';

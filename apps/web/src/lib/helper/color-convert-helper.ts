@@ -1,5 +1,4 @@
-import parseInt from 'lodash/parseInt';
-import replace from 'lodash/replace';
+import { parseInt, replace } from 'lodash';
 
 type RgbaString = string; // e.g. 'rgba(255, 255, 255, 1)'
 

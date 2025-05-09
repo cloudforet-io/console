@@ -8,8 +8,9 @@ import dayjs from 'dayjs';
 import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
-import isEmpty from 'lodash/isEmpty';
-import throttle from 'lodash/throttle';
+import {
+    isEmpty, throttle,
+} from 'lodash';
 
 import {
     PDataLoader, PSkeleton,

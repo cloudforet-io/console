@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import map from 'lodash/map';
+import { map } from 'lodash';
 
 import {
     PPaneLayout, PFieldTitle, PButton, PSelectDropdown, PCopyButton,

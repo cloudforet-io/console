@@ -3,8 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import find from 'lodash/find';
-import sum from 'lodash/sum';
+import { find, sum } from 'lodash';
 
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

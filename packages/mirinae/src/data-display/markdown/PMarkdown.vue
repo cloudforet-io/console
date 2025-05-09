@@ -10,7 +10,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { render } from 'ejs';
-import get from 'lodash/get';
+import { get } from 'lodash';
 
 import { useMarkdown } from '@/hooks/use-markdown/use-markdown';
 

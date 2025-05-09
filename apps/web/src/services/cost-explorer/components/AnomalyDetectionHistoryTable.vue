@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash';
 
 import {
     PToolboxTable, PLink, PLazyImg, PI,

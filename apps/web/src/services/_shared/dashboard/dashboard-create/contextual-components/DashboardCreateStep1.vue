@@ -2,8 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import flatMapDeep from 'lodash/flatMapDeep';
-import uniq from 'lodash/uniq';
+import { flatMapDeep, uniq } from 'lodash';
 
 import {
     PEmpty, PSearch, PFieldTitle, PButton,

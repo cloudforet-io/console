@@ -5,9 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import cloneDeep from 'lodash/cloneDeep';
-import debounce from 'lodash/debounce';
-import isEqual from 'lodash/isEqual';
+import { cloneDeep, debounce, isEqual } from 'lodash';
 
 import { PTag, PSlider } from '@cloudforet/mirinae';
 

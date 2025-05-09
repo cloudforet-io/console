@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PButtonModal, PTextInput, PButton, PSelectDropdown, PIconButton, PRadioGroup, PRadio,

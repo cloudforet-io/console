@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import { PI, PTextButton } from '@cloudforet/mirinae';
 

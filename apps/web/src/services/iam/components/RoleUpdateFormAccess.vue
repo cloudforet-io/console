@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import filter from 'lodash/filter';
+import { filter } from 'lodash';
 
 import {
     PI, PToggleButton, PDataTable, PSelectDropdown, PCheckboxGroup, PCheckbox, PHeading,

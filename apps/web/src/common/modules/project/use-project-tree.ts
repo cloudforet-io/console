@@ -1,7 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
+import { cloneDeep, get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query, Sort } from '@cloudforet/core-lib/space-connector/type';

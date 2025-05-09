@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax,no-await-in-loop */
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import { getComponentNameBySchemaProperty } from '@/controls/forms/json-schema-form/helpers/inner-schema-helper';
 import type { JsonSchema, ReferenceHandler } from '@/controls/forms/json-schema-form/type';

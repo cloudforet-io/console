@@ -1,7 +1,6 @@
-import cloneDeep from 'lodash/cloneDeep';
-import flatMap from 'lodash/flatMap';
-import flatten from 'lodash/flatten';
-import uniq from 'lodash/uniq';
+import {
+    cloneDeep, flatMap, flatten, uniq,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';

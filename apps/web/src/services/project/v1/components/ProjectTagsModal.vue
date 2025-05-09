@@ -3,7 +3,7 @@ import {
     reactive, computed, onMounted,
 } from 'vue';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 
 import {
     PButtonModal,

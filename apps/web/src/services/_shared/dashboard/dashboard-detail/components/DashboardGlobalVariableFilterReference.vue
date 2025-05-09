@@ -4,10 +4,9 @@
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import cloneDeep from 'lodash/cloneDeep';
-import flattenDeep from 'lodash/flattenDeep';
-import isEqual from 'lodash/isEqual';
-import xor from 'lodash/xor';
+import {
+    cloneDeep, flattenDeep, isEqual, xor,
+} from 'lodash';
 
 import { PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';

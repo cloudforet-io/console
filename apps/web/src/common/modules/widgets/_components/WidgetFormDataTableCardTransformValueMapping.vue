@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import random from 'lodash/random';
+import { random } from 'lodash';
 
 import {
     PButton, PFieldGroup, PSelectButton, PTextInput, PSelectDropdown, PFieldTitle, PIconButton,

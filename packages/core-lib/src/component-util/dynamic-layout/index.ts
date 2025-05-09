@@ -7,7 +7,7 @@ import type {
     DynamicLayoutType,
     SearchSchema,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import forEach from 'lodash/forEach';
+import { forEach } from 'lodash';
 
 import {
     makeDistinctValueHandler,

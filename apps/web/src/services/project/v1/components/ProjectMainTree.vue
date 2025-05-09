@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import { PI, PTreeView } from '@cloudforet/mirinae';
 import type { TreeData, TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/types/data-display/tree/tree-view/type';

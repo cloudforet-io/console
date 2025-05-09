@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash';
 
 import {
     PButton, PIconButton, POverlayLayout, PToggleButton, PToolboxTable, PScopedNotification,

@@ -3,7 +3,7 @@ import {
     watch,
 } from 'vue';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 import type {
     WidgetProps, WidgetEmit,

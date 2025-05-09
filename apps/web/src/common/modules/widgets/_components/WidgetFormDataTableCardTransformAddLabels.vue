@@ -5,8 +5,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import cloneDeep from 'lodash/cloneDeep';
-import random from 'lodash/random';
+import { cloneDeep, random } from 'lodash';
 
 import {
     PIconButton, PFieldGroup, PTextInput, PButton, PFieldTitle,

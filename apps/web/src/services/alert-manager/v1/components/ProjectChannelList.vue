@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import filter from 'lodash/filter';
-import get from 'lodash/get';
+import { get, filter } from 'lodash';
 
 import { PI } from '@cloudforet/mirinae';
 

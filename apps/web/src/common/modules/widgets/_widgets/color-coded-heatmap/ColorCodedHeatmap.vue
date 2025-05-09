@@ -3,7 +3,7 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import orderBy from 'lodash/orderBy';
+import { orderBy } from 'lodash';
 
 import {
     PEmpty,
