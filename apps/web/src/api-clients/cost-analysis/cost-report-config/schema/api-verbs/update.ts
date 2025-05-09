@@ -14,6 +14,6 @@ export interface CostReportConfigUpdateParameters {
     };
     adjustment_options?: {
         enabled: boolean;
-        period: number;
+        period?: number;
     };
 }
