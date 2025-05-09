@@ -13,9 +13,9 @@ import {
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
@@ -47,14 +47,14 @@ const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    currentGrantInfo: computed(() => userStore.state.currentGrantInfo),
+    currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({

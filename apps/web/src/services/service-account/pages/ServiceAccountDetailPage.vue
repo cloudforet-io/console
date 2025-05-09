@@ -20,12 +20,11 @@ import type { TrustedAccountGetParameters } from '@/api-clients/identity/trusted
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
-import type { PageAccessMap } from '@/lib/access-control/config';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -58,7 +57,7 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 
@@ -69,8 +68,7 @@ const storeState = reactive({
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => userStore.getters.pageAccessPermissionMap),
+    isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     loading: true,
@@ -83,7 +81,7 @@ const state = reactive({
         }
         return targetMenuId;
     }),
-    hasReadWriteAccess: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[state.selectedMenuId]?.write),
+    hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     originServiceAccountItem: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),

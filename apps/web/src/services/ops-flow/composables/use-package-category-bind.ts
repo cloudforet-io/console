@@ -1,24 +1,27 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useDefaultPackage } from '@/services/ops-flow/composables/use-default-package';
 
 const useTaskCategoryMutations = () => {
-    const { taskCategoryAPI, taskCategoryQueryKey, taskCategoryListQueryKey } = useTaskCategoryApi();
+    const { taskCategoryAPI } = useTaskCategoryApi();
+    const { withSuffix: taskCategoryQueryKeyWithSuffix } = useServiceQueryKey('opsflow', 'task-category', 'get');
+    const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
     const queryClient = useQueryClient();
     const { mutateAsync: updateTaskCategory } = useMutation({
         mutationFn: taskCategoryAPI.update,
         onSuccess: (updatedCategory) => {
-            queryClient.setQueryData([...taskCategoryQueryKey.value, { category_id: updatedCategory.category_id }], updatedCategory);
+            queryClient.setQueryData(taskCategoryQueryKeyWithSuffix(updatedCategory.category_id), updatedCategory);
         },
         onError: (error) => {
             ErrorHandler.handleError(error);
         },
     });
-    return { updateTaskCategory, taskCategoryQueryKey, taskCategoryListQueryKey };
+    return { updateTaskCategory, taskCategoryListQueryKey };
 };
 
 export const usePackageCategoryBind = () => {

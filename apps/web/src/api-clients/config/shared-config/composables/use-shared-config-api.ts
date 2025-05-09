@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SharedConfigCreateParameters } from '@/api-clients/config/shared-config/schema/api-verbs/create';
 import type { SharedConfigDeleteParameters } from '@/api-clients/config/shared-config/schema/api-verbs/delete';
@@ -10,9 +9,6 @@ import type { SharedConfigUpdateParameters } from '@/api-clients/config/shared-c
 import type { SharedConfigModel } from '@/api-clients/config/shared-config/schema/model';
 
 export const useSharedConfigApi = () => {
-    const sharedConfigQueryKey = useAPIQueryKey('config', 'shared-config', 'get');
-    const sharedConfigListQueryKey = useAPIQueryKey('config', 'shared-config', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.config.sharedConfig.create<SharedConfigCreateParameters, SharedConfigModel>,
         update: SpaceConnector.clientV2.config.sharedConfig.update<SharedConfigUpdateParameters, SharedConfigModel>,
@@ -22,8 +18,6 @@ export const useSharedConfigApi = () => {
     };
 
     return {
-        sharedConfigQueryKey,
-        sharedConfigListQueryKey,
         sharedConfigAPI: actions,
     };
 };

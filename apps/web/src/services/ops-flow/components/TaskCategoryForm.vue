@@ -8,6 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n, getParticle } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -70,7 +71,10 @@ const {
 });
 
 /* task category mutations */
-const { taskCategoryAPI, taskCategoryListQueryKey, taskCategoryQueryKey } = useTaskCategoryApi();
+const { taskCategoryAPI } = useTaskCategoryApi();
+const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
+const { withSuffix: withTaskCategoryQueryKeySuffix } = useServiceQueryKey('opsflow', 'task-category', 'get');
+
 const queryClient = useQueryClient();
 interface UpdateVariables {
     categoryId: string;
@@ -85,9 +89,9 @@ const { mutateAsync: updateCategory, isPending: isUpdating } = useMutation({
         name: form.name,
         description: form.description,
     }),
-    onSuccess: () => {
+    onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
-        queryClient.invalidateQueries({ queryKey: taskCategoryQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: withTaskCategoryQueryKeySuffix(data.category_id) });
         showSuccessMessage(i18n.t('OPSFLOW.ALT_S_EDIT_TARGET', { target: i18n.t('OPSFLOW.CATEGORY') }), '');
         taskManagementPageStore.closeCategoryForm();
     },

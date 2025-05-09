@@ -1,6 +1,6 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type {
-    AlertsInfoType, AlertsType, MembersType, ServiceOptionsType,
+    AlertsInfoType, AlertsType, HealthyType, MembersType, ServiceOptionsType,
 } from '@/schema/alert-manager/service/type';
 
 export interface ServiceModel {
@@ -9,6 +9,7 @@ export interface ServiceModel {
     service_key: string;
     description: string;
     members: Record<MembersType, string[]>;
+    service_healthy: HealthyType;
     options: ServiceOptionsType;
     channels?: string[];
     webhooks?: string[];

@@ -12,13 +12,13 @@ import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useAuthorizationStore } from '../authorization/authorization-store';
 
 
 export type CollectorItem = Required<Pick<ReferenceItem<CollectorModel>, 'key'|'label'|'name'|'icon'>>;
@@ -28,7 +28,7 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useCollectorReferenceStore = defineStore('reference-collector', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const state = reactive({
         items: null as CollectorReferenceMap | null,
@@ -36,7 +36,7 @@ export const useCollectorReferenceStore = defineStore('reference-collector', () 
 
     const getters = reactive({
         collectorItems: asyncComputed<CollectorReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

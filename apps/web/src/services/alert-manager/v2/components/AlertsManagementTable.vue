@@ -3,11 +3,11 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+import type { RawLocation } from 'vue-router/types/router';
 
 import dayjs from 'dayjs';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -15,13 +15,17 @@ import {
     PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { AppReferenceMap } from '@/store/reference/app-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
@@ -43,6 +47,7 @@ import {
     alertStatusBadgeStyleTypeFormatter, calculateTime,
     getAlertStateI18n,
     getAlertUrgencyI18n,
+    makeTriggeredValueHandler,
 } from '@/services/alert-manager/v2/composables/alert-table-data';
 import {
     ALERT_EXCEL_FIELDS,
@@ -59,7 +64,9 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/se
 import type {
     AlertFilterType, AlertPeriodItemType,
     AlertPeriodDropdownMenuType,
+    Period,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -70,8 +77,11 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
+const router = useRouter();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -83,8 +93,12 @@ const storeState = reactive({
     selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
+    selectedLabels: computed<SelectDropdownMenuItem[]>(() => alertPageState.selectedLabels),
     selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
+    period: computed<Period>(() => alertPageState.selectedPeriod),
+    selectedPeriodRange: computed<string>(() => alertPageState.selectedPeriodRange),
     timezone: computed<string>(() => userState.timezone || ''),
+    currentWorkspaceId: computed<string>(() => userWorkspaceGetters.currentWorkspaceId || ''),
 });
 const state = reactive({
     loading: false,
@@ -104,6 +118,13 @@ const state = reactive({
     defaultFields: computed<DataTableFieldType[]>(() => (state.isServicePage ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS])),
     fields: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME ? ALERT_MANAGEMENT_TABLE_FIELDS : [{ name: 'service_id', label: 'Service' }, ...ALERT_MANAGEMENT_TABLE_FIELDS],
     customRangeModalVisible: false,
+    tableHandler: computed<ValueHandlerMap>(() => ({
+        ...ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap,
+        triggered_by: makeTriggeredValueHandler({
+            webhooks: storeState.webhook,
+            apps: storeState.app,
+        }),
+    })),
 });
 const filterState = reactive({
     urgencyFields: computed<SelectDropdownMenuItem[]>(() => ([
@@ -111,7 +132,6 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.HIGH'), name: ALERT_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.ALERTS.LOW'), name: ALERT_URGENCY.LOW },
     ])),
-    period: { start: undefined, end: undefined },
     periodMenuItems: computed<AlertPeriodItemType[]>(() => [
         {
             type: 'item',
@@ -149,16 +169,15 @@ const filterState = reactive({
     isPeriodInvalid: computed<boolean>(() => {
         const now = dayjs().utc();
         const checkPeriod = (limit:number):{isStartInvalid:boolean, isEndInvalid:boolean} => {
-            const isStartInvalid = now.diff(filterState.period?.start, 'month') >= limit;
-            const isEndInvalid = now.diff(filterState.period?.end, 'month') >= limit;
+            const isStartInvalid = now.diff(storeState.period?.start, 'month') >= limit;
+            const isEndInvalid = now.diff(storeState.period?.end, 'month') >= limit;
             return { isStartInvalid, isEndInvalid };
         };
         const LIMIT_MONTH = 36;
         const { isStartInvalid, isEndInvalid } = checkPeriod(LIMIT_MONTH);
         return isStartInvalid || isEndInvalid;
     }),
-    selectedPeriod: ALERT_PERIOD_DROPDOWN_MENU.ALL as string,
-    showPeriodBadge: computed<boolean>(() => filterState.selectedPeriod === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM && filterState.period.start && filterState.period.end),
+    showPeriodBadge: computed<boolean>(() => storeState.selectedPeriodRange === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM && storeState.period?.start && storeState.period?.end),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
@@ -168,8 +187,6 @@ const filterState = reactive({
         { label: i18n.t('ALERT_MANAGER.ALERTS.IGNORED'), name: ALERT_STATUS_FILTERS.IGNORED },
         { label: i18n.t('ALERT_MANAGER.ALERTS.ALL'), name: 'ALL' },
     ])),
-    labelHandler: computed(() => makeDistinctValueHandler('alert_manager.Alert', 'labels')),
-    selectedLabels: [] as SelectDropdownMenuItem[],
 });
 
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -219,8 +236,9 @@ const getServiceName = (id: string): TranslateResult => {
     if (filterState.serviceDropdownList.length === 0) return '';
     return filterState.serviceDropdownList.find((i) => i.name === id)?.label || '';
 };
-const handleSelectLabelsItem = (value: SelectDropdownMenuItem[]) => {
-    filterState.selectedLabels = value;
+const handleSelectLabelsItem = async (value: SelectDropdownMenuItem[]) => {
+    await alertPageStore.setSelectedLabels(value[0]?.name);
+    await replaceUrlQuery('labels', value[0]?.name);
     fetchAlertsList();
 };
 const handleSelectServiceDropdownItem = async (id: string) => {
@@ -244,11 +262,16 @@ const handleSelectPeriod = async (periodMenuName: AlertPeriodDropdownMenuType) =
         return;
     }
     if (periodMenuName === ALERT_PERIOD_DROPDOWN_MENU.ALL) {
-        filterState.period = { start: undefined, end: undefined };
+        alertPageStore.setSelectedPeriod({ start: undefined, end: undefined });
     }
-    filterState.selectedPeriod = periodMenuName;
     const selectedPeriodItem = filterState.periodMenuItems.find((d) => d.name === periodMenuName) || {} as AlertPeriodItemType;
-    filterState.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : filterState.period;
+    alertPageStore.setSelectedPeriodRange(periodMenuName);
+    alertPageStore.setSelectedPeriod(selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : storeState.period);
+    replaceUrlQuery({
+        range: periodMenuName,
+        period: undefined,
+    });
+
     await fetchAlertsList();
 };
 const handleChange = async (options: any = {}) => {
@@ -283,12 +306,70 @@ const handleExportToExcel = async () => {
     });
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
-    filterState.period = { start, end };
-    filterState.selectedPeriod = ALERT_PERIOD_DROPDOWN_MENU.CUSTOM;
+    alertPageStore.setSelectedPeriodRange(ALERT_PERIOD_DROPDOWN_MENU.CUSTOM);
+    alertPageStore.setSelectedPeriod({ start, end });
     state.customRangeModalVisible = false;
+    replaceUrlQuery('period', `start=${start}&end=${end}`);
+    replaceUrlQuery('range', ALERT_PERIOD_DROPDOWN_MENU.CUSTOM);
     fetchAlertsList();
 };
+const createRouteParams = (params: {
+    provider: string;
+    group: string;
+    name: string;
+    id: string;
+}): RawLocation => {
+    const queryHelper = new QueryHelper();
+    return {
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        params: {
+            provider: params.provider,
+            group: params.group,
+            name: params.name,
+            workspaceId: storeState.currentWorkspaceId || '',
+        },
+        query: {
+            filters: queryHelper.setFilters([
+                { k: 'cloud_service_id', v: params.id, o: '=' },
+            ]).rawQueryStrings,
+        },
+    };
+};
 
+const handleRouteViewButton = async (id: string, type?: string) => {
+    const [provider, group, name] = type?.split('.') || [];
+
+    if (!type && !id) {
+        console.warn('Invalid parameters: both id and type are missing');
+        return;
+    }
+
+    try {
+        const routeParams = type ? {
+            provider, group, name, id,
+        } : await (async () => {
+            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+                cloud_service_id: id,
+            });
+            return {
+                provider: response.provider,
+                group: response.cloud_service_group,
+                name: response.cloud_service_type,
+                id: response.cloud_service_id,
+            };
+        })();
+
+        window.open(router.resolve(createRouteParams(routeParams)).href, '_blank');
+    } catch (e) {
+        if (!type) {
+            ErrorHandler.handleError(e, true);
+            return;
+        }
+        window.open(router.resolve(createRouteParams({
+            provider, group, name, id,
+        })).href, '_blank');
+    }
+};
 const fetchAlertsList = async () => {
     state.loading = true;
     try {
@@ -301,21 +382,20 @@ const fetchAlertsList = async () => {
         } else if (storeState.selectedStatus !== 'ALL') {
             filterQueryHelper.addFilter({ k: 'status', v: storeState.selectedStatus, o: '=' });
         }
-        if (filterState.selectedLabels.length > 0) {
-            filterQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
+        if (storeState.selectedLabels?.length > 0) {
+            filterQueryHelper.addFilter({ k: 'labels', v: storeState.selectedLabels.map((i) => i.name), o: '=' });
         }
 
-        if (filterState.period.start && filterState.period.end && (filterState.period.start === filterState.period.end)) {
-            filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+        if (storeState.period.start && storeState.period.end && (storeState.period.start === storeState.period.end)) {
+            filterQueryHelper.addFilter({ k: 'created_at', v: storeState.period.start, o: '>=' });
         } else {
-            if (filterState.period.start) {
-                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.start, o: '>=' });
+            if (storeState.period.start) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: storeState.period.start, o: '>=' });
             }
-            if (filterState.period.end) {
-                filterQueryHelper.addFilter({ k: 'created_at', v: filterState.period.end, o: '<=' });
+            if (storeState.period.end) {
+                filterQueryHelper.addFilter({ k: 'created_at', v: storeState.period.end, o: '<=' });
             }
         }
-
 
         if (state.isServicePage) {
             filterQueryHelper.addFilter({ k: 'service_id', v: storeState.serviceId, o: '=' });
@@ -349,13 +429,28 @@ watch(() => storeState.serviceId, async (serviceId) => {
 
 (async () => {
     const {
-        serviceId, status, urgency, filters,
+        serviceId, status, urgency, filters, labels, period, range,
     } = route.query;
     if (!state.isServicePage) {
         await alertPageStore.setSelectedServiceId(serviceId as string);
     }
     await alertPageStore.setSelectedStatus(status as string || 'OPEN');
     await alertPageStore.setSelectedUrgency(urgency as string || 'ALL');
+    await alertPageStore.setSelectedLabels(labels as string);
+
+    const params = new URLSearchParams(period as string);
+
+    alertPageStore.setSelectedPeriodRange(range as string || ALERT_PERIOD_DROPDOWN_MENU.ALL);
+    if (range === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM) {
+        await alertPageStore.setSelectedPeriod({
+            start: params.get('start') || undefined,
+            end: params.get('end') || undefined,
+        });
+    } else {
+        const selectedPeriodItem = filterState.periodMenuItems.find((d) => d.name === range) || {} as AlertPeriodItemType;
+        alertPageStore.setSelectedPeriod(selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : storeState.period);
+    }
+
     if (filters) {
         await queryTagHelper.setURLQueryStringFilters(route.query.filters);
     }
@@ -380,7 +475,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                          :fields="state.fields"
                          :items="state.refinedAlertList"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
-                         :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
+                         :value-handler-map="state.tableHandler"
                          settings-visible
                          @change="handleChange"
                          @click-settings="handleClickSettings"
@@ -416,7 +511,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                                            disable-proxy
                                            style-type="rounded"
                                            use-fixed-menu-style
-                                           :selected="filterState.selectedPeriod"
+                                           :selected="storeState.selectedPeriodRange"
                                            :invalid="filterState.isPeriodInvalid"
                                            @select="handleSelectPeriod"
                         />
@@ -425,7 +520,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                                  style-type="gray200"
                                  class="ml-2"
                         >
-                            {{ `${dayjs.utc(filterState.period.start).format('MMM D, YYYY')} ~ ${dayjs.utc(filterState.period.end).format('MMM D, YYYY')}` }}
+                            {{ `${dayjs.utc(storeState.period.start).format('MMM D, YYYY')} ~ ${dayjs.utc(storeState.period.end).format('MMM D, YYYY')}` }}
                         </p-badge>
                     </div>
                     <p-divider vertical
@@ -444,11 +539,10 @@ watch(() => storeState.serviceId, async (serviceId) => {
                     <p-select-dropdown :selection-label="$t('ALERT_MANAGER.ALERTS.LABEL')"
                                        :handler="labelMenuItemsHandler()"
                                        style-type="rounded"
-                                       appearance-type="stack"
                                        show-delete-all-button
                                        selection-highlight
                                        use-fixed-menu-style
-                                       :selected="filterState.selectedLabels"
+                                       :selected="storeState.selectedLabels"
                                        class="service-dropdown"
                                        @update:selected="handleSelectLabelsItem"
                     />
@@ -531,6 +625,28 @@ watch(() => storeState.serviceId, async (serviceId) => {
             <template #col-triggered_by-format="{ value }">
                 <span>{{ getCreatedByNames(value) }}</span>
             </template>
+            <template #col-resources-format="{ value }">
+                <div v-for="(item, idx) in value"
+                     :key="`resource-item-${idx}`"
+                >
+                    <component :is="item.asset_id ? PLink : 'p'"
+                               class="resource-item"
+                               :class="{ 'link': item.asset_id }"
+                               @click="item.asset_id ? handleRouteViewButton(item.asset_id, item.asset_type) : null"
+                    >
+                        <span class="flex items-center">
+                            <span class="text inline-block truncate">{{ item?.name }}</span>
+                            <p-i v-if="item.asset_id"
+                                 name="ic_arrow-right-up"
+                                 class="ml-0.5"
+                                 height="0.875rem"
+                                 width="0.875rem"
+                                 color="inherit"
+                            />
+                        </span>
+                    </component>
+                </div>
+            </template>
         </p-toolbox-table>
         <custom-field-modal :visible="state.visibleCustomFieldModal"
                             :resource-type="state.isServicePage ? 'service.alert' : 'alertManager.alert'"
@@ -540,8 +656,8 @@ watch(() => storeState.serviceId, async (serviceId) => {
                             @custom-field-loaded="handleCustomFieldUpdate"
         />
         <custom-date-modal :visible.sync="state.customRangeModalVisible"
-                           :start="filterState.period?.start"
-                           :end="filterState.period?.end"
+                           :start="storeState.period?.start"
+                           :end="storeState.period?.end"
                            :datetime-picker-data-type="'yearToDate'"
                            use-restricted-mode
                            @confirm="handleCustomRangeModalConfirm"
@@ -597,6 +713,14 @@ watch(() => storeState.serviceId, async (serviceId) => {
                     padding-bottom: 0;
                 }
             }
+        }
+    }
+    .resource-item {
+        .text {
+            max-width: 20rem;
+        }
+        &.link {
+            @apply text-secondary truncate cursor-pointer;
         }
     }
 }

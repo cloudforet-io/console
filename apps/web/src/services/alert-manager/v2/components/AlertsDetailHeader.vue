@@ -12,9 +12,12 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 
 import AlertDetailDeleteModal from '@/services/alert-manager/v2/components/AlertDetailDeleteModal.vue';
 import AlertDetailEditModal from '@/services/alert-manager/v2/components/AlertDetailEditModal.vue';
+import { ALERT_PERIOD_DROPDOWN_MENU } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
+import type { Period } from '@/services/alert-manager/v2/types/alert-manager-type';
+
 
 type ModalType = 'edit' | 'delete';
 
@@ -34,6 +37,9 @@ const storeState = reactive({
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
     selectedSearchFilter: computed<string[]|undefined>(() => alertPageState.selectedSearchFilter),
+    selectedLabels: computed<string|undefined>(() => (alertPageState.selectedLabels.length > 0 ? alertPageState.selectedLabels[0].name : undefined)),
+    period: computed<Period>(() => alertPageState.selectedPeriod),
+    selectedPeriodRange: computed<string>(() => alertPageState.selectedPeriodRange),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => [
@@ -66,6 +72,9 @@ const handleRouteBackButton = () => {
                 status: storeState.selectedStatus,
                 urgency: storeState.selectedUrgency,
                 filters: storeState.selectedSearchFilter,
+                labels: storeState.selectedLabels,
+                period: storeState.selectedPeriodRange === ALERT_PERIOD_DROPDOWN_MENU.CUSTOM ? `start=${storeState.period.start}&end=${storeState.period.end}` : undefined,
+                range: storeState.selectedPeriodRange,
             },
         }).catch(() => {});
     }

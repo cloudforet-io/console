@@ -22,9 +22,8 @@ import {
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useErrorStore } from '@/store/error/error-store';
+import type { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { pinia } from '@/store/pinia';
-import type { useUserStore } from '@/store/user/user-store';
 
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -36,7 +35,7 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 const grantAndLoadByCurrentScope = async (
     scope: GrantScope,
     afterGrantedCallback: () => void,
-    userStore: ReturnType<typeof useUserStore>,
+    authorizationStore: ReturnType<typeof useAuthorizationStore>,
     workspaceId?: string,
 ): Promise<{ failStatus: boolean }> => {
     const refreshToken = SpaceConnector.getRefreshToken();
@@ -46,20 +45,22 @@ const grantAndLoadByCurrentScope = async (
         workspace_id: workspaceId,
     };
 
-    const errorStore = useErrorStore(pinia);
-    const isGranted: boolean = await userStore.grantRole(grantRequest);
+    const isGranted: boolean = await authorizationStore.grantRole(grantRequest);
     if (isGranted) {
         afterGrantedCallback();
     }
-    const grantAccessFailStatus = errorStore.state.grantAccessFailStatus;
     return {
-        failStatus: !!grantAccessFailStatus,
+        failStatus: !!authorizationStore.state.grantAccessFailStatus,
     };
 };
 export class SpaceRouter {
     static router: VueRouter;
 
-    static init(routes: RouteConfig[], afterGrantedCallback: () => void, userStore: ReturnType<typeof useUserStore>) {
+    static init(
+        routes: RouteConfig[],
+        afterGrantedCallback: () => void,
+        authorizationStore: ReturnType<typeof useAuthorizationStore>,
+    ) {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
         Vue.use(VueRouter);
@@ -116,7 +117,7 @@ export class SpaceRouter {
 
             /* Grant Scope Process */
             if (routeScope !== ROUTE_SCOPE.EXCLUDE_AUTH && shouldUpdateScope(prevRole, routeScope, prevWorkspaceId, to.params.workspaceId)) {
-                const { failStatus } = await grantAndLoadByCurrentScope(routeScope, afterGrantedCallback, userStore, to.params.workspaceId);
+                const { failStatus } = await grantAndLoadByCurrentScope(routeScope, afterGrantedCallback, authorizationStore, to.params.workspaceId);
 
                 if (failStatus) { // Grant fail
                     await userWorkspaceStore.load();
@@ -125,7 +126,7 @@ export class SpaceRouter {
                         params: { statusCode: '404' },
                     });
                 } else if (routeScope === ROUTE_SCOPE.WORKSPACE) { // Grant success - Workspace
-                    verifyPageAccessAndRedirect(to, next, to.params.workspaceId, userStore.getters.pageAccessPermissionList);
+                    verifyPageAccessAndRedirect(to, next, to.params.workspaceId, authorizationStore.getters.pageAccessPermissionList);
                 } else next(); // Grant success - Others (Admin, User)
             } else { // Grant Process Not Needed
                 appContextStore.setGlobalGrantLoading(false);
@@ -140,7 +141,7 @@ export class SpaceRouter {
             // set target page as GTag page view
             if (GTag.gtag) GTag.setPageView(to);
             const isAdminMode = appContextStore.getters.isAdminMode;
-            const pageAccessPermissionMap = userStore.getters.pageAccessPermissionMap;
+            const pageAccessPermissionMap = authorizationStore.getters.pageAccessPermissionMap;
             const routeScope = getRouteScope(to);
 
             if (!isAdminMode && routeScope === 'WORKSPACE') {

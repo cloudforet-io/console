@@ -80,12 +80,12 @@ import type {
 } from '@/data-display/tables/definition-table/type';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
-const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[]): DefinitionProps[] => fields.map((field) => {
+const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[], disableCopy?: boolean): DefinitionProps[] => fields.map((field) => {
     const dataValue = get(data, field.name) ?? getValueByPath(data, field.name) ?? '';
     return {
         ...field,
         data: dataValue,
-        copyValue: field.disableCopy ? undefined : dataValue,
+        copyValue: (disableCopy || field.disableCopy) ? undefined : dataValue,
     };
 });
 
@@ -138,7 +138,7 @@ export default defineComponent({
                 return !def.data;
             })),
             skeletons: computed(() => range(props.skeletonRows ?? 5)),
-            items: computed(() => makeDefItems(props.fields, props.data)),
+            items: computed(() => makeDefItems(props.fields, props.data, props.disableCopy)),
         });
 
         watch([() => props.data, () => props.fields], () => {

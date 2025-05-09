@@ -9,10 +9,10 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProviderListParameters } from '@/api-clients/identity/provider/schema/api-verbs/list';
 import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
@@ -21,7 +21,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo } from '@/styles/colors';
 
-
 export type ProviderItem = Required<Pick<ReferenceItem<ProviderModel>, 'key'|'label'|'name'|'icon'|'color'|'data'>>;
 export type ProviderReferenceMap = ReferenceMap<ProviderItem>;
 
@@ -29,14 +28,14 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useProviderReferenceStore = defineStore('reference-provider', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const state = reactive({
         items: null as ProviderReferenceMap | null,
     });
 
     const getters = reactive({
         providerItems: asyncComputed<ProviderReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

@@ -14,7 +14,7 @@ import type { ProjectUpdateParameters } from '@/api-clients/identity/project/sch
 import type { ProjectUpdateProjectTypeParameters } from '@/api-clients/identity/project/schema/api-verbs/update-project-type';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import getRandomId from '@/lib/random-id-generator';
 
@@ -24,13 +24,12 @@ import type {
 } from '@/common/modules/project/project-tree-type';
 import { useProjectTree } from '@/common/modules/project/use-project-tree';
 
-
 const projectTreeHelper = useProjectTree();
 export const useProjectPageStore = defineStore('page-project', () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const _state = reactive({
-        currentRoleType: computed(() => userStore.state.currentRoleInfo?.roleType),
+        currentRoleType: computed(() => authorizationStore.state.currentRoleInfo?.roleType),
     });
     const state = reactive({
         projectTreeKey: getRandomId(),

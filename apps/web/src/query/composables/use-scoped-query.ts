@@ -42,7 +42,7 @@ import type { GrantScope } from '@/api-clients/identity/token/schema/type';
 import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 
 type ScopedEnabled = MaybeRef<boolean>;
@@ -65,10 +65,10 @@ export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnD
     }
 
     const appContextStore = useAppContextStore();
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
 
     const currentGrantScope = computed<GrantScope | undefined>(
-        () => userStore.state.currentGrantInfo?.scope,
+        () => authorizationStore.state.currentGrantInfo?.scope,
     );
     const isAppReady = computed(() => !appContextStore.getters.globalGrantLoading);
 

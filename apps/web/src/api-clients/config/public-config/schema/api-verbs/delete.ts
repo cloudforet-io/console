@@ -1,3 +1,3 @@
-export interface PublicConfigGetParameters {
+export interface PublicConfigDeleteParameters {
     name: string;
 }

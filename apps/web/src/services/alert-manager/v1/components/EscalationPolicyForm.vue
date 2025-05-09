@@ -18,8 +18,8 @@ import { i18n } from '@/translations';
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
@@ -45,8 +45,7 @@ const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
-const userStore = useUserStore();
-
+const authorizationStore = useAuthorizationStore();
 const { getReferenceLocation } = useReferenceRouter();
 
 const state = reactive({
@@ -57,7 +56,7 @@ const state = reactive({
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
     resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyModel['resource_group']}[]>(() => {
-        const currentRoleType = userStore.state.currentRoleInfo?.roleType;
+        const currentRoleType = authorizationStore.state.currentRoleInfo?.roleType;
         const resGroup: {label: TranslateResult; value: EscalationPolicyModel['resource_group']}[] = [
             { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
         ];

@@ -6,9 +6,11 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { PButtonModal, PRadio, PRadioGroup } from '@cloudforet/mirinae';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
-
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -59,8 +61,12 @@ const getIsValid = (_isProject: boolean, selectProjectGroup: boolean, selectedPr
 };
 
 /* mutations */
-const { projectAPI, projectListQueryKey, projectQueryKey } = useProjectApi();
-const { projectGroupAPI, projectGroupListQueryKey, projectGroupQueryKey } = useProjectGroupApi();
+const { projectAPI } = useProjectApi();
+const { key: projectListQueryKey } = useServiceQueryKey('identity', 'project', 'list');
+const { withSuffix: projectQueryKeyWithSuffix } = useServiceQueryKey('identity', 'project', 'get');
+const { projectGroupAPI } = useProjectGroupApi();
+const { key: projectGroupListQueryKey } = useServiceQueryKey('identity', 'project-group', 'list');
+const { withSuffix: projectGroupQueryKeyWithSuffix } = useServiceQueryKey('identity', 'project-group', 'get');
 const queryClient = useQueryClient();
 
 const { mutateAsync: changeProjectGroup } = useMutation({
@@ -68,25 +74,26 @@ const { mutateAsync: changeProjectGroup } = useMutation({
         if (!targetId.value) throw new Error('No target id');
         const _projectGroupId = state.selectProjectGroup ? state.selectedProjectGroupIdList[0] : null;
         if (isProject.value) {
-            await projectAPI.changeProjectGroup({
+            return projectAPI.changeProjectGroup({
                 project_id: targetId.value,
                 project_group_id: _projectGroupId,
             });
-        } else {
-            await projectGroupAPI.changeParentGroup({
-                project_group_id: targetId.value,
-                parent_group_id: _projectGroupId,
-            });
         }
+        return projectGroupAPI.changeParentGroup({
+            project_group_id: targetId.value,
+            parent_group_id: _projectGroupId,
+        });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
         if (isProject.value) {
+            const _project = data as ProjectModel;
             queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
-            queryClient.invalidateQueries({ queryKey: [...projectQueryKey.value, targetId.value] });
+            queryClient.invalidateQueries({ queryKey: projectQueryKeyWithSuffix(_project.project_id) });
         } else {
+            const _projectGroup = data as ProjectGroupModel;
             queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
-            queryClient.invalidateQueries({ queryKey: [...projectGroupQueryKey.value, targetId.value] });
+            queryClient.invalidateQueries({ queryKey: projectGroupQueryKeyWithSuffix(_projectGroup.project_group_id) });
         }
     },
     onError: (e) => {

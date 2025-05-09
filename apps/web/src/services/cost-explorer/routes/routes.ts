@@ -2,9 +2,6 @@ import type { RouteConfig } from 'vue-router';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { pinia } from '@/store/pinia';
-import { useUserStore } from '@/store/user/user-store';
-
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -31,10 +28,7 @@ const costExplorerRoutes: RouteConfig = {
         menuId: MENU_ID.COST_EXPLORER,
         translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
     },
-    redirect: (to) => {
-        const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
-    },
+    redirect: (to) => getRedirectRouteByPagePermission(to),
     component: CostExplorerContainer,
     children: [
         {

@@ -40,7 +40,8 @@ const visibleForm = computed(() => taskCategoryPageState.visibleTaskTypeForm);
 
 /* task type */
 const { taskType } = useTaskTypeQuery({
-    queryKey: computed(() => ({ task_type_id: targetTaskTypeId.value as string })),
+    taskTypeId: computed(() => targetTaskTypeId.value),
+    params: computed(() => ({ task_type_id: targetTaskTypeId.value as string })),
     enabled: computed(() => visibleForm.value && !!targetTaskTypeId.value),
 });
 
@@ -72,7 +73,7 @@ const {
 
 /* task types */
 const { taskTypes } = useTaskTypesQuery({
-    queryKey: computed(() => ({
+    params: computed(() => ({
         query: {
             filter: [{ k: 'category_id', v: currentCategoryId.value, o: 'eq' }],
         },

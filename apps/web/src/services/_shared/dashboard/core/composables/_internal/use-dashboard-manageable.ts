@@ -8,21 +8,20 @@ import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/sc
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { useDashboardSharedContext } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-shared-context';
 import type { DashboardSharedEntryPoint } from '@/services/_shared/dashboard/core/types/dashboard-shared-type';
 
 
-
 export const useDashboardManageable = () => {
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const appContextStore = useAppContextStore();
     const { entryPoint } = useDashboardSharedContext();
     const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
     const storeState = reactive({
-        isWorkspaceOwner: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+        isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     });
 
     const _isManageable = (

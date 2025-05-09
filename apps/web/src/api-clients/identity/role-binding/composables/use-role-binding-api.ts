@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { RoleCreateParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/create';
 import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
@@ -9,9 +8,6 @@ import type { RoleBindingUpdateRoleParameters } from '@/api-clients/identity/rol
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
 
 export const useRoleBindingApi = () => {
-    const roleBindingQueryKey = useAPIQueryKey('identity', 'role-binding', 'get');
-    const roleBindingListQueryKey = useAPIQueryKey('identity', 'role-binding', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>,
         delete: SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>,
@@ -20,8 +16,6 @@ export const useRoleBindingApi = () => {
     };
 
     return {
-        roleBindingQueryKey,
-        roleBindingListQueryKey,
         roleBindingAPI: actions,
     };
 };

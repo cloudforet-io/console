@@ -30,6 +30,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router/composables';
 
+
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
@@ -41,6 +42,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/hooks/use-tab/type';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -97,7 +99,8 @@ const {
 });
 
 /* task */
-const { taskListQueryKey, taskAPI } = useTaskApi();
+const { taskAPI } = useTaskApi();
+const { key: taskListQueryKey } = useServiceQueryKey('opsflow', 'task', 'list');
 const {
     data: task, queryKey: taskDetailQueryKey, isLoading: isLoadingTask, error: errorOnTask,
 } = useTaskQuery({

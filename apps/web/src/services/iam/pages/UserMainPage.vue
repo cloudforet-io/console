@@ -7,7 +7,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -28,14 +28,14 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
-    grantInfo: computed(() => userStore.state.currentGrantInfo),
+    grantInfo: computed(() => authorizationStore.state.currentGrantInfo),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()

@@ -1,30 +1,31 @@
-import type { Ref } from 'vue';
-import { computed, watch } from 'vue';
+import type { ComputedRef } from 'vue';
+import { watch } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskListParameters } from '@/api-clients/opsflow/task/schema/api-verbs/list';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useAssociatedTasksQuery = ({
-    queryKey,
+    params,
     enabled,
 }: {
-  queryKey: Ref<TaskListParameters>;
-  enabled: Ref<boolean>;
+    params: ComputedRef<TaskListParameters>;
+    enabled: ComputedRef<boolean>;
 }) => {
-    const { taskListQueryKey, taskAPI } = useTaskApi();
+    const { taskAPI } = useTaskApi();
+    const { key: taskListQueryKey, params: taskListParams } = useServiceQueryKey('opsflow', 'task', 'list', {
+        params,
+    });
     const {
         data: tasks, isLoading, isError, refetch,
     } = useQuery({
-        queryKey: computed(() => [
-            ...taskListQueryKey.value,
-            queryKey.value,
-        ]),
+        queryKey: taskListQueryKey,
         queryFn: async () => {
-            const { results } = await taskAPI.list(queryKey.value);
+            const { results } = await taskAPI.list(taskListParams.value);
             return results ?? [];
         },
         enabled,

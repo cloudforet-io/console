@@ -41,6 +41,7 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
     const metricId = `metric-managed-${label}-count`;
 
     const { key, params } = useServiceQueryKey('inventory', 'metric-data', 'analyze', {
+        contextKey: [mode?.value, metricId],
         params: computed(() => {
             const today = dayjs.utc().format('YYYY-MM-DD');
             const filter = projectIds?.value?.length ? [{
@@ -66,16 +67,15 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
                 },
             };
         }),
-        contextKey: [mode?.value, metricId],
     });
 
 
     const { data, isLoading } = useScopedQuery({
         queryKey: key,
-        queryFn: () => metricDataAPI.analyze<AnalyzeResult>(params.value),
+        queryFn: () => metricDataAPI.analyze(params.value),
         select: (response): SelectResult[] => {
             const results = response.results ?? [];
-            return results.map((i) => ({
+            return results.map((i: AnalyzeResult) => ({
                 cloudServiceGroup: i['Cloud Service Group'],
                 cloudServiceType: i['Cloud Service Type'],
                 provider: i.Provider,

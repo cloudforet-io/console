@@ -2,9 +2,6 @@ import type { RouteConfig } from 'vue-router';
 
 import { ROUTE_SCOPE } from '@/router/constant';
 
-import { pinia } from '@/store/pinia';
-import { useUserStore } from '@/store/user/user-store';
-
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -26,10 +23,7 @@ const myPageRoutes: RouteConfig = {
         translationId: MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId,
         scope: ROUTE_SCOPE.USER,
     },
-    redirect: (to) => {
-        const userStore = useUserStore(pinia);
-        return getRedirectRouteByPagePermission(to, userStore.getters.pageAccessPermissionMap);
-    },
+    redirect: (to) => getRedirectRouteByPagePermission(to),
     component: MyPageContainer,
     children: [
         {

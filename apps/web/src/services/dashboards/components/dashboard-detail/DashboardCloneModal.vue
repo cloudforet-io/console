@@ -16,7 +16,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -27,7 +27,6 @@ import { useDashboardCloneMutation } from '@/services/_shared/dashboard/core/com
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-
 
 
 interface Props {
@@ -51,7 +50,8 @@ const queryClient = useQueryClient();
 
 const router = useRouter();
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
+
 const {
     forms: {
         name,
@@ -74,8 +74,8 @@ const {
 });
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    isWorkspaceMember: computed<boolean>(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceOwner: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),

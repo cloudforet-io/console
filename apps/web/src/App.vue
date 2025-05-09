@@ -6,6 +6,9 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
+import { ConsoleVueQueryDevtools } from 'console-vue-query-devtools-sdk';
+
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
@@ -15,6 +18,7 @@ import { EXTERNAL_PAGE_ROUTE } from '@/router/constant';
 import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useErrorStore } from '@/store/error/error-store';
@@ -37,6 +41,15 @@ import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
+if (import.meta.env.DEV) {
+    const queryClient = useQueryClient();
+    import('@/_dev-tools/vue-query-console-debug').then((mod) => mod.initVueQueryConsoleDebug(queryClient))
+        .catch((error) => {
+            console.error('Failed to load vue-query-console-debug module:', error);
+            console.error('Ensure the module exists and the path is correct.');
+        });
+}
+
 const router = useRouter();
 const route = useRoute();
 
@@ -56,6 +69,7 @@ const state = reactive({
 });
 
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const appContextStore = useAppContextStore();
 const errorStore = useErrorStore();
 const globalUIStore = useGlobalUIStore();
@@ -74,7 +88,7 @@ const goToSignIn = async () => {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { previousPath: route.fullPath },
     };
-    userStore.setCurrentGrantInfo(undefined);
+    authorizationStore.setCurrentGrantInfo(undefined);
     errorStore.setVisibleSessionExpiredError(false);
 
     await router.push(to);
@@ -104,6 +118,7 @@ watch(() => state.userId, (userId) => {
     <div v-cloak
          id="app"
     >
+        <console-vue-query-devtools />
         <template v-if="displayStore.state.isInitialized">
             <p-notice-alert group="noticeTopLeft" />
             <p-notice-alert group="noticeTopRight" />

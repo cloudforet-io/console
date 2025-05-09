@@ -3,7 +3,7 @@ import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
-import { FEATURES } from '@/lib/config/global-config/constants/constants';
+import { SERVICE_FEATURES } from '@/lib/config/global-config/constants/constants';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -92,12 +92,12 @@ export const MANAGED_PAGE_ACCESS = [
 ] as const;
 
 export const DEFAULT_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] = [
-    { id: MENU_ID.DASHBOARDS, key: FEATURES.DASHBOARDS },
-    { id: MENU_ID.SERVICE_ACCOUNT, key: FEATURES.SERVICE_ACCOUNT },
-    { id: MENU_ID.PROJECT, key: FEATURES.PROJECT },
+    { id: MENU_ID.DASHBOARDS, key: SERVICE_FEATURES.DASHBOARDS },
+    { id: MENU_ID.SERVICE_ACCOUNT, key: SERVICE_FEATURES.SERVICE_ACCOUNT },
+    { id: MENU_ID.PROJECT, key: SERVICE_FEATURES.PROJECT },
     {
         id: MENU_ID.ASSET_INVENTORY,
-        key: FEATURES.ASSET_INVENTORY,
+        key: SERVICE_FEATURES.ASSET_INVENTORY,
         subMenuList: [
             { id: MENU_ID.CLOUD_SERVICE },
             { id: MENU_ID.SERVER },
@@ -108,7 +108,7 @@ export const DEFAULT_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] =
     },
     {
         id: MENU_ID.COST_EXPLORER,
-        key: FEATURES.COST_EXPLORER,
+        key: SERVICE_FEATURES.COST_EXPLORER,
         subMenuList: [
             { id: MENU_ID.COST_ANALYSIS },
             { id: MENU_ID.BUDGET },
@@ -117,7 +117,7 @@ export const DEFAULT_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] =
     },
     {
         id: MENU_ID.OPS_FLOW,
-        key: FEATURES.OPS_FLOW,
+        key: SERVICE_FEATURES.OPS_FLOW,
         subMenuList: [
             { id: MENU_ID.OPS_FLOW_LANDING },
             { id: MENU_ID.TASK_BOARD },
@@ -127,7 +127,7 @@ export const DEFAULT_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] =
 export const ALERT_V2_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] = [
     {
         id: MENU_ID.ALERT_MANAGER,
-        key: FEATURES.ALERT_MANAGER,
+        key: SERVICE_FEATURES.ALERT_MANAGER,
         subMenuList: [
             { id: MENU_ID.SERVICE },
             { id: MENU_ID.ALERTS },
@@ -135,7 +135,7 @@ export const ALERT_V2_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] 
     },
     {
         id: MENU_ID.IAM,
-        key: FEATURES.IAM,
+        key: SERVICE_FEATURES.IAM,
         subMenuList: [
             { id: MENU_ID.USER },
             { id: MENU_ID.USER_GROUP },
@@ -147,7 +147,7 @@ export const ALERT_V2_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] 
 export const ALERT_V1_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] = [
     {
         id: MENU_ID.ALERT_MANAGER,
-        key: FEATURES.ALERT_MANAGER,
+        key: SERVICE_FEATURES.ALERT_MANAGER,
         subMenuList: [
             { id: MENU_ID.ALERT_MANAGER_DASHBOARD },
             { id: MENU_ID.ALERTS },
@@ -156,7 +156,7 @@ export const ALERT_V1_WORKSPACE_PAGE_ACCESS_MENU_LIST: PageAccessMenuByConfig[] 
     },
     {
         id: MENU_ID.IAM,
-        key: FEATURES.IAM,
+        key: SERVICE_FEATURES.IAM,
         subMenuList: [
             { id: MENU_ID.USER },
             { id: MENU_ID.APP },

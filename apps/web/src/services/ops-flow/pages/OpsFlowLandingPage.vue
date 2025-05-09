@@ -35,7 +35,7 @@ const categoriesWithTaskType = computed(() => {
 
 /* task types */
 const { taskTypes, isLoading: isLoadingTaskTypes } = useTaskTypesQuery({
-    queryKey: computed(() => ({
+    params: computed(() => ({
         query: {
             filter: [{ k: 'category_id', v: availableCategories.value?.map((c) => c.category_id), o: 'in' }],
         },

@@ -3,7 +3,7 @@ import {
     computed, onMounted, reactive, watch,
 } from 'vue';
 
-import { range, zipObject } from 'lodash';
+import { map, range, zipObject } from 'lodash';
 
 import {
     PFieldGroup, PRadioGroup, PRadio, PI, PSelectButton, PSelectDropdown,
@@ -13,6 +13,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
 import { i18n } from '@/translations';
 
+import { timezoneList } from '@/store/user/constant';
 import { useUserStore } from '@/store/user/user-store';
 
 import type {
@@ -42,6 +43,10 @@ const storeState = reactive({
     timezone: computed(() => userState.timezone || 'UTC'),
 });
 const state = reactive({
+    timezones: computed<SelectDropdownMenuItem[]>(() => map(timezoneList, (d) => ({
+        type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
+    }))),
+    timezone: [{ label: storeState.timezone, name: storeState.timezone }] as SelectDropdownMenuItem[],
     scheduleTypeList: computed<ScheduleRadioType[]>(() => [
         { name: 'WEEK_DAY', label: i18n.t('COMMON.SCHEDULE_SETTING.WEEKDAYS') },
         { name: 'ALL_DAY', label: i18n.t('COMMON.SCHEDULE_SETTING.EVERYDAY') },
@@ -128,10 +133,10 @@ const areDayArraysEqual = (selectedDayButton: DayType[], compareDays: DayType[])
 };
 
 
-watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end], ([selectedRadioIdx]) => {
+watch([() => state.selectedRadioIdx, () => state.selectedDayButton, () => state.start, () => state.end, () => state.timezone], ([selectedRadioIdx]) => {
     emit('update-form', {
         SCHEDULE_TYPE: state.scheduleTypeList[selectedRadioIdx].name,
-        TIMEZONE: storeState.timezone,
+        TIMEZONE: state.timezone[0]?.name,
         ...state.scheduleDayForm,
     });
 }, { immediate: true });
@@ -155,6 +160,19 @@ onMounted(() => {
 
 <template>
     <div class="schedule-setting-form flex flex-col">
+        <p-field-group :label="$t('COMMON.SCHEDULE_SETTING.SET_TIMEZONE')"
+                       required
+                       class="flex flex-col"
+        >
+            <p-select-dropdown :menu="state.timezones"
+                               :selected.sync="state.timezone"
+                               :page-size="10"
+                               is-filterable
+                               is-fixed-width
+                               show-delete-all-button
+                               class="timezone-dropdown"
+            />
+        </p-field-group>
         <p-field-group :label="$t('COMMON.SCHEDULE_SETTING.SCHEDULE_SETTING')"
                        required
         >
@@ -205,3 +223,9 @@ onMounted(() => {
         </p-field-group>
     </div>
 </template>
+
+<style lang="postcss" scoped>
+.timezone-dropdown {
+    width: 16.625rem;
+}
+</style>

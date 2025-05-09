@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PackageChangeOrderParameters } from '@/api-clients/identity/package/schema/api-verbs/change-order';
 import type { PackageCreateParameters } from '@/api-clients/identity/package/schema/api-verbs/create';
@@ -13,9 +12,6 @@ import type { PackageModel } from '@/api-clients/identity/package/schema/model';
 
 
 export const usePackageApi = () => {
-    const packageQueryKey = useAPIQueryKey('identity', 'package', 'get');
-    const packageListQueryKey = useAPIQueryKey('identity', 'package', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.package.create<PackageCreateParameters, PackageModel>,
         update: SpaceConnector.clientV2.identity.package.update<PackageUpdateParameters, PackageModel>,
@@ -27,8 +23,6 @@ export const usePackageApi = () => {
     };
 
     return {
-        packageQueryKey,
-        packageListQueryKey,
         packageAPI: actions,
     };
 };

@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { useAPIQueryKey } from '@/api-clients/_common/composables/use-api-query-key';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AgentCreateParameters } from '@/api-clients/identity/agent/schema/api-verbs/create';
 import type { AgentDeleteParameters } from '@/api-clients/identity/agent/schema/api-verbs/delete';
@@ -12,9 +11,6 @@ import type { AgentRegenerateParameters } from '@/api-clients/identity/agent/sch
 import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
 
 export const useAgentApi = () => {
-    const agentQueryKey = useAPIQueryKey('identity', 'agent', 'get');
-    const agentListQueryKey = useAPIQueryKey('identity', 'agent', 'list');
-
     const actions = {
         create: SpaceConnector.clientV2.identity.agent.create<AgentCreateParameters, AgentModel>,
         delete: SpaceConnector.clientV2.identity.agent.delete<AgentDeleteParameters>,
@@ -26,8 +22,6 @@ export const useAgentApi = () => {
     };
 
     return {
-        agentQueryKey,
-        agentListQueryKey,
         agentAPI: actions,
     };
 };

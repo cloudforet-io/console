@@ -10,15 +10,14 @@ import type { WorkspaceGroupListParameters } from '@/api-clients/identity/worksp
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
-import { useUserStore } from '@/store/user/user-store';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 type PickedWorkspaceGroupModel = Pick<WorkspaceGroupModel, 'tags'>;
 export type WorkspaceGroupItem = Required<Pick<ReferenceItem<PickedWorkspaceGroupModel>, 'key'|'label'|'name'|'data'>>;
@@ -29,7 +28,7 @@ let lastLoadedTime = 0;
 
 export const useWorkspaceGroupReferenceStore = defineStore('reference-workspace-group', () => {
     const appContextStore = useAppContextStore();
-    const userStore = useUserStore();
+    const authorizationStore = useAuthorizationStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
@@ -39,7 +38,7 @@ export const useWorkspaceGroupReferenceStore = defineStore('reference-workspace-
 
     const getters = reactive({
         workspaceGroupItems: asyncComputed<WorkspaceGroupReferenceMap>(async () => {
-            if (!userStore.state.currentGrantInfo?.scope || userStore.state.currentGrantInfo?.scope === 'USER') return {};
+            if (!authorizationStore.state.currentGrantInfo?.scope || authorizationStore.state.currentGrantInfo?.scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),

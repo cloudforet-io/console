@@ -7,7 +7,7 @@ import { pinia } from '@/store/pinia';
 import { useUserStore } from '@/store/user/user-store';
 
 
-export const initUserAndAuth = async (config): Promise<string | undefined> => {
+export const initUserAndToken = async (config): Promise<string | undefined> => {
     const domainStore = useDomainStore(pinia);
     const userStore = useUserStore(pinia);
     let userId = userStore.state.userId;

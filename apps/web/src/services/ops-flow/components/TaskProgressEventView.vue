@@ -27,7 +27,8 @@ const taskFieldMetadataStore = useTaskFieldMetadataStore();
 
 /* task type */
 const { taskType } = useTaskTypeQuery({
-    queryKey: computed(() => ({ task_type_id: props.taskTypeId as string, include_category_fields: true })),
+    taskTypeId: computed(() => props.taskTypeId),
+    params: computed(() => ({ task_type_id: props.taskTypeId as string, include_category_fields: true })),
     enabled: computed(() => !!props.taskTypeId),
 });
 
