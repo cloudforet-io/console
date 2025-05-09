@@ -84,8 +84,8 @@ const storeState = reactive({
 const tableState = reactive({
     fields: computed(() => [
         { name: 'name', label: 'Name', width: '350px' },
-        { name: 'channel_id', label: 'Channel', width: '230px' },
-        { name: 'day', label: 'Day', width: '337px' },
+        { name: 'channel_id', label: 'Channel', width: '240px' },
+        { name: 'day', label: 'Day', width: '327px' },
         { name: 'time', label: 'Time', width: '116px' },
         { name: 'timeZone', label: 'Time Zone', width: '250px' },
     ]),
@@ -123,13 +123,13 @@ const state = reactive({
         value: protocol.protocol_id,
     })) ?? []),
     dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
-        MON: i18n.t('ALERT_MANAGER.NOTIFICATIONS.MONDAY'),
-        TUE: i18n.t('ALERT_MANAGER.NOTIFICATIONS.TUESDAY'),
-        WED: i18n.t('ALERT_MANAGER.NOTIFICATIONS.WEDNESDAY'),
-        THU: i18n.t('ALERT_MANAGER.NOTIFICATIONS.THURSDAY'),
-        FRI: i18n.t('ALERT_MANAGER.NOTIFICATIONS.FRIDAY'),
-        SAT: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SATURDAY'),
-        SUN: i18n.t('ALERT_MANAGER.NOTIFICATIONS.SUNDAY'),
+        MON: i18n.t('COMMON.SCHEDULE_SETTING.MON'),
+        TUE: i18n.t('COMMON.SCHEDULE_SETTING.TUE'),
+        WED: i18n.t('COMMON.SCHEDULE_SETTING.WED'),
+        THU: i18n.t('COMMON.SCHEDULE_SETTING.THU'),
+        FRI: i18n.t('COMMON.SCHEDULE_SETTING.FRI'),
+        SAT: i18n.t('COMMON.SCHEDULE_SETTING.SAT'),
+        SUN: i18n.t('COMMON.SCHEDULE_SETTING.SUN'),
     })),
 });
 
