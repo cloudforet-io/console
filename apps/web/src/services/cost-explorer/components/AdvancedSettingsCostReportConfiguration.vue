@@ -29,8 +29,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import AdvancedSettingsSetAdjustmentsOverlay from '@/services/cost-explorer/components/AdvancedSettingsSetAdjustmentsOverlay.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 
+const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const { costReportConfig } = useCostReportConfigQuery();
 
 const state = reactive({
@@ -148,6 +151,9 @@ const handleUpdateToggle = (val: boolean) => {
 const handleUpdateManualAdjustablePeriod = (val: number) => {
     setForm('manualAdjustablePeriod', val);
 };
+const handleOpenAdjustmentsOverlay = () => {
+    costExplorerSettingsStore.setShowAdjustmentsOverlay(true);
+};
 
 /* Watcher */
 watch(() => costReportConfig.value, (val) => {
@@ -261,6 +267,7 @@ watch(() => costReportConfig.value, (val) => {
                 <p-button style-type="tertiary"
                           icon-left="ic_settings"
                           class="mt-4"
+                          @click="handleOpenAdjustmentsOverlay"
                 >
                     {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.SET_ADJUSTMENTS') }}
                 </p-button>
@@ -275,6 +282,7 @@ watch(() => costReportConfig.value, (val) => {
                 </p-button>
             </div>
         </div>
+        <advanced-settings-set-adjustments-overlay />
     </p-pane-layout>
 </template>
 
