@@ -38,7 +38,7 @@ watch(() => budgetCreatePageState.thresholds, () => {
     const values = budgetCreatePageState.thresholds.map((t) => Number(t.value));
     invalidThreshold.value = budgetCreatePageState.thresholds.map((threshold, idx) => {
         const val = values[idx];
-        const isValidNumber = val > 0 && val < 101;
+        const isValidNumber = val > 0;
         const isDuplicate = values.indexOf(val) !== idx;
         return !(isValidNumber && !isDuplicate);
     });
