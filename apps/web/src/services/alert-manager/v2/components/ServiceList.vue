@@ -282,7 +282,9 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
                 </div>
             </p-data-loader>
 
-            <div v-if="!state.loading && !state.healthyLoading && state.alertServiceList.length === 0 && state.healthyServiceList.length === 0">
+            <div v-if="!state.loading && !state.healthyLoading && state.alertServiceList.length === 0 && state.healthyServiceList.length === 0"
+                 class="mt-4"
+            >
                 <p-empty show-image
                          :show-button="hasReadWriteAccess"
                 >
