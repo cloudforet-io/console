@@ -49,7 +49,6 @@ const state = reactive({
     enableAdjustments: false as boolean,
 });
 
-
 /* Computed */
 const languageMenuList = computed<SelectDropdownMenuItem[]>(() => map(languages, (d, k) => ({
     type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
