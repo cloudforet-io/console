@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import { map } from 'lodash';
 
@@ -18,7 +19,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { useCostReportUpdateMutation } from '@/api-clients/cost-analysis/cost-report-config/composables/mutations/use-cost-report-update-mutation';
+import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
+import type { CostReportConfigUpdateParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/update';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { languages } from '@/store/user/constant';
@@ -33,9 +36,11 @@ import AdvancedSettingsSetAdjustmentsOverlay from '@/services/cost-explorer/comp
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 
+
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const { costReportConfig } = useCostReportConfigQuery();
-
+const { costReportConfigAPI } = useCostReportConfigApi();
+const queryClient = useQueryClient();
 const state = reactive({
     // Base Settings
     selectedLanguage: undefined as LanguageCode | undefined,
@@ -121,14 +126,19 @@ const getUpcomingIssueDate = (enableLastDay: boolean, _issueDay?: number): strin
 };
 
 /* Api */
-const { mutate: updateCostReportConfig } = useCostReportUpdateMutation({
-    onSuccess: () => {
-        showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_UPDATE_COST_REPORT_CONFIGURATION'), '');
+const { key: costReportConfigListQueryKey } = useServiceQueryKey('cost-analysis', 'cost-report-config', 'list');
+const { mutateAsync: updateCostReportConfig } = useMutation(
+    {
+        mutationFn: (params: CostReportConfigUpdateParameters) => costReportConfigAPI.update(params),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: costReportConfigListQueryKey });
+            showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_UPDATE_COST_REPORT_CONFIGURATION'), '');
+        },
+        onError: (error) => {
+            ErrorHandler.handleRequestError(error, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_UPDATE_COST_REPORT_CONFIGURATION'));
+        },
     },
-    onError: (error) => {
-        ErrorHandler.handleRequestError(error, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_UPDATE_COST_REPORT_CONFIGURATION'));
-    },
-});
+);
 
 const handleSave = () => {
     if (!costReportConfig.value?.cost_report_config_id) return;

@@ -4,30 +4,17 @@ import { computed, reactive } from 'vue';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { PButton, PSkeleton, PDivider } from '@cloudforet/mirinae';
+import { PSkeleton, PDivider } from '@cloudforet/mirinae';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { languages } from '@/store/user/constant';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-
-interface Props {
-    hasReadWriteAccess?: boolean;
-}
-
-const props = defineProps<Props>();
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const costReportPageState = costReportPageStore.state;
-const appContextStore = useAppContextStore();
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
 const state = reactive({
-    settingsModalVisible: false,
     recentIssueDate: computed<Dayjs>(() => {
         const today = dayjs.utc();
         if (Number(today.format('D')) < costReportPageGetters.issueDay) {
@@ -55,11 +42,6 @@ const state = reactive({
         return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
     }),
 });
-
-/* Event */
-const handleClickSettings = (): void => {
-    state.settingsModalVisible = true;
-};
 </script>
 
 <template>
@@ -68,17 +50,6 @@ const handleClickSettings = (): void => {
             <span class="title">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_REPORT') }}
             </span>
-        </template>
-        <template v-if="props.hasReadWriteAccess && storeState.isAdminMode"
-                  #right-extra
-        >
-            <p-button style-type="tertiary"
-                      icon-left="ic_settings"
-                      size="sm"
-                      @click="handleClickSettings"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SETTINGS') }}
-            </p-button>
         </template>
         <template #content>
             <p-skeleton v-if="costReportPageState.reportConfigLoading"
@@ -110,7 +81,6 @@ const handleClickSettings = (): void => {
                     </span>
                 </div>
             </template>
-            <cost-report-settings-modal :visible.sync="state.settingsModalVisible" />
         </template>
     </cost-report-overview-card-template>
 </template>
