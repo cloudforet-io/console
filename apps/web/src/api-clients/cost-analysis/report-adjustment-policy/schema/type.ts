@@ -1,2 +1,6 @@
 export type ReportAdjustmentPolicyScope = 'WORKSPACE'|'PROJECT';
-export type ReportAdjustmentPolicyState = 'ENALBED' | 'DELETED' | 'DISABLED';
+
+export type ReportAdjustmentPolicyFilter = {
+    workspace_ids?: string[];
+    project_ids?: string[];
+};

@@ -6,6 +6,4 @@ export interface ReportAdjustmentPolicyListParameters {
     query?: Query;
     name?: string;
     state?: ReportAdjustmentPolicyState;
-    workspace_id?: string;
-    user_projects?: string[];
 }
