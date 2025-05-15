@@ -9,7 +9,7 @@ export interface ReportAdjustmentModel {
     provider: string;
     currency: string;
     order: number;
-    filters: Record<string, string>;
+    adjustment_filter: Record<string, string>;
     cost_report_config_id: string;
     report_adjustment_policy_id: string;
     domain_id: string;
@@ -17,5 +17,4 @@ export interface ReportAdjustmentModel {
     project_id: string;
     created_at: string;
     updated_at: string;
-    deleted_at: string;
 }
