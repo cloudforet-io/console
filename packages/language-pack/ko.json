@@ -707,7 +707,6 @@
 						"PROJECT_MEMBER": "프로젝트 멤버",
 						"PROJECT_VALIDATION": "해당 프로젝트는 이미 사용 중입니다.",
 						"REQUIRED_NAME": "이름을 입력하세요.",
-						"RESET_DATE": "",
 						"SCOPE": "범위",
 						"SELECT_MONTH": "월 선택",
 						"SERVICE_ACCOUNT": "서비스 어카운트",
@@ -1535,8 +1534,8 @@
 			"ALT_S_UPDATE": "개인 정보 수정 완료",
 			"CONFIRM_PASSWORD": "비밀번호 확인",
 			"CURRENT_PASSWORD": "현재 비밀번호",
-			"CURRENT_PASSWORD_INVALID": "",
-			"EDIT_ACCOUNT_INFO": "",
+			"CURRENT_PASSWORD_INVALID": "잘못된 비밀번호입니다.",
+			"EDIT_ACCOUNT_INFO": "계정 정보 수정",
 			"EMAIL": "이메일",
 			"EMAIL_REQUIRED": "이메일을 입력해주세요.",
 			"GROUP": "소속",
@@ -1552,7 +1551,7 @@
 			"PASSWORD": "비밀번호",
 			"PASSWORD_CHECK": "비밀번호 확인",
 			"PASSWORD_CHECK_INVALID": "동일한 비밀번호를 입력해 주세요.",
-			"PASSWORD_CHECK_TITLE": "",
+			"PASSWORD_CHECK_TITLE": "현재 비밀번호 확인",
 			"PASSWORD_HELP_TEXT": "인증된 알림 전용 이메일이 있는 계정일 경우에만 비밀번호 재설정 링크 수신이 가능합니다.",
 			"ROLE": "권한",
 			"SEND_LINK": "사용자에게 비밀번호 재설정 이메일 발송",
@@ -1860,8 +1859,8 @@
 			},
 			"DEFAULT_WIDTH": "기본 너비",
 			"DELETE": "삭제",
-			"DIMENSIONS": "",
-			"DIMENSIONS_DESC": "",
+			"DIMENSIONS": "차원",
+			"DIMENSIONS_DESC": "최대 3개까지 선택하여 보기 화면을 사용자 지정할 수 있습니다.",
 			"DISPLAY_ANNOTATION": {
 				"DISPLAY_ANNOTATION": "부가 정보 표시",
 				"INVALID_VALUE": "추가로 표시할 내용을 입력해주세요.",
@@ -2349,7 +2348,7 @@
 				"UNCHECK_MODAL_HELP_TEXT_1": "해당 변수를 상속받고 있는",
 				"UNCHECK_MODAL_HELP_TEXT_2": "다음과 같은 위젯들에 영향을 미칠 수 있습니다.",
 				"UNCHECK_MODAL_TITLE": "이 변수 사용을 해제할까요? ",
-				"VALIDATION_NAME_REQUIRED": ""
+				"VALIDATION_NAME_REQUIRED": "이름을 입력하세요."
 			}
 		},
 		"DETAIL": {
@@ -2663,7 +2662,7 @@
 					"SECURITY": "보안",
 					"SELECT_A_DATA_SOURCE": "데이터 소스 선택",
 					"SELECT_DATA_SOURCE_TYPE": "데이터 소스 타입 선택",
-					"UNIFIED_COST": ""
+					"UNIFIED_COST": "Unified Cost"
 				},
 				"STEP_2": {
 					"ADD_RULE": "규칙 추가",
@@ -2683,7 +2682,7 @@
 					"DATE_RANGE_INVALID_RANGE_TEXT": "시작 날짜는 종료 날짜보다 이전이어야 합니다.",
 					"DEPRECATED_OPTION": "지원 중지된 옵션",
 					"DESCRIPTION": "설명",
-					"DIMENSIONS": "",
+					"DIMENSIONS": "차원",
 					"DYNAMIC_FIELD": "변동 데이터 필드",
 					"EDIT_DATA": "데이터 수정",
 					"END": "종료",
@@ -4910,8 +4909,8 @@
 		"CREATE_TARGET": "{target} 생성",
 		"DEFAULT": "기본",
 		"DELETE_TARGET": "{target} 삭제",
-		"DELETE_TARGET_CONFIRMATION": "정말 이 {object}{particle} 삭제하시겠습니까?",
-		"DESCRIBE_FIELD": "이 {field}{particle} 간단히 설명해주세요.",
+		"DELETE_TARGET_CONFIRMATION": "이 {object}{particle}를 삭제하시겠습니까?",
+		"DESCRIBE_FIELD": "이 {field}{particle}를 간단히 설명하세요.",
 		"DESCRIPTION": "설명",
 		"EDIT_TARGET": "{target} 변경",
 		"FIELDS_CONFIG": "필드 설정",
@@ -4920,7 +4919,7 @@
 			"ASSET": "자산",
 			"DATE": "날짜",
 			"DROPDOWN": "드롭다운",
-			"ENTER_DEFAULT_DESCRIPTION": "기본적으로 표시될 설명을 입력하세요.",
+			"ENTER_DEFAULT_DESCRIPTION": "표시할 기본 설명을 입력하세요.",
 			"FIELD": "필드",
 			"FIELD_DELETE_DESC": "{taskType}의 {field}를 삭제하면, 기존 {task}에도 해당 필드 삭제가 반영됩니다.",
 			"FIELD_ID_EDIT_DESC": "필드 아이디를 수정하면 기존 {task}에 작성한 내용이 보이지 않게되며, 새로 생성되는 {task}에만 반영됩니다.",
@@ -4988,8 +4987,8 @@
 			"ALT_S_DISABLE_LANDING": "랜딩 페이지 비활성화",
 			"ALT_S_ENABLE_LANDING": "랜딩 페이지 활성화",
 			"CATEGORY": {
-				"DELETE_CONFIRMATION_DESC": "이 카테고리 하위에 {tasks}{particle} 존재합니다. 삭제 시엔 {tasks} 수정이 불가합니다. 그래도 정말 삭제하시겠습니까?",
-				"DESC": "이는 {tasks}의 유형을 그룹화한 것입니다. 사용자는 {task}{taskObjectParticle} 제출할 때 적절한 카테고리를 선택하여 담당자가 {tasks}{tasksObjectParticle} 더 효율적으로 관리할 수 있도록 돕습니다."
+				"DELETE_CONFIRMATION_DESC": "이 카테고리 아래에 {tasks}{particle}가 있습니다. 삭제하면 {tasks}는 수정할 수 없습니다. 계속 진행하시겠습니까?",
+				"DESC": "이 그룹은 {tasks} 유형을 분류합니다. 사용자는 {task}{taskObjectParticle}를 제출할 때 적절한 카테고리를 선택하며, 이는 담당자가 {task}{taskObjectParticle}를 보다 효율적으로 관리하는 데 도움이 됩니다."
 			},
 			"ENABLE_LANDING": "랜딩 페이지 활성화",
 			"ENABLE_LANDING_DESC": "OpsFlow 메뉴 아래에 랜딩 페이지가 표시됩니다.",
@@ -4998,10 +4997,10 @@
 				"AFFECTED_DESC": "영향 받는 {workspace}와 {category}는 다음과 같습니다.",
 				"CHANGE_STATUS": "변경 여부",
 				"C_CATEGORY": "카테고리",
-				"C_IS": "",
+				"C_IS": "is | are",
 				"C_WORKSPACE": "워크스페이스",
-				"DELETE_UNAVAILABLE": "연결된 카테고리가 존재하므로 패키지 삭제가 불가합니다.",
-				"DESC": "계약에 따라 사용자에게 제공되는 기능의 집합으로, 전체 서비스의 범위를 나타냅니다.",
+				"DELETE_UNAVAILABLE": "연결된 카테고리가 있어 패키지를 삭제할 수 없습니다.",
+				"DESC": "사용자의 계약에 따라 제공되는 기능들의 집합으로, 서비스의 전체 범위를 나타냅니다.",
 				"REMOVED": "삭제됨",
 				"SET_DEFAULT_DESC": "이 패키지를 관련 작업에 사용할 기본 패키지로 변경합니다.",
 				"SET_TARGET_AS_DEFAULT": "{target} 패키지를 기본으로 설정",
@@ -5591,7 +5590,7 @@
 				"REMOVE": "제거"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
-			"MOVE": "이동\n",
+			"MOVE": "이동",
 			"NO_GROUP_MEMBER": "프로젝트 그룹 멤버 없음",
 			"NO_PROJECT_GROUP_MSG": "이 워크스페이스에는 아직 생성된 프로젝트 또는 프로젝트 그룹이 없습니다.",
 			"ONLY_PEOPLE_INVITED": "초대된 사용자만",
