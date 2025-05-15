@@ -34,10 +34,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import AdvancedSettingsSetAdjustmentsOverlay from '@/services/cost-explorer/components/AdvancedSettingsSetAdjustmentsOverlay.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
-import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
+import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 
 
-const costExplorerSettingsStore = useCostExplorerSettingsStore();
+const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const { costReportConfig } = useCostReportConfigQuery();
 const { costReportConfigAPI } = useCostReportConfigApi();
 const queryClient = useQueryClient();
@@ -162,7 +162,7 @@ const handleUpdateManualAdjustablePeriod = (val: number) => {
     setForm('manualAdjustablePeriod', val);
 };
 const handleOpenAdjustmentsOverlay = () => {
-    costExplorerSettingsStore.setShowAdjustmentsOverlay(true);
+    advancedSettingsPageStore.setShowAdjustmentsOverlay(true);
 };
 
 /* Watcher */
