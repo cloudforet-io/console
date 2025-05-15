@@ -10,5 +10,5 @@ export interface ReportAdjustmentCreateParameters {
     description?: string;
     currency?: string;
     order?: number;
-    filters?: Record<string, string>;
+    adjustment_filter?: Record<string, string>;
 }
