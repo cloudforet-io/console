@@ -3,10 +3,10 @@ import type { ReportAdjustmentPolicyFilter, ReportAdjustmentPolicyScope } from '
 
 
 export interface ReportAdjustmentPolicyCreateParameters {
-    name: string;
     scope: ReportAdjustmentPolicyScope;
     cost_report_config_id: string;
     order?: number;
+    description?: string;
     tags: Tags;
     policy_filter: ReportAdjustmentPolicyFilter;
 }

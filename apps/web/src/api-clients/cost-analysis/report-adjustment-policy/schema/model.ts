@@ -3,7 +3,7 @@ import type { ReportAdjustmentPolicyFilter, ReportAdjustmentPolicyScope } from '
 
 export interface ReportAdjustmentPolicyModel {
     report_adjustment_policy_id: string;
-    name: string;
+    description: string;
     scope: ReportAdjustmentPolicyScope;
     order: number;
     adjustments: string[];

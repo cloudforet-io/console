@@ -1,4 +1,4 @@
-export type ReportAdjustmentPolicyScope = 'WORKSPACE'|'PROJECT';
+export type ReportAdjustmentPolicyScope = 'WORKSPACE'|'PROJECT'|'SERVICE_ACCOUNT';
 
 export type ReportAdjustmentPolicyFilter = {
     workspace_ids?: string[];
