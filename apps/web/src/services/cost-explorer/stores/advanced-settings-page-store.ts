@@ -1,0 +1,64 @@
+import { defineStore } from 'pinia';
+
+import getRandomId from '@/lib/random-id-generator';
+
+import type { AdjustmentData, AdjustmentPolicyData } from '@/services/cost-explorer/types/report-adjustment-type';
+
+interface AdvancedSettingsPageStore {
+    loading: boolean;
+    showAdjustmentsOverlay: boolean;
+    adjustmentPolicyList: AdjustmentPolicyData[];
+    adjustmentListMap: Record<string, AdjustmentData[]>;
+}
+export const useAdvancedSettingsPageStore = defineStore('advanced-settings', {
+    state: (): AdvancedSettingsPageStore => ({
+        loading: true,
+        showAdjustmentsOverlay: false,
+        adjustmentPolicyList: [], // [{ id, workspace_ids, ... }]
+        adjustmentListMap: {}, // { policy_id: [{ id, ... }] }
+    }),
+    getters: {
+        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => item.workspaceIdList.length > 0),
+        isAdjustmentValid: (state) => Object.values(state.adjustmentListMap)
+            .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && adjustment.amount)),
+    },
+    actions: {
+        setLoading(state: AdvancedSettingsPageStore['loading']) {
+            this.loading = state;
+        },
+        setShowAdjustmentsOverlay(state: AdvancedSettingsPageStore['showAdjustmentsOverlay']) {
+            this.showAdjustmentsOverlay = state;
+        },
+        setAdjustmentPolicyList(state: AdvancedSettingsPageStore['adjustmentPolicyList']) {
+            this.adjustmentPolicyList = state;
+        },
+        setAdjustmentListMap(state: AdvancedSettingsPageStore['adjustmentListMap']) {
+            this.adjustmentListMap = state;
+        },
+        addAdjustmentPolicy(policyId: string) {
+            this.adjustmentPolicyList.push({
+                id: policyId,
+                workspaceIdList: [],
+            });
+            this.adjustmentListMap[policyId] = [];
+        },
+        addAdjustment(policyId: string) {
+            this.adjustmentListMap[policyId].push({
+                id: getRandomId(),
+                name: '',
+                provider: '',
+                adjustment: 'FIXED_ADDITION',
+                amount: 0,
+                description: '',
+                policyId,
+            });
+        },
+        deleteAdjustmentPolicy(policyId: string) {
+            this.adjustmentPolicyList = this.adjustmentPolicyList.filter((item) => item.id !== policyId);
+            delete this.adjustmentListMap[policyId];
+        },
+        deleteAdjustment(policyId: string, adjustmentId: string) {
+            this.adjustmentListMap[policyId] = this.adjustmentListMap[policyId].filter((item) => item.id !== adjustmentId);
+        },
+    },
+});
