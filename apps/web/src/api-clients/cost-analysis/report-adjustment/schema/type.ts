@@ -1,1 +1,1 @@
-export type ReportAdjustmentMethod = 'FIXED' | 'RATE';
+export type ReportAdjustmentMethod = 'FIXED' | 'PERCENTAGE';
