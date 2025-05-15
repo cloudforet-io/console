@@ -1,13 +1,12 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { ReportAdjustmentPolicyScope } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/type';
+import type { ReportAdjustmentPolicyFilter, ReportAdjustmentPolicyScope } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/type';
 
 
 export interface ReportAdjustmentPolicyCreateParameters {
-    name: string;
     scope: ReportAdjustmentPolicyScope;
     cost_report_config_id: string;
     order?: number;
+    description?: string;
     tags: Tags;
-    project_id: string;
-    workspace_id: string;
+    policy_filter: ReportAdjustmentPolicyFilter;
 }

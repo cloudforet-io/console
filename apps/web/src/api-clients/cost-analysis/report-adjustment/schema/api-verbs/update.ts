@@ -8,5 +8,5 @@ export interface ReportAdjustmentUpdateParameters {
     value?: number;
     description?: string;
     provider?: string;
-    filters?: Record<string, string>;
+    adjustment_filter?: Record<string, string>;
 }
