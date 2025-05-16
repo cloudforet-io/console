@@ -707,7 +707,6 @@
 						"PROJECT_MEMBER": "Project Member",
 						"PROJECT_VALIDATION": "The project is already in use.",
 						"REQUIRED_NAME": "Please enter name.",
-						"RESET_DATE": "",
 						"SCOPE": "Scope",
 						"SELECT_MONTH": "Select Month",
 						"SERVICE_ACCOUNT": "Service Account",
@@ -2349,7 +2348,7 @@
 				"UNCHECK_MODAL_HELP_TEXT_1": "This will affect the following widgets",
 				"UNCHECK_MODAL_HELP_TEXT_2": "which currently have options inherited by selected variable.",
 				"UNCHECK_MODAL_TITLE": "Not going to use this variable?",
-				"VALIDATION_NAME_REQUIRED": ""
+				"VALIDATION_NAME_REQUIRED": "Please enter name."
 			}
 		},
 		"DETAIL": {
