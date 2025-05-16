@@ -1,25 +1,47 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
     PButton, PIconButton, PCard, PSelectDropdown,
 } from '@cloudforet/mirinae';
-
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import getRandomId from '@/lib/random-id-generator';
+import { VariableModelFactory } from '@/lib/variable-models';
+import {
+    getVariableModelMenuHandler,
+} from '@/lib/variable-models/variable-model-menu-handler';
+import type {
+    VariableModelMenuHandlerInfo,
+} from '@/lib/variable-models/variable-model-menu-handler';
 
 import AdvancedSettingsAdjustmentsForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentsForm.vue';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 
-
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
 
+const workspaceMenuHandler = computed<AutocompleteHandler>(() => {
+    const variableModelInfo: VariableModelMenuHandlerInfo = {
+        variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'workspace' }),
+    };
+    return getVariableModelMenuHandler([variableModelInfo]);
+});
+
+const handleSelectWorkspace = (policyId: string, selected: SelectDropdownMenuItem[]) => {
+    const targetPolicy = advancedSettingsPageState.adjustmentPolicyList.find((d) => d.id === policyId);
+    if (targetPolicy) {
+        advancedSettingsPageStore.updateAdjustmentPolicy(policyId, {
+            ...targetPolicy,
+            workspaceMenuItems: selected,
+        });
+    }
+};
 const handleAddAdjustmentPolicy = () => {
     const policyId = getRandomId();
     advancedSettingsPageStore.addAdjustmentPolicy(policyId);
 };
-
 const handleDeleteAdjustmentPolicy = (policyId: string) => {
     advancedSettingsPageStore.deleteAdjustmentPolicy(policyId);
 };
@@ -50,9 +72,18 @@ const handleDeleteAdjustmentPolicy = (policyId: string) => {
                                            size="sm"
                             />
                             {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.WORKSPACE') }}:
-                            <p-select-dropdown :menu="[]"
-                                               style-type="transparent"
+                            <p-select-dropdown size="sm"
+                                               is-filterable
+                                               :handler="workspaceMenuHandler"
+                                               :selected="adjustmentPolicy.workspaceMenuItems"
+                                               menu-position="left"
+                                               multi-selectable
+                                               show-select-marker
+                                               use-fixed-menu-style
                                                :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.SELECT_WORKSPACE')"
+                                               :disabled="!adjustmentPolicy.workspaceMenuItems"
+                                               :page-size="10"
+                                               @update:select="handleSelectWorkspace(adjustmentPolicy.id, $event)"
                             />
                         </div>
                         <div class="right-part">
