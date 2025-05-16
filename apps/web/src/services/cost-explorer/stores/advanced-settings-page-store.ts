@@ -10,7 +10,7 @@ interface AdvancedSettingsPageStore {
     adjustmentPolicyList: AdjustmentPolicyData[];
     adjustmentListMap: Record<string, AdjustmentData[]>;
 }
-export const useAdvancedSettingsPageStore = defineStore('advanced-settings', {
+export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings', {
     state: (): AdvancedSettingsPageStore => ({
         loading: true,
         showAdjustmentsOverlay: false,
@@ -18,7 +18,7 @@ export const useAdvancedSettingsPageStore = defineStore('advanced-settings', {
         adjustmentListMap: {}, // { policy_id: [{ id, ... }] }
     }),
     getters: {
-        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => item.workspaceIdList.length > 0),
+        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => !item.workspaceMenuItems || item.workspaceMenuItems.length > 0),
         isAdjustmentValid: (state) => Object.values(state.adjustmentListMap)
             .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && adjustment.amount)),
     },
@@ -38,7 +38,7 @@ export const useAdvancedSettingsPageStore = defineStore('advanced-settings', {
         addAdjustmentPolicy(policyId: string) {
             this.adjustmentPolicyList.push({
                 id: policyId,
-                workspaceIdList: [],
+                workspaceMenuItems: undefined,
             });
             this.adjustmentListMap[policyId] = [];
         },
@@ -59,6 +59,12 @@ export const useAdvancedSettingsPageStore = defineStore('advanced-settings', {
         },
         deleteAdjustment(policyId: string, adjustmentId: string) {
             this.adjustmentListMap[policyId] = this.adjustmentListMap[policyId].filter((item) => item.id !== adjustmentId);
+        },
+        updateAdjustmentPolicy(policyId: string, policy: AdjustmentPolicyData) {
+            this.adjustmentPolicyList = this.adjustmentPolicyList.map((item) => (item.id === policyId ? policy : item));
+        },
+        updateAdjustment(policyId: string, adjustmentId: string, adjustment: AdjustmentData) {
+            this.adjustmentListMap[policyId] = this.adjustmentListMap[policyId].map((item) => (item.id === adjustmentId ? adjustment : item));
         },
     },
 });

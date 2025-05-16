@@ -5,29 +5,47 @@ import {
     PButton, POverlayLayout,
 } from '@cloudforet/mirinae';
 
-import { useReportAdjustmentPolicyApi } from '@/api-clients/cost-analysis/report-adjustment-policy/composables/use-report-adjustment-policy-api';
 import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/model';
-import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjustment/composables/use-report-adjustment-api';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
 import AdvancedSettingsAdjustmentGroupForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentGroupForm.vue';
+import { useReportAdjustmentPolicyQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-policy-query';
+import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 import type { AdjustmentType, AdjustmentData, AdjustmentPolicyData } from '@/services/cost-explorer/types/report-adjustment-type';
 
+
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
-const { reportAdjustmentPolicyAPI } = useReportAdjustmentPolicyApi();
-const { reportAdjustmentAPI } = useReportAdjustmentApi();
+const {
+    reportAdjustmentList,
+    isLoading: isReportAdjustmentLoading,
+} = useReportAdjustmentQuery();
+const {
+    reportAdjustmentPolicyList,
+    isLoading: isReportAdjustmentPolicyLoading,
+} = useReportAdjustmentPolicyQuery();
 
 const state = reactive({
     isAllValid: computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid),
 });
 
+const storeState = reactive({
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+});
+
 /* Util */
 const convertRawPolicy = (rawPolicy: ReportAdjustmentPolicyModel): AdjustmentPolicyData => ({
     id: rawPolicy.report_adjustment_policy_id,
-    workspaceIdList: rawPolicy.policy_filter?.workspace_ids || [],
+    workspaceMenuItems: rawPolicy.policy_filter?.workspace_ids?.map((workspaceId) => ({
+        name: workspaceId,
+        label: storeState.workspaces[workspaceId]?.name || workspaceId,
+    })) || [],
 });
 const convertRawAdjustment = (rawAdjustment: ReportAdjustmentModel): AdjustmentData => {
     let adjustment: AdjustmentType;
@@ -50,24 +68,19 @@ const convertRawAdjustment = (rawAdjustment: ReportAdjustmentModel): AdjustmentD
 /* Init */
 const initForm = async () => {
     try {
-        // 1. List Adjustment Policy and convert
-        const policyListRes = await reportAdjustmentPolicyAPI.list({});
-        const policyList: AdjustmentPolicyData[] = policyListRes.results?.map(convertRawPolicy) || [];
-
-        // 2. List Adjustment and convert
-        const adjustmentListRes = await reportAdjustmentAPI.list({});
-        const adjustmentList: AdjustmentData[] = adjustmentListRes.results?.map(convertRawAdjustment) || [];
+        const adjustmentPolicyList: AdjustmentPolicyData[] = reportAdjustmentPolicyList.value?.map(convertRawPolicy) || [];
+        const adjustmentList: AdjustmentData[] = reportAdjustmentList.value?.map(convertRawAdjustment) || [];
 
         // 3. Group Adjustment by Policy
         const adjustmentsByPolicy: Record<string, AdjustmentData[]> = {};
-        policyList.forEach((policy) => {
+        adjustmentPolicyList.forEach((policy) => {
             adjustmentsByPolicy[policy.id] = adjustmentList.filter(
                 (adj) => adj.policyId === policy.id,
             );
         });
 
         // 4. Store them
-        advancedSettingsPageStore.setAdjustmentPolicyList(policyList);
+        advancedSettingsPageStore.setAdjustmentPolicyList(adjustmentPolicyList);
         advancedSettingsPageStore.setAdjustmentListMap(adjustmentsByPolicy);
     } catch (error) {
         console.error(error);
@@ -92,8 +105,12 @@ const handleSave = async () => {
 };
 
 /* Watcher */
-watch(() => advancedSettingsPageState.showAdjustmentsOverlay, (visible) => {
-    if (visible) initForm();
+watch([
+    () => advancedSettingsPageState.showAdjustmentsOverlay,
+    () => isReportAdjustmentLoading.value,
+    () => isReportAdjustmentPolicyLoading.value,
+], ([visible, _isReportAdjustmentLoading, _isReportAdjustmentPolicyLoading]) => {
+    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) initForm();
 });
 </script>
 
