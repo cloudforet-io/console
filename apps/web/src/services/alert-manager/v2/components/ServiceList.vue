@@ -10,7 +10,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolbox, PDataLoader, PEmpty, PButton, PPagination,
 } from '@cloudforet/mirinae';
-import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -66,12 +65,23 @@ const handleToolbox = async (options: ToolboxOptions) => {
         queryTagHelper.setQueryTags(options.queryTags);
 
         const nameTags = options.queryTags.filter((tag) => tag.key?.name === 'name');
-        const names = nameTags.map((tag) => tag.value?.name).filter(Boolean);
+        const hasName = nameTags.length > 0;
 
-        replaceUrlQuery({
+        const newQuery: Record<string, any> = {
             ...route.query,
-            serviceName: names.length ? names : undefined,
-        });
+        };
+
+        if (hasName) {
+            delete newQuery.unhealthyPage;
+            delete newQuery.healthyPage;
+            serviceListPageStore.setUnhealthyPage(1);
+            serviceListPageStore.setHealthyPage(1);
+        } else {
+            newQuery.unhealthyPage = String(serviceListPageStore.unhealthyThisPage);
+            newQuery.healthyPage = String(serviceListPageStore.healthyThisPage);
+        }
+
+        replaceUrlQuery(newQuery);
     }
     await fetchBothLists();
 };
@@ -166,7 +176,7 @@ const handleNavigateToDetail = (serviceId: string) => {
 };
 
 onMounted(async () => {
-    const { unhealthyPage, healthyPage, serviceName } = route.query;
+    const { unhealthyPage, healthyPage } = route.query;
 
     let parsedUnhealthy = parseInt(unhealthyPage as string);
     let parsedHealthy = parseInt(healthyPage as string);
@@ -177,29 +187,8 @@ onMounted(async () => {
     serviceListPageStore.setUnhealthyPage(parsedUnhealthy);
     serviceListPageStore.setHealthyPage(parsedHealthy);
 
-    // eslint-disable-next-line no-nested-ternary
-    const serviceNames = serviceName ? (Array.isArray(serviceName) ? serviceName : [serviceName]) : [];
-    if (serviceNames.length) {
-        const tags: QueryTag[] = serviceNames.map((name) => ({
-            key: { name: 'name', label: 'Name' },
-            operator: '=',
-            value: { label: name ?? '', name: name ?? '' },
-        }));
-        queryTagHelper.setQueryTags(tags);
-    }
-
     await fetchBothLists();
 });
-
-watch(() => queryTags.value, (tags) => {
-    const nameTags = tags.filter((tag) => tag.key?.name === 'name');
-    const names = nameTags.map((tag) => tag.value?.name).filter(Boolean);
-
-    replaceUrlQuery({
-        ...route.query,
-        serviceName: names.length ? names : undefined,
-    });
-}, { immediate: true });
 
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
     replaceUrlQuery({

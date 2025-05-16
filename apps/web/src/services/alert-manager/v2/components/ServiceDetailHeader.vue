@@ -89,7 +89,6 @@ const handleGoBackButton = () => {
             query: {
                 unhealthyPage: validUnhealthyPage.toString(),
                 healthyPage: validHealthyPage.toString(),
-                serviceName: route.query.filterService,
             },
         }).catch(() => {});
         return;
