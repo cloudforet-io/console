@@ -1,8 +1,8 @@
-
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 export interface AdjustmentPolicyData {
   id: string;
-  workspaceIdList: string[];
+  workspaceMenuItems?: SelectDropdownMenuItem[];
 }
 
 export interface AdjustmentData {
