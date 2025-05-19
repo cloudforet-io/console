@@ -920,6 +920,7 @@
 				"ALT_S_UPDATE_RECIPIENTS": "レポート受信者が正常に更新されました",
 				"ALT_S_UPDATE_SETTINGS": "レポート設定が正常に更新されました",
 				"APPLY_CUSTOM_RANGE": "適用するカスタム範囲",
+				"CONFIRMATION_DATE": "確定日",
 				"COPY": "コピー",
 				"COST": "費用",
 				"COST_REPORT": "コストレポート",
@@ -962,6 +963,7 @@
 				"TOTAL_COST_FOR_PREVIOUS_MONTH": "{previous_month}期間内の総費用",
 				"UPCOMING_ISSUE_DATE": "今後のレポート発行日",
 				"UPCOMING_REPORT": "今後のレポート",
+				"UPCOMING_REPORT_CONFIRMATION_DATE_TOOLTIP": "確認日は、発行日から調整期間が経過した後の最終日です。",
 				"WORKSPACE": "ワークスペース",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Ownerの役"

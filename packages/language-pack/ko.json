@@ -920,6 +920,7 @@
 				"ALT_S_UPDATE_RECIPIENTS": "리포트 수신처 업데이트 완료",
 				"ALT_S_UPDATE_SETTINGS": "리포트 설정 업데이트 완료",
 				"APPLY_CUSTOM_RANGE": "커스텀 기간 선택",
+				"CONFIRMATION_DATE": "확정일",
 				"COPY": "복사",
 				"COST": "비용",
 				"COST_REPORT": "비용 리포트",
@@ -962,6 +963,7 @@
 				"TOTAL_COST_FOR_PREVIOUS_MONTH": "{previous_month} 기간 내 총비용 ",
 				"UPCOMING_ISSUE_DATE": "다음 리포트 발행일",
 				"UPCOMING_REPORT": "다음 리포트",
+				"UPCOMING_REPORT_CONFIRMATION_DATE_TOOLTIP": "확정일은 발행일로부터 조정 기간이 지난 후의 최종 날짜입니다.",
 				"WORKSPACE": "워크스페이스",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Owner 역할(Role)"
