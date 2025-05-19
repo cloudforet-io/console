@@ -1,19 +1,31 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
+
 import {
-    PSkeleton, PDivider, PTooltip, PI,
+    PSkeleton, PDivider, PTooltip, PButton, PI,
 } from '@cloudforet/mirinae';
 
+import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { i18n } from '@/translations';
+
 import { languages } from '@/store/user/constant';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
 import { getUpcomingIssueDate, getUpcomingConfirmationDate } from '@/services/cost-explorer/helpers/cost-report-issue-date-helper';
 
 const { costReportConfig, isLoading: isCostReportConfigLoading } = useCostReportConfigQuery();
+const { costReportConfigAPI } = useCostReportConfigApi();
+const queryClient = useQueryClient();
 
 const issueDate = computed<number|undefined>(() => costReportConfig.value?.issue_day);
 const lastDayOfMonth = computed<boolean>(() => costReportConfig.value?.is_last_day || false);
@@ -34,6 +46,24 @@ const reportDateRange = computed<string>(() => {
     const endOfNextMonth = recentReportDate.endOf('month');
     return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
 });
+
+const { key: costReportConfigListQueryKey } = useServiceQueryKey('cost-analysis', 'cost-report-config', 'list');
+const { mutateAsync: reissueReport, isPending: reissueReportLoading } = useMutation({
+    mutationFn: costReportConfigAPI.run,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: costReportConfigListQueryKey.value });
+        showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_REISSUE_REPORT'), '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_REISSUE_REPORT'));
+    },
+});
+const handleReissueReport = async () => {
+    if (!costReportConfig.value?.cost_report_config_id) return;
+    await reissueReport({
+        cost_report_config_id: costReportConfig.value?.cost_report_config_id,
+    });
+};
 </script>
 
 <template>
@@ -42,6 +72,18 @@ const reportDateRange = computed<string>(() => {
             <span class="title">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_REPORT') }}
             </span>
+        </template>
+        <template #right-extra>
+            <p-button
+                style-type="secondary"
+                size="sm"
+                icon-left="ic_renew"
+                :disabled="!costReportConfig?.cost_report_config_id"
+                :loading="reissueReportLoading"
+                @click="handleReissueReport"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.REISSUE_REPORT') }}
+            </p-button>
         </template>
         <template #content>
             <p-skeleton v-if="isCostReportConfigLoading"
@@ -98,14 +140,6 @@ const reportDateRange = computed<string>(() => {
 </template>
 
 <style lang="scss" scoped>
-.top-part {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .title {
-        @apply text-label-lg font-bold;
-    }
-}
 .upcoming-report-date-wrapper {
     @apply bg-gray-100 rounded-md p-4 text-label-md;
     display: flex;
