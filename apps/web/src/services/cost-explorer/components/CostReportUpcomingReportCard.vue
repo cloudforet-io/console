@@ -1,46 +1,38 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { PSkeleton, PDivider } from '@cloudforet/mirinae';
+import {
+    PSkeleton, PDivider, PTooltip, PI,
+} from '@cloudforet/mirinae';
 
 import { languages } from '@/store/user/constant';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
+import { getUpcomingIssueDate, getUpcomingConfirmationDate } from '@/services/cost-explorer/helpers/cost-report-issue-date-helper';
 
-const costReportPageStore = useCostReportPageStore();
-const costReportPageGetters = costReportPageStore.getters;
-const costReportPageState = costReportPageStore.state;
-const state = reactive({
-    recentIssueDate: computed<Dayjs>(() => {
-        const today = dayjs.utc();
-        if (Number(today.format('D')) < costReportPageGetters.issueDay) {
-            return today.subtract(1, 'month').date(costReportPageGetters.issueDay);
-        }
-        return today.date(costReportPageGetters.issueDay);
-    }),
-    recentReportDate: computed<Dayjs>(() => {
-        const today = dayjs.utc();
-        if (Number(today.format('D')) < costReportPageGetters.issueDay) {
-            return today.subtract(2, 'month');
-        }
-        return today.subtract(1, 'month');
-    }),
-    upcomingReportDateText: computed(() => {
-        const issueDay = costReportPageGetters.issueDay;
-        const issueDayText = issueDay < 10 ? `0${issueDay}` : String(issueDay);
-        const upcomingIssueDate = state.recentIssueDate.add(1, 'month').format('YYYY-MM');
-        return `${upcomingIssueDate}-${issueDayText}`;
-    }),
-    upcomingReportDateRangeText: computed(() => {
-        const upcomingReportDate = state.recentReportDate.add(1, 'month');
-        const startOfNextMonth = upcomingReportDate.startOf('month');
-        const endOfNextMonth = upcomingReportDate.endOf('month');
-        return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
-    }),
+const { costReportConfig, isLoading: isCostReportConfigLoading } = useCostReportConfigQuery();
+
+const issueDate = computed<number|undefined>(() => costReportConfig.value?.issue_day);
+const lastDayOfMonth = computed<boolean>(() => costReportConfig.value?.is_last_day || false);
+const enableAdjustments = computed<boolean>(() => costReportConfig.value?.adjustment_options?.enabled || false);
+const manualAdjustablePeriod = computed<number|undefined>(() => costReportConfig.value?.adjustment_options?.period);
+const upcomingReportDate = computed<string>(() => getUpcomingIssueDate(lastDayOfMonth.value, issueDate.value));
+const confirmationDate = computed<string>(() => getUpcomingConfirmationDate(enableAdjustments.value, upcomingReportDate.value, manualAdjustablePeriod.value ?? 0));
+const reportDateRange = computed<string>(() => {
+    if (!costReportConfig.value) return '';
+    let recentReportDate = dayjs.utc();
+    const today = dayjs.utc();
+    if (Number(today.format('D')) < costReportConfig.value?.issue_day) {
+        recentReportDate = today.subtract(1, 'month');
+    } else {
+        recentReportDate = today;
+    }
+    const startOfNextMonth = recentReportDate.startOf('month');
+    const endOfNextMonth = recentReportDate.endOf('month');
+    return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
 });
 </script>
 
@@ -52,23 +44,43 @@ const state = reactive({
             </span>
         </template>
         <template #content>
-            <p-skeleton v-if="costReportPageState.reportConfigLoading"
+            <p-skeleton v-if="isCostReportConfigLoading"
                         width="8rem"
                         height="1.875rem"
             />
             <template v-else>
-                <p class="date-text">
-                    {{ state.upcomingReportDateText }}
-                </p>
+                <div class="upcoming-report-date-wrapper">
+                    <div class="date-row">
+                        <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DATE') }}</span>
+                        <span class="value">{{ upcomingReportDate }}</span>
+                    </div>
+                    <div class="date-row">
+                        <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CONFIRMATION_DATE') }}</span>
+                        <span class="value">
+                            <span class="date">{{ confirmationDate }}</span>
+                            <p-tooltip
+                                :contents="$t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_REPORT_CONFIRMATION_DATE_TOOLTIP')"
+                                position="bottom"
+                            >
+                                <p-i name="ic_info-circle"
+                                     height="0.75rem"
+                                     width="0.75rem"
+                                     color="inherit"
+                                />
+                            </p-tooltip>
+                        </span>
+                    </div>
+                </div>
                 <p class="date-range-text">
-                    {{ state.upcomingReportDateRangeText }}
+                    {{ reportDateRange }}
                 </p>
+                <p-divider />
                 <div class="language-currency-wrapper">
                     <span class="label">
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.LANGUAGE') }}:
                     </span>
                     <span class="text">
-                        {{ languages[costReportPageGetters.language] ?? costReportPageGetters.language }}
+                        {{ languages[costReportConfig?.language ?? 'en'] ?? costReportConfig?.language }}
                     </span>
                     <p-divider class="divider"
                                vertical
@@ -77,7 +89,7 @@ const state = reactive({
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY') }}:
                     </span>
                     <span class="text">
-                        {{ costReportPageGetters.currency }}
+                        {{ costReportConfig?.currency }}
                     </span>
                 </div>
             </template>
@@ -94,12 +106,37 @@ const state = reactive({
         @apply text-label-lg font-bold;
     }
 }
+.upcoming-report-date-wrapper {
+    @apply bg-gray-100 rounded-md p-4 text-label-md;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+    .date-row {
+        display: grid;
+        grid-template-columns: 10rem 1fr;
+        align-items: center;
+        .label {
+            @apply text-gray-700;
+        }
+        .value {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            .date {
+                @apply text-gray-800;
+                font-weight: 700;
+            }
+        }
+    }
+}
 .date-text {
     @apply text-display-sm;
     padding-bottom: 0.125rem;
 }
 .date-range-text {
     @apply text-label-md text-gray-500;
+    padding-bottom: 1rem;
 }
 .language-currency-wrapper {
     @apply text-label-md;
