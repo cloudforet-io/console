@@ -16,11 +16,6 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
-import type { WebhookListErrorSParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
-import type { WebhookUpdateMessageFormatParameters } from '@/schema/alert-manager/webhook/api-verbs/update-message-format';
-import type { WebhookModel, WebhookListErrorsModel } from '@/schema/alert-manager/webhook/model';
-import type { WebhookMessageFormatType } from '@/schema/alert-manager/webhook/type';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
@@ -47,6 +42,12 @@ import {
 } from '@/services/alert-manager/v2/constants/webhook-table-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { WebhookDetailTabsType } from '@/services/alert-manager/v2/types/alert-manager-type';
+
+import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
+import type { WebhookListErrorsParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
+import type { WebhookUpdateMessageFormatParameters } from '@/schema/alert-manager/webhook/api-verbs/update-message-format';
+import type { WebhookModel, WebhookListErrorsModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookMessageFormatType } from '@/schema/alert-manager/webhook/type';
 
 const EXTRA_WIDTH = 315; // created_at width + show_button width + padding
 
@@ -180,7 +181,7 @@ const fetchWebhookErrorList = async () => {
         errorListApiQueryHelper.setFilters([
             ...queryTagHelper.filters.value,
         ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.listErrors<WebhookListErrorSParameters, ListResponse<WebhookListErrorsModel>>({
+        const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.listErrors<WebhookListErrorsParameters, ListResponse<WebhookListErrorsModel>>({
             webhook_id: storeState.selectedWebhookId,
             query: errorListApiQueryHelper.data,
         });
