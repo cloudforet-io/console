@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-    onMounted, reactive, watch, watchEffect,
-} from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 import {
     useRoute, useRouter,
 } from 'vue-router/composables';
@@ -88,10 +86,6 @@ const handleToolbox = async (options: ToolboxOptions) => {
 
     await fetchBothLists();
 };
-
-watchEffect(() => {
-    console.log(route.query);
-});
 
 const fetchBothLists = async () => {
     await Promise.all([
