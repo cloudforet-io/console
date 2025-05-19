@@ -84,6 +84,7 @@ const handleGoBackButton = () => {
         const validHealthyPage = (!Number.isNaN(serviceListPageStore.healthyThisPage) && serviceListPageStore.healthyThisPage > 0)
             ? serviceListPageStore.healthyThisPage
             : 1;
+
         router.push({
             name: ALERT_MANAGER_ROUTE.SERVICE._NAME,
             query: {

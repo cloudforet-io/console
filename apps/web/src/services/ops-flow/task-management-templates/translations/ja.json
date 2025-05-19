@@ -1,25 +1,25 @@
 {
 	"default": {
-		"Task": "",
-		"TaskBoard": "",
-		"TaskCategory": "",
-		"TaskType": "",
-		"TemplateName": "",
-		"task": "",
-		"taskType": "",
-		"taskTypes": "",
-		"tasks": ""
+	  "Task": "タスク",
+	  "TaskBoard": "タスクボード",
+	  "TaskCategory": "タスクカテゴリ",
+	  "TaskType": "タスタイプ",
+	  "TemplateName": "デフォルト",
+	  "task": "タスク",
+	  "taskType": "タスタイプ",
+	  "taskTypes": "タスタイプ一覧",
+	  "tasks": "タスク一覧"
 	},
 	"service-desk": {
-		"Task": "",
-		"TaskBoard": "",
-		"TaskCategory": "",
-		"TaskType": "",
-		"TemplateName": "",
-		"landingDescription": "",
-		"task": "",
-		"taskType": "",
-		"taskTypes": "",
-		"tasks": ""
+	  "Task": "チケット",
+	  "TaskBoard": "チケットボード",
+	  "TaskCategory": "サポートカテゴリ",
+	  "TaskType": "リクエストタイプ",
+	  "TemplateName": "サービスデスク",
+	  "landingDescription": "サポートリクエストを簡単に送信・追跡できます。以下のカテゴリとリクエストタイプを選択して開始してください。アカウント管理、請求に関する問い合わせ、またはサービスリクエストなど、Service Deskがあなたのサポートを提供します。",
+	  "task": "チケット",
+	  "taskType": "リクエストタイプ",
+	  "taskTypes": "リクエストタイプ一覧",
+	  "tasks": "チケット一覧"
 	}
-}
+  }

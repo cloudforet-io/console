@@ -61,7 +61,29 @@ const queryTagHelper = useQueryTags({ keyItemSets: SERVICE_SEARCH_HANDLER.keyIte
 const { queryTags } = queryTagHelper;
 
 const handleToolbox = async (options: ToolboxOptions) => {
-    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+    if (options.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
+
+        const nameTags = options.queryTags.filter((tag) => tag.key?.name === 'name');
+        const nameValues = nameTags.map((tag) => tag.value.name).filter(Boolean);
+
+        const newQuery: Record<string, any> = {
+            unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
+            healthyPage: String(serviceListPageStore.healthyThisPage),
+        };
+
+        if (nameValues.length > 0) {
+            newQuery.serviceName = nameValues.join(',');
+        } else {
+            newQuery.serviceName = undefined;
+        }
+
+        replaceUrlQuery(newQuery);
+
+        serviceListPageStore.setUnhealthyPage(1);
+        serviceListPageStore.setHealthyPage(1);
+    }
+
     await fetchBothLists();
 };
 
@@ -166,33 +188,35 @@ onMounted(async () => {
     serviceListPageStore.setUnhealthyPage(parsedUnhealthy);
     serviceListPageStore.setHealthyPage(parsedHealthy);
 
+    const { serviceName } = route.query;
+    if (serviceName && typeof serviceName === 'string') {
+        const nameValues = serviceName.split(',').map((name) => ({
+            key: { name: 'name' },
+            value: { label: name, name },
+        }));
+        queryTagHelper.setQueryTags(nameValues);
+    }
+
     await fetchBothLists();
 });
 
-watch(() => route.query.serviceName, async (serviceName) => {
-    if (!serviceName) return;
-    queryTagHelper.setQueryTags([
-        {
-            key: { name: 'name', label: 'Name' },
-            operator: '=',
-            value: { label: serviceName as string, name: serviceName },
-        },
-    ]);
-    await fetchBothLists();
-}, { immediate: true });
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
-    replaceUrlQuery({
-        unhealthyPage: String(val),
-        healthyPage: String(serviceListPageStore.healthyThisPage),
-    });
+    if (!queryTags.value.some((tag) => tag.key?.name === 'name')) {
+        replaceUrlQuery({
+            unhealthyPage: String(val),
+            healthyPage: String(serviceListPageStore.healthyThisPage),
+        });
+    }
     handleUnhealthyPageChange();
 });
 
 watch(() => serviceListPageStore.healthyThisPage, (val) => {
-    replaceUrlQuery({
-        unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
-        healthyPage: String(val),
-    });
+    if (!queryTags.value.some((tag) => tag.key?.name === 'name')) {
+        replaceUrlQuery({
+            unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
+            healthyPage: String(val),
+        });
+    }
     handleHealthyPageChange();
 });
 </script>
@@ -212,10 +236,12 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
         />
 
         <section>
-            <p-data-loader :loading="state.loading"
-                           :data="state.alertServiceList"
-                           loader-backdrop-color="transparent"
-                           class="loader-wrapper"
+            <p-data-loader
+                :loading="state.loading"
+                :data="state.alertServiceList"
+                loader-backdrop-color="transparent"
+                disable-empty-case
+                class="loader-wrapper"
             >
                 <div>
                     <service-list-content v-if="state.alertServiceList.length > 0"
@@ -225,6 +251,7 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
                     />
                     <div class="flex justify-center mt-4">
                         <p-pagination
+                            v-if="state.totalCount > 0"
                             :total-count="state.totalCount"
                             :this-page.sync="serviceListPageStore.unhealthyThisPage"
                             :page-size.sync="serviceListPageStore.unhealthyPageSize"
@@ -232,6 +259,15 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
                         />
                     </div>
                 </div>
+            </p-data-loader>
+
+            <p-data-loader
+                :loading="state.healthyLoading"
+                :data="state.healthyServiceList"
+                loader-backdrop-color="transparent"
+                disable-empty-case
+                class="loader-wrapper"
+            >
                 <div>
                     <service-list-content v-if="state.healthyServiceList.length > 0"
                                           :list="state.healthyServiceList"
@@ -239,7 +275,7 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
                                           @navigate-to-detail="handleNavigateToDetail"
                     />
                     <div class="flex justify-center mt-4">
-                        <p-pagination v-if="state.healthyTotalCount > serviceListPageStore.healthyPageSize"
+                        <p-pagination v-if="state.healthyTotalCount > 0"
                                       :total-count="state.healthyTotalCount"
                                       :this-page.sync="serviceListPageStore.healthyThisPage"
                                       :page-size.sync="serviceListPageStore.healthyPageSize"
@@ -247,38 +283,31 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
                         />
                     </div>
                 </div>
-                <template #no-data>
-                    <div class="pt-12">
-                        <p-empty show-image
-                                 :show-button="hasReadWriteAccess"
-                        >
-                            <template #image>
-                                <img src="../../../../assets/images/img_jellyocto-with-a-telescope.png"
-                                     alt="empty-image"
-                                >
-                            </template>
-                            <template v-if="hasReadWriteAccess"
-                                      #button
-                            >
-                                <p-button icon-left="ic_plus_bold"
-                                          @click="handleClickCreateButton"
-                                >
-                                    {{ $t('ALERT_MANAGER.SERVICE.NO_DATA') }}
-                                </p-button>
-                            </template>
-                            {{ $t('ALERT_MANAGER.SERVICE.NO_DATA_DESC') }}
-                        </p-empty>
-                    </div>
-                </template>
             </p-data-loader>
+
+            <div v-if="!state.loading && !state.healthyLoading && state.alertServiceList.length === 0 && state.healthyServiceList.length === 0"
+                 class="mt-4"
+            >
+                <p-empty show-image
+                         :show-button="hasReadWriteAccess"
+                >
+                    <template #image>
+                        <img src="../../../../assets/images/img_jellyocto-with-a-telescope.png"
+                             alt="empty-image"
+                        >
+                    </template>
+                    <template v-if="hasReadWriteAccess"
+                              #button
+                    >
+                        <p-button icon-left="ic_plus_bold"
+                                  @click="handleClickCreateButton"
+                        >
+                            {{ $t('ALERT_MANAGER.SERVICE.NO_DATA') }}
+                        </p-button>
+                    </template>
+                    {{ $t('ALERT_MANAGER.SERVICE.NO_DATA_DESC') }}
+                </p-empty>
+            </div>
         </section>
     </div>
 </template>
-
-<style scoped lang="postcss">
-.service-list {
-    .loader-wrapper {
-        min-height: 13.75rem;
-    }
-}
-</style>

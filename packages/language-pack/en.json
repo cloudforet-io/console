@@ -695,19 +695,18 @@
 						"FIXED_TERM": "Fixed term",
 						"INCRASE_BY_SPECIFIC_PERCENTAGE": "Increase by a specific % each month",
 						"INITIAL_AMOUNT": "Initial Amount",
-						"LAST_COST_TREND": "Last {count} Month Cost Trend",
 						"MONTHLY": "Monthly",
 						"MONTHLY_BUDGET_ALLOCATION": "Monthly Budget Allocation",
 						"MONTHLY_GROWTH_RATE": "Monthly Growth Rate",
 						"OTHERS": "Others",
 						"PREVIOUS": "Previous",
+						"PREVIOUS_PERIOD_SPEND": "Previous Period Spending",
 						"PROJECT": "Project",
 						"PROJECT_DUPLICATED_WARNING1": "The project {project} already has a budget set for the following month(s): {month_list}",
 						"PROJECT_DUPLICATED_WARNING2": "The service account {serviceAccount} under project {project} already has a budget set for the following month(s): {month_list}",
 						"PROJECT_MEMBER": "Project Member",
 						"PROJECT_VALIDATION": "The project is already in use.",
 						"REQUIRED_NAME": "Please enter name.",
-						"RESET_DATE": "",
 						"SCOPE": "Scope",
 						"SELECT_MONTH": "Select Month",
 						"SERVICE_ACCOUNT": "Service Account",
@@ -722,7 +721,7 @@
 						"STEP1_DESC": "Set up a budget easily to track and manage your spending.",
 						"STEP2_DESCRIPTION": "Create a budget by setting the currency and budget cycle.",
 						"STEP3_DESCRIPTION": "Receive alerts when ‘Actual Spend’ exceeds the threshold.",
-						"THRESHOLD_INVALID_TEXT": "Alert Threshold is required.",
+						"THRESHOLD_INVALID_TEXT": "Please ensure the amount is entered and not duplicated.",
 						"WORKSPACE_OWNERS": "Workspace Owners"
 					},
 					"CREATE_BUDGET": "Create Budget",
@@ -2349,7 +2348,7 @@
 				"UNCHECK_MODAL_HELP_TEXT_1": "This will affect the following widgets",
 				"UNCHECK_MODAL_HELP_TEXT_2": "which currently have options inherited by selected variable.",
 				"UNCHECK_MODAL_TITLE": "Not going to use this variable?",
-				"VALIDATION_NAME_REQUIRED": ""
+				"VALIDATION_NAME_REQUIRED": "Please enter name."
 			}
 		},
 		"DETAIL": {
@@ -3399,6 +3398,7 @@
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
 					"DESCRIPTION": "Description",
+					"DUPLICATED_INVALID_TEXT": "This group name already exists. Please enter a different name.",
 					"GROUP_NAME": "Group Name",
 					"NOTIFICATION_CHANNEL": "Notification Channel",
 					"PROTOCOL": "Protocol",

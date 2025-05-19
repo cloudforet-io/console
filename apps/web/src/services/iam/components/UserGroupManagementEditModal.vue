@@ -33,12 +33,13 @@ const state = reactive({
     groupName: '',
     description: '',
     disabled: false,
+    isGroupNameDuplicated: false,
 });
 
 /* Watcher */
-watch(() => state.groupName, (groupName) => {
-    state.disabled = groupName.length > 0;
-}, { immediate: true });
+watch(() => state, () => {
+    state.disabled = state.groupName.length > 0 && !state.isGroupNameDuplicated;
+}, { deep: true, immediate: true });
 
 /* Component */
 const handleConfirm = async () => {
@@ -94,6 +95,7 @@ const handleClose = () => {
 const handleUpdateValues = (data) => {
     state.groupName = data.groupName;
     state.description = data.description;
+    state.isGroupNameDuplicated = data.isGroupNameDuplicated;
 };
 
 /* API */
