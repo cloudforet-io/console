@@ -12,7 +12,7 @@ import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/
 import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useScopedQuery } from '@/query/core/composables/use-scoped-query';
 import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 

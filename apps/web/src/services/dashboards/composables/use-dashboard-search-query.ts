@@ -15,7 +15,7 @@ import type { PrivateDashboardModel } from '@/api-clients/dashboard/private-dash
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useScopedQuery } from '@/query/core/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

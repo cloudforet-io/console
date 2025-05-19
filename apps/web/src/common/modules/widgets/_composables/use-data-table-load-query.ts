@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { usePrivateDataTableApi } from '@/api-clients/dashboard/private-data-table/composables/use-private-data-table-api';
 import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
 import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useScopedQuery } from '@/query/core/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { WIDGET_LOAD_STALE_TIME } from '@/common/modules/widgets/_constants/widget-constant';

@@ -17,7 +17,7 @@ import { numberFormatter } from '@cloudforet/utils';
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useScopedQuery } from '@/query/core/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 

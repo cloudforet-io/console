@@ -10,6 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { useMetricReferenceData } from '@/query/reference/metric/use-metric-reference-data';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -20,6 +21,7 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 
+
 interface Props {
     dataSourceDomain: string;
     selectedMetricId?: string;
@@ -28,11 +30,16 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:selected-metric-id', metricId: string): void;
 }>();
 
+const {
+    referenceMap,
+    refererenceList,
+} = useMetricReferenceData();
+
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    // metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
 });
 const state = reactive({
     proxySelectedMetricId: useProxyValue('selectedMetricId', props, emit),
@@ -84,7 +91,9 @@ const state = reactive({
     // metric
     metricMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedNamespaceId) return [];
-        const _metrics = Object.values(storeState.metrics)
+
+        // const _metrics = Object.values(storeState.metrics)
+        const _metrics = refererenceList.value
             .filter((metric) => metric.data.namespace_id === state.selectedNamespaceId)
             .filter((metric) => metric.label.toLowerCase().includes(state.metricSearchText.toLowerCase()));
         return _metrics.map((metric) => ({
