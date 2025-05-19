@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      REVIEWERS: '["WANZARGEN", "seungyeoneeee", "skdud4659", "piggggggggy"]'
+      REVIEWERS: '["seungyeoneeee", "skdud4659", "piggggggggy", "yuda110"]'
     
     steps:
       - uses: actions/checkout@v3
@@ -34,12 +34,10 @@ jobs:
             
             // Shuffle array and pick first two reviewers
             const shuffled = reviewers.sort(() => 0.5 - Math.random());
-            const randomReviewer1 = shuffled[0];
-            const randomReviewer2 = shuffled[1];
-            console.log('randomReviewer1:', randomReviewer1, 'randomReviewer2:', randomReviewer2);
+            const randomReviewer = shuffled[0];
+            console.log('randomReviewer:', randomReviewer);
 
-            core.setOutput('randomReviewer1', randomReviewer1);
-            core.setOutput('randomReviewer2', randomReviewer2);
+            core.setOutput('randomReviewer', randomReviewer);
 
       - name: Add Comment
         uses: actions/github-script@v6
@@ -49,7 +47,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🎉 @${{ steps.pick_random_reviewer.outputs.randomReviewer1 }} and @${{ steps.pick_random_reviewer.outputs.randomReviewer2 }} have been randomly selected as the reviewers! Please review. 🙏`
+              body: `🎉 @${{ steps.pick_random_reviewer.outputs.randomReviewer }} has been randomly selected as the reviewer! Please review. 🙏`
             });
       
       - name: Add Reviewers
@@ -61,7 +59,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number,
-              reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer1 }}`, `${{ steps.pick_random_reviewer.outputs.randomReviewer2 }}`]
+              reviewers: [`${{ steps.pick_random_reviewer.outputs.randomReviewer }}`]
             });
 
       - name: Check if the PR author is an organization member and add as assignee
