@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue';
+import {
+    onMounted, reactive, watch, watchEffect,
+} from 'vue';
 import {
     useRoute, useRouter,
 } from 'vue-router/composables';
@@ -65,26 +67,31 @@ const handleToolbox = async (options: ToolboxOptions) => {
         queryTagHelper.setQueryTags(options.queryTags);
 
         const nameTags = options.queryTags.filter((tag) => tag.key?.name === 'name');
-        const hasName = nameTags.length > 0;
+        const nameValues = nameTags.map((tag) => tag.value.name).filter(Boolean);
 
         const newQuery: Record<string, any> = {
-            ...route.query,
+            unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
+            healthyPage: String(serviceListPageStore.healthyThisPage),
         };
 
-        if (hasName) {
-            delete newQuery.unhealthyPage;
-            delete newQuery.healthyPage;
-            serviceListPageStore.setUnhealthyPage(1);
-            serviceListPageStore.setHealthyPage(1);
+        if (nameValues.length > 0) {
+            newQuery.serviceName = nameValues.join(',');
         } else {
-            newQuery.unhealthyPage = String(serviceListPageStore.unhealthyThisPage);
-            newQuery.healthyPage = String(serviceListPageStore.healthyThisPage);
+            newQuery.serviceName = undefined;
         }
 
         replaceUrlQuery(newQuery);
+
+        serviceListPageStore.setUnhealthyPage(1);
+        serviceListPageStore.setHealthyPage(1);
     }
+
     await fetchBothLists();
 };
+
+watchEffect(() => {
+    console.log(route.query);
+});
 
 const fetchBothLists = async () => {
     await Promise.all([
@@ -187,22 +194,35 @@ onMounted(async () => {
     serviceListPageStore.setUnhealthyPage(parsedUnhealthy);
     serviceListPageStore.setHealthyPage(parsedHealthy);
 
+    const { serviceName } = route.query;
+    if (serviceName && typeof serviceName === 'string') {
+        const nameValues = serviceName.split(',').map((name) => ({
+            key: { name: 'name' },
+            value: { label: name, name },
+        }));
+        queryTagHelper.setQueryTags(nameValues);
+    }
+
     await fetchBothLists();
 });
 
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
-    replaceUrlQuery({
-        unhealthyPage: String(val),
-        healthyPage: String(serviceListPageStore.healthyThisPage),
-    });
+    if (!queryTags.value.some((tag) => tag.key?.name === 'name')) {
+        replaceUrlQuery({
+            unhealthyPage: String(val),
+            healthyPage: String(serviceListPageStore.healthyThisPage),
+        });
+    }
     handleUnhealthyPageChange();
 });
 
 watch(() => serviceListPageStore.healthyThisPage, (val) => {
-    replaceUrlQuery({
-        unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
-        healthyPage: String(val),
-    });
+    if (!queryTags.value.some((tag) => tag.key?.name === 'name')) {
+        replaceUrlQuery({
+            unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
+            healthyPage: String(val),
+        });
+    }
     handleHealthyPageChange();
 });
 </script>
