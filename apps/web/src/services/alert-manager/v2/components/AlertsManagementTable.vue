@@ -19,6 +19,8 @@ import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
+import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
@@ -32,8 +34,7 @@ import type { ServiceReferenceMap } from '@/store/reference/service-reference-st
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
-import { downloadExcel } from '@/lib/helper/file-download-helper';
+import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
@@ -295,15 +296,27 @@ const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
     state.fields = fields;
 };
 const handleExportToExcel = async () => {
-    await downloadExcel({
-        url: '/alert-manager/alert/list',
-        param: {
-            query: { ...alertListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
-        },
-        fields: ALERT_EXCEL_FIELDS,
-        file_name_prefix: FILE_NAME_PREFIX.alert,
-        timezone: storeState.timezone,
-    });
+    const excelQuery = new ApiQueryHelper()
+        .setMultiSortV2([{ key: 'created_at', desc: true }])
+        .setFilters([...filterQueryHelper.filters]);
+    const excelExportFetcher = () => {
+        const alertExcelExportParams: ExportParameter = {
+            file_name: 'alert_export',
+            options: [
+                {
+                    name: 'Main Table',
+                    query_type: QueryType.SEARCH,
+                    search_query: {
+                        ...excelQuery.data,
+                        fields: ALERT_EXCEL_FIELDS,
+                    },
+                },
+            ],
+            timezone: state.timezone,
+        };
+        return SpaceConnector.clientV2.alertManager.alert.export(alertExcelExportParams);
+    };
+    await downloadExcelByExportFetcher(excelExportFetcher);
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
     alertPageStore.setSelectedPeriodRange(ALERT_PERIOD_DROPDOWN_MENU.CUSTOM);
