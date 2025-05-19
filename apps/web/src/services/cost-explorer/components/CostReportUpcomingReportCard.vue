@@ -1,16 +1,14 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
-
 
 import {
     PSkeleton, PDivider, PTooltip, PButton, PI,
 } from '@cloudforet/mirinae';
 
 import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { languages } from '@/store/user/constant';
@@ -25,7 +23,6 @@ import { getUpcomingIssueDate, getUpcomingConfirmationDate } from '@/services/co
 
 const { costReportConfig, isLoading: isCostReportConfigLoading } = useCostReportConfigQuery();
 const { costReportConfigAPI } = useCostReportConfigApi();
-const queryClient = useQueryClient();
 
 const issueDate = computed<number|undefined>(() => costReportConfig.value?.issue_day);
 const lastDayOfMonth = computed<boolean>(() => costReportConfig.value?.is_last_day || false);
@@ -47,11 +44,9 @@ const reportDateRange = computed<string>(() => {
     return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
 });
 
-const { key: costReportConfigListQueryKey } = useServiceQueryKey('cost-analysis', 'cost-report-config', 'list');
 const { mutateAsync: reissueReport, isPending: reissueReportLoading } = useMutation({
     mutationFn: costReportConfigAPI.run,
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: costReportConfigListQueryKey.value });
         showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_REISSUE_REPORT'), '');
     },
     onError: (e) => {
