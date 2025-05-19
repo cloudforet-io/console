@@ -7,11 +7,11 @@ import { useRouter } from 'vue-router/composables';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
-import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
+import type { ServiceChannelCreateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create';
 import type {
     ServiceChannelCreateForwardChannelParameters,
-} from '@/schema/alert-manager/service-channel/api-verbs/create-forward-channel';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+} from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create-forward-channel';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

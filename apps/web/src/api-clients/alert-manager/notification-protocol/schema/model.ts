@@ -1,11 +1,10 @@
 import type { TranslateResult } from 'vue-i18n';
 
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     NotificationProtocolPluginInfoType,
     NotificationProtocolStateType,
-} from '@/schema/alert-manager/notification-protocol/type';
+} from '@/api-clients/alert-manager/notification-protocol/schema/type';
 
 export interface NotificationProtocolModel {
     protocol_id: string;

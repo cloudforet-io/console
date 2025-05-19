@@ -13,7 +13,7 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 import { i18n, setI18nLocale } from '@/translations';

@@ -3,7 +3,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import type {
     ServiceChannelStateType,
     ServiceChannelType,
-} from '@/schema/alert-manager/service-channel/type';
+} from '@/api-clients/alert-manager/service-channel/schema/type';
 
 export interface ServiceChannelListParameters {
     query?: Query;

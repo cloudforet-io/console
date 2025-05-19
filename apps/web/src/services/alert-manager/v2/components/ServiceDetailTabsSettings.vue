@@ -9,8 +9,8 @@ import {
     PHeading, PHeadingLayout, PCard, PIconButton, PI,
 } from '@cloudforet/mirinae';
 
-import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/service/constants';
-import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
+import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { NotificationUrgencyType, RecoveryModeType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';

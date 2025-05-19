@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { WebhookStateType } from '@/schema/alert-manager/webhook/type';
+import type { WebhookStateType } from '@/api-clients/alert-manager/webhook/schema/type';
 
 export interface WebhookListParameters {
     query?: Query;

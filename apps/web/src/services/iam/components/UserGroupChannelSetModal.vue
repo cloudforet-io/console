@@ -6,13 +6,13 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PButton, PLazyImg } from '@cloudforet/mirinae';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
-import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import type { UserGroupChannelCreateParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/create';
+import type { UserGroupChannelUpdateParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/update';
+import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-group-channel/schema/model';
 import type {
     UserGroupChannelScheduleInfoType,
-} from '@/schema/alert-manager/user-group-channel/type';
+} from '@/api-clients/alert-manager/user-group-channel/schema/type';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

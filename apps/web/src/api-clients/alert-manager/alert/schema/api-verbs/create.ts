@@ -1,4 +1,4 @@
-import type { AlertResourcesType, AlertSeverityType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import type { AlertResourcesType, AlertSeverityType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
 
 export interface AlertCreateParameters {
     title: string;

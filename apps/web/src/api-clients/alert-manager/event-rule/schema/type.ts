@@ -1,5 +1,5 @@
-import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
-import type { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_URGENCY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
+import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
+import type { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_URGENCY, EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
 
 export type EventRuleConditionsPolicyType = typeof EVENT_RULE_CONDITIONS_POLICY[keyof typeof EVENT_RULE_CONDITIONS_POLICY];
 export type EventRuleUrgencyType = typeof EVENT_RULE_URGENCY[keyof typeof EVENT_RULE_URGENCY];

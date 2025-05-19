@@ -1,10 +1,9 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     EscalationPolicyFinishConditionType,
     EscalationPolicyRepeatType,
     EscalationPolicyRulesType,
-} from '@/schema/alert-manager/escalation-policy/type';
+} from '@/api-clients/alert-manager/escalation-policy/schema/type';
 
 export interface EscalationPolicyUpdateParameters {
     escalation_policy_id: string;

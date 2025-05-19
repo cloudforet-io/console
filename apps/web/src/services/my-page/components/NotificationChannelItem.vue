@@ -7,8 +7,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { UserChannelDisableParameters } from '@/schema/alert-manager/user-channel/api-verbs/disable';
-import type { UserChannelEnableParameters } from '@/schema/alert-manager/user-channel/api-verbs/enable';
+import type { UserChannelDisableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/disable';
+import type { UserChannelEnableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/enable';
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
 import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
 import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
@@ -33,6 +33,7 @@ import NotificationChannelItemSchedule
 import NotificationChannelItemTopic
     from '@/services/my-page/components/NotificationChannelItemTopic.vue';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
+
 
 const STATE_TYPE = {
     ENABLED: 'ENABLED',

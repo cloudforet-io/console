@@ -1,7 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
-import type { NotificationProtocolPluginInfoRequestType } from '@/schema/alert-manager/notification-protocol/type';
-
+import type { NotificationProtocolPluginInfoRequestType } from '@/api-clients/alert-manager/notification-protocol/schema/type';
 
 export interface NotificationProtocolCreateParameters {
     name: string;

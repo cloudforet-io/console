@@ -1,4 +1,4 @@
-import type { NotificationProtocolPluginUpgradeModeType } from '@/schema/alert-manager/notification-protocol/type';
+import type { NotificationProtocolPluginUpgradeModeType } from '@/api-clients/alert-manager/notification-protocol/schema/type';
 
 export interface NotificationProtocolUpdatePluginParameters {
     protocol_id: string;

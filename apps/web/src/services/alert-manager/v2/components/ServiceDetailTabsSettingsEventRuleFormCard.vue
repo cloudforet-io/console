@@ -18,13 +18,13 @@ import {
     screens,
 } from '@cloudforet/mirinae';
 
-import type { EventRuleCreateParameters } from '@/schema/alert-manager/event-rule/api-verbs/create';
-import type { EventRuleUpdateParameters } from '@/schema/alert-manager/event-rule/api-verbs/update';
-import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type { EventRuleCreateParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/create';
+import type { EventRuleUpdateParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/update';
+import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType,
-} from '@/schema/alert-manager/event-rule/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

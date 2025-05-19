@@ -1,10 +1,10 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     ServiceChannelDataType,
+    ServiceChannelScheduleInfoType,
     ServiceChannelStateType,
-    ServiceChannelType, ServiceChannelScheduleInfoType,
-} from '@/schema/alert-manager/service-channel/type';
+    ServiceChannelType,
+} from '@/api-clients/alert-manager/service-channel/schema/type';
 
 export interface ServiceChannelModel {
     channel_id: string;

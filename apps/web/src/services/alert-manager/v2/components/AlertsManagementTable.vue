@@ -21,8 +21,8 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
-import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';

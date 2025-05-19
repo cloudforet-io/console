@@ -7,8 +7,8 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 

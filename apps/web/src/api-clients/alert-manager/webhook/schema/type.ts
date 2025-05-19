@@ -1,4 +1,4 @@
-import type { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
+import type { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 
 export type WebhookStateType = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
 

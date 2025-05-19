@@ -12,10 +12,10 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { ServiceChannelUpdateParameters } from '@/schema/alert-manager/service-channel/api-verbs/update';
-import { SERVICE_CHANNEL_FORWARD_TYPE, SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { MembersType } from '@/schema/alert-manager/service/type';
+import type { ServiceChannelUpdateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/update';
+import { SERVICE_CHANNEL_FORWARD_TYPE, SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

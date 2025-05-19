@@ -11,11 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleActionsType,
-} from '@/schema/alert-manager/event-rule/type';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

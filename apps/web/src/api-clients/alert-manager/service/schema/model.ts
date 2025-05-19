@@ -1,8 +1,7 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     AlertsInfoType, AlertsType, HealthyType, MembersType, ServiceOptionsType,
-} from '@/schema/alert-manager/service/type';
+} from '@/api-clients/alert-manager/service/schema/type';
 
 export interface ServiceModel {
     service_id: string;

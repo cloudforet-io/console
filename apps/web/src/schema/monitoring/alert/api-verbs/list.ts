@@ -1,19 +1,19 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type {
-    AlertSeverity, AlertState, AlertUrgency,
-} from '@/schema/monitoring/alert/type';
+    AlertSeverityType, AlertUrgencyType, AlertStatusType,
+} from '@/api-clients/alert-manager/alert/schema/type';
 
 export interface AlertListParameters {
     alert_number?: number;
     alert_id?: string;
     title?: string;
-    state?: AlertState;
+    state?: AlertStatusType;
     assignee?: string;
-    urgency?: AlertUrgency;
-    severity?: AlertSeverity;
+    urgency?: AlertUrgencyType;
+    severity?: AlertSeverityType;
     resource_id?: string;
     provider?: string;
     account?: string;

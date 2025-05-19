@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { UserGroupChannelStateType } from '@/schema/alert-manager/user-group-channel/type';
+import type { UserGroupChannelStateType } from '@/api-clients/alert-manager/user-group-channel/schema/type';
 
 export interface UserGroupChannelListParameters {
     query?: Query;

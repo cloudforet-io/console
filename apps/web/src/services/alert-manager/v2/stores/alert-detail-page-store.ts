@@ -5,9 +5,9 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { AlertGetParameters } from '@/schema/alert-manager/alert/api-verbs/get';
-import type { AlertUpdateParameters } from '@/schema/alert-manager/alert/api-verbs/update';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertGetParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/get';
+import type { AlertUpdateParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/update';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

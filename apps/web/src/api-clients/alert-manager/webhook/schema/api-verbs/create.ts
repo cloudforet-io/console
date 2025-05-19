@@ -1,6 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
-import type { WebhookPluginInfoType } from '@/schema/alert-manager/webhook/type';
+import type { WebhookPluginInfoType } from '@/api-clients/alert-manager/webhook/schema/type';
 
 export interface WebhookCreateParameters {
     name: string;

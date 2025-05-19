@@ -7,11 +7,11 @@ import {
     PTableCheckModal, PLazyImg, PStatus, PI,
 } from '@cloudforet/mirinae';
 
-import type { ServiceChannelDisableParameters } from '@/schema/alert-manager/service-channel/api-verbs/disable';
-import type { ServiceChannelEnableParameters } from '@/schema/alert-manager/service-channel/api-verbs/enable';
-import { SERVICE_CHANNEL_FORWARD_TYPE } from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
+import type { ServiceChannelDisableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/disable';
+import type { ServiceChannelEnableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/enable';
+import { SERVICE_CHANNEL_FORWARD_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

@@ -7,8 +7,8 @@ import dayjs from 'dayjs';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ValueHandler } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertStatusType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
 import { i18n } from '@/translations';
 
 import type { AppReferenceMap } from '@/store/reference/app-reference-store';

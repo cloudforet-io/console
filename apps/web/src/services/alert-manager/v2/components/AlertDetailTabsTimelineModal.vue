@@ -10,9 +10,9 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import {
     ALERT_HISTORY_ACTION,
     ALERT_HISTORY_NOTIFICATION_STATE,
-} from '@/schema/alert-manager/alert/constants';
-import type { AlertHistoryModel, AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertHistoryActionType, AlertHistoryNotificationInfoType, AlertHistoryNotificationChannelInfoType } from '@/schema/alert-manager/alert/type';
+} from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertHistoryModel, AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { AlertHistoryActionType, AlertHistoryNotificationInfoType, AlertHistoryNotificationChannelInfoType } from '@/api-clients/alert-manager/alert/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

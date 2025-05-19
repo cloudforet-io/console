@@ -3,7 +3,7 @@ import type {
     SERVICE_CHANNEL_STATE,
     SERVICE_CHANNEL_TYPE,
     SERVICE_CHANNEL_SCHEDULE_TYPE,
-} from '@/schema/alert-manager/service-channel/constants';
+} from '@/api-clients/alert-manager/service-channel/schema/constants';
 
 export type ServiceChannelStateType = typeof SERVICE_CHANNEL_STATE[keyof typeof SERVICE_CHANNEL_STATE];
 export type ServiceChannelType = typeof SERVICE_CHANNEL_TYPE[keyof typeof SERVICE_CHANNEL_TYPE];

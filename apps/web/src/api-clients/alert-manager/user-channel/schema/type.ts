@@ -1,4 +1,4 @@
-import type { USER_CHANNEL_SCHEDULE_TYPE, USER_CHANNEL_STATE } from '@/schema/alert-manager/user-channel/constants';
+import type { USER_CHANNEL_SCHEDULE_TYPE, USER_CHANNEL_STATE } from '@/api-clients/alert-manager/user-channel/schema/constants';
 
 export type UserChannelStateType = typeof USER_CHANNEL_STATE[keyof typeof USER_CHANNEL_STATE];
 export type UserChannelScheduleType = typeof USER_CHANNEL_SCHEDULE_TYPE[keyof typeof USER_CHANNEL_SCHEDULE_TYPE];

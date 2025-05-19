@@ -5,11 +5,11 @@ import { computed, reactive, watch } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PJsonSchemaForm } from '@cloudforet/mirinae';
-import type { JsonSchema } from '@cloudforet/mirinae/types/inputs/forms/json-schema-form/type';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

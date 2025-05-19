@@ -1,4 +1,4 @@
-import type { EventSeverityType, EventType } from '@/schema/alert-manager/event/type';
+import type { EventSeverityType, EventType } from '@/api-clients/alert-manager/event/schema/type';
 
 export interface EventModel {
     event_id: string;

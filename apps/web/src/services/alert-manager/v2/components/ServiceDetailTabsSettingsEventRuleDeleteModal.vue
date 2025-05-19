@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { EventRuleDeleteParameters } from '@/schema/alert-manager/event-rule/api-verbs/delete';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type { EventRuleDeleteParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/delete';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 

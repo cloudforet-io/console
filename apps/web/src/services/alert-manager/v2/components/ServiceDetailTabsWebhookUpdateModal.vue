@@ -9,8 +9,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { WebhookUpdateParameters } from '@/schema/alert-manager/webhook/api-verbs/update';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookUpdateParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n } from '@/translations';
 
 import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';

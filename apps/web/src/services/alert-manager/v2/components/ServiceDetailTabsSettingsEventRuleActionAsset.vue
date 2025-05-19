@@ -14,10 +14,10 @@ import {
     PButton,
 } from '@cloudforet/mirinae';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleActionsType,
-} from '@/schema/alert-manager/event-rule/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

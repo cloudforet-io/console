@@ -12,11 +12,11 @@ import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
-import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertStatusType, AlertUrgencyType } from '@/schema/alert-manager/alert/type';
-import { SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
+import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
+import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { AlertStatusType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
+import { SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';

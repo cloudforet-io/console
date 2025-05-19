@@ -1,10 +1,9 @@
 
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     UserGroupChannelStateType,
     UserGroupChannelScheduleInfoType,
-} from '@/schema/alert-manager/user-group-channel/type';
+} from '@/api-clients/alert-manager/user-group-channel/schema/type';
 
 export interface UserGroupChannelModel {
     channel_id: string;

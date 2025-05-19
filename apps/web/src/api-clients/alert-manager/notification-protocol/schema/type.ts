@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { NOTIFICATION_PROTOCOL_STATE, NOTIFICATION_PROTOCOL_PLUGIN_UPGRADE_MODE } from '@/schema/alert-manager/notification-protocol/constants';
+import type { NOTIFICATION_PROTOCOL_STATE, NOTIFICATION_PROTOCOL_PLUGIN_UPGRADE_MODE } from '@/api-clients/alert-manager/notification-protocol/schema/constants';
 
 export type NotificationProtocolStateType = typeof NOTIFICATION_PROTOCOL_STATE[keyof typeof NOTIFICATION_PROTOCOL_STATE];
 

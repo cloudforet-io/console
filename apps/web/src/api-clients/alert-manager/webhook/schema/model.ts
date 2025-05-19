@@ -1,8 +1,7 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     WebhookPluginInfoType, WebhookRequestType, WebhookStateType, WebhookMessageFormatType,
-} from '@/schema/alert-manager/webhook/type';
+} from '@/api-clients/alert-manager/webhook/schema/type';
 
 export interface WebhookModel {
     webhook_id: string;

@@ -7,8 +7,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
+import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';

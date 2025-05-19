@@ -1,12 +1,11 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-
 import type {
     EventRuleActionsType,
     EventRuleConditionsPolicyType,
     EventRuleConditionsType,
     EventRuleOptions,
     EventRuleScopeType,
-} from '@/schema/alert-manager/event-rule/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 
 export interface EventRuleModel {
     event_rule_id: string;

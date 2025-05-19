@@ -5,7 +5,7 @@ import type {
     AlertSeverityType,
     AlertStatusType, AlertTriggeredType,
     AlertUrgencyType,
-} from '@/schema/alert-manager/alert/type';
+} from '@/api-clients/alert-manager/alert/schema/type';
 
 export interface AlertListParameters {
     query?: Query;

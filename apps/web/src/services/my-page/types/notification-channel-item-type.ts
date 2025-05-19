@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
+import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 

@@ -2,7 +2,7 @@ import type {
     ALERT_SEVERITY, ALERT_STATUS, ALERT_TRIGGERED_TYPE, ALERT_URGENCY,
     ALERT_HISTORY_ACTION,
     ALERT_HISTORY_NOTIFICATION_STATE,
-} from '@/schema/alert-manager/alert/constants';
+} from '@/api-clients/alert-manager/alert/schema/constants';
 
 export type AlertStatusType = typeof ALERT_STATUS[keyof typeof ALERT_STATUS];
 export type AlertUrgencyType = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];

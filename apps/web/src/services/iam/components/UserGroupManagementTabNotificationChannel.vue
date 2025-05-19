@@ -13,16 +13,16 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { UserGroupChannelGetParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/get';
-import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
-import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import type { NotificationProtocolGetParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/get';
+import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import type { UserGroupChannelGetParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/get';
+import type { UserGroupChannelListParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/list';
+import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/api-clients/alert-manager/user-group-channel/schema/constants';
+import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-group-channel/schema/model';
 import type {
     UserGroupChannelScheduleInfoType,
-} from '@/schema/alert-manager/user-group-channel/type';
+} from '@/api-clients/alert-manager/user-group-channel/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

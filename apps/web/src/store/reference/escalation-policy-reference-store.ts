@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyModel as EscalationPolicyModelV1 } from '@/schema/monitoring/escalation-policy/model';
 
 import type {

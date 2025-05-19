@@ -5,7 +5,7 @@ import type {
     AlertUrgencyType,
     AlertHistoryActionType,
     AlertHistoryNotificationInfoType,
-} from '@/schema/alert-manager/alert/type';
+} from '@/api-clients/alert-manager/alert/schema/type';
 
 export interface AlertModel {
     alert_id: string;
