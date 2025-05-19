@@ -14,8 +14,8 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
+import { ALERT_STATE, ALERT_URGENCY } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 import { i18n, setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';

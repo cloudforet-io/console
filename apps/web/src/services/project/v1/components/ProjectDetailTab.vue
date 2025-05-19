@@ -9,7 +9,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';

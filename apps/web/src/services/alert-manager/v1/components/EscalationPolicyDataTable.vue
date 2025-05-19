@@ -7,11 +7,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
 import type {
     EscalationPolicyFinishCondition,
-} from '@/schema/monitoring/escalation-policy/type';
+} from '@/api-clients/monitoring/escalation-policy/schema/type';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
