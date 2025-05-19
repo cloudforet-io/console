@@ -920,6 +920,7 @@
 				"ALT_S_UPDATE_RECIPIENTS": "Report Recipients successfully updated",
 				"ALT_S_UPDATE_SETTINGS": "Report Settings successfully updated",
 				"APPLY_CUSTOM_RANGE": "Apply Custom Range",
+				"CONFIRMATION_DATE": "Confirmation Date",
 				"COPY": "Copy",
 				"COST": "Cost",
 				"COST_REPORT": "Cost Report",
@@ -962,6 +963,7 @@
 				"TOTAL_COST_FOR_PREVIOUS_MONTH": "Total costs for {previous_month}",
 				"UPCOMING_ISSUE_DATE": "Upcoming Report Date",
 				"UPCOMING_REPORT": "Upcoming Report",
+				"UPCOMING_REPORT_CONFIRMATION_DATE_TOOLTIP": "The confirmation date is the final date after the adjustable period from the issue date.",
 				"WORKSPACE": "Workspace",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Owner Role"
