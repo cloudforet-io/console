@@ -34,6 +34,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import AdvancedSettingsSetAdjustmentsOverlay from '@/services/cost-explorer/components/AdvancedSettingsSetAdjustmentsOverlay.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
+import { getUpcomingIssueDate, getUpcomingConfirmationDate } from '@/services/cost-explorer/helpers/cost-report-issue-date-helper';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 
 
@@ -54,12 +55,7 @@ const languageMenuList = computed<SelectDropdownMenuItem[]>(() => map(languages,
     type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
 })));
 const upcomingReportDate = computed<string>(() => getUpcomingIssueDate(state.lastDayOfMonth, issueDate.value));
-const confirmationDate = computed<string>(() => {
-    if (!state.enableAdjustments || !issueDate.value) return '-';
-    const reportDate = dayjs.utc(upcomingReportDate.value);
-    const confirmDate = reportDate.add(manualAdjustablePeriod.value ?? 0, 'day');
-    return confirmDate.format('YYYY-MM-DD');
-});
+const confirmationDate = computed<string>(() => getUpcomingConfirmationDate(state.enableAdjustments, upcomingReportDate.value, manualAdjustablePeriod.value ?? 0));
 const isSaveDisabled = computed<boolean>(() => {
     if (!costReportConfig.value?.cost_report_config_id) return true;
     return !isAllValid.value;
@@ -105,24 +101,6 @@ const getLastDay = (): number => {
         return today.add(1, 'month').endOf('month').date();
     }
     return today.endOf('month').date();
-};
-const getUpcomingIssueDate = (enableLastDay: boolean, _issueDay?: number): string => {
-    const today = dayjs.utc();
-    const __issueDay: number = enableLastDay ? today.endOf('month').date() : _issueDay ?? 10;
-
-    // 1. case for today(2024-01-15) is before issue day(31) -> 2024-01-31
-    if (Number(today.format('D')) < __issueDay) {
-        return today.date(__issueDay).format('YYYY-MM-DD');
-    }
-
-    // 2. case for next month(2024-02) has less days than issue day(31) -> 2024-02-29
-    const nextMonth = today.add(1, 'month');
-    if (nextMonth.endOf('month').date() < __issueDay) {
-        return nextMonth.endOf('month').format('YYYY-MM-DD');
-    }
-
-    // 3. case for next month(2024-02) has equal or more days than issue day(10) -> 2024-02-10
-    return nextMonth.date(__issueDay).format('YYYY-MM-DD');
 };
 
 /* Api */
