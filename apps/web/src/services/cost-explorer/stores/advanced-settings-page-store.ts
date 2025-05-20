@@ -18,7 +18,7 @@ export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings'
         adjustmentListMap: {}, // { policy_id: [{ id, ... }] }
     }),
     getters: {
-        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => !item.workspaceMenuItems || item.workspaceMenuItems.length > 0),
+        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => item.isAllWorkspaceSelected || !!item.workspaceMenuItems?.length),
         isAdjustmentValid: (state) => Object.values(state.adjustmentListMap)
             .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && adjustment.amount)),
     },
@@ -39,6 +39,7 @@ export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings'
             this.adjustmentPolicyList.push({
                 id: policyId,
                 workspaceMenuItems: undefined,
+                isAllWorkspaceSelected: true,
             });
             this.adjustmentListMap[policyId] = [];
         },
