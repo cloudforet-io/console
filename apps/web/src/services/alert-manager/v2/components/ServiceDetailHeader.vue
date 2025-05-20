@@ -78,11 +78,11 @@ const handleActionModal = (type: ModalType) => {
 };
 const handleGoBackButton = () => {
     if (state.isSettingMode) {
-        const validUnhealthyPage = (!Number.isNaN(serviceListPageStore.unhealthyThisPage) && serviceListPageStore.unhealthyThisPage > 0)
-            ? serviceListPageStore.unhealthyThisPage
+        const validUnhealthyPage = (!Number.isNaN(serviceListPageStore.$state.unhealthyThisPage) && serviceListPageStore.unhealthyThisPage > 0)
+            ? serviceListPageStore.$state.unhealthyThisPage
             : 1;
-        const validHealthyPage = (!Number.isNaN(serviceListPageStore.healthyThisPage) && serviceListPageStore.healthyThisPage > 0)
-            ? serviceListPageStore.healthyThisPage
+        const validHealthyPage = (!Number.isNaN(serviceListPageStore.$state.healthyThisPage) && serviceListPageStore.$state.healthyThisPage > 0)
+            ? serviceListPageStore.$state.healthyThisPage
             : 1;
 
         router.push({
