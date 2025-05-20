@@ -13,7 +13,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolbox, PDataLoader, PEmpty, PButton, PPagination,
 } from '@cloudforet/mirinae';
-import type { QueryTag } from '@cloudforet/mirinae/types/controls/search/query-search-tags/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
@@ -66,7 +65,6 @@ const queryTags = computed(() => searchQueryHelper.setFilters(serviceListPageSto
 
 const handleToolbox = async (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
-        // queryTagHelper.setQueryTags(options.queryTags);
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
 
         serviceListPageStore.$patch((_state) => {
@@ -77,14 +75,27 @@ const handleToolbox = async (options: ToolboxOptions = {}) => {
         const nameValues = nameTags.map((tag) => tag.value.name).filter(Boolean);
 
         const newQuery: Record<string, any> = {
-            unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
-            healthyPage: String(serviceListPageStore.healthyThisPage),
+            unhealthyPage: '1',
+            healthyPage: '1',
         };
 
         if (nameValues.length > 0) {
             newQuery.serviceName = nameValues.join(',');
         } else {
             newQuery.serviceName = undefined;
+        }
+
+        const isFullNameOnly = searchQueryHelper.filters.some((f) => f.k === 'name'
+            && Array.isArray(f.v)
+            && f.v.length === 1
+            && typeof f.v[0] === 'string'
+            && f.v[0].length > 2);
+
+        if (isFullNameOnly) {
+            serviceListPageStore.setUnhealthyPage(1);
+            serviceListPageStore.setHealthyPage(1);
+            newQuery.unhealthyPage = '1';
+            newQuery.healthyPage = '1';
         }
 
         replaceUrlQuery(newQuery);
@@ -111,10 +122,17 @@ const handleHealthyPageChange = async () => {
 const fetchServiceList = async () => {
     state.loading = true;
     try {
-        const validPage = Math.max(1, serviceListPageStore.unhealthyThisPage);
-        const pageStart = (validPage - 1) * serviceListPageStore.unhealthyPageSize + 1;
+        const isFullNameOnly = searchQueryHelper.filters.length === 1
+            && searchQueryHelper.filters[0].k === 'name'
+            && Array.isArray(searchQueryHelper.filters[0].v)
+            && searchQueryHelper.filters[0].v.length === 1
+            && typeof searchQueryHelper.filters[0].v[0] === 'string'
+            && searchQueryHelper.filters[0].v[0].length > 2;
 
-        serviceListApiQueryHelper.setPage(pageStart, serviceListPageStore.unhealthyPageSize).setFilters([
+        const pageSize = isFullNameOnly ? 1000 : serviceListPageStore.unhealthyPageSize;
+        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.unhealthyThisPage) - 1) * pageSize + 1);
+
+        serviceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
             ...searchQueryHelper.filters,
             { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.UNHEALTHY, o: '=' },
         ]);
@@ -136,10 +154,17 @@ const fetchServiceList = async () => {
 const fetchHealthyServiceList = async () => {
     state.healthyLoading = true;
     try {
-        const validPage = Math.max(1, serviceListPageStore.healthyThisPage);
-        const pageStart = (validPage - 1) * serviceListPageStore.healthyPageSize + 1;
+        const isFullNameOnly = searchQueryHelper.filters.length === 1
+            && searchQueryHelper.filters[0].k === 'name'
+            && Array.isArray(searchQueryHelper.filters[0].v)
+            && searchQueryHelper.filters[0].v.length === 1
+            && typeof searchQueryHelper.filters[0].v[0] === 'string'
+            && searchQueryHelper.filters[0].v[0].length > 2;
 
-        healthyServiceListApiQueryHelper.setPage(pageStart, serviceListPageStore.healthyPageSize).setFilters([
+        const pageSize = isFullNameOnly ? 1000 : serviceListPageStore.healthyPageSize;
+        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.healthyThisPage) - 1) * pageSize + 1);
+
+        healthyServiceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
             ...searchQueryHelper.filters,
             { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.HEALTHY, o: '=' },
         ]);
@@ -192,16 +217,17 @@ onMounted(async () => {
         }));
         searchQueryHelper.setFiltersAsQueryTag(nameValues);
 
-        const splitNameFilters = searchQueryHelper.filters.flatMap((f) => {
-            if (f.k === 'name' && Array.isArray(f.v) && f.v.length > 1) {
-                return f.v.map((val, idx) => ({
-                    k: 'name',
-                    v: [val],
-                    o: idx === 0 ? '' : '=',
-                }));
+        const splitNameFilters = searchQueryHelper.filters.map((f) => {
+            if (f.k === 'name' && Array.isArray(f.v)) {
+                const fullNames = f.v.filter((val) => typeof val === 'string' && val.length > 2);
+                const partials = f.v.filter((val) => typeof val === 'string' && val.length <= 2);
+                return [
+                    ...(fullNames.length > 0 ? [{ k: 'name', v: fullNames, o: '=' }] : []),
+                    ...(partials.map((val) => ({ k: 'name', v: [val], o: '' }))),
+                ];
             }
             return f;
-        });
+        }).flat();
         searchQueryHelper.setFilters(splitNameFilters);
 
         serviceListPageStore.setSearchFilters(searchQueryHelper.filters);
@@ -238,23 +264,25 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
     handleHealthyPageChange();
 });
 
-watch(() => route.query.serviceName, async (newServiceName) => {
+watch(async () => route.query.serviceName, async (newServiceName) => {
     if (typeof newServiceName === 'string') {
         const nameValues = newServiceName.split(',').map((name) => ({
             key: { name: 'name' },
-            value: { label: name, name: [name] as string[] },
+            value: { label: name, name },
         }));
-        searchQueryHelper.setFiltersAsQueryTag(nameValues as QueryTag[]);
-        const splitNameFilters = searchQueryHelper.filters.flatMap((f: any) => {
-            if (f.k === 'name' && Array.isArray(f.v) && f.v.length > 1) {
-                return f.v.map((val, idx) => ({
-                    k: 'name',
-                    v: [val],
-                    o: idx === 0 ? '=' : '',
-                }));
+        searchQueryHelper.setFiltersAsQueryTag(nameValues);
+
+        const splitNameFilters = searchQueryHelper.filters.map((f) => {
+            if (f.k === 'name' && Array.isArray(f.v)) {
+                const fullNames = f.v.filter((val) => typeof val === 'string' && val.length > 2);
+                const partials = f.v.filter((val) => typeof val === 'string' && val.length <= 2);
+                return [
+                    ...(fullNames.length > 0 ? [{ k: 'name', v: fullNames, o: '=' }] : []),
+                    ...(partials.map((val) => ({ k: 'name', v: [val], o: '' }))),
+                ];
             }
             return f;
-        });
+        }).flat();
         searchQueryHelper.setFilters(splitNameFilters);
 
         serviceListPageStore.setSearchFilters(searchQueryHelper.filters);
