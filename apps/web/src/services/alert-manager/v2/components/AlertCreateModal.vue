@@ -9,9 +9,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { AlertCreateParameters } from '@/schema/alert-manager/alert/api-verbs/create';
-import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertCreateParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/create';
+import { ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
