@@ -1,3 +1,4 @@
+import { isNumber } from 'lodash';
 import { defineStore } from 'pinia';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -20,7 +21,7 @@ export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings'
     getters: {
         isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => item.isAllWorkspaceSelected || !!item.workspaceMenuItems?.length),
         isAdjustmentValid: (state) => Object.values(state.adjustmentListMap)
-            .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && adjustment.amount)),
+            .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && isNumber(adjustment.amount))),
     },
     actions: {
         setLoading(state: AdvancedSettingsPageStore['loading']) {
