@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue';
+import {
+    onMounted, reactive, watch, computed,
+} from 'vue';
 import {
     useRoute, useRouter,
 } from 'vue-router/composables';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -21,7 +24,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useQueryTags } from '@/common/composables/query-tags';
 
 import ServiceListContent from '@/services/alert-manager/v2/components/ServiceListContent.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
@@ -57,19 +59,24 @@ const serviceListPageStore = useServiceListPageStore();
 
 const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 const healthyServiceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
-const queryTagHelper = useQueryTags({ keyItemSets: SERVICE_SEARCH_HANDLER.keyItemSets });
-const { queryTags } = queryTagHelper;
+const searchQueryHelper = new QueryHelper();
 
-const handleToolbox = async (options: ToolboxOptions) => {
+const queryTags = computed(() => searchQueryHelper.setFilters(serviceListPageStore.searchFilters).queryTags);
+
+const handleToolbox = async (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
-        queryTagHelper.setQueryTags(options.queryTags);
+        searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
+
+        serviceListPageStore.$patch((_state) => {
+            _state.searchFilters = searchQueryHelper.filters;
+        });
 
         const nameTags = options.queryTags.filter((tag) => tag.key?.name === 'name');
         const nameValues = nameTags.map((tag) => tag.value.name).filter(Boolean);
 
         const newQuery: Record<string, any> = {
-            unhealthyPage: String(serviceListPageStore.unhealthyThisPage),
-            healthyPage: String(serviceListPageStore.healthyThisPage),
+            unhealthyPage: '1',
+            healthyPage: '1',
         };
 
         if (nameValues.length > 0) {
@@ -78,10 +85,18 @@ const handleToolbox = async (options: ToolboxOptions) => {
             newQuery.serviceName = undefined;
         }
 
-        replaceUrlQuery(newQuery);
+        const isFullNameOnly = searchQueryHelper.filters.some((f) => f.k === 'name'
+            && Array.isArray(f.v)
+            && f.v.length === 1
+            && typeof f.v[0] === 'string'
+            && f.v[0].length > 2);
 
-        serviceListPageStore.setUnhealthyPage(1);
-        serviceListPageStore.setHealthyPage(1);
+        if (isFullNameOnly) {
+            serviceListPageStore.setUnhealthyPage(1);
+            serviceListPageStore.setHealthyPage(1);
+        }
+
+        replaceUrlQuery(newQuery);
     }
 
     await fetchBothLists();
@@ -105,11 +120,18 @@ const handleHealthyPageChange = async () => {
 const fetchServiceList = async () => {
     state.loading = true;
     try {
-        const validPage = Math.max(1, serviceListPageStore.unhealthyThisPage);
-        const pageStart = (validPage - 1) * serviceListPageStore.unhealthyPageSize + 1;
+        const isFullNameOnly = searchQueryHelper.filters.length === 1
+            && searchQueryHelper.filters[0].k === 'name'
+            && Array.isArray(searchQueryHelper.filters[0].v)
+            && searchQueryHelper.filters[0].v.length === 1
+            && typeof searchQueryHelper.filters[0].v[0] === 'string'
+            && searchQueryHelper.filters[0].v[0].length > 2;
 
-        serviceListApiQueryHelper.setPage(pageStart, serviceListPageStore.unhealthyPageSize).setFilters([
-            ...queryTagHelper.filters.value,
+        const pageSize = serviceListPageStore.unhealthyPageSize;
+        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.unhealthyThisPage) - 1) * pageSize + 1);
+
+        serviceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
+            ...searchQueryHelper.filters,
             { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.UNHEALTHY, o: '=' },
         ]);
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
@@ -130,11 +152,18 @@ const fetchServiceList = async () => {
 const fetchHealthyServiceList = async () => {
     state.healthyLoading = true;
     try {
-        const validPage = Math.max(1, serviceListPageStore.healthyThisPage);
-        const pageStart = (validPage - 1) * serviceListPageStore.healthyPageSize + 1;
+        const isFullNameOnly = searchQueryHelper.filters.length === 1
+            && searchQueryHelper.filters[0].k === 'name'
+            && Array.isArray(searchQueryHelper.filters[0].v)
+            && searchQueryHelper.filters[0].v.length === 1
+            && typeof searchQueryHelper.filters[0].v[0] === 'string'
+            && searchQueryHelper.filters[0].v[0].length > 2;
 
-        healthyServiceListApiQueryHelper.setPage(pageStart, serviceListPageStore.healthyPageSize).setFilters([
-            ...queryTagHelper.filters.value,
+        const pageSize = serviceListPageStore.healthyPageSize;
+        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.healthyThisPage) - 1) * pageSize + 1);
+
+        healthyServiceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
+            ...searchQueryHelper.filters,
             { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.HEALTHY, o: '=' },
         ]);
         const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
@@ -177,24 +206,37 @@ const handleNavigateToDetail = (serviceId: string) => {
 };
 
 onMounted(async () => {
-    const { unhealthyPage, healthyPage } = route.query;
+    const { serviceName, unhealthyPage, healthyPage } = route.query;
 
-    let parsedUnhealthy = parseInt(unhealthyPage as string);
-    let parsedHealthy = parseInt(healthyPage as string);
-
-    parsedUnhealthy = (!Number.isNaN(parsedUnhealthy) && parsedUnhealthy > 0) ? parsedUnhealthy : 1;
-    parsedHealthy = (!Number.isNaN(parsedHealthy) && parsedHealthy > 0) ? parsedHealthy : 1;
-
-    serviceListPageStore.setUnhealthyPage(parsedUnhealthy);
-    serviceListPageStore.setHealthyPage(parsedHealthy);
-
-    const { serviceName } = route.query;
     if (serviceName && typeof serviceName === 'string') {
         const nameValues = serviceName.split(',').map((name) => ({
             key: { name: 'name' },
             value: { label: name, name },
         }));
-        queryTagHelper.setQueryTags(nameValues);
+        searchQueryHelper.setFiltersAsQueryTag(nameValues);
+
+        const splitNameFilters = searchQueryHelper.filters.map((f) => {
+            if (f.k === 'name' && Array.isArray(f.v)) {
+                const fullNames = f.v.filter((val) => typeof val === 'string' && val.length > 2);
+                const partials = f.v.filter((val) => typeof val === 'string' && val.length <= 2);
+                return [
+                    ...(fullNames.length > 0 ? [{ k: 'name', v: fullNames, o: '=' }] : []),
+                    ...(partials.map((val) => ({ k: 'name', v: [val], o: '' }))),
+                ];
+            }
+            return f;
+        }).flat();
+        searchQueryHelper.setFilters(splitNameFilters);
+
+        serviceListPageStore.setSearchFilters(searchQueryHelper.filters);
+    } else {
+        const parsedUnhealthy = (!Number.isNaN(parseInt(unhealthyPage as string)) && parseInt(unhealthyPage as string) > 0)
+            ? parseInt(unhealthyPage as string) : 1;
+        const parsedHealthy = (!Number.isNaN(parseInt(healthyPage as string)) && parseInt(healthyPage as string) > 0)
+            ? parseInt(healthyPage as string) : 1;
+
+        serviceListPageStore.setUnhealthyPage(parsedUnhealthy);
+        serviceListPageStore.setHealthyPage(parsedHealthy);
     }
 
     await fetchBothLists();
@@ -218,6 +260,37 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
         });
     }
     handleHealthyPageChange();
+});
+
+watch(async () => route.query.serviceName, async (newServiceName) => {
+    if (typeof newServiceName === 'string') {
+        const nameValues = newServiceName.split(',').map((name) => ({
+            key: { name: 'name' },
+            value: { label: name, name },
+        }));
+        searchQueryHelper.setFiltersAsQueryTag(nameValues);
+
+        const splitNameFilters = searchQueryHelper.filters.map((f) => {
+            if (f.k === 'name' && Array.isArray(f.v)) {
+                const fullNames = f.v.filter((val) => typeof val === 'string' && val.length > 2);
+                const partials = f.v.filter((val) => typeof val === 'string' && val.length <= 2);
+                return [
+                    ...(fullNames.length > 0 ? [{ k: 'name', v: fullNames, o: '=' }] : []),
+                    ...(partials.map((val) => ({ k: 'name', v: [val], o: '' }))),
+                ];
+            }
+            return f;
+        }).flat();
+        searchQueryHelper.setFilters(splitNameFilters);
+
+        serviceListPageStore.setSearchFilters(searchQueryHelper.filters);
+        await fetchBothLists();
+    } else if (!newServiceName) {
+        searchQueryHelper.setFiltersAsQueryTag([]);
+        serviceListPageStore.$patch((_state) => {
+            _state.searchFilters = [];
+        });
+    }
 });
 </script>
 
