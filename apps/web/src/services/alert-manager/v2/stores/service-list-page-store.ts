@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-export const useServiceListPageStore = defineStore('serviceListPage', {
+export const useServiceListPageStore = defineStore('page-service-list', {
     state: () => ({
         unhealthyThisPage: 1,
         unhealthyPageSize: 10,
