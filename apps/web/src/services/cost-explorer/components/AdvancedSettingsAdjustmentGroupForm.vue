@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PIconButton, PCard, PSelectDropdown,
+    PButton, PIconButton, PCard, PSelectDropdown, PCheckbox,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -35,6 +35,17 @@ const handleSelectWorkspace = (policyId: string, selected: SelectDropdownMenuIte
         advancedSettingsPageStore.updateAdjustmentPolicy(policyId, {
             ...targetPolicy,
             workspaceMenuItems: selected,
+        });
+    }
+};
+const handleUpdateIsAllWorkspaceSelected = (policyId: string) => {
+    const targetPolicy = advancedSettingsPageState.adjustmentPolicyList.find((d) => d.id === policyId);
+    const _isSelected = !targetPolicy?.isAllWorkspaceSelected;
+    if (targetPolicy) {
+        advancedSettingsPageStore.updateAdjustmentPolicy(policyId, {
+            ...targetPolicy,
+            ...(_isSelected ? { workspaceMenuItems: undefined } : {}),
+            isAllWorkspaceSelected: _isSelected,
         });
     }
 };
@@ -81,10 +92,17 @@ const handleDeleteAdjustmentPolicy = (policyId: string) => {
                                                show-select-marker
                                                use-fixed-menu-style
                                                :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.SELECT_WORKSPACE')"
-                                               :disabled="!adjustmentPolicy.workspaceMenuItems"
+                                               :disabled="!!adjustmentPolicy.isAllWorkspaceSelected"
                                                :page-size="10"
-                                               @update:select="handleSelectWorkspace(adjustmentPolicy.id, $event)"
+                                               @update:selected="handleSelectWorkspace(adjustmentPolicy.id, $event)"
                             />
+                            <p-checkbox
+                                :selected="adjustmentPolicy.isAllWorkspaceSelected"
+                                class="ml-2 min-w-40"
+                                @change="handleUpdateIsAllWorkspaceSelected(adjustmentPolicy.id)"
+                            >
+                                {{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}
+                            </p-checkbox>
                         </div>
                         <div class="right-part">
                             <p-icon-button name="ic_delete"
