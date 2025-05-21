@@ -7,6 +7,6 @@ export interface ReportAdjustmentPolicyCreateParameters {
     cost_report_config_id: string;
     order?: number;
     description?: string;
-    tags: Tags;
+    tags?: Tags;
     policy_filter: ReportAdjustmentPolicyFilter;
 }

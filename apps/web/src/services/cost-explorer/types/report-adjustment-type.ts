@@ -3,6 +3,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 export interface AdjustmentPolicyData {
   id: string;
   workspaceMenuItems?: SelectDropdownMenuItem[];
+  isAllWorkspaceSelected?: boolean;
 }
 
 export interface AdjustmentData {
