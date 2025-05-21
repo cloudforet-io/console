@@ -3,7 +3,8 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQuery } from '@tanstack/vue-query';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PTextButton,
@@ -11,17 +12,15 @@ import {
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
+import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertStatusType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
 import { SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, red } from '@/styles/colors';
 
@@ -87,17 +86,35 @@ const state = reactive({
     selectedUrgency: 'ALL',
 });
 const tableState = reactive({
-    loading: false,
     alertsList: [] as AlertModel[],
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
-    totalCounts: 0,
     sortBy: '',
     sortDesc: false,
 });
 
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
+const { alertAPI } = useAlertApi();
+const { key: alertListQueryKey, params: alertListQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'list', {
+    params: computed(() => ({
+        service_id: storeState.serviceInfo.service_id,
+        status: state.selectedStatus,
+        urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
+        query: alertListApiQueryHelper.data,
+    })),
+});
+const { data: alertListData, isLoading: alertListLoading, refetch: refetchAlertList } = useQuery({
+    queryKey: alertListQueryKey.value,
+    queryFn: async () => {
+        const res = await alertAPI.list(alertListQueryParams.value);
+        return {
+            results: res.results ?? [],
+            totalCount: res.total_count ?? 0,
+        };
+    },
+    enabled: false,
+});
 
 const handleRouteAlerts = (id: string) => {
     router.push({
@@ -118,43 +135,24 @@ const handleRouteAlertsTab = async () => {
 };
 const handleClickStatus = (name: AlertStatusType) => {
     state.selectedStatus = name;
-    fetchAlertsList();
+    refetchAlertList();
 };
 const handleSelectUrgency = (value: AlertUrgencyType) => {
     state.selectedUrgency = value;
-    fetchAlertsList();
+    refetchAlertList();
 };
 const handleChangeToolbox = async (sortBy:string, sortDesc:boolean) => {
     tableState.sortBy = sortBy;
     tableState.sortDesc = sortDesc;
     alertListApiQueryHelper.setSort(sortBy, sortDesc);
-    await fetchAlertsList();
+    await refetchAlertList();
 };
 
-const fetchAlertsList = async () => {
-    tableState.loading = true;
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>({
-            service_id: storeState.serviceInfo.service_id,
-            status: state.selectedStatus,
-            urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
-            query: alertListApiQueryHelper.data,
-        });
-        tableState.alertsList = results || [];
-        tableState.totalCounts = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        tableState.alertsList = [];
-        tableState.totalCounts = 0;
-    } finally {
-        tableState.loading = false;
+watch(() => storeState.serviceInfo.service_id, async (serviceId) => {
+    if (serviceId) {
+        await refetchAlertList();
     }
-};
-
-watch(() => storeState.serviceInfo.service_id, (service_id) => {
-    if (!service_id) return;
-    fetchAlertsList();
-}, { immediate: true });
+});
 </script>
 
 <template>
@@ -233,17 +231,17 @@ watch(() => storeState.serviceInfo.service_id, (service_id) => {
                     </p-select-status>
                     <p-icon-button class="ml-auto"
                                    name="ic_refresh"
-                                   @click="fetchAlertsList"
+                                   @click="refetchAlertList"
                     />
                 </div>
                 <p-data-table :fields="SERVICE_ALERT_TABLE_FIELDS"
-                              :items="tableState.alertsList"
-                              :loading="tableState.loading"
+                              :items="alertListData?.results"
+                              :loading="alertListLoading"
                               striped
                               :bordered="false"
                               :sort-by.sync="tableState.sortBy"
                               :sort-desc.sync="tableState.sortDesc"
-                              :show-footer="tableState.totalCounts > tableState.alertsList.length"
+                              :show-footer="(alertListData?.totalCount || 0) > (alertListData?.results?.length || 0)"
                               sortable
                               class="table"
                               @changeSort="handleChangeToolbox"
