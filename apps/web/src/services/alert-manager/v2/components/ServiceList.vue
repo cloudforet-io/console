@@ -94,8 +94,6 @@ const handleToolbox = async (options: ToolboxOptions = {}) => {
         if (isFullNameOnly) {
             serviceListPageStore.setUnhealthyPage(1);
             serviceListPageStore.setHealthyPage(1);
-            newQuery.unhealthyPage = '1';
-            newQuery.healthyPage = '1';
         }
 
         replaceUrlQuery(newQuery);
@@ -129,7 +127,7 @@ const fetchServiceList = async () => {
             && typeof searchQueryHelper.filters[0].v[0] === 'string'
             && searchQueryHelper.filters[0].v[0].length > 2;
 
-        const pageSize = isFullNameOnly ? 1000 : serviceListPageStore.unhealthyPageSize;
+        const pageSize = serviceListPageStore.unhealthyPageSize;
         const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.unhealthyThisPage) - 1) * pageSize + 1);
 
         serviceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
@@ -161,7 +159,7 @@ const fetchHealthyServiceList = async () => {
             && typeof searchQueryHelper.filters[0].v[0] === 'string'
             && searchQueryHelper.filters[0].v[0].length > 2;
 
-        const pageSize = isFullNameOnly ? 1000 : serviceListPageStore.healthyPageSize;
+        const pageSize = serviceListPageStore.healthyPageSize;
         const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.healthyThisPage) - 1) * pageSize + 1);
 
         healthyServiceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
