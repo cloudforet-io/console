@@ -78,7 +78,7 @@ const state = reactive({
     loading: true,
     syncReqLoading: false,
     items: [] as any,
-    sortBy: 'name',
+    sortBy: 'created_at',
     sortDesc: true,
     totalCount: 0,
     pageLimit: 15,
@@ -377,7 +377,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                     </span>
                 </template>
                 <template #col-created_at-format="{value}">
-                    {{ dayjs(value.data).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                    {{ dayjs(value).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
                 </template>
             </p-data-table>
         </div>
