@@ -43,6 +43,14 @@ const reportDateRange = computed<string>(() => {
     const endOfNextMonth = recentReportDate.endOf('month');
     return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
 });
+const showReissueButton = computed<boolean>(() => {
+    if (!upcomingReportDate.value || !confirmationDate.value) return false;
+    const todayDay = dayjs.utc().date();
+    const issueDay = dayjs(upcomingReportDate.value).date();
+    const confirmationDay = dayjs(confirmationDate.value).date();
+
+    return todayDay >= issueDay && todayDay <= confirmationDay;
+});
 
 const { mutateAsync: reissueReport, isPending: reissueReportLoading } = useMutation({
     mutationFn: costReportConfigAPI.run,
@@ -70,6 +78,7 @@ const handleReissueReport = async () => {
         </template>
         <template #right-extra>
             <p-button
+                v-if="showReissueButton"
                 style-type="secondary"
                 size="sm"
                 icon-left="ic_renew"
