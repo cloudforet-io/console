@@ -16,4 +16,4 @@ export interface AdjustmentData {
   description?: string;
 }
 
-export type AdjustmentType = 'PERCENTAGE_DEDUCTION' | 'FIXED_DEDUCTION' | 'PERCENTAGE_ADDITION' | 'FIXED_ADDITION';
+export type AdjustmentType = 'PERCENT_DEDUCTION' | 'FIXED_DEDUCTION' | 'PERCENT_ADDITION' | 'FIXED_ADDITION';
