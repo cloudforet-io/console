@@ -144,8 +144,8 @@ const handleSave = async () => {
                 await createAdjustmentPolicy(policy, idx);
             }
         });
-        const { withSuffix: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
-        queryClient.invalidateQueries({ queryKey: [rapQueryKey] });
+        const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
+        queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
         advancedSettingsPageStore.setShowAdjustmentsOverlay(false);
     } catch (error) {
         console.error(error);
