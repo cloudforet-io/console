@@ -2,6 +2,8 @@
 import { computed, reactive } from 'vue';
 import draggable from 'vuedraggable';
 
+import { isEmpty } from 'lodash';
+
 import {
     PButton, PIconButton, PSelectDropdown, PFieldTitle, PTextInput, PLazyImg, PI,
 } from '@cloudforet/mirinae';
@@ -45,11 +47,11 @@ const adjustmentMenuItems = computed<SelectDropdownMenuItem[]>(() => ([
         label: i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.FIXED_DEDUCTION'),
     },
     {
-        name: 'PERCENTAGE_ADDITION',
+        name: 'PERCENT_ADDITION',
         label: i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.PERCENTAGE_ADDITION'),
     },
     {
-        name: 'PERCENTAGE_DEDUCTION',
+        name: 'PERCENT_DEDUCTION',
         label: i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.PERCENTAGE_DEDUCTION'),
     },
 ]));
@@ -57,14 +59,14 @@ const adjustmentList = computed<AdjustmentData[]>(() => advancedSettingsPageStat
 
 /* Util */
 const getAmountRightExtra = (adjustment: AdjustmentType): string => {
-    if (adjustment === 'PERCENTAGE_DEDUCTION' || adjustment === 'PERCENTAGE_ADDITION') {
+    if (adjustment === 'PERCENT_DEDUCTION' || adjustment === 'PERCENT_ADDITION') {
         return '%';
     }
     const currency = reportAdjustmentList.value?.find((item) => item.report_adjustment_id === props.policyId)?.currency || 'USD';
     return currency;
 };
 const getAmountSymbol = (adjustment: AdjustmentType): string => {
-    if (adjustment === 'FIXED_DEDUCTION' || adjustment === 'PERCENTAGE_DEDUCTION') {
+    if (adjustment === 'FIXED_DEDUCTION' || adjustment === 'PERCENT_DEDUCTION') {
         return 'ic_minus';
     }
     return 'ic_plus';
@@ -139,6 +141,7 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                                class="adjustment-row-drag-button"
                 />
                 <p-text-input v-model="item.name"
+                              :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.TITLE')"
                               block
                 />
                 <p-select-dropdown :menu="providerMenuItems"
@@ -148,7 +151,9 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                                    @update:selected="handleUpdateProvider(item.id, $event)"
                 >
                     <template #dropdown-button="dropdownItem">
-                        <div class="flex items-center gap-2">
+                        <div v-if="!isEmpty(dropdownItem)"
+                             class="flex items-center gap-2"
+                        >
                             <p-lazy-img v-if="dropdownItem && dropdownItem.imageUrl"
                                         class="selected-icon"
                                         :src="dropdownItem.imageUrl"
@@ -163,6 +168,11 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                             />
                             <span class="selected-text">
                                 {{ dropdownItem?.label }}
+                            </span>
+                        </div>
+                        <div v-else>
+                            <span class="text-gray-600">
+                                {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.PROVIDER') }}
                             </span>
                         </div>
                     </template>
@@ -190,7 +200,9 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                         {{ getAmountRightExtra(item.adjustment) }}
                     </template>
                 </p-text-input>
-                <p-text-input v-model="item.description" />
+                <p-text-input v-model="item.description"
+                              :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.DESCRIPTION')"
+                />
                 <p-icon-button name="ic_delete"
                                size="sm"
                                class="adjustment-row-delete-button"

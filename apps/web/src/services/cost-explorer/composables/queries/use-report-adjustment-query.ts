@@ -4,7 +4,7 @@ import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjus
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-const reportAdjustmentApiHelper = new ApiQueryHelper().setSort('created_at', true);
+const reportAdjustmentApiHelper = new ApiQueryHelper().setSort('order', false);
 export const useReportAdjustmentQuery = () => {
     const { reportAdjustmentAPI } = useReportAdjustmentApi();
     const { key, params } = useServiceQueryKey('cost-analysis', 'report-adjustment', 'list', {
