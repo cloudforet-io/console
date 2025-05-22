@@ -1,27 +1,33 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButton, POverlayLayout,
 } from '@cloudforet/mirinae';
 
+import { useReportAdjustmentPolicyApi } from '@/api-clients/cost-analysis/report-adjustment-policy/composables/use-report-adjustment-policy-api';
 import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/model';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import AdvancedSettingsAdjustmentGroupForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentGroupForm.vue';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
 import { useReportAdjustmentPolicyQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-policy-query';
 import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 import type { AdjustmentType, AdjustmentData, AdjustmentPolicyData } from '@/services/cost-explorer/types/report-adjustment-type';
 
-
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
-
+const { reportAdjustmentPolicyAPI } = useReportAdjustmentPolicyApi();
+const { costReportConfig } = useCostReportConfigQuery();
+const queryClient = useQueryClient();
 const {
     reportAdjustmentList,
     isLoading: isReportAdjustmentLoading,
@@ -32,24 +38,26 @@ const {
 } = useReportAdjustmentPolicyQuery();
 
 const state = reactive({
-    isAllValid: computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid),
+    loading: false,
 });
-
-const storeState = reactive({
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-});
+const workspaceReferenceMap = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
+const isAllValid = computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid);
+const formPolicies = computed<AdjustmentPolicyData[]>(() => advancedSettingsPageState.adjustmentPolicyList);
+const originalPolicies = computed<ReportAdjustmentPolicyModel[]>(() => reportAdjustmentPolicyList.value || []);
+const costReportConfigId = computed<string>(() => costReportConfig.value?.cost_report_config_id || '');
 
 /* Util */
-const convertRawPolicy = (rawPolicy: ReportAdjustmentPolicyModel): AdjustmentPolicyData => ({
+const convertRawPolicyToPolicyData = (rawPolicy: ReportAdjustmentPolicyModel): AdjustmentPolicyData => ({
     id: rawPolicy.report_adjustment_policy_id,
     workspaceMenuItems: rawPolicy.policy_filter?.workspace_ids?.map((workspaceId) => ({
         name: workspaceId,
-        label: storeState.workspaces[workspaceId]?.name || workspaceId,
+        label: workspaceReferenceMap.value?.[workspaceId]?.name || workspaceId,
     })) || [],
+    isAllWorkspaceSelected: !rawPolicy.policy_filter?.workspace_ids,
 });
-const convertRawAdjustment = (rawAdjustment: ReportAdjustmentModel): AdjustmentData => {
+const convertRawAdjustmentToAdjustmentData = (rawAdjustment: ReportAdjustmentModel): AdjustmentData => {
     let adjustment: AdjustmentType;
-    if (rawAdjustment.method === 'FIXED') {
+    if (rawAdjustment.unit === 'FIXED') {
         adjustment = rawAdjustment.value > 0 ? 'FIXED_DEDUCTION' : 'FIXED_ADDITION';
     } else {
         adjustment = rawAdjustment.value > 0 ? 'PERCENTAGE_DEDUCTION' : 'PERCENTAGE_ADDITION';
@@ -68,8 +76,8 @@ const convertRawAdjustment = (rawAdjustment: ReportAdjustmentModel): AdjustmentD
 /* Init */
 const initForm = async () => {
     try {
-        const adjustmentPolicyList: AdjustmentPolicyData[] = reportAdjustmentPolicyList.value?.map(convertRawPolicy) || [];
-        const adjustmentList: AdjustmentData[] = reportAdjustmentList.value?.map(convertRawAdjustment) || [];
+        const adjustmentPolicyList: AdjustmentPolicyData[] = reportAdjustmentPolicyList.value?.map(convertRawPolicyToPolicyData) || [];
+        const adjustmentList: AdjustmentData[] = reportAdjustmentList.value?.map(convertRawAdjustmentToAdjustmentData) || [];
 
         // 3. Group Adjustment by Policy
         const adjustmentsByPolicy: Record<string, AdjustmentData[]> = {};
@@ -87,20 +95,62 @@ const initForm = async () => {
     }
 };
 
+/* Api */
+const deleteAdjustmentPolicy = async () => {
+    const deletedPolicyIds = originalPolicies.value
+        .map((policy) => policy.report_adjustment_policy_id)
+        .filter((_id) => _id.startsWith('rap-') && !formPolicies.value.some((p) => p.id === _id));
+
+    deletedPolicyIds.forEach(async (_id) => {
+        await reportAdjustmentPolicyAPI.delete({
+            report_adjustment_policy_id: _id,
+        });
+    });
+};
+const createAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
+    await reportAdjustmentPolicyAPI.create({
+        cost_report_config_id: costReportConfigId.value,
+        policy_filter: {
+            workspace_ids: policy.workspaceMenuItems?.map((item) => item.name) || [],
+        },
+        order: idx + 1,
+    });
+};
+const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
+    await reportAdjustmentPolicyAPI.update({
+        report_adjustment_policy_id: policy.id,
+        policy_filter: {
+            workspace_ids: policy.workspaceMenuItems?.map((item) => item.name) || [],
+        },
+    });
+    await reportAdjustmentPolicyAPI.changeOrder({
+        report_adjustment_policy_id: policy.id,
+        order: idx + 1,
+    });
+};
+
 /* Event */
 const handleClose = () => {
     advancedSettingsPageStore.setShowAdjustmentsOverlay(false);
 };
 const handleSave = async () => {
-    advancedSettingsPageStore.setLoading(true);
+    state.loading = true;
     try {
-        // const allData = advancedSettingsPageStore.getAdjustmentGroups();
-        // await saveAdjustmentGroups(allData);
+        await deleteAdjustmentPolicy();
+        formPolicies.value.forEach(async (policy, idx) => {
+            if (policy.id.startsWith('rap-')) {
+                await updateAdjustmentPolicy(policy, idx);
+            } else {
+                await createAdjustmentPolicy(policy, idx);
+            }
+        });
+        const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
+        queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
         advancedSettingsPageStore.setShowAdjustmentsOverlay(false);
     } catch (error) {
         console.error(error);
     } finally {
-        advancedSettingsPageStore.setLoading(false);
+        state.loading = false;
     }
 };
 
@@ -128,12 +178,14 @@ watch([
             <template #footer>
                 <div class="footer-wrapper">
                     <p-button style-type="transparent"
+                              :loading="state.loading"
                               @click="handleClose"
                     >
                         {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!state.isAllValid"
+                              :disabled="!isAllValid"
+                              :loading="state.loading"
                               @click="handleSave"
                     >
                         {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.SAVE_CHANGES') }}
