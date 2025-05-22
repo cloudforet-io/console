@@ -9,6 +9,7 @@ import {
 
 import { useReportAdjustmentPolicyApi } from '@/api-clients/cost-analysis/report-adjustment-policy/composables/use-report-adjustment-policy-api';
 import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/model';
+import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjustment/composables/use-report-adjustment-api';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
@@ -26,6 +27,7 @@ const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const { reportAdjustmentPolicyAPI } = useReportAdjustmentPolicyApi();
+const { reportAdjustmentAPI } = useReportAdjustmentApi();
 const { costReportConfig } = useCostReportConfigQuery();
 const queryClient = useQueryClient();
 const {
@@ -44,6 +46,8 @@ const workspaceReferenceMap = computed<WorkspaceReferenceMap>(() => allReference
 const isAllValid = computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid);
 const formPolicies = computed<AdjustmentPolicyData[]>(() => advancedSettingsPageState.adjustmentPolicyList);
 const originalPolicies = computed<ReportAdjustmentPolicyModel[]>(() => reportAdjustmentPolicyList.value || []);
+const originalAdjustments = computed<ReportAdjustmentModel[]>(() => reportAdjustmentList.value || []);
+const formAdjustments = computed<AdjustmentData[]>(() => Object.values(advancedSettingsPageState.adjustmentListMap).flat());
 const costReportConfigId = computed<string>(() => costReportConfig.value?.cost_report_config_id || '');
 
 /* Util */
@@ -68,7 +72,7 @@ const convertRawAdjustmentToAdjustmentData = (rawAdjustment: ReportAdjustmentMod
         name: rawAdjustment.name,
         provider: rawAdjustment.provider,
         adjustment,
-        amount: rawAdjustment.value,
+        amount: Math.abs(rawAdjustment.value),
         description: rawAdjustment.description,
     };
 };
@@ -96,16 +100,17 @@ const initForm = async () => {
 };
 
 /* Api */
-const deleteAdjustmentPolicy = async () => {
-    const deletedPolicyIds = originalPolicies.value
+const deleteAdjustmentPolicy = async (): Promise<string[]> => {
+    const deletedPolicyIds: string[] = originalPolicies.value
         .map((policy) => policy.report_adjustment_policy_id)
-        .filter((_id) => _id.startsWith('rap-') && !formPolicies.value.some((p) => p.id === _id));
+        .filter((_id) => !formPolicies.value.some((p) => p.id === _id));
 
     deletedPolicyIds.forEach(async (_id) => {
         await reportAdjustmentPolicyAPI.delete({
             report_adjustment_policy_id: _id,
         });
     });
+    return deletedPolicyIds;
 };
 const createAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
     await reportAdjustmentPolicyAPI.create({
@@ -128,6 +133,43 @@ const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
         order: idx + 1,
     });
 };
+const deleteAdjustment = async (deletedPolicyIds: string[]) => {
+    const deletedAdjustmentIds: string[] = originalAdjustments.value
+        .filter((adjustment) => !deletedPolicyIds.includes(adjustment.report_adjustment_policy_id))
+        .filter((adjustment) => !formAdjustments.value.some((a) => a.id === adjustment.report_adjustment_id))
+        .map((adjustment) => adjustment.report_adjustment_id);
+
+    deletedAdjustmentIds.forEach(async (_id) => {
+        await reportAdjustmentAPI.delete({
+            report_adjustment_id: _id,
+        });
+    });
+};
+const createAdjustment = async (adjustment: AdjustmentData, idx: number) => {
+    await reportAdjustmentAPI.create({
+        report_adjustment_policy_id: adjustment.policyId,
+        name: adjustment.name,
+        provider: adjustment.provider,
+        unit: adjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED',
+        value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
+        description: adjustment.description,
+        order: idx + 1,
+    });
+};
+const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
+    await reportAdjustmentAPI.update({
+        report_adjustment_id: adjustment.id,
+        name: adjustment.name,
+        provider: adjustment.provider,
+        unit: adjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED',
+        value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
+        description: adjustment.description,
+    });
+    await reportAdjustmentAPI.changeOrder({
+        report_adjustment_id: adjustment.id,
+        order: idx + 1,
+    });
+};
 
 /* Event */
 const handleClose = () => {
@@ -136,7 +178,8 @@ const handleClose = () => {
 const handleSave = async () => {
     state.loading = true;
     try {
-        await deleteAdjustmentPolicy();
+        // CUD Adjustment Policy
+        const deletedPolicyIds = await deleteAdjustmentPolicy();
         formPolicies.value.forEach(async (policy, idx) => {
             if (policy.id.startsWith('rap-')) {
                 await updateAdjustmentPolicy(policy, idx);
@@ -144,8 +187,23 @@ const handleSave = async () => {
                 await createAdjustmentPolicy(policy, idx);
             }
         });
+
+        // CUD Adjustment
+        await deleteAdjustment(deletedPolicyIds);
+        formAdjustments.value.forEach(async (adjustment, idx) => {
+            if (adjustment.id.startsWith('ra-')) {
+                await updateAdjustment(adjustment, idx);
+            } else {
+                await createAdjustment(adjustment, idx);
+            }
+        });
+
         const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
         queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
+
+        const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment', 'list');
+        queryClient.invalidateQueries({ queryKey: raQueryKey.value });
+
         advancedSettingsPageStore.setShowAdjustmentsOverlay(false);
     } catch (error) {
         console.error(error);
