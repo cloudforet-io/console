@@ -112,6 +112,7 @@ const state = reactive({
             { name: 'state', label: 'State', sortable: false },
             { name: 'workspace_id', label: 'Workspace', sortable: false },
             { name: 'project_id', label: 'Project', sortable: false },
+            { name: 'last_synced_at', label: 'Last Synced', sortable: false },
             { name: 'created_at', label: 'Created', sortable: false },
         ];
     }),
@@ -375,6 +376,9 @@ watch(() => state.trustedAccountId, async (ta) => {
                             />
                         </router-link>
                     </span>
+                </template>
+                <template #col-last_synced_at-format="{value}">
+                    {{ value ? dayjs(value).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') : '-' }}
                 </template>
                 <template #col-created_at-format="{value}">
                     {{ dayjs(value).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
