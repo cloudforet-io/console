@@ -8,13 +8,18 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useReportAdjustmentPolicyApi } from '@/api-clients/cost-analysis/report-adjustment-policy/composables/use-report-adjustment-policy-api';
+import type { ReportAdjustmentPolicyUpdateParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/update';
 import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/model';
 import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjustment/composables/use-report-adjustment-api';
+import type { ReportAdjustmentUpdateParameters } from '@/api-clients/cost-analysis/report-adjustment/schema/api-verbs/update';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import AdvancedSettingsAdjustmentGroupForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentGroupForm.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
@@ -38,6 +43,9 @@ const {
     reportAdjustmentPolicyList,
     isLoading: isReportAdjustmentPolicyLoading,
 } = useReportAdjustmentPolicyQuery();
+
+const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
+const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment', 'list');
 
 const state = reactive({
     loading: false,
@@ -122,16 +130,28 @@ const createAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
     });
 };
 const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
-    await reportAdjustmentPolicyAPI.update({
+    const oldPolicy = originalPolicies.value.find((p) => p.report_adjustment_policy_id === policy.id);
+    const newPolicy: ReportAdjustmentPolicyUpdateParameters = {
         report_adjustment_policy_id: policy.id,
         policy_filter: {
-            workspace_ids: policy.workspaceMenuItems?.map((item) => item.name) || [],
+            workspace_ids: policy.isAllWorkspaceSelected ? undefined : policy.workspaceMenuItems?.map((item) => item.name),
         },
-    });
-    await reportAdjustmentPolicyAPI.changeOrder({
-        report_adjustment_policy_id: policy.id,
-        order: idx + 1,
-    });
+    };
+    const isEqual = (
+        !oldPolicy?.policy_filter?.workspace_ids && !newPolicy.policy_filter?.workspace_ids
+        || (oldPolicy?.policy_filter?.workspace_ids?.length === newPolicy.policy_filter?.workspace_ids?.length
+            && !!oldPolicy?.policy_filter?.workspace_ids?.every((id) => newPolicy.policy_filter?.workspace_ids?.includes(id)))
+    );
+    if (!isEqual) {
+        await reportAdjustmentPolicyAPI.update(newPolicy);
+    }
+    const newOrder = idx + 1;
+    if (oldPolicy?.order !== newOrder) {
+        await reportAdjustmentPolicyAPI.changeOrder({
+            report_adjustment_policy_id: policy.id,
+            order: newOrder,
+        });
+    }
 };
 const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     const deletedAdjustmentIds: string[] = originalAdjustments.value
@@ -157,18 +177,32 @@ const createAdjustment = async (adjustment: AdjustmentData, idx: number) => {
     });
 };
 const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
-    await reportAdjustmentAPI.update({
+    const oldAdjustment = originalAdjustments.value.find((a) => a.report_adjustment_id === adjustment.id);
+    const newAdjustment: ReportAdjustmentUpdateParameters = {
         report_adjustment_id: adjustment.id,
         name: adjustment.name,
         provider: adjustment.provider,
         unit: adjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED',
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
-    });
-    await reportAdjustmentAPI.changeOrder({
-        report_adjustment_id: adjustment.id,
-        order: idx + 1,
-    });
+    };
+    const isEqual = (
+        newAdjustment.name === oldAdjustment?.name
+        && newAdjustment.provider === oldAdjustment?.provider
+        && newAdjustment.unit === oldAdjustment?.unit
+        && newAdjustment.value === oldAdjustment?.value
+        && newAdjustment.description === oldAdjustment?.description
+    );
+    if (!isEqual) {
+        await reportAdjustmentAPI.update(newAdjustment);
+    }
+    const newOrder = idx + 1;
+    if (oldAdjustment?.order !== newOrder) {
+        await reportAdjustmentAPI.changeOrder({
+            report_adjustment_id: adjustment.id,
+            order: newOrder,
+        });
+    }
 };
 
 /* Event */
@@ -180,31 +214,31 @@ const handleSave = async () => {
     try {
         // CUD Adjustment Policy
         const deletedPolicyIds = await deleteAdjustmentPolicy();
-        formPolicies.value.forEach(async (policy, idx) => {
+        await Promise.all(formPolicies.value.map(async (policy, idx) => {
             if (policy.id.startsWith('rap-')) {
                 await updateAdjustmentPolicy(policy, idx);
             } else {
                 await createAdjustmentPolicy(policy, idx);
             }
-        });
+        }));
 
         // CUD Adjustment
         await deleteAdjustment(deletedPolicyIds);
-        formAdjustments.value.forEach(async (adjustment, idx) => {
-            if (adjustment.id.startsWith('ra-')) {
-                await updateAdjustment(adjustment, idx);
-            } else {
-                await createAdjustment(adjustment, idx);
-            }
-        });
+        await Promise.all(formPolicies.value.map(async (policy) => {
+            const adjustments = formAdjustments.value.filter((adjustment) => adjustment.policyId === policy.id);
+            await Promise.all(adjustments.map(async (adjustment, idx) => {
+                if (adjustment.id.startsWith('ra-')) {
+                    await updateAdjustment(adjustment, idx);
+                } else {
+                    await createAdjustment(adjustment, idx);
+                }
+            }));
+        }));
 
-        const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
         queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
-
-        const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment', 'list');
         queryClient.invalidateQueries({ queryKey: raQueryKey.value });
 
-        advancedSettingsPageStore.setShowAdjustmentsOverlay(false);
+        showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SAVE_COST_REPORT_ADJUSTMENTS'), '');
     } catch (error) {
         console.error(error);
     } finally {
