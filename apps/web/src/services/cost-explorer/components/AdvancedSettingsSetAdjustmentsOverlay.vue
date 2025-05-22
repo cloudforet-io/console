@@ -58,9 +58,9 @@ const convertRawPolicyToPolicyData = (rawPolicy: ReportAdjustmentPolicyModel): A
 const convertRawAdjustmentToAdjustmentData = (rawAdjustment: ReportAdjustmentModel): AdjustmentData => {
     let adjustment: AdjustmentType;
     if (rawAdjustment.unit === 'FIXED') {
-        adjustment = rawAdjustment.value > 0 ? 'FIXED_DEDUCTION' : 'FIXED_ADDITION';
+        adjustment = rawAdjustment.value > 0 ? 'FIXED_ADDITION' : 'FIXED_DEDUCTION';
     } else {
-        adjustment = rawAdjustment.value > 0 ? 'PERCENTAGE_DEDUCTION' : 'PERCENTAGE_ADDITION';
+        adjustment = rawAdjustment.value > 0 ? 'PERCENT_ADDITION' : 'PERCENT_DEDUCTION';
     }
     return {
         id: rawAdjustment.report_adjustment_id,
