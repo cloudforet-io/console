@@ -8,8 +8,10 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useReportAdjustmentPolicyApi } from '@/api-clients/cost-analysis/report-adjustment-policy/composables/use-report-adjustment-policy-api';
+import type { ReportAdjustmentPolicyUpdateParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/update';
 import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/model';
 import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjustment/composables/use-report-adjustment-api';
+import type { ReportAdjustmentUpdateParameters } from '@/api-clients/cost-analysis/report-adjustment/schema/api-verbs/update';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
@@ -25,7 +27,6 @@ import { useReportAdjustmentPolicyQuery } from '@/services/cost-explorer/composa
 import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 import type { AdjustmentType, AdjustmentData, AdjustmentPolicyData } from '@/services/cost-explorer/types/report-adjustment-type';
-
 
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
@@ -86,9 +87,7 @@ const convertRawAdjustmentToAdjustmentData = (rawAdjustment: ReportAdjustmentMod
 
 /* Init */
 const initForm = async () => {
-    console.log('initForm');
     try {
-        console.log('reportAdjustmentPolicyList', reportAdjustmentPolicyList.value);
         const adjustmentPolicyList: AdjustmentPolicyData[] = reportAdjustmentPolicyList.value?.map(convertRawPolicyToPolicyData) || [];
         const adjustmentList: AdjustmentData[] = reportAdjustmentList.value?.map(convertRawAdjustmentToAdjustmentData) || [];
 
@@ -131,16 +130,28 @@ const createAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
     });
 };
 const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
-    await reportAdjustmentPolicyAPI.update({
+    const oldPolicy = originalPolicies.value.find((p) => p.report_adjustment_policy_id === policy.id);
+    const newPolicy: ReportAdjustmentPolicyUpdateParameters = {
         report_adjustment_policy_id: policy.id,
         policy_filter: {
-            workspace_ids: policy.workspaceMenuItems?.map((item) => item.name) || [],
+            workspace_ids: policy.isAllWorkspaceSelected ? undefined : policy.workspaceMenuItems?.map((item) => item.name),
         },
-    });
-    await reportAdjustmentPolicyAPI.changeOrder({
-        report_adjustment_policy_id: policy.id,
-        order: idx + 1,
-    });
+    };
+    const isEqual = (
+        !oldPolicy?.policy_filter?.workspace_ids && !newPolicy.policy_filter?.workspace_ids
+        || (oldPolicy?.policy_filter?.workspace_ids?.length === newPolicy.policy_filter?.workspace_ids?.length
+            && !!oldPolicy?.policy_filter?.workspace_ids?.every((id) => newPolicy.policy_filter?.workspace_ids?.includes(id)))
+    );
+    if (!isEqual) {
+        await reportAdjustmentPolicyAPI.update(newPolicy);
+    }
+    const newOrder = idx + 1;
+    if (oldPolicy?.order !== newOrder) {
+        await reportAdjustmentPolicyAPI.changeOrder({
+            report_adjustment_policy_id: policy.id,
+            order: newOrder,
+        });
+    }
 };
 const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     const deletedAdjustmentIds: string[] = originalAdjustments.value
@@ -166,18 +177,32 @@ const createAdjustment = async (adjustment: AdjustmentData, idx: number) => {
     });
 };
 const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
-    await reportAdjustmentAPI.update({
+    const oldAdjustment = originalAdjustments.value.find((a) => a.report_adjustment_id === adjustment.id);
+    const newAdjustment: ReportAdjustmentUpdateParameters = {
         report_adjustment_id: adjustment.id,
         name: adjustment.name,
         provider: adjustment.provider,
         unit: adjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED',
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
-    });
-    await reportAdjustmentAPI.changeOrder({
-        report_adjustment_id: adjustment.id,
-        order: idx + 1,
-    });
+    };
+    const isEqual = (
+        newAdjustment.name === oldAdjustment?.name
+        && newAdjustment.provider === oldAdjustment?.provider
+        && newAdjustment.unit === oldAdjustment?.unit
+        && newAdjustment.value === oldAdjustment?.value
+        && newAdjustment.description === oldAdjustment?.description
+    );
+    if (!isEqual) {
+        await reportAdjustmentAPI.update(newAdjustment);
+    }
+    const newOrder = idx + 1;
+    if (oldAdjustment?.order !== newOrder) {
+        await reportAdjustmentAPI.changeOrder({
+            report_adjustment_id: adjustment.id,
+            order: newOrder,
+        });
+    }
 };
 
 /* Event */
