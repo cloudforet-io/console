@@ -12,9 +12,12 @@ import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/re
 import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjustment/composables/use-report-adjustment-api';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import AdvancedSettingsAdjustmentGroupForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentGroupForm.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
@@ -22,6 +25,7 @@ import { useReportAdjustmentPolicyQuery } from '@/services/cost-explorer/composa
 import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 import type { AdjustmentType, AdjustmentData, AdjustmentPolicyData } from '@/services/cost-explorer/types/report-adjustment-type';
+
 
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
@@ -38,6 +42,9 @@ const {
     reportAdjustmentPolicyList,
     isLoading: isReportAdjustmentPolicyLoading,
 } = useReportAdjustmentPolicyQuery();
+
+const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
+const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment', 'list');
 
 const state = reactive({
     loading: false,
@@ -79,7 +86,9 @@ const convertRawAdjustmentToAdjustmentData = (rawAdjustment: ReportAdjustmentMod
 
 /* Init */
 const initForm = async () => {
+    console.log('initForm');
     try {
+        console.log('reportAdjustmentPolicyList', reportAdjustmentPolicyList.value);
         const adjustmentPolicyList: AdjustmentPolicyData[] = reportAdjustmentPolicyList.value?.map(convertRawPolicyToPolicyData) || [];
         const adjustmentList: AdjustmentData[] = reportAdjustmentList.value?.map(convertRawAdjustmentToAdjustmentData) || [];
 
@@ -180,31 +189,31 @@ const handleSave = async () => {
     try {
         // CUD Adjustment Policy
         const deletedPolicyIds = await deleteAdjustmentPolicy();
-        formPolicies.value.forEach(async (policy, idx) => {
+        await Promise.all(formPolicies.value.map(async (policy, idx) => {
             if (policy.id.startsWith('rap-')) {
                 await updateAdjustmentPolicy(policy, idx);
             } else {
                 await createAdjustmentPolicy(policy, idx);
             }
-        });
+        }));
 
         // CUD Adjustment
         await deleteAdjustment(deletedPolicyIds);
-        formAdjustments.value.forEach(async (adjustment, idx) => {
-            if (adjustment.id.startsWith('ra-')) {
-                await updateAdjustment(adjustment, idx);
-            } else {
-                await createAdjustment(adjustment, idx);
-            }
-        });
+        await Promise.all(formPolicies.value.map(async (policy) => {
+            const adjustments = formAdjustments.value.filter((adjustment) => adjustment.policyId === policy.id);
+            await Promise.all(adjustments.map(async (adjustment, idx) => {
+                if (adjustment.id.startsWith('ra-')) {
+                    await updateAdjustment(adjustment, idx);
+                } else {
+                    await createAdjustment(adjustment, idx);
+                }
+            }));
+        }));
 
-        const { key: rapQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment-policy', 'list');
         queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
-
-        const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustment', 'list');
         queryClient.invalidateQueries({ queryKey: raQueryKey.value });
 
-        advancedSettingsPageStore.setShowAdjustmentsOverlay(false);
+        showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SAVE_COST_REPORT_ADJUSTMENTS'), '');
     } catch (error) {
         console.error(error);
     } finally {
