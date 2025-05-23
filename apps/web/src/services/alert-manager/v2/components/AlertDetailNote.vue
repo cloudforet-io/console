@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -14,27 +15,26 @@ import type { NoteListParameters } from '@/api-clients/alert-manager/note/schema
 import type { NoteModel } from '@/api-clients/alert-manager/note/schema/model';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
+import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
 
-interface Props {
-    alertId?: string;
-}
-const props = withDefaults(defineProps<Props>(), {
-    alertId: '',
-});
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageGetters = alertDetailPageStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
+
+const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
-    timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    timezone: computed<string>(() => userState.timezone || 'UTC'),
 });
 const state = reactive({
     noteList: [] as NoteModel[],
@@ -58,7 +58,7 @@ const handleSelect = (noteId) => {
 const handleCreateNote = async () => {
     try {
         await SpaceConnector.clientV2.alertManager.note.create<NoteCreateParameters, NoteModel>({
-            alert_id: props.alertId,
+            alert_id: alertData.value?.alert_id || '',
             note: state.noteInput,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_CREATE'), '');
@@ -85,7 +85,7 @@ const handleDeleteModal = async () => {
 const fetchNoteList = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.note.list<NoteListParameters, ListResponse<NoteModel>>({
-            alert_id: props.alertId,
+            alert_id: alertData.value?.alert_id || '',
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },
@@ -105,7 +105,7 @@ const fetchNoteList = async () => {
     }
 };
 
-watch(() => props.alertId, async (id) => {
+watch(() => alertData.value?.alert_id, async (id) => {
     if (!id) return;
     await fetchNoteList();
 }, { immediate: true });

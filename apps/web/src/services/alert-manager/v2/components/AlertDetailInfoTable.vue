@@ -22,13 +22,13 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/v2/components/AlertDetailInfoTableDescription.vue';
 import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 type BadgeInfo = {
@@ -36,8 +36,8 @@ type BadgeInfo = {
     styleType: string;
 };
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageGetters = alertDetailPageStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -51,7 +51,7 @@ const queryHelper = new QueryHelper();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    timezone: computed<string>(() => userState.timezone || 'UTC'),
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     serviceMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });

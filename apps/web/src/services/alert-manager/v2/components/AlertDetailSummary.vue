@@ -14,6 +14,7 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
@@ -24,10 +25,9 @@ import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/
 import { useAlertDetailUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-detail-update-mutation';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageGetters = alertDetailPageStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -37,7 +37,7 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
-    timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    timezone: computed<string>(() => userState.timezone || 'UTC'),
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({

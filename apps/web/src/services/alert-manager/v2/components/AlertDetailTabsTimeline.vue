@@ -23,12 +23,12 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { AppReferenceMap } from '@/store/reference/app-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 
 import AlertDetailTabsTimelineModal from '@/services/alert-manager/v2/components/AlertDetailTabsTimelineModal.vue';
 import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import type { AlertFilterType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 type HistoryItemInfo = {
@@ -36,8 +36,8 @@ type HistoryItemInfo = {
     styleType?: string;
 };
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageGetters = alertDetailPageStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
@@ -46,7 +46,7 @@ const route = useRoute();
 const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
-    timezone: computed<string>(() => alertDetailPageGetters.timezone),
+    timezone: computed<string>(() => userState.timezone || 'UTC'),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     app: computed<AppReferenceMap>(() => allReferenceGetters.app),
     user: computed<UserReferenceMap>(() => allReferenceGetters.user),
