@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { AlertDeleteParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/delete';
-import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -15,22 +14,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 
 interface Props {
     visible: boolean;
+    alertId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    alertId: '',
 });
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
-
-const storeState = reactive({
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
-});
 const router = useRouter();
 const route = useRoute();
 
@@ -49,7 +43,7 @@ const handleConfirm = async () => {
     state.loading = true;
     try {
         await SpaceConnector.clientV2.alertManager.alert.delete<AlertDeleteParameters>({
-            alert_id: storeState.alertInfo.alert_id,
+            alert_id: props.alertId,
         });
         const serviceId = route.params?.serviceId;
         if (serviceId) {

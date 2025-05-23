@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 import type { RawLocation } from 'vue-router/types/router';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -12,8 +12,9 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constants';
-import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertSeverityType } from '@/api-clients/alert-manager/alert/schema/type';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -25,12 +26,10 @@ import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-st
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/v2/components/AlertDetailInfoTableDescription.vue';
+import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 
 type BadgeInfo = {
     badgeType: string;
@@ -38,20 +37,21 @@ type BadgeInfo = {
 };
 
 const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
+const route = useRoute();
+
+const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
 
 const queryHelper = new QueryHelper();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     serviceMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
@@ -61,7 +61,7 @@ const tableState = reactive({
         { name: 'description', label: i18n.t('ALERT_MANAGER.ALERTS.DESC'), disableCopy: true },
         { name: 'rule', label: i18n.t('ALERT_MANAGER.ALERTS.RULE'), disableCopy: true },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.ALERTS.SEVERITY'), disableCopy: true },
-        { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => storeState.alertInfo.triggered_by },
+        { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => alertData.value?.triggered_by },
         { name: 'service_id', label: i18n.t('ALERT_MANAGER.ALERTS.SERVICE'), disableCopy: true },
         { name: 'resources', label: i18n.t('ALERT_MANAGER.ALERTS.RESOURCE'), disableCopy: true },
         { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED'), disableCopy: true },
@@ -163,15 +163,15 @@ const handleRouteViewButton = async (id: string, type?: string) => {
 <template>
     <p-pane-layout class="alert-detail-info-table overflow-hidden pb-10">
         <p-definition-table :fields="tableState.fields"
-                            :data="storeState.alertInfo"
+                            :data="alertData"
                             :skeleton-rows="10"
                             custom-key-width="10rem"
                             style-type="white"
                             block
         >
             <template #data-description>
-                <alert-detail-info-table-description :value="storeState.alertInfo.description"
-                                                     :alert-id="storeState.alertInfo.alert_id"
+                <alert-detail-info-table-description :value="alertData?.description || ''"
+                                                     :alert-id="alertData?.alert_id || ''"
                 />
             </template>
             <template #data-rule="{value}">
@@ -231,11 +231,11 @@ const handleRouteViewButton = async (id: string, type?: string) => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #data-acknowledged_at="{ value }">
-                <span v-if="storeState.alertInfo.acknowledged_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
+                <span v-if="alertData?.acknowledged_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-resolved_at="{ value }">
-                <span v-if="storeState.alertInfo.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
+                <span v-if="alertData?.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-labels="{ value }">

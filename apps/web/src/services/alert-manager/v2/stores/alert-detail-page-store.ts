@@ -5,7 +5,6 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { AlertGetParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/get';
 import type { AlertUpdateParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/update';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
@@ -36,18 +35,6 @@ export const useAlertDetailPageStore = defineStore('page-alert-detail', () => {
     });
 
     const actions = {
-        async init() {
-            state.alertInfo = {} as AlertModel;
-        },
-        async fetchAlertDetail(alertId: string): Promise<void|Error> {
-            try {
-                state.alertInfo = await SpaceConnector.clientV2.alertManager.alert.get<AlertGetParameters, AlertModel>({
-                    alert_id: alertId,
-                });
-            } catch (e: any) {
-                ErrorHandler.handleError(e);
-            }
-        },
         async updateAlertDetail(param: AlertUpdateParameters): Promise<void|Error> {
             try {
                 state.alertInfo = await SpaceConnector.clientV2.alertManager.alert.update<AlertUpdateParameters, AlertModel>(param);

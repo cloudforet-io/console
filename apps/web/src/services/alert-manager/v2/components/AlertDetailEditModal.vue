@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
-
-import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -12,20 +10,20 @@ import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/aler
 
 interface Props {
     visible: boolean;
+    alertTitle?: string;
+    alertId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    alertTitle: '',
+    alertId: '',
 });
 
 const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
-const storeState = reactive({
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
-});
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
@@ -38,7 +36,7 @@ const {
     invalidState,
     isAllValid,
 } = useFormValidator({
-    name: storeState.alertInfo.title,
+    name: props.alertTitle,
 }, {
     name(value: string) {
         if (!value) return ' ';
@@ -54,7 +52,7 @@ const handleConfirm = async () => {
     state.loading = true;
     try {
         await alertDetailPageStore.updateAlertDetail({
-            alert_id: storeState.alertInfo.alert_id,
+            alert_id: props.alertId,
             title: name.value,
         });
     } finally {

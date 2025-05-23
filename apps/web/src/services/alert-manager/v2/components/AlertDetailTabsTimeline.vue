@@ -3,6 +3,7 @@ import {
     computed,
     reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -12,7 +13,7 @@ import {
 
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_HISTORY_ACTION } from '@/api-clients/alert-manager/alert/schema/constants';
-import type { AlertModel, AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertHistoryActionType } from '@/api-clients/alert-manager/alert/schema/type';
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
@@ -26,6 +27,7 @@ import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-st
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 
 import AlertDetailTabsTimelineModal from '@/services/alert-manager/v2/components/AlertDetailTabsTimelineModal.vue';
+import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import type { AlertFilterType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
@@ -35,13 +37,15 @@ type HistoryItemInfo = {
 };
 
 const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
 const alertDetailPageGetters = alertDetailPageStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
+const route = useRoute();
+
+const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+
 const storeState = reactive({
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     timezone: computed<string>(() => alertDetailPageGetters.timezone),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     app: computed<AppReferenceMap>(() => allReferenceGetters.app),
@@ -87,7 +91,7 @@ const queryClient = useQueryClient();
 const { alertAPI } = useAlertApi();
 const { key: alertHistoryQueryKey, params: alertHistoryQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'history', {
     params: computed(() => ({
-        alert_id: storeState.alertInfo.alert_id,
+        alert_id: alertData.value?.alert_id || '',
         include_details: true,
     })),
 });
@@ -145,8 +149,8 @@ const { data: alertHistoryData, isFetching: alertHistoryLoading } = useScopedQue
     staleTime: 1000 * 30,
 }, ['WORKSPACE']);
 
-watch(() => storeState.alertInfo, async (alertInfo) => {
-    if (!alertInfo) return;
+watch(() => alertData.value?.alert_id, async (alertId) => {
+    if (!alertId) return;
     refreshHistoryList();
 }, { immediate: true });
 </script>
@@ -242,6 +246,7 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                                           :visible.sync="state.modalVisible"
                                           :type="state.modalType"
                                           :history="state.selectedItem"
+                                          :service-id="alertData?.service_id || ''"
         />
     </section>
 </template>
