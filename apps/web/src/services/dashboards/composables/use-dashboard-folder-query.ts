@@ -15,7 +15,7 @@ import type { PrivateFolderModel } from '@/api-clients/dashboard/private-folder/
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
 import type { PublicFolderUpdateParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/update';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useScopedQuery } from '@/query/core/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

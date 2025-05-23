@@ -40,6 +40,7 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { referenceQueryClient } from './query/clients';
 
 if (import.meta.env.DEV) {
     const queryClient = useQueryClient();
@@ -118,7 +119,7 @@ watch(() => state.userId, (userId) => {
     <div v-cloak
          id="app"
     >
-        <console-vue-query-devtools />
+        <console-vue-query-devtools :client="referenceQueryClient" />
         <template v-if="displayStore.state.isInitialized">
             <p-notice-alert group="noticeTopLeft" />
             <p-notice-alert group="noticeTopRight" />

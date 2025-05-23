@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue';
 
+import { useProjectReferenceData } from '@/query/reference/project/use-project-reference-data';
+
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
@@ -11,6 +13,8 @@ import CostSummary from '@/services/workspace-home/shared/components/CostSummary
 import { useProjectIdsFromGroup } from '@/services/workspace-home/shared/composables/use-project-ids-from-group';
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
+
+const { referenceMap } = useProjectReferenceData();
 
 const props = defineProps<{
     projectGroupId?: string;
@@ -30,6 +34,7 @@ const projectIds = computed(() => {
 
 <template>
     <div>
+        <p>{{ referenceMap[props.projectId || '']?.name || 'TEST' }}</p>
         <div class="bg-gray-100 py-1 border-gray-100 border-x overflow-hidden">
             <div class="flex space-x-1 tablet:flex-wrap">
                 <asset-summary v-if="visibleContents"

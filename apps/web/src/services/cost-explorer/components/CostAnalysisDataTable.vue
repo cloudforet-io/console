@@ -27,6 +27,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import { useProjectReferenceData } from '@/query/reference/project/use-project-reference-data';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
@@ -99,6 +100,9 @@ const getValueSumKey = (dataType: string) => {
         return `data.${dataType}`;
     }
 };
+
+const { referenceMap } = useProjectReferenceData();
+
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -571,9 +575,7 @@ watch(
                       @click="handleClickRowData(field.name, value)"
                 >
                     {{
-                        storeState.projects[value]
-                            ? storeState.projects[value].label
-                            : value
+                        referenceMap[value]?.label || '-'
                     }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROVIDER">
