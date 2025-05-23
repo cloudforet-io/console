@@ -6,7 +6,7 @@ import { useReferenceQueryKey } from '@/query/query-key/use-reference-query-key'
 import type { ReferenceFetchInfo, ReferenceKeyType } from '@/query/reference/types/reference-type';
 
 
-export const useReferenceListQuery = <T, R extends Record<string, any>>(
+export const useReferenceList = <T, R extends Record<string, any>>(
     resourceKey: ReferenceKeyType,
     fetchInfo: ReferenceFetchInfo<T>,
     transform: (item: T) => R,
@@ -35,7 +35,7 @@ export const useReferenceListQuery = <T, R extends Record<string, any>>(
     });
 
     return {
-        data: computed<R[]>(() => {
+        referenceList: computed<R[]>(() => {
             if (!hasTrriggered.value && !isFetched.value && !data.value) {
                 refetch();
                 hasTrriggered.value = true;
