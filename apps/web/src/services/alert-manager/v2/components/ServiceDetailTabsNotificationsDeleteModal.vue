@@ -7,12 +7,12 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import type { ServiceChannelDeleteParameters } from '@/schema/alert-manager/service-channel/api-verbs/delete';
-import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { EscalationPolicyListParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/list';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import type { ServiceChannelDeleteParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/delete';
+import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

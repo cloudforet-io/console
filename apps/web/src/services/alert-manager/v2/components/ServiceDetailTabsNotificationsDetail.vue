@@ -9,13 +9,13 @@ import {
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ServiceChannelGetParameters } from '@/schema/alert-manager/service-channel/api-verbs/get';
+import type { ServiceChannelGetParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/get';
 import {
     SERVICE_CHANNEL_FORWARD_TYPE,
     SERVICE_CHANNEL_SCHEDULE_TYPE, SERVICE_CHANNEL_TYPE,
-} from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/schema/alert-manager/service-channel/type';
+} from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/api-clients/alert-manager/service-channel/schema/type';
 import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';

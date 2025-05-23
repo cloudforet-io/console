@@ -7,10 +7,10 @@ import {
     PButtonModal, PSelectCard, PI,
 } from '@cloudforet/mirinae';
 
-import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
-import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/service/constants';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
+import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
+import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import type { NotificationUrgencyType, RecoveryModeType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

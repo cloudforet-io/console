@@ -10,10 +10,10 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertHistoryParameters } from '@/schema/alert-manager/alert/api-verbs/history';
-import { ALERT_HISTORY_ACTION } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel, AlertHistoryModel } from '@/schema/alert-manager/alert/model';
-import type { AlertHistoryActionType } from '@/schema/alert-manager/alert/type';
+import type { AlertHistoryParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/history';
+import { ALERT_HISTORY_ACTION } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel, AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { AlertHistoryActionType } from '@/api-clients/alert-manager/alert/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

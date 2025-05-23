@@ -8,9 +8,9 @@ import {
     PFieldGroup, PTextInput, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import type { ServiceCreateParameters } from '@/schema/alert-manager/service/api-verbs/create';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { MembersType } from '@/schema/alert-manager/service/type';
+import type { ServiceCreateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/create';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

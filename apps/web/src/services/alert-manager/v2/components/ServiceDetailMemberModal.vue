@@ -10,12 +10,12 @@ import {
     PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens, PEmpty, PScopedNotification, PLink,
 } from '@cloudforet/mirinae';
 
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { ServiceChangeMembersParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/change-members';
+import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceChangeMembersParameters } from '@/schema/alert-manager/service/api-verbs/chagne-members';
-import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
-import type { MembersType } from '@/schema/alert-manager/service/type';
 import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
@@ -35,6 +35,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-co
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+
 
 type modalMode = 'member' | 'invitation';
 

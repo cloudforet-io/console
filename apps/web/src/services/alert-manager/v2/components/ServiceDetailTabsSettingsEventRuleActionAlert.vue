@@ -18,17 +18,17 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
-import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import { EVENT_RULE_URGENCY } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
+import type { EscalationPolicyListParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/list';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import { EVENT_RULE_URGENCY } from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleActionsType,
     EventRuleUrgencyType,
-} from '@/schema/alert-manager/event-rule/type';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

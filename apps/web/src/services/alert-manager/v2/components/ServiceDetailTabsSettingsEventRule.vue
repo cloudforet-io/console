@@ -6,8 +6,8 @@ import {
 
 import { PButton, PDataLoader, screens } from '@cloudforet/mirinae';
 
-import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import { EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 

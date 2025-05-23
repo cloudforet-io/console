@@ -20,9 +20,9 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
-import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookListParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/list';
+import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';

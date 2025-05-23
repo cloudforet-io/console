@@ -7,8 +7,8 @@ import { useRouter } from 'vue-router/composables';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
-import type { WebhookCreateParameters } from '@/schema/alert-manager/webhook/api-verbs/create';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookCreateParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/create';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
 

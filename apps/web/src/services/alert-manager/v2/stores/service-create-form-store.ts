@@ -6,9 +6,9 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

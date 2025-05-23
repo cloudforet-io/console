@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { PHeadingLayout, PHeading, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';

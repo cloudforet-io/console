@@ -1,5 +1,5 @@
-import { SERVICE_CHANNEL_FORWARD_TYPE } from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelDataType } from '@/schema/alert-manager/service-channel/type';
+import { SERVICE_CHANNEL_FORWARD_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelDataType } from '@/api-clients/alert-manager/service-channel/schema/type';
 import { i18n } from '@/translations';
 
 import { ALERT_MANAGER_STATE_COLOR } from '@/services/alert-manager/v2/constants/common-constant';

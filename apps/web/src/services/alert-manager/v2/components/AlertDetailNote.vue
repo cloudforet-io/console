@@ -8,11 +8,11 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { NoteCreateParameters } from '@/schema/alert-manager/note/api-verbs/create';
-import type { NoteDeleteParameters } from '@/schema/alert-manager/note/api-verbs/delete';
-import type { NoteListParameters } from '@/schema/alert-manager/note/api-verbs/list';
-import type { NoteModel } from '@/schema/alert-manager/note/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { NoteCreateParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/create';
+import type { NoteDeleteParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/delete';
+import type { NoteListParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/list';
+import type { NoteModel } from '@/api-clients/alert-manager/note/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

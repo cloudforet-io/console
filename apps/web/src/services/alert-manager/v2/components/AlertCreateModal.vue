@@ -2,16 +2,17 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { AlertCreateParameters } from '@/schema/alert-manager/alert/api-verbs/create';
-import { ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
+import type { AlertCreateParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/create';
+import { ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -35,19 +36,20 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.state;
 const alertPageGetters = alertPageStore.getters;
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const route = useRoute();
 
+const queryClient = useQueryClient();
+const { alertAPI } = useAlertApi();
+const { key: alertListQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
+
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
-    alertListQuery: computed<Query|undefined>(() => alertPageState.alertListQuery),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     isServicePage: route.name === ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
 
@@ -64,6 +66,7 @@ const state = reactive({
     ]),
     selectedRadioIdx: 0,
 });
+
 const {
     forms: {
         name,
@@ -82,28 +85,30 @@ const {
     },
 });
 
+const { mutate: createAlert, isPending } = useMutation({
+    mutationFn: (params: AlertCreateParameters) => alertAPI.create(params),
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
+        queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
+        handleClose();
+    },
+});
+
 const handleClose = () => {
     state.proxyVisible = false;
 };
 const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.alert.create<AlertCreateParameters, AlertModel>({
-            title: name.value,
-            description: description.value,
-            service_id: state.selectedServiceId,
-            urgency: state.radioMenuList[state.selectedRadioIdx].name,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
-        await alertPageStore.fetchAlertsList({
-            query: storeState.alertListQuery,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-        handleClose();
-    }
+    createAlert({
+        title: name.value,
+        description: description.value,
+        service_id: state.selectedServiceId,
+        urgency: state.radioMenuList[state.selectedRadioIdx].name,
+    });
 };
 </script>
 
@@ -115,7 +120,7 @@ const handleConfirm = async () => {
                     :backdrop="true"
                     :visible="state.proxyVisible"
                     :disabled="!isAllValid || !state.selectedServiceId"
-                    :loading="state.loading"
+                    :loading="isPending"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

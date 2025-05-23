@@ -10,8 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookListParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/list';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 

@@ -9,9 +9,9 @@ import {
     PBadge, PDivider, PFieldTitle, PIconButton, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyGetParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/get';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
+import type { EscalationPolicyGetParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/get';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

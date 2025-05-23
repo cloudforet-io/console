@@ -10,7 +10,7 @@ import {
     PBadge, PIconButton, PI, PTextInput, PFieldGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
+import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

@@ -8,8 +8,8 @@ import {
     PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader, PI,
 } from '@cloudforet/mirinae';
 
-import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

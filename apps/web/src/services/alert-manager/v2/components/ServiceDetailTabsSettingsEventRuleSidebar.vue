@@ -10,9 +10,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PI, PSearch, PBadge, PLazyImg, screens, PButton,
 } from '@cloudforet/mirinae';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type';
 
-import type { EventRuleChangeOrderParameters } from '@/schema/alert-manager/event-rule/api-verbs/change-order';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import type { EventRuleChangeOrderParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/change-order';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -30,7 +31,6 @@ import { gray } from '@/styles/colors';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { TreeNode } from '@/services/project/v-shared/tree/type';
 
 interface Props {
   hideSidebar: boolean;

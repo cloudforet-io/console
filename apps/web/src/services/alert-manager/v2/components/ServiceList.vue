@@ -16,9 +16,9 @@ import {
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
-import { SERVICE_HEALTHY_TYPE } from '@/schema/alert-manager/service/constants';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { ServiceListParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/list';
+import { SERVICE_HEALTHY_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 

@@ -8,8 +8,8 @@ import {
     PButtonModal,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyDeleteParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/delete';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
+import type { EscalationPolicyDeleteParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/delete';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

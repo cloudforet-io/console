@@ -6,8 +6,8 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserChannelUpdateParameters } from '@/schema/alert-manager/user-channel/api-verbs/update';
-import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
+import type { UserChannelUpdateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/update';
+import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelUpdateParameters } from '@/schema/notification/project-channel/api-verbs/update';
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';

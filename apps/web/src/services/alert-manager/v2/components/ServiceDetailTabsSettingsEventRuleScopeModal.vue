@@ -13,10 +13,10 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleScopeType } from '@/schema/alert-manager/event-rule/type';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import { EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleScopeType } from '@/api-clients/alert-manager/event-rule/schema/type';
+import type { WebhookListParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/list';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

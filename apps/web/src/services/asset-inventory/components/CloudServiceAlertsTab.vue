@@ -14,9 +14,9 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
-import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
+import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

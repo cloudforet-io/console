@@ -6,7 +6,7 @@ import { map } from 'lodash';
 import { PDefinitionTable, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 
