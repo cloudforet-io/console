@@ -10,7 +10,7 @@ import type { ReferenceKeyType } from '@/query/reference/types/reference-type';
 type MutationCallback<T> = () => Promise<T>;
 type callbackForReferenceRefresh = () => Promise<void>;
 
-export const useReferenceQuerySync = <T>(resourceType: ReferenceKeyType) => {
+export const useReferenceModelSync = <T>(resourceType: ReferenceKeyType) => {
     const queryClient = useQueryClient();
 
     const withReferenceUpdate = async (
