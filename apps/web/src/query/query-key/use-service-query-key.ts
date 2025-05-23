@@ -3,7 +3,7 @@ import type { Ref, ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import { useQueryKeyAppContext } from '@/query/query-key/_composable/use-app-context-query-key';
-import { createImmutableObjectKeyItem } from '@/query/query-key/_helpers/immutable-query-key-helper';
+import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/query-key/_helpers/query-key-helper';
 import type {
     QueryKeyArray, ResourceName, ServiceName, Verb,
 } from '@/query/query-key/_types/query-key-type';
@@ -78,7 +78,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     const memoizedContextKey = computed(() => {
         const resolvedContextKey = toValue(contextKey);
         return resolvedContextKey
-            ? _normalizeQueryKeyPart(createImmutableObjectKeyItem(resolvedContextKey))
+            ? normalizeQueryKeyPart(createImmutableObjectKeyItem(resolvedContextKey))
             : [];
     });
 
@@ -110,7 +110,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
                 const cached = suffixCache.get(arg);
                 if (cached) return cached;
 
-                const result = [...queryKey.value, ..._normalizeQueryKeyPart(createImmutableObjectKeyItem(arg))];
+                const result = [...queryKey.value, ...normalizeQueryKeyPart(createImmutableObjectKeyItem(arg))];
                 suffixCache.set(arg, result);
                 return result;
             }
@@ -119,13 +119,6 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     } as UseServiceQueryKeyResult<T>;
 };
 
-
-const _normalizeQueryKeyPart = (key: unknown): QueryKeyArray => {
-    if (Array.isArray(key)) {
-        return key;
-    }
-    return [key];
-};
 
 // const _logQueryKeyDebug = (queryKey: QueryKeyArray) => {
 //     const now = Date.now();
