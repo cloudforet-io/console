@@ -6,7 +6,8 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
+import { useAlertDetailUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-detail-update-mutation';
+
 
 interface Props {
     visible: boolean;
@@ -20,12 +21,9 @@ const props = withDefaults(defineProps<Props>(), {
     alertId: '',
 });
 
-const alertDetailPageStore = useAlertDetailPageStore();
-
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const {
@@ -44,21 +42,21 @@ const {
     },
 });
 
+const { mutate: alertUpdateMutate, isPending } = useAlertDetailUpdateMutation({
+    onSettled: () => {
+        handleClose();
+    },
+});
+
 const handleClose = () => {
     state.proxyVisible = false;
 };
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await alertDetailPageStore.updateAlertDetail({
-            alert_id: props.alertId,
-            title: name.value,
-        });
-    } finally {
-        state.loading = false;
-        handleClose();
-    }
+const handleConfirm = () => {
+    alertUpdateMutate({
+        alert_id: props.alertId,
+        title: name.value,
+    });
 };
 </script>
 
@@ -70,7 +68,7 @@ const handleConfirm = async () => {
                     :backdrop="true"
                     :visible="state.proxyVisible"
                     :disabled="!isAllValid"
-                    :loading="state.loading"
+                    :loading="isPending"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

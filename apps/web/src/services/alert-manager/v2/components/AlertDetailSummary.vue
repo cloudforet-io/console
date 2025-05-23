@@ -21,6 +21,7 @@ import { gray, red } from '@/styles/colors';
 
 import { calculateTime } from '@/services/alert-manager/v2/composables/alert-table-data';
 import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
+import { useAlertDetailUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-detail-update-mutation';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
@@ -60,14 +61,17 @@ const state = reactive({
 
 const getEscalationInfo = (id: string) => storeState.escalationPolicy[id]?.label || '';
 
-const handleChangeAlertState = async (alertState: AlertStatusType) => {
-    await alertDetailPageStore.updateAlertDetail({
+
+const { mutate: alertUpdateMutate } = useAlertDetailUpdateMutation();
+
+const handleChangeAlertState = (alertState: AlertStatusType) => {
+    alertUpdateMutate({
         alert_id: alertData.value?.alert_id || '',
         status: alertState,
     });
 };
-const handleChangeAlertUrgency = async (alertUrgency: AlertUrgencyType) => {
-    await alertDetailPageStore.updateAlertDetail({
+const handleChangeAlertUrgency = (alertUrgency: AlertUrgencyType) => {
+    alertUpdateMutate({
         alert_id: alertData.value?.alert_id || '',
         urgency: alertUrgency,
     });
