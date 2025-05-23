@@ -12,8 +12,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EventListParameters } from '@/schema/monitoring/event/api-verbs/list';
-import type { EventModel } from '@/schema/monitoring/event/model';
+import type { EventListParameters } from '@/api-clients/monitoring/event/schema/api-verbs/list';
+import type { EventModel } from '@/api-clients/monitoring/event/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
@@ -21,7 +21,6 @@ import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import AlertDetailTabsPushedEventVerticalTimeline
     from '@/services/alert-manager/v1/components/AlertDetailTabsPushedEventVerticalTimeline.vue';
-
 
 
 const PAGE_SIZE = 10;

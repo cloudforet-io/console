@@ -11,7 +11,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

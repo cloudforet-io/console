@@ -1,5 +1,5 @@
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertSeverity } from '@/schema/monitoring/alert/type';
+import { ALERT_STATE, ALERT_URGENCY } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertSeverity } from '@/api-clients/monitoring/alert/schema/type';
 
 import {
     blue, coral, gray, red, violet, yellow,

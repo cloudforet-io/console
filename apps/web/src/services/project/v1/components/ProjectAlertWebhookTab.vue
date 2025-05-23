@@ -25,11 +25,11 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';
-import type { WebhookDisableParameters } from '@/schema/monitoring/webhook/api-verbs/disable';
-import type { WebhookEnableParameters } from '@/schema/monitoring/webhook/api-verbs/enable';
-import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+import type { WebhookDeleteParameters } from '@/api-clients/monitoring/webhook/schema/api-verbs/delete';
+import type { WebhookDisableParameters } from '@/api-clients/monitoring/webhook/schema/api-verbs/disable';
+import type { WebhookEnableParameters } from '@/api-clients/monitoring/webhook/schema/api-verbs/enable';
+import type { WebhookListParameters } from '@/api-clients/monitoring/webhook/schema/api-verbs/list';
+import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

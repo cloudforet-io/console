@@ -9,8 +9,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
+import type { EventRuleActions, EventRuleOptions } from '@/api-clients/monitoring/event-rule/schema/type';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

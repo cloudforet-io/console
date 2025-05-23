@@ -492,6 +492,67 @@ export const API_DOC = {
             'analyze',
         ],
     },
+    monitoring: {
+        alert: [
+            'assign-user',
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update-state',
+            'update',
+        ],
+        'data-source': [
+            'list',
+        ],
+        'escalation-policy': [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'set-default',
+            'update',
+        ],
+        event: [
+            'list',
+        ],
+        'event-rule': [
+            'change-order',
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+        ],
+        log: [
+            'list',
+        ],
+        note: [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+        ],
+        'project-alert-config': [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+        ],
+        webhook: [
+            'create',
+            'delete',
+            'disable',
+            'enable',
+            'get',
+            'list',
+            'update-plugin',
+            'update',
+            'verify-plugin',
+        ],
+    },
     opsflow: {
         comment: [
             'create',
