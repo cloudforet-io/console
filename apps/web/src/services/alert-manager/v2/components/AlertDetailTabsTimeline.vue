@@ -4,16 +4,18 @@ import {
     reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButton, PToolbox, PHeading, PHeadingLayout, PDataLoader, PDivider, PSelectStatus, PTextButton,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertHistoryParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/history';
+import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_HISTORY_ACTION } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel, AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertHistoryActionType } from '@/api-clients/alert-manager/alert/schema/type';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -22,7 +24,6 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertDetailTabsTimelineModal from '@/services/alert-manager/v2/components/AlertDetailTabsTimelineModal.vue';
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
@@ -47,22 +48,18 @@ const storeState = reactive({
     user: computed<UserReferenceMap>(() => allReferenceGetters.user),
 });
 const state = reactive({
-    loading: true,
-    historyList: [] as AlertHistoryModel[],
     slicedHistoryList: computed<AlertHistoryModel[]>(() => {
-        let _list = state.historyList;
+        let _list = alertHistoryData.value || [];
         if (filterState.searchText) {
-            _list = state.historyList.filter((item) => item.description.toLowerCase().includes(filterState.searchText.toLowerCase()));
-        } else {
-            _list = state.historyList;
+            _list = _list.filter((item) => item.description.toLowerCase().includes(filterState.searchText.toLowerCase()));
         }
         if (filterState.selectedAction !== 'ALL') {
             if (filterState.selectedAction === 'NOTIFIED') {
-                _list = state.historyList.filter((item) => item.action === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE
+                _list = _list.filter((item) => item.action === ALERT_HISTORY_ACTION.NOTIFIED_FAILURE
                     || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SUCCESS
                     || item.action === ALERT_HISTORY_ACTION.NOTIFIED_SKIPPED);
             } else {
-                _list = state.historyList.filter((item) => item.action === filterState.selectedAction);
+                _list = _list.filter((item) => item.action === filterState.selectedAction);
             }
         }
         return _list.slice(0, state.pageStart * state.pageLimit);
@@ -84,6 +81,15 @@ const filterState = reactive({
     ])),
     selectedAction: 'ALL',
     searchText: '',
+});
+
+const queryClient = useQueryClient();
+const { alertAPI } = useAlertApi();
+const { key: alertHistoryQueryKey, params: alertHistoryQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'history', {
+    params: computed(() => ({
+        alert_id: storeState.alertInfo.alert_id,
+        include_details: true,
+    })),
 });
 
 const getCreatedByNames = (createdBy: string): string => {
@@ -127,26 +133,21 @@ const handleChangeToolbox = async (value: string) => {
 const handleClickShowMore = async () => {
     state.pageStart += 1;
 };
-
-const fetchHistoryList = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.alert.history<AlertHistoryParameters, ListResponse<AlertHistoryModel>>({
-            alert_id: storeState.alertInfo.alert_id,
-            include_details: true,
-        });
-        state.historyList = results || [];
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        state.historyList = [];
-    } finally {
-        state.loading = false;
-    }
+const refreshHistoryList = () => {
+    queryClient.invalidateQueries({ queryKey: alertHistoryQueryKey.value });
 };
+
+const { data: alertHistoryData, isFetching: alertHistoryLoading } = useScopedQuery({
+    queryKey: alertHistoryQueryKey,
+    queryFn: () => alertAPI.history(alertHistoryQueryParams.value),
+    select: (data) => data.results || [],
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['WORKSPACE']);
 
 watch(() => storeState.alertInfo, async (alertInfo) => {
     if (!alertInfo) return;
-    await fetchHistoryList();
+    refreshHistoryList();
 }, { immediate: true });
 </script>
 
@@ -161,12 +162,12 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
         </p-heading-layout>
         <p-toolbox search-type="plain"
                    filters-visible
-                   :total-count="state.historyList.length"
+                   :total-count="alertHistoryData?.length || 0"
                    :page-size-changeable="false"
                    :pagination-visible="false"
                    :search-text="filterState.searchText"
                    @update:search-text="handleChangeToolbox"
-                   @refresh="fetchHistoryList()"
+                   @refresh="refreshHistoryList()"
         />
         <div class="action-filter-wrapper">
             <span class="font-bold">{{ $t('ALERT_MANAGER.ALERTS.TYPE') }}</span>
@@ -183,7 +184,7 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
                 {{ item.label }}
             </p-select-status>
         </div>
-        <p-data-loader :loading="state.loading"
+        <p-data-loader :loading="alertHistoryLoading"
                        :data="state.slicedHistoryList"
                        class="min-h-10"
         >
@@ -226,12 +227,12 @@ watch(() => storeState.alertInfo, async (alertInfo) => {
         </p-data-loader>
         <div class="flex justify-center mt-6">
             <p-button v-if="state.slicedHistoryList.length > 0
-                          && state.historyList.length > 10
-                          && state.historyList.length > state.slicedHistoryList.length"
+                          && (alertHistoryData?.length || 0) > 10
+                          && (alertHistoryData?.length || 0) > state.slicedHistoryList.length"
                       icon-right="ic_chevron-down"
                       size="sm"
                       style-type="secondary"
-                      :loading="state.loading"
+                      :loading="alertHistoryLoading"
                       @click="handleClickShowMore"
             >
                 {{ $t('ALERT_MANAGER.SHOW_MORE') }}
