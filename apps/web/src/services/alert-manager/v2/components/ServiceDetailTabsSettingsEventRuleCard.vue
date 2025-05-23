@@ -9,18 +9,18 @@ import {
     PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton, screens,
 } from '@cloudforet/mirinae';
 
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
 import {
     EVENT_RULE_CONDITIONS_POLICY,
     EVENT_RULE_SCOPE,
     EVENT_RULE_URGENCY,
-} from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+} from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleActionsMatchAssetType, EventRuleActionsType,
     EventRuleActionsMergeAssetLabelsType,
-} from '@/schema/alert-manager/event-rule/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

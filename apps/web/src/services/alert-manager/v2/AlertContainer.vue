@@ -6,7 +6,6 @@ import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page
 const alertPageStore = useAlertPageStore();
 
 onUnmounted(() => {
-    alertPageStore.init();
     alertPageStore.$dispose();
 });
 </script>

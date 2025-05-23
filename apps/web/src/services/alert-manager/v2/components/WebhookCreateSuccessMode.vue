@@ -9,8 +9,8 @@ import {
     PDefinitionTable, PButton, PStatus, PMarkdown, PLazyImg, PLink,
 } from '@cloudforet/mirinae';
 
-import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n as _i18n } from '@/translations';
 
@@ -22,6 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
+
 
 type WebhookTableData = {
     name: string;

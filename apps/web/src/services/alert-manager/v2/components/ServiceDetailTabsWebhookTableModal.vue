@@ -5,10 +5,10 @@ import type { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLazyImg, PStatus } from '@cloudforet/mirinae';
 
-import type { WebhookDisableParameters } from '@/schema/alert-manager/webhook/api-verbs/disable';
-import type { WebhookEnableParameters } from '@/schema/alert-manager/webhook/api-verbs/enable';
-import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookDisableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/disable';
+import type { WebhookEnableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/enable';
+import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';

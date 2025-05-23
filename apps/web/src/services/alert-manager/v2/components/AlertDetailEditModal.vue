@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';

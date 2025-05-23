@@ -9,10 +9,10 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
-import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
+import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

@@ -5,8 +5,8 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { AlertDeleteParameters } from '@/schema/alert-manager/alert/api-verbs/delete';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import type { AlertDeleteParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/delete';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

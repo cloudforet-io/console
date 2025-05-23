@@ -21,13 +21,13 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
+import type { ServiceChannelListParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/list';
 import {
     SERVICE_CHANNEL_STATE,
     SERVICE_CHANNEL_TYPE,
-} from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+} from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';

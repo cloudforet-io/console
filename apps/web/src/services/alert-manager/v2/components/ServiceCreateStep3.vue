@@ -4,11 +4,11 @@ import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ServiceChannelCreateParameters } from '@/schema/alert-manager/service-channel/api-verbs/create';
+import type { ServiceChannelCreateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create';
 import type {
     ServiceChannelCreateForwardChannelParameters,
-} from '@/schema/alert-manager/service-channel/api-verbs/create-forward-channel';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+} from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create-forward-channel';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,6 +23,7 @@ import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/commo
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType } from '@/services/alert-manager/v2/types/alert-manager-type';
+
 
 const serviceCreateFormStore = useServiceCreateFormStore();
 const serviceCreateFormState = serviceCreateFormStore.state;

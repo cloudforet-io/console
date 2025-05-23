@@ -9,12 +9,12 @@ import {
     PButtonModal, PTextInput, PRadio, PFieldGroup, PRadioGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { EscalationPolicyCreateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/create';
-import type { EscalationPolicyUpdateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/update';
-import { ESCALATION_POLICY_STATE } from '@/schema/alert-manager/escalation-policy/constants';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { EscalationPolicyCreateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/create';
+import type { EscalationPolicyUpdateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/update';
+import { ESCALATION_POLICY_STATE } from '@/api-clients/alert-manager/escalation-policy/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

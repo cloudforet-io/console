@@ -6,19 +6,19 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EventRuleGetParameters } from '@/schema/alert-manager/event-rule/api-verbs/get';
-import type { EventRuleListParameters } from '@/schema/alert-manager/event-rule/api-verbs/list';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceDeleteParameters } from '@/schema/alert-manager/service/api-verbs/delete';
-import type { ServiceGetParameters } from '@/schema/alert-manager/service/api-verbs/get';
-import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
-import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/schema/alert-manager/service/constants';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
+import type { EventRuleGetParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/get';
+import type { EventRuleListParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/list';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
+import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import type { ServiceChannelListParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/list';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { ServiceDeleteParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/delete';
+import type { ServiceGetParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/get';
+import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
+import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import type { AlertsInfoType, AlertsType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -37,6 +37,7 @@ import type {
     Service,
     ProtocolCardItemType,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
+
 
 interface ServiceFormStoreState {
     loading: boolean;

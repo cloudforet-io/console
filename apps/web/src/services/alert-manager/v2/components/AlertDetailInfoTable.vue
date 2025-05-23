@@ -11,11 +11,9 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertSeverityType } from '@/schema/alert-manager/alert/type';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { AlertSeverityType } from '@/api-clients/alert-manager/alert/schema/type';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -30,6 +28,9 @@ import AlertDetailInfoTableDescription from '@/services/alert-manager/v2/compone
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 
 type BadgeInfo = {
     badgeType: string;

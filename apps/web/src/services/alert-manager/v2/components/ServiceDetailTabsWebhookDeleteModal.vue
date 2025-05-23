@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTextInput } from '@cloudforet/mirinae';
 
-import type { WebhookDeleteParameters } from '@/schema/alert-manager/webhook/api-verbs/delete';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookDeleteParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/delete';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

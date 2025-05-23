@@ -15,10 +15,10 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { UserChannelListParameters } from '@/schema/alert-manager/user-channel/api-verbs/list';
-import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
+import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import type { UserChannelListParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/list';
+import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
