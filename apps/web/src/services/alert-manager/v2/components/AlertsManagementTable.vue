@@ -407,7 +407,7 @@ const { data: alertListData, isFetching: alertListFetching } = useScopedQuery({
         total_count: 0,
     },
     gcTime: 1000 * 60 * 2,
-}, ['DOMAIN', 'WORKSPACE']);
+}, ['WORKSPACE']);
 const handleExportToExcel = async () => {
     const excelQuery = new ApiQueryHelper()
         .setMultiSortV2([{ key: 'created_at', desc: true }])

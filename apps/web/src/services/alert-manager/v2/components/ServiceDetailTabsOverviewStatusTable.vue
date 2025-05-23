@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { useQuery } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -17,6 +17,7 @@ import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/s
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertStatusType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
 import { SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -93,6 +94,7 @@ const tableState = reactive({
     sortDesc: false,
 });
 
+const queryClient = useQueryClient();
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
 const { alertAPI } = useAlertApi();
@@ -104,18 +106,20 @@ const { key: alertListQueryKey, params: alertListQueryParams } = useServiceQuery
         query: alertListApiQueryHelper.data,
     })),
 });
-const { data: alertListData, isLoading: alertListLoading, refetch: refetchAlertList } = useQuery({
-    queryKey: alertListQueryKey.value,
-    queryFn: async () => {
-        const res = await alertAPI.list(alertListQueryParams.value);
-        return {
-            results: res.results ?? [],
-            totalCount: res.total_count ?? 0,
-        };
-    },
-    enabled: false,
-});
+const { data: alertListData, isFetching: alertListLoading } = useScopedQuery({
+    queryKey: alertListQueryKey,
+    queryFn: async () => alertAPI.list(alertListQueryParams.value),
+    select: (data) => ({
+        results: data.results ?? [],
+        totalCount: data.total_count ?? 0,
+    }),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['WORKSPACE']);
 
+const refetchAlertList = () => {
+    queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
+};
 const handleRouteAlerts = (id: string) => {
     router.push({
         name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
