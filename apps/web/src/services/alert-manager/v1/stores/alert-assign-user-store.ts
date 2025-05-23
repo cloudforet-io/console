@@ -8,10 +8,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { AlertAssignUserParameters } from '@/schema/monitoring/alert/api-verbs/assign-user';
-import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
+import type { AlertAssignUserParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/assign-user';
+import type { AlertUpdateParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/update';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

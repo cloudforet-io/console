@@ -5,7 +5,7 @@ import {
 
 import { PButtonModal, PCheckbox } from '@cloudforet/mirinae';
 
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

@@ -11,9 +11,9 @@ import {
 } from '@cloudforet/mirinae';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
-import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
+import type { AlertDeleteParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/delete';
+import { ALERT_STATE, ALERT_URGENCY } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import type { WebhookModel as WebhookModelV1 } from '@/schema/monitoring/webhook/model';
+import type { WebhookModel as WebhookModelV1 } from '@/api-clients/monitoring/webhook/schema/model';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {

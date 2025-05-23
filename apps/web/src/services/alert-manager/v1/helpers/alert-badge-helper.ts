@@ -1,6 +1,6 @@
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
 
 
 

@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostDataSourceListParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/list';
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
+import type { DataSourceModel } from '@/api-clients/monitoring/data-source/schema/model';
 
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';

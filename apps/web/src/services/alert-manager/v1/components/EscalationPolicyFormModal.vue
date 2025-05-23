@@ -5,9 +5,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 
-import type { EscalationPolicyCreateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/create';
-import type { EscalationPolicyUpdateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/update';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { EscalationPolicyCreateParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/create';
+import type { EscalationPolicyUpdateParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/update';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
