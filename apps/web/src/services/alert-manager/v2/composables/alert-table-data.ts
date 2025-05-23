@@ -50,8 +50,8 @@ export const alertStatusBadgeStyleTypeFormatter = (alertState) => {
 };
 
 export const calculateTime = (time: string, timezone: string): string => {
-    const createdTime = dayjs.tz(time, timezone);
-    const todayTime = dayjs().tz(timezone);
+    const createdTime = dayjs.utc(time).tz(timezone);
+    const todayTime = dayjs.utc().tz(timezone);
     const timeForCalculate = todayTime.diff(createdTime, 'minute');
     const days = Math.floor(timeForCalculate / 1440);
     const hours = Math.floor((timeForCalculate % 1440) / 60);
