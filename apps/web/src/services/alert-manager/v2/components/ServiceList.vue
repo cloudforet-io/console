@@ -85,16 +85,8 @@ const handleToolbox = async (options: ToolboxOptions = {}) => {
             newQuery.serviceName = undefined;
         }
 
-        const isFullNameOnly = searchQueryHelper.filters.some((f) => f.k === 'name'
-            && Array.isArray(f.v)
-            && f.v.length === 1
-            && typeof f.v[0] === 'string'
-            && f.v[0].length > 2);
-
-        if (isFullNameOnly) {
-            serviceListPageStore.setUnhealthyPage(1);
-            serviceListPageStore.setHealthyPage(1);
-        }
+        serviceListPageStore.setUnhealthyPage(1);
+        serviceListPageStore.setHealthyPage(1);
 
         replaceUrlQuery(newQuery);
     }
