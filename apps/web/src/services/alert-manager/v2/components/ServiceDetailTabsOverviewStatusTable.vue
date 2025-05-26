@@ -12,13 +12,10 @@ import {
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertStatusType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
 import { SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -35,6 +32,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-co
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
+import { useAlertListQuery } from '../composables/use-alert-list-query';
 
 type AlertStatusInfoType = {
     status: TranslateResult,
@@ -97,8 +95,9 @@ const tableState = reactive({
 const queryClient = useQueryClient();
 const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
-const { alertAPI } = useAlertApi();
-const { key: alertListQueryKey, params: alertListQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'list', {
+const {
+    alertListData, alertListTotalCount, alertListFetching, alertListQueryKey,
+} = useAlertListQuery({
     params: computed(() => ({
         service_id: storeState.serviceInfo.service_id,
         status: state.selectedStatus,
@@ -106,16 +105,6 @@ const { key: alertListQueryKey, params: alertListQueryParams } = useServiceQuery
         query: alertListApiQueryHelper.data,
     })),
 });
-const { data: alertListData, isFetching: alertListLoading } = useScopedQuery({
-    queryKey: alertListQueryKey,
-    queryFn: async () => alertAPI.list(alertListQueryParams.value),
-    select: (data) => ({
-        results: data.results ?? [],
-        totalCount: data.total_count ?? 0,
-    }),
-    gcTime: 1000 * 60 * 2,
-    staleTime: 1000 * 30,
-}, ['WORKSPACE']);
 
 const refetchAlertList = () => {
     queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
@@ -239,13 +228,13 @@ watch(() => storeState.serviceInfo.service_id, async (serviceId) => {
                     />
                 </div>
                 <p-data-table :fields="SERVICE_ALERT_TABLE_FIELDS"
-                              :items="alertListData?.results"
-                              :loading="alertListLoading"
+                              :items="alertListData"
+                              :loading="alertListFetching"
                               striped
                               :bordered="false"
                               :sort-by.sync="tableState.sortBy"
                               :sort-desc.sync="tableState.sortDesc"
-                              :show-footer="(alertListData?.totalCount || 0) > (alertListData?.results?.length || 0)"
+                              :show-footer="(alertListTotalCount || 0) > (alertListData?.length || 0)"
                               sortable
                               class="table"
                               @changeSort="handleChangeToolbox"

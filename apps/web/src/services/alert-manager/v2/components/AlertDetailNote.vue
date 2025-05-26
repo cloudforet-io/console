@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -8,29 +9,32 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { NoteCreateParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/create';
 import type { NoteDeleteParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/delete';
 import type { NoteListParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/list';
 import type { NoteModel } from '@/api-clients/alert-manager/note/schema/model';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
-const alertDetailPageGetters = alertDetailPageStore.getters;
+
+const userStore = useUserStore();
+const userState = userStore.state;
+
+const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
-    timezone: computed<string>(() => alertDetailPageGetters.timezone),
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
+    timezone: computed<string>(() => userState.timezone || 'UTC'),
 });
 const state = reactive({
     noteList: [] as NoteModel[],
@@ -54,7 +58,7 @@ const handleSelect = (noteId) => {
 const handleCreateNote = async () => {
     try {
         await SpaceConnector.clientV2.alertManager.note.create<NoteCreateParameters, NoteModel>({
-            alert_id: storeState.alertInfo.alert_id,
+            alert_id: alertData.value?.alert_id || '',
             note: state.noteInput,
         });
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_CREATE'), '');
@@ -81,7 +85,7 @@ const handleDeleteModal = async () => {
 const fetchNoteList = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.note.list<NoteListParameters, ListResponse<NoteModel>>({
-            alert_id: storeState.alertInfo.alert_id,
+            alert_id: alertData.value?.alert_id || '',
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },
@@ -101,7 +105,7 @@ const fetchNoteList = async () => {
     }
 };
 
-watch(() => storeState.alertInfo.alert_id, async (id) => {
+watch(() => alertData.value?.alert_id, async (id) => {
     if (!id) return;
     await fetchNoteList();
 }, { immediate: true });
