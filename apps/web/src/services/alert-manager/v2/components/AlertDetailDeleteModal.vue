@@ -2,9 +2,11 @@
 import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import type { AlertDeleteParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
@@ -28,10 +30,11 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter();
 const route = useRoute();
 
+const { alertAPI } = useAlertApi();
+
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
@@ -39,12 +42,9 @@ const handleClose = () => {
     state.proxyVisible = false;
 };
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.alert.delete<AlertDeleteParameters>({
-            alert_id: props.alertId,
-        });
+const { mutate: alertDeleteMutate, isPending: alertDeleteLoading } = useMutation({
+    mutationFn: (params: AlertDeleteParameters) => alertAPI.delete(params),
+    onSuccess: async () => {
         const serviceId = route.params?.serviceId;
         if (serviceId) {
             await router.go(-1);
@@ -52,12 +52,18 @@ const handleConfirm = async () => {
             await router.push({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }).catch(() => {});
         }
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
         handleClose();
-    }
+    },
+});
+const handleConfirm = () => {
+    alertDeleteMutate({
+        alert_id: props.alertId,
+    });
 };
 </script>
 
@@ -69,7 +75,7 @@ const handleConfirm = async () => {
                     :fade="true"
                     :backdrop="true"
                     :visible="state.proxyVisible"
-                    :loading="state.loading"
+                    :loading="alertDeleteLoading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
