@@ -3,21 +3,26 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { sortBy, startCase, toLower } from 'lodash';
+import {
+    startCase, toLower,
+} from 'lodash';
 
 import {
-    PFieldTitle, PContextMenu,
+    PLazyImg, PTextHighlighting,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { getReferenceModelMenuHandler, type ReferenceModelMenuHandlerInfo } from '@/query/reference/helpers/reference-model-menu-handler';
+import { useMetricReferenceModel } from '@/query/reference/metric/use-metric-reference-model';
+import { useNamespaceReferenceModel } from '@/query/reference/namespace/use-namespace-reference-model';
+import { useProviderReferenceModel } from '@/query/reference/provider/use-provider-reference-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-
+import DataSelector from '@/common/components/select/DataSelector.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+
 
 
 interface Props {
@@ -28,105 +33,87 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:selected-metric-id', metricId: string): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-});
+const {
+    listReferenceQuery: metricListFetcher,
+} = useMetricReferenceModel();
+const {
+    listReferenceQuery: namespaceListFetcher,
+    statReferenceQuery: namespaceStatFetcher,
+} = useNamespaceReferenceModel();
+const {
+    referenceMap: providerMap,
+} = useProviderReferenceModel();
+
 const state = reactive({
     proxySelectedMetricId: useProxyValue('selectedMetricId', props, emit),
     // category
-    categoryMenuItems: computed<MenuItem[]>(() => {
-        const groups = Object.values(storeState.namespaces)
-            .filter((d) => d.data.category === props.dataSourceDomain)
-            .map((namespace) => namespace.data.group);
-        const _groupMenuItems: MenuItem[] = [];
-        const _uniqueGroups = Array.from(new Set(groups));
-
-        sortBy(_uniqueGroups, (group) => group !== 'common').forEach((group) => {
-            if (group === 'common') {
-                _groupMenuItems.push({
-                    type: 'item',
-                    name: group,
-                    label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON'),
-                });
-            } else {
-                const providerData = storeState.providers[group];
-                _groupMenuItems.push({
-                    type: 'item',
-                    name: providerData?.key || group,
-                    label: providerData?.label || customSnakeToTitleCase(group),
-                    imageUrl: providerData?.data?.icon,
-                });
-            }
+    categoryMenuHandler: computed<AutocompleteHandler>(() => {
+        const referenceModelInfo: ReferenceModelMenuHandlerInfo = {
+            fetchFn: namespaceStatFetcher('group'),
+        };
+        return getReferenceModelMenuHandler([referenceModelInfo], {
+            category: props.dataSourceDomain,
         });
-        return _groupMenuItems.filter((d) => d.label.toLowerCase().includes(state.categorySearchText.toLowerCase()));
     }),
-    categorySearchText: '',
     selectedCategory: undefined as undefined|string,
+    categorySearchText: '',
     // namespace
-    namespaceMenuItems: computed<MenuItem[]>(() => {
-        if (!state.selectedCategory) return [];
-        return Object.values(storeState.namespaces)
-            // .filter((d) => d.data.category === props.dataSourceDomain)
-            .filter((d) => d.data.group === state.selectedCategory)
-            .filter((d) => d.label.toLowerCase().includes(state.namespaceSearchText.toLowerCase()))
-            .map((namespace) => ({
-                type: 'item',
-                name: namespace.key,
-                label: namespace.label,
-                imageUrl: namespace.data?.icon,
-            }));
+    namespaceMenuHandler: computed<AutocompleteHandler|undefined>(() => {
+        if (!state.selectedCategory) return undefined;
+        const referenceModelInfo: ReferenceModelMenuHandlerInfo = {
+            fetchFn: namespaceListFetcher,
+        };
+        return getReferenceModelMenuHandler([referenceModelInfo], {
+            group: state.selectedCategory,
+            category: props.dataSourceDomain,
+        });
     }),
-    namespaceSearchText: '',
     selectedNamespaceId: undefined as undefined|string,
+    namespaceSearchText: '',
     // metric
-    metricMenuItems: computed<MenuItem[]>(() => {
-        if (!state.selectedNamespaceId) return [];
-        const _metrics = Object.values(storeState.metrics)
-            .filter((metric) => metric.data.namespace_id === state.selectedNamespaceId)
-            .filter((metric) => metric.label.toLowerCase().includes(state.metricSearchText.toLowerCase()));
-        return _metrics.map((metric) => ({
-            type: 'item',
-            name: metric.key,
-            label: metric.label,
-        }));
+    metricMenuHandler: computed<AutocompleteHandler|undefined>(() => {
+        if (!state.selectedNamespaceId) return undefined;
+        const referenceModelInfo: ReferenceModelMenuHandlerInfo = {
+            fetchFn: metricListFetcher,
+        };
+        return getReferenceModelMenuHandler([referenceModelInfo], {
+            namespace_id: state.selectedNamespaceId,
+        });
     }),
-    metricSearchText: '',
 });
 
 const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
 
-
 /* Event */
-const handleSelectCategory = (item: MenuItem) => {
-    state.selectedCategory = item.name;
+const handleSelectCategory = (items: MenuItem[]) => {
+    state.selectedCategory = items?.[0]?.name;
     state.selectedNamespaceId = undefined;
     state.proxySelectedMetricId = undefined;
 };
-const handleSelectNamespace = (item: MenuItem) => {
-    state.selectedNamespaceId = item.name;
+const handleUpdateCategorySearchText = (value: string) => {
+    state.categorySearchText = value;
+};
+const handleSelectNamespace = (items: MenuItem[]) => {
+    state.selectedNamespaceId = items?.[0]?.name;
     state.proxySelectedMetricId = undefined;
 };
-const handleSelectMetric = (item: MenuItem) => {
-    state.proxySelectedMetricId = item.name;
+const handleUpdateNamespaceSearchText = (value: string) => {
+    state.namespaceSearchText = value;
+};
+const handleSelectMetric = (items: MenuItem[]) => {
+    state.proxySelectedMetricId = items?.[0]?.name;
 };
 </script>
 
 <template>
     <div class="widget-form-asset-security-data-source-popper">
         <div class="data-source-select-col">
-            <p-field-title class="field-title"
-                           :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY')"
-                           required
-            />
-            <p-context-menu :menu="state.categoryMenuItems"
-                            :search-text.sync="state.categorySearchText"
-                            searchable
-                            @select="handleSelectCategory"
+            <data-selector :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY')"
+                           :handler="state.categoryMenuHandler"
+                           @update:selected="handleSelectCategory"
+                           @update:search-text="handleUpdateCategorySearchText"
             >
-                <template #item--format="{ item }">
+                <template #menu-item--format="{ item }">
                     <div v-if="item.name === 'common'"
                          class="flex gap-1"
                     >
@@ -134,31 +121,54 @@ const handleSelectMetric = (item: MenuItem) => {
                              alt="common-namespace-image"
                              class="common-category-image"
                         >
-                        {{ item.label }}
+                        <p-text-highlighting :text="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON')"
+                                             :term="state.categorySearchText"
+                                             style-type="secondary"
+                        />
+                    </div>
+                    <div v-else
+                         class="flex gap-1"
+                    >
+                        <p-lazy-img :src="providerMap?.[item.name]?.data?.icon"
+                                    width="1rem"
+                                    height="1rem"
+                                    alt="common-namespace-image"
+                                    class="common-category-image"
+                        />
+                        <p-text-highlighting :text="providerMap?.[item.name]?.label || customSnakeToTitleCase(item.name)"
+                                             :term="state.categorySearchText"
+                                             style-type="secondary"
+                        />
                     </div>
                 </template>
-            </p-context-menu>
+            </data-selector>
         </div>
         <div class="data-source-select-col">
-            <p-field-title class="field-title"
-                           :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.NAMESPACE')"
-                           required
-            />
-            <p-context-menu :menu="state.namespaceMenuItems"
-                            :search-text.sync="state.namespaceSearchText"
-                            searchable
-                            @select="handleSelectNamespace"
-            />
+            <data-selector :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.NAMESPACE')"
+                           :handler="state.namespaceMenuHandler"
+                           @update:selected="handleSelectNamespace"
+                           @update:search-text="handleUpdateNamespaceSearchText"
+            >
+                <template #menu-item--format="{ item }">
+                    <div class="flex gap-1">
+                        <p-lazy-img :src="item.data?.icon"
+                                    width="1rem"
+                                    height="1rem"
+                                    alt="common-namespace-image"
+                                    class="common-category-image"
+                        />
+                        <p-text-highlighting :text="item.label"
+                                             :term="state.namespaceSearchText"
+                                             style-type="secondary"
+                        />
+                    </div>
+                </template>
+            </data-selector>
         </div>
         <div class="data-source-select-col">
-            <p-field-title class="field-title"
-                           :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.METRIC')"
-                           required
-            />
-            <p-context-menu :menu="state.metricMenuItems"
-                            :search-text.sync="state.metricSearchText"
-                            searchable
-                            @select="handleSelectMetric"
+            <data-selector :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.METRIC')"
+                           :handler="state.metricMenuHandler"
+                           @update:selected="handleSelectMetric"
             />
         </div>
     </div>

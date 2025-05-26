@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import {
     ref, toRef, watch,
+    computed, useSlots,
 } from 'vue';
 
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
+import reduce from 'lodash/reduce';
 
-import { PFieldTitle, PContextMenu, useContextMenuItems } from '@cloudforet/mirinae';
+import {
+    PFieldTitle, PContextMenu, useContextMenuItems,
+} from '@cloudforet/mirinae';
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
 import type { DataSelectorItem } from '@/common/components/select/type';
@@ -17,13 +21,20 @@ const props = defineProps<{
     showSelectMarker?: boolean;
     multiSelectable?: boolean;
     selected?: DataSelectorItem[];
+    searchText?: string;
 }>();
 const emit = defineEmits<{(e: 'update:selected', value: DataSelectorItem[]): void;
     (e: 'update:search-text', value: string): void;
 }>();
+const slots = useSlots();
 
 const searchText = ref('');
 const selected = ref<DataSelectorItem[]>([]);
+
+const menuSlots = computed<Record<string, any>>(() => reduce(slots, (res, d, name) => {
+    if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
+    return res;
+}, {}));
 
 const {
     refinedMenu,
@@ -80,7 +91,15 @@ watch([() => props.menu, () => props.handler, () => props.selected], () => {
                             @click-show-more="showMoreMenu()"
                             @update:search-text="handleUpdateSearchText"
                             @update:selected="handleUpdateSelected"
-            />
+            >
+                <template v-for="(_, slot) of menuSlots"
+                          #[slot]="scope"
+                >
+                    <slot :name="`menu-${slot}`"
+                          v-bind="scope"
+                    />
+                </template>
+            </p-context-menu>
         </div>
     </div>
 </template>
