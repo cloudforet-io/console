@@ -120,7 +120,7 @@ const state = reactive({
             {
                 type: 'pie',
                 radius: ['30%', '70%'],
-                center: ['30%', '50%'],
+                center: ['50%', '50%'],
                 data: state.chartData,
                 emphasis: {
                     itemStyle: {
@@ -453,9 +453,6 @@ const handleCollapseAll = () => {
             <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.ui')"
                  id="total-amount-by-provider"
             >
-                <div ref="chartContext"
-                     class="chart"
-                />
                 <div class="table">
                     <div class="data-table-title-wrapper">
                         <p class="title">
@@ -484,6 +481,9 @@ const handleCollapseAll = () => {
                         </template>
                     </p-data-table>
                 </div>
+                <div ref="chartContext"
+                     class="chart"
+                />
             </div>
             <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.product')"
                  id="details-by-product"
@@ -717,7 +717,6 @@ const handleCollapseAll = () => {
 
         .data-table-section {
             margin-bottom: 3rem;
-            margin-left: 33%;
 
             .service-account-collapsible-wrapper {
                 @apply flex items-center border-b border-gray-300;
