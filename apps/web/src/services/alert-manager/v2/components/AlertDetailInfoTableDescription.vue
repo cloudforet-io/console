@@ -9,7 +9,7 @@ import {
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { useAlertDetailUpdateMutation } from '../composables/use-alert-detail-update-mutation';
+import { useAlertUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-update-mutation';
 
 
 interface Props {
@@ -28,7 +28,7 @@ const state = reactive({
     dataForUpdate: '',
 });
 
-const { mutate: alertUpdateMutate } = useAlertDetailUpdateMutation();
+const { mutate: alertUpdateMutate } = useAlertUpdateMutation();
 
 const handleClickEditModeButton = (value: boolean) => {
     state.isEditMode = value;

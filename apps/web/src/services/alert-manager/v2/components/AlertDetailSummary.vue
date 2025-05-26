@@ -21,8 +21,8 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import { gray, red } from '@/styles/colors';
 
 import { calculateTime } from '@/services/alert-manager/v2/composables/alert-table-data';
-import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
-import { useAlertDetailUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-detail-update-mutation';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
+import { useAlertUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-update-mutation';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 
@@ -34,7 +34,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const route = useRoute();
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),
@@ -62,7 +62,7 @@ const state = reactive({
 const getEscalationInfo = (id: string) => storeState.escalationPolicy[id]?.label || '';
 
 
-const { mutate: alertUpdateMutate } = useAlertDetailUpdateMutation();
+const { mutate: alertUpdateMutate } = useAlertUpdateMutation();
 
 const handleChangeAlertState = (alertState: AlertStatusType) => {
     alertUpdateMutate({

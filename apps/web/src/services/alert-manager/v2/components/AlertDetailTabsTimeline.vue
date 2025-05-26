@@ -28,7 +28,7 @@ import { useUserStore } from '@/store/user/user-store';
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
 
 import AlertDetailTabsTimelineModal from '@/services/alert-manager/v2/components/AlertDetailTabsTimelineModal.vue';
-import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 import type { AlertFilterType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 type HistoryItemInfo = {
@@ -43,7 +43,7 @@ const allReferenceGetters = allReferenceStore.getters;
 
 const route = useRoute();
 
-const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),

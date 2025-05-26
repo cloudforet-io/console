@@ -7,10 +7,10 @@ import { map } from 'lodash';
 import { PDefinitionTable, PHeading, PHeadingLayout } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 
 const route = useRoute();
-const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const state = reactive({
     data: computed<Record<string, any>>(() => alertData.value?.additional_info || {}),

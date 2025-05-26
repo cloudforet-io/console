@@ -9,13 +9,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface UseAlertDetailUpdateMutationOptions {
+interface UseAlertUpdateMutationOptions {
     onSuccess?: (data: unknown, variables: AlertUpdateParameters) => void|Promise<void>;
     onError?: (error: Error, variables: AlertUpdateParameters) => void|Promise<void>;
     onSettled?: (data: unknown|undefined, error: Error|null, variables: AlertUpdateParameters) => void|Promise<void>;
 }
 
-export const useAlertDetailUpdateMutation = (options?: UseAlertDetailUpdateMutationOptions) => {
+export const useAlertUpdateMutation = (options?: UseAlertUpdateMutationOptions) => {
     const { alertAPI } = useAlertApi();
     const queryClient = useQueryClient();
 

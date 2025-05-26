@@ -6,7 +6,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useAlertDetailUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-detail-update-mutation';
+import { useAlertUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-update-mutation';
 
 
 interface Props {
@@ -42,7 +42,7 @@ const {
     },
 });
 
-const { mutate: alertUpdateMutate, isPending } = useAlertDetailUpdateMutation({
+const { mutate: alertUpdateMutate, isPending } = useAlertUpdateMutation({
     onSettled: () => {
         handleClose();
     },

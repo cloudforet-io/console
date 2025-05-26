@@ -11,7 +11,7 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 
 import AlertDetailDeleteModal from '@/services/alert-manager/v2/components/AlertDetailDeleteModal.vue';
 import AlertDetailEditModal from '@/services/alert-manager/v2/components/AlertDetailEditModal.vue';
-import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 import { ALERT_PERIOD_DROPDOWN_MENU } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
@@ -26,7 +26,7 @@ const router = useRouter();
 const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
     selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),

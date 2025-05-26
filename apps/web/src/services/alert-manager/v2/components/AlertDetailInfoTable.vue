@@ -27,7 +27,7 @@ import { useUserStore } from '@/store/user/user-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/v2/components/AlertDetailInfoTableDescription.vue';
-import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -45,7 +45,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const router = useRouter();
 const route = useRoute();
 
-const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const queryHelper = new QueryHelper();
 

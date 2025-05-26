@@ -6,11 +6,11 @@ import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model'
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-interface UseAlertDetailQueryReturn {
+interface UseAlertGetQueryReturn {
     alertData: Ref<AlertModel | undefined>;
 }
 
-export const useAlertDetailGetQuery = (alertId: string): UseAlertDetailQueryReturn => {
+export const useAlertGetQuery = (alertId: string): UseAlertGetQueryReturn => {
     const { alertAPI } = useAlertApi();
 
     const { key: alertQueryKey, params: alertQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'get', {

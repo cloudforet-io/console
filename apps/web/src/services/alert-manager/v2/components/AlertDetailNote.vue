@@ -22,7 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { useAlertDetailGetQuery } from '@/services/alert-manager/v2/composables/use-alert-detail-get-query';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 
 
 const userStore = useUserStore();
@@ -31,7 +31,7 @@ const userState = userStore.state;
 const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-const { alertData } = useAlertDetailGetQuery(route.params.alertId as string);
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),
