@@ -10,11 +10,10 @@ import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 const DEFAULT_LIST_DATA = { results: [] };
 const STALE_TIME = 1000 * 60 * 5;
 
-export const useBudgetQuery = (budgetId?: string) => {
+export const useBudgetQuery = () => {
     const { budgetAPI } = useBudgetApi();
 
     const { key: budgetListQueryKey, params: budgetListParams } = useServiceQueryKey('cost-analysis', 'budget', 'list');
-    const { withSuffix: budgetGetQueryKey } = useServiceQueryKey('cost-analysis', 'budget', 'get');
 
     const budgetListQuery = useScopedQuery({
         queryKey: budgetListQueryKey,
@@ -26,43 +25,26 @@ export const useBudgetQuery = (budgetId?: string) => {
         enabled: true,
     }, ['DOMAIN', 'WORKSPACE']);
 
-    const budgetDataQuery = useScopedQuery({
-        queryKey: budgetGetQueryKey(budgetId ?? ''),
-        queryFn: () => budgetAPI.get({ budget_id: budgetId ?? '' }),
-        select: (data) => data,
-        initialData: undefined,
-        initialDataUpdatedAt: 0,
-        staleTime: STALE_TIME,
-        enabled: computed(() => !!budgetId),
-    }, ['DOMAIN', 'WORKSPACE']);
-
     const isLoading = computed<boolean>(() => budgetListQuery.isFetching.value);
 
     const queryClient = useQueryClient();
 
     const setQueryData = (newData: BudgetModel[]) => {
-        queryClient.setQueryData([budgetListQueryKey.value], newData);
+        queryClient.setQueryData([budgetListQueryKey.value], { results: newData });
     };
 
     const invalidateBudgetListQuery = () => {
         queryClient.invalidateQueries({ queryKey: budgetListQueryKey.value });
     };
 
-    const refetchBudgetListQuery = () => {
-        queryClient.refetchQueries({ queryKey: budgetListQueryKey.value });
-    };
-
 
     return {
         budgetList: computed<BudgetModel[]|any>(() => (budgetListQuery.data.value ?? [])),
-        budgetData: computed<BudgetModel|any>(() => (budgetDataQuery.data.value ?? {})),
         isLoading,
         budgetListQueryKey,
         budgetAPI,
         setQueryData,
-        budgetGetQueryKey,
         invalidateBudgetListQuery,
         queryClient,
-        refetchBudgetListQuery,
     };
 };
