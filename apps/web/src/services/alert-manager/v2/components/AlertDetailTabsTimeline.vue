@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
     computed,
-    reactive, watch,
+    reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -148,11 +148,6 @@ const { data: alertHistoryData, isFetching: alertHistoryLoading } = useScopedQue
     gcTime: 1000 * 60 * 2,
     staleTime: 1000 * 30,
 }, ['WORKSPACE']);
-
-watch(() => alertData.value?.alert_id, async (alertId) => {
-    if (!alertId) return;
-    refreshHistoryList();
-}, { immediate: true });
 </script>
 
 <template>
