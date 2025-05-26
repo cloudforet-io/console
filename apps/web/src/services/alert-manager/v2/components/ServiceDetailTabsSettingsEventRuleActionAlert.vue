@@ -2,7 +2,6 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDivider,
     PFieldGroup,
@@ -17,11 +16,8 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
-import type { EscalationPolicyListParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/list';
-import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import { EVENT_RULE_URGENCY } from '@/api-clients/alert-manager/event-rule/schema/constants';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
@@ -31,11 +27,11 @@ import type {
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { TagItem } from '@/common/modules/tags/type';
 
 import { gray } from '@/styles/colors';
 
+import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleActionsToggleType,
@@ -94,7 +90,10 @@ const state = reactive({
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.HIGH'), name: EVENT_RULE_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.LOW'), name: EVENT_RULE_URGENCY.LOW },
     ]),
-    escalationPolicyDropdownList: [] as SelectDropdownMenuItem[],
+    escalationPolicyDropdownList: computed<SelectDropdownMenuItem[]>(() => escalationPolicyListData.value.map((item) => ({
+        name: item.escalation_policy_id,
+        label: item.name,
+    }))),
 
     selectedActions: {
         change_title: false,
@@ -182,20 +181,11 @@ const handleInputTagValue = (idx, val) => {
     state.additionalInfoTags = _items;
 };
 
-const fetchEscalationPolicyList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
-            service_id: storeState.service.service_id,
-        });
-        state.escalationPolicyDropdownList = (results || []).map((item) => ({
-            name: item.escalation_policy_id,
-            label: item.name,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.escalationPolicyDropdownList = [];
-    }
-};
+const { escalationPolicyListData } = useEscalationPolicyListQuery({
+    params: computed(() => ({
+        service_id: storeState.service.service_id,
+    })),
+});
 
 watch([
     () => state.selectedActions,
@@ -236,10 +226,6 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
             change_escalation_policy: false,
         };
     }
-}, { immediate: true });
-watch(() => storeState.service.service_id, (id) => {
-    if (!id) return;
-    fetchEscalationPolicyList();
 }, { immediate: true });
 </script>
 
