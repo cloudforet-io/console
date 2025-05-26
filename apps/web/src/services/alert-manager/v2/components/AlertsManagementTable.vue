@@ -19,13 +19,11 @@ import {
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
-import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
-import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
+import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
@@ -49,11 +47,12 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import { gray, red } from '@/styles/colors';
 
 import {
-    alertStatusBadgeStyleTypeFormatter, calculateTime,
+    alertStatusBadgeStyleTypeFormatter,
     getAlertStateI18n,
     getAlertUrgencyI18n,
     makeTriggeredValueHandler,
 } from '@/services/alert-manager/v2/composables/alert-table-data';
+import { useAlertListQuery } from '@/services/alert-manager/v2/composables/use-alert-list-query';
 import {
     ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
@@ -205,11 +204,10 @@ const filterState = reactive({
 });
 
 const queryClient = useQueryClient();
-const { alertAPI } = useAlertApi();
 const alertListApiQueryHelper = new ApiQueryHelper();
 const { key: alertListBaseQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
-const { key: alertListQueryKey, params: alertListQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'list', {
-    params: computed(() => {
+const { alertListData, alertListTotalCount, alertListFetching } = useAlertListQuery({
+    params: computed<AlertListParameters>(() => {
         alertListApiQueryHelper
             .setPage(filterState.pageStart, filterState.pageLimit)
             .setSort(filterState.sortKey, filterState.sortDesc)
@@ -388,26 +386,6 @@ const createRouteParams = (params: {
     };
 };
 
-const { data: alertListData, isFetching: alertListFetching } = useScopedQuery({
-    queryKey: alertListQueryKey,
-    queryFn: async () => alertAPI.list(alertListQueryParams.value),
-    select: (data) => ({
-        results: (data.results ?? []).map((alert) => ({
-            ...alert,
-            duration: alert.status === ALERT_STATUS.RESOLVED
-                ? calculateTime(alert?.resolved_at, storeState.timezone)
-                : calculateTime(alert?.created_at, storeState.timezone),
-            created_at: iso8601Formatter(alert.created_at, storeState.timezone),
-            resolved_at: iso8601Formatter(alert.resolved_at, storeState.timezone) || '-',
-        })),
-        totalCount: data.total_count ?? 0,
-    }),
-    initialData: {
-        results: [],
-        total_count: 0,
-    },
-    gcTime: 1000 * 60 * 2,
-}, ['WORKSPACE']);
 const handleExportToExcel = async () => {
     const excelQuery = new ApiQueryHelper()
         .setMultiSortV2([{ key: 'created_at', desc: true }])
@@ -473,9 +451,9 @@ watch(() => storeState.serviceId, (serviceId) => {
         handleSelectServiceDropdownItem(serviceId);
     }
 });
-watch(alertListData, (d) => {
-    if (!d || !d.totalCount || state.listTotalCount === d.totalCount) return;
-    state.listTotalCount = d.totalCount || 0;
+watch(alertListTotalCount, (totalCount) => {
+    if (!totalCount || state.listTotalCount === totalCount) return;
+    state.listTotalCount = totalCount || 0;
 });
 
 (async () => {
@@ -523,7 +501,7 @@ watch(alertListData, (d) => {
                          :loading="alertListFetching"
                          :total-count="state.listTotalCount"
                          :fields="state.fields"
-                         :items="alertListData?.results"
+                         :items="alertListData"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                          :value-handler-map="state.tableHandler"
                          settings-visible
