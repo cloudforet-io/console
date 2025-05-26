@@ -1253,6 +1253,7 @@
 			"TITLE": "プロセス終了"
 		},
 		"COST_REPORT": {
+			"COLLAPSE_ALL": "すべて折りたたむ",
 			"COST_REPORT": "コストレポート",
 			"CURRENCY_REFERENCE": "通貨リファレンス",
 			"DETAILS_BY_PRODUCT": "製品別詳細",
@@ -2113,8 +2114,10 @@
 			"ADD_ADJUSTMENT_GROUP": "調整グループを追加",
 			"ADJUSTMENT": "調整",
 			"ALT_E_REISSUE_REPORT": "レポート再発行失敗",
+			"ALT_E_SAVE_COST_REPORT_ADJUSTMENTS": "レポート調整保存失敗",
 			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "コストレポート設定の修正に失敗しました",
 			"ALT_S_REISSUE_REPORT": "レポート再発行完了",
+			"ALT_S_SAVE_COST_REPORT_ADJUSTMENTS": "レポート調整保存完了",
 			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "コストレポート設定の更新が完了しました",
 			"AMOUNT": "アカウント",
 			"AUTO_APPLY_ADJUSTMENTS": "調整自動反映",

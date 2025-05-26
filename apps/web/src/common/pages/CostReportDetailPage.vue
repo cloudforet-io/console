@@ -6,11 +6,13 @@ import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
 import { init } from 'echarts/core';
 import {
-    sortBy, sum,
+    groupBy, sortBy, sum,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PLink, PDataTable, PIconButton } from '@cloudforet/mirinae';
+import {
+    PLink, PDataTable, PIconButton, PI, PButton,
+} from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
@@ -51,6 +53,13 @@ type CostReportDataAnalyzeResult = {
     }>|number;
     _total_value_sum?: number;
 };
+type CostReportDataAnalyzeResultByProduct = {
+    [provider: string]: {
+        [serviceAccount: string]: Array<{
+            [product: string]: CostReportDataAnalyzeResult;
+        }>;
+    };
+};
 interface Props {
     accessToken?: string;
     costReportId?: string;
@@ -89,7 +98,7 @@ const state = reactive({
         const endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
         return `${startDate} ~ ${endDate}`;
     }),
-    totalCost: computed<number>(() => sum(tableState.costByProduct.map((d) => d._total_value_sum))),
+    totalCost: computed<number>(() => sum(tableState.costByProvider.map((d) => d._total_value_sum))),
     chartOptions: computed<PieSeriesOption>(() => ({
         color: MASSIVE_CHART_COLORS,
         grid: {
@@ -111,7 +120,7 @@ const state = reactive({
             {
                 type: 'pie',
                 radius: ['30%', '70%'],
-                center: ['30%', '50%'],
+                center: ['50%', '50%'],
                 data: state.chartData,
                 emphasis: {
                     itemStyle: {
@@ -135,9 +144,10 @@ const state = reactive({
 const ETC = config.get('COST_REPORT.ETC_CUSTOM_LABEL') ?? 'ETC';
 
 const tableState = reactive({
-    costByProduct: [] as CostReportDataAnalyzeResult[],
+    costByProvider: [] as CostReportDataAnalyzeResult[],
     costByProject: [] as CostReportDataAnalyzeResult[],
     costByServiceAccount: [] as CostReportDataAnalyzeResult[],
+    costByProduct: {} as CostReportDataAnalyzeResultByProduct,
     costByProductFields: computed(() => makeTableFields({
         name: 'product',
         label: 'Product',
@@ -162,6 +172,7 @@ const tableState = reactive({
             sortable: false,
         },
     ])),
+    collapsedState: {} as Record<string, boolean>,
 });
 
 /* Util */
@@ -183,6 +194,20 @@ const makeTableFields = (customField:DataTableFieldType, currency:string, valueF
         sortable: false,
     },
 ]);
+const getConvertedProductTableData = (rawData: CostReportDataAnalyzeResult[]): CostReportDataAnalyzeResultByProduct => {
+    const results: CostReportDataAnalyzeResultByProduct = {};
+    const providerGroupBy = groupBy(rawData, 'provider');
+    Object.entries(providerGroupBy).forEach(([provider, providerData]) => {
+        const accountGroupBy = groupBy(providerData, 'service_account_name');
+        Object.entries(accountGroupBy).forEach(([account, accountData]) => {
+            results[provider] = {
+                ...(results[provider] ?? {}),
+                [account]: accountData?.[0]?.value_sum,
+            };
+        });
+    });
+    return results;
+};
 const getSortedTableData = (rawData: CostReportDataAnalyzeResult[]):CostReportDataAnalyzeResult[] => {
     const results: CostReportDataAnalyzeResult[] = [];
     rawData.forEach((data) => {
@@ -194,7 +219,7 @@ const getSortedTableData = (rawData: CostReportDataAnalyzeResult[]):CostReportDa
     return results;
 };
 const drawChart = () => {
-    state.chartData = tableState.costByProduct.map((d) => ({
+    state.chartData = tableState.costByProvider.map((d) => ({
         name: d.provider,
         value: d._total_value_sum,
         itemStyle: {
@@ -220,12 +245,12 @@ const fetchReportData = async () => {
     }
 };
 
-const fetchAnalyzeData = async (groupBy: string[], fieldGroup?: string[]):Promise<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined> => {
+const fetchAnalyzeData = async (_groupBy: string[], fieldGroup?: string[]):Promise<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined> => {
     try {
         return await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
             is_confirmed: true,
             query: {
-                group_by: groupBy,
+                group_by: [..._groupBy, 'is_adjusted'],
                 fields: {
                     value_sum: {
                         key: `cost.${state.baseInfo?.currency}`,
@@ -267,15 +292,18 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
 };
 
 const fetchTableData = async () => {
-    const results = await Promise.allSettled<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined>([
-        fetchAnalyzeData(['provider', 'product'], ['product']),
+    const results = await Promise.allSettled([
+        fetchAnalyzeData(['provider', 'service_account_name', 'product'], ['product']),
         fetchAnalyzeData(['project_name']),
         fetchAnalyzeData(['provider', 'service_account_name'], ['service_account_name']),
     ]);
-    const [costByProduct, costByProject, costByServiceAccount] = results;
-    tableState.costByProduct = getSortedTableData(costByProduct?.value?.results ?? []);
-    tableState.costByProject = costByProject?.value?.results ?? [];
-    tableState.costByServiceAccount = getSortedTableData(costByServiceAccount?.value?.results ?? []);
+    const [costByProvider, costByProject, costByServiceAccount] = results
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value);
+    tableState.costByProvider = getSortedTableData(costByProvider?.results ?? []);
+    tableState.costByProject = costByProject?.results ?? [];
+    tableState.costByServiceAccount = getSortedTableData(costByServiceAccount?.results ?? []);
+    tableState.costByProduct = getConvertedProductTableData(costByProvider?.results ?? []);
 };
 
 const setMetaTag = () => {
@@ -297,6 +325,22 @@ const handlePrint = () => {
     window.print();
 };
 
+const handleToggleServiceAccountCollapsed = (provider: string, serviceAccount: string) => {
+    tableState.collapsedState = {
+        ...tableState.collapsedState,
+        [`${provider}-${serviceAccount}`]: !tableState.collapsedState[`${provider}-${serviceAccount}`],
+    };
+};
+
+const handleCollapseAll = () => {
+    tableState.collapsedState = Object.keys(tableState.costByProduct).reduce((acc, key) => {
+        Object.keys(tableState.costByProduct[key]).forEach((serviceAccount) => {
+            acc[`${key}-${serviceAccount}`] = true;
+        });
+        return acc;
+    }, {} as Record<string, boolean>);
+};
+
 (async () => {
     setMetaTag();
     state.loading = true;
@@ -314,8 +358,8 @@ const handlePrint = () => {
 </script>
 
 <template>
-    <div class="body">
-        <div class="invoice">
+    <div class="cost-report-detail-page">
+        <div class="invoice-container">
             <div class="header">
                 <p class="main-title">
                     {{ $t('COMMON.COST_REPORT.COST_REPORT') }}
@@ -355,7 +399,9 @@ const handlePrint = () => {
             <div class="total"
                  :style="{borderTopColor: gray[500], borderBottomColor: gray[200]}"
             >
-                <span class="title">{{ $t('COMMON.COST_REPORT.TOTAL') }}</span>
+                <p class="title">
+                    {{ $t('COMMON.COST_REPORT.TOTAL') }}
+                </p>
                 <div class="total-value-wrapper">
                     <div class="total-cost">
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
@@ -367,7 +413,7 @@ const handlePrint = () => {
                 </div>
             </div>
             <div class="index-wrapper">
-                <p class="title">
+                <p class="title mb-2">
                     {{ $t('COMMON.COST_REPORT.INDEX') }}
                 </p>
                 <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.ui')"
@@ -406,15 +452,14 @@ const handlePrint = () => {
             <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.ui')"
                  id="total-amount-by-provider"
             >
-                <div ref="chartContext"
-                     class="chart"
-                />
                 <div class="table">
-                    <p class="title">
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
-                    </p>
+                    <div class="data-table-title-wrapper">
+                        <p class="title">
+                            {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
+                        </p>
+                    </div>
                     <p-data-table :fields="tableState.costByProviderFields"
-                                  :items="tableState.costByProduct"
+                                  :items="tableState.costByProvider"
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
@@ -435,50 +480,78 @@ const handlePrint = () => {
                         </template>
                     </p-data-table>
                 </div>
+                <div ref="chartContext"
+                     class="chart"
+                />
             </div>
             <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.product')"
                  id="details-by-product"
                  class="data-table-section"
             >
-                <p class="title">
-                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
-                </p>
-                <div v-for="(providerData, idx) in tableState.costByProduct"
-                     :key="idx"
+                <div class="data-table-title-wrapper">
+                    <p class="title">
+                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
+                    </p>
+                    <p-button name="ic_chevron-down"
+                              class="service-account-collapsible-icon"
+                              size="sm"
+                              style-type="tertiary"
+                              icon-left="ic_arrows-collapse-vertical"
+                              @click="handleCollapseAll"
+                    >
+                        {{ $t('COMMON.COST_REPORT.COLLAPSE_ALL') }}
+                    </p-button>
+                </div>
+                <div v-for="(providerData, idx) in tableState.costByProvider"
+                     :key="`${providerData.provider}-${idx}`"
                 >
                     <table-header :title="storeState.providers[providerData.provider]?.label"
                                   :sub-total="currencyMoneyFormatter(providerData._total_value_sum, state.numberFormatterOption)"
                                   :provider-icon-src="storeState.providers[providerData.provider]?.icon"
+                                  class="bg-gray-100"
                     />
-                    <p-data-table :fields="tableState.costByProductFields"
-                                  :items="providerData.value_sum"
-                                  :skeleton-rows="3"
-                                  :stripe="false"
-                                  :selectable="false"
-                                  :disable-copy="true"
-                                  :disable-hover="true"
-                                  :loading="state.loading"
-                                  class="budget-summary-table"
-                    >
-                        <template #col-index-format="{rowIndex}">
-                            {{ rowIndex + 1 }}
-                        </template>
-                        <template #col-product-format="{value}">
-                            {{ value === 'Unknown' ? ETC : value }}
-                        </template>
-                        <template #col-value-format="{value}">
-                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
-                        </template>
-                    </p-data-table>
+                    <template v-for="([serviceAccount, productData], pIdx) in Object.entries(tableState.costByProduct[providerData.provider])">
+                        <div :key="`${providerData.provider}-${serviceAccount}-${pIdx}`">
+                            <div class="service-account-collapsible-wrapper"
+                                 @click="handleToggleServiceAccountCollapsed(providerData.provider, serviceAccount)"
+                            >
+                                <p-i :name="tableState.collapsedState[`${providerData.provider}-${serviceAccount}`] ? 'ic_chevron-right' : 'ic_chevron-down'"
+                                     class="service-account-collapsible-icon"
+                                />
+                                {{ serviceAccount === 'Unknown' ? ETC : serviceAccount }}
+                            </div>
+                            <p-data-table v-if="!tableState.collapsedState[`${providerData.provider}-${serviceAccount}`]"
+                                          :fields="tableState.costByProductFields"
+                                          :items="productData"
+                                          :stripe="false"
+                                          :selectable="false"
+                                          :disable-copy="true"
+                                          :disable-hover="true"
+                                          :loading="state.loading"
+                            >
+                                <template #col-index-format="{rowIndex}">
+                                    {{ rowIndex + 1 }}
+                                </template>
+                                <template #col-product-format="{value}">
+                                    {{ value === 'Unknown' ? ETC : value }}
+                                </template>
+                                <template #col-value-format="{value}">
+                                    {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
+                                </template>
+                            </p-data-table>
+                        </div>
+                    </template>
                 </div>
             </div>
             <div v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.project')"
                  id="details-by-project"
                  class="data-table-section"
             >
-                <p class="title">
-                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
-                </p>
+                <div class="data-table-title-wrapper">
+                    <p class="title">
+                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
+                    </p>
+                </div>
                 <p-data-table :fields="tableState.costByProjectFields"
                               :items="tableState.costByProject"
                               :selectable="false"
@@ -501,9 +574,11 @@ const handlePrint = () => {
                  id="details-by-service-account"
                  class="data-table-section"
             >
-                <p class="title">
-                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
-                </p>
+                <div class="data-table-title-wrapper">
+                    <p class="title">
+                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
+                    </p>
+                </div>
                 <div v-for="(providerData, idx) in tableState.costByServiceAccount"
                      :key="idx"
                 >
@@ -520,7 +595,6 @@ const handlePrint = () => {
                                   :disable-copy="true"
                                   :disable-hover="true"
                                   :loading="state.loading"
-                                  class="budget-summary-table"
                     >
                         <template #col-index-format="{rowIndex}">
                             {{ rowIndex + 1 }}
@@ -546,9 +620,12 @@ const handlePrint = () => {
 </template>
 
 <style lang="postcss" scoped>
+.data-table-title-wrapper {
+    @apply flex items-center justify-between;
+    padding-bottom: 0.75rem;
+}
 .title {
     @apply text-label-xl font-bold;
-    margin-bottom: 0.75rem;
 }
 
 /* custom design-system component - p-data-table */
@@ -556,14 +633,14 @@ const handlePrint = () => {
     min-height: 10rem;
 }
 
-.body {
+.cost-report-detail-page {
     @apply flex justify-center bg-white;
     font-size: 0.9625rem;
     font-family: Helvetica, Arial, sans-serif;
     color: #232533;
     font-weight: 400;
     overflow: auto;
-    .invoice {
+    .invoice-container {
         width: 100%;
         min-width: 7.4in;
         max-width: 8.5in;
@@ -639,7 +716,12 @@ const handlePrint = () => {
 
         .data-table-section {
             margin-bottom: 3rem;
-            margin-left: 33%;
+
+            .service-account-collapsible-wrapper {
+                @apply flex items-center border-b border-gray-300;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
         }
     }
 }

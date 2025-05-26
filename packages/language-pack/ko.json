@@ -1253,6 +1253,7 @@
 			"TITLE": "진행 중인 작업 종료"
 		},
 		"COST_REPORT": {
+			"COLLAPSE_ALL": "모두 접기",
 			"COST_REPORT": "비용 리포트",
 			"CURRENCY_REFERENCE": "통화 기준 ",
 			"DETAILS_BY_PRODUCT": "프로덕트별 상세 보기 ",
@@ -2113,8 +2114,10 @@
 			"ADD_ADJUSTMENT_GROUP": "조정 그룹 추가",
 			"ADJUSTMENT": "조정",
 			"ALT_E_REISSUE_REPORT": "리포트 재발행 실패",
+			"ALT_E_SAVE_COST_REPORT_ADJUSTMENTS": "리포트 조정 저장 실패",
 			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "비용 리포트 설정 수정 실패",
 			"ALT_S_REISSUE_REPORT": "리포트 재발행 완료",
+			"ALT_S_SAVE_COST_REPORT_ADJUSTMENTS": "리포트 조정 저장 완료",
 			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "비용 리포트 설정 수정 완료",
 			"AMOUNT": "금액",
 			"AUTO_APPLY_ADJUSTMENTS": "조정 자동 반영",

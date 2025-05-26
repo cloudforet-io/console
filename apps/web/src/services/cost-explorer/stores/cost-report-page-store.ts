@@ -121,7 +121,7 @@ export const useCostReportPageStore = defineStore('page-cost-report', () => {
         try {
             state.recentReportDataLoading = true;
             const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
-                status: 'SUCCESS',
+                status: 'DONE',
                 query: {
                     only: ['report_month', 'issue_date'],
                     filter: [

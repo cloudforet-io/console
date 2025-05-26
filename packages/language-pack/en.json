@@ -1253,6 +1253,7 @@
 			"TITLE": "Leave Process"
 		},
 		"COST_REPORT": {
+			"COLLAPSE_ALL": "Collapse All",
 			"COST_REPORT": "Cost Report",
 			"CURRENCY_REFERENCE": "Currency reference",
 			"DETAILS_BY_PRODUCT": "Details by Product",
@@ -2113,8 +2114,10 @@
 			"ADD_ADJUSTMENT_GROUP": "Add Adjustment Group",
 			"ADJUSTMENT": "Adjustment",
 			"ALT_E_REISSUE_REPORT": "Failed to reissue report",
+			"ALT_E_SAVE_COST_REPORT_ADJUSTMENTS": "Failed to save report adjustments",
 			"ALT_E_UPDATE_COST_REPORT_CONFIGURATION": "Failed to update Cost Report Configuration",
 			"ALT_S_REISSUE_REPORT": "Report successfully reissued",
+			"ALT_S_SAVE_COST_REPORT_ADJUSTMENTS": "Report adjustments successfully saved",
 			"ALT_S_UPDATE_COST_REPORT_CONFIGURATION": "Cost Report Configuration successfully updated",
 			"AMOUNT": "Amount",
 			"AUTO_APPLY_ADJUSTMENTS": "Auto-Apply Adjustments",
