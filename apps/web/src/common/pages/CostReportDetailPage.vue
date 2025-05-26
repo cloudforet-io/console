@@ -413,7 +413,7 @@ const handleCollapseAll = () => {
                 </div>
             </div>
             <div class="index-wrapper">
-                <p class="title">
+                <p class="title mb-2">
                     {{ $t('COMMON.COST_REPORT.INDEX') }}
                 </p>
                 <p-link v-if="!config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.ui')"
