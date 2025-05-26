@@ -239,7 +239,6 @@ const fetchReportData = async () => {
         state.baseInfo = await SpaceConnector.clientV2.costAnalysis.costReport.get<CostReportGetParameters, CostReportModel>({
             cost_report_id: costReportId,
         });
-        console.log(state.baseInfo);
     } catch (e: any) {
         ErrorHandler.handleError(e);
         await router.push({ name: ERROR_ROUTE.EXPIRED_LINK._NAME });
