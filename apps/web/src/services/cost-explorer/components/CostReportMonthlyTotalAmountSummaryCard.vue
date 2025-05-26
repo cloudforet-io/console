@@ -209,7 +209,7 @@ const listCostReport = async () => {
                     { k: 'report_month', v: state.currentDate?.format('YYYY-MM'), o: 'eq' },
                 ],
             },
-            status: 'SUCCESS',
+            status: 'DONE',
         });
         if (res.results?.length) state.currentReportId = res.results[0].cost_report_id;
         else state.currentReportId = undefined;
