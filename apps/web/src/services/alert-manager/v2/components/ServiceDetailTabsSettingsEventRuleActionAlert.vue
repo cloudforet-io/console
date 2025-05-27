@@ -19,7 +19,6 @@ import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-in
 import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
 import { EVENT_RULE_URGENCY } from '@/api-clients/alert-manager/event-rule/schema/constants';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleActionsType,
     EventRuleUrgencyType,
@@ -32,6 +31,7 @@ import type { TagItem } from '@/common/modules/tags/type';
 import { gray } from '@/styles/colors';
 
 import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleActionsToggleType,
@@ -45,10 +45,11 @@ const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
+const { eventRuleData } = useEventRuleGetQuery();
+
 const storeState = reactive({
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -111,7 +112,7 @@ const state = reactive({
 });
 
 const updateStateFromEventRuleInfo = (): void => {
-    const actions = storeState.eventRuleInfo.actions;
+    const actions = eventRuleData.value?.actions;
     if (!actions) return;
 
     if (actions.change_title) {

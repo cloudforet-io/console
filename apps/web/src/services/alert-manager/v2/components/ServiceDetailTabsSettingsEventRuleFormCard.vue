@@ -45,6 +45,7 @@ import ServiceDetailTabsSettingsEventRuleActionForm
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleActionForm.vue';
 import ServiceDetailTabsSettingsEventRuleConditionForm
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleConditionForm.vue';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleConditionPolicyButtonType,
@@ -67,10 +68,11 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const { width } = useWindowSize();
 
+const { eventRuleData } = useEventRuleGetQuery();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
@@ -171,7 +173,7 @@ const {
     name: '',
 }, {
     name(value: string) {
-        if (value === storeState.eventRuleInfo.name) return '';
+        if (value === eventRuleData.value?.name) return '';
         const duplicatedName = Object.values(storeState.eventRuleList)?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.EVENT_RULE.VALIDATION_NAME_UNIQUE');
@@ -225,17 +227,17 @@ const initializeState = () => {
 };
 
 const updateStateFromEventRuleInfo = () => {
-    const eventRuleInfo = storeState.eventRuleInfo;
+    const eventRuleInfo = eventRuleData.value;
 
-    setForm('name', eventRuleInfo.name || '');
-    state.selectedPolicyButton = eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
+    setForm('name', eventRuleInfo?.name || '');
+    state.selectedPolicyButton = eventRuleInfo?.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         : EVENT_RULE_CONDITIONS_POLICY.ANY;
     if (state.selectedPolicyButton !== EVENT_RULE_CONDITIONS_POLICY.ALWAYS) {
-        state.conditionsPolicy = eventRuleInfo.conditions_policy;
+        state.conditionsPolicy = eventRuleInfo?.conditions_policy;
     }
 
-    state.conditions = eventRuleInfo.conditions.map((i) => {
+    state.conditions = eventRuleInfo?.conditions?.map((i) => {
         if (i.key.includes('additional_info')) {
             return {
                 key: 'additional_info',
@@ -251,7 +253,7 @@ const updateStateFromEventRuleInfo = () => {
         operator: 'contain',
         subKey: '',
     }];
-    state.stopProcessing = eventRuleInfo.options?.stop_processing || false;
+    state.stopProcessing = eventRuleInfo?.options?.stop_processing || false;
 };
 const getWebhookIcon = (): string|undefined => {
     if (!props.selectedWebhook) return undefined;
@@ -287,7 +289,7 @@ const handleAddButton = () => {
         eventRuleMutation(state.refinedData);
     } else {
         eventRuleMutation({
-            event_rule_id: storeState.eventRuleInfo.event_rule_id,
+            event_rule_id: eventRuleData.value?.event_rule_id,
             name: state.refinedData.name,
             conditions: state.refinedData.conditions,
             conditions_policy: state.refinedData.conditions_policy,

@@ -6,7 +6,6 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EventRuleGetParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/get';
 import type { EventRuleListParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/list';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
@@ -49,11 +48,9 @@ interface ServiceFormStoreState {
     selectedEscalationPolicyId?: string;
     serviceChannelList: ServiceChannelModel[];
     eventRuleList: EventRuleModel[];
-    eventRuleInfo: EventRuleModel;
     eventRuleScopeModalVisible: boolean;
     showEventRuleFormCard: boolean;
     isEventRuleEditMode: boolean;
-    eventRuleInfoLoading: boolean;
 }
 interface ServiceFormStoreGetters {
     serviceInfo: ComputedRef<Service>;
@@ -82,11 +79,9 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         selectedEscalationPolicyId: undefined,
         serviceChannelList: [],
         eventRuleList: [],
-        eventRuleInfo: {} as EventRuleModel,
         eventRuleScopeModalVisible: false,
         showEventRuleFormCard: false,
         isEventRuleEditMode: false,
-        eventRuleInfoLoading: false,
     });
 
     const getters = reactive<ServiceFormStoreGetters>({
@@ -163,14 +158,12 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.selectedNotificationId = undefined;
             state.selectedEscalationPolicyId = undefined;
             state.eventRuleList = [];
-            state.eventRuleInfo = {} as EventRuleModel;
             state.eventRuleScopeModalVisible = false;
             state.showEventRuleFormCard = false;
             state.isEventRuleEditMode = false;
         },
         initEscalationPolicyState() {
             state.eventRuleList = [];
-            state.eventRuleInfo = {} as EventRuleModel;
             state.eventRuleScopeModalVisible = false;
             state.showEventRuleFormCard = false;
             state.isEventRuleEditMode = false;
@@ -232,17 +225,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 ErrorHandler.handleError(e);
                 state.eventRuleList = [];
                 throw e;
-            }
-        },
-        async fetchEventRuleInfo(params: EventRuleGetParameters) {
-            state.eventRuleInfoLoading = true;
-            try {
-                state.eventRuleInfo = await SpaceConnector.clientV2.alertManager.eventRule.get<EventRuleGetParameters, EventRuleModel>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.eventRuleInfo = {} as EventRuleModel;
-            } finally {
-                state.eventRuleInfoLoading = false;
             }
         },
         async fetchServiceChannelList(serviceId: string) {

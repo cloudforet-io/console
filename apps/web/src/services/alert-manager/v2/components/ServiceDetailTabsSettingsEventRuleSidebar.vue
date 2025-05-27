@@ -56,11 +56,12 @@ const router = useRouter();
 
 const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
 
+const { eventRuleAPI } = useEventRuleApi();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
@@ -82,12 +83,10 @@ const state = reactive({
     isEditMode: false,
 });
 
-const { eventRuleAPI } = useEventRuleApi();
 const { mutate: changeOrder } = useMutation({
-    mutationFn: (params: EventRuleChangeOrderParameters) => eventRuleAPI.changeOrder(params),
+    mutationFn: eventRuleAPI.changeOrder,
     onSuccess: () => {
-        // TODO: will be removed
-        fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
+        setEventRuleInfo();
         state.isEditMode = false;
     },
     onError: (error) => {
@@ -172,13 +171,12 @@ const handleClickItem = (value: TreeNode, idx?: number) => {
     router.push(value.data.to).catch(() => {});
     state.selectedTreeId = value.id;
 };
-const fetchAndSetEventRuleInfo = async (eventRuleId: string) => {
-    if (!eventRuleId) {
+const setEventRuleInfo = async () => {
+    if (!route.query?.eventRuleId) {
         state.selectedTreeId = undefined;
         return;
     }
-    await serviceDetailPageStore.fetchEventRuleInfo({ event_rule_id: eventRuleId });
-    state.selectedTreeId = storeState.eventRuleInfo.event_rule_id;
+    state.selectedTreeId = route.query?.eventRuleId;
 };
 
 const handleSaveOrder = async () => {
@@ -200,11 +198,11 @@ const handleSaveOrder = async () => {
 
 watch([() => storeState.isEventRuleEditMode, () => storeState.showEventRuleFormCard], async ([isEditMode, showFormCard]) => {
     if (showFormCard || !isEditMode) return;
-    await fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
+    await setEventRuleInfo();
 }, { immediate: true });
 
 watch(() => route.query?.eventRuleId, async (eventRuleId) => {
-    await fetchAndSetEventRuleInfo(eventRuleId as string);
+    await setEventRuleInfo();
     if (eventRuleId) await serviceDetailPageStore.setShowEventRuleFormCard(false);
 }, { immediate: true });
 

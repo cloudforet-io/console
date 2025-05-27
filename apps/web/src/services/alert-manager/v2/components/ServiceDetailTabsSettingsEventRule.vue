@@ -19,6 +19,7 @@ import ServiceDetailTabsSettingsEventRuleScopeModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleScopeModal.vue';
 import ServiceDetailTabsSettingsEventRuleSidebar
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleSidebar.vue';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -26,13 +27,14 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { width } = useWindowSize();
 
+const { eventRuleData } = useEventRuleGetQuery();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
     items: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -75,11 +77,11 @@ onUnmounted(() => {
                                                                  :items="storeState.items"
                 />
                 <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
-                                                                   :selected-webhook="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.webhook_id : state.selectedWebhook"
-                                                                   :selected-scope="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.scope : state.selectedScope"
+                                                                   :selected-webhook="storeState.isEventRuleEditMode ? eventRuleData?.webhook_id : state.selectedWebhook"
+                                                                   :selected-scope="storeState.isEventRuleEditMode ? eventRuleData?.scope : state.selectedScope"
                                                                    class="flex-1"
                 />
-                <service-detail-tabs-settings-event-rule-card v-else-if="storeState.eventRuleInfo.event_rule_id"
+                <service-detail-tabs-settings-event-rule-card v-else-if="eventRuleData?.event_rule_id"
                                                               class="flex-1"
                 />
             </div>
