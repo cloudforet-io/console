@@ -23,7 +23,6 @@ import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composab
 import type { EventRuleCreateParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/create';
 import type { EventRuleUpdateParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/update';
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
@@ -46,6 +45,7 @@ import ServiceDetailTabsSettingsEventRuleActionForm
 import ServiceDetailTabsSettingsEventRuleConditionForm
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleConditionForm.vue';
 import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleConditionPolicyButtonType,
@@ -69,12 +69,13 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const { width } = useWindowSize();
 
 const queryClient = useQueryClient();
+const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleData, eventRuleQueryKey } = useEventRuleGetQuery();
+const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery();
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
@@ -175,7 +176,7 @@ const {
 }, {
     name(value: string) {
         if (value === eventRuleData.value?.name) return '';
-        const duplicatedName = Object.values(storeState.eventRuleList)?.find((item) => item.name === value);
+        const duplicatedName = Object.values(eventRuleListData.value)?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.EVENT_RULE.VALIDATION_NAME_UNIQUE');
         }
@@ -183,7 +184,6 @@ const {
     },
 });
 
-const { eventRuleAPI } = useEventRuleApi();
 const { mutate: eventRuleMutation, isPending: eventRuleMutationPending } = useMutation({
     mutationFn: (params: Partial<EventRuleCreateParameters> | Partial<EventRuleUpdateParameters>) => {
         if (state.method === 'create') {
@@ -197,10 +197,7 @@ const { mutate: eventRuleMutation, isPending: eventRuleMutationPending } = useMu
         } else {
             showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '');
         }
-        // TODO: will be removed
-        await serviceDetailPageStore.fetchEventRuleList({
-            service_id: storeState.serviceId,
-        });
+        await queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey });
         if (!storeState.isEventRuleEditMode) {
             await replaceUrlQuery({
                 webhookId: data.webhook_id || 'global',

@@ -29,18 +29,17 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
 interface Props {
   hideSidebar: boolean;
-  items: EventRuleModel[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
     hideSidebar: false,
-    items: undefined,
 });
 
 const allReferenceStore = useAllReferenceStore();
@@ -57,6 +56,7 @@ const router = useRouter();
 const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
 
 const { eventRuleAPI } = useEventRuleApi();
+const { eventRuleListData } = useEventRuleListQuery();
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
@@ -73,8 +73,8 @@ const state = reactive({
     searchValue: '',
     filteredItems: computed<EventRuleModel[]>(() => {
         const filtered = state.searchValue
-            ? props.items.filter((item) => item.name.toLowerCase().includes(state.searchValue.toLowerCase()))
-            : props.items;
+            ? eventRuleListData.value?.filter((item) => item.name.toLowerCase().includes(state.searchValue.toLowerCase()))
+            : eventRuleListData.value;
         return sortBy(filtered, [(item) => !item.webhook_id, 'order']);
     }),
     treeList: [],
@@ -206,7 +206,7 @@ watch(() => route.query?.eventRuleId, async (eventRuleId) => {
     if (eventRuleId) await serviceDetailPageStore.setShowEventRuleFormCard(false);
 }, { immediate: true });
 
-watch([() => props.items.length, () => storeState.showEventRuleFormCard], async ([itemLength, showFormCard]) => {
+watch([() => eventRuleListData.value?.length, () => storeState.showEventRuleFormCard], async ([itemLength, showFormCard]) => {
     if (itemLength === 0) return;
     state.treeList = setTreeList();
     if (!showFormCard && !route.query?.eventRuleId) await initSidebar();

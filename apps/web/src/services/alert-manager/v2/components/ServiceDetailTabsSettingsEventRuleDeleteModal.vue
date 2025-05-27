@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -14,7 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 
 interface Props {
     visible: boolean;
@@ -24,24 +23,19 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
-
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:visible'): void;
 }>();
 
+const queryClient = useQueryClient();
+const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleData } = useEventRuleGetQuery();
+const { eventRuleListQueryKey } = useEventRuleListQuery();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
-});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
-const { eventRuleAPI } = useEventRuleApi();
 const { mutate: eventRuleDeleteMutation, isPending: eventRuleDeleteMutationPending } = useMutation({
     mutationFn: eventRuleAPI.delete,
     onSuccess: async () => {
@@ -49,10 +43,7 @@ const { mutate: eventRuleDeleteMutation, isPending: eventRuleDeleteMutationPendi
             webhookId: undefined,
             eventRuleId: undefined,
         });
-        // TODO: will be removed
-        await serviceDetailPageStore.fetchEventRuleList({
-            service_id: storeState.serviceId,
-        });
+        queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey });
     },
     onError: (e) => {
         ErrorHandler.handleError(e, true);

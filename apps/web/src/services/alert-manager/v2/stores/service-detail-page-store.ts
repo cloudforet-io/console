@@ -6,8 +6,6 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EventRuleListParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/list';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
 import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
 import type { ServiceChannelListParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/list';
@@ -37,7 +35,6 @@ import type {
     ProtocolCardItemType,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
 
-
 interface ServiceFormStoreState {
     loading: boolean;
     currentTab?: ServiceDetailTabsType;
@@ -47,7 +44,6 @@ interface ServiceFormStoreState {
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
     serviceChannelList: ServiceChannelModel[];
-    eventRuleList: EventRuleModel[];
     eventRuleScopeModalVisible: boolean;
     showEventRuleFormCard: boolean;
     isEventRuleEditMode: boolean;
@@ -78,7 +74,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
         serviceChannelList: [],
-        eventRuleList: [],
         eventRuleScopeModalVisible: false,
         showEventRuleFormCard: false,
         isEventRuleEditMode: false,
@@ -109,7 +104,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                     RESOLVED: getAlerts(SERVICE_ALERTS_TYPE.RESOLVED),
                     TOTAL: getAlerts(SERVICE_ALERTS_TYPE.TOTAL),
                 },
-                rules: state.eventRuleList.length,
             };
         }),
         pluginsReferenceMap: computed(() => allReferenceGetters.plugin),
@@ -157,13 +151,11 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.selectedWebhookId = undefined;
             state.selectedNotificationId = undefined;
             state.selectedEscalationPolicyId = undefined;
-            state.eventRuleList = [];
             state.eventRuleScopeModalVisible = false;
             state.showEventRuleFormCard = false;
             state.isEventRuleEditMode = false;
         },
         initEscalationPolicyState() {
-            state.eventRuleList = [];
             state.eventRuleScopeModalVisible = false;
             state.showEventRuleFormCard = false;
             state.isEventRuleEditMode = false;
@@ -215,16 +207,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.notificationProtocolListData = [];
-            }
-        },
-        async fetchEventRuleList(params?: EventRuleListParameters) {
-            try {
-                const { results } = await SpaceConnector.clientV2.alertManager.eventRule.list<EventRuleListParameters, ListResponse<EventRuleModel>>(params);
-                state.eventRuleList = results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.eventRuleList = [];
-                throw e;
             }
         },
         async fetchServiceChannelList(serviceId: string) {
