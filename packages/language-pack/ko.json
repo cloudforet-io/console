@@ -590,6 +590,7 @@
 						"BUDGET_ALERT_MODAL_DESC1": "예산 알림을 끄시겠습니까?",
 						"BUDGET_ALERT_MODAL_DESC2": "예산 알림을 켜시겠습니까?",
 						"BUDGET_NAME": "예산명",
+						"BUDGET_NAME_INVALID": "예산 이름은 한 글자 이상이어야 합니다.",
 						"BUDGET_NOTI_HELP_TEXT": "다음 경우에 알림을 발송합니다.",
 						"BUDGET_USAGE": "예산금액의 {symbol} 사용",
 						"CANCEL": "취소",
