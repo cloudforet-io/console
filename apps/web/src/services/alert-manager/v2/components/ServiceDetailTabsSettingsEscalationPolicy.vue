@@ -152,7 +152,6 @@ const handleSelectTableRow = (selectedItems: number[]) => {
 };
 const handleCloseModal = () => {
     state.selectIndex = undefined;
-    refreshEscalationPolicyList();
 };
 const refreshEscalationPolicyList = () => {
     queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey });
