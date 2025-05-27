@@ -5,15 +5,14 @@ import {
 
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PSelectDropdown, PDatetimePicker, PButton,
     PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
 import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
+import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -30,7 +29,7 @@ import { DEFAULT_UNIFIED_COST_CURRENCY, YAHOO_FINANCE_ID } from '@/services/cost
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
 
-
+const { budgetUsageAPI } = useBudgetUsageApi();
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
 
@@ -141,7 +140,7 @@ const isValidPositiveNumber = (value: any): boolean => {
 
 const fetchBudgetUsage = async (params: BudgetUsageListParameters) => {
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.list<BudgetUsageListParameters, ListResponse<BudgetUsageModel>>(params);
+        const { results } = await budgetUsageAPI.list(params);
         state.existingBudgetUsageList = results ?? [];
     } catch (error) {
         ErrorHandler.handleError(error);
@@ -712,4 +711,3 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
     }
 }
 </style>
-
