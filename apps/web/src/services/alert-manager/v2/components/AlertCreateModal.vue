@@ -10,7 +10,6 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
-import type { AlertCreateParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/create';
 import { ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
@@ -86,10 +85,10 @@ const {
 });
 
 const { mutate: createAlert, isPending } = useMutation({
-    mutationFn: (params: AlertCreateParameters) => alertAPI.create(params),
+    mutationFn: alertAPI.create,
     onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
-        queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: alertListQueryKey });
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);

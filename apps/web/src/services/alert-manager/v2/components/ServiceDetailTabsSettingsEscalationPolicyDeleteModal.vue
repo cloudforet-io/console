@@ -3,13 +3,15 @@ import {
     reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyDeleteParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/delete';
+import { useEscalationPolicyApi } from '@/api-clients/alert-manager/escalation-policy/composables/use-escalation-policy-api';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -34,20 +36,27 @@ const state = reactive({
     loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
 });
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.escalationPolicy.delete<EscalationPolicyDeleteParameters>({
-            escalation_policy_id: props.selectedItem.escalation_policy_id,
-        });
+
+const queryClient = useQueryClient();
+const { escalationPolicyAPI } = useEscalationPolicyApi();
+const { key: escalationPolicyListBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
+const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
+    mutationFn: escalationPolicyAPI.delete,
+    onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '');
+        queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey });
         state.proxyVisible = false;
         emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const handleConfirm = async () => {
+    escalationPolicyMutation({
+        escalation_policy_id: props.selectedItem.escalation_policy_id,
+    });
 };
 </script>
 
@@ -55,7 +64,7 @@ const handleConfirm = async () => {
     <p-button-modal class="service-detail-tabs-settings-escalation-policy-delete-modal"
                     :visible.sync="state.proxyVisible"
                     :header-title="$t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_DELETE_TITLE')"
-                    :loading="state.loading"
+                    :loading="escalationPolicyMutationPending"
                     theme-color="alert"
                     size="sm"
                     @confirm="handleConfirm"

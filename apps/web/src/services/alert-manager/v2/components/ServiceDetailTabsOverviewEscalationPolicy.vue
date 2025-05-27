@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PBadge, PDivider, PFieldTitle, PIconButton, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { EscalationPolicyGetParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/get';
+import { useEscalationPolicyApi } from '@/api-clients/alert-manager/escalation-policy/composables/use-escalation-policy-api';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
@@ -37,9 +36,17 @@ const state = reactive({
     loading: true,
     pageStart: 0,
     item: {} as EscalationPolicyModel,
-    rules: computed<EscalationPolicyRulesType[]>(() => state.item.rules || []),
+    rules: computed<EscalationPolicyRulesType[]>(() => escalationPolicyData.value?.rules || []),
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
     pageMax: computed<number>(() => Math.max(state.rules.length - state.visibleCount, 0)),
+});
+
+
+const { escalationPolicyAPI } = useEscalationPolicyApi();
+const { key: escalationPolicyGetQueryKey, params: escalationPolicyGetQueryParams } = useServiceQueryKey('alert-manager', 'escalation-policy', 'get', {
+    params: computed(() => ({
+        escalation_policy_id: storeState.escalationPolicyId,
+    })),
 });
 
 const handleClickArrowButton = (increment: number) => {
@@ -59,24 +66,13 @@ const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.SETTINGS)
 );
 
-const fetchEscalationPolicy = async () => {
-    state.loading = true;
-    try {
-        state.item = await SpaceConnector.clientV2.alertManager.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
-            escalation_policy_id: storeState.escalationPolicyId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.item = {};
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
-    if (!escalationPolicyId) return;
-    fetchEscalationPolicy();
-}, { immediate: true });
+const { data: escalationPolicyData, isFetching: escalationPolicyFetching } = useScopedQuery({
+    queryKey: escalationPolicyGetQueryKey,
+    queryFn: async () => escalationPolicyAPI.get(escalationPolicyGetQueryParams.value),
+    enabled: computed(() => !!storeState.escalationPolicyId),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+}, ['WORKSPACE']);
 </script>
 
 <template>
@@ -86,13 +82,13 @@ watch(() => storeState.escalationPolicyId, (escalationPolicyId) => {
                        size="lg"
                        font-weight="regular"
         />
-        <p-data-loader :loading="state.loading"
-                       :data="state.item"
+        <p-data-loader :loading="escalationPolicyFetching"
+                       :data="escalationPolicyData"
                        class="content flex-1"
                        :class="{ 'empty': !state.rules.length }"
         >
             <p class="pb-3 pl-4 text-paragraph-md">
-                {{ state.item.name }}
+                {{ escalationPolicyData?.name }}
             </p>
             <div ref="rowItemsWrapperRef"
                  class="row-items-wrapper"

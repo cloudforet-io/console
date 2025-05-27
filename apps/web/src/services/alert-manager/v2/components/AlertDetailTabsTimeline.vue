@@ -138,7 +138,7 @@ const handleClickShowMore = async () => {
     state.pageStart += 1;
 };
 const refreshHistoryList = () => {
-    queryClient.invalidateQueries({ queryKey: alertHistoryQueryKey.value });
+    queryClient.invalidateQueries({ queryKey: alertHistoryQueryKey });
 };
 
 const { data: alertHistoryData, isFetching: alertHistoryLoading } = useScopedQuery({
