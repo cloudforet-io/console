@@ -2,7 +2,7 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PCard,
@@ -68,7 +68,8 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const { width } = useWindowSize();
 
-const { eventRuleData } = useEventRuleGetQuery();
+const queryClient = useQueryClient();
+const { eventRuleData, eventRuleQueryKey } = useEventRuleGetQuery();
 
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
@@ -205,6 +206,8 @@ const { mutate: eventRuleMutation, isPending: eventRuleMutationPending } = useMu
                 webhookId: data.webhook_id || 'global',
                 eventRuleId: data.event_rule_id,
             });
+        } else {
+            queryClient.invalidateQueries({ queryKey: eventRuleQueryKey });
         }
         await handleDeleteForm();
     },
