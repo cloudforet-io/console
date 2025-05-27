@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 import type { EventRuleDeleteParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/delete';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 
@@ -35,28 +37,33 @@ const storeState = reactive({
     eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.eventRule.delete<EventRuleDeleteParameters>({
-            event_rule_id: storeState.eventRuleInfo.event_rule_id,
-        });
+
+const { eventRuleAPI } = useEventRuleApi();
+const { mutate: eventRuleDeleteMutation, isPending: eventRuleDeleteMutationPending } = useMutation({
+    mutationFn: (params: EventRuleDeleteParameters) => eventRuleAPI.delete(params),
+    onSuccess: async () => {
         await replaceUrlQuery({
             webhookId: undefined,
             eventRuleId: undefined,
         });
+        // TODO: will be removed
         await serviceDetailPageStore.fetchEventRuleList({
             service_id: storeState.serviceId,
         });
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
+    },
+    onSettled: () => {
         handleClose();
-    }
+    },
+});
+const handleConfirm = async () => {
+    eventRuleDeleteMutation({
+        event_rule_id: storeState.eventRuleInfo.event_rule_id,
+    });
 };
 const handleClose = () => {
     state.proxyVisible = false;
@@ -71,7 +78,7 @@ const handleClose = () => {
                     :fade="true"
                     :backdrop="true"
                     :visible="state.proxyVisible"
-                    :loading="state.loading"
+                    :loading="eventRuleDeleteMutationPending"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
