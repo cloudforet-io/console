@@ -40,7 +40,7 @@ interface BudgetCreateStep1State {
     projectList: any[];
     selectedProject: string;
     serviceAccountList: string[];
-    budgetList: BudgetModel[];
+    budgetList: ComputedRef<BudgetModel[]>;
     budgetNames: string[];
     existingProjectIds: string[];
     existingBudgetYears: number[];
@@ -59,7 +59,7 @@ const state = reactive<BudgetCreateStep1State>({
     projectList: [],
     selectedProject: '',
     serviceAccountList: [],
-    budgetList: [],
+    budgetList: computed(() => budgetList.value),
     budgetNames: [],
     existingProjectIds: [],
     existingBudgetYears: [],
@@ -134,22 +134,13 @@ const getServiceAccountIncludedinProjectInfo = async () => {
     }
 };
 
-const fetchBudget = async () => {
-    try {
-        state.budgetList = budgetList.value;
-        state.budgetNames = budgetList.value?.map((result) => result.name) ?? [];
-        state.existingProjectIds = budgetList.value?.map((result) => result.project_id) ?? [];
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
-
 watch(() => budgetCreatePageState.project, async () => {
     await getServiceAccountIncludedinProjectInfo();
 }, { deep: true, immediate: true });
 
 watchEffect(async () => {
-    await fetchBudget();
+    state.budgetNames = state.budgetList?.map((result) => result.name) ?? [];
+    state.existingProjectIds = state.budgetList.map((result) => result.project_id) ?? [];
 });
 </script>
 
