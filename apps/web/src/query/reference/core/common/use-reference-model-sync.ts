@@ -40,9 +40,9 @@ const _updateReferenceCache = async <T>(
 ) => {
     const { key: referenceQueryKey, withSuffix } = useReferenceQueryKey(resourceType);
 
-    const resourceKey = referenceConfigMap[resourceType].resourceKey;
+    const idKey = referenceConfigMap[resourceType].idKey;
 
-    if (!resourceKey || !newData[resourceKey]) {
+    if (!idKey || !newData[idKey]) {
         throw new Error(`Invalid resource key or data for type: ${resourceType}`);
     }
 
@@ -54,7 +54,7 @@ const _updateReferenceCache = async <T>(
         }
 
         const existingItemIndex = currentResults.findIndex(
-            (item) => item?.[resourceKey] === newData[resourceKey],
+            (item) => item?.[idKey] === newData[idKey],
         );
 
         if (existingItemIndex > -1) {

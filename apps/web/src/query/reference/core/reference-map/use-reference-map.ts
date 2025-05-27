@@ -19,7 +19,7 @@ export const useReferenceMap = <T, R extends Record<string, any>>(
     const _config = referenceConfigMap[resourceKey];
 
     if (!_config) {
-        throw new Error(`Invalid reference key - list : ${resourceKey}`);
+        throw new Error(`Invalid reference key - map : ${resourceKey}`);
     }
 
     const { listFetchFn } = fetchInfo;
