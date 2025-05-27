@@ -97,15 +97,7 @@ const {
 
 const queryClient = useQueryClient();
 const { escalationPolicyAPI } = useEscalationPolicyApi();
-const { key: escalationPolicyLisBasetQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
-
-const handleClose = () => {
-    state.proxyVisible = false;
-};
-const handleRouteDetail = () => {
-    serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS);
-    handleClose();
-};
+const { key: escalationPolicyLisBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
 
 const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
     mutationFn: (params: Partial<EscalationPolicyCreateParameters | EscalationPolicyUpdateParameters>) => {
@@ -115,7 +107,7 @@ const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPen
         return escalationPolicyAPI.update(params as EscalationPolicyUpdateParameters);
     },
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: escalationPolicyLisBasetQueryKey });
+        queryClient.invalidateQueries({ queryKey: escalationPolicyLisBaseQueryKey });
         if (props.type === 'CREATE') {
             showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
         } else {
@@ -128,6 +120,14 @@ const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPen
         ErrorHandler.handleError(error, true);
     },
 });
+
+const handleClose = () => {
+    state.proxyVisible = false;
+};
+const handleRouteDetail = () => {
+    serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS);
+    handleClose();
+};
 
 const handleClickConfirm = async () => {
     const params: Partial<EscalationPolicyCreateParameters | EscalationPolicyUpdateParameters> = {

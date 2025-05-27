@@ -89,7 +89,7 @@ const { mutate: createAlert, isPending } = useMutation({
     mutationFn: (params: AlertCreateParameters) => alertAPI.create(params),
     onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
-        queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: alertListQueryKey });
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
