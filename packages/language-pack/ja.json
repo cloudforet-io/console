@@ -699,6 +699,7 @@
 						"MONTHLY": "月次",
 						"MONTHLY_BUDGET_ALLOCATION": "月ごとの予算配分",
 						"MONTHLY_GROWTH_RATE": "月次成長率",
+						"NAME_INVALID_TEXT": "この予算名はすでに使用されています。",
 						"OTHERS": "その他",
 						"PREVIOUS": "前へ",
 						"PREVIOUS_PERIOD_SPEND": "過去の同期間の費用推移",
