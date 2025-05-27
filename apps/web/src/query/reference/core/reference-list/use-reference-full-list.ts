@@ -6,14 +6,14 @@ import { useReferenceQueryKey } from '@/query/query-key/use-reference-query-key'
 import type { ReferenceFetchInfo, ReferenceKeyType } from '@/query/reference/types/reference-type';
 
 
-export const useReferenceList = <T, R extends Record<string, any>>(
+export const useReferenceFullList = <T, R extends Record<string, any>>(
     resourceKey: ReferenceKeyType,
     fetchInfo: ReferenceFetchInfo<T>,
     transform: (item: T) => R,
 ) => {
     const { listFetchFn } = fetchInfo;
     const { key: queryKey } = useReferenceQueryKey(resourceKey);
-    const hasTrriggered = ref(false);
+    const hasTriggered = ref(false);
 
     const {
         data, isFetched, isFetching, refetch,
@@ -28,7 +28,7 @@ export const useReferenceList = <T, R extends Record<string, any>>(
             return response.results || [];
         },
         select: (item) => item.map(transform),
-        enabled: computed(() => hasTrriggered.value),
+        enabled: computed(() => hasTriggered.value),
         refetchOnWindowFocus: true,
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 10,
@@ -36,9 +36,9 @@ export const useReferenceList = <T, R extends Record<string, any>>(
 
     return {
         referenceList: computed<R[]>(() => {
-            if (!hasTrriggered.value && !isFetched.value && !data.value) {
+            if (!hasTriggered.value && !isFetched.value && !data.value) {
                 refetch();
-                hasTrriggered.value = true;
+                hasTriggered.value = true;
             }
             return data.value || [];
         }),

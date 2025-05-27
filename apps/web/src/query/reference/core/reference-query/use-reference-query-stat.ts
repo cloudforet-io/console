@@ -70,7 +70,7 @@ export const useReferenceQueryStat = <T>(
         };
     };
 
-    const statReferenceQuery = async (dataKey: string) => {
+    const statReferenceQuery = (dataKey: string) => {
         const _dataKey = dataKey;
         return async (params: ReferenceQueryParams = {}): Promise<ReferenceQueryResponse<any>> => {
             if (!statFetchFn) {

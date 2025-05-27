@@ -10,7 +10,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export interface ReferenceModelMenuHandlerInfo {
-    fetchFn: (query: ReferenceQueryParams) => Promise<ReferenceQueryResponse<any>>;
+    fetchFn: (params?: ReferenceQueryParams) => Promise<ReferenceQueryResponse<any>>;
     title?: string;
 }
 
