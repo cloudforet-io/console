@@ -2,12 +2,12 @@
 import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
-import type { AlertDeleteParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/delete';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -38,20 +38,24 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
+const queryClient = useQueryClient();
+const { key: alertListBaseQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
+
 const handleClose = () => {
     state.proxyVisible = false;
 };
 
 const { mutate: alertDeleteMutate, isPending: alertDeleteLoading } = useMutation({
-    mutationFn: (params: AlertDeleteParameters) => alertAPI.delete(params),
+    mutationFn: alertAPI.delete,
     onSuccess: async () => {
         const serviceId = route.params?.serviceId;
+        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
+        queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey });
         if (serviceId) {
             await router.go(-1);
         } else {
             await router.push({ name: ALERT_MANAGER_ROUTE.ALERTS._NAME }).catch(() => {});
         }
-        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);

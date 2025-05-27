@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PScopedNotification, PLink, PDataTable, PStatus, PI, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EscalationPolicyListParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/list';
-import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { ServiceChannelDeleteParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/delete';
 import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
@@ -22,6 +19,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
@@ -50,7 +48,6 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    escalationPolicyList: [] as EscalationPolicyModel[],
     notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const tableState = reactive({
@@ -66,9 +63,15 @@ const tableState = reactive({
     }]),
 });
 
+const { escalationPolicyListData } = useEscalationPolicyListQuery({
+    params: computed(() => ({
+        service_id: storeState.service.service_id,
+    })),
+});
+
 const hasNotificationValue = (): boolean => {
     if (!props.selectedItem?.channel_id) return false;
-    return state.escalationPolicyList.some((item) => item.rules.some((rule) => rule.channels.includes(props.selectedItem?.channel_id || '')));
+    return escalationPolicyListData.value.some((item) => item.rules.some((rule) => rule.channels.includes(props.selectedItem?.channel_id || '')));
 };
 const getEscalationPolicyLink = () => ({
     name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
@@ -93,21 +96,6 @@ const handleConfirm = async () => {
         state.loading = false;
     }
 };
-const fetchEscalationPolicyList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
-            service_id: storeState.service.service_id,
-        });
-        state.escalationPolicyList = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.escalationPolicyList = [];
-    }
-};
-
-onMounted(() => {
-    fetchEscalationPolicyList();
-});
 </script>
 
 <template>
