@@ -4,14 +4,15 @@ import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 import draggable from 'vuedraggable';
 
+import { useMutation } from '@tanstack/vue-query';
 import { sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PI, PSearch, PBadge, PLazyImg, screens, PButton,
 } from '@cloudforet/mirinae';
 import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type';
 
+import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 import type { EventRuleChangeOrderParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/change-order';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import { i18n } from '@/translations';
@@ -79,6 +80,19 @@ const state = reactive({
     treeListOpenState: {} as Record<string, boolean>,
     selectedTreeId: undefined as string | undefined,
     isEditMode: false,
+});
+
+const { eventRuleAPI } = useEventRuleApi();
+const { mutate: changeOrder } = useMutation({
+    mutationFn: (params: EventRuleChangeOrderParameters) => eventRuleAPI.changeOrder(params),
+    onSuccess: () => {
+        // TODO: will be removed
+        fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
+        state.isEditMode = false;
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
 });
 
 const setTreeList = (): TreeNode[] => {
@@ -168,30 +182,20 @@ const fetchAndSetEventRuleInfo = async (eventRuleId: string) => {
 };
 
 const handleSaveOrder = async () => {
-    state.loading = true;
-    try {
-        const mismatchedIds = [] as EventRuleChangeOrderParameters[];
-
-        state.treeList.forEach((t) => {
-            if (t.children) {
-                t.children.forEach((child, index) => {
-                    if (child.data.order !== index + 1) {
-                        mismatchedIds.push({
-                            event_rule_id: child.id,
-                            order: index + 1,
-                        });
-                    }
-                });
-            }
-        });
-        await Promise.all(mismatchedIds.map((i) => SpaceConnector.clientV2.alertManager.eventRule.changeOrder<EventRuleChangeOrderParameters>(i)));
-        await fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
-        state.isEditMode = false;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = true;
-    }
+    const mismatchedIds = [] as EventRuleChangeOrderParameters[];
+    state.treeList.forEach((t) => {
+        if (t.children) {
+            t.children.forEach((child, index) => {
+                if (child.data.order !== index + 1) {
+                    mismatchedIds.push({
+                        event_rule_id: child.id,
+                        order: index + 1,
+                    });
+                }
+            });
+        }
+    });
+    await Promise.all(mismatchedIds.map((i) => changeOrder(i)));
 };
 
 watch([() => storeState.isEventRuleEditMode, () => storeState.showEventRuleFormCard], async ([isEditMode, showFormCard]) => {
