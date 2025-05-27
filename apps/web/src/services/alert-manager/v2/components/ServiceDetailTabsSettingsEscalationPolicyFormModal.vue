@@ -4,17 +4,20 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PTextInput, PRadio, PFieldGroup, PRadioGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import { useEscalationPolicyApi } from '@/api-clients/alert-manager/escalation-policy/composables/use-escalation-policy-api';
 import type { EscalationPolicyCreateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/create';
 import type { EscalationPolicyUpdateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/update';
 import { ESCALATION_POLICY_STATE } from '@/api-clients/alert-manager/escalation-policy/schema/constants';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -51,7 +54,6 @@ const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     headerTitle: computed<TranslateResult>(() => {
         if (props.type === 'CREATE') return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_CREATE_TITLE');
@@ -93,6 +95,10 @@ const {
     },
 });
 
+const queryClient = useQueryClient();
+const { escalationPolicyAPI } = useEscalationPolicyApi();
+const { key: escalationPolicyLisBasetQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
+
 const handleClose = () => {
     state.proxyVisible = false;
 };
@@ -100,38 +106,46 @@ const handleRouteDetail = () => {
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS);
     handleClose();
 };
-const handleClickConfirm = async () => {
-    state.loading = true;
-    try {
-        const params = {
-            name: name.value,
-            rules: state.rules,
-            repeat: {
-                state: ESCALATION_POLICY_STATE.DISABLED,
-                count: state.repeatCount,
-            },
-            finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
-        };
+
+const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
+    mutationFn: (params: Partial<EscalationPolicyCreateParameters | EscalationPolicyUpdateParameters>) => {
         if (props.type === 'CREATE') {
-            await SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters>({
-                service_id: storeState.serviceId,
-                ...params,
-            });
+            return escalationPolicyAPI.create(params as EscalationPolicyCreateParameters);
+        }
+        return escalationPolicyAPI.update(params as EscalationPolicyUpdateParameters);
+    },
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: escalationPolicyLisBasetQueryKey });
+        if (props.type === 'CREATE') {
             showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
         } else {
-            await SpaceConnector.clientV2.alertManager.escalationPolicy.update<EscalationPolicyUpdateParameters>({
-                escalation_policy_id: props.selectedItem?.escalation_policy_id || '',
-                ...params,
-            });
             showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_UPDATE_POLICY'), '');
         }
         handleClose();
         emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const handleClickConfirm = async () => {
+    const params: Partial<EscalationPolicyCreateParameters | EscalationPolicyUpdateParameters> = {
+        name: name.value,
+        rules: state.rules,
+        repeat: {
+            state: ESCALATION_POLICY_STATE.DISABLED,
+            count: state.repeatCount,
+        },
+        finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
+    };
+    if (props.type === 'CREATE') {
+        params.service_id = storeState.serviceId;
+    } else {
+        params.escalation_policy_id = props.selectedItem?.escalation_policy_id || '';
     }
+
+    escalationPolicyMutation(params);
 };
 
 watch(() => props.type, (type) => {
@@ -148,7 +162,7 @@ watch(() => props.type, (type) => {
                     :header-title="state.headerTitle"
                     :fade="true"
                     :backdrop="true"
-                    :loading="state.loading"
+                    :loading="escalationPolicyMutationPending"
                     :visible.sync="state.proxyVisible"
                     :disabled="!state.isModalValid"
                     @confirm="handleClickConfirm"
