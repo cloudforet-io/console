@@ -10,7 +10,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useEscalationPolicyApi } from '@/api-clients/alert-manager/escalation-policy/composables/use-escalation-policy-api';
-import type { EscalationPolicyDeleteParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/delete';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
@@ -42,7 +41,7 @@ const queryClient = useQueryClient();
 const { escalationPolicyAPI } = useEscalationPolicyApi();
 const { key: escalationPolicyListBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
 const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
-    mutationFn: (params: EscalationPolicyDeleteParameters) => escalationPolicyAPI.delete(params),
+    mutationFn: escalationPolicyAPI.delete,
     onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '');
         queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey });

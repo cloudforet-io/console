@@ -7,7 +7,6 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
-import type { AlertDeleteParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/delete';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -47,7 +46,7 @@ const handleClose = () => {
 };
 
 const { mutate: alertDeleteMutate, isPending: alertDeleteLoading } = useMutation({
-    mutationFn: (params: AlertDeleteParameters) => alertAPI.delete(params),
+    mutationFn: alertAPI.delete,
     onSuccess: async () => {
         const serviceId = route.params?.serviceId;
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
