@@ -218,7 +218,7 @@ const getConvertedProductTableData = (rawData: CostReportDataAnalyzeResult[]): C
         Object.entries(accountGroupBy).forEach(([account, accountData]) => {
             results[provider] = {
                 ...(results[provider] ?? {}),
-                [account]: accountData?.[0]?.value_sum,
+                [account]: accountData[0].value_sum?.sort((a, b) => b.value - a.value),
             };
         });
     });
