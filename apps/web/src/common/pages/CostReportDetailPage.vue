@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 import type { PieSeriesOption } from 'echarts/charts';
+import type { EChartsType, ComposeOption } from 'echarts/core';
 import { init } from 'echarts/core';
 import {
     groupBy, sortBy, sum,
@@ -94,104 +95,103 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     baseInfo: undefined as CostReportModel|undefined,
-    currency: computed<Currency>(() => state.baseInfo?.currency ?? 'USD'),
     isExpired: false,
-    reportDateRage: computed<string>(() => {
-        const baseDate = dayjs(state.baseInfo?.issue_date);
-        if (!baseDate) return '';
-        const lastMonth = baseDate.subtract(1, 'month');
-        const startDate = lastMonth.startOf('month').format('YYYY-MM-DD');
-        const endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
-        return `${startDate} ~ ${endDate}`;
-    }),
-    totalCost: computed<number>(() => sum(costByProviderTableData.value.map((d) => d._total_value_sum))),
-    chartOptions: computed<PieSeriesOption>(() => ({
-        color: MASSIVE_CHART_COLORS,
-        grid: {
-            containLabel: true,
-        },
-        tooltip: {
-            trigger: 'item',
-            position: 'inside',
-            formatter: (params) => {
-                const _name = storeState.providers[params.name]?.label ?? params.name;
-                const _value = numberFormatter(params.value) || '';
-                return `${params.marker} ${_name}: <b>${_value}</b>`;
-            },
-        },
-        legend: {
-            show: false,
-        },
-        series: [
-            {
-                type: 'pie',
-                radius: ['30%', '70%'],
-                center: ['50%', '50%'],
-                data: state.chartData,
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
-                },
-                avoidLabelOverlap: false,
-                label: {
-                    show: false,
-                },
-            },
-        ],
-    })),
-    chartData: [],
-    numberFormatterOption: computed<Intl.NumberFormatOptions>(() => ({ currency: state.currency, style: 'decimal', notation: 'standard' })),
+    chartData: [] as Array<{ name: string; value: number | undefined; itemStyle: { color: string } }>,
+    chart: null as EChartsType | null,
     printMode: false,
+    providerRawData: [] as CostReportDataAnalyzeResult[],
+    productRawData: [] as CostReportDataAnalyzeResult[],
+    projectRawData: [] as CostReportDataAnalyzeResult[],
+    collapsedState: {} as Record<string, boolean>,
 });
 
 const ETC = config.get('COST_REPORT.ETC_CUSTOM_LABEL') ?? 'ETC';
-
-const tableState = reactive({
-    productRawData: [] as CostReportDataAnalyzeResult[],
-    projectRawData: [] as CostReportDataAnalyzeResult[],
-    costByProductFields: computed(() => makeTableFields({
-        name: 'product',
-        label: 'Product',
-    }, state.baseInfo?.currency)),
-    costByProjectFields: computed(() => makeTableFields({
-        name: 'project_name',
-        label: 'Project',
-    }, state.baseInfo?.currency, '_total_value_sum')),
-    costByProviderFields: computed(() => ([
-        {
-            name: 'provider',
-            label: 'Provider',
-        },
-        {
-            name: '_total_value_sum',
-            label: `Amount (${CURRENCY_SYMBOL[state.baseInfo?.currency]})`,
-            textAlign: 'right',
-            sortable: false,
-        },
-    ])),
-    collapsedState: {} as Record<string, boolean>,
+const currency = computed<Currency>(() => state.baseInfo?.currency ?? 'USD');
+const numberFormatterOption = computed<Intl.NumberFormatOptions>(() => ({ currency: currency.value, style: 'decimal', notation: 'standard' }));
+const totalCost = computed<number>(() => sum(costByProviderTableData.value.map((d) => d._total_value_sum)));
+const reportDateRange = computed<string>(() => {
+    const baseDate = dayjs(state.baseInfo?.issue_date);
+    if (!baseDate) return '';
+    const lastMonth = baseDate.subtract(1, 'month');
+    const startDate = lastMonth.startOf('month').format('YYYY-MM-DD');
+    const endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
+    return `${startDate} ~ ${endDate}`;
 });
-const costByProductTableData = computed<CostReportDataAnalyzeResultByProduct>(() => getConvertedProductTableData(tableState.productRawData));
-const costByProviderTableData = computed<CostReportDataAnalyzeResult[]>(() => getSortedTableData(tableState.productRawData));
-const costByProjectTableData = computed<CostReportDataAnalyzeResult[]>(() => tableState.projectRawData.filter((d) => !d.is_adjusted));
+const chartOptions = computed<ComposeOption<PieSeriesOption>>(() => ({
+    color: MASSIVE_CHART_COLORS,
+    grid: {
+        containLabel: true,
+    },
+    tooltip: {
+        trigger: 'item',
+        position: 'inside',
+        formatter: (params) => {
+            const _name = storeState.providers[params.name]?.label ?? params.name;
+            const _value = numberFormatter(params.value) || '';
+            return `${params.marker} ${_name}: <b>${_value}</b>`;
+        },
+    },
+    legend: {
+        show: false,
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: ['30%', '70%'],
+            center: ['50%', '50%'],
+            data: state.chartData,
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                },
+            },
+            avoidLabelOverlap: false,
+            label: {
+                show: false,
+            },
+        },
+    ],
+}));
+const costByProductFields = computed(() => makeTableFields({
+    name: 'product',
+    label: 'Product',
+}));
+const costByProjectFields = computed(() => makeTableFields({
+    name: 'project_name',
+    label: 'Project',
+}, '_total_value_sum'));
+const costByProviderFields = computed(() => ([
+    {
+        name: 'provider',
+        label: 'Provider',
+    },
+    {
+        name: '_total_value_sum',
+        label: `Amount (${CURRENCY_SYMBOL[currency.value]})`,
+        textAlign: 'right',
+        sortable: false,
+    },
+]));
+const costByProductTableData = computed<CostReportDataAnalyzeResultByProduct>(() => getConvertedProductTableData(state.productRawData));
+const costByProviderTableData = computed<CostReportDataAnalyzeResult[]>(() => getSortedTableData(state.providerRawData));
+const costByProjectTableData = computed<CostReportDataAnalyzeResult[]>(() => state.projectRawData.filter((d) => !d.is_adjusted));
 const adjustedProviderData = computed<CostReportAdjustedDataAnalyzeResultByProvider>(() => {
     const results: CostReportAdjustedDataAnalyzeResultByProvider = {};
-    const adjustedData = tableState.productRawData.filter((d) => d.is_adjusted);
+    const adjustedData = state.productRawData.filter((d) => d.is_adjusted);
     adjustedData.forEach((d) => {
         results[d.provider] = d.value_sum;
     });
     return results;
 });
 const adjustedProjectData = computed<AdjustmentProductData>(() => {
-    const adjustedData = tableState.projectRawData.filter((d) => d.is_adjusted);
+    const adjustedData = state.projectRawData.filter((d) => d.is_adjusted);
     if (adjustedData.length === 0) return [];
     return adjustedData[0].value_sum;
 });
 /* Util */
-const makeTableFields = (customField:DataTableFieldType, currency:string, valueFieldName = 'value') => ([
+const makeTableFields = (customField:DataTableFieldType, valueFieldName = 'value') => ([
     {
         name: 'index',
         label: 'no',
@@ -204,7 +204,7 @@ const makeTableFields = (customField:DataTableFieldType, currency:string, valueF
     },
     {
         name: valueFieldName,
-        label: `Amount (${CURRENCY_SYMBOL[currency]})`,
+        label: `Amount (${CURRENCY_SYMBOL[currency.value]})`,
         textAlign: 'right',
         sortable: false,
     },
@@ -245,7 +245,7 @@ const drawChart = () => {
     }));
 
     state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
+    state.chart.setOption(chartOptions.value, true);
 };
 
 /* Api */
@@ -262,19 +262,19 @@ const fetchReportData = async () => {
     }
 };
 
-const fetchAnalyzeData = async (_groupBy: string[], fieldGroup?: string[]):Promise<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined> => {
+const fetchAnalyzeData = async (_groupBy: string[]):Promise<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined> => {
     try {
         return await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
             is_confirmed: true,
             query: {
-                group_by: [..._groupBy, 'is_adjusted'],
+                group_by: [..._groupBy, 'product', 'is_adjusted'],
                 fields: {
                     value_sum: {
                         key: `cost.${state.baseInfo?.currency}`,
                         operator: 'sum',
                     },
                 },
-                field_group: fieldGroup,
+                field_group: ['product'],
                 filter: [
                     {
                         k: 'cost_report_config_id',
@@ -310,14 +310,16 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
 
 const fetchTableData = async () => {
     const results = await Promise.allSettled([
-        fetchAnalyzeData(['provider', 'service_account_name', 'product'], ['product']),
-        fetchAnalyzeData(['project_name', 'product'], ['product']),
+        fetchAnalyzeData(['provider']),
+        fetchAnalyzeData(['provider', 'service_account_name']),
+        fetchAnalyzeData(['project_name']),
     ]);
-    const [costByProvider, costByProject] = results
+    const [costByProvider, costByProduct, costByProject] = results
         .filter((r) => r.status === 'fulfilled')
         .map((r) => r.value);
-    tableState.productRawData = costByProvider?.results ?? [];
-    tableState.projectRawData = costByProject?.results ?? [];
+    state.providerRawData = costByProvider?.results ?? [];
+    state.productRawData = costByProduct?.results ?? [];
+    state.projectRawData = costByProject?.results ?? [];
 };
 
 const setMetaTag = () => {
@@ -340,14 +342,14 @@ const handlePrint = () => {
 };
 
 const handleToggleServiceAccountCollapsed = (provider: string, serviceAccount: string) => {
-    tableState.collapsedState = {
-        ...tableState.collapsedState,
-        [`${provider}-${serviceAccount}`]: !tableState.collapsedState[`${provider}-${serviceAccount}`],
+    state.collapsedState = {
+        ...state.collapsedState,
+        [`${provider}-${serviceAccount}`]: !state.collapsedState[`${provider}-${serviceAccount}`],
     };
 };
 
 const handleCollapseAll = () => {
-    tableState.collapsedState = Object.keys(costByProductTableData.value).reduce((acc, key) => {
+    state.collapsedState = Object.keys(costByProductTableData.value).reduce((acc, key) => {
         Object.keys(costByProductTableData.value[key]).forEach((serviceAccount) => {
             acc[`${key}-${serviceAccount}`] = true;
         });
@@ -407,7 +409,7 @@ const handleCollapseAll = () => {
                 <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.issue_date')"
                    class="report-info"
                 >
-                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
+                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ reportDateRange }})</span>
                 </p>
             </div>
             <div class="total">
@@ -416,11 +418,11 @@ const handleCollapseAll = () => {
                 </p>
                 <div class="total-value-wrapper">
                     <div class="total-cost">
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                        <span class="total-text">{{ currencyMoneyFormatter(state.totalCost, state.numberFormatterOption) }}</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[currency] }}</span>
+                        <span class="total-text">{{ currencyMoneyFormatter(totalCost, numberFormatterOption) }}</span>
                     </div>
                     <div class="currency-value">
-                        {{ state.currency }}
+                        {{ currency }}
                     </div>
                 </div>
             </div>
@@ -470,7 +472,7 @@ const handleCollapseAll = () => {
                             {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
                         </p>
                     </div>
-                    <p-data-table :fields="tableState.costByProviderFields"
+                    <p-data-table :fields="costByProviderFields"
                                   :items="costByProviderTableData"
                                   :selectable="false"
                                   :disable-copy="true"
@@ -482,13 +484,13 @@ const handleCollapseAll = () => {
                                 <span class="legend-icon"
                                       :style="{ 'background-color': storeState.providers[value]?.color }"
                                 /><span>{{ storeState.providers[value]?.label ?? value }}</span>
-                                <span v-if="state.totalCost && !config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.percentage')"
+                                <span v-if="totalCost && !config.get('COST_REPORT.EXCLUDE.CONTENTS.provider.percentage')"
                                       class="ratio"
-                                >{{ ((item._total_value_sum / state.totalCost) * 100).toFixed(0) }}%</span>
+                                >{{ ((item._total_value_sum / totalCost) * 100).toFixed(0) }}%</span>
                             </div>
                         </template>
                         <template #col-_total_value_sum-format="{value}">
-                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
+                            {{ currencyMoneyFormatter(value, numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -519,7 +521,7 @@ const handleCollapseAll = () => {
                      class="mb-6"
                 >
                     <table-header :title="storeState.providers[providerData.provider]?.label"
-                                  :sub-total="currencyMoneyFormatter(providerData._total_value_sum, state.numberFormatterOption)"
+                                  :sub-total="currencyMoneyFormatter(providerData._total_value_sum, numberFormatterOption)"
                                   :provider-icon-src="storeState.providers[providerData.provider]?.icon"
                                   class="bg-gray-100"
                     />
@@ -529,13 +531,13 @@ const handleCollapseAll = () => {
                         <div class="service-account-collapsible-wrapper"
                              @click="handleToggleServiceAccountCollapsed(providerData.provider, serviceAccount)"
                         >
-                            <p-i :name="tableState.collapsedState[`${providerData.provider}-${serviceAccount}`] ? 'ic_chevron-right' : 'ic_chevron-down'"
+                            <p-i :name="state.collapsedState[`${providerData.provider}-${serviceAccount}`] ? 'ic_chevron-right' : 'ic_chevron-down'"
                                  class="service-account-collapsible-icon"
                             />
                             {{ serviceAccount === 'Unknown' ? ETC : serviceAccount }}
                         </div>
-                        <p-data-table v-if="!tableState.collapsedState[`${providerData.provider}-${serviceAccount}`]"
-                                      :fields="tableState.costByProductFields"
+                        <p-data-table v-if="!state.collapsedState[`${providerData.provider}-${serviceAccount}`]"
+                                      :fields="costByProductFields"
                                       :items="productData"
                                       :stripe="false"
                                       :selectable="false"
@@ -550,7 +552,7 @@ const handleCollapseAll = () => {
                                 {{ value === 'Unknown' ? ETC : value }}
                             </template>
                             <template #col-value-format="{value}">
-                                {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
+                                {{ currencyMoneyFormatter(value, numberFormatterOption) }}
                             </template>
                         </p-data-table>
                     </div>
@@ -578,7 +580,7 @@ const handleCollapseAll = () => {
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
                     </p>
                 </div>
-                <p-data-table :fields="tableState.costByProjectFields"
+                <p-data-table :fields="costByProjectFields"
                               :items="costByProjectTableData"
                               :selectable="false"
                               :disable-copy="true"
@@ -592,7 +594,7 @@ const handleCollapseAll = () => {
                         {{ value === 'Unknown' ? ETC : value }}
                     </template>
                     <template #col-_total_value_sum-format="{value}">
-                        {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
+                        {{ currencyMoneyFormatter(value, numberFormatterOption) }}
                     </template>
                 </p-data-table>
                 <template v-for="adjustedData in adjustedProjectData">
