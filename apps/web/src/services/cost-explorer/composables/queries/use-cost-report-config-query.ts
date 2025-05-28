@@ -9,7 +9,10 @@ export const useCostReportConfigQuery = () => {
     const { costReportConfigAPI } = useCostReportConfigApi();
     const { key, params } = useServiceQueryKey('cost-analysis', 'cost-report-config', 'list', {
         params: {
-            query: costReportConfigApiHelper.data,
+            query: {
+                ...costReportConfigApiHelper.data,
+                sort: [{ key: 'created_at', desc: false }],
+            },
         },
     });
     const { data, isLoading, error } = useScopedQuery({
