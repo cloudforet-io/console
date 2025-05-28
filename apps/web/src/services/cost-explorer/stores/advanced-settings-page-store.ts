@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -18,7 +19,8 @@ export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings'
         adjustmentListMap: {}, // { policy_id: [{ id, ... }] }
     }),
     getters: {
-        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList.every((item) => item.isAllWorkspaceSelected || !!item.workspaceMenuItems?.length),
+        isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList
+            .every((item) => (item.isAllWorkspaceSelected || !!item.workspaceMenuItems?.length) && !!state.adjustmentListMap[item.id]?.length),
         isAdjustmentValid: (state) => Object.values(state.adjustmentListMap)
             .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && !!adjustment.amount)),
     },
@@ -53,6 +55,7 @@ export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings'
                 description: '',
                 policyId,
             });
+            this.adjustmentListMap = cloneDeep(this.adjustmentListMap);
         },
         deleteAdjustmentPolicy(policyId: string) {
             this.adjustmentPolicyList = this.adjustmentPolicyList.filter((item) => item.id !== policyId);
