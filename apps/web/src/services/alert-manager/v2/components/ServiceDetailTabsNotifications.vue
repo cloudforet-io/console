@@ -45,6 +45,7 @@ import ServiceDetailTabsNotificationsTableModal
 import ServiceDetailTabsNotificationsUpdateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsNotificationsUpdateModal.vue';
 import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -54,7 +55,7 @@ import {
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { NotificationsModalType, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { NotificationsModalType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     tableHeight: number;
@@ -72,6 +73,8 @@ const serviceCreateFormStore = useServiceCreateFormStore();
 const router = useRouter();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -110,7 +113,6 @@ const tableState = reactive({
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const state = reactive({
     loading: false,
@@ -277,11 +279,11 @@ onUnmounted(() => {
                          height="1rem"
                     />
                     <p-lazy-img v-else
-                                :src="assetUrlConverter(getProtocolInfo(value, storeState.notificationProtocolList).icon || '')"
+                                :src="assetUrlConverter(getProtocolInfo(value, notificationProtocolListData).icon || '')"
                                 width="1rem"
                                 height="1rem"
                     />
-                    <span>{{ getProtocolInfo(value, storeState.notificationProtocolList, item.data).name }}</span>
+                    <span>{{ getProtocolInfo(value, notificationProtocolListData, item.data).name }}</span>
                 </div>
             </template>
         </p-toolbox-table>

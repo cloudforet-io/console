@@ -9,7 +9,6 @@ import {
 
 import type { ServiceChannelDisableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/disable';
 import type { ServiceChannelEnableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/enable';
-import { SERVICE_CHANNEL_FORWARD_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import { i18n } from '@/translations';
@@ -20,10 +19,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { alertManagerStateFormatter } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { NOTIFICATION_MANAGEMENT_TABLE_FIELDS } from '@/services/alert-manager/v2/constants/notification-table-constant';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolInfo, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -34,12 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
-
-const storeState = reactive({
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
-});
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
 
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
@@ -56,25 +49,6 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
-const getProtocolInfo = (id: string): ProtocolInfo => {
-    if (id === 'forward') {
-        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
-        }
-        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
-        }
-        if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
-        }
-        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
-    }
-    const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    return {
-        name: protocol?.name || '',
-        icon: protocol?.icon || '',
-    };
-};
 const handleConfirm = async () => {
     state.loading = true;
     try {
@@ -123,11 +97,11 @@ const handleConfirm = async () => {
                      height="1rem"
                 />
                 <p-lazy-img v-else
-                            :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                            :src="assetUrlConverter(getProtocolInfo(value, notificationProtocolListData).icon || '')"
                             width="1rem"
                             height="1rem"
                 />
-                <span>{{ getProtocolInfo(value).name }}</span>
+                <span>{{ getProtocolInfo(value, notificationProtocolListData).name }}</span>
             </div>
         </template>
     </p-table-check-modal>

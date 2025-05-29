@@ -15,9 +15,10 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 const ITEM_DEFAULT_WIDTH = 120 + 8;
 const DEFAULT_LEFT_PADDING = 16;
@@ -31,9 +32,10 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
     serviceChannelList: computed<ServiceChannelModel[]>(() => serviceDetailPageState.serviceChannelList.slice(0, 15)),
 });
 const state = reactive({
@@ -54,12 +56,6 @@ const handleClickArrowButton = (increment: number) => {
 
     const marginLeft = increment * state.pageStart * element.defaultWidth;
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
-};
-const getPluginIcon = (protocolId: string): string => {
-    const notificationProtocol = storeState.notificationProtocolList.find((item) => item.protocol_id === protocolId);
-    if (!notificationProtocol) return '';
-
-    return assetUrlConverter(notificationProtocol?.icon || '');
 };
 
 const handleRouteDetail = () => (
@@ -112,7 +108,7 @@ watch(() => storeState.serviceId, (serviceId) => {
                                  height="1.25rem"
                             />
                             <p-lazy-img v-else
-                                        :src="getPluginIcon(item.protocol_id)"
+                                        :src="assetUrlConverter(getProtocolInfo(item.protocol_id, notificationProtocolListData).icon || '')"
                                         width="1.25rem"
                                         height="1.25rem"
                             />

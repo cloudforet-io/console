@@ -9,8 +9,6 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { EventRuleGetParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/get';
 import type { EventRuleListParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/list';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
-import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
-import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
 import type { ServiceChannelListParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/list';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { ServiceDeleteParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/delete';
@@ -35,15 +33,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type {
     ServiceDetailTabsType,
     Service,
-    ProtocolCardItemType,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
-
 
 interface ServiceFormStoreState {
     loading: boolean;
     currentTab?: ServiceDetailTabsType;
     serviceInfo: ServiceModel;
-    notificationProtocolListData: NotificationProtocolModel[];
     selectedWebhookId?: string;
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
@@ -63,7 +58,6 @@ interface ServiceFormStoreGetters {
     serviceReferenceMap: ComputedRef<ServiceReferenceMap>;
     timezone: ComputedRef<string>;
     language: ComputedRef<string>;
-    notificationProtocolList: ComputedRef<ProtocolCardItemType[]>;
 }
 
 export const useServiceDetailPageStore = defineStore('page-service-detail', () => {
@@ -76,7 +70,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         loading: false,
         currentTab: undefined,
         serviceInfo: {} as ServiceModel,
-        notificationProtocolListData: [],
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
@@ -123,10 +116,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         serviceReferenceMap: computed(() => allReferenceGetters.service),
         timezone: computed(() => userState.timezone || 'UTC'),
         language: computed(() => userStore.state.language || 'en'),
-        notificationProtocolList: computed(() => state.notificationProtocolListData.map((i) => ({
-            ...i,
-            icon: getters.pluginsReferenceMap[i.plugin_info.plugin_id]?.icon || '',
-        }))),
     });
 
     const mutations = {
@@ -158,7 +147,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             state.loading = false;
             state.currentTab = undefined;
             state.serviceInfo = {} as ServiceModel;
-            state.notificationProtocolListData = [];
             state.selectedWebhookId = undefined;
             state.selectedNotificationId = undefined;
             state.selectedEscalationPolicyId = undefined;
@@ -213,15 +201,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 throw e;
-            }
-        },
-        async fetchNotificationProtocolList() {
-            try {
-                const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
-                state.notificationProtocolListData = results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.notificationProtocolListData = [];
             }
         },
         async fetchEventRuleList(params?: EventRuleListParameters) {
