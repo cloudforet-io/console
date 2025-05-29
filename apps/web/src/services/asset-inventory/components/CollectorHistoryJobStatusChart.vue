@@ -29,13 +29,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     succeededPercentage: computed(() => {
-        if (props.job.total_tasks > 0) {
+        if (props.job.total_tasks > 0 && props.job.success_tasks) {
             return (props.job.success_tasks / props.job.total_tasks) * 100;
         }
         return 0;
     }),
     failedPercentage: computed(() => {
-        if (props.job.total_tasks > 0) {
+        if (props.job.total_tasks > 0 && props.job.failure_tasks) {
             if (props.job.status === JOB_STATE.SUCCESS) {
                 return 100 - state.succeededPercentage;
             }

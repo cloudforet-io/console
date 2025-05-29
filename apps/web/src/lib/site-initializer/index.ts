@@ -59,11 +59,11 @@ const initRouter = (domainId?: string) => {
     )?.children;
 
     const featureRoutes = globalConfigSchemaStore.state.routeSchema;
-    if (adminChildren) {
+    if (featureRoutes.adminRoutes && adminChildren) {
         adminChildren.push(...featureRoutes.adminRoutes);
     }
 
-    if (workspaceChildren) {
+    if (featureRoutes.routes && workspaceChildren) {
         workspaceChildren.push(...featureRoutes.routes);
     }
 
