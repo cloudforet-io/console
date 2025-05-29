@@ -2,46 +2,56 @@ import { toValue } from '@vueuse/core';
 import type { Ref, ComputedRef } from 'vue';
 import { computed } from 'vue';
 
+import { omitPageFromLoadParams, omitPageQueryParams } from '@/query/pagination/pagination-query-helper';
 import { useQueryKeyAppContext } from '@/query/query-key/_composable/use-app-context-query-key';
 import { createImmutableObjectKeyItem } from '@/query/query-key/_helpers/immutable-query-key-helper';
 import type {
     QueryKeyArray, ResourceName, ServiceName, Verb,
 } from '@/query/query-key/_types/query-key-type';
 
+
 // Cache for debug logs
 // const debugLogCache = new Map<string, number>();
-// const DEBUG_LOG_THROTTLE = 1000; // 1초
+// const DEBUG_LOG_THROTTLE = 1000;
 
 
 type _MaybeRefOrGetter<T> = T | Ref<T> | ComputedRef<T> | (() => T);
 /**
- * Options for generating service query keys.
+ * Generates a stable query key for service-level queries using service, resource, verb, and optional context/params.
  *
- * While the options are provided as an object where the order of keys doesn't matter,
- * the generated query key will always follow this structure:
- *
- * ```typescript
+ * Structure:
  * [
  *   ...globalContext,
  *   service,
  *   resource,
  *   verb,
- *   contextKey?,    // Optional, appears first in namespace if present
- *   params?,        // Optional, appears second if present
+ *   contextKey?,   // optional
+ *   params?,       // optional (pagination params excluded if enabled)
  * ]
  *
- * Note: The order of keys in the options object doesn't affect the final query key structure.
- * The query key will always maintain the above order, ensuring predictable cache management.
+ * Options:
+ * - contextKey: contextual key for scoping (e.g. selected ID)
+ * - params: request parameters (ref, computed, or raw object)
+ * - pagination: if true, removes pagination fields (e.g. page/start/limit) from params by verb type
  *
- * @property contextKey - Optional key for contextual data (string, array, or object).
- *                       When present, it appears first in the namespace part of the query key,
- *                       enabling contextual cache management.
- * @property params - Optional parameters for the API request.
- *                    When present, it appears second in the namespace part of the query key.
+ * Example:
+ * useServiceQueryKey('dashboard', 'data-table', 'load', {
+ *   contextKey: selectedId,
+ *   params: computed(() => ({ page, sort, granularity })),
+ *   pagination: true, // removes 'page' from queryKey
+ * });
+ *
+ * ---
+ *
+ * @property contextKey - Optional value (string | object | array) used to scope the cache context (e.g., ID or workspace)
+ * @property params - API parameters. Can be a ref, computed, or raw object. Automatically processed if `pagination` is enabled.
+ * @property pagination - When true, removes pagination-related params (`page`, `start`, `limit`) according to the verb ('load', 'list', 'analyze', etc.)
+ *
  */
 interface UseServiceQueryKeyOptions<T extends object = object> {
     contextKey?: _MaybeRefOrGetter<ContextKeyType>;
     params?: _MaybeRefOrGetter<T>;
+    pagination?: boolean;
 }
 type ContextKeyType = string|unknown[]|object;
 
@@ -57,7 +67,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     verb: V,
     options: UseServiceQueryKeyOptions<T> = {},
 ): UseServiceQueryKeyResult<T> => {
-    const { params, contextKey } = options;
+    const { params, contextKey, pagination } = options;
 
     // Runtime validation for development environment
     if (import.meta.env.DEV) {
@@ -83,7 +93,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     });
 
     const queryKey = computed(() => {
-        const resolvedParams = toValue(params);
+        const resolvedParams = pagination ? _omitPageParamsByVerb(verb, toValue(params)) as T : toValue(params);
         return [
             ...queryKeyAppContext.value,
             service, resource, verb,
@@ -102,7 +112,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     return {
         key: queryKey,
         params: computed(() => {
-            const resolvedParams = toValue(params);
+            const resolvedParams = pagination ? _omitPageParamsByVerb(verb, toValue(params)) as T : toValue(params);
             return createImmutableObjectKeyItem(resolvedParams);
         }),
         withSuffix: (arg) => {
@@ -127,13 +137,8 @@ const _normalizeQueryKeyPart = (key: unknown): QueryKeyArray => {
     return [key];
 };
 
-// const _logQueryKeyDebug = (queryKey: QueryKeyArray) => {
-//     const now = Date.now();
-//     const key = queryKey.join('/');
-//     const lastLogTime = debugLogCache.get(key) || 0;
-
-//     if (now - lastLogTime >= DEBUG_LOG_THROTTLE) {
-//         console.debug('[QueryKey]', { queryKey });
-//         debugLogCache.set(key, now);
-//     }
-// };
+const _omitPageParamsByVerb = <S extends ServiceName, R extends ResourceName<S>>(verb: Verb<S, R>, params = {}) => {
+    if (verb === 'load') return omitPageFromLoadParams(params);
+    if (verb === 'list' || verb === 'analyze' || verb === 'stat') return omitPageQueryParams(params);
+    return params;
+};
