@@ -1,13 +1,6 @@
 <script lang="ts" setup>
-
-
-import { computed, reactive } from 'vue';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
-import type { BudgetUpdateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/update';
-import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -15,27 +8,24 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
+import { useBudgetUpdateMutation } from '@/services/cost-explorer/composables/use-budget-update-mutation';
+
 
 interface Props {
     visible: boolean;
     budgetName: string;
+    budgetId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     budgetName: '',
+    budgetId: '',
 });
 
-const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
-}>();
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
-
-const state = reactive({
-    loading: false,
-    budgetName: computed<string|undefined>(() => budgetPageState?.budgetData?.name),
-});
+const { invalidateBudgetGetQuery } = useBudgetGetQuery(props.budgetId);
 
 const {
     forms: { budgetName },
@@ -47,36 +37,33 @@ const {
 }, {
     budgetName: (val: string) => {
         if (val.length < 1) {
-            return 'nononono';
-            // return i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NAME_INVALID');
-        } if (state.budgetName?.includes(val)) {
+            return i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NAME_INVALID');
+        } if (props.budgetName?.includes(val)) {
             return true;
         }
         return true;
     },
 });
 
-const updateBudgetName = async (params: BudgetUpdateParameters) => {
-    try {
-        state.loading = true;
-        await SpaceConnector.clientV2.costAnalysis.budget.update<BudgetUpdateParameters, BudgetModel>(params);
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'), '');
+const { mutate: updateBudget, isPending: isUpdatingBudget } = useBudgetUpdateMutation({
+    onSuccess: () => {
+        invalidateBudgetGetQuery();
         emit('update:visible', false);
-    } catch (error) {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'), '');
+    },
+    onError: (error) => {
         ErrorHandler.handleError(error, true);
-    } finally {
-        state.loading = false;
-    }
-};
+    },
+});
 
 const handleCancel = () => {
     emit('update:visible', false);
 };
 
-const handleConfirm = async () => {
-    if (budgetPageState.budgetData?.budget_id) {
-        await updateBudgetName({
-            budget_id: budgetPageState.budgetData?.budget_id,
+const handleConfirm = () => {
+    if (props.budgetId) {
+        updateBudget({
+            budget_id: props.budgetId,
             name: budgetName.value,
         });
     }
@@ -87,7 +74,7 @@ const handleConfirm = async () => {
     <p-button-modal :visible="props.visible"
                     size="sm"
                     :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.UPDATE_NAME_TITLE')"
-                    :loading="state.loading"
+                    :loading="isUpdatingBudget"
                     :disabled="invalidState.budgetName"
                     @cancel="handleCancel"
                     @close="handleCancel"

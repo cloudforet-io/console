@@ -17,27 +17,30 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+
 import BudgetDetailDeleteModal from '@/services/cost-explorer/components/BudgetDetailDeleteModal.vue';
 import BudgetNameEditModal from '@/services/cost-explorer/components/BudgetNameEditModal.vue';
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+
 
 interface Props {
     loading?: boolean;
+    budgetId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
+    budgetId: '',
 });
 
 const appContextStore = useAppContextStore();
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const authorizationStore = useAuthorizationStore();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
+const { budgetData } = useBudgetGetQuery(props.budgetId);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -50,7 +53,7 @@ const state = reactive({
         { name: 'delete', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE'), icon: 'ic_delete' },
     ],
     selectedAction: '',
-    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
+    budgetData: computed<BudgetModel>(() => budgetData.value),
     isProjectTarget: computed(() => state.budgetData?.resource_group === 'PROJECT'),
     dataSourceName: computed(() => {
         if (!state.budgetData) return '';
@@ -69,10 +72,9 @@ watch(() => state, () => {
 }, { deep: true, immediate: true });
 
 /* Event */
-const handleUpdateNameEditModalVisible = () => {
+const handleUpdateNameEditModalVisible = async () => {
     state.selectedAction = '';
     state.nameEditModalVisible = false;
-    budgetPageStore.getBudgetData(state.budgetData?.budget_id ?? '');
 };
 
 const handleUpdateDelete = () => {
@@ -107,7 +109,6 @@ const handleClickBackButton = () => {
                         >
                             <template #menu-item--format="{item}">
                                 <div class="flex items-center">
-                                    <p-i :name="item.icon" />
                                     <span>{{ item.label }}</span>
                                 </div>
                             </template>
@@ -137,11 +138,14 @@ const handleClickBackButton = () => {
         </p-heading-layout>
         <budget-detail-delete-modal v-if="!props.loading"
                                     :visible="state.deleteModalVisible"
+                                    :budget-name="state.budgetData?.name"
+                                    :budget-id="state.budgetData?.budget_id"
                                     @update:visible="handleUpdateDelete"
                                     @confirm="handleConfirmDelete"
         />
         <budget-name-edit-modal :visible="state.nameEditModalVisible"
                                 :budget-name="state.budgetData?.name"
+                                :budget-id="state.budgetData?.budget_id"
                                 @update:visible="handleUpdateNameEditModalVisible"
         />
     </div>
