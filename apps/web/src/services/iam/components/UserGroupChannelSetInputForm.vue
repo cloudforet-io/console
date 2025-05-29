@@ -10,12 +10,14 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import UserGroupChannelAddFormData from '@/services/iam/components/UserGroupChannelAddFormData.vue';
-import { useNotificationProtocolGetQuery } from '@/services/iam/composables/use-notification-protocol-get-query';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -29,6 +31,7 @@ const userGroupPageState = userGroupPageStore.state;
 
 interface ChannelInfo {
   channelName: string;
+  schema: ComputedRef<JsonSchema>;
   channelData: ComputedRef<Record<string, JsonSchema>>;
   channelInput: any;
 }
@@ -38,9 +41,28 @@ interface UserModeInfo {
   users: MenuItem[]
 }
 
+const protocolId = computed<string>(() => notificationChannelCreateFormState.selectedProtocol.protocol_id);
+
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+
+const { key: notificationProtocolQueryKey, params: notificationProtocolQueryParams } = useServiceQueryKey('alert-manager', 'notification-protocol', 'get', {
+    params: computed(() => ({
+        protocol_id: protocolId.value,
+    })),
+});
+
+const { data: notificationProtocolData } = useScopedQuery({
+    queryKey: notificationProtocolQueryKey,
+    queryFn: () => notificationProtocolAPI.get(notificationProtocolQueryParams.value),
+    enabled: computed(() => !!protocolId.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
+
 const state = reactive<ChannelInfo & UserModeInfo>({
     channelName: '',
-    channelData: computed(() => notificationProtocolData.value?.plugin_info.metadata.data.schema.properties || {}),
+    schema: computed(() => notificationProtocolData.value?.plugin_info.metadata.data.schema ?? {}),
+    channelData: computed(() => state.schema.properties || {}),
     channelInput: {},
     userMode: {},
     users: [],
@@ -49,8 +71,6 @@ const state = reactive<ChannelInfo & UserModeInfo>({
 const validateState = reactive({
     schemaValid: false,
 });
-
-const { notificationProtocolData } = useNotificationProtocolGetQuery(notificationChannelCreateFormState.selectedProtocol.protocol_id);
 
 const {
     forms: {
@@ -116,6 +136,7 @@ watch(() => validateState, (nv_validate_state) => {
             </template>
         </p-field-group>
         <user-group-channel-add-form-data v-if="userGroupPageState.modal.title === $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
+                                          :schema="state.schema"
                                           @update-valid="handleUpdateValid"
         />
     </div>
