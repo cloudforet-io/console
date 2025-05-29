@@ -44,7 +44,7 @@ const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPen
     mutationFn: escalationPolicyAPI.delete,
     onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '');
-        queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey.value });
         state.proxyVisible = false;
         emit('close');
     },

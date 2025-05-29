@@ -11,7 +11,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleActionsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
@@ -20,6 +19,7 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
@@ -35,10 +35,11 @@ const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
+const { eventRuleData } = useEventRuleGetQuery();
+
 const storeState = reactive({
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((i) => ({
         name: i.name,
         label: i.label,
@@ -56,7 +57,7 @@ const state = reactive({
 });
 
 const updateStateFromEventRuleInfo = (): void => {
-    const actions = storeState.eventRuleInfo.actions;
+    const actions = eventRuleData.value?.actions;
     if (!actions) return;
 
     if (actions.change_service) {

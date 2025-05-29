@@ -74,7 +74,6 @@ export type createHeaderInfoByStep = {
 
 export interface Service extends ServiceModel {
     alerts: Record<AlertsType, AlertsInfoType>;
-    rules: number;
 }
 
 export type CreatedNotificationInfoType = {

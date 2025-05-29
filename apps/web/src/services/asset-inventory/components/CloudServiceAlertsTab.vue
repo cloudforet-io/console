@@ -143,7 +143,7 @@ const { data: alertListData, isFetching: alertListLoading } = useScopedQuery({
     staleTime: 1000 * 30,
 }, ['DOMAIN', 'WORKSPACE']);
 const refreshhAlertData = () => {
-    queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey });
+    queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey.value });
 };
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {

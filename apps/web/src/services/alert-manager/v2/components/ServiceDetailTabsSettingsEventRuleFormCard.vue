@@ -2,7 +2,8 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PCard,
     PFieldTitle,
@@ -18,10 +19,10 @@ import {
     screens,
 } from '@cloudforet/mirinae';
 
+import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 import type { EventRuleCreateParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/create';
 import type { EventRuleUpdateParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/update';
 import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import type {
     EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
@@ -43,6 +44,8 @@ import ServiceDetailTabsSettingsEventRuleActionForm
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleActionForm.vue';
 import ServiceDetailTabsSettingsEventRuleConditionForm
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleConditionForm.vue';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleConditionPolicyButtonType,
@@ -65,17 +68,20 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const { width } = useWindowSize();
 
+const queryClient = useQueryClient();
+const { eventRuleAPI } = useEventRuleApi();
+const { eventRuleData, eventRuleQueryKey } = useEventRuleGetQuery();
+const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 const state = reactive({
+    method: 'create' as 'create' | 'update',
     isMobileSize: computed(() => width.value < screens.mobile.max),
-    loading: false,
     conditionPolicy: computed<EventRuleConditionPolicyButtonType[]>(() => [
         { name: EVENT_RULE_CONDITIONS_POLICY.ALWAYS, label: i18n.t('ALERT_MANAGER.EVENT_RULE.ALWAYS') },
         { name: EVENT_RULE_CONDITIONS_POLICY.ANY, label: i18n.t('ALERT_MANAGER.EVENT_RULE.SET_CONDITION') },
@@ -169,12 +175,41 @@ const {
     name: '',
 }, {
     name(value: string) {
-        if (value === storeState.eventRuleInfo.name) return '';
-        const duplicatedName = Object.values(storeState.eventRuleList)?.find((item) => item.name === value);
+        if (value === eventRuleData.value?.name) return '';
+        const duplicatedName = Object.values(eventRuleListData.value)?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('ALERT_MANAGER.EVENT_RULE.VALIDATION_NAME_UNIQUE');
         }
         return '';
+    },
+});
+
+const { mutate: eventRuleMutation, isPending: eventRuleMutationPending } = useMutation({
+    mutationFn: (params: Partial<EventRuleCreateParameters> | Partial<EventRuleUpdateParameters>) => {
+        if (state.method === 'create') {
+            return eventRuleAPI.create(params as EventRuleCreateParameters);
+        }
+        return eventRuleAPI.update(params as EventRuleUpdateParameters);
+    },
+    onSuccess: async (data) => {
+        if (state.method === 'create') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
+        } else {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '');
+        }
+        await queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey });
+        if (!storeState.isEventRuleEditMode) {
+            await replaceUrlQuery({
+                webhookId: data.webhook_id || 'global',
+                eventRuleId: data.event_rule_id,
+            });
+        } else {
+            queryClient.invalidateQueries({ queryKey: eventRuleQueryKey });
+        }
+        await handleDeleteForm();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
     },
 });
 
@@ -192,17 +227,17 @@ const initializeState = () => {
 };
 
 const updateStateFromEventRuleInfo = () => {
-    const eventRuleInfo = storeState.eventRuleInfo;
+    const eventRuleInfo = eventRuleData.value;
 
-    setForm('name', eventRuleInfo.name || '');
-    state.selectedPolicyButton = eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
+    setForm('name', eventRuleInfo?.name || '');
+    state.selectedPolicyButton = eventRuleInfo?.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         ? EVENT_RULE_CONDITIONS_POLICY.ALWAYS
         : EVENT_RULE_CONDITIONS_POLICY.ANY;
     if (state.selectedPolicyButton !== EVENT_RULE_CONDITIONS_POLICY.ALWAYS) {
-        state.conditionsPolicy = eventRuleInfo.conditions_policy;
+        state.conditionsPolicy = eventRuleInfo?.conditions_policy;
     }
 
-    state.conditions = eventRuleInfo.conditions.map((i) => {
+    state.conditions = eventRuleInfo?.conditions?.map((i) => {
         if (i.key.includes('additional_info')) {
             return {
                 key: 'additional_info',
@@ -218,7 +253,7 @@ const updateStateFromEventRuleInfo = () => {
         operator: 'contain',
         subKey: '',
     }];
-    state.stopProcessing = eventRuleInfo.options?.stop_processing || false;
+    state.stopProcessing = eventRuleInfo?.options?.stop_processing || false;
 };
 const getWebhookIcon = (): string|undefined => {
     if (!props.selectedWebhook) return undefined;
@@ -246,47 +281,21 @@ const handleSelectPolicyButton = () => {
 const handleDeleteForm = () => {
     serviceDetailPageStore.setShowEventRuleFormCard(false);
 };
-const handleAddButton = async () => {
-    state.loading = true;
-    try {
-        const method = storeState.isEventRuleEditMode ? 'update' : 'create';
-        const response = await fetchEventRule(method);
-        await serviceDetailPageStore.fetchEventRuleList({
-            service_id: storeState.serviceId,
-        });
-        if (!storeState.isEventRuleEditMode) {
-            await replaceUrlQuery({
-                webhookId: response.webhook_id || 'global',
-                eventRuleId: response.event_rule_id,
-            });
-        }
-        await handleDeleteForm();
-    } finally {
-        state.loading = false;
-    }
-};
+const handleAddButton = () => {
+    const method = storeState.isEventRuleEditMode ? 'update' : 'create';
+    state.method = method;
 
-const fetchEventRule = async (method: 'create' | 'update') => {
-    try {
-        let response;
-        if (method === 'create') {
-            response = await SpaceConnector.clientV2.alertManager.eventRule.create<EventRuleCreateParameters>(state.refinedData);
-            showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
-        } else {
-            response = await SpaceConnector.clientV2.alertManager.eventRule.update<EventRuleUpdateParameters>({
-                event_rule_id: storeState.eventRuleInfo.event_rule_id,
-                name: state.refinedData.name,
-                conditions: state.refinedData.conditions,
-                conditions_policy: state.refinedData.conditions_policy,
-                actions: state.refinedData.actions,
-                options: state.refinedData.options,
-            });
-            showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '');
-        }
-        return response;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        throw e;
+    if (method === 'create') {
+        eventRuleMutation(state.refinedData);
+    } else {
+        eventRuleMutation({
+            event_rule_id: eventRuleData.value?.event_rule_id,
+            name: state.refinedData.name,
+            conditions: state.refinedData.conditions,
+            conditions_policy: state.refinedData.conditions_policy,
+            actions: state.refinedData.actions,
+            options: state.refinedData.options,
+        });
     }
 };
 
@@ -436,7 +445,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                     {{ $t('COMMON.BUTTONS.CANCEL') }}
                 </p-button>
                 <p-button :disabled="!state.isAllValid"
-                          :loading="state.loading"
+                          :loading="eventRuleMutationPending"
                           @click="handleAddButton"
                 >
                     {{ storeState.isEventRuleEditMode ? $t('ALERT_MANAGER.EVENT_RULE.SAVE') : $t('COMMON.BUTTONS.ADD') }}

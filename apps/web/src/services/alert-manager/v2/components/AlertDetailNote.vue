@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useNoteApi } from '@/api-clients/alert-manager/note/composables/use-note-api';
 import type { NoteCreateParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/create';
 import type { NoteDeleteParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/delete';
-import type { NoteListParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/list';
-import type { NoteModel } from '@/api-clients/alert-manager/note/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -31,13 +32,31 @@ const userState = userStore.state;
 const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const queryClient = useQueryClient();
+const { noteAPI } = useNoteApi();
 const { alertData } = useAlertGetQuery(route.params.alertId as string);
+const { key: noteListQueryKey, params: noteListQueryParams } = useServiceQueryKey('alert-manager', 'note', 'list', {
+    params: computed(() => ({
+        alert_id: alertData.value?.alert_id || '',
+        query: {
+            sort: [{ key: 'created_at', desc: true }],
+        },
+    })),
+});
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),
 });
 const state = reactive({
-    noteList: [] as NoteModel[],
+    noteList: computed(() => (noteListData.value?.results || []).map((d) => ({
+        title: d.created_by,
+        data: {
+            note: d.note,
+            note_id: d.note_id,
+        },
+        ...d,
+    }))),
     menuItems: [
         {
             label: 'Delete', name: 'delete',
@@ -45,7 +64,40 @@ const state = reactive({
     ],
     noteInput: '',
     selectedNoteId: '',
+    method: 'create' as 'create' | 'delete',
 });
+
+const { mutate: noteMutation } = useMutation({
+    mutationFn: (params: NoteCreateParameters | NoteDeleteParameters) => {
+        if (state.method === 'create') {
+            return noteAPI.create(params as NoteCreateParameters);
+        }
+        return noteAPI.delete(params as NoteDeleteParameters);
+    },
+    onSuccess: () => {
+        if (state.method === 'create') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_CREATE'), '');
+        } else {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_DELETE'), '');
+        }
+        queryClient.invalidateQueries({ queryKey: noteListQueryKey });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        state.noteInput = '';
+        state.selectedNoteId = '';
+    },
+});
+
+const { data: noteListData } = useScopedQuery({
+    queryKey: noteListQueryKey,
+    queryFn: async () => noteAPI.list(noteListQueryParams.value),
+    enabled: computed(() => !!alertData.value?.alert_id),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+}, ['WORKSPACE']);
 
 const handleChangeNoteInput = (e) => {
     state.noteInput = e.target?.value;
@@ -55,60 +107,19 @@ const handleSelect = (noteId) => {
     handleDeleteModal();
 };
 
-const handleCreateNote = async () => {
-    try {
-        await SpaceConnector.clientV2.alertManager.note.create<NoteCreateParameters, NoteModel>({
-            alert_id: alertData.value?.alert_id || '',
-            note: state.noteInput,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_CREATE'), '');
-        await fetchNoteList();
-    } catch (e: any) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.noteInput = '';
-    }
+const handleCreateNote = () => {
+    state.method = 'create';
+    noteMutation({
+        alert_id: alertData.value?.alert_id || '',
+        note: state.noteInput,
+    });
 };
-const handleDeleteModal = async () => {
-    try {
-        await SpaceConnector.clientV2.alertManager.note.delete<NoteDeleteParameters, NoteModel>({
-            note_id: state.selectedNoteId,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_DELETE'), '');
-        await fetchNoteList();
-    } catch (e: any) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.selectedNoteId = '';
-    }
+const handleDeleteModal = () => {
+    state.method = 'delete';
+    noteMutation({
+        note_id: state.selectedNoteId,
+    });
 };
-const fetchNoteList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.note.list<NoteListParameters, ListResponse<NoteModel>>({
-            alert_id: alertData.value?.alert_id || '',
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        });
-        state.noteList = (results || []).map((d) => ({
-            title: d.created_by,
-            data: {
-                note: d.note,
-                note_id: d.note_id,
-            },
-            ...d,
-        }));
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        state.noteList = [];
-        throw e;
-    }
-};
-
-watch(() => alertData.value?.alert_id, async (id) => {
-    if (!id) return;
-    await fetchNoteList();
-}, { immediate: true });
 </script>
 
 <template>

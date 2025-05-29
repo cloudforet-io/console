@@ -7,7 +7,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import { i18n } from '@/translations';
 
@@ -20,6 +19,7 @@ import { gray } from '@/styles/colors';
 import ServiceDetailDeleteModal from '@/services/alert-manager/v2/components/ServiceDetailDeleteModal.vue';
 import ServiceDetailEditModal from '@/services/alert-manager/v2/components/ServiceDetailEditModal.vue';
 import ServiceDetailMemberModal from '@/services/alert-manager/v2/components/ServiceDetailMemberModal.vue';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import { useServiceListPageStore } from '@/services/alert-manager/v2/stores/service-list-page-store';
@@ -28,7 +28,6 @@ import type { Service } from '@/services/alert-manager/v2/types/alert-manager-ty
 type ModalType = 'edit' | 'delete' | 'member' | 'alert';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const serviceListPageStore = useServiceListPageStore();
@@ -38,8 +37,9 @@ const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
+const { eventRuleListData } = useEventRuleListQuery();
+
 const storeState = reactive({
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
@@ -134,7 +134,7 @@ const handleGoBackButton = () => {
                         </template>
                     </p-heading>
                 </template>
-                <template v-if="hasReadWriteAccess && !state.isSettingMode && storeState.eventRuleList.length > 0"
+                <template v-if="hasReadWriteAccess && !state.isSettingMode && eventRuleListData.length > 0"
                           #extra
                 >
                     <p-button icon-left="ic_plus_bold"

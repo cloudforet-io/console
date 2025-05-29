@@ -107,7 +107,7 @@ const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPen
         return escalationPolicyAPI.update(params as EscalationPolicyUpdateParameters);
     },
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: escalationPolicyLisBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: escalationPolicyLisBaseQueryKey.value });
         if (props.type === 'CREATE') {
             showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
         } else {

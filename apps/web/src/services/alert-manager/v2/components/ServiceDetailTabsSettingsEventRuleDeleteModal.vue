@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { EventRuleDeleteParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/delete';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
+import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 
 interface Props {
     visible: boolean;
@@ -22,41 +23,39 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
-
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:visible'): void;
 }>();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
-});
+const queryClient = useQueryClient();
+const { eventRuleAPI } = useEventRuleApi();
+const { eventRuleData } = useEventRuleGetQuery();
+const { eventRuleListQueryKey } = useEventRuleListQuery();
+
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.eventRule.delete<EventRuleDeleteParameters>({
-            event_rule_id: storeState.eventRuleInfo.event_rule_id,
-        });
+
+const { mutate: eventRuleDeleteMutation, isPending: eventRuleDeleteMutationPending } = useMutation({
+    mutationFn: eventRuleAPI.delete,
+    onSuccess: async () => {
         await replaceUrlQuery({
             webhookId: undefined,
             eventRuleId: undefined,
         });
-        await serviceDetailPageStore.fetchEventRuleList({
-            service_id: storeState.serviceId,
-        });
-    } catch (e) {
+        queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey });
+    },
+    onError: (e) => {
         ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
+    },
+    onSettled: () => {
         handleClose();
-    }
+    },
+});
+const handleConfirm = async () => {
+    eventRuleDeleteMutation({
+        event_rule_id: eventRuleData.value?.event_rule_id || '',
+    });
 };
 const handleClose = () => {
     state.proxyVisible = false;
@@ -71,7 +70,7 @@ const handleClose = () => {
                     :fade="true"
                     :backdrop="true"
                     :visible="state.proxyVisible"
-                    :loading="state.loading"
+                    :loading="eventRuleDeleteMutationPending"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

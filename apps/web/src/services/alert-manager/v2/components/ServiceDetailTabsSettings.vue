@@ -22,6 +22,7 @@ import { red } from '@/styles/colors';
 import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
 import ServiceDetailTabsSettingsModal from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsUpdateModal.vue';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager/v2/types/alert-manager-type';
@@ -42,6 +43,8 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
+
+const { eventRuleListData } = useEventRuleListQuery();
 
 const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
@@ -155,7 +158,7 @@ onMounted(() => {
                                      height="1rem"
                                      width="1rem"
                                 />
-                                <b v-else>{{ storeState.serviceInfo.rules }}</b>
+                                <b v-else>{{ eventRuleListData?.length ?? 0 }}</b>
                                 <span class="text-label-md">{{ getCardValueInfo(item.type).text }}</span>
                             </div>
                         </div>

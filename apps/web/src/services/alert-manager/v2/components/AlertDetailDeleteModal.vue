@@ -50,7 +50,7 @@ const { mutate: alertDeleteMutate, isPending: alertDeleteLoading } = useMutation
     onSuccess: async () => {
         const serviceId = route.params?.serviceId;
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_DELETE'), '');
-        queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey.value });
         if (serviceId) {
             await router.go(-1);
         } else {

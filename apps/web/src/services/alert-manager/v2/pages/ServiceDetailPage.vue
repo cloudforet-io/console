@@ -54,9 +54,6 @@ const state = reactive({
 watch(() => props.serviceId, async (serviceId) => {
     if (!serviceId) return;
     await serviceDetailPageStore.fetchNotificationProtocolList();
-    await serviceDetailPageStore.fetchEventRuleList({
-        service_id: serviceId,
-    });
     await serviceDetailPageStore.fetchServiceDetailData(serviceId);
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });

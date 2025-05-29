@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive,
 } from 'vue';
 
 import { PButton, PDataLoader, screens } from '@cloudforet/mirinae';
 
 import { EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
-import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
@@ -19,6 +18,8 @@ import ServiceDetailTabsSettingsEventRuleScopeModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleScopeModal.vue';
 import ServiceDetailTabsSettingsEventRuleSidebar
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleSidebar.vue';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -26,13 +27,14 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { width } = useWindowSize();
 
+const { eventRuleData } = useEventRuleGetQuery();
+const { eventRuleListData, eventRuleListFetching } = useEventRuleListQuery();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
-    items: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -46,18 +48,6 @@ const handleClickAddRule = () => {
     serviceDetailPageStore.setEventRuleScopeModalVisible(true);
 };
 
-watch(() => storeState.serviceId, async (id) => {
-    if (!id) return;
-    try {
-        state.loading = true;
-        await serviceDetailPageStore.fetchEventRuleList({
-            service_id: storeState.serviceId,
-        });
-    } finally {
-        state.loading = false;
-    }
-}, { immediate: true });
-
 onUnmounted(() => {
     serviceDetailPageStore.initEscalationPolicyState();
 });
@@ -65,21 +55,20 @@ onUnmounted(() => {
 
 <template>
     <div class="service-detail-tabs-settings-event-rule pt-6 pb-10 relative">
-        <p-data-loader :loading="state.loading"
-                       :data="!storeState.showEventRuleFormCard ? storeState.items : true"
+        <p-data-loader :loading="eventRuleListFetching"
+                       :data="!storeState.showEventRuleFormCard ? eventRuleListData : true"
                        class="loader"
         >
             <div class="content-wrapper flex gap-6">
                 <service-detail-tabs-settings-event-rule-sidebar v-if="!state.isMobileSize"
                                                                  :hide-sidebar.sync="state.hideSidebar"
-                                                                 :items="storeState.items"
                 />
                 <service-detail-tabs-settings-event-rule-form-card v-if="storeState.showEventRuleFormCard"
-                                                                   :selected-webhook="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.webhook_id : state.selectedWebhook"
-                                                                   :selected-scope="storeState.isEventRuleEditMode ? storeState.eventRuleInfo.scope : state.selectedScope"
+                                                                   :selected-webhook="storeState.isEventRuleEditMode ? eventRuleData?.webhook_id : state.selectedWebhook"
+                                                                   :selected-scope="storeState.isEventRuleEditMode ? eventRuleData?.scope : state.selectedScope"
                                                                    class="flex-1"
                 />
-                <service-detail-tabs-settings-event-rule-card v-else-if="storeState.eventRuleInfo.event_rule_id"
+                <service-detail-tabs-settings-event-rule-card v-else-if="eventRuleData?.event_rule_id"
                                                               class="flex-1"
                 />
             </div>
@@ -103,7 +92,6 @@ onUnmounted(() => {
         </p-data-loader>
         <service-detail-tabs-settings-event-rule-sidebar v-if="state.isMobileSize"
                                                          :hide-sidebar.sync="state.hideSidebar"
-                                                         :items="storeState.items"
         />
         <service-detail-tabs-settings-event-rule-scope-modal v-if="hasReadWriteAccess && storeState.modalVisible"
                                                              :visible="hasReadWriteAccess && storeState.modalVisible"
