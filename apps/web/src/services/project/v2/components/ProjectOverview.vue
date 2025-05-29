@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import { computed } from 'vue';
+
+import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -8,7 +12,7 @@ import { useContentsAccessibility } from '@/common/composables/contents-accessib
 import AccountSummary from '@/services/workspace-home/shared/components/AccountSummary.vue';
 import AssetSummary from '@/services/workspace-home/shared/components/AssetSummary.vue';
 import CostSummary from '@/services/workspace-home/shared/components/CostSummary.vue';
-import { useProjectIdsFromGroup } from '@/services/workspace-home/shared/composables/use-project-ids-from-group';
+
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 
@@ -16,13 +20,24 @@ const props = defineProps<{
     projectGroupId?: string;
     projectId?: string;
 }>();
-const childProjectIds = useProjectIdsFromGroup(toRef(props, 'projectGroupId'));
+
+const { projectAPI } = useProjectApi();
+const { key: projectListQueryKey, params: projectListQueryParams } = useServiceQueryKey('identity', 'project', 'list', {
+    params: computed(() => ({
+        project_group_id: props.projectGroupId,
+        include_children: true,
+    })),
+});
+const { data: projectListData } = useScopedQuery({
+    queryKey: projectListQueryKey,
+    queryFn: () => projectAPI.list(projectListQueryParams.value),
+}, ['DOMAIN', 'WORKSPACE']);
 const projectIds = computed(() => {
     if (props.projectId) {
         return [props.projectId];
     }
     if (props.projectGroupId) {
-        return childProjectIds.value;
+        return projectListData.value?.results?.map((i) => i.project_id) ?? [];
     }
     return [];
 });
