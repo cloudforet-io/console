@@ -154,7 +154,7 @@ const handleCloseModal = () => {
     state.selectIndex = undefined;
 };
 const refreshEscalationPolicyList = () => {
-    queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey });
+    queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey.value });
 };
 
 watch(escalationPolicyListTotalCount, (totalCount) => {

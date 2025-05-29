@@ -259,7 +259,7 @@ const labelMenuItemsHandler = (): AutocompleteHandler => async (inputText: strin
 };
 
 const refetchAlertList = () => {
-    queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey });
+    queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey.value });
 };
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
