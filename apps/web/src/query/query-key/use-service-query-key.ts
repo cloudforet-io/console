@@ -98,6 +98,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
             ...queryKeyAppContext.value,
             service, resource, verb,
             ...memoizedContextKey.value,
+            ...(pagination ? ['pagination'] : []),
             ...(resolvedParams ? [createImmutableObjectKeyItem(resolvedParams)] : []),
         ];
     });
