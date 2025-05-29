@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PIconButton, PCard, PSelectDropdown, PCheckbox,
+    PButton, PIconButton, PCard, PSelectDropdown, PCheckbox, PButtonModal,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+
+import type { Currency } from '@/store/display/type';
 
 import getRandomId from '@/lib/random-id-generator';
 import { VariableModelFactory } from '@/lib/variable-models';
@@ -17,10 +19,28 @@ import type {
 } from '@/lib/variable-models/variable-model-menu-handler';
 
 import AdvancedSettingsAdjustmentsForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentsForm.vue';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
+import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
+
+
+const emit = defineEmits<{(e: 'sync-currency', policyIdList: string[]): void; }>();
 
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
+const { costReportConfig } = useCostReportConfigQuery();
+const { reportAdjustmentList } = useReportAdjustmentQuery();
+
+const state = reactive({
+    syncCurrencyModalVisible: false,
+});
+const originCostReportConfigCurrency = computed<Currency|undefined>(() => costReportConfig.value?.currency);
+const differentCurrencyPolicyIds = computed<string[]>(() => {
+    const ids = reportAdjustmentList.value
+        ?.filter((d) => d.currency !== originCostReportConfigCurrency.value)
+        .map((d) => d.report_adjustment_policy_id) ?? [];
+    return Array.from(new Set(ids));
+});
 
 const workspaceMenuHandler = computed<AutocompleteHandler>(() => {
     const variableModelInfo: VariableModelMenuHandlerInfo = {
@@ -56,6 +76,13 @@ const handleAddAdjustmentPolicy = () => {
 const handleDeleteAdjustmentPolicy = (policyId: string) => {
     advancedSettingsPageStore.deleteAdjustmentPolicy(policyId);
 };
+const handleOpenSyncCurrencyModal = () => {
+    state.syncCurrencyModalVisible = true;
+};
+const handleSyncCurrency = () => {
+    emit('sync-currency', differentCurrencyPolicyIds.value);
+    state.syncCurrencyModalVisible = false;
+};
 </script>
 
 <template>
@@ -66,6 +93,14 @@ const handleDeleteAdjustmentPolicy = (policyId: string) => {
                       @click="handleAddAdjustmentPolicy"
             >
                 {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.ADD_ADJUSTMENT_GROUP') }}
+            </p-button>
+            <p-button v-if="differentCurrencyPolicyIds.length > 0"
+                      style-type="negative-primary"
+                      icon-left="ic_warning-filled"
+                      size="sm"
+                      @click="handleOpenSyncCurrencyModal"
+            >
+                {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.SYNC_EXCHANGE_RATE') }}
             </p-button>
         </div>
         <draggable :list="advancedSettingsPageState.adjustmentPolicyList"
@@ -114,6 +149,19 @@ const handleDeleteAdjustmentPolicy = (policyId: string) => {
                 <advanced-settings-adjustments-form :policy-id="adjustmentPolicy.id" />
             </p-card>
         </draggable>
+        <p-button-modal class="sync-currency-modal"
+                        size="sm"
+                        theme-color="alert"
+                        :visible.sync="state.syncCurrencyModalVisible"
+                        :header-title="$t('COST_EXPLORER.ADVANCED_SETTINGS.SYNC_EXCHANGE_RATE')"
+                        @confirm="handleSyncCurrency"
+        >
+            <template #body>
+                <div class="whitespace-pre-line">
+                    {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.SYNC_EXCHANGE_RATE_MODAL_DESC') }}
+                </div>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
@@ -124,6 +172,7 @@ const handleDeleteAdjustmentPolicy = (policyId: string) => {
     width: 100%;
     gap: 1rem;
     .sidebar-contents-header {
+        @apply flex items-center justify-between;
         margin-bottom: 1rem;
     }
     .draggable-item-group {

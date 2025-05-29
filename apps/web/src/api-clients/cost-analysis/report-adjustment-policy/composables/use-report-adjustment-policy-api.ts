@@ -6,8 +6,10 @@ import type { ReportAdjustmentPolicyCreateParameters } from '@/api-clients/cost-
 import type { ReportAdjustmentPolicyDeleteParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/delete';
 import type { ReportAdjustmentPolicyGetParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/get';
 import type { ReportAdjustmentPolicyListParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/list';
+import type { ReportAdjustmentPolicySyncCurrencyParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/sync-currency';
 import type { ReportAdjustmentPolicyUpdateParameters } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/api-verbs/update';
 import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/report-adjustment-policy/schema/model';
+
 
 
 interface UseReportAdjustmentPolicyApiReturn {
@@ -18,6 +20,7 @@ interface UseReportAdjustmentPolicyApiReturn {
         delete: (params: ReportAdjustmentPolicyDeleteParameters) => Promise<ReportAdjustmentPolicyModel>;
         changeOrder: (params: ReportAdjustmentPolicyChangeOrderParameters) => Promise<ReportAdjustmentPolicyModel>;
         get: (params: ReportAdjustmentPolicyGetParameters) => Promise<ReportAdjustmentPolicyModel>;
+        syncCurrency: (params: ReportAdjustmentPolicySyncCurrencyParameters) => Promise<ReportAdjustmentPolicyModel>;
     }
 }
 
@@ -29,6 +32,7 @@ export const useReportAdjustmentPolicyApi = (): UseReportAdjustmentPolicyApiRetu
         delete: SpaceConnector.clientV2.costAnalysis.reportAdjustmentPolicy.delete<ReportAdjustmentPolicyDeleteParameters, ReportAdjustmentPolicyModel>,
         changeOrder: SpaceConnector.clientV2.costAnalysis.reportAdjustmentPolicy.changeOrder<ReportAdjustmentPolicyChangeOrderParameters, ReportAdjustmentPolicyModel>,
         get: SpaceConnector.clientV2.costAnalysis.reportAdjustmentPolicy.get<ReportAdjustmentPolicyGetParameters, ReportAdjustmentPolicyModel>,
+        syncCurrency: SpaceConnector.clientV2.costAnalysis.reportAdjustmentPolicy.syncCurrency<ReportAdjustmentPolicySyncCurrencyParameters, ReportAdjustmentPolicyModel>,
     };
 
     return {
