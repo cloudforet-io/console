@@ -13,7 +13,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolGetParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/get';
 import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
 import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
 import type { UserGroupChannelGetParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/get';
@@ -197,15 +196,13 @@ const handleUpdateModal = async (modalType: string) => {
             } = result;
 
             if (protocol_id) {
-                const protocolResult = await fetchGetNotificationProtocol({
-                    protocol_id,
-                });
+                const protocolResult = userGroupPageState.protocolList?.find((protocol) => protocol.protocol_id === protocol_id);
 
-                if (protocolResult && storeState.plugins[protocolResult.plugin_info.plugin_id] !== undefined) {
+                if (protocolResult && storeState.plugins[protocolResult?.plugin_info.plugin_id] !== undefined) {
                     notificationChannelCreateFormStore.$patch((_state) => {
                         _state.state.selectedProtocol.protocol_id = protocol_id;
-                        _state.state.selectedProtocol.icon = storeState.plugins[protocolResult.plugin_info.plugin_id]?.icon || '';
-                        _state.state.selectedProtocol.name = protocolResult.name;
+                        _state.state.selectedProtocol.icon = storeState.plugins[protocolResult?.plugin_info.plugin_id]?.icon || '';
+                        _state.state.selectedProtocol.name = protocolResult?.name;
                         _state.state.channelName = name;
                         _state.state.scheduleInfo = {
                             SCHEDULE_TYPE: schedule.SCHEDULE_TYPE,
@@ -323,16 +320,6 @@ watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChann
         isDeleteAble.value = false;
     }
 }, { deep: true, immediate: true });
-
-/* API */
-const fetchGetNotificationProtocol = async (params: NotificationProtocolGetParameters) => {
-    try {
-        return await SpaceConnector.clientV2.alertManager.notificationProtocol.get<NotificationProtocolGetParameters, NotificationProtocolModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        return null;
-    }
-};
 
 
 const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): Promise<UserGroupChannelModel | undefined> => {
