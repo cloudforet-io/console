@@ -247,6 +247,19 @@ const handleSave = async () => {
         state.loading = false;
     }
 };
+const handleSyncCurrency = async (policyIdList: string[]) => {
+    try {
+        await Promise.all(policyIdList.map(async (policyId) => {
+            await reportAdjustmentPolicyAPI.syncCurrency({
+                report_adjustment_policy_id: policyId,
+            });
+        }));
+        showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SYNC_EXCHANGE_RATE'), '');
+        queryClient.invalidateQueries({ queryKey: raQueryKey });
+    } catch (error) {
+        ErrorHandler.handleRequestError(error, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_SYNC_EXCHANGE_RATE'));
+    }
+};
 
 /* Watcher */
 watch([
@@ -267,7 +280,7 @@ watch([
                           @close="handleClose"
         >
             <div class="sidebar-contents">
-                <advanced-settings-adjustment-group-form />
+                <advanced-settings-adjustment-group-form @sync-currency="handleSyncCurrency" />
             </div>
             <template #footer>
                 <div class="footer-wrapper">
