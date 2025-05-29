@@ -537,6 +537,18 @@ export const API_DOC = {
             'verify-plugin',
         ],
     },
+    notification: {
+        protocol: [
+            'create',
+            'delete',
+            'disable',
+            'enable',
+            'get',
+            'list',
+            'update-plugin',
+            'update',
+        ],
+    },
     opsflow: {
         comment: [
             'create',
