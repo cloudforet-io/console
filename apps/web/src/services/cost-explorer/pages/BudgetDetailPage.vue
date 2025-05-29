@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-
 import BudgetDetailBaseInformation from '@/services/cost-explorer/components/BudgetDetailBaseInformation.vue';
 import BudgetDetailHeading from '@/services/cost-explorer/components/BudgetDetailHeading.vue';
 import BudgetUsageTrend from '@/services/cost-explorer/components/BudgetUsageTrend.vue';
@@ -10,10 +8,6 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
     budgetId: '',
-});
-
-const state = reactive({
-    isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
 });
 </script>
 

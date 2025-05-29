@@ -26,11 +26,9 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 
 interface Props {
-    loading?: boolean;
     budgetId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
-    loading: false,
     budgetId: '',
 });
 
@@ -40,7 +38,7 @@ const authorizationStore = useAuthorizationStore();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
-const { budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData, isFetching } = useBudgetGetQuery(props.budgetId);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -93,11 +91,11 @@ const handleClickBackButton = () => {
     <div class="budget-detail-heading">
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading :show-back-button="!props.loading"
+                <p-heading :show-back-button="!isFetching"
                            :title="state.budgetData?.name"
                            @click-back-button="handleClickBackButton"
                 >
-                    <template v-if="!props.loading"
+                    <template v-if="!isFetching"
                               #title-right-extra
                     >
                         <p-select-dropdown v-if="hasReadWriteAccess && (state.isProjectTarget && storeState.isWorkspaceOwner) && !storeState.isAdminMode"
@@ -136,7 +134,7 @@ const handleClickBackButton = () => {
                 </div>
             </template> -->
         </p-heading-layout>
-        <budget-detail-delete-modal v-if="!props.loading"
+        <budget-detail-delete-modal v-if="!isFetching"
                                     :visible="state.deleteModalVisible"
                                     :budget-name="state.budgetData?.name"
                                     :budget-id="state.budgetData?.budget_id"
