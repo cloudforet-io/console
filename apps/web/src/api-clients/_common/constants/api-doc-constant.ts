@@ -95,6 +95,22 @@ export const API_DOC = {
             'analyze',
             'list',
         ],
+        'report-adjustment-policy': [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+            'change-order',
+        ],
+        'report-adjustment': [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+            'change-order',
+        ],
         'data-source': [
             'get',
             'list',

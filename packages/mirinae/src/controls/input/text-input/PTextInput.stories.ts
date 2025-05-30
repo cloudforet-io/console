@@ -58,6 +58,9 @@ const Template: Story = {
                         :page-size="pageSize"
                         :hide-spin-button="hideSpinButton"
             >
+                <template v-if="inputLeftSlot" #input-left>
+                    <span v-html="inputLeftSlot"></span>
+                </template>
                 <template v-if="inputRightSlot" #input-right>
                     <span v-html="inputRightSlot"></span>
                 </template>
@@ -447,6 +450,10 @@ export const Slots: Story = {
         components: { PTextInput, PButton },
         template: `
             <div>
+                <p class="text-lg font-bold mb-4">input-left slot</p>
+                <p-text-input type="number" multi-input v-model="value" >
+                    <template #input-left>left</template>
+                </p-text-input>
                 <p class="text-lg font-bold mb-4">input-right slot</p>
                 <p-text-input type="number" multi-input v-model="value" >
                     <template #input-right>%</template>

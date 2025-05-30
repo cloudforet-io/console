@@ -63,7 +63,10 @@ export const useCostReportPageStore = defineStore('page-cost-report', () => {
         try {
             state.reportConfigLoading = true;
             const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
-                query: fetchApiHelper.data,
+                query: {
+                    ...fetchApiHelper.data,
+                    sort: [{ key: 'created_at', desc: false }],
+                },
             });
             state.costReportConfig = results?.[0];
         } catch (e) {
@@ -121,7 +124,7 @@ export const useCostReportPageStore = defineStore('page-cost-report', () => {
         try {
             state.recentReportDataLoading = true;
             const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
-                status: 'SUCCESS',
+                status: 'DONE',
                 query: {
                     only: ['report_month', 'issue_date'],
                     filter: [

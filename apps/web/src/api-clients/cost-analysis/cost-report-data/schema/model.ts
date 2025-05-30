@@ -19,4 +19,8 @@ export interface CostReportDataModel {
     workspace_id: string;
     domain_id: string;
     created_at: string;
+    is_adjusted: boolean;
+    region_code: string;
+    region_key: string;
+    report_adjustment_policy_id: string;
 }

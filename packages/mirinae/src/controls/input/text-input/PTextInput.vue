@@ -10,6 +10,13 @@
              @keyup.esc.capture.stop="hideMenu"
              @click.stop="handleClickInput"
         >
+            <span v-if="$slots['input-left']"
+                  class="input-left"
+            >
+                <slot name="input-left"
+                      v-bind="{ value }"
+                />
+            </span>
             <div class="tag-container">
                 <template v-if="proxySelected.length > 0 && multiInput">
                     <template v-if="appearanceType === 'stack'">
@@ -608,7 +615,7 @@ export default defineComponent({
             }
         }
 
-        > .right-extra, > .input-right {
+        > .right-extra, > .input-right, > .input-left {
             @apply text-gray-400;
             display: inline-flex;
             flex-shrink: 0;

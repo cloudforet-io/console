@@ -11,6 +11,9 @@ import { i18n } from '@/translations';
 
 import { useDomainConfigStore } from '@/store/config/domain-config-store';
 
+import AdvancedSettingsCostReportConfiguration from '@/services/cost-explorer/components/AdvancedSettingsCostReportConfiguration.vue';
+import AdvancedSettingsCurrencyConverter from '@/services/cost-explorer/components/AdvancedSettingsCurrencyConverter.vue';
+
 const domainConfigStore = useDomainConfigStore();
 
 const route = useRoute();
@@ -25,22 +28,23 @@ const state = reactive({
 </script>
 
 <template>
-    <section class="cost-advanced-settings-container">
+    <section class="admin-cost-advanced-settings-configuration">
         <p-heading class="mb-6"
                    :title="state.headingTitle"
         />
         <div class="page-content-wrapper">
-            <router-view />
+            <advanced-settings-currency-converter />
+            <advanced-settings-cost-report-configuration />
         </div>
     </section>
 </template>
 
 <style lang="postcss" scoped>
-.cost-advanced-settings-container {
+.admin-cost-advanced-settings-configuration {
     .page-content-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
     }
 }
 </style>

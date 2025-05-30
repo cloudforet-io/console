@@ -20,6 +20,11 @@ export interface CostReportConfigModel {
         data_sources: string[];
     };
     language?: LanguageCode;
+    scope: 'WORKSPACE'|'PROJECT';
+    adjustment_options?: {
+        enabled: boolean;
+        period: number;
+    };
     domain_id: string;
     created_at: string;
     updated_at: string;

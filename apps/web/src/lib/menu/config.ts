@@ -35,8 +35,6 @@ export const MENU_ID = Object.freeze({
     DOMAIN_INFORMATION: 'domain_information',
     APPEARANCE: 'appearance',
     AUTO_DORMANCY_CONFIGURATION: 'auto_dormancy_configuration',
-    ANOMALY_DETECTION_DOMAIN_CONFIGURATION: 'anomaly_detection_domain_configuration',
-    CURRENCY_CONVERTER: 'currency_converter',
     WORKSPACES: 'workspaces',
     WORKSPACE_GROUP: 'workspace_group',
     BOOKMARK: 'bookmark',

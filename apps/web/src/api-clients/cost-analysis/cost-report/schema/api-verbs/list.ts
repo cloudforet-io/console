@@ -5,8 +5,9 @@ import type { CostReportStatus } from '@/api-clients/cost-analysis/cost-report/s
 
 export interface CostReportListParameters {
     query?: Query;
+    cost_report_config_id?: string;
     cost_report_id?: string;
     status?: CostReportStatus;
     issue_date?: string;
-    workspace_name?: string;
+    name?: string;
 }

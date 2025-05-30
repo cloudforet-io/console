@@ -12,9 +12,12 @@ export interface CostReportModel {
     issue_date: string;
     report_year: string;
     report_month: string;
-    workspace_name: string;
+    name: string;
     cost_report_config_id: string;
     workspace_id: string;
+    project_id: string;
+    service_account_id: string;
+    is_adjusted: boolean;
     domain_id: string;
     bank_name: string;
     currency_date: string;

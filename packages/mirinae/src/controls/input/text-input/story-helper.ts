@@ -474,6 +474,20 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
             control: 'text',
         },
+        inputLeftSlot: {
+            name: 'input-left',
+            description: 'Slot on the left of the input.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: null,
+                },
+                category: 'slots',
+            },
+            control: 'text',
+        },
         // events
         onUpdateValue: {
             name: 'update:value',
