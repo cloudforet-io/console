@@ -105,12 +105,22 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
 
     // Watches the `thisPage` ref and automatically fetches all pages up to that index
     // Ensures that the page requested by the consumer is available in the data list
-    watch(thisPage, async (val) => {
-        const currentLength = query.data.value?.pages?.length ?? 0;
-        if (val > currentLength && !query.isFetchingNextPage.value) {
-            const calls = Array.from({ length: val - currentLength });
-            await Promise.all(calls.map(() => query.fetchNextPage()));
+    const fetchUntilPageLoaded = (targetPage: number) => {
+        const current = query.data.value?.pages?.length ?? 0;
+
+        if (current >= targetPage) return;
+
+        if (!query.isFetchingNextPage.value) {
+            query.fetchNextPage().then(() => {
+                setTimeout(() => fetchUntilPageLoaded(targetPage), 0);
+            });
+        } else {
+            setTimeout(() => fetchUntilPageLoaded(targetPage), 50);
         }
+    };
+
+    watch(thisPage, (val) => {
+        fetchUntilPageLoaded(val);
     });
 
     // Clear cached pages when page size changes to avoid inconsistent pagination data
