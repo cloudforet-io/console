@@ -24,7 +24,7 @@ export const useBudgetGetQuery = (budgetId: string) => {
         enabled: computed(() => !!budgetId),
     }, ['DOMAIN', 'WORKSPACE']);
 
-    const isLoading = computed<boolean>(() => budgetDataQuery.isFetching.value);
+    const isFetching = computed<boolean>(() => budgetDataQuery.isFetching.value);
 
     const queryClient = useQueryClient();
 
@@ -39,7 +39,7 @@ export const useBudgetGetQuery = (budgetId: string) => {
     return {
         budgetAPI,
         budgetData: computed<BudgetModel|any>(() => (budgetDataQuery.data.value ?? {})),
-        isLoading,
+        isFetching,
         budgetGetQueryKey,
         setQueryData,
         invalidateBudgetGetQuery,

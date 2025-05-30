@@ -18,7 +18,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import { useBudgetApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-api';
 import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { SpaceRouter } from '@/router';
@@ -40,15 +39,13 @@ import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BudgetDeleteCheckModal from '@/services/cost-explorer/components/BudgetDeleteCheckModal.vue';
 import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToolset.vue';
+import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
 import { BUDGET_SEARCH_HANDLERS } from '@/services/cost-explorer/constants/budget-constant';
 import { BUDGET_EXCEL_FIELDS } from '@/services/cost-explorer/constants/budget-table-constant';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-
-
 
 interface Props {
   modalVisible: boolean;
@@ -84,8 +81,8 @@ interface BudgetQuery {
 }
 
 /* Query */
-const { budgetAPI } = useBudgetApi();
 const { budgetUsageAPI } = useBudgetUsageApi();
+const { budgetAPI, isFetching } = useBudgetQuery();
 
 const props = withDefaults(defineProps<Props>(), {
     modalVisible: false,
@@ -99,8 +96,6 @@ const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
 const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
-const budgetCreatePageStore = useBudgetCreatePageStore();
-const budgetCreatePageState = budgetCreatePageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
 const projectReferenceStore = useProjectReferenceStore();
@@ -116,7 +111,7 @@ const state = reactive<BudgetMainListState>({
     modalVisible: false,
     queryFilters: queryHelper.setFiltersAsRawQueryString(currentRoute.query.filters).filters,
     pageStart: 1,
-    pageLimit: 24,
+    pageLimit: 15,
     period: {},
     query: undefined,
     isExpiredBudgetsHidden: false,
@@ -237,13 +232,11 @@ const handleQuery = (query: BudgetQuery) => {
 };
 
 const handleDeleteConfirm = async () => {
-    budgetCreatePageState.loading = true;
     try {
         await fetchBudgets();
         await listBudgetUsages();
     } finally {
         state.selectedIndex = [];
-        budgetCreatePageState.loading = false;
     }
 };
 
@@ -376,8 +369,6 @@ const fetchBudgetUsages = async () => {
 
 
 const fetchBudgets = async () => {
-    if (state.loading) return;
-
     const filters = getBudgetFilters();
 
     const { results, total_count } = await budgetAPI.list({
@@ -499,7 +490,9 @@ onMounted(async () => {
                              exportable
                              search-type="query"
                              searchable
+                             :page-size="state.pageLimit"
                              :total-count="state.totalCount"
+                             :loading="isFetching"
                              :select-index="state.selectedIndex"
                              :key-item-sets="BUDGET_SEARCH_HANDLERS"
                              :value-handler-map="tableState.valueHandlerMap"
