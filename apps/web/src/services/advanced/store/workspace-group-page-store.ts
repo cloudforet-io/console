@@ -230,7 +230,11 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         fetchCostReportConfig: async () => {
             if (workspaceTabState.costReportConfig !== null) return;
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
+                    query: {
+                        sort: [{ key: 'created_at', desc: false }],
+                    },
+                });
                 workspaceTabState.costReportConfig = results?.[0];
             } catch (e) {
                 ErrorHandler.handleError(e);
