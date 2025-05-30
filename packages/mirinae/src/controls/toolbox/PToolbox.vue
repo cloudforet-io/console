@@ -249,7 +249,7 @@ export default defineComponent({
             pageMenu: computed<SelectDropdownMenuItem[]>(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
                 return props.pageSizeOptions.map((d) => ({
-                    name: `${d}`, label: `${d}`, type: 'item',
+                    name: d, label: `${d}`, type: 'item',
                 }));
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy]?.[0]?.label : proxyState.sortBy)),
@@ -289,7 +289,7 @@ export default defineComponent({
             });
         };
 
-        const onChangePageSize = (pageSize) => {
+        const onChangePageSize = (pageSize: number) => {
             proxyState.pageSize = pageSize;
             emitChange({ pageLimit: pageSize });
         };
