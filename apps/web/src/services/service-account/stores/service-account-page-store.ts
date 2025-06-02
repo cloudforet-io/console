@@ -165,7 +165,11 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         fetchCostReportConfig: async () => {
             if (state.costReportConfig !== null) return;
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+                const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
+                    query: {
+                        sort: [{ key: 'created_at', desc: false }],
+                    },
+                });
                 state.costReportConfig = results?.[0];
             } catch (e) {
                 ErrorHandler.handleError(e);
