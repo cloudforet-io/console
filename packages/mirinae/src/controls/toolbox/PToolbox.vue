@@ -249,7 +249,7 @@ export default defineComponent({
             pageMenu: computed<SelectDropdownMenuItem[]>(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
                 return props.pageSizeOptions.map((d) => ({
-                    name: d, label: `${d}`, type: 'item',
+                    name: `${d}`, label: `${d}`, type: 'item',
                 }));
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy]?.[0]?.label : proxyState.sortBy)),
@@ -289,9 +289,15 @@ export default defineComponent({
             });
         };
 
-        const onChangePageSize = (pageSize: number) => {
-            proxyState.pageSize = pageSize;
-            emitChange({ pageLimit: pageSize });
+        const onChangePageSize = (pageSize: string) => {
+            const converted = Number(pageSize);
+
+            if (Number.isNaN(converted)) {
+                console.warn('[PToolbox] pageSizeOptions must be the array of number:', pageSize);
+                return;
+            }
+            proxyState.pageSize = converted;
+            emitChange({ pageLimit: converted });
         };
 
         const onChangeSortBy = (sortBy) => {
