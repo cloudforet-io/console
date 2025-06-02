@@ -2127,6 +2127,7 @@
 			"CONFIRM_DATE_EXCEEDS_MONTH_END": "The confirmation date cannot exceed the last day of the month.",
 			"COST_REPORT_ADJUSTMENTS": "Cost Report Adjustments",
 			"COST_REPORT_CONFIGURATION": "Cost Report Configuration",
+			"COST_REPORT_CURRENCY": "Cost Report Currency",
 			"CURRENCY_CONVERTER": "Currency Converter",
 			"DAYS_AFTER_REPORT": "Days After Report Issuance",
 			"DESCRIPTION": "Description",
@@ -2173,6 +2174,7 @@
 		"CURRENCY_CONVERTER": "Currency Converter",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "Aggregation Date",
+			"COST_ANALYSIS_CURRENCY": "Cost Analysis Currency",
 			"CURRENCY_CONVERTER": "Currency Converter",
 			"EXCHANGE_RATE_SOURCE": "Exchange Rate Source",
 			"LAST_DAY_OF_THE_MONTH": "Last day of the month",
