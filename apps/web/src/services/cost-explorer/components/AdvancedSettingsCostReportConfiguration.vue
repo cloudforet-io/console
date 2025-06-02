@@ -271,6 +271,7 @@ watch(() => costReportConfig.value, (val) => {
                 <p-button style-type="tertiary"
                           icon-left="ic_settings"
                           class="mt-4"
+                          :disabled="!state.enableAdjustments"
                           @click="handleOpenAdjustmentsOverlay"
                 >
                     {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.SET_ADJUSTMENTS') }}
