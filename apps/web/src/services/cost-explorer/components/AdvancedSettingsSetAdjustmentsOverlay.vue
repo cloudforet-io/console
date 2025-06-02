@@ -51,7 +51,7 @@ const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustme
 
 const state = reactive({
     loading: false,
-    createdPolicyIdMap: new Map<string, string>(),
+    createdPolicyIdMap: new Map<string, string>(), // Map to store new policy IDs
 });
 const workspaceReferenceMap = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
 const isAllValid = computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid);
