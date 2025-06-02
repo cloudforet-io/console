@@ -289,7 +289,7 @@ export default defineComponent({
             });
         };
 
-        const onChangePageSize = (pageSize: string) => {
+        const onChangePageSize = (pageSize) => {
             const converted = Number(pageSize);
 
             if (Number.isNaN(converted)) {
