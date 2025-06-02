@@ -154,7 +154,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesInitMap({});
         setLoadingWidgets(false);
         state.showDateRangeNotification = true;
-        state.selectedWorkspaceId = undefined;
     };
     const setDashboardInfoStoreStateV2 = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
