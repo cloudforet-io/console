@@ -6,7 +6,6 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 import type { RawLocation } from 'vue-router/types/router';
 
-import { useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -24,7 +23,6 @@ import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/exp
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
@@ -52,7 +50,7 @@ import {
     getAlertUrgencyI18n,
     makeTriggeredValueHandler,
 } from '@/services/alert-manager/v2/composables/alert-table-data';
-import { useAlertListQuery } from '@/services/alert-manager/v2/composables/use-alert-list-query';
+import { useAlertListPaginationQuery } from '@/services/alert-manager/v2/composables/use-alert-list-pagination-query';
 import {
     ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
@@ -124,8 +122,6 @@ const state = reactive({
 });
 const filters = ref<Record<string, string[]>>({});
 const filterState = reactive({
-    pageStart: 1,
-    pageLimit: 15,
     sortKey: 'created_at',
     sortDesc: true,
     consoleFilters: computed<ConsoleFilter[]>(() => {
@@ -203,14 +199,23 @@ const filterState = reactive({
     ])),
 });
 
-const queryClient = useQueryClient();
+const paginationState = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
+
 const alertListApiQueryHelper = new ApiQueryHelper();
-const { key: alertListBaseQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
-const { alertListData, alertListTotalCount, alertListFetching } = useAlertListQuery({
+
+const {
+    data: alertListData,
+    totalCount: alertListTotalCount,
+    isLoading: alertListLoading,
+    refresh: refreshAlertList,
+} = useAlertListPaginationQuery({
+    thisPage: computed(() => paginationState.thisPage),
+    pageSize: computed(() => paginationState.pageSize),
     params: computed<AlertListParameters>(() => {
         alertListApiQueryHelper
-            .setPage(filterState.pageStart, filterState.pageLimit)
-            .setSort(filterState.sortKey, filterState.sortDesc)
             .setFilters([...filterState.consoleFilters]);
 
         if (storeState.period.start && storeState.period.end && (storeState.period.start === storeState.period.end)) {
@@ -223,13 +228,17 @@ const { alertListData, alertListTotalCount, alertListFetching } = useAlertListQu
                 alertListApiQueryHelper.addFilter({ k: 'created_at', v: storeState.period.end, o: '<=' });
             }
         }
-
         alertListApiQueryHelper.addFilter(...queryTagHelper.filters.value);
         return {
-            query: alertListApiQueryHelper.data,
+            query: {
+                ...alertListApiQueryHelper.data,
+                sort: [{ key: filterState.sortKey, desc: filterState.sortDesc }],
+            },
         };
     }),
 });
+
+
 
 const labelMenuItemsHandler = (): AutocompleteHandler => async (inputText: string, pageStart = 1, pageLimit = 10) => {
     try {
@@ -258,9 +267,6 @@ const labelMenuItemsHandler = (): AutocompleteHandler => async (inputText: strin
     }
 };
 
-const refetchAlertList = () => {
-    queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey.value });
-};
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
         return storeState.webhook[id]?.label || id;
@@ -344,8 +350,8 @@ const handleChange = async (options: any = {}) => {
         await replaceUrlQuery('filters', queryTagHelper.getURLQueryStringFilters());
         await alertPageStore.setSelectedSearchFilter(queryTagHelper.getURLQueryStringFilters());
     }
-    if (options.pageStart !== undefined) filterState.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) filterState.pageLimit = options.pageLimit;
+    // if (options.pageStart !== undefined) filterState.pageStart = options.pageStart;
+    // if (options.pageLimit !== undefined) filterState.pageLimit = options.pageLimit;
 };
 const handleClickSettings = () => {
     state.visibleCustomFieldModal = true;
@@ -451,10 +457,6 @@ watch(() => storeState.serviceId, (serviceId) => {
         handleSelectServiceDropdownItem(serviceId);
     }
 });
-watch(alertListTotalCount, (totalCount) => {
-    if (!totalCount || state.listTotalCount === totalCount) return;
-    state.listTotalCount = totalCount || 0;
-});
 
 (async () => {
     const {
@@ -498,8 +500,10 @@ watch(alertListTotalCount, (totalCount) => {
                          :class="{'is-service-page': state.isServicePage}"
                          :sort-desc="true"
                          :query-tags="queryTags"
-                         :loading="alertListFetching"
-                         :total-count="state.listTotalCount"
+                         :this-page.sync="paginationState.thisPage"
+                         :page-size.sync="paginationState.pageSize"
+                         :loading="alertListLoading"
+                         :total-count="alertListTotalCount"
                          :fields="state.fields"
                          :items="alertListData"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
@@ -507,7 +511,7 @@ watch(alertListTotalCount, (totalCount) => {
                          settings-visible
                          @change="handleChange"
                          @click-settings="handleClickSettings"
-                         @refresh="refetchAlertList"
+                         @refresh="refreshAlertList"
                          @export="handleExportToExcel"
         >
             <template v-if="!state.isServicePage"
@@ -680,7 +684,7 @@ watch(alertListTotalCount, (totalCount) => {
                             :resource-type="state.isServicePage ? 'service.alert' : 'alertManager.alert'"
                             :default-field="state.defaultFields"
                             @update:visible="handleVisibleCustomFieldModal"
-                            @complete="refetchAlertList"
+                            @complete="refreshAlertList"
                             @custom-field-loaded="handleCustomFieldUpdate"
         />
         <custom-date-modal :visible.sync="state.customRangeModalVisible"
