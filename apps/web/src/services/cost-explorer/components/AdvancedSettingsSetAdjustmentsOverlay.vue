@@ -176,6 +176,7 @@ const createAdjustment = async (adjustment: AdjustmentData, idx: number) => {
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
         order: idx + 1,
+        currency: costReportConfig.value?.currency,
     });
 };
 const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
