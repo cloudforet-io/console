@@ -24,6 +24,8 @@ import type { CostReportConfigUpdateParameters } from '@/api-clients/cost-analys
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 import { languages } from '@/store/user/constant';
 import type { LanguageCode } from '@/store/user/type';
 
@@ -45,6 +47,7 @@ const queryClient = useQueryClient();
 const state = reactive({
     // Base Settings
     selectedLanguage: undefined as LanguageCode | undefined,
+    selectedCurrency: undefined as Currency | undefined,
     lastDayOfMonth: false,
     // Auto Apply Adjustments
     enableAdjustments: false as boolean,
@@ -60,6 +63,7 @@ const isSaveDisabled = computed<boolean>(() => {
     if (!costReportConfig.value?.cost_report_config_id) return true;
     return !isAllValid.value;
 });
+const currencyMenuList = Object.values(CURRENCY).map((currency) => ({ label: `${CURRENCY_SYMBOL[currency]} ${currency}`, name: currency }));
 
 const {
     forms: {
@@ -130,6 +134,7 @@ const handleSave = () => {
             enabled: state.enableAdjustments,
             period: manualAdjustablePeriod.value,
         },
+        currency: state.selectedCurrency,
     });
 };
 
@@ -147,6 +152,7 @@ const handleOpenAdjustmentsOverlay = () => {
 watch(() => costReportConfig.value, (val) => {
     if (val) {
         state.selectedLanguage = val.language;
+        state.selectedCurrency = val.currency;
         setForm('issueDate', val.issue_day);
         if (!val.is_last_day) {
             setForm('issueDate', val.issue_day);
@@ -175,6 +181,16 @@ watch(() => costReportConfig.value, (val) => {
                     <p-select-dropdown
                         :menu="languageMenuList"
                         :selected.sync="state.selectedLanguage"
+                        class="w-48"
+                    />
+                </p-field-group>
+
+                <p-field-group :label="$t('COST_EXPLORER.ADVANCED_SETTINGS.COST_REPORT_CURRENCY')"
+                               required
+                >
+                    <p-select-dropdown
+                        :menu="currencyMenuList"
+                        :selected.sync="state.selectedCurrency"
                         class="w-48"
                     />
                 </p-field-group>
