@@ -127,7 +127,7 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
             >
                 {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.NOTIFICATION') }}
             </p-scoped-notification>
-            <p-field-group :label="$t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY')"
+            <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.COST_ANALYSIS_CURRENCY')"
                            required
             >
                 <p-select-dropdown class="currency-dropdown"

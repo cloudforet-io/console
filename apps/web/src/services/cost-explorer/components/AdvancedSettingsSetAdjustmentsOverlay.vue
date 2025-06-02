@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -51,6 +53,7 @@ const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustme
 
 const state = reactive({
     loading: false,
+    createdPolicyIdMap: new Map<string, string>(), // Map to store new policy IDs
 });
 const workspaceReferenceMap = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
 const isAllValid = computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid);
@@ -123,13 +126,14 @@ const deleteAdjustmentPolicy = async (): Promise<string[]> => {
     return deletedPolicyIds;
 };
 const createAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
-    await reportAdjustmentPolicyAPI.create({
+    const createdPolicy = await reportAdjustmentPolicyAPI.create({
         cost_report_config_id: costReportConfigId.value,
         policy_filter: {
             workspace_ids: policy.workspaceMenuItems?.map((item) => item.name) || [],
         },
         order: idx + 1,
     });
+    state.createdPolicyIdMap.set(policy.id, createdPolicy.report_adjustment_policy_id);
 };
 const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
     const oldPolicy = originalPolicies.value.find((p) => p.report_adjustment_policy_id === policy.id);
@@ -168,14 +172,16 @@ const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     });
 };
 const createAdjustment = async (adjustment: AdjustmentData, idx: number) => {
+    const createdPolicyId = state.createdPolicyIdMap.get(adjustment.policyId) || adjustment.policyId;
     await reportAdjustmentAPI.create({
-        report_adjustment_policy_id: adjustment.policyId,
+        report_adjustment_policy_id: createdPolicyId,
         name: adjustment.name,
         provider: adjustment.provider,
         unit: adjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED',
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
         order: idx + 1,
+        currency: costReportConfig.value?.currency,
     });
 };
 const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
@@ -267,7 +273,10 @@ watch([
     () => isReportAdjustmentLoading.value,
     () => isReportAdjustmentPolicyLoading.value,
 ], ([visible, _isReportAdjustmentLoading, _isReportAdjustmentPolicyLoading]) => {
-    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) initForm();
+    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) {
+        state.createdPolicyIdMap.clear();
+        initForm();
+    }
 });
 </script>
 
