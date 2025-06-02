@@ -14,15 +14,16 @@ import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
 interface Props {
     data: any;
+    budgetId: string;
 }
 
 interface MonthData {
@@ -36,11 +37,10 @@ interface DataByMonth {
 
 const props = defineProps<Props>();
 
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
+const { budgetData } = useBudgetGetQuery(props.budgetId);
+
 const appContextStore = useAppContextStore();
 
-const budgetData = computed(() => budgetPageStore.$state.budgetData);
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
 
@@ -213,7 +213,7 @@ const handleToggleOriginalData = (value: boolean) => {
                     <span class="block text-right px-4">
                         <template v-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET')">
                             <p class="font-bold text-gray-900">
-                                {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
+                                {{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }}
                                 {{
                                     state.isOriginalData ? Number(value).toFixed(2).toLocaleString()
                                     : formatNumberToShort(value)
@@ -221,16 +221,16 @@ const handleToggleOriginalData = (value: boolean) => {
                             </p>
                         </template>
                         <template v-else-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND')">
-                            {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
+                            {{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }}
                             {{ state.isOriginalData
                                 ? value.toLocaleString()
                                 : formatNumberToShort(value) }}
                         </template>
                         <template v-else-if="item.category ===$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACCUMULATED_USAGE')">
-                            <p :class="{ exceeded: budgetPageState.budgetData
-                                && value > budgetPageState.budgetData?.limit }"
+                            <p :class="{ exceeded: budgetData
+                                && value > budgetData?.limit }"
                             >
-                                {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
+                                {{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }}
                                 {{ state.isOriginalData ? value.toLocaleString() : formatNumberToShort(value) }}
                             </p>
                         </template>
@@ -243,7 +243,7 @@ const handleToggleOriginalData = (value: boolean) => {
                         </template>
                         <template v-else-if="item.category === $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.BUDGET_REMAINING')">
                             <p :class="{exceeded: value < 0, 'exceeded-budget': value < 0}">
-                                {{ CURRENCY_SYMBOL[budgetPageState.budgetData?.currency ?? 'KRW'] }}
+                                {{ CURRENCY_SYMBOL[budgetData?.currency ?? 'KRW'] }}
                                 {{ !state.isOriginalData
                                     ? formatNumberToShort(Math.abs(value.toFixed(2)))
                                     : Math.abs(value).toLocaleString() }}
@@ -266,12 +266,12 @@ const handleToggleOriginalData = (value: boolean) => {
                         filters: arrayToQueryString([
                             {
                                 k: 'project_id',
-                                v: budgetPageState.budgetData?.project_id ? [budgetPageState.budgetData.project_id] : [],
+                                v: budgetData?.project_id ? [budgetData.project_id] : [],
                                 o: '',
                             },
                             {
                                 k: 'service_account_id',
-                                v: budgetPageState.budgetData?.service_account_id ? [budgetPageState.budgetData.service_account_id] : [],
+                                v: budgetData?.service_account_id ? [budgetData.service_account_id] : [],
                                 o: '',
                             },
                         ]),
