@@ -458,12 +458,6 @@ watch(() => storeState.serviceId, (serviceId) => {
     }
 });
 
-watch(() => paginationState.pageSize, (pageSize, prevPageSize) => {
-    if (pageSize !== prevPageSize) {
-        paginationState.thisPage = 1;
-    }
-});
-
 (async () => {
     const {
         serviceId, status, urgency, filters: queryFilters, labels, period, range,
