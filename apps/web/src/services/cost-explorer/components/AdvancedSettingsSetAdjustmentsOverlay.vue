@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
@@ -273,11 +273,10 @@ watch([
     () => isReportAdjustmentLoading.value,
     () => isReportAdjustmentPolicyLoading.value,
 ], ([visible, _isReportAdjustmentLoading, _isReportAdjustmentPolicyLoading]) => {
-    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) initForm();
-});
-
-onMounted(() => {
-    state.createdPolicyIdMap.clear();
+    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) {
+        state.createdPolicyIdMap.clear();
+        initForm();
+    }
 });
 </script>
 
