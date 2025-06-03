@@ -58,16 +58,18 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
                     @confirm="handleClose"
     >
         <template #body>
-            <h1 class="notice-popup-title">
-                {{ props.item ? props.item.title : '' }}
-            </h1>
-            <div class="notice-popup-info">
-                <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, userStore.state.timezone) }} · {{ item.writer }}</span>
+            <div class="pr-2">
+                <h1 class="notice-popup-title">
+                    {{ props.item ? props.item.title : '' }}
+                </h1>
+                <div class="notice-popup-info">
+                    <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, userStore.state.timezone) }} · {{ item.writer }}</span>
+                </div>
+                <p-divider class="!my-4" />
+                <text-editor-viewer :contents="editorContents"
+                                    :contents-type="contentsType"
+                />
             </div>
-            <p-divider class="!my-4" />
-            <text-editor-viewer :contents="editorContents"
-                                :contents-type="contentsType"
-            />
         </template>
         <template #footer-extra>
             <p-button style-type="tertiary"
