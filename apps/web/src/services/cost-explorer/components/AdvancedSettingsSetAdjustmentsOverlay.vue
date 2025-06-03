@@ -222,34 +222,35 @@ const handleSave = async () => {
     try {
         // CUD Adjustment Policy
         const deletedPolicyIds = await deleteAdjustmentPolicy();
-        await Promise.all(formPolicies.value.map(async (policy, idx) => {
+        const policyPromises = formPolicies.value.map(async (policy, idx) => {
             if (policy.id.startsWith('rap-')) {
-                await updateAdjustmentPolicy(policy, idx);
-            } else {
-                await createAdjustmentPolicy(policy, idx);
+                return updateAdjustmentPolicy(policy, idx);
             }
-        }));
+            return createAdjustmentPolicy(policy, idx);
+        });
+        await Promise.all(policyPromises);
 
         // CUD Adjustment
         await deleteAdjustment(deletedPolicyIds);
-        await Promise.all(formPolicies.value.map(async (policy) => {
+        const adjustmentPromises = formPolicies.value.flatMap(async (policy) => {
             const adjustments = formAdjustments.value.filter((adjustment) => adjustment.policyId === policy.id);
-            await Promise.all(adjustments.map(async (adjustment, idx) => {
+            return adjustments.map(async (adjustment, idx) => {
                 if (adjustment.id.startsWith('ra-')) {
-                    await updateAdjustment(adjustment, idx);
-                } else {
-                    await createAdjustment(adjustment, idx);
+                    return updateAdjustment(adjustment, idx);
                 }
-            }));
-        }));
-
-        queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
-        queryClient.invalidateQueries({ queryKey: raQueryKey.value });
+                return createAdjustment(adjustment, idx);
+            });
+        });
+        await Promise.all(adjustmentPromises.flat());
 
         showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SAVE_COST_REPORT_ADJUSTMENTS'), '');
     } catch (error) {
         ErrorHandler.handleRequestError(error, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_SAVE_COST_REPORT_ADJUSTMENTS'));
     } finally {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: rapQueryKey.value }),
+            queryClient.invalidateQueries({ queryKey: raQueryKey.value }),
+        ]);
         state.loading = false;
     }
 };
