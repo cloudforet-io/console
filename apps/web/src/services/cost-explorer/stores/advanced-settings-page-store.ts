@@ -22,7 +22,7 @@ export const useAdvancedSettingsPageStore = defineStore('page-advanced-settings'
         isAdjustmentPolicyValid: (state) => state.adjustmentPolicyList
             .every((item) => (item.isAllWorkspaceSelected || !!item.workspaceMenuItems?.length) && !!state.adjustmentListMap[item.id]?.length),
         isAdjustmentValid: (state) => Object.values(state.adjustmentListMap)
-            .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && !!adjustment.amount)),
+            .every((item) => item.every((adjustment) => adjustment.name && adjustment.provider && adjustment.adjustment && !!adjustment.amount && Number(adjustment.amount) > 0)),
     },
     actions: {
         setLoading(state: AdvancedSettingsPageStore['loading']) {
