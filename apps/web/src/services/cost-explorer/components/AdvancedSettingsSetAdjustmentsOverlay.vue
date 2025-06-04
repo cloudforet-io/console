@@ -152,12 +152,10 @@ const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
         await reportAdjustmentPolicyAPI.update(newPolicy);
     }
     const newOrder = idx + 1;
-    if (oldPolicy?.order !== newOrder) {
-        await reportAdjustmentPolicyAPI.changeOrder({
-            report_adjustment_policy_id: policy.id,
-            order: newOrder,
-        });
-    }
+    await reportAdjustmentPolicyAPI.changeOrder({
+        report_adjustment_policy_id: policy.id,
+        order: newOrder,
+    });
 };
 const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     const deletedAdjustmentIds: string[] = originalAdjustments.value
@@ -205,12 +203,10 @@ const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
         await reportAdjustmentAPI.update(newAdjustment);
     }
     const newOrder = idx + 1;
-    if (oldAdjustment?.order !== newOrder) {
-        await reportAdjustmentAPI.changeOrder({
-            report_adjustment_id: adjustment.id,
-            order: newOrder,
-        });
-    }
+    await reportAdjustmentAPI.changeOrder({
+        report_adjustment_id: adjustment.id,
+        order: newOrder,
+    });
 };
 
 /* Event */
@@ -222,27 +218,27 @@ const handleSave = async () => {
     try {
         // CUD Adjustment Policy
         const deletedPolicyIds = await deleteAdjustmentPolicy();
-        const policyPromises = formPolicies.value.map(async (policy, idx) => {
+        await formPolicies.value.reduce(async (promise, policy, idx) => {
+            await promise;
             if (policy.id.startsWith('rap-')) {
                 return updateAdjustmentPolicy(policy, idx);
             }
             return createAdjustmentPolicy(policy, idx);
-        });
-        await Promise.all(policyPromises);
+        }, Promise.resolve());
 
         // CUD Adjustment
         await deleteAdjustment(deletedPolicyIds);
-        const adjustmentPromises = formPolicies.value.flatMap(async (policy) => {
+        await formPolicies.value.reduce(async (promise, policy) => {
+            await promise;
             const adjustments = formAdjustments.value.filter((adjustment) => adjustment.policyId === policy.id);
-            return adjustments.map(async (adjustment, idx) => {
+            return adjustments.reduce(async (adjPromise, adjustment, idx) => {
+                await adjPromise;
                 if (adjustment.id.startsWith('ra-')) {
                     return updateAdjustment(adjustment, idx);
                 }
                 return createAdjustment(adjustment, idx);
-            });
-        });
-        const resolvedAdjustments = await Promise.all(adjustmentPromises);
-        await Promise.all(resolvedAdjustments.flat());
+            }, Promise.resolve());
+        }, Promise.resolve());
 
         showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SAVE_COST_REPORT_ADJUSTMENTS'), '');
     } catch (error) {
