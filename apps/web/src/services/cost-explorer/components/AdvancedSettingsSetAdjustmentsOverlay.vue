@@ -248,6 +248,7 @@ const handleSave = async () => {
             queryClient.invalidateQueries({ queryKey: rapQueryKey.value }),
             queryClient.invalidateQueries({ queryKey: raQueryKey.value }),
         ]);
+        initForm();
         state.loading = false;
     }
 };
