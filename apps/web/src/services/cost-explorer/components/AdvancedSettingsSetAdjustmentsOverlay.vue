@@ -241,7 +241,8 @@ const handleSave = async () => {
                 return createAdjustment(adjustment, idx);
             });
         });
-        await Promise.all(adjustmentPromises.flat());
+        const resolvedAdjustments = await Promise.all(adjustmentPromises);
+        await Promise.all(resolvedAdjustments.flat());
 
         showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SAVE_COST_REPORT_ADJUSTMENTS'), '');
     } catch (error) {
