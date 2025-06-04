@@ -108,7 +108,7 @@ const state = reactive({
     selectableDataTableItems: computed(() => dataTableList.value.map((d) => ({
         name: d.data_table_id,
         label: d.name,
-        icon: d.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
+        icon: d?.data_type === DATA_TABLE_TYPE.TRANSFORMED ? 'ic_transform-data' : 'ic_service_data-sources',
     }))),
     selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
     errorModalCurrentType: undefined as 'default'|'geoMap'|undefined,

@@ -415,7 +415,7 @@ const handleSelectSourceItem = (selectedItem: string) => {
 
 const handleClickDeleteDataTable = async () => {
     const isExistingDataTableInTransformed = dataTableList.value.find((dataTable) => {
-        const isTransformedData = dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED;
+        const isTransformedData = dataTable?.data_type === DATA_TABLE_TYPE.TRANSFORMED;
         if (!isTransformedData) return undefined;
         const isDualDataTableOperator = dataTable.operator === DATA_TABLE_OPERATOR.CONCAT || dataTable.operator === DATA_TABLE_OPERATOR.JOIN;
         const operatorOptions = (dataTable.options ?? {})[dataTable.operator ?? ''];

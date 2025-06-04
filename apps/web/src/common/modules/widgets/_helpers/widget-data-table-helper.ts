@@ -96,7 +96,7 @@ export const createDataTableReferenceMap = (dataTableList: DataTableModel[]): Re
     savedDataTables.forEach((dataTable) => {
         const currentRef = getOrCreateReference(dataTable.data_table_id);
 
-        if (dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED && dataTable.operator) {
+        if (dataTable?.data_type === DATA_TABLE_TYPE.TRANSFORMED && dataTable?.operator) {
             const operatorOptions = dataTable.options[dataTable.operator] as (ConcatOptions | JoinOptions | { data_table_id?: string });
 
             if (MULTIPE_DATA_TABLE_OPERATORS.includes(dataTable.operator)) {

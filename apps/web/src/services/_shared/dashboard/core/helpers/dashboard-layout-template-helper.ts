@@ -36,7 +36,7 @@ const _fetchWidgetDataTables = async (widgetId: string, costDataSource: CostData
         if (!results) return undefined;
         const refinedResults = cloneDeep(results);
         results.forEach((r, idx) => {
-            if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
+            if (r?.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
                 const dataSourceId = r.options.COST?.data_source_id || '';
                 refinedResults[idx].options.COST.plugin_id = costDataSource[dataSourceId]?.data?.plugin_info?.plugin_id;
                 refinedResults[idx].options.COST.data_source_id = undefined;
@@ -74,7 +74,7 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
             operator: dt.operator,
             options: dt.options,
         };
-        if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+        if (dt?.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
             const operatorOptions = dt.options[dt.operator];
             if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
                 const dataTableIds = operatorOptions?.data_tables;

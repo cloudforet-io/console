@@ -66,7 +66,7 @@ const convertConsoleFiltersToMetricFilter = (filters?: ConsoleFilter[]): MetricF
 };
 const getRecursiveDataTableIds = (prevValue: string[] = [], dataTable: DataTableModel, dataTables: DataTableModel[]): string[] => {
     let _results: string[] = [];
-    if (dataTable.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+    if (dataTable?.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
         if (dataTable.operator === 'JOIN' || dataTable.operator === 'CONCAT') {
             const _dataTableIds = dataTable?.options?.[dataTable.operator]?.data_tables ?? [];
             const _dataTables = dataTables.filter((d) => _dataTableIds.includes(d.data_table_id));

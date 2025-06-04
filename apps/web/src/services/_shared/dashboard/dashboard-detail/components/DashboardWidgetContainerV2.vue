@@ -271,7 +271,7 @@ const listWidgetDataTables = async (widgetId: string) => {
         if (!results) return [];
         const _refinedResults = cloneDeep(results);
         results.forEach((r, idx) => {
-            if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
+            if (r?.data_type === DATA_TABLE_TYPE.ADDED && r?.source_type === 'COST') {
                 const _dataSourceId = r.options.COST?.data_source_id;
                 _refinedResults[idx].options.COST.plugin_id = storeState.costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
                 _refinedResults[idx].options.COST.data_source_id = undefined;
@@ -294,7 +294,7 @@ const getRefinedDataTables = (dataTableList: DataTableModel[]) => {
             operator: dt.operator,
             options: dt.options,
         };
-        if (dt.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
+        if (dt?.data_type === DATA_TABLE_TYPE.TRANSFORMED) {
             if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
                 const _dataTableIds = dt.options[dt.operator]?.data_tables;
                 const _dataTableIndices = _dataTableIds?.map((dtId) => dataTableList.findIndex((d) => d.data_table_id === dtId));
