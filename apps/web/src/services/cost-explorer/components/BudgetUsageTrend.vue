@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import { PCard } from '@cloudforet/mirinae';
 
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+import BudgetUsageTrendMonthly from '@/services/cost-explorer/components/BudgetUsageTrendMonthly.vue';
+import BudgetUsageTrendTotal from '@/services/cost-explorer/components/BudgetUsageTrendTotal.vue';
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 
-import BudgetUsageTrendMonthly from './BudgetUsageTrendMonthly.vue';
-import BudgetUsageTrendTotal from './BudgetUsageTrendTotal.vue';
 
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
+interface Props {
+    budgetId: string;
+}
 
-const budgetData = computed(() => budgetPageState.budgetData);
+const props = defineProps<Props>();
+
+const { budgetData } = useBudgetGetQuery(props.budgetId);
 </script>
 
 <template>
@@ -20,10 +21,10 @@ const budgetData = computed(() => budgetPageState.budgetData);
             :header="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.TITLE')"
     >
         <div v-if="budgetData?.time_unit === 'MONTHLY'">
-            <budget-usage-trend-monthly />
+            <budget-usage-trend-monthly :budget-id="props.budgetId" />
         </div>
         <div v-else-if="budgetData?.time_unit === 'TOTAL'">
-            <budget-usage-trend-total />
+            <budget-usage-trend-total :budget-id="props.budgetId" />
         </div>
     </p-card>
 </template>

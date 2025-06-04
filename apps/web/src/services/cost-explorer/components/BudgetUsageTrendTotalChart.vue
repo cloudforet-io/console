@@ -15,7 +15,9 @@ import {
     gray, indigo, peacock, red,
 } from '@/styles/colors';
 
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+
 
 const budgetpageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetpageStore.$state;
@@ -23,9 +25,12 @@ const budgetPageState = budgetpageStore.$state;
 
 interface Props {
     data: any;
+    budgetId: string;
 }
 
 const props = defineProps<Props>();
+
+const { budgetData } = useBudgetGetQuery(props.budgetId);
 
 const chartContext = ref<HTMLElement|null>(null);
 
@@ -154,7 +159,7 @@ const drawChart = (rawData: {
         accumulatedData.push(accumulatedValue);
     });
 
-    const threshold = Number(budgetPageState.budgetData?.limit ?? 0);
+    const threshold = Number(budgetData.value?.limit ?? 0);
 
     const accumulatedBelow: (number | null)[] = [];
     const accumulatedAbove: (number | null)[] = [];

@@ -10,4 +10,5 @@ export interface BudgetUpdateParameters {
     end?: string;
     utilization_rate?: number;
     tags?: Tags;
+    budget_manager_id?: string;
 }

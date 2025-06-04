@@ -1,48 +1,60 @@
 import { useMutation } from '@tanstack/vue-query';
 
-import type { BudgetUpdateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/update';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
 
+export interface BudgetUpdateMutationContext {
+    type: 'BUDGET_MANAGER' | 'BUDGET_PLAN' | 'BUDGET_ALERT' | 'BUDGET_NAME';
+  }
+
+const formatMutationType = (type: BudgetUpdateMutationContext['type']): string => type
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
 interface UseBudgetUpdateMutationOptions {
-    onSuccess?: (data: BudgetModel, variables: BudgetUpdateParameters, type: string) => void|Promise<void>;
-    onError?: (error: Error, variables: BudgetUpdateParameters) => void|Promise<void>;
-    onSettled?: (data: BudgetModel|undefined, error: Error|null, variables: BudgetUpdateParameters) => void|Promise<void>;
+    context?: BudgetUpdateMutationContext;
+    onSuccess?: (data: BudgetModel) => void|Promise<void>;
+    onError?: (error: Error) => void|Promise<void>;
+    onSettled?: (data: BudgetModel|undefined, error: Error|null) => void|Promise<void>;
 }
+
 
 export const useBudgetUpdateMutation = (options: UseBudgetUpdateMutationOptions) => {
     const { budgetAPI, queryClient } = useBudgetQuery();
     const { withSuffix: budgetGetQueryKey } = useServiceQueryKey('cost-analysis', 'budget', 'get');
 
     const {
-        onSuccess, onError, onSettled,
+        context, onSuccess, onError, onSettled,
     } = options;
 
-    // Accept __mutationType and remove it before calling API (for internal use)
-    const updateBudgetFn = async (
-        params: BudgetUpdateParameters & { __mutationType?: string },
-    ): Promise<BudgetModel> => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { __mutationType, ...pureParams } = params;
-        return budgetAPI.update(pureParams as BudgetUpdateParameters);
-    };
-
     return useMutation({
-        mutationFn: updateBudgetFn,
-        onSuccess: async (data, variables) => {
-            const _budgetId = variables.budget_id;
-            queryClient.setQueryData(budgetGetQueryKey(_budgetId), data);
+        mutationFn: budgetAPI.update,
+        onSuccess: async (data) => {
+            if (context?.type) {
+                queryClient.setQueryData(budgetGetQueryKey(data.budget_id), data);
+                if (context.type === 'BUDGET_NAME') {
+                    showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'), '');
+                } else {
+                    const formattedType = formatMutationType(context.type);
+                    showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
+                        data: formattedType,
+                    }), '');
+                }
+            }
 
-            const type = (variables as any).__mutationType ?? 'unknown';
-            if (onSuccess) await onSuccess(data, variables, type);
+            if (onSuccess) await onSuccess(data);
         },
-        onError: async (error, variables) => {
-            if (onError) await onError(error, variables);
+        onError: async (error) => {
+            if (onError) await onError(error);
         },
-        onSettled: async (data, error, variables) => {
-            if (onSettled) await onSettled(data, error, variables);
+        onSettled: async (data, error) => {
+            if (onSettled) await onSettled(data, error);
         },
     });
 };
