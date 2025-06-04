@@ -152,12 +152,10 @@ const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
         await reportAdjustmentPolicyAPI.update(newPolicy);
     }
     const newOrder = idx + 1;
-    if (oldPolicy?.order !== newOrder) {
-        await reportAdjustmentPolicyAPI.changeOrder({
-            report_adjustment_policy_id: policy.id,
-            order: newOrder,
-        });
-    }
+    await reportAdjustmentPolicyAPI.changeOrder({
+        report_adjustment_policy_id: policy.id,
+        order: newOrder,
+    });
 };
 const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     const deletedAdjustmentIds: string[] = originalAdjustments.value
@@ -205,12 +203,10 @@ const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
         await reportAdjustmentAPI.update(newAdjustment);
     }
     const newOrder = idx + 1;
-    if (oldAdjustment?.order !== newOrder) {
-        await reportAdjustmentAPI.changeOrder({
-            report_adjustment_id: adjustment.id,
-            order: newOrder,
-        });
-    }
+    await reportAdjustmentAPI.changeOrder({
+        report_adjustment_id: adjustment.id,
+        order: newOrder,
+    });
 };
 
 /* Event */
