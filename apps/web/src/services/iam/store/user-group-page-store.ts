@@ -47,7 +47,6 @@ interface UserGroupPageState {
         selectedIndices: number[];
         searchFilters: ConsoleFilter[];
     }
-    protocolList?: any[];
     modal: ModalState;
 }
 
@@ -76,7 +75,6 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
             selectedIndices: [],
             searchFilters: [],
         },
-        protocolList: [],
         modal: {
             type: '',
             title: '',
@@ -127,7 +125,6 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
                 selectedIndices: [],
                 searchFilters: [],
             };
-            state.protocolList = [];
             state.modal = {
                 type: '',
                 title: '',

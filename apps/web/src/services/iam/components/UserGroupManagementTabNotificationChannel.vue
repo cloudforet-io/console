@@ -13,8 +13,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
-import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
 import type { UserGroupChannelGetParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/get';
 import type { UserGroupChannelListParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/list';
 import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/api-clients/alert-manager/user-group-channel/schema/constants';
@@ -22,6 +21,8 @@ import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-gro
 import type {
     UserGroupChannelScheduleInfoType,
 } from '@/api-clients/alert-manager/user-group-channel/schema/type';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -49,11 +50,10 @@ const props = defineProps<Props>();
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
-
-const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
-
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 const channelListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userGroupPageState.userGroupChannels.pageStart)
@@ -116,11 +116,7 @@ const tableState = reactive({
 const state = reactive({
     loading: false,
     channelName: '',
-    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList?.map((protocol) => ({
-        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
-        label: protocol.name,
-        value: protocol.protocol_id,
-    })) ?? []),
+    protocols: [],
     dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
         MON: i18n.t('COMMON.SCHEDULE_SETTING.MON'),
         TUE: i18n.t('COMMON.SCHEDULE_SETTING.TUE'),
@@ -134,7 +130,25 @@ const state = reactive({
 
 const totalCount = ref(0);
 
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+const { key: notificationProtocolListQueryKey } = useServiceQueryKey('alert-manager', 'notification-protocol', 'list');
+
+const { data: notificationProtocolListData } = useScopedQuery({
+    queryKey: notificationProtocolListQueryKey,
+    queryFn: async () => notificationProtocolAPI.list(),
+    select: (data) => data.results?.map((i) => ({
+        plugin_info: i.plugin_info,
+        name: i.name,
+        protocol_id: i.protocol_id,
+        icon: storeState.plugins[i.plugin_info.plugin_id]?.icon || '',
+    })),
+    enabled: computed(() => Object.keys(storeState.plugins).length > 0),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
+
 /* Component */
+const getProtocolInfo = (id: string) => notificationProtocolListData.value?.find((i) => i.protocol_id === id);
 const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
     try {
         const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
@@ -196,13 +210,13 @@ const handleUpdateModal = async (modalType: string) => {
             } = result;
 
             if (protocol_id) {
-                const protocolResult = userGroupPageState.protocolList?.find((protocol) => protocol.protocol_id === protocol_id);
+                const protocolResult = notificationProtocolListData.value?.find((protocol) => protocol.protocol_id === protocol_id);
 
                 if (protocolResult && storeState.plugins[protocolResult?.plugin_info.plugin_id] !== undefined) {
                     notificationChannelCreateFormStore.$patch((_state) => {
                         _state.state.selectedProtocol.protocol_id = protocol_id;
                         _state.state.selectedProtocol.icon = storeState.plugins[protocolResult?.plugin_info.plugin_id]?.icon || '';
-                        _state.state.selectedProtocol.name = protocolResult?.name;
+                        _state.state.selectedProtocol.name = protocolResult?.name as string;
                         _state.state.channelName = name;
                         _state.state.scheduleInfo = {
                             SCHEDULE_TYPE: schedule.SCHEDULE_TYPE,
@@ -331,15 +345,6 @@ const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): 
     }
 };
 
-const fetchNotificationProtocolList = async (params: NotificationProtocolListParameters) => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>(params);
-        userGroupPageState.protocolList = results;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
-};
-
 /* Mounted */
 onMounted(async () => {
     if (userGroupPageGetters.selectedUserGroups[0].user_group_id) {
@@ -348,10 +353,6 @@ onMounted(async () => {
             query: channelListApiQuery,
         });
     }
-});
-
-onMounted(async () => {
-    await fetchNotificationProtocolList({});
 });
 </script>
 
@@ -412,19 +413,13 @@ onMounted(async () => {
                          @refresh="handleChange()"
         >
             <template #col-channel_id-format="{value}">
-                <div v-for="(protocol, idx) in state.protocolList"
-                     :key="`${protocol}-${idx}`"
-                >
-                    <div v-if="protocol.value === value"
-                         class="flex items-center gap-2"
-                    >
-                        <p-lazy-img :src="assetUrlConverter(protocol.icon)"
-                                    width="1rem"
-                                    height="1rem"
-                                    error-icon="ic_notification-protocol_envelope"
-                        />
-                        <p>{{ protocol.label }}</p>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value)?.icon || '')"
+                                width="1rem"
+                                height="1rem"
+                                error-icon="ic_notification-protocol_envelope"
+                    />
+                    <p>{{ getProtocolInfo(value)?.name }}</p>
                 </div>
             </template>
             <template #col-day-format="{value}">
