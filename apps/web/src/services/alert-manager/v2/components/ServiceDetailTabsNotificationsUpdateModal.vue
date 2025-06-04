@@ -28,8 +28,9 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { UserRadioType, ProtocolInfo, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { UserRadioType, ProtocolInfo } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -43,13 +44,14 @@ const props = withDefaults(defineProps<Props>(), {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
 }>();
 
 const storeState = reactive({
     serviceMember: computed<Record<MembersType, string[]>>(() => serviceDetailPageGetters.serviceInfo?.members || []),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
     language: computed<string>(() => serviceDetailPageGetters.language),
 });
 const state = reactive({
@@ -89,7 +91,7 @@ const state = reactive({
         if (!name.value) return false;
         return isAllValid && (state.isForwardTypeProtocol ? state.isMemberDataValid : true);
     }),
-    notificationChannelList: computed<SelectDropdownMenuItem[]>(() => storeState.notificationProtocolList.map((i) => ({
+    notificationChannelList: computed<SelectDropdownMenuItem[]>(() => notificationProtocolListData.value.map((i) => ({
         name: i.protocol_id || '',
         label: i.name,
     }))),
@@ -125,7 +127,7 @@ const getProtocolInfo = (id: string): ProtocolInfo => {
         }
         return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
     }
-    const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
+    const protocol = notificationProtocolListData.value.find((item) => item.protocol_id === id);
     const schema = protocol?.plugin_info?.metadata.data.schema || {};
     const disabledProperties: Record<string, JsonSchema> = mapValues(schema.properties, (property) => ({
         ...property,
@@ -189,7 +191,7 @@ watch(() => props.selectedItem, (selectedItem) => {
         }
         state.selectedNotificationChannelIds = (props.selectedItem?.data.PROTOCOL || []).map((i) => ({
             name: i,
-            label: storeState.notificationProtocolList.find((item) => item.protocol_id === i)?.name || '',
+            label: notificationProtocolListData.value.find((item) => item.protocol_id === i)?.name || '',
         }));
     }
 }, { immediate: true });

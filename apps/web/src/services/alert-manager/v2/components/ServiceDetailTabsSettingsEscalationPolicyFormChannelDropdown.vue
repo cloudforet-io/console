@@ -23,8 +23,9 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolCardItemType, ProtocolInfo } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { ProtocolInfo } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface DropdownItem extends SelectDropdownMenuItem {
     name: string;
@@ -44,9 +45,10 @@ const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+
 const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const state = reactive({
     loading: false,
@@ -60,7 +62,7 @@ const state = reactive({
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
     const channel = state.serviceChannelList.find((item) => item.channel_id === id);
-    const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === channel.protocol_id);
+    const protocol = notificationProtocolListData.value.find((item) => item.protocol_id === channel.protocol_id);
     return {
         name: channel?.name || '',
         icon: channel.channel_type === SERVICE_CHANNEL_TYPE.FORWARD ? '' : protocol?.icon || '',

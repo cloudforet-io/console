@@ -6,6 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
 import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
 
@@ -14,8 +16,9 @@ import type {
     ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import APIClientManager from '@/lib/config/global-config/api-client-manager';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export type ProtocolItem = Required<Pick<ReferenceItem<ProtocolModel>, 'key'|'label'|'name'>>;
 export type ProtocolReferenceMap = ReferenceMap<ProtocolItem>;
@@ -53,8 +56,13 @@ export const useProtocolReferenceStore = defineStore('reference-protocol', () =>
         ) return;
 
         const referenceMap: ProtocolReferenceMap = {};
+        const alertManagerClient = APIClientManager.alertManager;
+        if (!alertManagerClient) return;
         try {
-            const response = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+            const fetcher = alertManagerClient.version === 'V1'
+                ? SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>
+                : SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>;
+            const response = await fetcher({
                 query: {
                     only: ['protocol_id', 'name'],
                 },
