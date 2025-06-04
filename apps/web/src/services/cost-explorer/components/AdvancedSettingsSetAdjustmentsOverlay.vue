@@ -57,6 +57,50 @@ const state = reactive({
 });
 const workspaceReferenceMap = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
 const isAllValid = computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid);
+const isFormChanged = computed<boolean>(() => {
+    // Compare policies
+    const hasPolicyChanges = formPolicies.value.some((formPolicy, idx) => {
+        const originalPolicy = originalPolicies.value[idx];
+        if (!originalPolicy) return true; // New policy added
+        if (formPolicy.id !== originalPolicy.report_adjustment_policy_id) return true; // Policy ID changed
+        if (formPolicy.isAllWorkspaceSelected !== !originalPolicy.policy_filter?.workspace_ids) return true; // Workspace selection changed
+        if (!formPolicy.isAllWorkspaceSelected && formPolicy.workspaceMenuItems) {
+            const formWorkspaceIds = formPolicy.workspaceMenuItems.map((item) => item.name).sort();
+            const originalWorkspaceIds = (originalPolicy.policy_filter?.workspace_ids || []).sort();
+            if (formWorkspaceIds.length !== originalWorkspaceIds.length) return true;
+            return formWorkspaceIds.some((id, i) => id !== originalWorkspaceIds[i]);
+        }
+        return false;
+    }) || originalPolicies.value.length !== formPolicies.value.length; // Policy deleted
+
+    // Compare adjustments
+    const hasAdjustmentChanges = formAdjustments.value.some((formAdjustment) => {
+        const originalAdjustment = originalAdjustments.value.find((adj) => adj.report_adjustment_id === formAdjustment.id);
+        if (!originalAdjustment) return true; // New adjustment added
+        if (formAdjustment.policyId !== originalAdjustment.report_adjustment_policy_id) return true; // Policy ID changed
+        if (formAdjustment.name !== originalAdjustment.name) return true;
+        if (formAdjustment.provider !== originalAdjustment.provider) return true;
+        if (formAdjustment.description !== originalAdjustment.description) return true;
+        const formValue = formAdjustment.adjustment.includes('DEDUCTION') ? -formAdjustment.amount : formAdjustment.amount;
+        if (formValue !== originalAdjustment.value) return true;
+        const formUnit = formAdjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED';
+        if (formUnit !== originalAdjustment.unit) return true;
+
+        // Check order changes within the same policy
+        const policyAdjustments = formAdjustments.value.filter((adj) => adj.policyId === formAdjustment.policyId);
+        const originalPolicyAdjustments = originalAdjustments.value.filter((adj) => adj.report_adjustment_policy_id === formAdjustment.policyId);
+        if (policyAdjustments.length !== originalPolicyAdjustments.length) return true;
+
+        // Compare order of adjustments within the same policy
+        const originalOrder = originalPolicyAdjustments.findIndex((adj) => adj.report_adjustment_id === formAdjustment.id);
+        const currentOrder = policyAdjustments.findIndex((adj) => adj.id === formAdjustment.id);
+        if (originalOrder !== currentOrder) return true;
+
+        return false;
+    }) || originalAdjustments.value.length !== formAdjustments.value.length; // Adjustment deleted
+
+    return hasPolicyChanges || hasAdjustmentChanges;
+});
 const formPolicies = computed<AdjustmentPolicyData[]>(() => advancedSettingsPageState.adjustmentPolicyList);
 const originalPolicies = computed<ReportAdjustmentPolicyModel[]>(() => reportAdjustmentPolicyList.value || []);
 const originalAdjustments = computed<ReportAdjustmentModel[]>(() => reportAdjustmentList.value || []);
@@ -143,12 +187,12 @@ const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
             workspace_ids: policy.isAllWorkspaceSelected ? undefined : policy.workspaceMenuItems?.map((item) => item.name),
         },
     };
-    const isEqual = (
+    const policyIsEqual = (
         !oldPolicy?.policy_filter?.workspace_ids && !newPolicy.policy_filter?.workspace_ids
         || (oldPolicy?.policy_filter?.workspace_ids?.length === newPolicy.policy_filter?.workspace_ids?.length
             && !!oldPolicy?.policy_filter?.workspace_ids?.every((id) => newPolicy.policy_filter?.workspace_ids?.includes(id)))
     );
-    if (!isEqual) {
+    if (!policyIsEqual) {
         await reportAdjustmentPolicyAPI.update(newPolicy);
     }
     const newOrder = idx + 1;
@@ -192,14 +236,14 @@ const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
     };
-    const isEqual = (
+    const adjustmentIsEqual = (
         newAdjustment.name === oldAdjustment?.name
         && newAdjustment.provider === oldAdjustment?.provider
         && newAdjustment.unit === oldAdjustment?.unit
         && newAdjustment.value === oldAdjustment?.value
         && newAdjustment.description === oldAdjustment?.description
     );
-    if (!isEqual) {
+    if (!adjustmentIsEqual) {
         await reportAdjustmentAPI.update(newAdjustment);
     }
     const newOrder = idx + 1;
@@ -299,7 +343,7 @@ watch([
                         {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!isAllValid"
+                              :disabled="!isAllValid || !isFormChanged"
                               :loading="state.loading"
                               @click="handleSave"
                     >
