@@ -142,12 +142,14 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                 />
                 <p-text-input v-model="item.name"
                               :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.TITLE')"
+                              :invalid="!item.name"
                               block
                 />
                 <p-select-dropdown :menu="providerMenuItems"
                                    :selected="item.provider"
                                    use-fixed-menu-style
                                    :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.PROVIDER')"
+                                   :invalid="!item.provider"
                                    @update:selected="handleUpdateProvider(item.id, $event)"
                 >
                     <template #dropdown-button="dropdownItem">
@@ -180,12 +182,15 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                 <p-select-dropdown :menu="adjustmentMenuItems"
                                    :selected="item.adjustment"
                                    use-fixed-menu-style
+                                   :invalid="!item.adjustment"
                                    @update:selected="handleUpdateAdjustment(item.id, $event)"
                 />
                 <p-text-input v-model="item.amount"
                               type="number"
                               :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.AMOUNT')"
+                              :invalid="!item.amount"
                               class="w-auto"
+                              :min="0"
                 >
                     <template #input-left>
                         <div :class="['symbol-icon', getAmountSymbol(item.adjustment) === 'ic_minus' ? 'text-red-500' : 'text-green-500']">

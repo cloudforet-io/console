@@ -17,6 +17,7 @@ import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
 
@@ -34,6 +35,7 @@ import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-rep
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
+const appContextStore = useAppContextStore();
 
 const state = reactive({
     currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
@@ -80,10 +82,14 @@ const tableState = reactive({
         workspace_name: makeDistinctValueHandler('cost_analysis.CostReport', 'workspace_name', 'string', [{ k: 'status', v: 'SUCCESS', o: 'eq' }]),
     },
 });
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
-    .setSort('issue_date', true);
+    .setSort('issue_date', true)
+    .setFilters([
+        { k: 'status', v: isAdminMode.value ? ['DONE', 'ADJUSTING'] : ['DONE'], o: '' },
+    ]);
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -274,7 +280,9 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                 <span class="currency-text">{{ item.currency }}</span>
             </template>
             <template #col-extra-format="{item}">
-                <div class="float-right">
+                <div v-if="item.status === 'DONE'"
+                     class="float-right"
+                >
                     <p-button style-type="tertiary"
                               icon-left="ic_link"
                               size="sm"

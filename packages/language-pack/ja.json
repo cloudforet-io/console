@@ -2129,6 +2129,7 @@
 			"CONFIRM_DATE_EXCEEDS_MONTH_END": "確定日はその月の最終日を超えることはできません。",
 			"COST_REPORT_ADJUSTMENTS": "コストレポート調整",
 			"COST_REPORT_CONFIGURATION": "コストレポート設定",
+			"COST_REPORT_CURRENCY": "コストレポート通貨",
 			"CURRENCY_CONVERTER": "為替レート設定",
 			"DAYS_AFTER_REPORT": "日 (レポート発行日後)",
 			"DESCRIPTION": "説明",
@@ -2175,6 +2176,7 @@
 		"CURRENCY_CONVERTER": "為替レート設定",
 		"CURRENCY_CONVERTER_PAGE": {
 			"AGGREGATION_DATE": "集計日",
+			"COST_ANALYSIS_CURRENCY": "コスト分析通貨",
 			"CURRENCY_CONVERTER": "為替レート設定",
 			"EXCHANGE_RATE_SOURCE": "為替基準",
 			"LAST_DAY_OF_THE_MONTH": "月末",
