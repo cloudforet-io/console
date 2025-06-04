@@ -367,14 +367,19 @@ const fetchBudgetUsages = async () => {
     }
 };
 
-
 const fetchBudgets = async () => {
     const filters = getBudgetFilters();
+    const originalQuery = budgetApiQueryHelper.data;
+
+    const mergedFilters = [
+        ...(originalQuery.filter ?? []),
+        ...filters,
+    ];
 
     const { results, total_count } = await budgetAPI.list({
         query: {
-            filter: filters,
-            ...budgetApiQueryHelper.data,
+            ...originalQuery,
+            filter: mergedFilters,
         },
     });
 
