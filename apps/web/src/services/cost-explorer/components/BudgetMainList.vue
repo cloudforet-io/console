@@ -371,6 +371,10 @@ const fetchBudgetUsages = async () => {
 const fetchBudgets = async () => {
     const filters = getBudgetFilters();
 
+    /**
+     * 💡 Merge filters from the original query and the new filters to ensure that
+     * both pre-existing query conditions(queryTag) and additional user-defined filters(from BudgetToolset) are applied.
+     */
     const { results, total_count } = await budgetAPI.list({
         query: {
             filter: filters,
