@@ -88,7 +88,7 @@ const {
     manualAdjustablePeriod(val: number | undefined) {
         if (!state.enableAdjustments) return true;
         if (!val) return i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.REQUIRED_FIELD');
-        if (val < 0) return i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.GREATER_THAN_OR_EQUAL_TO_0');
+        if (val < 1) return i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.GREATER_THAN_OR_EQUAL_TO_1');
         const confirmDate = dayjs.utc(confirmationDate.value);
         const reportDate = dayjs.utc(upcomingReportDate.value);
         const endOfMonth = reportDate.endOf('month');
@@ -251,7 +251,7 @@ watch(() => costReportConfig.value, (val) => {
                             <p-text-input
                                 :value="manualAdjustablePeriod"
                                 type="number"
-                                min="0"
+                                min="1"
                                 :disabled="!state.enableAdjustments"
                                 :invalid="invalid"
                                 @update:value="handleUpdateManualAdjustablePeriod"
