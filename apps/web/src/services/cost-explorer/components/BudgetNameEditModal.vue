@@ -3,8 +3,6 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -46,10 +44,12 @@ const {
 });
 
 const { mutate: updateBudget, isPending: isUpdatingBudget } = useBudgetUpdateMutation({
+    context: {
+        type: 'BUDGET_NAME',
+    },
     onSuccess: () => {
         invalidateBudgetGetQuery();
         emit('update:visible', false);
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'), '');
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
