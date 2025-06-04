@@ -190,6 +190,7 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                               :placeholder="$t('COST_EXPLORER.ADVANCED_SETTINGS.AMOUNT')"
                               :invalid="!item.amount"
                               class="w-auto"
+                              :min="0"
                 >
                     <template #input-left>
                         <div :class="['symbol-icon', getAmountSymbol(item.adjustment) === 'ic_minus' ? 'text-red-500' : 'text-green-500']">
