@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
-import { map } from 'lodash';
+import { isEqual, map } from 'lodash';
 
 import {
     PFieldGroup,
@@ -64,6 +64,12 @@ const isSaveDisabled = computed<boolean>(() => {
     return !isAllValid.value;
 });
 const currencyMenuList = Object.values(CURRENCY).map((currency) => ({ label: `${CURRENCY_SYMBOL[currency]} ${currency}`, name: currency }));
+const isFormChanged = computed<boolean>(() => !isEqual(state.selectedLanguage, costReportConfig.value?.language)
+        || !isEqual(state.selectedCurrency, costReportConfig.value?.currency)
+        || !isEqual(Number(issueDate.value), Number(costReportConfig.value?.issue_day))
+        || !isEqual(state.lastDayOfMonth, !!costReportConfig.value?.is_last_day)
+        || !isEqual(state.enableAdjustments, !!costReportConfig.value?.adjustment_options?.enabled)
+        || !isEqual(Number(manualAdjustablePeriod.value), Number(costReportConfig.value?.adjustment_options?.period)));
 
 const {
     forms: {
@@ -280,7 +286,7 @@ watch(() => costReportConfig.value, (val) => {
             <div class="mt-8">
                 <p-button
                     style-type="primary"
-                    :disabled="isSaveDisabled"
+                    :disabled="isSaveDisabled || !isFormChanged"
                     @click="handleSave"
                 >
                     {{ $t('LADING.SAVE_CHANGES') }}
