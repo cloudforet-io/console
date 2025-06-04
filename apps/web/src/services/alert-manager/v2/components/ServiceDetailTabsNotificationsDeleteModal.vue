@@ -20,10 +20,10 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
 import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -40,7 +40,8 @@ const emit = defineEmits<{(e: 'close'): void,
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
 
 const storeState = reactive({
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
@@ -48,7 +49,6 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const tableState = reactive({
     fields: [
@@ -142,11 +142,11 @@ const handleConfirm = async () => {
                                  height="1rem"
                             />
                             <p-lazy-img v-else
-                                        :src="assetUrlConverter(getProtocolInfo(value, state.notificationProtocolList, item.data).icon || '')"
+                                        :src="assetUrlConverter(getProtocolInfo(value, notificationProtocolListData, item.data).icon || '')"
                                         width="1rem"
                                         height="1rem"
                             />
-                            <span>{{ getProtocolInfo(value, state.notificationProtocolList, item.data).name }}</span>
+                            <span>{{ getProtocolInfo(value, notificationProtocolListData, item.data).name }}</span>
                         </div>
                     </template>
                 </p-data-table>
