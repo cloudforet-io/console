@@ -254,7 +254,6 @@ const fetchReportData = async () => {
 const fetchAnalyzeData = async (_groupBy: string[], fieldGroup?: string[]):Promise<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined> => {
     try {
         return await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
-            is_confirmed: true,
             query: {
                 group_by: _groupBy,
                 fields: {
