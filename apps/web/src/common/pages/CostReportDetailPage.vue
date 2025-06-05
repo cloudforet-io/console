@@ -224,6 +224,12 @@ const getConvertedProductTableData = (rawData: CostReportDataAnalyzeResult[]): C
     });
     return results;
 };
+const getFormattedProductTotalValue = (provider: string, serviceAccount: string): string => {
+    const productData = state.productRawData.find((d) => d.provider === provider && d.service_account_name === serviceAccount);
+    return currencyMoneyFormatter(productData?._total_value_sum ?? 0, numberFormatterOption.value) ?? '';
+};
+
+
 const drawChart = () => {
     state.chartData = costByProviderTableData.value.map((d) => ({
         name: d.provider,
@@ -496,7 +502,7 @@ const handleCollapseAll = () => {
                         {{ $t('COMMON.COST_REPORT.COLLAPSE_ALL') }}
                     </p-button>
                 </div>
-                <div v-for="([provider, providerData], idx) in Object.entries(costByProductTableData)"
+                <div v-for="({ provider }, idx) in state.providerRawData"
                      :key="`${provider}-${idx}`"
                      class="mb-6"
                 >
@@ -505,7 +511,7 @@ const handleCollapseAll = () => {
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                                   class="table-header"
                     />
-                    <div v-for="([serviceAccount, productData], pIdx) in Object.entries(providerData)"
+                    <div v-for="([serviceAccount, productData], pIdx) in Object.entries(costByProductTableData[provider] ?? {})"
                          :key="`${provider}-${serviceAccount}-${pIdx}`"
                     >
                         <div class="service-account-collapsible-wrapper"
@@ -518,7 +524,7 @@ const handleCollapseAll = () => {
                                 {{ serviceAccount === 'Unknown' ? ETC : serviceAccount }}
                             </div>
                             <div class="right-part text-paragraph-md">
-                                {{ currencyMoneyFormatter(sum(Object.values(productData).map((d) => d.value)), numberFormatterOption) }}
+                                {{ getFormattedProductTotalValue(provider, serviceAccount) }}
                             </div>
                         </div>
                         <p-data-table v-if="!state.collapsedState[`${provider}-${serviceAccount}`]"
@@ -708,6 +714,7 @@ const handleCollapseAll = () => {
             .table-header {
                 @apply bg-gray-100;
                 padding: 0.75rem 1rem;
+                margin-bottom: 0.25rem;
             }
             .service-account-collapsible-wrapper {
                 @apply flex items-center justify-between border-b border-gray-300;
