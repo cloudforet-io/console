@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 
 import {
-    PFieldGroup, PCheckbox, PRadioGroup, PRadio, PBadge,
+    PFieldGroup, PCheckbox, PRadioGroup, PRadio, PBadge, PHeading,
     PPaneLayout, PTextInput, PSelectDropdown, PButton, PScopedNotification,
 } from '@cloudforet/mirinae';
 
@@ -114,8 +114,12 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
 </script>
 
 <template>
-    <p-pane-layout class="admin-domain-settings-currency-converter-page">
+    <p-pane-layout class="advanced-settings-currency-converter">
         <div class="content-wrapper">
+            <p-heading :title="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.CURRENCY_CONVERTER')"
+                       heading-type="sub"
+                       class="content-title"
+            />
             <p-scoped-notification type="information"
                                    icon="ic_info-circle"
                                    layout="in-section"
@@ -123,7 +127,7 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
             >
                 {{ $t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.NOTIFICATION') }}
             </p-scoped-notification>
-            <p-field-group :label="$t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY')"
+            <p-field-group :label="$t('COST_EXPLORER.CURRENCY_CONVERTER_PAGE.COST_ANALYSIS_CURRENCY')"
                            required
             >
                 <p-select-dropdown class="currency-dropdown"
@@ -202,9 +206,13 @@ watch(() => state.originUnifiedCostConfig, (unifiedCostConfig) => {
 </template>
 
 <style lang="postcss" scoped>
-.admin-domain-settings-currency-converter-page {
+.advanced-settings-currency-converter {
     .content-wrapper {
         padding: 1.5rem 1rem;
+
+        .content-title {
+            margin-bottom: 1rem;
+        }
 
         .currency-dropdown {
             width: 9rem;

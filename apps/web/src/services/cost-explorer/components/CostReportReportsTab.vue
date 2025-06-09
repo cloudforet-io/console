@@ -5,7 +5,7 @@ import {
 
 import dayjs from 'dayjs';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,8 +17,11 @@ import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -32,8 +35,13 @@ import CostReportResendModal from '@/services/cost-explorer/components/CostRepor
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
+const allReferenceStore = useAllReferenceStore();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
+const appContextStore = useAppContextStore();
+
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const workspaces = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
 
 const state = reactive({
     currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
@@ -61,7 +69,7 @@ const tableState = reactive({
     field: [
         { label: 'Issue Date', name: 'issue_date' },
         { label: 'Report Number', name: 'report_number' },
-        { label: 'Workspace', name: 'workspace_name' },
+        ...(isAdminMode.value ? [{ label: 'Workspace', name: 'workspace_id' }] : []),
         { label: 'Cost', name: 'cost', textAlign: 'right' },
         { label: ' ', name: 'extra' },
     ],
@@ -71,19 +79,23 @@ const tableState = reactive({
             items: [
                 { name: 'issue_date', label: 'Issue Date' },
                 { name: 'report_number', label: 'Report Number' },
-                { name: 'workspace_name', label: 'Workspace' },
+                { name: 'workspace_id', label: 'Workspace' },
             ],
         }] as KeyItemSet[],
     valueHandlerMap: {
         issue_date: makeDistinctValueHandler('cost_analysis.CostReport', 'issue_date', 'string', [{ k: 'status', v: 'SUCCESS', o: 'eq' }]),
         report_number: makeDistinctValueHandler('cost_analysis.CostReport', 'report_number', 'string', [{ k: 'status', v: 'SUCCESS', o: 'eq' }]),
-        workspace_name: makeDistinctValueHandler('cost_analysis.CostReport', 'workspace_name', 'string', [{ k: 'status', v: 'SUCCESS', o: 'eq' }]),
+        workspace_id: makeReferenceValueHandler('identity.Workspace'),
     },
 });
 
 
+
 const costReportListApiQueryHelper = new ApiQueryHelper()
-    .setSort('issue_date', true);
+    .setSort('issue_date', true)
+    .setFilters([
+        { k: 'status', v: isAdminMode.value ? ['DONE', 'ADJUSTING'] : ['DONE'], o: '' },
+    ]);
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -245,6 +257,9 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                     </template>
                 </p-heading-layout>
             </template>
+            <template #col-workspace_id-format="{value}">
+                {{ workspaces[value]?.name || value }}
+            </template>
             <template #col-issue_date-format="{value}">
                 <div class="date-text">
                     {{ value }}
@@ -274,7 +289,9 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                 <span class="currency-text">{{ item.currency }}</span>
             </template>
             <template #col-extra-format="{item}">
-                <div class="float-right">
+                <div v-if="item.status === 'DONE'"
+                     class="float-right"
+                >
                     <p-button style-type="tertiary"
                               icon-left="ic_link"
                               size="sm"

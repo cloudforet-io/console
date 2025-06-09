@@ -1,5 +1,7 @@
 <script lang="ts" setup="">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch, onUnmounted,
+} from 'vue';
 
 import { isEqual } from 'lodash';
 
@@ -22,7 +24,6 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { useDashboardDetailInfoStore } from '@/services/_shared/dashboard/dashboard-detail/stores/dashboard-detail-info-store';
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
-
 
 
 const allReferenceStore = useAllReferenceStore();
@@ -98,6 +99,11 @@ const handleConfirmPerformanceDelay = () => {
 watch(() => storeState.workspaces, (workspaces) => {
     if (workspaces) initSelectedWorkspace();
 }, { immediate: true });
+
+onUnmounted(() => {
+    dashboardDetailStore.setSelectedWorkspaceId(undefined);
+    state.selectedWorkspaceItems = [];
+});
 </script>
 
 <template>

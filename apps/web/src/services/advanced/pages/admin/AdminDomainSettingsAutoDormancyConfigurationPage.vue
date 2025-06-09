@@ -140,7 +140,11 @@ const fetchDomainSettings = async () => {
 const fetchCostReportConfig = async () => {
     if (!state.currency) return;
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
+            query: {
+                sort: [{ key: 'created_at', desc: false }],
+            },
+        });
         state.currency = results?.[0]?.currency;
     } catch (e) {
         ErrorHandler.handleError(e);
