@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core';
 import {
     onMounted, reactive, watch, computed,
 } from 'vue';
@@ -198,6 +199,7 @@ const handleNavigateToDetail = (serviceId: string) => {
 };
 
 onMounted(async () => {
+    serviceListPageStore.updateHealthyPageSizeByWindowWidth();
     const { serviceName, unhealthyPage, healthyPage } = route.query;
 
     if (serviceName && typeof serviceName === 'string') {
@@ -234,6 +236,16 @@ onMounted(async () => {
     await fetchBothLists();
 });
 
+// ✅ event listener to change healthy page size (6 -> 8) when window width is 1920px or more
+let prevHealthyPageSize = serviceListPageStore.healthyPageSize;
+useEventListener(window, 'resize', () => {
+    serviceListPageStore.updateHealthyPageSizeByWindowWidth();
+    if (serviceListPageStore.healthyPageSize !== prevHealthyPageSize) {
+        prevHealthyPageSize = serviceListPageStore.healthyPageSize;
+        fetchHealthyServiceList();
+    }
+});
+
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
     if (!queryTags.value.some((tag) => tag.key?.name === 'name')) {
         replaceUrlQuery({
@@ -254,7 +266,7 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
     handleHealthyPageChange();
 });
 
-watch(async () => route.query.serviceName, async (newServiceName) => {
+watch(async () => route.query.serviceName, async (newServiceName: any) => {
     if (typeof newServiceName === 'string') {
         const nameValues = newServiceName.split(',').map((name) => ({
             key: { name: 'name' },
