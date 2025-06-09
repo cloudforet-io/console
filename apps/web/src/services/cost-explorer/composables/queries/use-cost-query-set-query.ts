@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
@@ -18,12 +19,13 @@ export const useCostQuerySetQuery = (data_source_id: string) => {
 
     const queryHelper = computed(() => {
         const helper = new ApiQueryHelper().setSort('created_at', true);
-        helper.setFilters([{ k: 'user_id', v: _userId.value, o: '=' }]);
+        const filters: ConsoleFilter[] = [{ k: 'user_id', v: _userId.value, o: '=' }];
         if (_isAdminMode.value) {
-            helper.setFilters([{ k: 'workspace_id', v: null, o: '=' }]);
+            filters.push({ k: 'workspace_id', v: null, o: '=' });
         } else {
-            helper.setFilters([{ k: 'workspace_id', v: _workspaceId.value ?? '', o: '=' }]);
+            filters.push({ k: 'workspace_id', v: _workspaceId.value ?? '', o: '=' });
         }
+        helper.setFilters(filters);
         return helper;
     });
 
