@@ -121,7 +121,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
             />
             <span>{{ state.title }}</span>
         </div>
-        <div class="collapsible-contents flex flex-wrap gap-4">
+        <div class="collapsible-contents">
             <p-select-card v-for="(item, idx) in props.list"
                            :key="`service-item-${idx}`"
                            class="card"
@@ -253,7 +253,34 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
     .collapsible-contents {
         opacity: 1;
         transition: opacity 0.3s ease, visibility 0.3s ease;
+
+        @apply grid grid-cols-3 gap-4;
     }
+
+    @media (min-width: 120rem) {
+        .collapsible-contents {
+            @apply grid grid-cols-4 gap-4;
+        }
+    }
+
+    @screen laptop {
+        .collapsible-contents {
+            @apply grid grid-cols-3 gap-4;
+        }
+    }
+
+    @screen tablet {
+        .collapsible-contents {
+            @apply grid grid-cols-2 gap-4;
+        }
+    }
+
+    @screen mobile {
+        .collapsible-contents {
+            @apply grid grid-cols-1 gap-4;
+        }
+    }
+
     &.is-collapsed {
         .collapsible-title {
             .arrow-button {
@@ -270,8 +297,7 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
         }
     }
     .card {
-        width: 28rem;
-        max-width: 28rem;
+        min-width: 25rem;
         padding: 1.25rem 1.5rem 1rem 1.5rem;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
         .card-inner-wrapper {
