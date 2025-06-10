@@ -119,7 +119,7 @@ const handleDeleteQueryConfirm = async () => {
 
 const handleRouteToUnifiedCostSettings = () => {
     router.push({
-        name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.CURRENCY_CONVERTER._NAME,
+        name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME,
     }).catch(() => {});
 };
 

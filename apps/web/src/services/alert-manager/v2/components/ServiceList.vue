@@ -6,6 +6,8 @@ import {
     useRoute, useRouter,
 } from 'vue-router/composables';
 
+import { debounce } from 'lodash';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -197,7 +199,25 @@ const handleNavigateToDetail = (serviceId: string) => {
     }).catch(() => {});
 };
 
+// ✅ event listener to change healthy page size (6 -> 8) when window width is 1920px or more
+const handleResize = debounce(async () => {
+    const width = window.innerWidth;
+    const newPageSize = width >= 1920 ? 8 : 6;
+
+    if (newPageSize !== serviceListPageStore.healthyPageSize) {
+        const oldPageSize = serviceListPageStore.healthyPageSize;
+        const oldPage = serviceListPageStore.healthyThisPage;
+        const startIndex = (oldPage - 1) * oldPageSize;
+        const newPage = Math.floor(startIndex / newPageSize) + 1;
+
+        serviceListPageStore.setHealthyPageSize(newPageSize);
+        serviceListPageStore.setHealthyPage(newPage);
+        fetchHealthyServiceList();
+    }
+}, 300);
+
 onMounted(async () => {
+    await handleResize();
     const { serviceName, unhealthyPage, healthyPage } = route.query;
 
     if (serviceName && typeof serviceName === 'string') {
@@ -254,7 +274,7 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
     handleHealthyPageChange();
 });
 
-watch(async () => route.query.serviceName, async (newServiceName) => {
+watch(async () => route.query.serviceName, async (newServiceName: any) => {
     if (typeof newServiceName === 'string') {
         const nameValues = newServiceName.split(',').map((name) => ({
             key: { name: 'name' },

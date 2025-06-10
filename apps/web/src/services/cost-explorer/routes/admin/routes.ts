@@ -22,7 +22,7 @@ const AdminAdvancedSettingsPage = () => import('@/services/cost-explorer/pages/a
 const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetMainPage.vue');
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
 
-const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
+const CostAnalysisPage = () => import('@/services/cost-explorer/pages/CostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 const DataSourcesPage = () => import('@/services/cost-explorer/pages/admin/AdminDataSourcePage.vue');
 
@@ -95,7 +95,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                         copiable: ({ params }) => ![DYNAMIC_COST_QUERY_SET_PARAMS].includes(params.costQuerySetId),
                     },
                     props: true,
-                    component: AdminCostAnalysisPage as any,
+                    component: CostAnalysisPage as any,
                 },
             ],
         },
