@@ -20,10 +20,8 @@ export const useServiceListPageStore = defineStore('page-service-list', {
         setSearchFilters(filters: ConsoleFilter[]) {
             this.searchFilters = filters;
         },
-        updateHealthyPageSizeByWindowWidth() {
-            const width = window.innerWidth;
-            if (width > 1920) this.healthyPageSize = 8;
-            else this.healthyPageSize = 6;
+        setHealthyPageSize(size: number) {
+            this.healthyPageSize = size;
         },
     },
 });

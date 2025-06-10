@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { useEventListener } from '@vueuse/core';
 import {
     onMounted, reactive, watch, computed,
 } from 'vue';
 import {
     useRoute, useRouter,
 } from 'vue-router/composables';
+
+import { debounce } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -198,8 +199,25 @@ const handleNavigateToDetail = (serviceId: string) => {
     }).catch(() => {});
 };
 
+// ✅ event listener to change healthy page size (6 -> 8) when window width is 1920px or more
+const handleResize = debounce(async () => {
+    const width = window.innerWidth;
+    const newPageSize = width >= 1920 ? 8 : 6;
+
+    if (newPageSize !== serviceListPageStore.healthyPageSize) {
+        const oldPageSize = serviceListPageStore.healthyPageSize;
+        const oldPage = serviceListPageStore.healthyThisPage;
+        const startIndex = (oldPage - 1) * oldPageSize;
+        const newPage = Math.floor(startIndex / newPageSize) + 1;
+
+        serviceListPageStore.setHealthyPageSize(newPageSize);
+        serviceListPageStore.setHealthyPage(newPage);
+        fetchHealthyServiceList();
+    }
+}, 300);
+
 onMounted(async () => {
-    serviceListPageStore.updateHealthyPageSizeByWindowWidth();
+    await handleResize();
     const { serviceName, unhealthyPage, healthyPage } = route.query;
 
     if (serviceName && typeof serviceName === 'string') {
@@ -234,16 +252,6 @@ onMounted(async () => {
     }
 
     await fetchBothLists();
-});
-
-// ✅ event listener to change healthy page size (6 -> 8) when window width is 1920px or more
-let prevHealthyPageSize = serviceListPageStore.healthyPageSize;
-useEventListener(window, 'resize', () => {
-    serviceListPageStore.updateHealthyPageSizeByWindowWidth();
-    if (serviceListPageStore.healthyPageSize !== prevHealthyPageSize) {
-        prevHealthyPageSize = serviceListPageStore.healthyPageSize;
-        fetchHealthyServiceList();
-    }
 });
 
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
