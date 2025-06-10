@@ -1,3 +1,5 @@
+import { computed } from 'vue';
+
 import type { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useCostApi } from '@/api-clients/cost-analysis/cost/composables/use-cost-api';
@@ -8,10 +10,10 @@ import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 export const useCostAnalysisQuery = (data_source_id: string, query: ApiQueryHelper) => {
     const { costAPI } = useCostApi();
     const { key, params } = useServiceQueryKey('cost-analysis', 'cost', 'analyze', {
-        params: {
+        params: computed(() => ({
             data_source_id,
             query: query.data,
-        },
+        })),
     });
 
     const { data, isLoading, error } = useScopedQuery({

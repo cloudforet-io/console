@@ -7,16 +7,7 @@ import type { CostQuerySetListParameters } from '@/api-clients/cost-analysis/cos
 import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 
-interface UseCostQuerySetApiReturn {
-    costQuerySetAPI: {
-        create: (params: CostQuerySetCreateParameters) => Promise<CostQuerySetModel>;
-        list: (params: CostQuerySetListParameters) => Promise<ListResponse<CostQuerySetModel>>;
-        update: (params: CostQuerySetUpdateParameters) => Promise<CostQuerySetModel>;
-        delete: (params: CostQuerySetDeleteParameters) => Promise<void>;
-    }
-}
-
-export const useCostQuerySetApi = (): UseCostQuerySetApiReturn => {
+export const useCostQuerySetApi = () => {
     const actions = {
         create: SpaceConnector.clientV2.costAnalysis.costQuerySet.create<CostQuerySetCreateParameters, CostQuerySetModel>,
         list: SpaceConnector.clientV2.costAnalysis.costQuerySet.list<CostQuerySetListParameters, ListResponse<CostQuerySetModel>>,
