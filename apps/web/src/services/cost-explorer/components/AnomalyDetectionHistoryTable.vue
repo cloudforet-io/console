@@ -58,7 +58,7 @@ const tableState = reactive({
             <template #col-name-format="{value, item}">
                 <p-link highlight
                         :to="{
-                            name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME,
+                            name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME,
                             params: { historyId: item.history_id }
                         }"
                         class="col-name"

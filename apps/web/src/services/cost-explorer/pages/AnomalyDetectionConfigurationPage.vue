@@ -18,7 +18,7 @@ const router = useRouter();
             </template>
             <template #extra>
                 <p-button icon-left="ic_plus"
-                          @click="router.push({ name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS.ANOMALY_DETECTION_DOMAIN_CONFIGURATION._NAME})"
+                          @click="router.push({ name: ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME})"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.ANOMALY_DETECTION.CREATE') }}
                 </p-button>
