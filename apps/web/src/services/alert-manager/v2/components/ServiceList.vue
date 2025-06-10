@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
-    onMounted, reactive, watch, computed,
-    onBeforeUnmount,
+    onMounted, watch, computed, onBeforeUnmount,
 } from 'vue';
 import {
     useRoute, useRouter,
@@ -11,24 +10,20 @@ import { debounce } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolbox, PDataLoader, PEmpty, PButton, PPagination,
 } from '@cloudforet/mirinae';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceListParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/list';
 import { SERVICE_HEALTHY_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
-import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import ServiceListContent from '@/services/alert-manager/v2/components/ServiceListContent.vue';
+import { useServiceListPaginationQuery } from '@/services/alert-manager/v2/composables/use-service-list-pagination-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceListPageStore } from '@/services/alert-manager/v2/stores/service-list-page-store';
 
@@ -49,27 +44,87 @@ const SERVICE_SEARCH_HANDLER = {
     },
 };
 
-const state = reactive({
-    loading: true,
-    healthyLoading: true,
-    totalCount: 0,
-    healthyTotalCount: 0,
-    alertServiceList: [] as ServiceModel[],
-    healthyServiceList: [] as ServiceModel[],
-});
-
 const serviceListPageStore = useServiceListPageStore();
 
 const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 const healthyServiceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 const searchQueryHelper = new QueryHelper();
 
+const currentSearchFilters = computed(() => serviceListPageStore.searchFilters);
+
 const queryTags = computed(() => searchQueryHelper.setFilters(serviceListPageStore.searchFilters).queryTags);
+
+const {
+    data: unhealthyServiceList,
+    totalCount: unhealthyTotalCount,
+    isLoading: unhealthyLoading,
+    refresh: refreshUnhealthyList,
+} = useServiceListPaginationQuery({
+    thisPage: computed(() => serviceListPageStore.unhealthyThisPage),
+    pageSize: computed(() => serviceListPageStore.unhealthyPageSize),
+    params: computed(() => {
+        const isFullNameOnly = currentSearchFilters.value.length === 1
+            && currentSearchFilters.value[0].k === 'name'
+            && Array.isArray(currentSearchFilters.value[0].v)
+            && currentSearchFilters.value[0].v.length === 1
+            && typeof currentSearchFilters.value[0].v[0] === 'string'
+            && currentSearchFilters.value[0].v[0].length > 2;
+
+        const pageSize = serviceListPageStore.unhealthyPageSize;
+        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.unhealthyThisPage) - 1) * pageSize + 1);
+
+        serviceListApiQueryHelper
+            .setPage(pageStart, pageSize)
+            .setSort('created_at', true)
+            .setFilters([
+                ...currentSearchFilters.value,
+                { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.UNHEALTHY, o: '=' },
+            ]);
+
+        return {
+            query: serviceListApiQueryHelper.data,
+            details: true,
+        };
+    }),
+});
+
+const {
+    data: healthyServiceList,
+    totalCount: healthyTotalCount,
+    isLoading: healthyLoading,
+    refresh: refreshHealthyList,
+} = useServiceListPaginationQuery({
+    thisPage: computed(() => serviceListPageStore.healthyThisPage),
+    pageSize: computed(() => serviceListPageStore.healthyPageSize),
+    params: computed(() => {
+        const isFullNameOnly = currentSearchFilters.value.length === 1
+            && currentSearchFilters.value[0].k === 'name'
+            && Array.isArray(currentSearchFilters.value[0].v)
+            && currentSearchFilters.value[0].v.length === 1
+            && typeof currentSearchFilters.value[0].v[0] === 'string'
+            && currentSearchFilters.value[0].v[0].length > 2;
+
+        const pageSize = serviceListPageStore.healthyPageSize;
+        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.healthyThisPage) - 1) * pageSize + 1);
+
+        healthyServiceListApiQueryHelper
+            .setPage(pageStart, pageSize)
+            .setSort('created_at', true)
+            .setFilters([
+                ...currentSearchFilters.value,
+                { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.HEALTHY, o: '=' },
+            ]);
+
+        return {
+            query: healthyServiceListApiQueryHelper.data,
+            details: true,
+        };
+    }),
+});
 
 const handleToolbox = async (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-
         serviceListPageStore.$patch((_state) => {
             _state.searchFilters = searchQueryHelper.filters;
         });
@@ -94,86 +149,10 @@ const handleToolbox = async (options: ToolboxOptions = {}) => {
         replaceUrlQuery(newQuery);
     }
 
-    await fetchBothLists();
-};
-
-const fetchBothLists = async () => {
     await Promise.all([
-        fetchServiceList(),
-        fetchHealthyServiceList(),
+        refreshUnhealthyList(),
+        refreshHealthyList(),
     ]);
-};
-
-const handleUnhealthyPageChange = async () => {
-    await fetchServiceList();
-};
-
-const handleHealthyPageChange = async () => {
-    await fetchHealthyServiceList();
-};
-
-const fetchServiceList = async () => {
-    state.loading = true;
-    try {
-        const isFullNameOnly = searchQueryHelper.filters.length === 1
-            && searchQueryHelper.filters[0].k === 'name'
-            && Array.isArray(searchQueryHelper.filters[0].v)
-            && searchQueryHelper.filters[0].v.length === 1
-            && typeof searchQueryHelper.filters[0].v[0] === 'string'
-            && searchQueryHelper.filters[0].v[0].length > 2;
-
-        const pageSize = serviceListPageStore.unhealthyPageSize;
-        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.unhealthyThisPage) - 1) * pageSize + 1);
-
-        serviceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
-            ...searchQueryHelper.filters,
-            { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.UNHEALTHY, o: '=' },
-        ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
-            query: serviceListApiQueryHelper.data,
-            details: true,
-        });
-        state.alertServiceList = results || [];
-        state.totalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.alertServiceList = [];
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-};
-
-const fetchHealthyServiceList = async () => {
-    state.healthyLoading = true;
-    try {
-        const isFullNameOnly = searchQueryHelper.filters.length === 1
-            && searchQueryHelper.filters[0].k === 'name'
-            && Array.isArray(searchQueryHelper.filters[0].v)
-            && searchQueryHelper.filters[0].v.length === 1
-            && typeof searchQueryHelper.filters[0].v[0] === 'string'
-            && searchQueryHelper.filters[0].v[0].length > 2;
-
-        const pageSize = serviceListPageStore.healthyPageSize;
-        const pageStart = isFullNameOnly ? 1 : ((Math.max(1, serviceListPageStore.healthyThisPage) - 1) * pageSize + 1);
-
-        healthyServiceListApiQueryHelper.setPage(pageStart, pageSize).setFilters([
-            ...searchQueryHelper.filters,
-            { k: 'service_healthy', v: SERVICE_HEALTHY_TYPE.HEALTHY, o: '=' },
-        ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.service.list<ServiceListParameters, ListResponse<ServiceModel>>({
-            query: healthyServiceListApiQueryHelper.data,
-            details: true,
-        });
-        state.healthyServiceList = results || [];
-        state.healthyTotalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.healthyServiceList = [];
-        state.healthyTotalCount = 0;
-    } finally {
-        state.healthyLoading = false;
-    }
 };
 
 const handleClickCreateButton = () => {
@@ -213,7 +192,7 @@ const handleResize = debounce(async () => {
 
         serviceListPageStore.setHealthyPageSize(newPageSize);
         serviceListPageStore.setHealthyPage(newPage);
-        fetchHealthyServiceList();
+        refreshHealthyList();
     }
 }, 100);
 
@@ -252,7 +231,10 @@ onMounted(async () => {
         serviceListPageStore.setHealthyPage(parsedHealthy);
     }
 
-    await fetchBothLists();
+    await Promise.all([
+        refreshUnhealthyList(),
+        refreshHealthyList(),
+    ]);
 });
 
 window.addEventListener('resize', handleResize);
@@ -268,7 +250,7 @@ watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
             healthyPage: String(serviceListPageStore.healthyThisPage),
         });
     }
-    handleUnhealthyPageChange();
+    refreshUnhealthyList();
 });
 
 watch(() => serviceListPageStore.healthyThisPage, (val) => {
@@ -278,7 +260,7 @@ watch(() => serviceListPageStore.healthyThisPage, (val) => {
             healthyPage: String(val),
         });
     }
-    handleHealthyPageChange();
+    refreshHealthyList();
 });
 
 watch(async () => route.query.serviceName, async (newServiceName: any) => {
@@ -303,7 +285,10 @@ watch(async () => route.query.serviceName, async (newServiceName: any) => {
         searchQueryHelper.setFilters(splitNameFilters);
 
         serviceListPageStore.setSearchFilters(searchQueryHelper.filters);
-        await fetchBothLists();
+        await Promise.all([
+            refreshUnhealthyList(),
+            refreshHealthyList(),
+        ]);
     } else if (!newServiceName) {
         searchQueryHelper.setFiltersAsQueryTag([]);
         serviceListPageStore.$patch((_state) => {
@@ -324,60 +309,60 @@ watch(async () => route.query.serviceName, async (newServiceName: any) => {
                    :key-item-sets="SERVICE_SEARCH_HANDLER.keyItemSets"
                    :value-handler-map="SERVICE_SEARCH_HANDLER.valueHandlerMap"
                    @change="handleToolbox"
-                   @refresh="fetchBothLists"
+                   @refresh="handleToolbox"
         />
 
         <section>
             <p-data-loader
-                :loading="state.loading"
-                :data="state.alertServiceList"
+                :loading="unhealthyLoading"
+                :data="unhealthyServiceList"
                 loader-backdrop-color="transparent"
                 disable-empty-case
                 class="loader-wrapper"
             >
                 <div>
-                    <service-list-content v-if="state.alertServiceList.length > 0"
-                                          :list="state.alertServiceList"
+                    <service-list-content v-if="unhealthyServiceList.length > 0"
+                                          :list="unhealthyServiceList"
                                           type="alert"
                                           @navigate-to-detail="handleNavigateToDetail"
                     />
                     <div class="flex justify-center mt-4">
                         <p-pagination
-                            v-if="state.totalCount > 0"
-                            :total-count="state.totalCount"
+                            v-if="unhealthyTotalCount > 0"
+                            :total-count="unhealthyTotalCount"
                             :this-page.sync="serviceListPageStore.unhealthyThisPage"
                             :page-size.sync="serviceListPageStore.unhealthyPageSize"
-                            @change="handleUnhealthyPageChange"
+                            @change="handleToolbox"
                         />
                     </div>
                 </div>
             </p-data-loader>
 
             <p-data-loader
-                :loading="state.healthyLoading"
-                :data="state.healthyServiceList"
+                :loading="healthyLoading"
+                :data="healthyServiceList"
                 loader-backdrop-color="transparent"
                 disable-empty-case
                 class="loader-wrapper"
             >
                 <div>
-                    <service-list-content v-if="state.healthyServiceList.length > 0"
-                                          :list="state.healthyServiceList"
+                    <service-list-content v-if="healthyServiceList.length > 0"
+                                          :list="healthyServiceList"
                                           type="healthy"
                                           @navigate-to-detail="handleNavigateToDetail"
                     />
                     <div class="flex justify-center mt-4">
-                        <p-pagination v-if="state.healthyTotalCount > 0"
-                                      :total-count="state.healthyTotalCount"
+                        <p-pagination v-if="healthyTotalCount > 0"
+                                      :total-count="healthyTotalCount"
                                       :this-page.sync="serviceListPageStore.healthyThisPage"
                                       :page-size.sync="serviceListPageStore.healthyPageSize"
-                                      @change="handleHealthyPageChange"
+                                      @change="handleToolbox"
                         />
                     </div>
                 </div>
             </p-data-loader>
 
-            <div v-if="!state.loading && !state.healthyLoading && state.alertServiceList.length === 0 && state.healthyServiceList.length === 0"
+            <div v-if="!unhealthyLoading && !healthyLoading && unhealthyServiceList.length === 0 && healthyServiceList.length === 0"
                  class="mt-4"
             >
                 <p-empty show-image
