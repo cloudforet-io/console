@@ -11,6 +11,7 @@ import {
 import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { languages } from '@/store/user/constant';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,7 +24,9 @@ import { getUpcomingIssueDate, getUpcomingConfirmationDate } from '@/services/co
 
 const { costReportConfig, isLoading: isCostReportConfigLoading } = useCostReportConfigQuery();
 const { costReportConfigAPI } = useCostReportConfigApi();
+const appContextStore = useAppContextStore();
 
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 const issueDate = computed<number|undefined>(() => costReportConfig.value?.issue_day);
 const lastDayOfMonth = computed<boolean>(() => costReportConfig.value?.is_last_day || false);
 const enableAdjustments = computed<boolean>(() => costReportConfig.value?.adjustment_options?.enabled || false);
@@ -44,6 +47,7 @@ const reportDateRange = computed<string>(() => {
     return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
 });
 const showReissueButton = computed<boolean>(() => {
+    if (!isAdminMode.value) return false;
     if (!upcomingReportDate.value || !confirmationDate.value) return false;
     const todayDay = dayjs.utc().date();
     const issueDay = dayjs(upcomingReportDate.value).date();

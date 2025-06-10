@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -51,9 +53,54 @@ const { key: raQueryKey } = useServiceQueryKey('cost-analysis', 'report-adjustme
 
 const state = reactive({
     loading: false,
+    createdPolicyIdMap: new Map<string, string>(), // Map to store new policy IDs
 });
 const workspaceReferenceMap = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
 const isAllValid = computed<boolean>(() => advancedSettingsPageStore.isAdjustmentPolicyValid && advancedSettingsPageStore.isAdjustmentValid);
+const isFormChanged = computed<boolean>(() => {
+    // Compare policies
+    const hasPolicyChanges = formPolicies.value.some((formPolicy, idx) => {
+        const originalPolicy = originalPolicies.value[idx];
+        if (!originalPolicy) return true; // New policy added
+        if (formPolicy.id !== originalPolicy.report_adjustment_policy_id) return true; // Policy ID changed
+        if (formPolicy.isAllWorkspaceSelected !== !originalPolicy.policy_filter?.workspace_ids) return true; // Workspace selection changed
+        if (!formPolicy.isAllWorkspaceSelected && formPolicy.workspaceMenuItems) {
+            const formWorkspaceIds = formPolicy.workspaceMenuItems.map((item) => item.name).sort();
+            const originalWorkspaceIds = (originalPolicy.policy_filter?.workspace_ids || []).sort();
+            if (formWorkspaceIds.length !== originalWorkspaceIds.length) return true;
+            return formWorkspaceIds.some((id, i) => id !== originalWorkspaceIds[i]);
+        }
+        return false;
+    }) || originalPolicies.value.length !== formPolicies.value.length; // Policy deleted
+
+    // Compare adjustments
+    const hasAdjustmentChanges = formAdjustments.value.some((formAdjustment) => {
+        const originalAdjustment = originalAdjustments.value.find((adj) => adj.report_adjustment_id === formAdjustment.id);
+        if (!originalAdjustment) return true; // New adjustment added
+        if (formAdjustment.policyId !== originalAdjustment.report_adjustment_policy_id) return true; // Policy ID changed
+        if (formAdjustment.name !== originalAdjustment.name) return true;
+        if (formAdjustment.provider !== originalAdjustment.provider) return true;
+        if (formAdjustment.description !== originalAdjustment.description) return true;
+        const formValue = formAdjustment.adjustment.includes('DEDUCTION') ? -formAdjustment.amount : formAdjustment.amount;
+        if (formValue !== originalAdjustment.value) return true;
+        const formUnit = formAdjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED';
+        if (formUnit !== originalAdjustment.unit) return true;
+
+        // Check order changes within the same policy
+        const policyAdjustments = formAdjustments.value.filter((adj) => adj.policyId === formAdjustment.policyId);
+        const originalPolicyAdjustments = originalAdjustments.value.filter((adj) => adj.report_adjustment_policy_id === formAdjustment.policyId);
+        if (policyAdjustments.length !== originalPolicyAdjustments.length) return true;
+
+        // Compare order of adjustments within the same policy
+        const originalOrder = originalPolicyAdjustments.findIndex((adj) => adj.report_adjustment_id === formAdjustment.id);
+        const currentOrder = policyAdjustments.findIndex((adj) => adj.id === formAdjustment.id);
+        if (originalOrder !== currentOrder) return true;
+
+        return false;
+    }) || originalAdjustments.value.length !== formAdjustments.value.length; // Adjustment deleted
+
+    return hasPolicyChanges || hasAdjustmentChanges;
+});
 const formPolicies = computed<AdjustmentPolicyData[]>(() => advancedSettingsPageState.adjustmentPolicyList);
 const originalPolicies = computed<ReportAdjustmentPolicyModel[]>(() => reportAdjustmentPolicyList.value || []);
 const originalAdjustments = computed<ReportAdjustmentModel[]>(() => reportAdjustmentList.value || []);
@@ -123,13 +170,14 @@ const deleteAdjustmentPolicy = async (): Promise<string[]> => {
     return deletedPolicyIds;
 };
 const createAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
-    await reportAdjustmentPolicyAPI.create({
+    const createdPolicy = await reportAdjustmentPolicyAPI.create({
         cost_report_config_id: costReportConfigId.value,
         policy_filter: {
             workspace_ids: policy.workspaceMenuItems?.map((item) => item.name) || [],
         },
         order: idx + 1,
     });
+    state.createdPolicyIdMap.set(policy.id, createdPolicy.report_adjustment_policy_id);
 };
 const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number) => {
     const oldPolicy = originalPolicies.value.find((p) => p.report_adjustment_policy_id === policy.id);
@@ -139,21 +187,19 @@ const updateAdjustmentPolicy = async (policy: AdjustmentPolicyData, idx: number)
             workspace_ids: policy.isAllWorkspaceSelected ? undefined : policy.workspaceMenuItems?.map((item) => item.name),
         },
     };
-    const isEqual = (
+    const policyIsEqual = (
         !oldPolicy?.policy_filter?.workspace_ids && !newPolicy.policy_filter?.workspace_ids
         || (oldPolicy?.policy_filter?.workspace_ids?.length === newPolicy.policy_filter?.workspace_ids?.length
             && !!oldPolicy?.policy_filter?.workspace_ids?.every((id) => newPolicy.policy_filter?.workspace_ids?.includes(id)))
     );
-    if (!isEqual) {
+    if (!policyIsEqual) {
         await reportAdjustmentPolicyAPI.update(newPolicy);
     }
     const newOrder = idx + 1;
-    if (oldPolicy?.order !== newOrder) {
-        await reportAdjustmentPolicyAPI.changeOrder({
-            report_adjustment_policy_id: policy.id,
-            order: newOrder,
-        });
-    }
+    await reportAdjustmentPolicyAPI.changeOrder({
+        report_adjustment_policy_id: policy.id,
+        order: newOrder,
+    });
 };
 const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     const deletedAdjustmentIds: string[] = originalAdjustments.value
@@ -168,14 +214,16 @@ const deleteAdjustment = async (deletedPolicyIds: string[]) => {
     });
 };
 const createAdjustment = async (adjustment: AdjustmentData, idx: number) => {
+    const createdPolicyId = state.createdPolicyIdMap.get(adjustment.policyId) || adjustment.policyId;
     await reportAdjustmentAPI.create({
-        report_adjustment_policy_id: adjustment.policyId,
+        report_adjustment_policy_id: createdPolicyId,
         name: adjustment.name,
         provider: adjustment.provider,
         unit: adjustment.adjustment.includes('PERCENT') ? 'PERCENT' : 'FIXED',
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
         order: idx + 1,
+        currency: costReportConfig.value?.currency,
     });
 };
 const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
@@ -188,23 +236,21 @@ const updateAdjustment = async (adjustment: AdjustmentData, idx: number) => {
         value: adjustment.adjustment.includes('DEDUCTION') ? -adjustment.amount : adjustment.amount,
         description: adjustment.description,
     };
-    const isEqual = (
+    const adjustmentIsEqual = (
         newAdjustment.name === oldAdjustment?.name
         && newAdjustment.provider === oldAdjustment?.provider
         && newAdjustment.unit === oldAdjustment?.unit
         && newAdjustment.value === oldAdjustment?.value
         && newAdjustment.description === oldAdjustment?.description
     );
-    if (!isEqual) {
+    if (!adjustmentIsEqual) {
         await reportAdjustmentAPI.update(newAdjustment);
     }
     const newOrder = idx + 1;
-    if (oldAdjustment?.order !== newOrder) {
-        await reportAdjustmentAPI.changeOrder({
-            report_adjustment_id: adjustment.id,
-            order: newOrder,
-        });
-    }
+    await reportAdjustmentAPI.changeOrder({
+        report_adjustment_id: adjustment.id,
+        order: newOrder,
+    });
 };
 
 /* Event */
@@ -216,34 +262,37 @@ const handleSave = async () => {
     try {
         // CUD Adjustment Policy
         const deletedPolicyIds = await deleteAdjustmentPolicy();
-        await Promise.all(formPolicies.value.map(async (policy, idx) => {
+        await formPolicies.value.reduce(async (promise, policy, idx) => {
+            await promise;
             if (policy.id.startsWith('rap-')) {
-                await updateAdjustmentPolicy(policy, idx);
-            } else {
-                await createAdjustmentPolicy(policy, idx);
+                return updateAdjustmentPolicy(policy, idx);
             }
-        }));
+            return createAdjustmentPolicy(policy, idx);
+        }, Promise.resolve());
 
         // CUD Adjustment
         await deleteAdjustment(deletedPolicyIds);
-        await Promise.all(formPolicies.value.map(async (policy) => {
+        await formPolicies.value.reduce(async (promise, policy) => {
+            await promise;
             const adjustments = formAdjustments.value.filter((adjustment) => adjustment.policyId === policy.id);
-            await Promise.all(adjustments.map(async (adjustment, idx) => {
+            return adjustments.reduce(async (adjPromise, adjustment, idx) => {
+                await adjPromise;
                 if (adjustment.id.startsWith('ra-')) {
-                    await updateAdjustment(adjustment, idx);
-                } else {
-                    await createAdjustment(adjustment, idx);
+                    return updateAdjustment(adjustment, idx);
                 }
-            }));
-        }));
-
-        queryClient.invalidateQueries({ queryKey: rapQueryKey.value });
-        queryClient.invalidateQueries({ queryKey: raQueryKey.value });
+                return createAdjustment(adjustment, idx);
+            }, Promise.resolve());
+        }, Promise.resolve());
 
         showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SAVE_COST_REPORT_ADJUSTMENTS'), '');
     } catch (error) {
         ErrorHandler.handleRequestError(error, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_SAVE_COST_REPORT_ADJUSTMENTS'));
     } finally {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: rapQueryKey.value }),
+            queryClient.invalidateQueries({ queryKey: raQueryKey.value }),
+        ]);
+        initForm();
         state.loading = false;
     }
 };
@@ -267,7 +316,10 @@ watch([
     () => isReportAdjustmentLoading.value,
     () => isReportAdjustmentPolicyLoading.value,
 ], ([visible, _isReportAdjustmentLoading, _isReportAdjustmentPolicyLoading]) => {
-    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) initForm();
+    if (visible && !_isReportAdjustmentLoading && !_isReportAdjustmentPolicyLoading) {
+        state.createdPolicyIdMap.clear();
+        initForm();
+    }
 });
 </script>
 
@@ -291,7 +343,7 @@ watch([
                         {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!isAllValid"
+                              :disabled="!isAllValid || !isFormChanged"
                               :loading="state.loading"
                               @click="handleSave"
                     >

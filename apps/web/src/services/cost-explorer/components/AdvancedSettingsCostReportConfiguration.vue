@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
-import { map } from 'lodash';
+import { isEqual, map } from 'lodash';
 
 import {
     PFieldGroup,
@@ -24,6 +24,8 @@ import type { CostReportConfigUpdateParameters } from '@/api-clients/cost-analys
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 import { languages } from '@/store/user/constant';
 import type { LanguageCode } from '@/store/user/type';
 
@@ -45,6 +47,7 @@ const queryClient = useQueryClient();
 const state = reactive({
     // Base Settings
     selectedLanguage: undefined as LanguageCode | undefined,
+    selectedCurrency: undefined as Currency | undefined,
     lastDayOfMonth: false,
     // Auto Apply Adjustments
     enableAdjustments: false as boolean,
@@ -60,6 +63,13 @@ const isSaveDisabled = computed<boolean>(() => {
     if (!costReportConfig.value?.cost_report_config_id) return true;
     return !isAllValid.value;
 });
+const currencyMenuList = Object.values(CURRENCY).map((currency) => ({ label: `${CURRENCY_SYMBOL[currency]} ${currency}`, name: currency }));
+const isFormChanged = computed<boolean>(() => !isEqual(state.selectedLanguage, costReportConfig.value?.language)
+        || !isEqual(state.selectedCurrency, costReportConfig.value?.currency)
+        || !isEqual(Number(issueDate.value), Number(costReportConfig.value?.issue_day))
+        || !isEqual(state.lastDayOfMonth, !!costReportConfig.value?.is_last_day)
+        || !isEqual(state.enableAdjustments, !!costReportConfig.value?.adjustment_options?.enabled)
+        || !isEqual(Number(manualAdjustablePeriod.value), Number(costReportConfig.value?.adjustment_options?.period)));
 
 const {
     forms: {
@@ -84,7 +94,7 @@ const {
     manualAdjustablePeriod(val: number | undefined) {
         if (!state.enableAdjustments) return true;
         if (!val) return i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.REQUIRED_FIELD');
-        if (val < 0) return i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.GREATER_THAN_OR_EQUAL_TO_0');
+        if (val < 1) return i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.GREATER_THAN_OR_EQUAL_TO_1');
         const confirmDate = dayjs.utc(confirmationDate.value);
         const reportDate = dayjs.utc(upcomingReportDate.value);
         const endOfMonth = reportDate.endOf('month');
@@ -130,6 +140,7 @@ const handleSave = () => {
             enabled: state.enableAdjustments,
             period: manualAdjustablePeriod.value,
         },
+        currency: state.selectedCurrency,
     });
 };
 
@@ -147,6 +158,7 @@ const handleOpenAdjustmentsOverlay = () => {
 watch(() => costReportConfig.value, (val) => {
     if (val) {
         state.selectedLanguage = val.language;
+        state.selectedCurrency = val.currency;
         setForm('issueDate', val.issue_day);
         if (!val.is_last_day) {
             setForm('issueDate', val.issue_day);
@@ -175,6 +187,16 @@ watch(() => costReportConfig.value, (val) => {
                     <p-select-dropdown
                         :menu="languageMenuList"
                         :selected.sync="state.selectedLanguage"
+                        class="w-48"
+                    />
+                </p-field-group>
+
+                <p-field-group :label="$t('COST_EXPLORER.ADVANCED_SETTINGS.COST_REPORT_CURRENCY')"
+                               required
+                >
+                    <p-select-dropdown
+                        :menu="currencyMenuList"
+                        :selected.sync="state.selectedCurrency"
                         class="w-48"
                     />
                 </p-field-group>
@@ -235,7 +257,7 @@ watch(() => costReportConfig.value, (val) => {
                             <p-text-input
                                 :value="manualAdjustablePeriod"
                                 type="number"
-                                min="0"
+                                min="1"
                                 :disabled="!state.enableAdjustments"
                                 :invalid="invalid"
                                 @update:value="handleUpdateManualAdjustablePeriod"
@@ -255,6 +277,7 @@ watch(() => costReportConfig.value, (val) => {
                 <p-button style-type="tertiary"
                           icon-left="ic_settings"
                           class="mt-4"
+                          :disabled="!state.enableAdjustments"
                           @click="handleOpenAdjustmentsOverlay"
                 >
                     {{ $t('COST_EXPLORER.ADVANCED_SETTINGS.SET_ADJUSTMENTS') }}
@@ -263,7 +286,7 @@ watch(() => costReportConfig.value, (val) => {
             <div class="mt-8">
                 <p-button
                     style-type="primary"
-                    :disabled="isSaveDisabled"
+                    :disabled="isSaveDisabled || !isFormChanged"
                     @click="handleSave"
                 >
                     {{ $t('LADING.SAVE_CHANGES') }}
