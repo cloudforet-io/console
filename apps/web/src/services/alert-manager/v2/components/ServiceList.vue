@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
     onMounted, reactive, watch, computed,
+    onBeforeUnmount,
 } from 'vue';
 import {
     useRoute, useRouter,
@@ -214,7 +215,7 @@ const handleResize = debounce(async () => {
         serviceListPageStore.setHealthyPage(newPage);
         fetchHealthyServiceList();
     }
-}, 300);
+}, 100);
 
 onMounted(async () => {
     await handleResize();
@@ -252,6 +253,12 @@ onMounted(async () => {
     }
 
     await fetchBothLists();
+});
+
+window.addEventListener('resize', handleResize);
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize);
 });
 
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
