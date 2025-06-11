@@ -10,6 +10,7 @@ import { debounce } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolbox, PDataLoader, PEmpty, PButton, PPagination,
@@ -50,7 +51,7 @@ const serviceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', tru
 const healthyServiceListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 const searchQueryHelper = new QueryHelper();
 
-const currentSearchFilters = computed(() => serviceListPageStore.searchFilters);
+const currentSearchFilters = computed<ConsoleFilter[]>(() => serviceListPageStore.searchFilters);
 
 const queryTags = computed(() => searchQueryHelper.setFilters(serviceListPageStore.searchFilters).queryTags);
 
@@ -60,8 +61,8 @@ const {
     isLoading: unhealthyLoading,
     refresh: refreshUnhealthyList,
 } = useServiceListPaginationQuery({
-    thisPage: computed(() => serviceListPageStore.unhealthyThisPage),
-    pageSize: computed(() => serviceListPageStore.unhealthyPageSize),
+    thisPage: computed<number>(() => serviceListPageStore.unhealthyThisPage),
+    pageSize: computed<number>(() => serviceListPageStore.unhealthyPageSize),
     params: computed(() => {
         const isFullNameOnly = currentSearchFilters.value.length === 1
             && currentSearchFilters.value[0].k === 'name'
@@ -94,8 +95,8 @@ const {
     isLoading: healthyLoading,
     refresh: refreshHealthyList,
 } = useServiceListPaginationQuery({
-    thisPage: computed(() => serviceListPageStore.healthyThisPage),
-    pageSize: computed(() => serviceListPageStore.healthyPageSize),
+    thisPage: computed<number>(() => serviceListPageStore.healthyThisPage),
+    pageSize: computed<number>(() => serviceListPageStore.healthyPageSize),
     params: computed(() => {
         const isFullNameOnly = currentSearchFilters.value.length === 1
             && currentSearchFilters.value[0].k === 'name'
