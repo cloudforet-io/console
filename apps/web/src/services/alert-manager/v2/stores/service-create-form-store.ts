@@ -2,16 +2,8 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/api-clients/alert-manager/notification-protocol/schema/api-verbs/list';
-import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
@@ -23,7 +15,6 @@ interface ServiceFormStoreState {
     webhookName: string;
     webhookVersion?: string;
     selectedProtocol: ProtocolCardItemType;
-    protocolList: NotificationProtocolModel[];
 }
 
 export const useServiceCreateFormStore = defineStore('service-create-form', () => {
@@ -38,7 +29,6 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
         webhookVersion: undefined,
         // notification
         selectedProtocol: {} as ProtocolCardItemType,
-        protocolList: [],
     });
 
     const mutations = {
@@ -81,16 +71,6 @@ export const useServiceCreateFormStore = defineStore('service-create-form', () =
             state.currentSubStep = 1;
             state.selectedWebhookType = {} as PluginModel;
             state.webhookName = '';
-        },
-        async fetchNotificationProtocolList() {
-            try {
-                const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>();
-                state.protocolList = results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.protocolList = [];
-                throw e;
-            }
         },
     };
 
