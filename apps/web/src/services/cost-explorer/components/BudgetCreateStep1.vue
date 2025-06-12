@@ -182,6 +182,7 @@ watchEffect(async () => {
             </p-button>
             <p-button icon-right="ic_arrow-right"
                       :disabled="!state.isContinueAble"
+                      style-type="substitutive"
                       @click="handleNext"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.CONTINUE') }}

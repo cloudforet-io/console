@@ -46,9 +46,7 @@ watch(() => budgetCreatePageState.scope.serviceAccount, async () => {
 </script>
 
 <template>
-    <p-field-group required
-                   :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_MANAGER')"
-    >
+    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_MANAGER')">
         <user-select-dropdown
             show-user-list
             :show-user-group-list="false"

@@ -10,7 +10,7 @@ import type { EChartsType } from 'echarts/core';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PPaneLayout } from '@cloudforet/mirinae';
+import { PPaneLayout, PI } from '@cloudforet/mirinae';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
@@ -157,20 +157,30 @@ watch(() => budgetCreatePageState, async () => {
 </script>
 
 <template>
-    <p-pane-layout class="chart-wrapper p-4">
-        <p class="font-bold text-sm">
-            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PREVIOUS_PERIOD_SPEND') }}
-        </p>
-        <div ref="chartContext"
-             class="chart"
-        />
-    </p-pane-layout>
+    <div>
+        <div class="flex items-center gap-2 mt-6 mb-2">
+            <p-i name="ic_info-circle"
+                 width="16"
+                 height="16"
+            />
+            <span class="text-xs text-gray-600">
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PREVIOUS_PERIOD_SPEND') }}
+            </span>
+        </div>
+        <p-pane-layout class="chart-wrapper p-4">
+            <div ref="chartContext"
+                 class="chart"
+            />
+        </p-pane-layout>
+    </div>
 </template>
 
 <style scoped lang="postcss">
 .chart-wrapper {
     width: 56rem;
     height: 17rem;
+
+    @apply bg-gray-100;
     .chart {
         height: 100%;
         width: 100%;

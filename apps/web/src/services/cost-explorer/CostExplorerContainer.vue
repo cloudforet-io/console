@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {
-    onUnmounted, watch,
-} from 'vue';
+import { onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -19,6 +17,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import CostExplorerLSB from '@/services/cost-explorer/CostExplorerLSB.vue';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
@@ -87,7 +86,7 @@ onUnmounted(() => {
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lsbVisible"
+        <vertical-page-layout v-if="route?.meta?.lsbVisible"
                               class="cost-explorer-container"
         >
             <template #sidebar>
@@ -97,8 +96,9 @@ onUnmounted(() => {
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-else-if="$route.meta.centeredLayout"
+        <centered-page-layout v-else-if="route?.meta?.centeredLayout"
                               class="cost-centered-layout"
+                              :class="{'landing-page': route?.name === COST_EXPLORER_ROUTE.LANDING._NAME}"
                               has-nav-bar
         >
             <router-view />
@@ -116,11 +116,13 @@ onUnmounted(() => {
     }
 }
 .cost-centered-layout {
-    &::before {
-        opacity: 1;
-        background-position: 50% 0;
-        background-size: 90rem auto;
-        background-repeat: no-repeat;
+    &.landing-page {
+        &::before {
+            opacity: 1;
+            background-position: 50% 0;
+            background-size: 90rem auto;
+            background-repeat: no-repeat;
+        }
     }
 }
 </style>
