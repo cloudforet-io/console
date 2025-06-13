@@ -42,7 +42,7 @@ import {
 } from '@tanstack/vue-query';
 
 import type { GrantScope } from '@/api-clients/identity/token/schema/type';
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
+import type { QueryKeyArray } from '@/query/query-key/types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';

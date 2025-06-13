@@ -7,7 +7,7 @@ import { useQueryKeyAppContext } from '@/query/query-key/_composable/use-app-con
 import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/query-key/_helpers/query-key-helper';
 import type {
     QueryKeyArray, ResourceName, ServiceName, Verb,
-} from '@/query/query-key/_types/query-key-type';
+} from '@/query/query-key/types/query-key-type';
 
 
 // Cache for debug logs
@@ -129,14 +129,12 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
         },
     } as UseServiceQueryKeyResult<T>;
 };
-
-
-const _normalizeQueryKeyPart = (key: unknown): QueryKeyArray => {
-    if (Array.isArray(key)) {
-        return key;
-    }
-    return [key];
-};
+// const _normalizeQueryKeyPart = (key: unknown): QueryKeyArray => {
+//     if (Array.isArray(key)) {
+//         return key;
+//     }
+//     return [key];
+// };
 
 const _omitPageParamsByVerb = <S extends ServiceName, R extends ResourceName<S>>(verb: Verb<S, R>, params = {}) => {
     if (verb === 'load') return omitPageFromLoadParams(params);

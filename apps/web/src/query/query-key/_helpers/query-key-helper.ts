@@ -1,4 +1,4 @@
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
+import type { QueryKeyArray } from '@/query/query-key/types/query-key-type';
 
 export const createImmutableObjectKeyItem = <T>(obj: T): T => {
     if (obj === null || typeof obj !== 'object') {
