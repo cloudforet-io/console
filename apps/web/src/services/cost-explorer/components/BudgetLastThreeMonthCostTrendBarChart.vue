@@ -168,19 +168,19 @@ watch(() => budgetCreatePageState, async () => {
             </span>
         </div>
         <p-pane-layout class="chart-wrapper p-4">
-            <div ref="chartContext"
-                 class="chart"
-            />
+            <template #default>
+                <div ref="chartContext"
+                     class="chart"
+                />
+            </template>
         </p-pane-layout>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .chart-wrapper {
-    width: 56rem;
     height: 17rem;
-
-    @apply bg-gray-100;
+    background-color: transparent !important;
     .chart {
         height: 100%;
         width: 100%;

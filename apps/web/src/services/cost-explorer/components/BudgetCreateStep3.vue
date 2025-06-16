@@ -75,6 +75,10 @@ const handleFormatRecipients = (value: Record<string, any>) => {
     }
 };
 
+const handleGoBack = () => {
+    budgetCreatePageState.currentStep = 2;
+};
+
 const { mutate: _createBudget, isPending: isCreatingBudget } = useBudgetCreateMutation({
     onSuccess: () => {
         router.push({
@@ -91,7 +95,7 @@ const { mutate: _createBudget, isPending: isCreatingBudget } = useBudgetCreateMu
     },
 });
 
-const createBudget = (type: 'skip' | 'set') => {
+const createBudget = (type: 'skip' | 'create') => {
     if (budgetCreatePageState.loading) return;
 
     isCreatingBudget.value = true;
@@ -104,7 +108,7 @@ const createBudget = (type: 'skip' | 'set') => {
         time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
         start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
         end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
-        notification: type === 'set' ? {
+        notification: type === 'create' ? {
             state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
                 ? 'ENABLED' : 'DISABLED',
             plans: budgetCreatePageState.thresholds.length > 0 ? budgetCreatePageState.thresholds.map((threshold) => ({
@@ -186,6 +190,12 @@ const createBudget = (type: 'skip' | 'set') => {
             />
         </p-field-group>
         <div class="mt-8 flex justify-end gap-4">
+            <p-button icon-left="ic_arrow-left"
+                      style-type="transparent"
+                      @click="handleGoBack"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.GO_BACK') }}
+            </p-button>
             <p-button style-type="tertiary"
                       :loading="isCreatingBudget"
                       @click="createBudget('skip')"
@@ -195,9 +205,9 @@ const createBudget = (type: 'skip' | 'set') => {
             <p-button class="substitutive"
                       :disabled="invalidThreshold.includes(true) || !isAlertRecipientsSelected"
                       :loading="isCreatingBudget"
-                      @click="createBudget('set')"
+                      @click="createBudget('create')"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SET') }}
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
             </p-button>
         </div>
     </div>

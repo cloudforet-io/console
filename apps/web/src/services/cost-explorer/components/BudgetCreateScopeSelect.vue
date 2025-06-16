@@ -95,15 +95,14 @@ watch(() => budgetCreatePageState.project, () => {
                     v-model="budgetCreatePageState.scope.type"
                     :value="scope.name"
                     :disabled="!state.isRadioDisable"
-                    class="min-w-[140px]"
+                    class="min-w-[8.75rem] mb-2"
                 >
                     {{ scope.label }}
                 </p-radio>
 
                 <p-select-dropdown
-                    v-if="scope.name === 'serviceAccount'"
+                    v-if="scope.name === 'serviceAccount' && state.isSelectable"
                     block
-                    :disabled="!state.isSelectable"
                     :menu="state.refinedServiceAccountList"
                     :selected.sync="budgetCreatePageState.scope.serviceAccount"
                 />

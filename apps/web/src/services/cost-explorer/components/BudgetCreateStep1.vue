@@ -161,8 +161,6 @@ watchEffect(async () => {
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT')"
                            required
             >
-                <!-- :invalid="!state.projectInvalid"
-                           :invalid-text="state.projectInvalidText" -->
                 <project-select-dropdown
                     show-delete-all-button
                     :project-group-selectable="false"
