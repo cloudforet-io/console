@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 
 import {
     PFieldGroup, PSelectDropdown, PDatetimePicker, PButton,
-    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge,
+    PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge, PSelectCard,
 } from '@cloudforet/mirinae';
 
 import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
@@ -55,7 +55,6 @@ const state = reactive({
         { name: 'TOTAL', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.FIXED_TERM') },
         { name: 'MONTHLY', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY') },
     ],
-    selectedBudgetCycle: '',
     monthlyBudgetAllocationList: [
         { name: 'applySameAmount', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.APPLY_THE_SAME_AMOUNT') },
         { name: 'increaseBySpecificPercentage', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.INCRASE_BY_SPECIFIC_PERCENTAGE') },
@@ -97,7 +96,7 @@ const handleUpdatgeBudgetEachDate = (value: string, index: number) => {
     budgetCreatePageState.budgetEachDate = newBudgetEachDate;
 };
 
-const handlePrevious = () => {
+const handleGoBack = () => {
     budgetCreatePageStore.setCurrentStep(1);
 };
 
@@ -131,6 +130,10 @@ const handleUpdateMonthlyGrowthRate = (value) => {
     } else {
         budgetCreatePageStore.setMonthlyGrowthRate(Number(value));
     }
+};
+
+const handleSelectBudgetCycle = (value: string) => {
+    budgetCreatePageStore.setTimeUnit(value);
 };
 
 const isValidPositiveNumber = (value: any): boolean => {
@@ -462,200 +465,249 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                 </p-radio>
             </p-radio-group>
         </p-field-group>
-        <div class="bottom-section">
-            <div class="left-section">
-                <p-divider />
-                <div class="flex gap-6 mt-6 -mb-4">
-                    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.START_MONTH')"
-                                   :invalid="state.existingBudgetUsageList.length > 0"
-                                   required
-                                   class="flex flex-col "
-                    >
-                        <p-datetime-picker data-type="yearToMonth"
-                                           :selected-dates.sync="budgetCreatePageState.startMonth"
-                                           :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
-                                           :invalid="state.existingBudgetUsageList.length > 0"
-                                           @close="handleStartMonthPickerClosed"
-                        />
-                    </p-field-group>
-                    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.END_MONTH')"
-                                   :invalid="state.existingBudgetUsageList.length > 0"
-                                   required
-                    >
-                        <p-datetime-picker data-type="yearToMonth"
-                                           :selected-dates.sync="budgetCreatePageState.endMonth"
-                                           :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
-                                           :min-date="budgetCreatePageState.startMonth.length > 0
-                                               ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : ''"
-                                           :max-date="budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(11, 'month').format('YYYY-MM') : ''"
-                                           :invalid="state.existingBudgetUsageList.length > 0 || (budgetCreatePageState.startMonth.length > 0
-                                               && budgetCreatePageState.endMonth.length === 0)"
-                        />
-                    </p-field-group>
-                </div>
-                <span v-if="state.existingBudgetUsageList.length > 0"
-                      class="text-red-500 font-normal text-xs"
+        <div class="left-section">
+            <p-divider />
+            <p class="text-base font-bold mt-6">
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_PERIOD') }}
+            </p>
+            <div class="flex gap-6 mt-2 -mb-4">
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.START_MONTH')"
+                               :invalid="state.existingBudgetUsageList.length > 0"
+                               required
+                               class="flex flex-col "
                 >
-                    {{ budgetCreatePageState.scope.type === 'project'
-                        ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
-                            project: project[budgetCreatePageState.project].name,
-                            month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
-                        }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
-                            project: project[budgetCreatePageState.project].name,
-                            serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
-                            month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
-                        }) }}
-                </span>
-                <div class="mt-2">
-                    <budget-last-three-month-cost-trend-bar-chart />
-                </div>
-                <div class="flex mt-6">
-                    <p-field-group
-                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE')"
-                        :help-text="!isCycleEnabled ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
-                        required
-                    >
-                        <p-radio-group class="mt-2">
-                            <p-radio
-                                v-for="(cycle, idx) in state.budgetCycleList"
-                                :key="`budget-cycle-${idx}`"
-                                v-model="budgetCreatePageState.time_unit"
-                                :value="cycle.name"
-                                :disabled="!isCycleEnabled"
-                            >
-                                <span>{{ cycle.label }}</span>
-                            </p-radio>
-                        </p-radio-group>
-                    </p-field-group>
-                </div>
-                <p-pane-layout v-if="budgetCreatePageState.time_unit.length > 0 && isCycleEnabled"
-                               class="cycle-info-layout"
-                               :class="{'fixed-term-layout': budgetCreatePageState.time_unit === 'TOTAL'}"
+                    <template #label-extra>
+                        <span class="text-gray-400 text-xs font-normal">
+                            ({{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTH') }})
+                        </span>
+                    </template>
+                    <p-datetime-picker data-type="yearToMonth"
+                                       :selected-dates.sync="budgetCreatePageState.startMonth"
+                                       :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
+                                       :invalid="state.existingBudgetUsageList.length > 0"
+                                       @close="handleStartMonthPickerClosed"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.END_MONTH')"
+                               :invalid="state.existingBudgetUsageList.length > 0"
+                               required
                 >
-                    <div v-if="budgetCreatePageState.time_unit === 'TOTAL'"
-                         class="pt-4 pl-4"
+                    <template #label-extra>
+                        <span class="text-gray-400 text-xs font-normal">
+                            ({{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTH') }})
+                        </span>
+                    </template>
+                    <p-datetime-picker data-type="yearToMonth"
+                                       :selected-dates.sync="budgetCreatePageState.endMonth"
+                                       :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
+                                       :min-date="budgetCreatePageState.startMonth.length > 0
+                                           ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : ''"
+                                       :max-date="budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(11, 'month').format('YYYY-MM') : ''"
+                                       :invalid="state.existingBudgetUsageList.length > 0 || (budgetCreatePageState.startMonth.length > 0
+                                           && budgetCreatePageState.endMonth.length === 0)"
+                    />
+                </p-field-group>
+            </div>
+            <span v-if="state.existingBudgetUsageList.length > 0"
+                  class="text-red-500 font-normal text-xs"
+            >
+                {{ budgetCreatePageState.scope.type === 'project'
+                    ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
+                        project: project[budgetCreatePageState.project].name,
+                        month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
+                    }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
+                        project: project[budgetCreatePageState.project].name,
+                        serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
+                        month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
+                    }) }}
+            </span>
+            <div class="mt-2">
+                <budget-last-three-month-cost-trend-bar-chart />
+            </div>
+            <p class="text-base font-bold mt-6">
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE') }}
+            </p>
+            <div class="flex mt-1">
+                <p-field-group
+                    :help-text="!isCycleEnabled ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_CYCLE_DESCRIPTION') : ''"
+                    required
+                >
+                    <div class="flex gap-2 w-[52.5rem] pt-2">
+                        <p-select-card v-for="(cycle, idx) in state.budgetCycleList"
+                                       :key="`budget-cycle-${idx}`"
+                                       v-model="budgetCreatePageState.time_unit"
+                                       :selected.sync="budgetCreatePageState.time_unit"
+                                       :tab-index="idx"
+                                       :value="cycle.name"
+                                       :label="cycle.label"
+                                       :disabled="!isCycleEnabled"
+                                       block
+                                       @change="handleSelectBudgetCycle"
+                        />
+                    </div>
+                </p-field-group>
+            </div>
+            <p v-if="budgetCreatePageState.time_unit.length > 0 && isCycleEnabled"
+               class="font-bold text-sm mb-2"
+            >
+                {{ budgetCreatePageState.time_unit === 'TOTAL' ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.FIXED_TERM')
+                    : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY_BUDGET_ALLOCATION') }}
+            </p>
+            <p-pane-layout v-if="budgetCreatePageState.time_unit.length > 0 && isCycleEnabled && budgetCreatePageState.time_unit === 'TOTAL'"
+                           class="cycle-info-layout pt-4 pl-4"
+            >
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_AMOUNT')"
+                               :invalid="!isValidPositiveNumber(budgetCreatePageState.limit)"
+                               :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_INVALID_TEXT')"
+                               style-type="secondary"
+                               required
+                >
+                    <p-text-input :value="budgetCreatePageState.limit"
+                                  :invalid="!isValidPositiveNumber(budgetCreatePageState.limit)"
+                                  @update:value="handleUpdateBudgetAmount"
                     >
-                        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.BUDGET_AMOUNT')"
-                                       required
+                        <template #input-right>
+                            ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
+                        </template>
+                    </p-text-input>
+                </p-field-group>
+            </p-pane-layout>
+            <div v-else-if="budgetCreatePageState.time_unit.length > 0 && isCycleEnabled && budgetCreatePageState.time_unit === 'MONTHLY'">
+                <div class="allocation-layout">
+                    <p-radio-group direction="vertical"
+                                   class="flex flex-col"
+                    >
+                        <p-radio
+                            v-model="budgetCreatePageState.selectedMonthlyBudgetAllocation"
+                            value="applySameAmount"
+                            :disabled="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0"
                         >
-                            <p-text-input :value="budgetCreatePageState.limit"
-                                          :invalid="!isValidPositiveNumber(budgetCreatePageState.limit)"
-                                          @update:value="handleUpdateBudgetAmount"
-                            >
-                                <template #input-right>
-                                    ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
-                                </template>
-                            </p-text-input>
-                        </p-field-group>
-                    </div>
-                    <div v-else-if="budgetCreatePageState.time_unit === 'MONTHLY'"
-                         class="ml-2"
-                    >
-                        <div class="allocation-layout">
-                            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY_BUDGET_ALLOCATION')"
+                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.APPLY_THE_SAME_AMOUNT') }}
+                        </p-radio>
+                        <p-pane-layout v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount'"
+                                       class="monthly-text-layout"
+                        >
+                            <p-field-group v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount'"
+                                           :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_EACH_MONTH')"
+                                           :invalid="!isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)"
+                                           :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_INVALID_TEXT')"
+                                           style-type="secondary"
                                            required
-                                           class="pt-4"
-                                           :disabled="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0"
                             >
-                                <p-radio-group direction="vertical"
-                                               class="flex flex-col"
+                                <template #label-extra>
+                                    <span class="text-gray-400 text-xs font-normal">
+                                        ({{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.EACH_MONTH') }})
+                                    </span>
+                                </template>
+                                <p-text-input :value="budgetCreatePageState.budgetAppliedSameAmount"
+                                              :invalid="!isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)"
+                                              @update:value="handleUpdateBudgetAppliedSameAmount"
                                 >
-                                    <p-radio v-for="(allocation, idx) in state.monthlyBudgetAllocationList"
-                                             :key="`budget-allocation-${idx}`"
-                                             v-model="budgetCreatePageState.selectedMonthlyBudgetAllocation"
-                                             :value="allocation.name"
-                                             :disabled="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0"
-                                    >
-                                        <span>{{ allocation.label }}</span>
-                                    </p-radio>
-                                </p-radio-group>
+                                    <template #input-right>
+                                        ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
+                                    </template>
+                                </p-text-input>
                             </p-field-group>
-                            <p-pane-layout v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation"
-                                           class="monthly-text-layout"
+                        </p-pane-layout>
+                        <p-radio
+                            v-model="budgetCreatePageState.selectedMonthlyBudgetAllocation"
+                            value="increaseBySpecificPercentage"
+                            :disabled="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0"
+                        >
+                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.INCRASE_BY_SPECIFIC_PERCENTAGE') }}
+                        </p-radio>
+                        <p-pane-layout v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage'"
+                                       class="monthly-text-layout"
+                        >
+                            <div v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage'"
+                                 class="increase-layout"
                             >
-                                <p-field-group v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'applySameAmount'"
-                                               :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_EACH_MONTH')"
-                                               required
-                                >
-                                    <p-text-input :value="budgetCreatePageState.budgetAppliedSameAmount"
-                                                  :invalid="!isValidPositiveNumber(budgetCreatePageState.budgetAppliedSameAmount)"
-                                                  @update:value="handleUpdateBudgetAppliedSameAmount"
+                                <div class="flex gap-6 mt-1">
+                                    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.INITIAL_AMOUNT')"
+                                                   style-type="secondary"
+                                                   :invalid="!isValidPositiveNumber(budgetCreatePageState.initialAmount)"
+                                                   :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_INVALID_TEXT')"
+                                                   required
                                     >
-                                        <template #input-right>
-                                            ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
-                                        </template>
-                                    </p-text-input>
-                                </p-field-group>
-                                <div v-else-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'increaseBySpecificPercentage'"
-                                     class="increase-layout"
-                                >
-                                    <span class="text-md font-bold mb-1">Specific % Each Month</span>
-                                    <div class="flex gap-6 mt-1">
-                                        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.INITIAL_AMOUNT')"
-                                                       style-type="secondary"
-                                                       required
+                                        <p-text-input :value="budgetCreatePageState.initialAmount"
+                                                      :invalid="!isValidPositiveNumber(budgetCreatePageState.initialAmount)"
+                                                      @update:value="handleUpdateInitialAmount"
                                         >
-                                            <p-text-input :value="budgetCreatePageState.initialAmount"
-                                                          :invalid="!isValidPositiveNumber(budgetCreatePageState.initialAmount)"
-                                                          @update:value="handleUpdateInitialAmount"
-                                            >
-                                                <template #input-right>
-                                                    ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
-                                                </template>
-                                            </p-text-input>
-                                        </p-field-group>
-                                        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY_GROWTH_RATE')"
-                                                       style-type="secondary"
-                                                       required
+                                            <template #input-right>
+                                                ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
+                                            </template>
+                                        </p-text-input>
+                                    </p-field-group>
+                                    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY_GROWTH_RATE')"
+                                                   :invalid="!isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate)"
+                                                   :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_INVALID_TEXT')"
+                                                   style-type="secondary"
+                                                   required
+                                    >
+                                        <p-text-input :value="budgetCreatePageState.monthlyGrowthRate"
+                                                      :invalid="!isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate)"
+                                                      @update:value="handleUpdateMonthlyGrowthRate"
                                         >
-                                            <p-text-input :value="budgetCreatePageState.monthlyGrowthRate"
-                                                          :invalid="!isValidPositiveNumber(budgetCreatePageState.monthlyGrowthRate)"
-                                                          @update:value="handleUpdateMonthlyGrowthRate"
-                                            >
-                                                <template #input-right>
-                                                    %
-                                                </template>
-                                            </p-text-input>
-                                        </p-field-group>
-                                    </div>
+                                            <template #input-right>
+                                                %
+                                            </template>
+                                        </p-text-input>
+                                    </p-field-group>
                                 </div>
-                                <div v-else-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually'">
-                                    <span class="text-xs mb-2">Enter each month manually.</span>
-                                    <div class="allocation-enter-manually">
-                                        <p-field-group v-for="(date, idx) in state.dateList"
-                                                       :key="`budget-date-${idx}`"
-                                                       :label="date"
-                                                       required
+                            </div>
+                        </p-pane-layout>
+                        <p-radio
+                            v-model="budgetCreatePageState.selectedMonthlyBudgetAllocation"
+                            value="enterManually"
+                            :disabled="budgetCreatePageState.startMonth.length === 0 || budgetCreatePageState.endMonth.length === 0"
+                        >
+                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ENTER_MANUALLY') }}
+                        </p-radio>
+                        <p-pane-layout v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually'"
+                                       class="monthly-text-layout"
+                        >
+                            <div v-if="budgetCreatePageState.selectedMonthlyBudgetAllocation === 'enterManually'">
+                                <div class="allocation-enter-manually">
+                                    <p-field-group v-for="(date, idx) in state.dateList"
+                                                   :key="`budget-date-${idx}`"
+                                                   :label="date"
+                                                   :invalid="isDateInRange(idx) && (!budgetCreatePageState.budgetEachDate[idx]
+                                                       || !isValidPositiveNumber(Number(budgetCreatePageState.budgetEachDate[idx])))"
+                                                   :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.AMOUNT_INVALID_TEXT')"
+                                                   style-type="secondary"
+                                                   required
+                                    >
+                                        <p-text-input :value="budgetCreatePageState.budgetEachDate[idx]"
+                                                      :disabled="!isDateInRange(idx)"
+                                                      :invalid="isDateInRange(idx) && (!budgetCreatePageState.budgetEachDate[idx]
+                                                          || !isValidPositiveNumber(Number(budgetCreatePageState.budgetEachDate[idx])))"
+                                                      @update:value="(value) => handleUpdatgeBudgetEachDate(value, idx)"
                                         >
-                                            <p-text-input :value="budgetCreatePageState.budgetEachDate[idx]"
-                                                          :disabled="!isDateInRange(idx)"
-                                                          :invalid="isDateInRange(idx) && (!budgetCreatePageState.budgetEachDate[idx]
-                                                              || !isValidPositiveNumber(Number(budgetCreatePageState.budgetEachDate[idx])))"
-                                                          @update:value="(value) => handleUpdatgeBudgetEachDate(value, idx)"
-                                            >
-                                                <template #input-right>
-                                                    ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
-                                                </template>
-                                            </p-text-input>
-                                        </p-field-group>
-                                    </div>
+                                            <template #input-right>
+                                                ({{ CURRENCY_SYMBOL[state.selectedCurrency] }})
+                                            </template>
+                                        </p-text-input>
+                                    </p-field-group>
                                 </div>
-                            </p-pane-layout>
-                        </div>
-                    </div>
-                </p-pane-layout>
+                            </div>
+                        </p-pane-layout>
+                    </p-radio-group>
+                </div>
             </div>
         </div>
         <div class="mt-8 flex justify-end gap-4">
-            <p-button style-type="transparent"
-                      @click="handlePrevious"
+            <p-button icon-left="ic_arrow-left"
+                      style-type="transparent"
+                      @click="handleGoBack"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PREVIOUS') }}
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.GO_BACK') }}
             </p-button>
-            <p-button :disabled="!state.isContinueAble"
+            <p-button icon-right="ic_arrow-right"
+                      :disabled="!state.isContinueAble"
+                      style-type="substitutive"
                       @click="emit('click-next')"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.CONTINUE') }}
             </p-button>
         </div>
     </div>
@@ -668,37 +720,25 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
 }
 
 .cycle-info-layout {
-    margin-left: 1.5rem;
-    padding-bottom: 1rem;
-    &.fixed-term-layout {
-        max-height: 5.375rem;
-    }
-    .allocation-layout {
-        min-width: 500px;
-        .monthly-text-layout {
-            @apply pt-4 pl-4 bg-gray-100;
-            margin-left: 24px;
-            width: 25.5rem;
-            .increase-layout {
-                .p-text-input {
-                    width: 11rem;
-                }
-            }
-        }
+    background-color: transparent !important;
+}
+
+.allocation-layout {
+    .monthly-text-layout {
+        @apply pt-4 pl-4 ml-6 bg-gray-100;
     }
 }
 
 .allocation-enter-manually {
-    @apply grid grid-cols-4 grid-rows-3 mt-1;
+    @apply grid grid-cols-4 gap-2;
     .p-text-input {
-        width: 82px;
+        width: 174px;
     }
 }
 
 .bottom-section {
     @apply flex gap-8;
     .left-section {
-        width: 30.5rem;
         .start-selected {
             @apply text-gray-900;
         }

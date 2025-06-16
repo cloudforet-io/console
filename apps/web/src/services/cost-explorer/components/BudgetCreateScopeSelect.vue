@@ -5,7 +5,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PSelectDropdown, PRadioGroup, PRadio,
+    PFieldGroup, PSelectDropdown, PRadio,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -86,23 +86,27 @@ watch(() => budgetCreatePageState.project, () => {
     <p-field-group required
                    :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SCOPE')"
     >
-        <p-radio-group>
-            <p-radio v-for="(scope, idx) in state.scopeList"
-                     :key="`budget-scope-${idx}`"
-                     v-model="budgetCreatePageState.scope.type"
-                     :value="scope.name"
-                     class="mb-1"
-                     :disabled="!state.isRadioDisable"
+        <div class="flex flex-col mt-1">
+            <div v-for="(scope, idx) in state.scopeList"
+                 :key="`budget-scope-${idx}`"
+                 class="flex items-center"
             >
-                <span class="radio-item">
+                <p-radio
+                    v-model="budgetCreatePageState.scope.type"
+                    :value="scope.name"
+                    :disabled="!state.isRadioDisable"
+                    class="min-w-[8.75rem] mb-2"
+                >
                     {{ scope.label }}
-                </span>
-            </p-radio>
-        </p-radio-group>
-        <p-select-dropdown block
-                           :disabled="!state.isSelectable"
-                           :menu="state.refinedServiceAccountList"
-                           :selected.sync="budgetCreatePageState.scope.serviceAccount"
-        />
+                </p-radio>
+
+                <p-select-dropdown
+                    v-if="scope.name === 'serviceAccount' && state.isSelectable"
+                    block
+                    :menu="state.refinedServiceAccountList"
+                    :selected.sync="budgetCreatePageState.scope.serviceAccount"
+                />
+            </div>
+        </div>
     </p-field-group>
 </template>

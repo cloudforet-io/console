@@ -108,7 +108,9 @@ onUnmounted(() => {
 
 <style scoped lang="postcss">
 .budget-create-page {
-    margin: 9rem auto;
+    max-width: 57.5rem;
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
     &.step-1 {
         width: 62.5rem;
     }
