@@ -9,7 +9,7 @@ import { useProjectGroupApi } from '@/api-clients/identity/project-group/composa
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

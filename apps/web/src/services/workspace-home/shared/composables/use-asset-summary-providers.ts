@@ -4,8 +4,8 @@ import { computed } from 'vue';
 import dayjs from 'dayjs';
 
 import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composables/use-metric-data-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
