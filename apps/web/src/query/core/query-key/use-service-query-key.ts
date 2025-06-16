@@ -2,12 +2,12 @@ import { toValue } from '@vueuse/core';
 import type { Ref, ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { omitPageFromLoadParams, omitPageQueryParams } from '@/query/pagination/pagination-query-helper';
-import { useQueryKeyAppContext } from '@/query/query-key/_composable/use-app-context-query-key';
-import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/query-key/_helpers/query-key-helper';
+import { useQueryKeyAppContext } from '@/query/core/query-key/_composable/use-app-context-query-key';
+import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/core/query-key/_helpers/query-key-helper';
 import type {
     QueryKeyArray, ResourceName, ServiceName, Verb,
-} from '@/query/query-key/types/query-key-type';
+} from '@/query/core/query-key/types/query-key-type';
+import { omitPageFromLoadParams, omitPageQueryParams } from '@/query/service-query/pagination/pagination-query-helper';
 
 
 // Cache for debug logs

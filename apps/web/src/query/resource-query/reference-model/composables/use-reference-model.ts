@@ -4,12 +4,12 @@ import {
     reactive, ref, watch,
 } from 'vue';
 
-import { useWatchedQueryCache } from '@/query/composables/use-watched-query-cache';
-import { useReferenceQueryKey } from '@/query/query-key/use-reference-query-key';
+import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
 import { useBatchedReferenceFetch } from '@/query/resource-query/reference-model/composables/_internal/use-batched-reference-fetch';
 import type { ReferenceConfig, ReferenceItem } from '@/query/resource-query/reference-model/types/reference-type';
 import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
+import { useWatchedQueryCache } from '@/query/shared/use-watched-query-cache';
 
 export const useReferenceModel = <T extends Record<string, any>, R extends ReferenceItem>(
     resourceKey: ResourceKeyType,

@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/vue-query';
 import { useQueryClient } from '@tanstack/vue-query';
 
-import { useReferenceQueryKey } from '@/query/query-key/use-reference-query-key';
+import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 import type { ResourceCacheType, ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 

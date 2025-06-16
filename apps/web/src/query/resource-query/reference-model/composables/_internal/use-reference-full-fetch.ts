@@ -1,5 +1,5 @@
 import { referenceQueryClient as queryClient } from '@/query/clients';
-import type { QueryKeyArray } from '@/query/query-key/types/query-key-type';
+import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
 import type { ReferenceConfig } from '@/query/resource-query/reference-model/types/reference-type';
 import { createResourceIdResolver } from '@/query/resource-query/reference-model/utils/reference-helper';
 import { useResourceInfo } from '@/query/resource-query/shared/composable/use-resource-info';

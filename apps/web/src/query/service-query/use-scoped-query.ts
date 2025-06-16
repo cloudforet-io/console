@@ -1,5 +1,5 @@
 /**
- * useScopedInfiniteQuery - A custom wrapper around `useInfiniteQuery` to enforce scope-based API fetching.
+ * useScopedQuery - A custom wrapper around `useQuery` to enforce scope-based API fetching.
  *
  * ## Why this hook exists?
  * This hook was created to integrate **scope-based API access control** with Vue Query.
@@ -7,22 +7,23 @@
  * Additionally, it automatically handles loading states and prevents unnecessary queries.
  *
  * ## Functionality
- * - Extends `useInfiniteQuery` with **grant scope validation**.
+ * - Extends `useQuery` with **grant scope validation**.
  * - Runs queries only when **the user's scope is valid** and the app is **ready**.
  * - Uses Vue's **reactivity** to dynamically compute the `enabled` state.
  * - Supports both **static and reactive `enabled` values**.
  *
  * ## Parameters:
- * - `options`: Standard **Vue Query options** (`UseInfiniteQueryOptions`).
+ * - `options`: Standard **Vue Query options** (`UseQueryOptions`).
  * - `requiredScopes`: A list of **required grant scopes** to determine if the query should execute.
  *
+ * ## Supported Query Options:
+ * - `queryKey`, `queryFn`, `select`, `initialData`, `staleTime`, `enabled` (static or reactive)
+ *
  * ## Example:
- * const query = useScopedInfiniteQuery(
+ * const query = useScopedQuery(
  *   {
  *     queryKey: ['dashboard', dashboardId],
  *     queryFn: () => fetchDashboardData(dashboardId),
- *     initialPageParam: 1,
- *     getNextPageParam: (lastPage, allPages) => {}
  *     enabled: computed(() => isUserAuthorized.value),
  *   },
  *   ['DOMAIN', 'WORKSPACE']
@@ -33,16 +34,12 @@ import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/core';
 import { computed, type ComputedRef } from 'vue';
 
-import type {
-    InfiniteData,
-    QueryKey,
-} from '@tanstack/vue-query';
 import {
-    useInfiniteQuery, type UseInfiniteQueryOptions, type UseInfiniteQueryReturnType,
+    useQuery, type UseQueryOptions, type UseQueryReturnType,
 } from '@tanstack/vue-query';
 
 import type { GrantScope } from '@/api-clients/identity/token/schema/type';
-import type { QueryKeyArray } from '@/query/query-key/types/query-key-type';
+import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
@@ -51,15 +48,15 @@ import { useAuthorizationStore } from '@/store/authorization/authorization-store
 type ScopedEnabled = MaybeRef<boolean>;
 
 
-export const useScopedInfiniteQuery = <TQueryFnData, TError = unknown, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(
-    options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey, TPageParam>,
+export const useScopedQuery = <TQueryFnData, TError = unknown, TData = TQueryFnData>(
+    options: UseQueryOptions<TQueryFnData, TError, TData>,
     requiredScopes: [GrantScope, ...GrantScope[]],
-): UseInfiniteQueryReturnType<TData, TError> => {
+): UseQueryReturnType<TData, TError> => {
     // [Dev Warning] This query is missing `requiredScopes`.
     // All scoped queries must explicitly define at least one valid scope for clarity and safety.
     if (import.meta.env.DEV && (!requiredScopes || requiredScopes.length === 0)) {
         _warnOncePerTick(() => {
-            console.warn('[useScopedInfiniteQuery] `requiredScopes` is missing or empty.', {
+            console.warn('[useScopedQuery] `requiredScopes` is missing or empty.', {
                 queryKey: _extractQueryKey((options as any).queryKey),
                 suggestion: 'Pass at least one valid scope like [\'DOMAIN\'], [\'WORKSPACE\'], etc.',
             });
@@ -90,7 +87,7 @@ export const useScopedInfiniteQuery = <TQueryFnData, TError = unknown, TData = I
         const currentScope = currentGrantScope.value;
         if (isAppReady.value && currentScope && toValue(rawEnabled) && !requiredScopes.includes(currentScope)) {
             _warnOncePerTick(() => {
-                console.warn('[useScopedInfiniteQuery] Invalid requiredScopes for current scope:', {
+                console.warn('[useScopedQuery] Invalid requiredScopes for current scope:', {
                     queryKey: _extractQueryKey((options as any).queryKey),
                     requiredScopes,
                     currentScope,
@@ -100,7 +97,7 @@ export const useScopedInfiniteQuery = <TQueryFnData, TError = unknown, TData = I
         }
     }
 
-    return useInfiniteQuery<TQueryFnData, TError, TData, TQueryKey, TPageParam>({
+    return useQuery<TQueryFnData, TError, TData>({
         ...options,
         enabled: queryEnabled,
     });
@@ -119,7 +116,7 @@ const _getCallerKey = (): string => {
 
         const caller = stack.find((line, i) => i > 1
             && (line.includes('.ts') || line.includes('.vue'))
-            && !line.includes('use-scoped-infinite-query'));
+            && !line.includes('use-scoped-query'));
 
         return caller?.trim() ?? 'UNKNOWN_CALLSITE';
     } catch {
