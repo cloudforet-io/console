@@ -125,7 +125,7 @@ const analyzeTrendData = async () => {
             is_confirmed: true,
             query: {
                 granularity: GRANULARITY.MONTHLY,
-                group_by: [state.selectedTarget],
+                group_by: [state.selectedTarget, 'is_adjusted'],
                 field_group: ['date'],
                 start: state.period.start,
                 end: state.period.end,
