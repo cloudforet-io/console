@@ -92,10 +92,7 @@ const tableState = reactive({
 
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
-    .setSort('issue_date', true)
-    .setFilters([
-        { k: 'status', v: isAdminMode.value ? ['DONE', 'ADJUSTING'] : ['DONE'], o: '' },
-    ]);
+    .setSort('issue_date', true);
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -180,6 +177,11 @@ const getCostReportsList = (options: any = {}) => {
     if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
     costReportListApiQueryHelper.setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit);
+    if (!isAdminMode.value) {
+        costReportListApiQueryHelper.setFilters([
+            { k: 'status', v: ['DONE'], o: '' },
+        ]);
+    }
     costReportPageStore.fetchCostReportsList({
         query: costReportListApiQueryHelper.data,
     });
