@@ -122,7 +122,7 @@ const taskTypesById = computed<Record<string, TaskTypeModel>>(() => {
 /* tasks */
 const { taskAPI } = useTaskApi();
 const { key: taskListQueryKey, params: taskListQueryParams } = useServiceQueryKey('opsflow', 'task', 'list', {
-    contextKey: props.categoryId ?? 'all',
+    contextKey: computed(() => props.categoryId ?? 'all'),
     params: computed(() => ({
         query: taskListApiQuery.value,
     })),

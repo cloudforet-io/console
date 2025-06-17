@@ -13,7 +13,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider,
+    PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider, PTextButton,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
@@ -661,22 +661,24 @@ watch(() => storeState.serviceId, (serviceId) => {
                 <div v-for="(item, idx) in value"
                      :key="`resource-item-${idx}`"
                 >
-                    <component :is="item.asset_id ? PLink : 'p'"
-                               class="resource-item"
-                               :class="{ 'link': item.asset_id }"
-                               @click="item.asset_id ? handleRouteViewButton(item.asset_id, item.asset_type) : null"
+                    <p-text-button v-if="item.asset_id"
+                                   style-type="highlight"
+                                   class="resource-link"
+                                   @click="handleRouteViewButton(item.asset_id, item.asset_type)"
                     >
-                        <span class="flex items-center">
-                            <span class="text inline-block truncate">{{ item?.name }}</span>
-                            <p-i v-if="item.asset_id"
-                                 name="ic_arrow-right-up"
-                                 class="ml-0.5"
-                                 height="0.875rem"
-                                 width="0.875rem"
-                                 color="inherit"
-                            />
-                        </span>
-                    </component>
+                        {{ item?.name }}
+                        <p-i name="ic_arrow-right-up"
+                             class="ml-0.5"
+                             height="0.875rem"
+                             width="0.875rem"
+                             color="inherit"
+                        />
+                    </p-text-button>
+                    <p v-else
+                       class="resource-item truncate"
+                    >
+                        {{ item?.name }}
+                    </p>
                 </div>
             </template>
         </p-toolbox-table>
@@ -754,6 +756,9 @@ watch(() => storeState.serviceId, (serviceId) => {
         &.link {
             @apply text-secondary truncate cursor-pointer;
         }
+    }
+    .resource-link {
+        padding: 0;
     }
 }
 </style>
