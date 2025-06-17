@@ -4,23 +4,12 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
-
-import type { ServiceChannelCreateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create';
-import type {
-    ServiceChannelCreateForwardChannelParameters,
-} from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create-forward-channel';
-import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationsCreateForm from '@/services/alert-manager/v2/components/NotificationsCreateForm.vue';
 import NotificationsCreateTypeSelector
     from '@/services/alert-manager/v2/components/NotificationsCreateTypeSelector.vue';
+import { useServiceChannelCreateMutation } from '@/services/alert-manager/v2/composables/use-service-channel-create-mutation';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
@@ -51,6 +40,13 @@ const state = reactive({
         return state.formValid;
     }),
     isForwardTypeProtocol: computed<boolean>(() => storeState.selectedProtocolId?.toLowerCase().includes('forward') || false),
+});
+
+const { mutate: serviceChannelCreateMutate } = useServiceChannelCreateMutation({
+    onSuccess: async () => {
+        await handleClickCancelButton();
+    },
+    isForwardTypeProtocol: computed(() => state.isForwardTypeProtocol),
 });
 
 const handleChangeForm = (form: CreatedNotificationInfoType, formValid: boolean) => {
@@ -85,23 +81,15 @@ const handleActionButton = () => {
     fetchCreateNotifications();
 };
 
-const fetchCreateNotifications = async () => {
-    const fetcher = state.isForwardTypeProtocol
-        ? SpaceConnector.clientV2.alertManager.serviceChannel.createForwardChannel<ServiceChannelCreateForwardChannelParameters, ServiceChannelModel>
-        : SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>;
+const fetchCreateNotifications = () => {
     const defaultParams = {
         service_id: props.serviceId,
         ...state.form,
     };
-    try {
-        await fetcher(state.isForwardTypeProtocol
-            ? defaultParams
-            : { protocol_id: storeState.selectedProtocolId, ...defaultParams });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
-        handleClickCancelButton();
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
+    if (!state.isForwardTypeProtocol) {
+        defaultParams.protocol_id = storeState.selectedProtocolId;
     }
+    serviceChannelCreateMutate(defaultParams);
 };
 
 onUnmounted(() => {

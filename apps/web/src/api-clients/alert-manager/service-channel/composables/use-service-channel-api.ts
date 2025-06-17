@@ -2,6 +2,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceChannelCreateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create';
+import type { ServiceChannelCreateForwardChannelParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create-forward-channel';
 import type { ServiceChannelDeleteParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/delete';
 import type { ServiceChannelDisableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/disable';
 import type { ServiceChannelEnableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/enable';
@@ -12,7 +13,7 @@ import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-ch
 
 export const useServiceChannelApi = () => {
     const actions = {
-        createForwardChannel: SpaceConnector.clientV2.alertManager.serviceChannel.createForwardChannel<ServiceChannelCreateParameters, ServiceChannelModel>,
+        createForwardChannel: SpaceConnector.clientV2.alertManager.serviceChannel.createForwardChannel<ServiceChannelCreateForwardChannelParameters, ServiceChannelModel>,
         create: SpaceConnector.clientV2.alertManager.serviceChannel.create<ServiceChannelCreateParameters, ServiceChannelModel>,
         delete: SpaceConnector.clientV2.alertManager.serviceChannel.delete<ServiceChannelDeleteParameters>,
         disable: SpaceConnector.clientV2.alertManager.serviceChannel.disable<ServiceChannelDisableParameters>,
