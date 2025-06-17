@@ -2,12 +2,13 @@
 // @ts-nocheck
 import { computed, reactive } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelUpdateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/update';
-import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelUpdateParameters } from '@/schema/notification/project-channel/api-verbs/update';
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
@@ -31,6 +32,7 @@ type Emit<Data> = {
 
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
     const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
+    const { userChannelAPI } = useUserChannelApi();
 
     const state = reactive({
         visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
@@ -39,6 +41,24 @@ export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, e
         userChannelId: _state.userChannelId,
         projectChannelId: _state.projectChannelId,
     }) as NotificationItemState<Data>;
+
+    const { mutate: userChannelUpdateMutate } = useMutation({
+        mutationFn: (params: UserChannelUpdateParameters|UserChannelUpdateParametersV1) => {
+            if (state.visibleUserNotification) {
+                return userChannelAPI.update(params as UserChannelUpdateParameters);
+            }
+            return SpaceConnector.clientV2.notification.userChannel.update(params as UserChannelUpdateParametersV1);
+        },
+        onSuccess: () => {
+            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
+            state.isEditMode = false;
+            emit('edit', undefined);
+        },
+        onError: (error) => {
+            ErrorHandler.handleRequestError(error, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'));
+        },
+    });
+
     const cancelEdit = (initialData: Data) => {
         state.isEditMode = false;
         if (typeof initialData === 'object') {
@@ -78,10 +98,7 @@ export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, e
             } else if (paramKey === 'schedule') {
                 param.schedule = paramValue;
             }
-            const fetcher = state.visibleUserNotification
-                ? SpaceConnector.clientV2.alertManager.userChannel.update<UserChannelUpdateParameters, UserChannelModel>(param)
-                : SpaceConnector.clientV2.notification.userChannel.update<UserChannelUpdateParametersV1>(paramV1);
-            await fetcher;
+            userChannelUpdateMutate(param);
             showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
             state.isEditMode = false;
             emit('edit', undefined);

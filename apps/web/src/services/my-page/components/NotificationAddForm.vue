@@ -2,12 +2,15 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
 
+import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelCreateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/create';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelCreateParameters } from '@/schema/notification/project-channel/api-verbs/create';
@@ -38,6 +41,7 @@ const props = withDefaults(defineProps<{
 
 const router = useRouter();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
+const { userChannelAPI } = useUserChannelApi();
 
 const state = reactive({
     visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
@@ -60,29 +64,39 @@ const state = reactive({
     isInputValid: false,
 });
 
-const createUserChannel = async () => {
-    try {
-        const fetcher = state.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.userChannel.create<UserChannelCreateParameters>({
-                protocol_id: props.protocolId,
-                name: state.channelName,
-                schedule: state.scheduleSettingData,
-                data: state.schemaForm,
-                tags: {},
-            }) : SpaceConnector.clientV2.notification.userChannel.create<UserChannelCreateParametersV1>({
-                protocol_id: props.protocolId,
-                name: state.channelName,
-                data: state.data,
-                is_subscribe: state.topicMode,
-                subscriptions: state.topicList,
-                schedule: state.schedule,
-                is_scheduled: state.isScheduled,
-            });
-        await fetcher;
+const { mutate: userChannelCreateMutate } = useMutation({
+    mutationFn: (params: UserChannelCreateParameters|UserChannelCreateParametersV1) => {
+        if (state.visibleUserNotification) {
+            return userChannelAPI.create(params as UserChannelCreateParameters);
+        }
+        return SpaceConnector.clientV2.notification.userChannel.create(params as UserChannelCreateParametersV1);
+    },
+    onSuccess: () => {
         showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
+    },
+});
+
+const createUserChannel = async () => {
+    const params = state.visibleUserNotification
+        ? {
+            protocol_id: props.protocolId,
+            name: state.channelName,
+            schedule: state.scheduleSettingData,
+            data: state.schemaForm,
+            tags: {},
+        } : {
+            protocol_id: props.protocolId,
+            name: state.channelName,
+            data: state.data,
+            is_subscribe: state.topicMode,
+            subscriptions: state.topicList,
+            schedule: state.schedule,
+            is_scheduled: state.isScheduled,
+        };
+    userChannelCreateMutate(params);
 };
 
 const createProjectChannel = async () => {

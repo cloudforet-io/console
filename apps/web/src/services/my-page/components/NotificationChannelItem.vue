@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { reactive, nextTick, computed } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PIconButton, PPaneLayout, PToggleButton, PFieldTitle,
 } from '@cloudforet/mirinae';
 
 
+import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelDisableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/disable';
 import type { UserChannelEnableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/enable';
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
@@ -34,6 +37,8 @@ import NotificationChannelItemTopic
     from '@/services/my-page/components/NotificationChannelItemTopic.vue';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 
+import type { UserChannelDeleteParameters } from '@/schema/alert-manager/user-channel/api-verbs/delete';
+
 
 const STATE_TYPE = {
     ENABLED: 'ENABLED',
@@ -55,6 +60,8 @@ const emit = defineEmits<{(event: 'change'): void;
     (event: 'confirm'): void;
 }>();
 
+const { userChannelAPI } = useUserChannelApi();
+
 type EditTarget = 'name' | 'data' | 'notification_level' | 'schedule' | 'topic';
 const state = reactive({
     isActivated: props.channelData.state === STATE_TYPE.ENABLED,
@@ -62,10 +69,60 @@ const state = reactive({
     projectChannelId: props.channelData.project_channel_id,
     editTarget: undefined as EditTarget | undefined,
     scheduleData: props.channelData.schedule,
+    channelId: computed<string>(() => ((props.visibleUserNotification ? { channel_id: state.userChannelId } : { user_channel_id: state.userChannelId }))),
 });
 const checkDeleteState = reactive({
     visible: false,
     headerTitle: i18n.t('MY_PAGE.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE'),
+});
+
+const { mutate: userChannelDeleteMutate } = useMutation({
+    mutationFn: (params: UserChannelDeleteParameters|UserChannelDeleteParametersV1) => {
+        if (props.visibleUserNotification) {
+            return userChannelAPI.delete(params as UserChannelDeleteParameters);
+        }
+        return SpaceConnector.clientV2.notification.userChannel.delete(params as UserChannelDeleteParametersV1);
+    },
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
+    },
+    onSettled: () => {
+        checkDeleteState.visible = false;
+        emit('confirm');
+    },
+});
+const { mutate: userChannelDisableMutate } = useMutation({
+    mutationFn: (params: UserChannelDisableParameters|UserChannelDisableParametersV1) => {
+        if (props.visibleUserNotification) {
+            return userChannelAPI.disable(params as UserChannelDisableParameters);
+        }
+        return SpaceConnector.clientV2.notification.userChannel.disable(params as UserChannelDisableParametersV1);
+    },
+    onSuccess: () => {
+        state.isActivated = false;
+        showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
+    },
+});
+const { mutate: userChannelEnableMutate } = useMutation({
+    mutationFn: (params: UserChannelEnableParameters|UserChannelEnableParametersV1) => {
+        if (props.visibleUserNotification) {
+            return userChannelAPI.enable(params as UserChannelEnableParameters);
+        }
+        return SpaceConnector.clientV2.notification.userChannel.enable(params as UserChannelDisableParametersV1);
+    },
+    onSuccess: () => {
+        state.isActivated = false;
+        showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'));
+    },
 });
 
 const enableProjectChannel = async () => {
@@ -82,21 +139,8 @@ const enableProjectChannel = async () => {
 };
 
 const enableUserChannel = async () => {
-    try {
-        if (!state.userChannelId) throw new Error('User channel id is not defined');
-        const fetcher = props.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.userChannel.enable<UserChannelEnableParameters>({
-                channel_id: state.userChannelId,
-            })
-            : SpaceConnector.clientV2.notification.userChannel.enable<UserChannelEnableParametersV1>({
-                user_channel_id: state.userChannelId,
-            });
-        await fetcher;
-        state.isActivated = true;
-        showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'));
-    }
+    if (!state.userChannelId) throw new Error('User channel id is not defined');
+    userChannelEnableMutate(state.channelId);
 };
 
 const enableChannel = async () => {
@@ -119,21 +163,8 @@ const disableProjectChannel = async () => {
 };
 
 const disableUserChannel = async () => {
-    try {
-        if (!state.userChannelId) throw new Error('User channel id is not defined');
-        const fetcher = props.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.userChannel.disable<UserChannelDisableParameters>({
-                channel_id: state.userChannelId,
-            }) : SpaceConnector.clientV2.notification.userChannel.disable<UserChannelDisableParametersV1>({
-                user_channel_id: state.userChannelId,
-            });
-        await fetcher;
-        state.isActivated = false;
-        showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
-        throw e;
-    }
+    if (!state.userChannelId) throw new Error('User channel id is not defined');
+    userChannelDisableMutate(state.channelId);
 };
 
 const disableChannel = async () => {
@@ -175,23 +206,9 @@ const deleteProjectChannel = async () => {
     }
 };
 
-const deleteUserChannel = async () => {
-    try {
-        if (!state.userChannelId) throw new Error('User channel id is not defined');
-        const fetcher = props.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.userChannel.delete<UserChannelDisableParameters>({
-                channel_id: state.userChannelId,
-            }) : SpaceConnector.clientV2.notification.userChannel.delete<UserChannelDeleteParametersV1>({
-                user_channel_id: state.userChannelId,
-            });
-        await fetcher;
-        showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
-    } finally {
-        checkDeleteState.visible = false;
-        emit('confirm');
-    }
+const deleteUserChannel = () => {
+    if (!state.userChannelId) throw new Error('User channel id is not defined');
+    userChannelDeleteMutate(state.channelId);
 };
 
 const deleteChannelConfirm = async () => {
@@ -210,7 +227,7 @@ const onEdit = (value?: EditTarget) => {
 <template>
     <p-pane-layout class="channel-card-wrapper">
         <div class="card-header">
-            <p-field-title :label="props.channelData.protocol_name.toLowerCase().includes('spaceone') ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : props.channelData.protocol_name">
+            <p-field-title :label="props.channelData.protocol_name?.toLowerCase().includes('spaceone') ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER') : props.channelData.protocol_name">
                 <template #left>
                     <p-toggle-button :value="state.isActivated"
                                      :disabled="props.manageDisabled"
