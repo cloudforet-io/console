@@ -197,7 +197,7 @@ const analyzeCostReportData = debounce(async () => {
         state.rawData = res;
         state.refinedData = getRefinedAnalyzeData(res);
     } catch (e) {
-        state.rawData = {};
+        state.rawData = { results: [] };
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
