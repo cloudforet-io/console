@@ -543,6 +543,8 @@
 					"ACTUAL_COST": "실 사용액",
 					"AMOUNT_PLANNING_TYPE": "예산 설정 타입",
 					"BASE_INFORMATION": {
+						"ACCUMULATED_USAGE_OVER": "계획 예산 초과 누적 사용",
+						"ACCUMULATED_USAGE_UNDER": "계획 예산 이하 누적 사용",
 						"BUDGET_ALERTS_TEXT": "실제 지출이 {threshold}를 초과하면 예산 관리자와 알림 수신자에게 알림을 보냅니다.",
 						"EDIT": "편집",
 						"NAME_INVALID_TEXT": "이름을 입력하지 않았거나, 이미 존재하는 이름입니다.",
