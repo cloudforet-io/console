@@ -9,6 +9,7 @@ import {
     PI, PTooltip,
 } from '@cloudforet/mirinae';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDisplayStore } from '@/store/display/display-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -28,10 +29,11 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 
 const userStore = useUserStore();
 const displayStore = useDisplayStore();
+const authorizationStore = useAuthorizationStore();
 
 const state = reactive({
     hasNotifications: computed(() => displayStore.getters.hasUncheckedNotifications),
-    isNoRoleUser: computed<boolean>(() => userStore.getters.isNoRoleUser),
+    isNoRoleUser: computed<boolean>(() => authorizationStore.getters.isNoRoleUser),
     notificationCount: 0,
     iconColor: computed<string>(() => {
         if (props.visible) return blue[600];
