@@ -8,9 +8,7 @@ import { includes } from 'lodash';
 import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserStore } from '@/store/user/user-store';
-
-import type { MenuId } from '@/lib/menu/config';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import TopBarWorkspaces from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarWorkspaces.vue';
 import TopBarSearch from '@/common/modules/navigations/top-bar/modules/top-bar-search/TopBarSearch.vue';
@@ -19,12 +17,12 @@ import TopBarToolset from '@/common/modules/navigations/top-bar/modules/top-bar-
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 
 const appContextStore = useAppContextStore();
-const userStore = useUserStore();
+const athorizationStore = useAuthorizationStore();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     openedMenu: '',
-    hasPermission: computed<boolean>((() => userStore.getters.hasPermission)),
+    hasPermission: computed<boolean>((() => athorizationStore.getters.hasPermission)),
     logoLink: computed(() => {
         if (state.isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
         return null;
@@ -38,7 +36,7 @@ const topBarWorkspaceRef = ref<InstanceType<typeof TopBarWorkspaces>>();
 const hideMenu = () => {
     state.openedMenu = '';
 };
-const handleOpenMenu = (menuId: MenuId) => {
+const handleOpenMenu = (menuId: string) => {
     if (state.openedMenu === menuId) {
         hideMenu();
     } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuId)) {
