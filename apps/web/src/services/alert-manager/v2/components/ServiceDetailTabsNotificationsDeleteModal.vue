@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PScopedNotification, PLink, PDataTable, PStatus, PI, PLazyImg,
 } from '@cloudforet/mirinae';
 
+import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import type { ServiceChannelDeleteParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/delete';
 import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
@@ -42,12 +44,12 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceChannelAPI } = useServiceChannelApi();
 
 const storeState = reactive({
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const tableState = reactive({
@@ -69,6 +71,18 @@ const { escalationPolicyListData } = useEscalationPolicyListQuery({
     })),
 });
 
+const { mutate: serviceChannelDeleteMutate, isPending: deleteChannelLoading } = useMutation({
+    mutationFn: (params: ServiceChannelDeleteParameters) => serviceChannelAPI.delete(params),
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DELETED'), '');
+        state.proxyVisible = false;
+        emit('close');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 const hasNotificationValue = (): boolean => {
     if (!props.selectedItem?.channel_id) return false;
     return escalationPolicyListData.value.some((item) => item.rules.some((rule) => rule.channels.includes(props.selectedItem?.channel_id || '')));
@@ -81,27 +95,17 @@ const getEscalationPolicyLink = () => ({
     },
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.serviceChannel.delete<ServiceChannelDeleteParameters>({
-            channel_id: props.selectedItem?.channel_id || '',
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DELETED'), '');
-        state.proxyVisible = false;
-        emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+const handleConfirm = () => {
+    serviceChannelDeleteMutate({
+        channel_id: props.selectedItem?.channel_id || '',
+    });
 };
 </script>
 
 <template>
     <p-button-modal :header-title="i18n.t('ALERT_MANAGER.SERVICE.MODAL.DELETE_NOTIFICATION_TITLE')"
                     theme-color="alert"
-                    :loading="state.loading"
+                    :loading="deleteChannelLoading"
                     :visible.sync="state.proxyVisible"
                     :disabled="hasNotificationValue()"
                     @confirm="handleConfirm"
