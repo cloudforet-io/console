@@ -6,23 +6,23 @@ import {
 
 import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
 import { useBatchedReferenceFetch } from '@/query/resource-query/reference-model/composables/_internal/use-batched-reference-fetch';
-import type { ReferenceConfig, ReferenceItem } from '@/query/resource-query/reference-model/types/reference-type';
+import type { ReferenceItem } from '@/query/resource-query/reference-model/types/reference-type';
 import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 import { useWatchedQueryCache } from '@/query/shared/use-watched-query-cache';
 
 export const useReferenceModel = <T extends Record<string, any>, R extends ReferenceItem>(
     resourceKey: ResourceKeyType,
-    referenceConfig: ReferenceConfig<T>,
+    referenceAdaptor: (arg: T) => ReferenceItem,
+    fetchOptions: { only: string[] } = { only: [] },
 ) => {
     const { key: queryKey } = useReferenceQueryKey(resourceKey);
-    const { transform } = referenceConfig;
 
     // Core
     const { fetcher: enqueue } = useBatchedReferenceFetch<T>(
         resourceKey,
         queryKey.value,
-        referenceConfig,
+        fetchOptions,
     );
 
     const cachedReactiveMap = reactive<Record<string, Ref<R|undefined>>>({});
@@ -40,9 +40,9 @@ export const useReferenceModel = <T extends Record<string, any>, R extends Refer
     watch(cachedData, (data) => {
         if (data) {
             Object.entries(data).forEach(([id, item]) => {
-                const transformed = transform(item) as R;
-                if (!cachedReactiveMap[id]) cachedReactiveMap[id] = ref(transformed) as unknown as Ref<R|undefined>;
-                else cachedReactiveMap[id].value = transformed;
+                const referenceData = referenceAdaptor(item) as R;
+                if (!cachedReactiveMap[id]) cachedReactiveMap[id] = ref(referenceData) as Ref<R|undefined>;
+                else cachedReactiveMap[id].value = referenceData;
             });
         }
     }, { immediate: true });
@@ -51,3 +51,6 @@ export const useReferenceModel = <T extends Record<string, any>, R extends Refer
         referenceMap,
     };
 };
+
+
+// TODO: add referenceModel DX guidelines

@@ -4,7 +4,6 @@ import {
 
 import { referenceQueryClient as queryClient } from '@/query/clients';
 import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
-import type { ReferenceConfig } from '@/query/resource-query/reference-model/types/reference-type';
 import { createResourceIdResolver } from '@/query/resource-query/reference-model/utils/reference-helper';
 import { useResourceInfo } from '@/query/resource-query/shared/composable/use-resource-info';
 import type { ResourceKeyType, ResourceCacheType } from '@/query/resource-query/shared/types/resource-type';
@@ -18,10 +17,10 @@ const MAX_BATCH_SIZE = 30;
 export function useBatchedReferenceFetch<T extends Record<string, any>>(
     resourceKey: ResourceKeyType,
     queryKey: QueryKeyArray,
-    referenceConfig: ReferenceConfig<T>,
+    fetchOptions: { only: string[] } = { only: [] },
 ) {
     const { config, api } = useResourceInfo(resourceKey);
-    const { only } = referenceConfig;
+    const { only = [] } = fetchOptions;
 
     // Utills
     const getId = createResourceIdResolver<T>(resourceKey);
