@@ -543,6 +543,8 @@
 					"ACTUAL_COST": "費用",
 					"AMOUNT_PLANNING_TYPE": "予算設定タイプ",
 					"BASE_INFORMATION": {
+						"ACCUMULATED_USAGE_OVER": "計画予算超過の累積使用量",
+						"ACCUMULATED_USAGE_UNDER": "計画予算未満の累積使用量",
 						"BUDGET_ALERTS_TEXT": "実際の支出が {threshold} を超えた場合、予算管理者とアラート受信者に通知されます。",
 						"EDIT": "編集",
 						"NAME_INVALID_TEXT": "名前が入力されていないか、すでに使用されています。",

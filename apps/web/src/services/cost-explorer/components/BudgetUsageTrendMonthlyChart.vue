@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
 
     .chart {
         height: 100%;
-        min-width: 700px;
+        min-width: 43.75rem;
     }
 }
 </style>
