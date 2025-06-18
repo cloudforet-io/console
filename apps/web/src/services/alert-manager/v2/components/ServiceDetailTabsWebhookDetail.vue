@@ -4,6 +4,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -16,11 +17,13 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookGetParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/get';
 import type { WebhookListErrorsParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/list-errors';
 import type { WebhookUpdateMessageFormatParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update-message-format';
 import type { WebhookModel, WebhookListErrorsModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { WebhookMessageFormatType } from '@/api-clients/alert-manager/webhook/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
@@ -110,13 +113,16 @@ const state = reactive({
     errorTotalCount: 0,
 });
 const messageState = reactive({
-    loading: false,
     formatList: [] as WebhookMessageFormatType[],
     editFormVisible: false,
     sortBy: 'created_at',
     sortDesc: true,
     formats: {},
 });
+
+const queryClient = useQueryClient();
+const { webhookAPI } = useWebhookApi();
+const { key: webhookDetailBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'get');
 
 const errorListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
     .setPage(1, 15);
@@ -195,23 +201,26 @@ const fetchWebhookErrorList = async () => {
         state.errorListLoading = false;
     }
 };
-const fetchMessageUpdate = async (tags) => {
-    messageState.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.webhook.updateMessageFormat<WebhookUpdateMessageFormatParameters, WebhookModel>({
-            webhook_id: state.webhookInfo.webhook_id,
-            message_formats: Object.entries(tags).map(([key, value]) => ({
-                from: key,
-                to: value,
-            })) as WebhookMessageFormatType[],
-        });
+
+const { mutateAsync: updateMessageFormat, isPending: updateMessageFormatLoading } = useMutation({
+    mutationFn: (params: WebhookUpdateMessageFormatParameters) => webhookAPI.updateMessageFormat(params),
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: webhookDetailBaseQueryKey.value });
         await handleEditMessageFormat(false);
         await fetchWebhookDetail();
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        messageState.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const fetchMessageUpdate = (tags) => {
+    updateMessageFormat({
+        webhook_id: state.webhookInfo.webhook_id,
+        message_formats: Object.entries(tags).map(([key, value]) => ({
+            from: key,
+            to: value,
+        })) as WebhookMessageFormatType[],
+    });
 };
 
 watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
@@ -392,7 +401,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                 <transition name="slide-up">
                     <service-detail-tabs-webhook-detail-message-overlay v-if="messageState.editFormVisible"
                                                                         :formats="messageState.formats"
-                                                                        :loading="messageState.loading"
+                                                                        :loading="updateMessageFormatLoading"
                                                                         @close="handleEditMessageFormat(false)"
                                                                         @confirm="fetchMessageUpdate"
                     />
