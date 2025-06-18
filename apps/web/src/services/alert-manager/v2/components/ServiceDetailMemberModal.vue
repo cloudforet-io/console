@@ -3,18 +3,20 @@ import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { partition, reject, map } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens, PEmpty, PScopedNotification, PLink,
 } from '@cloudforet/mirinae';
 
+import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
 import type { ServiceChangeMembersParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/change-members';
 import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
@@ -118,7 +120,24 @@ const state = reactive({
     selectedDeleteMember: {} as MemberInfoType,
 });
 
+const queryClient = useQueryClient();
+const { serviceAPI } = useServiceApi();
+const { key: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
+
 const { serviceChannelListData } = useServiceChannelListQuery();
+const { mutate: changeMemegers } = useMutation({
+    mutationFn: (params: ServiceChangeMembersParameters) => serviceAPI.changeMembers(params),
+    onSuccess: async () => {
+        if (state.mode === 'invitation') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
+        }
+        queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey.value });
+        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
 
 const formatRoleType = (roleType: RoleType) => roleType?.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
 
@@ -186,21 +205,13 @@ const getNotificationLink = () => ({
 });
 
 const fetcherChangeMembers = async (userData: string[], userGroupData: string[]) => {
-    try {
-        await SpaceConnector.clientV2.alertManager.service.changeMembers<ServiceChangeMembersParameters>({
-            service_id: storeState.serviceInfo.service_id,
-            members: {
-                USER: userData,
-                USER_GROUP: userGroupData,
-            },
-        });
-        if (state.mode === 'invitation') {
-            showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
-        }
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
+    changeMemegers({
+        service_id: storeState.serviceInfo.service_id,
+        members: {
+            USER: userData,
+            USER_GROUP: userGroupData,
+        },
+    });
 };
 </script>
 
