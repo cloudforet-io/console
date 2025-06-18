@@ -69,7 +69,6 @@ const { data: serviceChannelData } = useScopedQuery({
     queryFn: () => serviceChannelAPI.get(serviceChannelGetQueryParams.value),
     enabled: computed(() => !!storeState.selectedNotificationId),
     gcTime: 1000 * 60 * 2,
-    staleTime: 1000 * 30,
 }, ['WORKSPACE']);
 
 const state = reactive({

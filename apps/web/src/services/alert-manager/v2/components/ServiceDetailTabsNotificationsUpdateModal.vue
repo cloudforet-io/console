@@ -254,6 +254,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                                         <p-radio v-for="(item, idx) in state.radioMenuList"
                                                  :key="`notification-scope-${idx}`"
                                                  v-model="state.selectedRadioIdx"
+                                                 :value="idx"
                                                  @change="handleChangeRadio"
                                         >
                                             <span class="radio-item">
