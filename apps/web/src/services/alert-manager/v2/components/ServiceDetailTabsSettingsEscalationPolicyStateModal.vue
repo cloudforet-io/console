@@ -3,7 +3,6 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDefinitionTable,
 } from '@cloudforet/mirinae';
@@ -11,15 +10,13 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
-import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
-import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useServiceUpdateMutation } from '@/services/alert-manager/v2/composables/use-service-update-mutation';
 import {
     ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
 } from '@/services/alert-manager/v2/constants/escalation-policy-table-constant';
@@ -47,30 +44,29 @@ const storeState = reactive({
     serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
 });
+
+const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
+    onSuccess: async () => {
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
+        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceId);
+        state.proxyVisible = false;
+        emit('close');
+    },
+});
+
 const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
     const allChannels = rules.flatMap((item) => item.channels);
     const uniqueChannels = new Set(allChannels);
     return uniqueChannels.size;
 };
+
 const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
-            escalation_policy_id: props.selectedItem.escalation_policy_id,
-            service_id: storeState.serviceId,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceId);
-        state.proxyVisible = false;
-        emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    updateService({
+        escalation_policy_id: props.selectedItem.escalation_policy_id,
+        service_id: storeState.serviceId,
+    });
 };
 </script>
 
@@ -78,7 +74,7 @@ const handleConfirm = async () => {
     <p-button-modal class="service-detail-tabs-settings-escalation-policy-state-modal"
                     :visible.sync="state.proxyVisible"
                     :header-title="$t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_STATE_TITLE')"
-                    :loading="state.loading"
+                    :loading="updateServiceLoading"
                     size="md"
                     @confirm="handleConfirm"
     >

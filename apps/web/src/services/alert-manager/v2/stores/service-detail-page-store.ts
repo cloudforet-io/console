@@ -6,11 +6,9 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ServiceGetParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/get';
-import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
 import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import type { AlertsInfoType, AlertsType } from '@/api-clients/alert-manager/service/schema/type';
-import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -18,8 +16,6 @@ import type { ServiceReferenceMap } from '@/store/reference/service-reference-st
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -156,20 +152,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 throw e;
             } finally {
                 state.loading = false;
-            }
-        },
-        async updateServiceDetailData({ name, description }: { name: string, description: string }) {
-            try {
-                await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
-                    service_id: getters.serviceInfo.service_id,
-                    name,
-                    description,
-                });
-                showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-            } catch (e) {
-                ErrorHandler.handleError(e, true);
-                state.serviceInfo = {} as ServiceModel;
-                throw e;
             }
         },
     };

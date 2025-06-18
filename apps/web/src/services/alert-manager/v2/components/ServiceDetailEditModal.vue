@@ -12,6 +12,7 @@ import type { ServiceReferenceMap } from '@/store/reference/service-reference-st
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useServiceUpdateMutation } from '@/services/alert-manager/v2/composables/use-service-update-mutation';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
@@ -33,7 +34,6 @@ const storeState = reactive({
     service: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     disabled: computed<boolean>(() => invalidState.name || (storeState.service.name === name.value && storeState.service.description === description.value)),
 });
@@ -59,18 +59,21 @@ const {
     },
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await serviceDetailPageStore.updateServiceDetailData({
-            name: name.value,
-            description: description.value || ' ',
-        });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.service.service_id);
-    } finally {
-        state.loading = false;
+const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
+    onSuccess: () => {
+        serviceDetailPageStore.fetchServiceDetailData(storeState.service.service_id);
+    },
+    onSettled: () => {
         handleClose();
-    }
+    },
+});
+
+const handleConfirm = async () => {
+    updateService({
+        service_id: storeState.service.service_id,
+        name: name.value,
+        description: description.value || ' ',
+    });
 };
 const handleClose = () => {
     state.proxyVisible = false;
@@ -85,7 +88,7 @@ const handleClose = () => {
                     :backdrop="true"
                     :visible="state.proxyVisible"
                     :disabled="state.disabled"
-                    :loading="state.loading"
+                    :loading="updateServiceLoading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
