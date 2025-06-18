@@ -7,6 +7,7 @@ import { PNotificationBar } from '@cloudforet/mirinae';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useErrorStore } from '@/store/error/error-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -21,10 +22,11 @@ const props = withDefaults(defineProps<{
 const userWorkspaceStore = useUserWorkspaceStore();
 const errorStore = useErrorStore();
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const route = useRoute();
 
 const storeState = reactive({
-    hasPermission: computed(() => userStore.getters.hasPermission),
+    hasPermission: computed(() => authorizationStore.getters.hasPermission),
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     workspaceList: computed(() => userWorkspaceStore.getters.workspaceList),
     visibleAuthorizationError: computed(() => errorStore.state.visibleAuthorizationError),

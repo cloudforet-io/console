@@ -50,7 +50,7 @@ export const GROUP_BY_FILTER_ITEM_MAP = {
 } as const;
 
 export const COST_REPORT_GROUP_BY_ITEM_MAP = {
-    [GROUP_BY.WORKSPACE_NAME]: { name: GROUP_BY.WORKSPACE_NAME, label: 'Workspace' },
+    [GROUP_BY.WORKSPACE]: { name: GROUP_BY.WORKSPACE, label: 'Workspace' },
     [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
 } as const;
 

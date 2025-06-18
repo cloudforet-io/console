@@ -113,7 +113,7 @@ const state = reactive({
     tableFields: computed<DataTableFieldType[]>(() => {
         const targetField: DataTableFieldType = {
             name: props.groupBy,
-            label: props.groupBy === 'workspace_id' ? 'Workspace' : 'Provider',
+            label: props.groupBy === GROUP_BY.WORKSPACE ? 'Workspace' : 'Provider',
             sortable: false,
         };
         const subTotalField = {
