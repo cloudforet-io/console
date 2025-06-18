@@ -3,16 +3,17 @@ import { computed, reactive } from 'vue';
 
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
-import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
-const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.state;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
@@ -24,13 +25,24 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
-        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
-        label: protocol.name,
-        value: protocol.protocol_id,
-    }))),
     selectedProtocol: {},
 });
+
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+const { key: notificationProtocolListQueryKey } = useServiceQueryKey('alert-manager', 'notification-protocol', 'list');
+
+const { data: notificationProtocolListData } = useScopedQuery({
+    queryKey: notificationProtocolListQueryKey,
+    queryFn: async () => notificationProtocolAPI.list(),
+    select: (data) => data.results?.map((i) => ({
+        label: i.name,
+        value: i.protocol_id,
+        icon: storeState.plugins[i.plugin_info.plugin_id]?.icon || '',
+    })),
+    enabled: computed(() => Object.keys(storeState.plugins).length > 0),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
 
 /* Component */
 const handleSelectChannel = (selectedProtocol) => {
@@ -46,7 +58,7 @@ const handleSelectChannel = (selectedProtocol) => {
 
 <template>
     <div class="select-channel-card">
-        <p-select-card v-for="(channel, idx) in state.protocolList"
+        <p-select-card v-for="(channel, idx) in notificationProtocolListData"
                        :key="`channel-${idx}`"
                        v-model="state.selectedProtocol"
                        :selected="state.selectedProtocol"
