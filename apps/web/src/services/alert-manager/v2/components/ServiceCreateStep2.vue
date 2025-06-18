@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { WebhookCreateParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/create';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ServiceCreateStepContainer from '@/services/alert-manager/v2/components/ServiceCreateStepContainer.vue';
 import WebhookCreateForm from '@/services/alert-manager/v2/components/WebhookCreateForm.vue';
@@ -18,6 +10,7 @@ import WebhookCreateSuccessMode
     from '@/services/alert-manager/v2/components/WebhookCreateSuccessMode.vue';
 import WebhookCreateTypeSelector
     from '@/services/alert-manager/v2/components/WebhookCreateTypeSelector.vue';
+import { useWebhookCreateMutation } from '@/services/alert-manager/v2/composables/use-webhook-create-mutation';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 
 const serviceCreateFormStore = useServiceCreateFormStore();
@@ -31,7 +24,6 @@ const storeState = reactive({
     webhookVersion: computed<string|undefined>(() => serviceCreateFormState.webhookVersion || ''),
 });
 const state = reactive({
-    loading: false,
     isAllFormValid: computed<boolean>(() => {
         if (storeState.currentSubStep === 1) return storeState.selectedWebhookType?.plugin_id !== '';
         if (storeState.currentSubStep === 2) return storeState.webhookName !== '';
@@ -40,24 +32,25 @@ const state = reactive({
     succeedWebhook: undefined as undefined|WebhookModel,
 });
 
-const handleCreateWebhook = async () => {
-    state.loading = true;
-    try {
-        state.succeedWebhook = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
-            name: storeState.webhookName,
-            plugin_info: {
-                plugin_id: storeState.selectedWebhookType?.plugin_id || '',
-                version: storeState.webhookVersion,
-            },
-            service_id: storeState.createdServiceId,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
+const { mutateAsync: createWebhook, isPending: createWebhookLoading } = useWebhookCreateMutation({
+    onSuccess: (data) => {
+        state.succeedWebhook = data as WebhookModel;
         serviceCreateFormStore.setCurrentSubStep(3);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    },
+    onError: () => {
+        state.succeedWebhook = undefined;
+    },
+});
+
+const handleCreateWebhook = async () => {
+    createWebhook({
+        name: storeState.webhookName,
+        plugin_info: {
+            plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+            version: storeState.webhookVersion,
+        },
+        service_id: storeState.createdServiceId,
+    });
 };
 
 onUnmounted(() => {
@@ -69,7 +62,7 @@ onUnmounted(() => {
     <service-create-step-container class="service-create-step2"
                                    :selected-item-id="storeState.selectedWebhookType?.plugin_id || ''"
                                    :is-all-form-valid="state.isAllFormValid"
-                                   :loading="state.loading"
+                                   :loading="createWebhookLoading"
                                    @create="handleCreateWebhook"
     >
         <webhook-create-type-selector v-if="storeState.currentSubStep === 1" />
