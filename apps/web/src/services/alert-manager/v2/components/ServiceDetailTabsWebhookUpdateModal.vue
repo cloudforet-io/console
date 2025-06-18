@@ -3,12 +3,14 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PLazyImg,
 } from '@cloudforet/mirinae';
 
 
+import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookUpdateParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n } from '@/translations';
@@ -43,7 +45,6 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     selectedPlugin: computed<PluginItem>(() => storeState.plugins[props.selectedItem?.plugin_info.plugin_id || '']),
 });
@@ -68,21 +69,23 @@ const {
     },
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.webhook.update<WebhookUpdateParameters>({
-            webhook_id: props.selectedItem?.webhook_id || '',
-            name: name.value,
-        });
+const { webhookAPI } = useWebhookApi();
+const { mutateAsync: updateWebhook, isPending: updateWebhookLoading } = useMutation({
+    mutationFn: (params: WebhookUpdateParameters) => webhookAPI.update(params),
+    onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_UPDATE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const handleConfirm = () => {
+    updateWebhook({
+        webhook_id: props.selectedItem?.webhook_id || '',
+        name: name.value,
+    });
 };
 </script>
 
@@ -90,7 +93,7 @@ const handleConfirm = async () => {
     <p-button-modal class="service-detail-tabs-webhook-update-modal"
                     :header-title="$t('ALERT_MANAGER.WEBHOOK.MODAL_UPDATE_TITLE')"
                     :visible.sync="state.proxyVisible"
-                    :loading="state.loading"
+                    :loading="updateWebhookLoading"
                     :disalbed="!isAllValid"
                     size="sm"
                     @confirm="handleConfirm"

@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -23,6 +25,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookListParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/list';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -125,8 +128,11 @@ const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', tru
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
+const queryClient = useQueryClient();
+const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
 const handleCloseModal = () => {
     state.selectIndex = undefined;
+    queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
     fetchWebhookList();
     serviceDetailPageStore.setSelectedWebhookId(undefined);
 };

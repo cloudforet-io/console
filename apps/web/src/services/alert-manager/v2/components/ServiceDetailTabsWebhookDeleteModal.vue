@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 
 import { PTextInput } from '@cloudforet/mirinae';
 
 import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookDeleteParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/delete';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -41,13 +40,10 @@ const state = reactive({
     }),
 });
 
-const queryClient = useQueryClient();
 const { webhookAPI } = useWebhookApi();
-const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
 const { mutateAsync: deleteWebhook, isPending: deleteWebhookLoading } = useMutation({
     mutationFn: (params: WebhookDeleteParameters) => webhookAPI.delete(params),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
         showSuccessMessage(_i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DELETE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');

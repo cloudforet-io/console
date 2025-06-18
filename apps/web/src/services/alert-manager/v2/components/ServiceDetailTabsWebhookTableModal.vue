@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 
 import { PTableCheckModal, PLazyImg, PStatus } from '@cloudforet/mirinae';
 
@@ -11,7 +11,6 @@ import type { WebhookDisableParameters } from '@/api-clients/alert-manager/webho
 import type { WebhookEnableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/enable';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -55,9 +54,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
-const queryClient = useQueryClient();
 const { webhookAPI } = useWebhookApi();
-const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
 const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = useMutation({
     mutationFn: (params: WebhookDisableParameters|WebhookEnableParameters) => {
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
@@ -71,7 +68,6 @@ const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = 
         } else {
             showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_ENABLE_WEBHOOK'), '');
         }
-        queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
         state.proxyVisible = false;
         emit('close');
     },
