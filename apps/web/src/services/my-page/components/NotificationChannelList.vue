@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onActivated, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
@@ -158,7 +158,7 @@ const { key: userChannelListQueryKey, params: userChannelListQueryParams } = use
         };
     }),
 });
-const { data: queryData, isFetching: serviceChannelListFetching } = useScopedQuery({
+const { data: userChannelListData, isFetching: serviceChannelListFetching } = useScopedQuery({
     queryKey: userChannelListQueryKey,
     queryFn: async () => {
         if (state.visibleUserNotification) {
@@ -169,10 +169,10 @@ const { data: queryData, isFetching: serviceChannelListFetching } = useScopedQue
     enabled: computed(() => state.visibleUserNotification && !props.projectId),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
-}, ['DOMAIN', 'WORKSPACE']);
+}, ['USER']);
 
 const listUserChannel = () => {
-    state.channelList = queryData.value?.results?.map((d) => ({
+    state.channelList = userChannelListData.value?.results?.map((d) => ({
         ...d,
         protocol_name: injectProtocolName(d),
         schema: injectProtocolSchema(d),
@@ -200,23 +200,18 @@ const listProjectChannel = async () => {
 };
 
 const listChannel = async () => {
+    await listProtocol();
     if (!state.visibleUserNotification && props.projectId) await listProjectChannel();
-    else await listUserChannel();
+    else if (userChannelListData.value) await listUserChannel();
 };
 
 const onChangeChannelItem = async () => {
     await listChannel();
 };
 
-(async () => {
-    await listProtocol();
+watch(userChannelListData, async () => {
     await listChannel();
-})();
-
-onActivated(async () => {
-    await listProtocol();
-    await listChannel();
-});
+}, { immediate: true });
 </script>
 
 <template>

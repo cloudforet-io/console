@@ -2,13 +2,14 @@
 // @ts-nocheck
 import { computed, reactive } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelUpdateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/update';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelUpdateParameters } from '@/schema/notification/project-channel/api-verbs/update';
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
@@ -32,7 +33,9 @@ type Emit<Data> = {
 
 export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, emit: Emit<Data>) => {
     const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
+    const queryClient = useQueryClient();
     const { userChannelAPI } = useUserChannelApi();
+    const { key: userChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'user-channel', 'list');
 
     const state = reactive({
         visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
@@ -50,6 +53,7 @@ export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, e
             return SpaceConnector.clientV2.notification.userChannel.update(params as UserChannelUpdateParametersV1);
         },
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: userChannelListBaseQueryKey.value });
             showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
             state.isEditMode = false;
             emit('edit', undefined);

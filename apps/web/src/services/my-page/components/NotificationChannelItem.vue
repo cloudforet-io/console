@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, nextTick, computed } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -12,6 +12,7 @@ import {
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelDisableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/disable';
 import type { UserChannelEnableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/enable';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
 import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
 import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
@@ -39,7 +40,6 @@ import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/type
 
 import type { UserChannelDeleteParameters } from '@/schema/alert-manager/user-channel/api-verbs/delete';
 
-
 const STATE_TYPE = {
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
@@ -60,7 +60,9 @@ const emit = defineEmits<{(event: 'change'): void;
     (event: 'confirm'): void;
 }>();
 
+const queryClient = useQueryClient();
 const { userChannelAPI } = useUserChannelApi();
+const { key: userChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'user-channel', 'list');
 
 type EditTarget = 'name' | 'data' | 'notification_level' | 'schedule' | 'topic';
 const state = reactive({
@@ -84,6 +86,7 @@ const { mutate: userChannelDeleteMutate } = useMutation({
         return SpaceConnector.clientV2.notification.userChannel.delete(params as UserChannelDeleteParametersV1);
     },
     onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userChannelListBaseQueryKey.value });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
     },
     onError: (error) => {
@@ -103,6 +106,7 @@ const { mutate: userChannelDisableMutate } = useMutation({
     },
     onSuccess: () => {
         state.isActivated = false;
+        queryClient.invalidateQueries({ queryKey: userChannelListBaseQueryKey.value });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
     },
     onError: (error) => {
@@ -117,7 +121,8 @@ const { mutate: userChannelEnableMutate } = useMutation({
         return SpaceConnector.clientV2.notification.userChannel.enable(params as UserChannelDisableParametersV1);
     },
     onSuccess: () => {
-        state.isActivated = false;
+        state.isActivated = true;
+        queryClient.invalidateQueries({ queryKey: userChannelListBaseQueryKey.value });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
     },
     onError: (error) => {

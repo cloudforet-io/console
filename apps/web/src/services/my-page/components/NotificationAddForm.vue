@@ -2,16 +2,16 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelCreateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/create';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelCreateParameters } from '@/schema/notification/project-channel/api-verbs/create';
 import type { ChannelSchedule } from '@/schema/notification/type';
@@ -40,8 +40,12 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
+
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
+
+const queryClient = useQueryClient();
 const { userChannelAPI } = useUserChannelApi();
+const { key: userChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'user-channel', 'list');
 
 const state = reactive({
     visibleUserNotification: computed<boolean>(() => alertManagerUiAffectsSchema.value?.visibleUserNotification ?? false),
@@ -73,6 +77,7 @@ const { mutate: userChannelCreateMutate } = useMutation({
     },
     onSuccess: () => {
         showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '');
+        queryClient.invalidateQueries({ queryKey: userChannelListBaseQueryKey.value });
     },
     onError: (error) => {
         ErrorHandler.handleRequestError(error, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
