@@ -7,7 +7,6 @@ import { useRouter } from 'vue-router/composables';
 import { useQueryClient } from '@tanstack/vue-query';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
@@ -21,11 +20,9 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookListParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/list';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -33,7 +30,6 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -44,6 +40,8 @@ import ServiceDetailTabsWebhookTableModal
 import ServiceDetailTabsWebhookUpdateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsWebhookUpdateModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useWebhookListPaginationQuery } from '@/services/alert-manager/v2/composables/use-webhook-list-pagination-query';
+import { useWebhookListQuery } from '@/services/alert-manager/v2/composables/use-webhook-list-query';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -112,15 +110,19 @@ const storeState = reactive({
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });
 const state = reactive({
-    loading: true,
     items: [] as WebhookModel[],
-    totalCount: 0,
     selectIndex: undefined as number|undefined,
-    selectedItem: computed<WebhookModel>(() => state.items[state.selectIndex]),
+    selectedItem: computed<WebhookModel>(() => webhookListData.value[state.selectIndex]),
 });
 const modalState = reactive({
     visible: false,
     type: undefined as WebhookModalType|undefined,
+});
+const filterState = reactive({
+    thisPage: 1,
+    pageSize: 15,
+    sortKey: 'created_at',
+    sortDesc: true,
 });
 
 const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
@@ -129,15 +131,16 @@ const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_
 const { queryTags } = queryTagHelper;
 
 const queryClient = useQueryClient();
-const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
+const { webhookListQueryKey } = useWebhookListQuery();
+
 const handleCloseModal = () => {
     state.selectIndex = undefined;
-    queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
-    fetchWebhookList();
+    queryClient.invalidateQueries({ queryKey: webhookListQueryKey.value });
+    refreshWebhookList();
     serviceDetailPageStore.setSelectedWebhookId(undefined);
 };
 const initSelectedWebhook = () => {
-    state.selectIndex = state.items.findIndex((item) => item.webhook_id === storeState.selectedWebhookId);
+    state.selectIndex = webhookListData.value?.findIndex((item) => item.webhook_id === storeState.selectedWebhookId);
 };
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
@@ -150,11 +153,9 @@ const handleSelectDropdownItem = (name: WebhookModalType) => {
     modalState.type = name;
 };
 const handleChangeToolbox = async (options: any = {}) => {
-    if (options.sortBy !== undefined) webhookListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy !== undefined) filterState.sortKey = options.sortBy;
+    if (options.sortDesc !== undefined) filterState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
-    if (options.pageStart !== undefined) webhookListApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) webhookListApiQueryHelper.setPageLimit(options.pageLimit);
-    await fetchWebhookList();
 };
 const handleExportExcel = async () => {
     await downloadExcel({
@@ -171,35 +172,29 @@ const handleExportExcel = async () => {
 const handleSelectTableRow = (item:number[]) => {
     if (item.length === 0) return;
     state.selectIndex = item[0];
-    serviceDetailPageStore.setSelectedWebhookId(state.items[item[0]].webhook_id);
+    serviceDetailPageStore.setSelectedWebhookId(webhookListData.value[item[0]].webhook_id);
 };
 
-const fetchWebhookList = async () => {
-    state.loading = true;
-    try {
+const {
+    data: webhookListData,
+    totalCount: webhookListTotalCount,
+    isLoading: webhookListLoading,
+    refresh: refreshWebhookList,
+} = useWebhookListPaginationQuery({
+    thisPage: computed(() => filterState.thisPage),
+    pageSize: computed(() => filterState.pageSize),
+    params: computed<WebhookListParameters>(() => {
         webhookListApiQueryHelper.setFilters([
             ...queryTagHelper.filters.value,
         ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
+        return {
             query: webhookListApiQueryHelper.data,
             service_id: storeState.serviceId,
-        });
-        state.items = results || [];
-        state.totalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-};
+        };
+    }),
+});
 
-watch(() => storeState.serviceId, (id) => {
-    if (!id) return;
-    fetchWebhookList();
-}, { immediate: true });
-watch([() => storeState.selectedWebhookId, () => state.items], ([selectedWebhookId]) => {
+watch([() => storeState.selectedWebhookId, () => webhookListData.value], ([selectedWebhookId]) => {
     if (!selectedWebhookId) return;
     initSelectedWebhook();
 }, { immediate: true });
@@ -218,9 +213,11 @@ onUnmounted(() => {
                          sortable
                          exportable
                          :multi-select="false"
-                         :loading="state.loading"
-                         :total-count="state.totalCount"
-                         :items="state.items"
+                         :loading="webhookListLoading"
+                         :total-count="webhookListTotalCount"
+                         :this-page.sync="filterState.thisPage"
+                         :page-size.sync="filterState.pageSize"
+                         :items="webhookListData"
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
@@ -228,7 +225,7 @@ onUnmounted(() => {
                          :value-handler-map="tableState.valueHandlerMap"
                          :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
                          @change="handleChangeToolbox"
-                         @refresh="handleChangeToolbox()"
+                         @refresh="refreshWebhookList"
                          @export="handleExportExcel"
                          @select="handleSelectTableRow"
         >
@@ -237,7 +234,7 @@ onUnmounted(() => {
                     <template #heading>
                         <p-heading heading-type="sub"
                                    use-total-count
-                                   :total-count="state.totalCount"
+                                   :total-count="webhookListTotalCount"
                                    :title="$t('ALERT_MANAGER.WEBHOOK.TITLE')"
                         />
                     </template>
