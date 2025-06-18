@@ -3,6 +3,7 @@ import { useElementSize } from '@vueuse/core/index';
 import {
     computed, reactive, ref,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader, PI,
@@ -26,6 +27,9 @@ const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
@@ -37,7 +41,7 @@ const state = reactive({
     pageMax: computed<number>(() => Math.max(serviceChannelListData.value.length - state.visibleCount, 0)),
 });
 
-const { serviceChannelListData, serviceChannelListFetching } = useServiceChannelListQuery();
+const { serviceChannelListData, serviceChannelListFetching } = useServiceChannelListQuery(serviceId.value);
 
 const handleClickArrowButton = (increment: number) => {
     const element = {

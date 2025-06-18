@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { mapValues } from 'lodash';
@@ -31,6 +32,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { UserRadioType, ProtocolInfo } from '@/services/alert-manager/v2/types/alert-manager-type';
 
@@ -47,8 +49,12 @@ const queryClient = useQueryClient();
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
+const { serviceData } = useServiceGetQuery(serviceId.value);
 
 const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
@@ -57,7 +63,7 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const storeState = reactive({
-    serviceMember: computed<Record<MembersType, string[]>>(() => serviceDetailPageGetters.serviceInfo?.members || []),
+    serviceMember: computed<Record<MembersType, string[]>|undefined>(() => serviceData.value?.members || undefined),
     language: computed<string>(() => serviceDetailPageGetters.language),
 });
 const state = reactive({

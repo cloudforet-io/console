@@ -62,7 +62,6 @@ import {
 } from '@/services/alert-manager/v2/helpers/alert-period-helper';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     AlertFilterType, AlertPeriodItemType,
     AlertPeriodDropdownMenuType,
@@ -75,8 +74,6 @@ const allReferenceGetters = allReferenceStore.getters;
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 const alertPageGetters = alertPageStore.getters;
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -92,7 +89,7 @@ const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     app: computed<AppReferenceMap>(() => allReferenceGetters.app),
     serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
+    serviceId: computed<string>(() => route.params.serviceId as string),
     selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),

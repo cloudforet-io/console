@@ -2,7 +2,7 @@
 import {
     reactive, computed, onUnmounted,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -27,7 +27,6 @@ import {
     SERVICE_CHANNEL_TYPE,
 } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
-import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
@@ -47,6 +46,7 @@ import ServiceDetailTabsNotificationsUpdateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsNotificationsUpdateModal.vue';
 import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
 import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -67,15 +67,18 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const serviceCreateFormStore = useServiceCreateFormStore();
 
+const route = useRoute();
 const router = useRouter();
+
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceData } = useServiceGetQuery(serviceId.value);
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -107,13 +110,12 @@ const tableState = reactive({
     ])),
     fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('alert_manager.ServiceChannel', 'name', 'string', [{ k: 'service_id', v: storeState.service.service_id, o: 'eq' }]),
+        name: makeDistinctValueHandler('alert_manager.ServiceChannel', 'name', 'string', [{ k: 'service_id', v: serviceId.value, o: 'eq' }]),
         state: makeEnumValueHandler(SERVICE_CHANNEL_STATE),
     })),
 });
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
-    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
 });
 const state = reactive({
     refinedItems: computed<ServiceChannelModel[]>(() => (serviceChannelListData.value?.results || []).map((i) => {
@@ -158,7 +160,7 @@ const { key: serviceChannelListQueryKey, params: serviceChannelListQueryParams }
                 ...notificationsListApiQueryHelper.data,
                 sort: [{ key: sortState.sortKey, desc: sortState.sortDesc }],
             },
-            service_id: storeState.service.service_id,
+            service_id: serviceId.value,
         };
     }),
     pagination: true,
@@ -185,7 +187,7 @@ const handleCloseModal = () => {
 };
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
-    serviceCreateFormStore.setCreatedService(storeState.service);
+    serviceCreateFormStore.setCreatedService(serviceData.value || {});
     router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
     }).catch(() => {});
@@ -203,7 +205,7 @@ const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/service-channel/list',
         param: {
-            service_id: storeState.service.service_id,
+            service_id: serviceId.value,
             query: { ...notificationsListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,

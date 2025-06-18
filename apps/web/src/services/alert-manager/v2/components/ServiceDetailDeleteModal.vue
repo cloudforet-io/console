@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -17,9 +17,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
@@ -29,17 +28,14 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
-
 const router = useRouter();
-
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
-const storeState = reactive({
-    service: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
-});
+const { serviceData } = useServiceGetQuery(serviceId.value);
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     fields: computed<DefinitionField[]>(() => [
@@ -47,8 +43,8 @@ const state = reactive({
         { name: 'webhook', label: i18n.t('ALERT_MANAGER.WEBHOOK.TITLE') },
     ]),
     data: computed(() => ({
-        alerts: storeState.service.alerts.TOTAL.HIGH + storeState.service.alerts.TOTAL.LOW,
-        webhook: storeState.service.webhooks?.length || 0,
+        alerts: (serviceData.value?.alerts?.TOTAL.HIGH || 0) + (serviceData.value?.alerts?.TOTAL.LOW || 0),
+        webhook: serviceData.value?.webhooks?.length || 0,
     })),
     noData: computed<boolean>(() => state.data.alerts === 0 && state.data.webhook === 0),
 });
@@ -72,7 +68,7 @@ const { mutate: deleteService, isPending: deleteServiceLoading } = useMutation({
 });
 const handleConfirm = async () => {
     deleteService({
-        service_id: serviceDetailPageGetters.serviceInfo.service_id,
+        service_id: serviceId.value,
         force: true,
     });
 };

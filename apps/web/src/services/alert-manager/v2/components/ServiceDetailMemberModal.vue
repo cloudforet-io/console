@@ -2,6 +2,7 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { partition, reject, map } from 'lodash';
@@ -32,10 +33,10 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 import { indigo } from '@/styles/colors';
 
 import { useServiceChannelListQuery } from '@/services/alert-manager/v2/composables/use-service-channel-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
 type modalMode = 'member' | 'invitation';
@@ -61,13 +62,17 @@ const props = withDefaults(defineProps<Props>(), {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
+const { serviceData } = useServiceGetQuery(serviceId.value);
+
 const { width } = useWindowSize();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
-    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
     userMap: computed<UserReferenceMap>(() => serviceDetailPageGetters.userReferenceMap),
     userGroupMap: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
 });
@@ -94,7 +99,7 @@ const state = reactive({
         }
     }),
     memberList: computed<MemberInfoType[]>(() => {
-        const userList = storeState.serviceInfo.members.USER.map((i) => {
+        const userList = (serviceData.value?.members?.USER || []).map((i) => {
             const user = storeState.userMap[i];
             return {
                 roleType: user?.data.roleInfo?.role_type,
@@ -103,7 +108,7 @@ const state = reactive({
                 key: user?.key,
             };
         });
-        const userGroupList = storeState.serviceInfo.members.USER_GROUP.map((i) => {
+        const userGroupList = (serviceData.value?.members?.USER_GROUP || []).map((i) => {
             const userGroup = storeState.userGroupMap[i];
             return {
                 label: userGroup?.name || '',
@@ -122,17 +127,17 @@ const state = reactive({
 
 const queryClient = useQueryClient();
 const { serviceAPI } = useServiceApi();
-const { key: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
+const { withSuffix: serviceQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
 
-const { serviceChannelListData } = useServiceChannelListQuery();
+const { serviceChannelListData } = useServiceChannelListQuery(serviceId.value);
 const { mutate: changeMemegers } = useMutation({
     mutationFn: (params: ServiceChangeMembersParameters) => serviceAPI.changeMembers(params),
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
+        const _serviceId = { service_id: variables.service_id };
         if (state.mode === 'invitation') {
             showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
         }
-        queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey.value });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
+        queryClient.invalidateQueries({ queryKey: serviceQueryKey(_serviceId) });
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
@@ -206,7 +211,7 @@ const getNotificationLink = () => ({
 
 const fetcherChangeMembers = async (userData: string[], userGroupData: string[]) => {
     changeMemegers({
-        service_id: storeState.serviceInfo.service_id,
+        service_id: serviceId.value,
         members: {
             USER: userData,
             USER_GROUP: userGroupData,

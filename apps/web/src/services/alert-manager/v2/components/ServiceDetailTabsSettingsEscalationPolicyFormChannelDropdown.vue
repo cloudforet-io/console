@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { isEqual } from 'lodash';
 
@@ -27,11 +28,14 @@ const props = withDefaults(defineProps<{
     selectedIds: undefined,
 });
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
 }>();
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
-const { serviceChannelListData } = useServiceChannelListQuery();
+const { serviceChannelListData } = useServiceChannelListQuery(serviceId.value);
 
 const state = reactive({
     loading: false,

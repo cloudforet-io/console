@@ -6,24 +6,17 @@ import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-ch
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-import { useServiceDetailPageStore } from '../stores/service-detail-page-store';
-
 interface UseServiceChannelListQueryReturn {
     serviceChannelListData: Ref<ServiceChannelModel[]>;
     serviceChannelListFetching: Ref<boolean>;
 }
 
-export const useServiceChannelListQuery = (): UseServiceChannelListQueryReturn => {
-    const serviceDetailPageStore = useServiceDetailPageStore();
-    const serviceDetailPageGetters = serviceDetailPageStore.getters;
-
+export const useServiceChannelListQuery = (serviceId: string): UseServiceChannelListQueryReturn => {
     const { serviceChannelAPI } = useServiceChannelApi();
-
-    const serviceId = computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id);
 
     const { key: serviceChannelListQueryKey, params: serviceChannelListQueryParams } = useServiceQueryKey('alert-manager', 'service-channel', 'list', {
         params: computed(() => ({
-            service_id: serviceId.value,
+            service_id: serviceId,
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },

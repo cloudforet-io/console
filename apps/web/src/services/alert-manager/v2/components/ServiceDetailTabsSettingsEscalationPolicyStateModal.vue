@@ -2,6 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PButtonModal, PDefinitionTable,
@@ -32,8 +33,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
@@ -41,7 +44,6 @@ const emit = defineEmits<{(e: 'update:visible'): void;
 
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
@@ -50,7 +52,6 @@ const state = reactive({
 const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
     onSuccess: async () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceId);
         state.proxyVisible = false;
         emit('close');
     },
@@ -65,7 +66,7 @@ const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): number => {
 const handleConfirm = async () => {
     updateService({
         escalation_policy_id: props.selectedItem.escalation_policy_id,
-        service_id: storeState.serviceId,
+        service_id: serviceId.value,
     });
 };
 </script>

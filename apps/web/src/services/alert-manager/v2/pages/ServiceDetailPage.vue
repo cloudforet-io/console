@@ -51,9 +51,9 @@ const state = reactive({
         { name: storeState.serviceList[props.serviceId].label },
     ]),
 });
+
 watch(() => props.serviceId, async (serviceId) => {
     if (!serviceId) return;
-    await serviceDetailPageStore.fetchServiceDetailData(serviceId);
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
 watch(() => storeState.serviceList, async (serviceList) => {

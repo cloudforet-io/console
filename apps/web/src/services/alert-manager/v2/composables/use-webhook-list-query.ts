@@ -8,8 +8,6 @@ import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/mo
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-import { useServiceDetailPageStore } from '../stores/service-detail-page-store';
-
 interface UseWebhookListQueryReturn {
     webhookListData: Ref<WebhookModel[]>;
     webhookListTotalCount: Ref<number>;
@@ -17,16 +15,12 @@ interface UseWebhookListQueryReturn {
     webhookListQueryKey: Ref<QueryKey>;
 }
 
-export const useWebhookListQuery = (): UseWebhookListQueryReturn => {
-    const serviceDetailPageStore = useServiceDetailPageStore();
-    const serviceDetailPageGetters = serviceDetailPageStore.getters;
-    const serviceId = computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id);
-
+export const useWebhookListQuery = (serviceId: string): UseWebhookListQueryReturn => {
     const { webhookAPI } = useWebhookApi();
 
     const { key: webhookListQueryKey, params: webhookListQueryParams } = useServiceQueryKey('alert-manager', 'webhook', 'list', {
         params: computed(() => ({
-            service_id: serviceId.value,
+            service_id: serviceId,
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },
