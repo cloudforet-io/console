@@ -5,7 +5,6 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ServiceDeleteParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/delete';
 import type { ServiceGetParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/get';
 import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
 import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
@@ -170,17 +169,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
             } catch (e) {
                 ErrorHandler.handleError(e, true);
                 state.serviceInfo = {} as ServiceModel;
-                throw e;
-            }
-        },
-        async deleteServiceDetailData() {
-            try {
-                await SpaceConnector.clientV2.alertManager.service.delete<ServiceDeleteParameters>({
-                    service_id: getters.serviceInfo.service_id,
-                    force: true,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e, true);
                 throw e;
             }
         },
