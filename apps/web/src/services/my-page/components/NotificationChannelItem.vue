@@ -12,7 +12,7 @@ import {
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelDisableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/disable';
 import type { UserChannelEnableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/enable';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
 import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
 import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';

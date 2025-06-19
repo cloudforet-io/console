@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
 
-import { useReferenceQueryKey } from '@/query/query-key/use-reference-query-key';
+import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
 import type { ReferenceFetchInfo, ReferenceKeyType } from '@/query/reference/types/reference-type';
 
 

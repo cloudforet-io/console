@@ -7,9 +7,9 @@ import type { InfiniteData } from '@tanstack/vue-query';
 import { useQueryClient, type UseInfiniteQueryOptions } from '@tanstack/vue-query';
 
 import type { GrantScope } from '@/api-clients/identity/token/schema/type';
-import { useScopedInfiniteQuery } from '@/query/composables/use-scoped-infinite-query';
-import { addPageToVerbParams } from '@/query/pagination/pagination-query-helper';
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
+import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
+import { addPageToVerbParams } from '@/query/service-query/pagination/pagination-query-helper';
+import { useScopedInfiniteQuery } from '@/query/service-query/use-scoped-infinite-query';
 
 
 /**

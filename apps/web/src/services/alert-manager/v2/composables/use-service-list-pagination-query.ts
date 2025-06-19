@@ -6,8 +6,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
 import type { ServiceListParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/list';
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 
 interface UseServiceListPaginationQueryOptions {
     params: ComputedRef<ServiceListParameters>;

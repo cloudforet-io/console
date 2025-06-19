@@ -9,7 +9,7 @@ import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/compos
 import type { PublicFolderShareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/share';
 import type { PublicFolderUnshareParameters } from '@/api-clients/dashboard/public-folder/schema/api-verbs/unshare';
 import type { PublicFolderModel } from '@/api-clients/dashboard/public-folder/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UseDashboardFolderShareMutationOptions {
     isShared: ComputedRef<boolean>;

@@ -12,7 +12,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';

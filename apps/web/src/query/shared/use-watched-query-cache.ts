@@ -4,8 +4,7 @@ import { onUnmounted, ref } from 'vue';
 import { hashKey } from '@tanstack/vue-query';
 
 import { referenceQueryClient as queryClient } from '@/query/clients';
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
-
+import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
 
 export const useWatchedQueryCache = <T>(queryKey: QueryKeyArray) => {
     const data = ref<T | undefined>(queryClient.getQueryData<T>(queryKey));

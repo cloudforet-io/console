@@ -6,8 +6,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
 import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 
 interface UseWebhookListPaginationQueryOptions {
     params: ComputedRef<AlertListParameters>;

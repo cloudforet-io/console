@@ -12,8 +12,8 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 
 import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
 import { useProtocolApi } from '@/api-clients/notification/protocol/composables/use-protocol-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import { i18n } from '@/translations';
 

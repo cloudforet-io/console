@@ -7,8 +7,8 @@ import {
 } from 'lodash';
 
 import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composables/use-metric-data-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';

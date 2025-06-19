@@ -14,8 +14,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 
 import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
 import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-group-channel/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';

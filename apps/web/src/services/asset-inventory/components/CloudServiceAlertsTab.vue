@@ -17,8 +17,8 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

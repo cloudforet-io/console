@@ -12,8 +12,8 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 
 const DEFAULT_LIST_DATA = { results: [] };

@@ -15,8 +15,8 @@ import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-a
 import { ALERT_HISTORY_ACTION } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertHistoryActionType } from '@/api-clients/alert-manager/alert/schema/type';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

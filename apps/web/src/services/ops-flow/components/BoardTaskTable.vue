@@ -17,8 +17,8 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';

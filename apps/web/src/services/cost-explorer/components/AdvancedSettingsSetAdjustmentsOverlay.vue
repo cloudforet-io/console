@@ -15,7 +15,7 @@ import type { ReportAdjustmentPolicyModel } from '@/api-clients/cost-analysis/re
 import { useReportAdjustmentApi } from '@/api-clients/cost-analysis/report-adjustment/composables/use-report-adjustment-api';
 import type { ReportAdjustmentUpdateParameters } from '@/api-clients/cost-analysis/report-adjustment/schema/api-verbs/update';
 import type { ReportAdjustmentModel } from '@/api-clients/cost-analysis/report-adjustment/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

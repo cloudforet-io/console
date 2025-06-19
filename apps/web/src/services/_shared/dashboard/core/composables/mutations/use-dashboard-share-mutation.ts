@@ -8,7 +8,7 @@ import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-ty
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardShareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/share';
 import type { PublicDashboardUnshareParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/unshare';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UseDashboardShareMutationOptions {
     isShared: ComputedRef<boolean>;

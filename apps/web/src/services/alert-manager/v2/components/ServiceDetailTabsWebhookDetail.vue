@@ -21,9 +21,9 @@ import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/u
 import type { WebhookUpdateMessageFormatParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update-message-format';
 import type { WebhookModel, WebhookListErrorsModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { WebhookMessageFormatType } from '@/api-clients/alert-manager/webhook/schema/type';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
@@ -183,6 +183,9 @@ const handleChange = async (options: any = {}) => {
     if (options.sortBy !== undefined) messageState.sortBy = options.sortBy;
     if (options.sortDesc !== undefined) messageState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+};
+const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value });
 };
 
 const setWebhookDetail = () => {
@@ -349,7 +352,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                                  :items="state.refinedErrorList"
                                  class="w-full border-none"
                                  @change="handleChange"
-                                 @refresh="queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value })"
+                                 @refresh="handleRefresh"
                 >
                     <template #col-created_at-format="{ value }">
                         {{ iso8601Formatter(value, storeState.timezone) }}
