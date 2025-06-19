@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { PButtonModal, PIconButton } from '@cloudforet/mirinae';
 
 import { useTaskTypeApi } from '@/api-clients/opsflow/task-type/composables/use-task-type-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

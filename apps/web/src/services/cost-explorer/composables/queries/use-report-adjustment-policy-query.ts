@@ -1,8 +1,8 @@
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useReportAdjustmentPolicyApi } from '@/api-clients/cost-analysis/report-adjustment-policy/composables/use-report-adjustment-policy-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 const reportAdjustmentPolicyApiHelper = new ApiQueryHelper().setSort('order', false);
 export const useReportAdjustmentPolicyQuery = () => {

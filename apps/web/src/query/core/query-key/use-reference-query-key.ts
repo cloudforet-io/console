@@ -1,9 +1,9 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { useQueryKeyAppContext } from '@/query/query-key/_composable/use-app-context-query-key';
-import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/query-key/_helpers/query-key-helper';
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
+import { useQueryKeyAppContext } from '@/query/core/query-key/_composable/use-app-context-query-key';
+import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/core/query-key/_helpers/query-key-helper';
+import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
 
 
 type ContextKeyType = string|unknown[]|object;
