@@ -99,9 +99,10 @@ export const useUserGroupPageStore = defineStore('page-user-group', () => {
         }),
         selectedUserGroupChannel: computed(() => {
             const userGroupChannels: UserGroupChannelModel[] = [];
-            if (state.userGroupChannels.selectedIndices.length > 0) {
-                userGroupChannels.push(state.userGroupChannels.list[state.userGroupChannels.selectedIndices[0]]);
-            }
+            state.userGroupChannels.selectedIndices.forEach((index) => {
+                const channel = state.userGroupChannels.list[index];
+                if (channel) userGroupChannels.push(channel);
+            });
             return userGroupChannels ?? [];
         }),
     });

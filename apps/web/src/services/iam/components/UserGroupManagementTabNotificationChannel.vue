@@ -98,7 +98,7 @@ const { data: userGroupChannelListData, totalCount: userGroupChannelListTotalCou
     queryFn: userGroupChannelAPI.list,
     params: userGroupChannelListQueryParams,
     gcTime: 1000 * 60 * 2,
-    enabled: computed(() => !!userGroupPageGetters.selectedUserGroups[0].user_group_id),
+    enabled: computed(() => userGroupPageGetters.selectedUserGroups.length > 0 && !!userGroupPageGetters.selectedUserGroups[0]?.user_group_id),
 }, {
     thisPage: computed(() => paginationState.thisPage),
     pageSize: computed(() => paginationState.pageSize),
@@ -180,7 +180,7 @@ const { key: userGroupChannelGetQueryKey, params: userGroupChannelGetQueryParams
 const { data: queryData } = useScopedQuery({
     queryKey: userGroupChannelGetQueryKey,
     queryFn: async () => userGroupChannelAPI.get(userGroupChannelGetQueryParams.value),
-    enabled: computed(() => userGroupPageGetters.selectedUserGroupChannel.length > 0 && !!userGroupPageGetters.selectedUserGroupChannel[0]?.channel_id),
+    enabled: computed(() => !!userGroupPageGetters.selectedUserGroupChannel[0]?.channel_id),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
 }, ['DOMAIN', 'WORKSPACE']);

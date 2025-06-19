@@ -61,6 +61,7 @@ const state = reactive<ChannelSetModalState>({
     scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
 });
 
+// TODO: Distinguishing conditions using modal types, etc.
 const { mutate: userGroupChannelMutate } = useMutation({
     mutationFn: (params: UserGroupChannelCreateParameters|UserGroupChannelUpdateParameters) => {
         if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {

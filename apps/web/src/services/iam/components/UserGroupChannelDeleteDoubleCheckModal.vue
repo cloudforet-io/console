@@ -43,6 +43,9 @@ const { mutate: userGroupChannelDeleteMutate, isPending: userGroupChannelDeleteP
 
 /* Component */
 const handleConfirm = () => {
+    if (!userGroupPageGetters.selectedUserGroupChannel?.[0]?.channel_id) {
+        return;
+    }
     userGroupChannelDeleteMutate({
         channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
     });
