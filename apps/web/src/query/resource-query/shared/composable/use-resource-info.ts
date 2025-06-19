@@ -18,6 +18,6 @@ export const useResourceInfo = (resourceKey: ResourceKeyType) => {
 
     return {
         config: referenceConfig,
-        api: resourceApiMap[resourceKey]()[`${resourceKey}API`] as Record<'list'|'stat', () => Promise<void>>,
+        api: resourceApiMap[resourceKey]()[`${resourceKey}API`],
     };
 };

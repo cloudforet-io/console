@@ -5,6 +5,7 @@ const IGNORED_KEYS = new Set([
     '__v_raw',
     '_isVue',
     '__v_readonly',
+    '__v_isReadonly',
     'state',
     'effect',
     'currentRoute',

@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import {
     ref,
 } from 'vue';
@@ -9,23 +10,25 @@ import { useResourceInfo } from '@/query/resource-query/shared/composable/use-re
 import type { ResourceKeyType, ResourceCacheType } from '@/query/resource-query/shared/types/resource-type';
 
 
-
+/*
+* DEBOUNCE_MS : Minimum wait time (ms) before triggering fetch after the last enqueue call
+* BATCH_SIZE : Minimum number of IDs to accumulate before triggering an immediate fetch
+* MAX_BATCH_SIZE : Maximum number of IDs to include in a single fetch batch
+* */
 const DEBOUNCE_MS = 300;
-const BATCH_SIZE = 10;
-const MAX_BATCH_SIZE = 30;
+const BATCH_SIZE = 15;
+const MAX_BATCH_SIZE = 45;
 
 export function useBatchedReferenceFetch<T extends Record<string, any>>(
     resourceKey: ResourceKeyType,
-    queryKey: QueryKeyArray,
+    queryKey: ComputedRef<QueryKeyArray>,
     fetchOptions: { only: string[] } = { only: [] },
 ) {
     const { config, api } = useResourceInfo(resourceKey);
     const { only = [] } = fetchOptions;
-
-    // Utills
     const getId = createResourceIdResolver<T>(resourceKey);
 
-    const batchedFecher = async (ids: string[]): Promise<T[]> => {
+    const batchedFetcher = async (ids: string[]): Promise<T[]> => {
         if (!config.idKey) {
             throw new Error(`[batchedFetcher] Invalid resource key: ${resourceKey}`);
         }
@@ -40,7 +43,7 @@ export function useBatchedReferenceFetch<T extends Record<string, any>>(
                 ],
             },
         };
-        if (only) {
+        if (only && only.length > 0) {
             params = {
                 ...params,
                 query: {
@@ -82,13 +85,13 @@ export function useBatchedReferenceFetch<T extends Record<string, any>>(
         pendingSet.value.clear();
         if (idsToFetch.length === 0) return;
 
-        const cached = queryClient.getQueryData<ResourceCacheType<T>>(queryKey) || {};
+        const cached = queryClient.getQueryData<ResourceCacheType<T>>(queryKey.value) || {};
         const cachedIds = new Set(Object.keys(cached));
         const ids = idsToFetch.filter((id) => !cachedIds.has(id));
 
         const chunks = _chunkArray(ids, MAX_BATCH_SIZE);
 
-        const fetchedArrays = await Promise.all(chunks.map(batchedFecher));
+        const fetchedArrays = await Promise.all(chunks.map(batchedFetcher));
         const fetched = fetchedArrays.flat();
 
         const uniqueFetched = fetched.filter((item) => !cachedIds.has(getId(item)));
@@ -96,8 +99,7 @@ export function useBatchedReferenceFetch<T extends Record<string, any>>(
         uniqueFetched.forEach((item) => {
             merged[getId(item)] = item;
         });
-        queryClient.setQueryData(queryKey, merged);
-        uniqueFetched.forEach((item) => cachedIds.add(getId(item)));
+        queryClient.setQueryData(queryKey.value, merged);
     };
 
     return {
