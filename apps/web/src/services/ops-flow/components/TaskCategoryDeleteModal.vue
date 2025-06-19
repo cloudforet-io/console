@@ -7,7 +7,7 @@ import { PButtonModal } from '@cloudforet/mirinae/';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { getParticle, i18n as _i18n } from '@/translations';
 
 import type { WorkspaceItem } from '@/store/reference/workspace-reference-store';

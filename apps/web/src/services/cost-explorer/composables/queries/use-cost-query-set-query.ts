@@ -4,8 +4,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

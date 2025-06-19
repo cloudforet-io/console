@@ -3,8 +3,8 @@ import { computed } from 'vue';
 import type { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useCostApi } from '@/api-clients/cost-analysis/cost/composables/use-cost-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 
 export const useCostAnalysisQuery = (data_source_id: string, query: ApiQueryHelper) => {

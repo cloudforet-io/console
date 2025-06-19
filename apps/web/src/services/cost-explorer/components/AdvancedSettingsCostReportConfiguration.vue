@@ -21,7 +21,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
 import type { CostReportConfigUpdateParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/update';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
