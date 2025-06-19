@@ -85,30 +85,23 @@ export const useNotificationItem = <Data>(_state: NotificationItemState<Data>, e
 
     const updateUserChannel = async <Key extends keyof (Partial<UserChannelUpdateParametersV1>
         &Partial<UserChannelUpdateParameters>) = 'name'|'data'|'schedule'>(paramKey: Key, paramValue: (Partial<UserChannelUpdateParametersV1> & Partial<UserChannelUpdateParameters>)[Key]) => {
-        try {
-            if (!state.userChannelId) throw new Error('userChannelId is undefined');
-            const paramV1: UserChannelUpdateParametersV1 = {
-                user_channel_id: state.userChannelId,
-            };
-            const param: UserChannelUpdateParameters = {
-                channel_id: state.userChannelId,
-            };
-            if (paramKey === 'name') {
-                paramV1.name = paramValue as string;
-                param.name = paramValue as string;
-            } else if (paramKey === 'data') {
-                paramV1.data = paramValue as object;
-                param.data = paramValue as object;
-            } else if (paramKey === 'schedule') {
-                param.schedule = paramValue;
-            }
-            userChannelUpdateMutate(param);
-            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
-            state.isEditMode = false;
-            emit('edit', undefined);
-        } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'));
+        if (!state.userChannelId) throw new Error('userChannelId is undefined');
+        const paramV1: UserChannelUpdateParametersV1 = {
+            user_channel_id: state.userChannelId,
+        };
+        const param: UserChannelUpdateParameters = {
+            channel_id: state.userChannelId,
+        };
+        if (paramKey === 'name') {
+            paramV1.name = paramValue as string;
+            param.name = paramValue as string;
+        } else if (paramKey === 'data') {
+            paramV1.data = paramValue as object;
+            param.data = paramValue as object;
+        } else if (paramKey === 'schedule') {
+            param.schedule = paramValue;
         }
+        userChannelUpdateMutate(state.visibleUserNotification ? param : paramV1);
     };
 
     const updateProjectChannel = async <Key extends keyof ProjectChannelUpdateParameters = 'name'|'data'|'notification_level'>(paramKey: Key, paramValue: ProjectChannelUpdateParameters[Key]) => {

@@ -40,6 +40,10 @@ import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/type
 
 import type { UserChannelDeleteParameters } from '@/schema/alert-manager/user-channel/api-verbs/delete';
 
+type ChannelIdType = {
+    channel_id?: string;
+    user_channel_id?: string;
+};
 const STATE_TYPE = {
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
@@ -67,11 +71,11 @@ const { key: userChannelListBaseQueryKey } = useServiceQueryKey('alert-manager',
 type EditTarget = 'name' | 'data' | 'notification_level' | 'schedule' | 'topic';
 const state = reactive({
     isActivated: props.channelData.state === STATE_TYPE.ENABLED,
-    userChannelId: computed<string>(() => (props.visibleUserNotification ? props.channelData.channel_id : props.channelData.user_channel_id)),
+    userChannelId: computed<string>(() => (props.visibleUserNotification ? props.channelData.channel_id || '' : props.channelData.user_channel_id || '')),
     projectChannelId: props.channelData.project_channel_id,
     editTarget: undefined as EditTarget | undefined,
     scheduleData: props.channelData.schedule,
-    channelId: computed<string>(() => ((props.visibleUserNotification ? { channel_id: state.userChannelId } : { user_channel_id: state.userChannelId }))),
+    channelId: computed<ChannelIdType>(() => ((props.visibleUserNotification ? { channel_id: state.userChannelId } : { user_channel_id: state.userChannelId }))),
 });
 const checkDeleteState = reactive({
     visible: false,
@@ -118,7 +122,7 @@ const { mutate: userChannelEnableMutate } = useMutation({
         if (props.visibleUserNotification) {
             return userChannelAPI.enable(params as UserChannelEnableParameters);
         }
-        return SpaceConnector.clientV2.notification.userChannel.enable(params as UserChannelDisableParametersV1);
+        return SpaceConnector.clientV2.notification.userChannel.enable(params as UserChannelEnableParametersV1);
     },
     onSuccess: () => {
         state.isActivated = true;
