@@ -64,9 +64,9 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
-import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
+import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';

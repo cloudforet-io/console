@@ -13,7 +13,7 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceTypeStatParameters } from '@/schema/inventory/cloud-service-type/api-verbs/stat';
+import type { CloudServiceTypeStatParameters } from '@/api-clients/inventory/cloud-service-type/schema/api-verbs/stat';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,

@@ -5,8 +5,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
-import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceTypeListParameters } from '@/api-clients/inventory/cloud-service-type/schema/api-verbs/list';
+import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
