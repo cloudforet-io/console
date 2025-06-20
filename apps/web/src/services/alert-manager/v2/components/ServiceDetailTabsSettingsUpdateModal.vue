@@ -11,8 +11,6 @@ import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/api-clients/alert-manager
 import type { NotificationUrgencyType, RecoveryModeType, ServiceOptionsType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { red } from '@/styles/colors';
@@ -86,7 +84,6 @@ const state = reactive({
 
 const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
     onSuccess: async () => {
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         state.proxyVisible = false;
     },
 });

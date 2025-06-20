@@ -11,9 +11,6 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -51,7 +48,6 @@ const state = reactive({
 
 const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
     onSuccess: async () => {
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         state.proxyVisible = false;
         emit('close');
     },

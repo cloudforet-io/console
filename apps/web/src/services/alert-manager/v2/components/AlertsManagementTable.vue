@@ -453,15 +453,12 @@ watch(() => storeState.serviceId, (serviceId) => {
     if (state.isServicePage && serviceId) {
         handleSelectServiceDropdownItem(serviceId);
     }
-});
+}, { immediate: true });
 
 (async () => {
     const {
-        serviceId, status, urgency, filters: queryFilters, labels, period, range,
+        status, urgency, filters: queryFilters, labels, period, range,
     } = route.query;
-    if (!state.isServicePage) {
-        handleSelectServiceDropdownItem(serviceId as string);
-    }
     await handleSelectStatus(status as string || 'OPEN');
     await handleSelectUrgency(urgency as string || 'ALL');
     if (labels) {
@@ -483,6 +480,7 @@ watch(() => storeState.serviceId, (serviceId) => {
     if (queryFilters) {
         await queryTagHelper.setURLQueryStringFilters(queryFilters);
     }
+    refreshAlertList();
 })();
 </script>
 

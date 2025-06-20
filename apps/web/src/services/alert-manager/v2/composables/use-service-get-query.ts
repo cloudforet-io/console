@@ -19,6 +19,7 @@ export const useServiceGetQuery = (serviceId: string): UseServiceGetQueryReturn 
     const { key: serviceQueryKey, params: serviceQueryParams } = useServiceQueryKey('alert-manager', 'service', 'get', {
         params: computed(() => ({
             service_id: serviceId,
+            details: true,
         })),
     });
 
