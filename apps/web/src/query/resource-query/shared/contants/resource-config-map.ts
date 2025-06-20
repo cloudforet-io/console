@@ -17,6 +17,30 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'app_id',
         nameKey: 'name',
     },
+    cloudServiceType: {
+        name: 'Cloud Service Type',
+        resourceKey: 'cloudServiceType',
+        idKey: 'cloud_service_type_id',
+        nameKey: 'name',
+    },
+    cloudServiceQuerySet: {
+        name: 'Cloud Service Query Set',
+        resourceKey: 'cloudServiceQuerySet',
+        idKey: 'query_set_id',
+        nameKey: 'name',
+    },
+    collector: {
+        name: 'Collector',
+        resourceKey: 'collector',
+        idKey: 'collector_id',
+        nameKey: 'name',
+    },
+    costDataSource: {
+        name: 'Cost Data Source',
+        resourceKey: 'costDataSource',
+        idKey: 'data_source_id',
+        nameKey: 'name',
+    },
     role: {
         name: 'Role',
         resourceKey: 'role',

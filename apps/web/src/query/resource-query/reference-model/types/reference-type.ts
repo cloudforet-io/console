@@ -13,7 +13,7 @@ export interface ReferenceItem<Data = Record<string, any>> {
     };
     latitude?: string;
     longitude?: string;
-    data: Data;
+    data?: Data;
     description?: string;
     link?: string;
 }
