@@ -2,6 +2,7 @@
 import {
     reactive, computed,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading,
@@ -13,17 +14,13 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 
 import AlertCreateModal from '@/services/alert-manager/v2/components/AlertCreateModal.vue';
 import AlertsManagementTable from '@/services/alert-manager/v2/components/AlertsManagementTable.vue';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
+const route = useRoute();
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo?.service_id),
-});
 const state = reactive({
     modalVisible: false,
 });
@@ -53,7 +50,7 @@ const handleCreateAlertModal = () => {
         </p-heading-layout>
         <alerts-management-table />
         <alert-create-modal v-if="state.modalVisible"
-                            :service-id="storeState.serviceId"
+                            :service-id="serviceId"
                             :visible.sync="state.modalVisible"
         />
     </div>

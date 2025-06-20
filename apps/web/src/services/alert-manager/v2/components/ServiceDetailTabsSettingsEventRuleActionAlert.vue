@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PButton, PDivider,
@@ -23,7 +24,6 @@ import type {
     EventRuleActionsType,
     EventRuleUrgencyType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
-import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import type { TagItem } from '@/common/modules/tags/type';
@@ -32,6 +32,7 @@ import { gray } from '@/styles/colors';
 
 import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
 import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleActionsToggleType,
@@ -41,14 +42,18 @@ import type {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
 const { eventRuleData } = useEventRuleGetQuery();
+const { serviceData } = useServiceGetQuery(serviceId.value);
+const defaultEscalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
 
 const storeState = reactive({
-    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
 });
 const state = reactive({
@@ -106,7 +111,7 @@ const state = reactive({
     title: '',
     selectedStatus: ALERT_STATUS.TRIGGERED as AlertStatusType,
     selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH as EventRuleUrgencyType,
-    selectedEscalationPolicyId: storeState.service.escalation_policy_id,
+    selectedEscalationPolicyId: defaultEscalationPolicyId.value,
     labels: [] as InputItem[],
     additionalInfoTags: [{ key: '', value: '' }] as TagItem[],
 });
@@ -158,7 +163,7 @@ const handleUpdateToggle = (action: string, value: boolean) => {
             state.selectedUrgencyRadio = EVENT_RULE_URGENCY.HIGH;
         }
         if (action === 'change_escalation_policy') {
-            state.selectedEscalationPolicyId = storeState.service.escalation_policy_id;
+            state.selectedEscalationPolicyId = defaultEscalationPolicyId.value;
         }
     }
 };
@@ -184,7 +189,7 @@ const handleInputTagValue = (idx, val) => {
 
 const { escalationPolicyListData } = useEscalationPolicyListQuery({
     params: computed(() => ({
-        service_id: storeState.service.service_id,
+        service_id: serviceId.value,
     })),
 });
 

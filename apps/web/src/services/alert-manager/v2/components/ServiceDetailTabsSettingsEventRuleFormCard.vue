@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -66,15 +67,18 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width } = useWindowSize();
 
 const queryClient = useQueryClient();
 const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleData, eventRuleQueryKey } = useEventRuleGetQuery();
-const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery();
+const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery(serviceId.value);
 
 const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
@@ -159,7 +163,7 @@ const state = reactive({
         options: {
             stop_processing: state.stopProcessing,
         },
-        service_id: storeState.serviceId,
+        service_id: serviceId.value,
         webhook_id: props.selectedScope === EVENT_RULE_SCOPE.GLOBAL ? undefined : props.selectedWebhook,
     })),
 });

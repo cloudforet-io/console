@@ -3,6 +3,7 @@ import { useWindowSize } from '@vueuse/core';
 import {
     computed, onUnmounted, reactive,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PButton, PDataLoader, screens } from '@cloudforet/mirinae';
 
@@ -24,14 +25,17 @@ import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/se
 
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { width } = useWindowSize();
 
 const { eventRuleData } = useEventRuleGetQuery();
-const { eventRuleListData, eventRuleListFetching } = useEventRuleListQuery();
+const { eventRuleListData, eventRuleListFetching } = useEventRuleListQuery(serviceId.value);
 
 const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),

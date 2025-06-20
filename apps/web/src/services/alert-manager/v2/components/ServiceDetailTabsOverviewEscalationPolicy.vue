@@ -3,6 +3,7 @@ import { useElementSize } from '@vueuse/core/index';
 import {
     computed, reactive, ref,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PBadge, PDivider, PFieldTitle, PIconButton, PTextButton, PDataLoader,
@@ -14,9 +15,9 @@ import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/esca
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-
 
 const ITEM_DEFAULT_WIDTH = 184 + 8;
 const DEFAULT_LEFT_PADDING = 16;
@@ -25,13 +26,15 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
+const { serviceData } = useServiceGetQuery(serviceId.value);
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
-const storeState = reactive({
-    escalationPolicyId: computed<string>(() => serviceDetailPageGetters.serviceInfo.escalation_policy_id),
-});
+const escalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
 const state = reactive({
     loading: true,
     pageStart: 0,
@@ -45,7 +48,7 @@ const state = reactive({
 const { escalationPolicyAPI } = useEscalationPolicyApi();
 const { key: escalationPolicyGetQueryKey, params: escalationPolicyGetQueryParams } = useServiceQueryKey('alert-manager', 'escalation-policy', 'get', {
     params: computed(() => ({
-        escalation_policy_id: storeState.escalationPolicyId,
+        escalation_policy_id: escalationPolicyId.value,
     })),
 });
 
@@ -69,7 +72,7 @@ const handleRouteDetail = () => (
 const { data: escalationPolicyData, isFetching: escalationPolicyFetching } = useScopedQuery({
     queryKey: escalationPolicyGetQueryKey,
     queryFn: async () => escalationPolicyAPI.get(escalationPolicyGetQueryParams.value),
-    enabled: computed(() => !!storeState.escalationPolicyId),
+    enabled: computed(() => !!escalationPolicyId.value),
     gcTime: 1000 * 60 * 2,
     staleTime: 1000 * 60 * 2,
 }, ['WORKSPACE']);
