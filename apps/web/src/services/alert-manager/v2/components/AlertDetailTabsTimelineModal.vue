@@ -7,6 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import {
     ALERT_HISTORY_ACTION,
     ALERT_HISTORY_NOTIFICATION_STATE,
@@ -18,8 +19,6 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { copyAnyData } from '@/lib/helper/copy-helper';
@@ -57,6 +56,8 @@ const allReferenceGetters = allReferenceStore.getters;
 
 const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
 }>();
+
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     pluginInfo: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),

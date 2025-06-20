@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    reactive, watch,
 } from 'vue';
 
 
@@ -15,8 +15,6 @@ import type { AlertListParameters } from '@/api-clients/monitoring/alert/schema/
 import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
 import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -27,10 +25,10 @@ const props = defineProps<{
     projectId: string;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     loading: true,
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     items: [] as AlertModelV1[],
     totalCount: 0,
 });
@@ -80,7 +78,7 @@ watch(() => props.projectId, async (projectId) => {
             <alert-list-item v-if="index < 15"
                              :item="item"
                              :show-status-message="true"
-                             :user-reference="state.users[item.assignee]"
+                             :user-reference="referenceMap.user[item.assignee]"
             />
             <div v-else
                  class="view-all-text"

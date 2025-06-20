@@ -21,9 +21,6 @@ import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -75,15 +72,14 @@ const tabState = reactive({
     },
 });
 const userStore = useUserStore();
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     loading: true,
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     urgencyList: computed(() => ([
         {
             name: ALERT_URGENCY_FILTER.ALL,
@@ -294,8 +290,8 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                     <template #item="{ item }">
                         <alert-list-item :item="item"
                                          :show-project-link="true"
-                                         :project-reference="state.projects[item.project_id]"
-                                         :user-reference="state.users[item.assignee]"
+                                         :project-reference="referenceMap.project[item.project_id]"
+                                         :user-reference="referenceMap.user[item.assignee]"
                         />
                     </template>
                     <template #no-data>

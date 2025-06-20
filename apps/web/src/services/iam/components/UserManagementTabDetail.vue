@@ -13,7 +13,6 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
@@ -39,14 +38,12 @@ const props = defineProps<Props>();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'refresh', id: string): void }>();
 
 const storeState = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    workspaceGroup: computed(() => allReferenceStore.getters.workspaceGroup),
 });
 const state = reactive({
     loading: false,

@@ -17,8 +17,6 @@ import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
@@ -26,7 +24,6 @@ import NotificationAddMemberGroup from '@/services/my-page/components/Notificati
 import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
 
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
 const PROTOCOL_TYPE = {
@@ -48,12 +45,15 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'change', payload: NotificationAddFormDataPayload|{channelName: string; data: Record<string, any>}): void;
 }>();
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
-    protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
     language: computed<string|undefined>(() => userStore.state.language),
 });
 const state = reactive({
-    protocol: computed(() => storeState.protocols[props.protocolId] ?? null),
+    protocol: computed(() => {
+        if (!props.protocolId) return null;
+        return referenceMap.protocol[props.protocolId] || null;
+    }),
     channelName: undefined as string|undefined,
     notificationLevel: 'LV1' as NotificationLevel,
     schemaForm: {} as Record<string, any>,

@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-
-import { get, filter } from 'lodash';
-
 import { PI } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
-
-const allReferenceStore = useAllReferenceStore();
 
 const CHANNEL_STATE = Object.freeze({
     ENABLED: 'ENABLED',
@@ -24,21 +16,15 @@ const props = withDefaults(defineProps<{
     projectChannels: () => [],
     notificationLevel: undefined,
 });
+const referenceMap = useAllReferenceDataModel();
 
-const state = reactive({
-    protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
-});
-
-const channelFormatter = (level?: string) => {
+const channelFormatter = (level?: string): ProjectChannelModel[] => {
     if (level === 'ALL') {
         return props.projectChannels;
     }
-    return filter(props.projectChannels, { notification_level: level });
+    return props.projectChannels.filter((channel) => channel.notification_level === level);
 };
-const protocolNameFormatter = (protocolId) => {
-    const protocolName = get(state.protocols, protocolId);
-    return protocolName ? protocolName.label : protocolId;
-};
+
 </script>
 
 <template>
@@ -51,7 +37,7 @@ const protocolNameFormatter = (protocolId) => {
              class="channel-wrapper"
         >
             <p class="title">
-                [{{ protocolNameFormatter(channel.protocol_id) }}] {{ channel.name }}
+                [{{ referenceMap.protocol[channel.protocol_id]?.label || channel.protocol_id }}] {{ channel.name }}
                 <span class="on-off">
                     <p-i name="ic_gnb_bell"
                          color="inherit"

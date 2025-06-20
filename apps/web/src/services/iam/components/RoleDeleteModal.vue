@@ -11,10 +11,9 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { RoleBindingListParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/list';
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
 import type { RoleDeleteParameters } from '@/api-clients/identity/role/schema/api-verbs/delete';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -51,13 +50,13 @@ const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
 }>();
 
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+
 const userStore = useUserStore();
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
 });
 const state = reactive({
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
     unDeletableRoles: [] as UnDeletableRole[],
@@ -166,7 +165,7 @@ watch(() => state.proxyVisible, async (after) => {
                     </span>
                 </template>
                 <template #col-assignTo-format="{ value }">
-                    {{ state.users[value.resource_id] ? state.users[value.resource_id].label : '--' }}
+                    {{ referenceMap.user[value.resource_id]?.label || value.resource_id || '--' }}
                 </template>
             </p-data-table>
         </template>

@@ -21,8 +21,6 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { i18n } from '@/translations';
 
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
@@ -43,8 +41,8 @@ const props = defineProps<{
     tag?: string;
 }>();
 
-const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const referenceMap = useAllReferenceDataModel();
 
 /* toolbox */
 const search = ref<string>('');
@@ -273,10 +271,10 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
                 />
             </template>
             <template #col-assignee-format="{value}">
-                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+                {{ referenceMap.user[value]?.label || referenceMap.user[value]?.name || value }}
             </template>
             <template #col-created_by-format="{value}">
-                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+                {{ referenceMap.user[value]?.label || referenceMap.user[value]?.name || value }}
             </template>
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}
