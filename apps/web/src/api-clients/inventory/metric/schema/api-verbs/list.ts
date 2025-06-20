@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { MetricType } from '@/schema/inventory/metric/type';
+import type { MetricType } from '@/api-clients/inventory/metric/schema/type';
 import type { NamespaceCategory } from '@/schema/inventory/namespace/type';
 
 

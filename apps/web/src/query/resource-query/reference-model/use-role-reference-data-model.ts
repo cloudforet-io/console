@@ -1,6 +1,8 @@
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import type { RoleModel, BasicRoleModel } from '@/api-clients/identity/role/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-model/composables/use-reference-data-model';
 import type {
+    ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
 } from '@/query/resource-query/reference-model/types/reference-type';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
@@ -9,9 +11,13 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type RoleReferenceItem = ReferenceItem<RoleModel|BasicRoleModel>;
 export type RoleReferenceMap = ReferenceMap<RoleReferenceItem>;
 
-export const useRoleReferenceModel = () => {
-    const fetchOptions = {
-        only: ['name', 'role_id', 'role_type'],
+export const useRoleReferenceDataModel = () => {
+    const { roleAPI } = useRoleApi();
+    const fetchConfig: ReferenceDataModelFetchConfig<RoleModel> = {
+        listFetcher: roleAPI.list,
+        query: {
+            only: ['name', 'role_id', 'role_type'],
+        },
     };
 
     const {
@@ -24,7 +30,7 @@ export const useRoleReferenceModel = () => {
             name: roleInfo.name,
             data: roleInfo,
         }),
-        fetchOptions,
+        fetchConfig,
     );
 
     return {

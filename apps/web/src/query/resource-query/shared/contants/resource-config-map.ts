@@ -11,6 +11,12 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'project_group_id',
         nameKey: 'name',
     },
+    workspace: {
+        name: 'Workspace',
+        resourceKey: 'workspace',
+        idKey: 'workspace_id',
+        nameKey: 'name',
+    },
     app: {
         name: 'App',
         resourceKey: 'app',
@@ -47,16 +53,34 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'role_id',
         nameKey: 'name',
     },
+    region: {
+        name: 'Region',
+        resourceKey: 'region',
+        idKey: 'region_code',
+        nameKey: 'name',
+    },
+    secret: {
+        name: 'Secret',
+        resourceKey: 'secret',
+        idKey: 'secret_id',
+        nameKey: 'name',
+    },
+    provider: {
+        name: 'Provider',
+        resourceKey: 'provider',
+        idKey: 'provider',
+        nameKey: 'name',
+    },
     serviceAccount: {
         name: 'Service Account',
         resourceKey: 'serviceAccount',
         idKey: 'service_account_id',
         nameKey: 'name',
     },
-    workspace: {
-        name: 'Workspace',
-        resourceKey: 'workspace',
-        idKey: 'workspace_id',
+    trustedAccount: {
+        name: 'Trusted Account',
+        resourceKey: 'trustedAccount',
+        idKey: 'trusted_account_id',
         nameKey: 'name',
     },
     workspaceGroup: {

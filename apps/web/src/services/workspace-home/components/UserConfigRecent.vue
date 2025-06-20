@@ -9,7 +9,6 @@ import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-s
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -58,7 +57,6 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),

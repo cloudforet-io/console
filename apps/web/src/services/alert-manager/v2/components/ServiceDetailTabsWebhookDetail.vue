@@ -30,8 +30,6 @@ import type { RepositoryListParameters } from '@/schema/repository/repository/ap
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -53,8 +51,6 @@ import type { WebhookDetailTabsType } from '@/services/alert-manager/v2/types/al
 
 const EXTRA_WIDTH = 315; // created_at width + show_button width + padding
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
@@ -66,7 +62,6 @@ const errorTableRef = ref<HTMLElement|null>(null);
 const { width } = useElementSize(errorTableRef);
 
 const storeState = reactive({
-    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     language: computed<string>(() => serviceDetailPageGetters.language),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),

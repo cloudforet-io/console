@@ -6,18 +6,18 @@ import {
 import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
 import { useBatchedReferenceFetch } from '@/query/resource-query/reference-model/composables/_internal/use-batched-reference-fetch';
 import { useReferenceReactiveCache } from '@/query/resource-query/reference-model/composables/_internal/use-reference-reactive-cache';
-import type { ReferenceItem } from '@/query/resource-query/reference-model/types/reference-type';
+import type { ReferenceItem, ReferenceDataModelFetchConfig } from '@/query/resource-query/reference-model/types/reference-type';
 import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
 export const useReferenceDataModel = <T extends Record<string, any>, R extends ReferenceItem>(
     resourceKey: ResourceKeyType,
     referenceAdaptor: (arg: T) => ReferenceItem,
-    fetchOptions: { only: string[] } = { only: [] },
+    fetchConfig: ReferenceDataModelFetchConfig<T>,
 ) => {
     const { key: queryKey } = useReferenceQueryKey(resourceKey);
 
-    const { fetcher: enqueue } = useBatchedReferenceFetch<T>(resourceKey, queryKey, fetchOptions);
+    const { fetcher: enqueue } = useBatchedReferenceFetch<T>(resourceKey, queryKey, fetchConfig);
 
     const { referenceMapRefs } = useReferenceReactiveCache(queryKey, referenceAdaptor);
 

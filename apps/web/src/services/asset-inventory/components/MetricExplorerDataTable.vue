@@ -20,7 +20,7 @@ import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
-import type { MetricLabelKey } from '@/schema/inventory/metric/type';
+import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

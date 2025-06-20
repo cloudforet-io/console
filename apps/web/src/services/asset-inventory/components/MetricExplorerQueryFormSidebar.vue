@@ -10,10 +10,10 @@ import {
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
-import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
-import { METRIC_TYPE } from '@/schema/inventory/metric/constant';
-import type { MetricModel } from '@/schema/inventory/metric/model';
+import type { MetricCreateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/create';
+import type { MetricUpdateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/update';
+import { METRIC_TYPE } from '@/api-clients/inventory/metric/schema/constant';
+import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

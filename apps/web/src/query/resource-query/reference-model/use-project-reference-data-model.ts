@@ -1,10 +1,12 @@
+import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { useReferenceDataModel } from '@/query/resource-query/reference-model/composables/use-reference-data-model';
 import type {
+    ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
 } from '@/query/resource-query/reference-model/types/reference-type';
-import { useProjectGroupReferenceModel } from '@/query/resource-query/reference-model/use-project-group-reference-model';
+import { useProjectGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
 import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 
@@ -22,10 +24,14 @@ interface ProjectResourceItemData {
 export type ProjectReferenceItem = ReferenceItem<ProjectResourceItemData>;
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
 
-export const useProjectReferenceModel = () => {
-    const { map: projectGroupReferenceMap } = useProjectGroupReferenceModel();
-    const fetchOptions = {
-        only: ['project_id', 'name', 'project_group_id', 'users', 'project_type', 'workspace_id'],
+export const useProjectReferenceDataModel = () => {
+    const { map: projectGroupReferenceMap } = useProjectGroupReferenceDataModel();
+    const { projectAPI } = useProjectApi();
+    const fetchConfig: ReferenceDataModelFetchConfig<ProjectModel> = {
+        listFetcher: projectAPI.list,
+        query: {
+            only: ['project_id', 'name', 'project_group_id', 'users', 'project_type', 'workspace_id'],
+        },
     };
 
     const {
@@ -43,7 +49,7 @@ export const useProjectReferenceModel = () => {
                 projectGroupId: projectInfo.project_group_id,
             },
         }),
-        fetchOptions,
+        fetchConfig,
     );
 
 
