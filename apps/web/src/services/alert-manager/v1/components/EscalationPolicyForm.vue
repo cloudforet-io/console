@@ -10,6 +10,7 @@ import {
 
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
@@ -19,7 +20,6 @@ import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
@@ -41,16 +41,15 @@ const props = withDefaults(defineProps<{
     escalationPolicyData: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const authorizationStore = useAuthorizationStore();
 const { getReferenceLocation } = useReferenceRouter();
 
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
-    //
     resourceGroupLabels: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
@@ -171,7 +170,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                                      resource_type: 'identity.Project',
                                      workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                                  })"
-                                 :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
+                                 :text="referenceMap.project[escalationPolicyFormState.projectId]?.label || escalationPolicyFormState.projectId"
                                  highlight
                         />)
                     </span>

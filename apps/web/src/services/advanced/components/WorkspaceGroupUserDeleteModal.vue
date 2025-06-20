@@ -11,9 +11,6 @@ import type { WorkspaceGroupUser } from '@/api-clients/identity/workspace-group-
 import type { WorkspaceGroupRemoveUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/remove-users';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,11 +29,9 @@ const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const userTabState = workspaceGroupPageStore.userTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
-const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     loading: false,
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     isRemoveSingleGroupUserType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER)),
     items: computed<WorkspaceGroupUser[]>(() => {
         switch (workspaceGroupPageState.modal.type) {

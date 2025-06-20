@@ -10,7 +10,6 @@ import { PHeading } from '@cloudforet/mirinae';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
@@ -22,9 +21,6 @@ import type {
 const route = useRoute();
 
 const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-});
 
 const state = reactive({
     protocolLabel: asyncComputed<string>(async () => {
@@ -46,7 +42,6 @@ const state = reactive({
         }
         return undefined;
     }),
-    project: computed<ProjectReferenceItem>(() => storeState.projects[state.projectId]),
 });
 </script>
 

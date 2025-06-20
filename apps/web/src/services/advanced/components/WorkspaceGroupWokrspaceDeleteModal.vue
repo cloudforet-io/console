@@ -10,9 +10,6 @@ import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/iden
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,11 +29,9 @@ const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
-const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     loading: false,
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     isRemoveWorkspacesType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES)),
     isRemoveSingleWorkspaceType: computed<boolean>(() => (workspaceGroupPageState.modal.type === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE)),
     items: computed<WorkspaceModel[]>(() => {

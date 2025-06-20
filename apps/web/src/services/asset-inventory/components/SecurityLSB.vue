@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -35,6 +36,8 @@ const appContextStore = useAppContextStore();
 
 const route = useRoute();
 const router = useRouter();
+
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -77,7 +80,7 @@ const state = reactive({
                 { name: i18n.t('MENU.ASSET_INVENTORY'), to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE._NAME : ASSET_INVENTORY_ROUTE._NAME } },
                 { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SECURITY._NAME : ASSET_INVENTORY_ROUTE.SECURITY._NAME } },
                 { name: state.pageParams.group || '', data: null },
-                { name: `[${allReferenceGetters.provider[state.pageParams.provider || '']?.label}] ${state.pageParams.name || ''}` },
+                { name: `[${referenceMap.provider[state.pageParams.provider]?.label || state.pageParams.provider}] ${state.pageParams.name || ''}` },
             ];
         }
         return [

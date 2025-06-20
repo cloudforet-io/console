@@ -14,6 +14,7 @@ import {
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { i18n } from '@/translations';
@@ -77,12 +78,14 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
+
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 
 const { getReferenceLocation } = useReferenceRouter();
@@ -282,7 +285,7 @@ onDeactivated(() => {
                     }"
                     action-icon="internal-link"
                     new-tab
-                    :text="storeState.workspaces[value]?.label"
+                    :text="referenceMap.workspace[value]?.label || value"
             />
         </template>
         <template #col-project_id-format="{ value, item }">

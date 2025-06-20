@@ -27,18 +27,12 @@ import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/typ
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -79,7 +73,6 @@ type CostAnalyzeRawData = {
 
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
@@ -100,25 +93,11 @@ const getValueSumKey = (dataType: string) => {
     }
 };
 
+
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
-    projects: computed<ProjectReferenceMap>(
-        () => allReferenceStore.getters.project,
-    ),
-    projectGroups: computed<ProjectGroupReferenceMap>(
-        () => allReferenceStore.getters.projectGroup,
-    ),
-    providers: computed<ProviderReferenceMap>(
-        () => allReferenceStore.getters.provider,
-    ),
-    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(
-        () => allReferenceStore.getters.serviceAccount,
-    ),
-    workspaces: computed<WorkspaceReferenceMap>(
-        () => allReferenceStore.getters.workspace,
-    ),
 });
 const state = reactive({
     component: computed(() => PToolboxTable),
@@ -553,50 +532,28 @@ watch(
                     Unknown
                 </span>
                 <span v-else-if="field.name === GROUP_BY.WORKSPACE">
-                    {{
-                        storeState.workspaces[value]
-                            ? storeState.workspaces[value].label
-                            : value
-                    }}
+                    {{ referenceMap.workspace[value]?.label || value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
-                    {{
-                        storeState.projectGroups[value]
-                            ? storeState.projectGroups[value].label
-                            : value
-                    }}
+                    {{ referenceMap.projectGroup[value]?.label || value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT"
                       class="cursor-pointer"
                       @click="handleClickRowData(field.name, value)"
                 >
-                    {{
-                        storeState.projects[value]
-                            ? storeState.projects[value].label
-                            : value
-                    }}
+                    {{ referenceMap.project[value]?.label || value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROVIDER">
-                    {{
-                        storeState.providers[value]
-                            ? storeState.providers[value].name
-                            : value
-                    }}
+                    {{ referenceMap.provider[value]?.name || value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.REGION">
-                    {{
-                        storeState.regions[value] ? storeState.regions[value].name : value
-                    }}
+                    {{ referenceMap.region[value]?.name || value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT"
                       class="cursor-pointer"
                       @click="handleClickRowData(field.name, value)"
                 >
-                    {{
-                        storeState.serviceAccounts[value]
-                            ? storeState.serviceAccounts[value].name
-                            : value
-                    }}
+                    {{ referenceMap.serviceAccount[value]?.name || value }}
                 </span>
                 <span v-else-if="field.name === 'Instance Type'">
                     {{ value ?? "Unknown" }}

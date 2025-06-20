@@ -20,13 +20,12 @@ import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { RoleReferenceMap } from '@/store/reference/role-reference-store';
 import { languages } from '@/store/user/constant';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -38,6 +37,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
+
+
 
 interface Props {
     visible: boolean
@@ -55,10 +57,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
 const route = useRoute();
 const router = useRouter();
-const allReferenceStore = useAllReferenceStore();
 
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
-    roles: computed<RoleReferenceMap>(() => allReferenceStore.getters.role),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isUserMode: computed(() => appContextStore.getters.isUserMode),
     userIcon: computed<string>(() => {
@@ -275,7 +276,7 @@ watch(() => props.visible, (value) => {
                      class="info-menu"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ state.roles[state.currentWorkspaceRole?.role_id]?.label ?? 'User' }}</span>
+                    <span class="value">{{ referenceMap.role[state.currentWorkspaceRole?.role_id]?.label || 'User' }}</span>
                 </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"

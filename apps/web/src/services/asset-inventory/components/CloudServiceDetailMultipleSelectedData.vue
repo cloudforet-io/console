@@ -23,6 +23,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
@@ -32,7 +33,6 @@ import { useServiceRouter } from '@/router/composables/use-service-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -73,8 +73,6 @@ const dataMap = {};
 
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
@@ -83,7 +81,7 @@ const router = useRouter();
 const serviceRouter = useServiceRouter(router);
 
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
-
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     data: undefined as any,
     loading: true,
@@ -361,7 +359,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                            size="md"
                                            @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
                             >
-                                {{ allReferenceGetters.workspace[value]?.label }}
+                                {{ referenceMap.workspace[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"
@@ -375,7 +373,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                            size="md"
                                            @click="handleClickLinkButton('project', item.workspace_id, value)"
                             >
-                                {{ allReferenceGetters.project[value]?.label }}
+                                {{ referenceMap.project[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"

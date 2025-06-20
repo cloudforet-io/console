@@ -29,6 +29,7 @@ import type { ServiceAccountModel } from '@/api-clients/identity/service-account
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -36,8 +37,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap, ProviderItem } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -52,10 +51,13 @@ import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynami
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
+import ProviderButtonList from '@/common/modules/provider-list/ProviderButtonList.vue';
 
 import { gray } from '@/styles/colors';
 
-import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
+import {
+    useServiceAccountProviderListQuery,
+} from '@/services/service-account/composables/use-service-account-provider-list-query';
 import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
@@ -81,35 +83,28 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
 
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
-
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
 });
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    providerList: computed<ProviderItem[]>(() => {
-        const _providerList = Object.values(state.providers) as ProviderItem[];
-        if (!state.isAdminMode) return _providerList;
-        const ADMIN_MODE_PROVIDER_KEYS = ['aws', 'google_cloud', 'azure'];
-        return _providerList.filter((provider) => ADMIN_MODE_PROVIDER_KEYS.includes(provider.key));
-    }),
     selectedProvider: undefined,
-    selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
+    selectedProviderName: computed(() => referenceMap.provider[state.selectedProvider]?.label),
     timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     grantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
     isAgentModeAccount: computed(() => state.selectedProvider === 'kubernetes'),
 });
+
+const { data: providerList } = useServiceAccountProviderListQuery();
 
 /** States for Dynamic Layout(search table type) * */
 const fetchOptionState = reactive({
@@ -310,10 +305,10 @@ const reloadTable = async () => {
 };
 
 const replaceQueryHelper = new QueryHelper();
-watch(() => state.providers, (providers) => {
-    if (providers) {
+watch(providerList, (providers) => {
+    if (providers && providers.length) {
         const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
-        state.selectedProvider = providerFilter || Object.keys(providers)?.[0];
+        state.selectedProvider = providerFilter || providers[0].provider;
     }
 }, { immediate: true });
 watch([() => state.selectedProvider, () => state.grantLoading], async ([after], [before]) => {
@@ -354,9 +349,9 @@ onMounted(async () => {
         <p-heading class="mb-6"
                    :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT')"
         />
-        <provider-list :provider-list="state.providerList"
-                       :selected-provider.sync="state.selectedProvider"
-                       class="service-account-provider-list"
+        <provider-button-list class="service-account-provider-list"
+                              :provider-list="providerList"
+                              :selected-provider.sync="state.selectedProvider"
         />
         <component :is="width > screens.tablet.max ? PTab : PPaneLayout"
                    :tabs="tableState.accountTypeList"
@@ -385,7 +380,7 @@ onMounted(async () => {
                     >
                         <template #title-left-extra>
                             <p-lazy-img class="provider"
-                                        :src="state.providers[state.selectedProvider]?.icon || ''"
+                                        :src="referenceMap.provider[state.selectedProvider]?.icon || ''"
                             />
                         </template>
                     </p-heading>
@@ -475,7 +470,7 @@ onMounted(async () => {
                 </template>
                 <template #col-is_managed-format="{item}">
                     <auto-sync-state v-if="item.trusted_account_id && item.is_managed"
-                                     :state="state.trustedAccounts[item.trusted_account_id]?.data?.schedule?.state"
+                                     :state="referenceMap.trustedAccount[item.trusted_account_id]?.data?.schedule?.state"
                                      size="xs"
                     />
                 </template>

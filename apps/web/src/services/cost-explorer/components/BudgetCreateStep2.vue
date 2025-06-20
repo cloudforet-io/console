@@ -14,13 +14,11 @@ import {
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
 import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -41,13 +39,10 @@ const handleStartMonthPickerClosed = () => {
 };
 const domainStore = useDomainStore();
 const domainState = domainStore.state;
-const allReferenceStore = useAllReferenceStore();
 
 const originUnifiedCostConfig = computed<UnifiedCostConfig|undefined>(() => domainState.config?.settings?.unified_cost_config);
 
-const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
-const serviceAccount = computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount);
-
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     selectedCurrency: originUnifiedCostConfig.value?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY,
     exchangeRateSourceOptions: [YAHOO_FINANCE_ID],
@@ -499,11 +494,13 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                 >
                     {{ budgetCreatePageState.scope.type === 'project'
                         ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
-                            project: project[budgetCreatePageState.project].name,
+                            project: referenceMap.project[budgetCreatePageState.project]?.name || budgetCreatePageState.project,
                             month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                         }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
-                            project: project[budgetCreatePageState.project].name,
-                            serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
+                            project: referenceMap.project[budgetCreatePageState.project]?.name || budgetCreatePageState.project,
+                            serviceAccount: budgetCreatePageState.scope.serviceAccount ?
+                                (referenceMap.serviceAccount[budgetCreatePageState.scope.serviceAccount]?.name || budgetCreatePageState.scope.serviceAccount)
+                                : undefined,
                             month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                         }) }}
                 </span>

@@ -18,13 +18,11 @@ import { useServiceAccountApi } from '@/api-clients/identity/service-account/com
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -43,21 +41,11 @@ const props = withDefaults(defineProps<{
     projectIds: undefined,
     mode: 'workspace',
 });
-
-
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceGetters = userWorkspaceStore.getters;
 const authorizationStore = useAuthorizationStore();
 
 const totalChartContext = ref<HTMLElement|null>(null);
 const providerChartContext = ref<HTMLElement|null>(null);
-
-const storeState = reactive({
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
-    provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
-});
+const { provider } = useAllReferenceDataModel();
 
 const { serviceAccountAPI } = useServiceAccountApi();
 const { key: serviceAccountQueryKey, params } = useServiceQueryKey('identity', 'service-account', 'list', {
@@ -147,7 +135,7 @@ const state = reactive({
         name: item.provider,
         value: item.count,
         itemStyle: {
-            color: storeState.provider[item.provider].color,
+            color: provider[item.provider]?.color,
         },
     }))),
     providerChart: null as EChartsType | null,
@@ -158,7 +146,7 @@ const state = reactive({
             trigger: 'item',
             position: 'right',
             formatter: (p) => {
-                const _name = storeState.provider[p.name].label;
+                const _name = provider[p.name]?.label || '';
                 const _value = numberFormatter(p.value) || '';
                 const percent = getPercent(p.value, state.itemsTotalCount);
                 return `${p.marker} ${_name}: <b>${_value}</b> (${percent}%)`;
@@ -267,7 +255,7 @@ const serviceAccountPageFiltersQueryString = computed(() => {
                                      class="provider-item"
                                 >
                                     <div class="image-wrapper">
-                                        <p-lazy-img :src="assetUrlConverter(storeState.provider[item.provider].icon)"
+                                        <p-lazy-img :src="assetUrlConverter(provider[item.provider]?.icon || '')"
                                                     width="1.5rem"
                                                     height="1.5rem"
                                                     class="provider-image"
@@ -275,7 +263,7 @@ const serviceAccountPageFiltersQueryString = computed(() => {
                                     </div>
                                     <div class="percent-wrapper">
                                         <div class="info">
-                                            <span>{{ storeState.provider[item.provider].label }}</span>
+                                            <span>{{ provider[item.provider]?.label || item.provider }}</span>
                                             <p>
                                                 <span>
                                                     <span class="percent">{{ getPercent(item.count, state.itemsTotalCount) }}</span>%
@@ -284,7 +272,7 @@ const serviceAccountPageFiltersQueryString = computed(() => {
                                             </p>
                                         </div>
                                         <p-progress-bar :percentage="getPercent(item.count, state.itemsTotalCount)"
-                                                        :color="storeState.provider[item.provider].color"
+                                                        :color="provider[item.provider]?.color"
                                                         size="md"
                                                         height="0.375rem"
                                         />

@@ -3,8 +3,6 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
-
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
@@ -19,6 +17,7 @@ import {
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { i18n } from '@/translations';
@@ -27,7 +26,6 @@ import { useAuthorizationStore } from '@/store/authorization/authorization-store
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -70,11 +68,12 @@ const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const authorizationStore = useAuthorizationStore();
 
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
 });
 const handlerState = reactive({
@@ -101,12 +100,7 @@ const handlerState = reactive({
 
 const searchQueryHelper = new QueryHelper();
 const state = reactive({
-    title: computed<string>(() => {
-        if (!isEmpty(storeState.providers[cloudServicePageState.selectedProvider])) {
-            return storeState.providers[cloudServicePageState.selectedProvider].name;
-        }
-        return cloudServicePageState.selectedProvider;
-    }),
+    title: computed<string>(() => referenceMap.provider[cloudServicePageState.selectedProvider]?.name || cloudServicePageState.selectedProvider),
     // list
     loading: true,
     items: undefined as CloudServiceAnalyzeResult[]|undefined,
