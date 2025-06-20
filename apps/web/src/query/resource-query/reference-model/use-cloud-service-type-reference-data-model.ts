@@ -13,7 +13,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 export type CloudServiceTypeReferenceItem = ReferenceItem<CloudServiceTypeModel>;
 export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeReferenceItem>;
 
-export const useCloudServiceTypeReferenceModel = () => {
+export const useCloudServiceTypeReferenceDataModel = () => {
     const { cloudServiceTypeAPI } = useCloudServiceTypeApi();
     const fetchConfig: ReferenceDataModelFetchConfig<CloudServiceTypeModel> = {
         listFetcher: cloudServiceTypeAPI.list,

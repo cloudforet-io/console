@@ -11,7 +11,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type AppReferenceItem = ReferenceItem<AppModel>;
 export type AppReferenceMap = ReferenceMap<AppReferenceItem>;
 
-export const useAppReferenceModel = () => {
+export const useAppReferenceDataModel = () => {
     const { appAPI } = useAppApi();
     const fetchConfig: ReferenceDataModelFetchConfig<AppModel> = {
         listFetcher: appAPI.list,

@@ -12,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type ServiceAccountReferenceItem = ReferenceItem<ServiceAccountModel>;
 export type ServiceAccountReferenceMap = ReferenceMap<ServiceAccountReferenceItem>;
 
-export const useServiceAccountReferenceModel = () => {
+export const useServiceAccountReferenceDataModel = () => {
     const { serviceAccountAPI } = useServiceAccountApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ServiceAccountModel> = {
         listFetcher: serviceAccountAPI.list,

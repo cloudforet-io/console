@@ -11,7 +11,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type MetricReferenceItem = ReferenceItem<MetricModel>;
 export type MetricReferenceMap = ReferenceMap<MetricReferenceItem>;
 
-export const useMetricReferenceModel = () => {
+export const useMetricReferenceDataModel = () => {
     const { metricAPI } = useMetricApi();
     const fetchConfig: ReferenceDataModelFetchConfig<MetricModel> = {
         listFetcher: metricAPI.list,

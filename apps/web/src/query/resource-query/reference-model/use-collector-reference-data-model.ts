@@ -13,7 +13,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 export type CollectorReferenceItem = ReferenceItem<CollectorModel>;
 export type CollectorReferenceMap = ReferenceMap<CollectorReferenceItem>;
 
-export const useCollectorReferenceModel = () => {
+export const useCollectorReferenceDataModel = () => {
     const { collectorAPI } = useCollectorApi();
     const fetchConfig: ReferenceDataModelFetchConfig<CollectorModel> = {
         listFetcher: collectorAPI.list,

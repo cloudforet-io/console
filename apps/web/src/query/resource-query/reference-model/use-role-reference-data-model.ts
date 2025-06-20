@@ -11,7 +11,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type RoleReferenceItem = ReferenceItem<RoleModel|BasicRoleModel>;
 export type RoleReferenceMap = ReferenceMap<RoleReferenceItem>;
 
-export const useRoleReferenceModel = () => {
+export const useRoleReferenceDataModel = () => {
     const { roleAPI } = useRoleApi();
     const fetchConfig: ReferenceDataModelFetchConfig<RoleModel> = {
         listFetcher: roleAPI.list,

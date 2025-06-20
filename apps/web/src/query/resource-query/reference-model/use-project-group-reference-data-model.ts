@@ -17,7 +17,7 @@ interface ProjectGroupResourceItemData {
 export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 
-export const useProjectGroupReferenceModel = () => {
+export const useProjectGroupReferenceDataModel = () => {
     const { projectGroupAPI } = useProjectGroupApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ProjectGroupModel> = {
         listFetcher: projectGroupAPI.list,
