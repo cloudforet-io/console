@@ -64,6 +64,7 @@ class CostExplorerConfigurator implements FeatureConfigurator {
                 ...baseMenu,
                 subMenuList: [
                     { id: MENU_ID.COST_ANALYSIS },
+                    { id: MENU_ID.ANOMALY_DETECTION },
                     { id: MENU_ID.BUDGET },
                     { id: MENU_ID.COST_REPORT },
                     { id: MENU_ID.DATA_SOURCES },

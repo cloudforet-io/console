@@ -6,6 +6,9 @@ export const ADMIN_COST_EXPLORER_ROUTE = {
         _NAME: `admin.${MENU_ID.COST_EXPLORER}.${MENU_ID.COST_ANALYSIS}`,
         QUERY_SET: { _NAME: `admin.${MENU_ID.COST_EXPLORER}.${MENU_ID.COST_ANALYSIS}.query_set` },
     },
+    ANOMALY_DETECTION: {
+        _NAME: `admin.${MENU_ID.COST_EXPLORER}.${MENU_ID.ANOMALY_DETECTION}`,
+    },
     BUDGET: {
         _NAME: `admin.${MENU_ID.COST_EXPLORER}.${MENU_ID.BUDGET}`,
         DETAIL: { _NAME: `admin.${MENU_ID.COST_EXPLORER}.${MENU_ID.BUDGET}.detail` },
