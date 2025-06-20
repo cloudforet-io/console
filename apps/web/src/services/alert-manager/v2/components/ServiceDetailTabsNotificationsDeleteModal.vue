@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PScopedNotification, PLink, PDataTable, PStatus, PI, PLazyImg,
@@ -12,6 +12,7 @@ import type { ServiceChannelDeleteParameters } from '@/api-clients/alert-manager
 import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -43,8 +44,10 @@ const emit = defineEmits<{(e: 'close'): void,
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const queryClient = useQueryClient();
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
+const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
 const storeState = reactive({
     service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
@@ -74,6 +77,7 @@ const { escalationPolicyListData } = useEscalationPolicyListQuery({
 const { mutate: serviceChannelDeleteMutate, isPending: deleteChannelLoading } = useMutation({
     mutationFn: (params: ServiceChannelDeleteParameters) => serviceChannelAPI.delete(params),
     onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
         showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DELETED'), '');
         state.proxyVisible = false;
         emit('close');

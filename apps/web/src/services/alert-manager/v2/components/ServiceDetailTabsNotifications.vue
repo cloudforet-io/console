@@ -148,7 +148,6 @@ const { queryTags } = queryTagHelper;
 
 const queryClient = useQueryClient();
 const { serviceChannelAPI } = useServiceChannelApi();
-const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 const { key: serviceChannelListQueryKey, params: serviceChannelListQueryParams } = useServiceQueryKey('alert-manager', 'service-channel', 'list', {
     params: computed(() => {
         notificationsListApiQueryHelper.setFilters([
@@ -182,7 +181,6 @@ const refreshServiceChannelList = () => {
 
 const handleCloseModal = () => {
     state.selectIndex = undefined;
-    queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
     serviceDetailPageStore.setSelectedNotificationId(undefined);
 };
 const handleClickCreateButton = () => {

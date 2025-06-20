@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { mapValues } from 'lodash';
 
 import {
@@ -17,6 +17,7 @@ import type { ServiceChannelUpdateParameters } from '@/api-clients/alert-manager
 import { SERVICE_CHANNEL_FORWARD_TYPE, SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -42,11 +43,14 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
+const queryClient = useQueryClient();
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
+
+const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
@@ -102,6 +106,7 @@ const state = reactive({
 const { mutate: serviceChannelUpdateMutate, isPending: updateLoading } = useMutation({
     mutationFn: (params: ServiceChannelUpdateParameters) => serviceChannelAPI.update(params),
     onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         state.proxyVisible = false;
         emit('close');
