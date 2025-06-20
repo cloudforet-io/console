@@ -1,7 +1,7 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { CollectorPluginInfo } from '@/schema/inventory/collector/model';
-import type { Schedule, SecretFilter } from '@/schema/inventory/collector/type';
+import type { CollectorPluginInfo } from '@/api-clients/inventory/collector/schema/model';
+import type { Schedule, SecretFilter } from '@/api-clients/inventory/collector/schema/type';
 
 export interface CollectorCreateParameters {
     name: string;

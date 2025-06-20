@@ -115,10 +115,10 @@ import {
     PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import type { CollectorDeleteParameters } from '@/api-clients/inventory/collector/schema/api-verbs/delete';
+import type { CollectorGetParameters } from '@/api-clients/inventory/collector/schema/api-verbs/get';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { SpaceRouter } from '@/router';
-import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
-import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 

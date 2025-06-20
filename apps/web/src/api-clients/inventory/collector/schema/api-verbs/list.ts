@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ScheduleState } from '@/schema/inventory/collector/type';
+import type { ScheduleState } from '@/api-clients/inventory/collector/schema/type';
 
 export interface CollectorListParameters {
     query?: Query;

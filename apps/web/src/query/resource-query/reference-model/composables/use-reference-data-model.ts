@@ -10,7 +10,7 @@ import type { ReferenceItem } from '@/query/resource-query/reference-model/types
 import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
-export const useReferenceModel = <T extends Record<string, any>, R extends ReferenceItem>(
+export const useReferenceDataModel = <T extends Record<string, any>, R extends ReferenceItem>(
     resourceKey: ResourceKeyType,
     referenceAdaptor: (arg: T) => ReferenceItem,
     fetchOptions: { only: string[] } = { only: [] },

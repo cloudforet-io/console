@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { Schedule, SecretFilter } from '@/schema/inventory/collector/type';
+import type { Schedule, SecretFilter } from '@/api-clients/inventory/collector/schema/type';
 
 // collector api parameters
 export interface CollectorUpdateParameters {

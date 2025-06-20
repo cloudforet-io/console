@@ -61,9 +61,9 @@ import {
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
-import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorCollectParameters } from '@/api-clients/inventory/collector/schema/api-verbs/collect';
+import type { CollectorCreateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/create';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 

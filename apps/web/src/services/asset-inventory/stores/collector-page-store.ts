@@ -7,10 +7,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { Schedule } from '@/schema/inventory/collector/type';
+import type { CollectorListParameters } from '@/api-clients/inventory/collector/schema/api-verbs/list';
+import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 

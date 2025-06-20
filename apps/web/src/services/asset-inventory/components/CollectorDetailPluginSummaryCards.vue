@@ -5,7 +5,7 @@ import type { Location } from 'vue-router';
 import { PCopyButton, PFieldTitle } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 
 import { useUserStore } from '@/store/user/user-store';
