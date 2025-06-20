@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { ProtocolPluginInfo } from '@/schema/notification/protocol/type';
+import type { ProtocolPluginInfo } from '@/api-clients/notification/protocol/schema/type';
 
 export interface ProtocolCreateParameters {
     name: string;

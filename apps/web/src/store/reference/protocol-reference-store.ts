@@ -6,8 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
-import type { ProtocolModel } from '@/schema/notification/protocol/model';
+import type { ProtocolListParameters } from '@/api-clients/notification/protocol/schema/api-verbs/list';
+import type { ProtocolModel } from '@/api-clients/notification/protocol/schema/model';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {

@@ -13,11 +13,11 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { ProtocolListParameters } from '@/api-clients/notification/protocol/schema/api-verbs/list';
+import type { ProtocolModel } from '@/api-clients/notification/protocol/schema/model';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
-import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
-import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

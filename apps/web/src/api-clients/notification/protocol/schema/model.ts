@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { ProtocolCapability, ProtocolPluginInfo, ProtocolState } from '@/schema/notification/protocol/type';
+import type { ProtocolCapability, ProtocolPluginInfo, ProtocolState } from '@/api-clients/notification/protocol/schema/type';
 
 export interface ProtocolModel {
     protocol_id: string;
