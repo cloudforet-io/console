@@ -3,19 +3,21 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { mapValues } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg, PJsonSchemaForm, PI, PSelectDropdown, PTag,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
+import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import type { ServiceChannelUpdateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/update';
 import { SERVICE_CHANNEL_FORWARD_TYPE, SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -41,10 +43,14 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
+const queryClient = useQueryClient();
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceChannelAPI } = useServiceChannelApi();
+
+const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
@@ -55,7 +61,6 @@ const storeState = reactive({
     language: computed<string>(() => serviceDetailPageGetters.language),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 
     isForwardTypeProtocol: computed<boolean>(() => props.selectedItem?.protocol_id?.toLowerCase().includes('forward') || false),
@@ -98,6 +103,19 @@ const state = reactive({
     selectedNotificationChannelIds: [],
 });
 
+const { mutate: serviceChannelUpdateMutate, isPending: updateLoading } = useMutation({
+    mutationFn: (params: ServiceChannelUpdateParameters) => serviceChannelAPI.update(params),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
+        state.proxyVisible = false;
+        emit('close');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 const {
     forms: {
         name,
@@ -114,7 +132,8 @@ const {
     },
 });
 
-const getProtocolInfo = (id: string): ProtocolInfo => {
+const getProtocolInfo = (id?: string): ProtocolInfo => {
+    if (!id) return { name: '', icon: '' };
     if (id === 'forward') {
         if (props.selectedItem?.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
             return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
@@ -148,7 +167,8 @@ const handleTagDelete = (idx: number) => {
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.selectedMemberItems = value;
 };
-const handleChangeRadio = () => {
+const handleChangeRadio = (idx: number) => {
+    state.selectedRadioIdx = idx;
     state.defaultMemberItems = [];
     state.selectedMemberItems = {} as Record<MembersType, string[]>;
 };
@@ -156,28 +176,18 @@ const handleScheduleForm = (form: ScheduleSettingFormType) => {
     state.scheduleForm = form;
 };
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.serviceChannel.update<ServiceChannelUpdateParameters>({
-            channel_id: props.selectedItem?.channel_id || '',
-            name: name.value,
-            schedule: state.scheduleForm,
-            data: !state.isForwardTypeProtocol ? state.schemaForm : {
-                FORWARD_TYPE: state.radioMenuList[state.selectedRadioIdx].name,
-                USER_GROUP: state.selectedRadioIdx === 1 ? state.selectedMemberItems.USER_GROUP : undefined,
-                USER: state.selectedRadioIdx === 2 ? state.selectedMemberItems.USER : undefined,
-                PROTOCOL: state.selectedNotificationChannelIds?.map((item) => item.name),
-            },
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-        state.proxyVisible = false;
-        emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+const handleConfirm = () => {
+    serviceChannelUpdateMutate({
+        channel_id: props.selectedItem?.channel_id || '',
+        name: name.value,
+        schedule: state.scheduleForm,
+        data: !state.isForwardTypeProtocol ? state.schemaForm : {
+            FORWARD_TYPE: state.radioMenuList[state.selectedRadioIdx].name,
+            USER_GROUP: state.selectedRadioIdx === 1 ? state.selectedMemberItems.USER_GROUP : undefined,
+            USER: state.selectedRadioIdx === 2 ? state.selectedMemberItems.USER : undefined,
+            PROTOCOL: state.selectedNotificationChannelIds?.map((item) => item.name),
+        },
+    });
 };
 
 watch(() => props.selectedItem, (selectedItem) => {
@@ -201,7 +211,7 @@ watch(() => props.selectedItem, (selectedItem) => {
     <p-button-modal class="service-detail-tabs-notifications-update-modal"
                     :header-title="$t('ALERT_MANAGER.NOTIFICATIONS.MODAL_UPDATE_TITLE')"
                     :visible.sync="state.proxyVisible"
-                    :loading="state.loading"
+                    :loading="updateLoading"
                     :disabled="!state.isAllFormValid"
                     @confirm="handleConfirm"
     >
@@ -212,17 +222,17 @@ watch(() => props.selectedItem, (selectedItem) => {
                         {{ $t('ALERT_MANAGER.NOTIFICATIONS.BASE_INFO_TITLE') }}
                     </p>
                     <div class="bg-gray-100 inline-flex w-full items-center mb-4 py-2 px-4 gap-2 rounded-md">
-                        <p-i v-if="props.selectedItem.protocol_id === 'forward'"
+                        <p-i v-if="props.selectedItem?.protocol_id === 'forward'"
                              name="ic_notification-protocol_users"
                              width="3rem"
                              height="3rem"
                         />
                         <p-lazy-img v-else
-                                    :src="assetUrlConverter(getProtocolInfo(props.selectedItem.protocol_id).icon)"
+                                    :src="assetUrlConverter(getProtocolInfo(props.selectedItem?.protocol_id)?.icon || '')"
                                     width="3rem"
                                     height="3rem"
                         />
-                        <span>{{ getProtocolInfo(props.selectedItem.protocol_id).name }}</span>
+                        <span>{{ getProtocolInfo(props.selectedItem?.protocol_id).name }}</span>
                     </div>
                     <p-field-group :label="$t('ALERT_MANAGER.NOTIFICATIONS.CHANNEL_NAME')"
                                    class="pt-2"
@@ -249,7 +259,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                                     <p-radio-group>
                                         <p-radio v-for="(item, idx) in state.radioMenuList"
                                                  :key="`notification-scope-${idx}`"
-                                                 v-model="state.selectedRadioIdx"
+                                                 :selected="state.selectedRadioIdx"
                                                  :value="idx"
                                                  @change="handleChangeRadio"
                                         >
@@ -287,7 +297,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                                 >
                                     <template #menu-item--format="{ item }">
                                         <div class="flex items-center gap-1">
-                                            <p-lazy-img :src="assetUrlConverter(getProtocolInfo(item.name).icon)"
+                                            <p-lazy-img :src="assetUrlConverter(getProtocolInfo(item.name)?.icon || '')"
                                                         width="1.25rem"
                                                         height="1.25rem"
                                             />
@@ -303,7 +313,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                                                    @delete="handleTagDelete(idx)"
                                             >
                                                 <div class="flex items-center gap-1">
-                                                    <p-lazy-img :src="assetUrlConverter(getProtocolInfo(item.name).icon)"
+                                                    <p-lazy-img :src="assetUrlConverter(getProtocolInfo(item.name)?.icon || '')"
                                                                 width="1rem"
                                                                 height="1rem"
                                                     />
@@ -318,7 +328,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                     </div>
                     <p-json-schema-form v-else
                                         :form-data.sync="state.schemaForm"
-                                        :schema="getProtocolInfo(props.selectedItem.protocol_id).schema"
+                                        :schema="getProtocolInfo(props.selectedItem?.protocol_id)?.schema || {}"
                                         :language="storeState.language"
                                         uniform-width
                     />

@@ -2,15 +2,18 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PTableCheckModal, PLazyImg, PStatus, PI,
 } from '@cloudforet/mirinae';
 
+import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import type { ServiceChannelDisableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/disable';
 import type { ServiceChannelEnableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/enable';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -32,14 +35,17 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
+const queryClient = useQueryClient();
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceChannelAPI } = useServiceChannelApi();
+
+const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
 const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:visible'): void
 }>();
 
 const state = reactive({
-    loading: false,
     headerTitle: computed<TranslateResult>(() => {
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             return i18n.t('ALERT_MANAGER.NOTIFICATIONS.MODAL_DISABLE_TITLE');
@@ -49,27 +55,32 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
+const { mutate: serviceChannelChangeStatusMutate, isPending: changeStatusLoading } = useMutation({
+    mutationFn: (params: ServiceChannelDisableParameters | ServiceChannelEnableParameters) => {
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
-            await SpaceConnector.clientV2.alertManager.serviceChannel.disable<ServiceChannelDisableParameters>({
-                channel_id: props.selectedItem?.channel_id || '',
-            });
+            return serviceChannelAPI.disable(params);
+        }
+        return serviceChannelAPI.enable(params);
+    },
+    onSuccess: () => {
+        if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DISABLED'), '');
         } else {
-            await SpaceConnector.clientV2.alertManager.serviceChannel.enable<ServiceChannelEnableParameters>({
-                channel_id: props.selectedItem?.channel_id || '',
-            });
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_ENABLED'), '');
         }
+        queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
         state.proxyVisible = false;
         emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const handleConfirm = () => {
+    serviceChannelChangeStatusMutate({
+        channel_id: props.selectedItem?.channel_id || '',
+    });
 };
 </script>
 
@@ -78,7 +89,7 @@ const handleConfirm = async () => {
                          :header-title="state.headerTitle"
                          :theme-color="props.selectedItem?.state === WEBHOOK_STATE.ENABLED ? 'alert' : 'primary'"
                          :fields="NOTIFICATION_MANAGEMENT_TABLE_FIELDS"
-                         :loading="state.loading"
+                         :loading="changeStatusLoading"
                          :items="[props.selectedItem]"
                          modal-size="md"
                          @confirm="handleConfirm"

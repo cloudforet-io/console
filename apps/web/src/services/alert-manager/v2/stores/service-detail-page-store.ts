@@ -5,9 +5,6 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceChannelListParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/list';
-import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { ServiceDeleteParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/delete';
 import type { ServiceGetParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/get';
 import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
@@ -39,7 +36,6 @@ interface ServiceFormStoreState {
     selectedWebhookId?: string;
     selectedNotificationId?: string;
     selectedEscalationPolicyId?: string;
-    serviceChannelList: ServiceChannelModel[];
     eventRuleScopeModalVisible: boolean;
     showEventRuleFormCard: boolean;
     isEventRuleEditMode: boolean;
@@ -67,7 +63,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
         selectedWebhookId: undefined,
         selectedNotificationId: undefined,
         selectedEscalationPolicyId: undefined,
-        serviceChannelList: [],
         eventRuleScopeModalVisible: false,
         showEventRuleFormCard: false,
         isEventRuleEditMode: false,
@@ -186,20 +181,6 @@ export const useServiceDetailPageStore = defineStore('page-service-detail', () =
                 });
             } catch (e) {
                 ErrorHandler.handleError(e, true);
-                throw e;
-            }
-        },
-        async fetchServiceChannelList(serviceId: string) {
-            try {
-                const { results } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
-                    service_id: serviceId,
-                    query: {
-                        sort: [{ key: 'created_at', desc: true }],
-                    },
-                });
-                state.serviceChannelList = results || [];
-            } catch (e) {
-                state.serviceChannelList = [];
                 throw e;
             }
         },

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { partition, reject, map } from 'lodash';
@@ -10,7 +10,6 @@ import {
     PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens, PEmpty, PScopedNotification, PLink,
 } from '@cloudforet/mirinae';
 
-import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { ServiceChangeMembersParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/change-members';
 import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
@@ -30,12 +29,12 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { indigo } from '@/styles/colors';
 
+import { useServiceChannelListQuery } from '@/services/alert-manager/v2/composables/use-service-channel-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
-
 
 type modalMode = 'member' | 'invitation';
 
@@ -58,7 +57,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width } = useWindowSize();
@@ -70,7 +68,6 @@ const storeState = reactive({
     serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
     userMap: computed<UserReferenceMap>(() => serviceDetailPageGetters.userReferenceMap),
     userGroupMap: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
-    serviceChannelList: computed<ServiceChannelModel[]>(() => serviceDetailPageState.serviceChannelList),
 });
 const state = reactive({
     loading: false,
@@ -121,6 +118,8 @@ const state = reactive({
     selectedDeleteMember: {} as MemberInfoType,
 });
 
+const { serviceChannelListData } = useServiceChannelListQuery();
+
 const formatRoleType = (roleType: RoleType) => roleType?.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
 
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
@@ -143,7 +142,7 @@ const handleConfirm = async () => {
         await inviteMember();
     }
 };
-const hasForwardValue = (): boolean => storeState.serviceChannelList.some((item) => {
+const hasForwardValue = (): boolean => serviceChannelListData.value.some((item) => {
     const forwardType = item.data?.FORWARD_TYPE;
     const forwardData = item.data?.[forwardType];
     return Array.isArray(forwardData) && forwardData.includes(state.selectedDeleteMember.key);
@@ -203,10 +202,6 @@ const fetcherChangeMembers = async (userData: string[], userGroupData: string[])
         ErrorHandler.handleError(e, true);
     }
 };
-
-onMounted(() => {
-    serviceDetailPageStore.fetchServiceChannelList(storeState.serviceInfo.service_id);
-});
 </script>
 
 <template>

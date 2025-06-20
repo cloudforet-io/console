@@ -5,7 +5,6 @@ import {
 
 import { isEqual } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     getTextHighlightRegex, PSelectDropdown, PTag, PI, PLazyImg,
 } from '@cloudforet/mirinae';
@@ -14,24 +13,13 @@ import type {
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceChannelListParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/list';
 import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
-import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
+import { useServiceChannelListQuery } from '@/services/alert-manager/v2/composables/use-service-channel-list-query';
 import type { ProtocolInfo } from '@/services/alert-manager/v2/types/alert-manager-type';
-
-interface DropdownItem extends SelectDropdownMenuItem {
-    name: string;
-    label: string;
-    members?: number;
-}
 
 const props = withDefaults(defineProps<{
      selectedIds?: string[];
@@ -42,18 +30,12 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
 }>();
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
-
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceChannelListData } = useServiceChannelListQuery();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-});
 const state = reactive({
     loading: false,
-    serviceChannelList: [] as ServiceChannelModel[],
-    serviceChannelDropdownList: computed<SelectDropdownMenuItem[]>(() => state.serviceChannelList.map((item) => ({
+    serviceChannelDropdownList: computed<SelectDropdownMenuItem[]>(() => serviceChannelListData.value.map((item) => ({
         name: item.channel_id,
         label: item.name,
     })).sort((a, b) => a.label.localeCompare(b.label))),
@@ -61,17 +43,17 @@ const state = reactive({
 });
 
 const getProtocolInfo = (id: string): ProtocolInfo => {
-    const channel = state.serviceChannelList.find((item) => item.channel_id === id);
-    const protocol = notificationProtocolListData.value.find((item) => item.protocol_id === channel.protocol_id);
+    const channel = serviceChannelListData.value.find((item) => item.channel_id === id);
+    const protocol = notificationProtocolListData.value.find((item) => item.protocol_id === channel?.protocol_id);
     return {
         name: channel?.name || '',
-        icon: channel.channel_type === SERVICE_CHANNEL_TYPE.FORWARD ? '' : protocol?.icon || '',
+        icon: channel?.channel_type === SERVICE_CHANNEL_TYPE.FORWARD ? '' : protocol?.icon || '',
     };
 };
 
 const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, pageStart = 1, pageLimit = 10) => {
     const _totalCount = pageStart - 1 + pageLimit;
-    const filterItems = (items: DropdownItem[]): DropdownItem[] => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
+    const filterItems = (items: SelectDropdownMenuItem[]): SelectDropdownMenuItem[] => items.filter((item) => getTextHighlightRegex(keyword).test(item.name)).slice(pageStart - 1, _totalCount);
 
     const _slicedItems = filterItems(state.serviceChannelDropdownList);
     return {
@@ -82,9 +64,9 @@ const menuItemsHandler = (): AutocompleteHandler => async (keyword: string, page
 
 const currentChannelIds = computed<string[]>(() => state.selectedItems.map((item) => item.name));
 
-const handleUpdateSelectedUserItems = (selectedUsers: SelectDropdownMenuItem[]) => {
-    if (isEqual(selectedUsers, state.selectedItems)) return;
-    state.selectedItems = selectedUsers;
+const handleUpdateSelectedUserItems = (selected: SelectDropdownMenuItem[]) => {
+    if (isEqual(selected, state.selectedItems)) return;
+    state.selectedItems = selected;
     if (isEqual(currentChannelIds.value, props.selectedIds)) return;
     emit('update:selected-ids', currentChannelIds.value);
 };
@@ -95,34 +77,18 @@ const handleTagDelete = (idx: number) => {
 const initMultipleType = (_channelIds?: string[]) => {
     if (!Array.isArray(_channelIds)) return;
     state.selectedItems = _channelIds.map((channelId) => {
-        const channel = state.serviceChannelList.find((item) => item.name === channelId);
+        const channel = serviceChannelListData.value.find((item) => item.name === channelId);
         return {
             name: channelId,
-            label: channel?.label ?? channelId,
+            label: channel?.name || channelId,
         };
     });
 };
 
-const fetchServiceChannelList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
-            service_id: storeState.serviceId,
-        });
-        state.serviceChannelList = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.serviceChannelList = [];
-    }
-};
-
-watch([() => props.selectedIds, () => state.serviceChannelList], async ([selectedIds, serviceChannelList]) => {
+watch([() => props.selectedIds, () => serviceChannelListData.value], async ([selectedIds, serviceChannelList]) => {
     if (serviceChannelList.length > 0 && selectedIds) {
         await initMultipleType(selectedIds);
     }
-}, { immediate: true });
-watch(() => storeState.serviceId, async (serviceId) => {
-    if (!serviceId) return;
-    await fetchServiceChannelList();
 }, { immediate: true });
 </script>
 
@@ -132,7 +98,7 @@ watch(() => storeState.serviceId, async (serviceId) => {
                        :selected="state.selectedItems"
                        :handler="menuItemsHandler()"
                        is-filterable
-                       page-size="10"
+                       :page-size="10"
                        use-fixed-menu-style
                        show-delete-all-button
                        multi-selectable

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
 
 import {
@@ -9,14 +9,12 @@ import {
 } from '@cloudforet/mirinae';
 
 import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
-import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
 import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
+import { useServiceChannelListQuery } from '@/services/alert-manager/v2/composables/use-service-channel-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
@@ -27,23 +25,19 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-    serviceChannelList: computed<ServiceChannelModel[]>(() => serviceDetailPageState.serviceChannelList.slice(0, 15)),
-});
 const state = reactive({
     loading: true,
     pageStart: 0,
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
-    pageMax: computed<number>(() => Math.max(storeState.serviceChannelList.length - state.visibleCount, 0)),
+    pageMax: computed<number>(() => Math.max(serviceChannelListData.value.length - state.visibleCount, 0)),
 });
+
+const { serviceChannelListData, serviceChannelListFetching } = useServiceChannelListQuery();
 
 const handleClickArrowButton = (increment: number) => {
     const element = {
@@ -61,22 +55,6 @@ const handleClickArrowButton = (increment: number) => {
 const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS)
 );
-
-const fetchServiceChannelList = async (serviceId: string) => {
-    state.loading = true;
-    try {
-        await serviceDetailPageStore.fetchServiceChannelList(serviceId);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => storeState.serviceId, (serviceId) => {
-    if (!serviceId) return;
-    fetchServiceChannelList(serviceId);
-}, { immediate: true });
 </script>
 
 <template>
@@ -86,10 +64,10 @@ watch(() => storeState.serviceId, (serviceId) => {
                        size="lg"
                        font-weight="regular"
         />
-        <p-data-loader :loading="state.loading"
-                       :data="storeState.serviceChannelList"
+        <p-data-loader :loading="serviceChannelListFetching"
+                       :data="serviceChannelListData"
                        class="content flex-1 pt-2"
-                       :class="{ 'empty': !storeState.serviceChannelList.length }"
+                       :class="{ 'empty': !serviceChannelListData.length }"
         >
             <div ref="rowItemsWrapperRef"
                  class="row-items-wrapper"
@@ -97,7 +75,7 @@ watch(() => storeState.serviceId, (serviceId) => {
                 <div ref="itemEl"
                      class="row-items-container"
                 >
-                    <div v-for="(item, idx) in storeState.serviceChannelList"
+                    <div v-for="(item, idx) in serviceChannelListData"
                          :key="`service-detail-notification-item-${idx}`"
                          class="item"
                     >
