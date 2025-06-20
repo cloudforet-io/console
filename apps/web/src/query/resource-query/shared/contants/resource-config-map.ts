@@ -17,6 +17,12 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'workspace_id',
         nameKey: 'name',
     },
+    workspaceGroup: {
+        name: 'Workspace Group',
+        resourceKey: 'workspaceGroup',
+        idKey: 'workspace_group_id',
+        nameKey: 'name',
+    },
     app: {
         name: 'App',
         resourceKey: 'app',
@@ -83,16 +89,22 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'trusted_account_id',
         nameKey: 'name',
     },
-    workspaceGroup: {
-        name: 'Workspace Group',
-        resourceKey: 'workspace_group',
-        idKey: 'workspace_group_id',
-        nameKey: 'name',
-    },
     user: {
         name: 'User',
         resourceKey: 'user',
         idKey: 'user_id',
+        nameKey: 'name',
+    },
+    userGroup: {
+        name: 'User Group',
+        resourceKey: 'userGroup',
+        idKey: 'user_group_id',
+        nameKey: 'name',
+    },
+    protocol: {
+        name: 'Protocol',
+        resourceKey: 'protocol',
+        idKey: 'protocol_id',
         nameKey: 'name',
     },
     metric: {
