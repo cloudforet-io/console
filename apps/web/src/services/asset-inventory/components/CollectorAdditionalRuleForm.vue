@@ -14,6 +14,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CloudServiceTypeStatParameters } from '@/api-clients/inventory/cloud-service-type/schema/api-verbs/stat';
+import type { RegionListParameters } from '@/api-clients/inventory/region/schema/api-verbs/list';
+import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
@@ -24,8 +26,6 @@ import type {
     CollectorRuleConditionOperator,
     CollectorRuleConditionPolicy,
 } from '@/schema/inventory/collector-rule/type';
-import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
-import type { RegionModel } from '@/schema/inventory/region/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -1,4 +1,4 @@
-import type { RegionModel } from '@/schema/inventory/region/model';
+import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

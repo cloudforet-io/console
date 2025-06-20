@@ -1,6 +1,8 @@
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-model/composables/use-reference-data-model';
 import type {
+    ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
 } from '@/query/resource-query/reference-model/types/reference-type';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
@@ -9,9 +11,13 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type AppReferenceItem = ReferenceItem<AppModel>;
 export type AppReferenceMap = ReferenceMap<AppReferenceItem>;
 
-export const useAppReferenceModel = () => {
-    const fetchOptions = {
-        only: ['name', 'app_id'],
+export const useAppReferenceDataModel = () => {
+    const { appAPI } = useAppApi();
+    const fetchConfig: ReferenceDataModelFetchConfig<AppModel> = {
+        listFetcher: appAPI.list,
+        query: {
+            only: ['name', 'app_id'],
+        },
     };
 
     const {
@@ -24,7 +30,7 @@ export const useAppReferenceModel = () => {
             name: appInfo.app_id,
             data: appInfo,
         }),
-        fetchOptions,
+        fetchConfig,
     );
 
     return {

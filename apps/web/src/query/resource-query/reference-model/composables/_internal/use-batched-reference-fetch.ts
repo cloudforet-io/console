@@ -5,8 +5,9 @@ import {
 
 import { referenceQueryClient as queryClient } from '@/query/clients';
 import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
+import type { ReferenceDataModelFetchConfig } from '@/query/resource-query/reference-model/types/reference-type';
 import { createResourceIdResolver } from '@/query/resource-query/reference-model/utils/reference-helper';
-import { useResourceInfo } from '@/query/resource-query/shared/composable/use-resource-info';
+import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 import type { ResourceKeyType, ResourceCacheType } from '@/query/resource-query/shared/types/resource-type';
 
 
@@ -22,21 +23,22 @@ const MAX_BATCH_SIZE = 45;
 export function useBatchedReferenceFetch<T extends Record<string, any>>(
     resourceKey: ResourceKeyType,
     queryKey: ComputedRef<QueryKeyArray>,
-    fetchOptions: { only: string[] } = { only: [] },
+    fetchConfig: ReferenceDataModelFetchConfig<T>,
 ) {
-    const { config, api } = useResourceInfo(resourceKey);
-    const { only = [] } = fetchOptions;
+    const resourceConfig = RESOURCE_CONFIG_MAP[resourceKey];
+    const listFetcher = fetchConfig.listFetcher;
+    const { only = [] } = fetchConfig.query || {};
     const getId = createResourceIdResolver<T>(resourceKey);
 
     const batchedFetcher = async (ids: string[]): Promise<T[]> => {
-        if (!config.idKey) {
+        if (!resourceConfig.idKey) {
             throw new Error(`[batchedFetcher] Invalid resource key: ${resourceKey}`);
         }
         let params: any = {
             query: {
                 filter: [
                     {
-                        k: config.idKey,
+                        k: resourceConfig.idKey,
                         o: 'in',
                         v: ids,
                     },
@@ -52,8 +54,8 @@ export function useBatchedReferenceFetch<T extends Record<string, any>>(
                 },
             };
         }
-        const response = await api.list(params);
-        return response.results || [];
+        const response = await listFetcher(params);
+        return response?.results || [];
     };
 
 

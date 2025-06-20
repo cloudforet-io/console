@@ -13,7 +13,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { MetricRunParameters } from '@/schema/inventory/metric/api-verbs/run';
+import type { MetricRunParameters } from '@/api-clients/inventory/metric/schema/api-verbs/run';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

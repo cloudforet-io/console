@@ -20,9 +20,9 @@ import type {
     TrustedAccountUpdateSecretDataParameters,
 } from '@/api-clients/identity/trusted-account/schema/api-verbs/update-secret-data';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import type { SecretGetParameters } from '@/schema/secret/secret/api-verbs/get';
-import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
-import type { SecretModel } from '@/schema/secret/secret/model';
+import type { SecretGetParameters } from '@/api-clients/secret/secret/schema/api-verbs/get';
+import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
+import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import type { TrustedSecretGetParameters } from '@/schema/secret/trusted-secret/api-verbs/get';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { i18n } from '@/translations';

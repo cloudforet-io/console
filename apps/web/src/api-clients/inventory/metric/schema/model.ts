@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { MetricType, MetricLabelKey } from '@/schema/inventory/metric/type';
+import type { MetricType, MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
 
 
 export interface MetricModel {

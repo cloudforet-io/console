@@ -6,12 +6,28 @@ import {
 
 import { useServiceQueryKey } from '../use-service-query-key';
 
+// Mock app context store
+vi.mock('@/store/app-context/workspace/user-workspace-store', () => ({
+    useUserWorkspaceStore: () => ({
+        getters: {
+            currentWorkspaceId: 'workspace-123',
+        },
+    }),
+}));
+vi.mock('@/store/app-context/app-context-store', () => ({
+    useAppContextStore: () => ({
+        getters: {
+            isAdminMode: false,
+        },
+    }),
+}));
 // Mock useQueryKeyAppContext
 vi.mock('@/query/query-key/_composable/use-app-context-query-key', () => ({
     useQueryKeyAppContext: () => ({
         value: ['workspace', 'workspace-123'] as const,
     }),
 }));
+
 
 describe('useServiceQueryKey', () => {
     it('should generate correct query key structure for basic usage', () => {
