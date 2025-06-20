@@ -8,15 +8,13 @@ import {
 
 import type { BudgetUsageAnalyzeResult } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import type { ProjectReferenceItem } from '@/query/resource-query/reference-model/use-project-reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -37,16 +35,13 @@ const props = withDefaults(defineProps<Props>(), {
     budgetUsage: () => ({} as BudgetUsageAnalyzeResult),
 });
 
-const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
+
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    costDataSource: computed(() => allReferenceStore.getters.costDataSource),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });
 const state = reactive({
@@ -63,11 +58,11 @@ const state = reactive({
 
         const targetNameList: string[] = [];
         if (state.isProjectTarget) {
-            const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetId];
+            const targetProject: ProjectReferenceItem|undefined = referenceMap.project[targetId];
             if (targetProject?.data?.groupInfo?.name) targetNameList.push(targetProject.data.groupInfo.name);
             targetNameList.push(targetProject?.name ?? targetId);
         } else { // for workspace
-            const targetWorkspace = storeState.workspaces[targetId];
+            const targetWorkspace = referenceMap.workspace[targetId];
             if (targetWorkspace) {
                 targetNameList.push(targetWorkspace?.name ?? targetId);
             }
@@ -78,9 +73,10 @@ const state = reactive({
     limit: computed<number>(() => props.budgetUsage.total_budget ?? 0),
     percentage: computed<number>(() => props.budgetUsage.budget_usage ?? 0),
     currency: computed<Currency>(() => {
-        const targetDataSource = storeState.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        if (!props.budgetUsage.data_source_id) return CURRENCY.USD;
+        const targetDataSource = referenceMap.costDataSource[props.budgetUsage.data_source_id];
         if (!targetDataSource) return CURRENCY.USD;
-        const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
+        const currentCurrency = targetDataSource.data?.plugin_info.metadata.currency;
         return currentCurrency ?? CURRENCY.USD;
     }),
     progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {
@@ -90,15 +86,16 @@ const state = reactive({
         return 'common';
     }),
     dataSourceText: computed<string>(() => {
-        const targetDataSource = storeState.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        if (!props.budgetUsage.data_source_id) return '';
+        const targetDataSource = referenceMap.costDataSource[props.budgetUsage.data_source_id];
         return targetDataSource?.label ?? '';
     }),
     providerText: computed<string>(() => {
-        const providerFilter = props.budgetUsage.provider_filter;
+        const providerFilter = props.budgetUsage?.provider_filter;
         if (!providerFilter) return '';
         if (providerFilter.providers?.length && providerFilter.state === 'ENABLED') {
             return providerFilter.providers.map((providerId) => {
-                const targetProvider = storeState.providers[providerId];
+                const targetProvider = referenceMap.provider[providerId];
                 return targetProvider?.label ?? providerId;
             }).join(', ');
         }

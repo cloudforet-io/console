@@ -25,7 +25,6 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -60,7 +59,6 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
 });
 
 const handlerState = reactive({

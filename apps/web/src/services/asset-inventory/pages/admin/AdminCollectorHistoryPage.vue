@@ -22,6 +22,7 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { SpaceRouter } from '@/router';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
@@ -95,11 +96,13 @@ const handlers = reactive({
         collector_id: makeReferenceValueHandler('inventory.Collector'),
     },
 });
+
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     loading: true,
@@ -292,7 +295,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                             })"
                             action-icon="internal-link"
                             new-tab
-                            :text="storeState.workspaces[value]?.label"
+                            :text="referenceMap.workspace[value]?.label || value"
                     />
                 </template>
                 <template #col-collector_info-format="{ value, item }">

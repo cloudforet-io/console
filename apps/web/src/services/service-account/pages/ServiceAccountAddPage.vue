@@ -17,13 +17,11 @@ import type { AccountType } from '@/api-clients/identity/service-account/schema/
 import type { TrustedAccountCreateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/create';
 import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -57,10 +55,9 @@ const props = defineProps<{
     serviceAccountType?: AccountType;
 }>();
 const router = useRouter();
-const allReferenceStore = useAllReferenceStore();
+
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    trustedAccounts: computed<TrustedAccountReferenceMap>(() => allReferenceStore.getters.trustedAccount),
     language: computed<string|undefined>(() => userStore.state.language),
 });
 
@@ -74,7 +71,7 @@ const state = reactive({
     providerSchemaData: computed<Partial<SchemaModel|undefined>>(
         () => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema),
     ),
-    providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
+    providerIcon: computed(() => (props.provider ? referenceMap.provider[props.provider]?.icon : '')),
     description: computed(() => state.providerSchemaData?.options?.help),
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length) && props.provider !== 'kubernetes',
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),

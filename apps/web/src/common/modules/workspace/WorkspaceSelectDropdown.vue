@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -17,10 +17,6 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -34,7 +30,6 @@ const router = useRouter();
 const emit = defineEmits<{(e: 'select', value: SelectDropdownMenuItem[]): void;
     (e: 'update:selected-project-ids', value: SelectDropdownMenuItem[]): void;
 }>();
-const allReferenceStore = useAllReferenceStore();
 
 interface Props {
     selectedWorkspaceIds?: SelectDropdownMenuItem[];
@@ -43,7 +38,6 @@ const props = withDefaults(defineProps<Props>(), {
     selectedWorkspaceIds: () => [],
 });
 const workspaceState = reactive({
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     loading: true,
     visible: false,
     menuItems: [] as MenuItem[],

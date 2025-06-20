@@ -12,12 +12,10 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -33,18 +31,16 @@ import { useAppPageStore } from '@/services/iam/store/app-page-store';
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 }>();
 
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
 });
 const state = reactive({
     confirmButton: computed(() => {
@@ -65,9 +61,9 @@ const state = reactive({
     selectedApp: computed(() => {
         let projectLabel = '';
         if (appPageStore.selectedApp.project_group_id) {
-            projectLabel = storeState.projectGroups[appPageStore.selectedApp.project_group_id].label;
+            projectLabel = referenceMap.projectGroup[appPageStore.selectedApp.project_group_id]?.label;
         } else if (appPageStore.selectedApp.project_id) {
-            projectLabel = storeState.projects[appPageStore.selectedApp.project_id].label;
+            projectLabel = referenceMap.project[appPageStore.selectedApp.project_id]?.label;
         }
         return {
             ...appPageStore.selectedApp,

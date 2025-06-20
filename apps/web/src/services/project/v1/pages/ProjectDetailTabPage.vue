@@ -13,14 +13,14 @@ import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/typ
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import type { ProjectGroupReferenceItem } from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
@@ -49,7 +49,6 @@ const route = useRoute();
 
 const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -67,16 +66,16 @@ const {
     publicFolderList,
 } = useDashboardFolderQuery();
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     visibleAlertTab: computed<boolean>(() => visibleContents.value && (alertManagerUiAffectsSchema.value?.visibleProjectAlertTab ?? false)),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     language: computed<string|undefined>(() => userStore.state.language),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
-    projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
+    projectGroupInfo: computed<ProjectGroupReferenceItem>(() => referenceMap.projectGroup[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
             { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE_V1._NAME } },

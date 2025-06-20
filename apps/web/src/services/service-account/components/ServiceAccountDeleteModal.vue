@@ -10,10 +10,10 @@ import type { ServiceAccountModel } from '@/api-clients/identity/service-account
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -42,12 +42,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 const serviceAccountPageStore = useServiceAccountPageStore();
-const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const recentStore = useRecentStore();
 const router = useRouter();
+
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
-    trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     proxyVisible: useProxyValue('visible', props, emit),
     fields: [
         { label: 'Service Account Name', name: 'name' },
@@ -55,7 +56,10 @@ const state = reactive({
     ],
     isGeneralAccount: computed(() => props.serviceAccountType === 'GENERAL'),
     serviceAccountData: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
-    relatedTrustedAccount: computed(() => state.trustedAccounts[state.serviceAccountData?.trusted_account_id]?.data ?? {}),
+    relatedTrustedAccount: computed(() => {
+        if (!state.serviceAccountData?.trusted_account_id) return {};
+        return referenceMap.trustedAccount[state.serviceAccountData.trusted_account_id]?.data ?? {};
+    }),
     isSyncedAccount: computed(() => state.serviceAccountData.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
     accountDeleteWarningInAgentMode: computed(() => _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_WARNING')),
 });

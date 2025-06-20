@@ -19,12 +19,10 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { APP_STATUS_TYPE } from '@/api-clients/identity/app/schema/constant';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
@@ -58,16 +56,14 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
+
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
     userId: computed<string|undefined>(() => userStore.state.userId),
-    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
 });
 const tableState = reactive({
     roleTypeFilter: computed<ApiFilter>(() => (storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'eq' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'not' })),
@@ -110,9 +106,9 @@ const state = reactive({
     refinedAppItems: computed(() => appPageState.apps.map((app) => {
         let projectLabel = '';
         if (app.project_group_id) {
-            projectLabel = storeState.projectGroups[app.project_group_id]?.label;
+            projectLabel = referenceMap.projectGroup[app.project_group_id]?.label;
         } else if (app.project_id) {
-            projectLabel = storeState.projects[app.project_id]?.label;
+            projectLabel = referenceMap.project[app.project_id]?.label;
         }
         return {
             ...app,

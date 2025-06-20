@@ -7,11 +7,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PBadge, PSelectStatus } from '@cloudforet/mirinae';
 
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
@@ -37,11 +36,8 @@ const props = withDefaults(defineProps<{
     disabled: false,
     provider: '',
 });
-const allReferenceStore = useAllReferenceStore();
 
-const storeState = reactive({
-    providers: computed(() => allReferenceStore.getters.provider),
-});
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     tagTypeList: computed(() => [
         { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.ALL') },
@@ -143,11 +139,11 @@ watch([() => props.resourceId, () => props.resourceId], () => { getCloudServiceT
             </p-badge>
         </template>
         <template #col-provider-format="{ value }">
-            <p-badge v-if="storeState.providers[value]"
-                     :background-color="storeState.providers[value]?.color"
+            <p-badge v-if="referenceMap.provider[value]"
+                     :background-color="referenceMap.provider[value]?.color"
                      text-color="white"
             >
-                {{ storeState.providers[value]?.label }}
+                {{ referenceMap.provider[value]?.label || value }}
             </p-badge>
         </template>
     </tags-panel>

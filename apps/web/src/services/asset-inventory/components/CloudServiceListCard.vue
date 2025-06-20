@@ -10,6 +10,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLazyImg, PDivider, PTooltip } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
@@ -49,6 +51,7 @@ const cloudServiceLSBStore = useCloudServiceLSBStore();
 
 const allReferenceStore = useAllReferenceStore();
 
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -137,7 +140,7 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
         >
             <div class="card-title-wrapper">
                 <div class="provider-title-wrapper">
-                    <span class="provider">{{ (item.provider && state.providers[item.provider]) ? state.providers[item.provider].label : item.provider }}</span>
+                    <span class="provider">{{ item.provider ? referenceMap.provider[item.provider]?.label || item.provider : '' }}</span>
                 </div>
                 <div class="service-group-wrapper">
                     <p-lazy-img width="1.25rem"

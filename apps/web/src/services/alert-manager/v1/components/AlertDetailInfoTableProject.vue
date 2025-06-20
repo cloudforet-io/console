@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import {
     PButton, PLink, PButtonModal, PCopyButton,
 } from '@cloudforet/mirinae';
 
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -35,12 +35,12 @@ const {
     dataForUpdate: props.alertData?.project_id,
 });
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const { getReferenceLocation } = useReferenceRouter();
 
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     modalVisible: false,
 });
 
@@ -59,7 +59,9 @@ const onSelectProject = (selected) => {
            class="content-wrapper"
         >
             <span class="project">
-                <p-copy-button :value="props.alertData.project_id">
+                <p-copy-button v-if="props.alertData?.project_id"
+                               :value="props.alertData.project_id"
+                >
                     <p-link action-icon="internal-link"
                             new-tab
                             :to="getReferenceLocation(
@@ -67,7 +69,7 @@ const onSelectProject = (selected) => {
                                 { resource_type: 'identity.Project', workspace_id: userWorkspaceStore.getters.currentWorkspaceId },)"
                             highlight
                     >
-                        {{ state.projects[props.alertData.project_id] ? state.projects[props.alertData.project_id].label : props.alertData.project_id }}
+                        {{ referenceMap.project[props.alertData.project_id]?.label || props.alertData.project_id }}
                     </p-link>
                 </p-copy-button>
             </span>

@@ -8,9 +8,8 @@ import {
 
 import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/schema/api-verbs/delete';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n as _i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -34,17 +33,20 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
-const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspaces[0]),
 });
+
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     headerTitle: computed(() => `${_i18n.t('IAM.WORKSPACES.DELETE_WORKSPACE')}`),
     selectedWorkspaceName: computed(() => storeState.selectedWorkspace?.name || ''),
-    trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
-    relatedTrustedAccount: computed(() => state.trustedAccounts[storeState.selectedWorkspace?.trusted_account_id]?.data ?? {}),
+    relatedTrustedAccount: computed(() => {
+        if (!storeState.selectedWorkspace?.trusted_account_id) return {};
+        return referenceMap.trustedAccount[storeState.selectedWorkspace.trusted_account_id]?.data ?? {};
+    }),
     isSyncedAccount: computed(() => storeState.selectedWorkspace?.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
 });
 

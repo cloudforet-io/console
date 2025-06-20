@@ -10,10 +10,9 @@ import {
     PDivider,
 } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
 import { queryStringToArray, queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
@@ -38,24 +37,22 @@ const { breadcrumbs } = useBreadcrumbs();
 const route = useRoute();
 const router = useRouter();
 
-const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
-const storeState = reactive({
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     breadCrumbs: computed(() => {
-        const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
+        const targetNamespace = referenceMap.namespace[metricExplorerPageGetters.namespaceId];
         const _targetMetric = metricExplorerPageState.metric;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
+                name: `[${targetNamespace?.name || metricExplorerPageGetters.namespaceId}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
                 path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];

@@ -16,8 +16,6 @@ import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -36,7 +34,6 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -50,7 +47,6 @@ const state = reactive({
 });
 const tableState = reactive({
     timezone: computed(() => userStore.state.timezone),
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     tableItems: computed<WorkspaceTableItem[]>(() => workspaceTabState.workspacesInSelectedGroup?.map((workspace) => ({
         ...workspace,
         remove_button: workspace,

@@ -14,19 +14,17 @@ import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/sc
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 
-const allReferenceStore = useAllReferenceStore();
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
 
-const serviceAccount = computed(() => allReferenceStore.getters.serviceAccount);
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     isSelectable: false,
@@ -41,7 +39,7 @@ const state = reactive({
     refinedServiceAccountList: computed<SelectDropdownMenuItem[]>(() => state.serviceAccountList
         .map((serviceAccountId) => ({
             name: serviceAccountId,
-            label: serviceAccount.value[serviceAccountId].label,
+            label: referenceMap.serviceAccount[serviceAccountId]?.label || serviceAccountId,
         }))),
     selectedServiceAccount: '',
 });

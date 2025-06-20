@@ -16,7 +16,6 @@ import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspa
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -42,7 +41,6 @@ const emit = defineEmits<{(e: 'change', member: string[]): void; }>();
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     userId: computed<string|undefined>(() => userStore.state.userId),
 });

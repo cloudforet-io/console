@@ -16,15 +16,12 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -43,7 +40,6 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
@@ -71,6 +67,8 @@ const attachedServiceAccountList = computed(() => [
     },
 ]);
 
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
     loading: true,
@@ -88,10 +86,6 @@ const state = reactive({
         if (state.secretFilter.state === 'DISABLED') return [];
         return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
     }),
-    // reference data
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
 });
 
 const querySearchHandlers = {
@@ -212,10 +206,10 @@ watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFi
                          @refresh="handleToolboxTableRefresh"
         >
             <template #col-service_account_id-format="{value}">
-                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
+                {{ referenceMap.serviceAccount[value]?.label || value }}
             </template>
             <template #col-project_id-format="{value}">
-                <p-link v-if="state.projects[value]"
+                <p-link v-if="referenceMap.project[value]"
                         action-icon="internal-link"
                         new-tab
                         :to="getReferenceLocation(value,{
@@ -223,15 +217,15 @@ watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFi
                             workspace_id: userWorkspaceStore.getters.currentWorkspaceId
                         })"
                 >
-                    {{ state.projects[value].label }}
+                    {{ referenceMap.project[value]?.label || value }}
                 </p-link>
             </template>
             <template #col-provider-format="{value}">
-                <p-badge v-if="state.providers[value]"
-                         :background-color="state.providers[value].color"
+                <p-badge v-if="referenceMap.provider[value]"
+                         :background-color="referenceMap.provider[value]?.color"
                          text-color="white"
                 >
-                    {{ state.providers[value].label }}
+                    {{ referenceMap.provider[value]?.label || value }}
                 </p-badge>
             </template>
             <template #col-collect-format="{item}">

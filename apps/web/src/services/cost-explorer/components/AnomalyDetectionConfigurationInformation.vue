@@ -7,8 +7,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -16,14 +16,10 @@ import AnomalyDetectionConfigurationInformationForm
     from '@/services/cost-explorer/components/AnomalyDetectionConfigurationInformationForm.vue';
 import { CONFIG_TEMP_DATA } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const route = useRoute();
+const referenceMap = useAllReferenceDataModel();
 
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
-});
 const state = reactive({
     isDetailPage: false,
     isEdit: false,
@@ -92,11 +88,11 @@ watch(() => route.params.configId, (configId) => {
                 <div class="col-data-source">
                     <p-lazy-img width="1rem"
                                 height="1rem"
-                                :src="assetUrlConverter(storeState.providers[value]?.icon)"
+                                :src="assetUrlConverter(referenceMap.provider[value]?.icon || '')"
                                 alt="provider-icon"
                                 class="icon"
                     />
-                    <span>{{ storeState.providers[value]?.label }}</span>
+                    <span>{{ referenceMap.provider[value]?.label || value }}</span>
                 </div>
             </template>
         </p-definition-table>

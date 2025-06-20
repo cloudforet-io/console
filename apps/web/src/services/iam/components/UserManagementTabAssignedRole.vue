@@ -14,14 +14,16 @@ import {
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-verbs/get';
 import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import type {
+    ProjectGroupReferenceItem,
+} from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
+import type { ProjectReferenceItem } from '@/query/resource-query/reference-model/use-project-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -45,10 +47,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const { getReferenceLocation } = useReferenceRouter();
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     title: computed(() => i18n.t('IAM.USER.MAIN.ASSIGNED_ROLES')),
@@ -61,8 +63,6 @@ const state = reactive({
         { name: 'labels', label: 'Labels' },
     ]),
     items: [] as UserRoleItem[],
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    projects: computed(() => allReferenceStore.getters.project),
 });
 
 const getProjectLink = (value, isProject: boolean) => {
@@ -126,7 +126,7 @@ watch(() => props.userId, () => {
                         new-tab
                         :to="getProjectLink(value, false)"
                 >
-                    {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
+                    {{ referenceMap.projectGroup[value]?.label || value }}
                 </p-link>
                 <p v-if="!value">
                     -
@@ -138,7 +138,7 @@ watch(() => props.userId, () => {
                         new-tab
                         :to="getProjectLink(value, true)"
                 >
-                    {{ state.projects[value] ? state.projects[value].label : value }}
+                    {{ referenceMap.project[value]?.label || value }}
                 </p-link>
                 <p v-if="!value">
                     -
