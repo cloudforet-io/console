@@ -95,11 +95,16 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'user_id',
         nameKey: 'name',
     },
-    // user
     metric: {
         name: 'Metric',
         resourceKey: 'metric',
         idKey: 'metric_id',
+        nameKey: 'name',
+    },
+    namespace: {
+        name: 'Namespace',
+        resourceKey: 'namespace',
+        idKey: 'namespace_id',
         nameKey: 'name',
     },
 } as const;

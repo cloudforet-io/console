@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { NamespaceCategory, NamespaceGroup } from '@/schema/inventory/namespace/type';
+import type { NamespaceCategory, NamespaceGroup } from '@/api-clients/inventory/namespace/schema/type';
 
 
 export interface NamespaceModel {
