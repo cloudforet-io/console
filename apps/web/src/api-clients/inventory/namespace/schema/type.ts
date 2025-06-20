@@ -1,4 +1,4 @@
-import type { NAMESPACE_CATEGORY } from '@/schema/inventory/namespace/constant';
+import type { NAMESPACE_CATEGORY } from '@/api-clients/inventory/namespace/schema/constant';
 
 export type NamespaceCategory = typeof NAMESPACE_CATEGORY[keyof typeof NAMESPACE_CATEGORY];
 

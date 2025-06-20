@@ -22,7 +22,7 @@ export const makeReferenceProxy = <T extends object>(
     baseGet: (target: T, prop: string) => any,
 ) => new Proxy(target, {
         get(_, id: string) {
-            if (IGNORED_KEYS.has(id) || typeof id !== 'string') return undefined;
+            if (IGNORED_KEYS.has(id) || typeof id !== 'string' || id === 'undefined' || id === 'null') return undefined;
             return baseGet(_, id);
         },
     });

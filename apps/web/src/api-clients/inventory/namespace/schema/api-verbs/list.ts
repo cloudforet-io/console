@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { NamespaceCategory, NamespaceGroup } from '@/schema/inventory/namespace/type';
+import type { NamespaceCategory, NamespaceGroup } from '@/api-clients/inventory/namespace/schema/type';
 
 
 export interface NamespaceListParameters {
