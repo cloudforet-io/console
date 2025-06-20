@@ -27,8 +27,6 @@ import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
@@ -49,11 +47,10 @@ interface EnrichedProtocolItem extends ProtocolModel {
     icon: any;
     id: string;
 }
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
-
+const referenceMap = useAllReferenceDataModel();
 const props = withDefaults(defineProps<{
     projectId?: string;
     manageDisabled?: boolean;
@@ -76,7 +73,6 @@ const state = reactive({
     protocolList: computed<EnrichedProtocolItem[]>(() => (
         state.defaultProtocolResp.map((d) => createProtocolItem(d))
     )),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 
 const createProtocolItem = (d) => {
@@ -94,7 +90,7 @@ const createProtocolItem = (d) => {
         protocolType: d.protocol_type,
         tags: d.tags,
         plugin_info: d.plugin_info,
-        icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
+        icon: referenceMap.plugin[d.plugin_info?.plugin_id]?.icon || '',
         name: d.name,
     };
 };

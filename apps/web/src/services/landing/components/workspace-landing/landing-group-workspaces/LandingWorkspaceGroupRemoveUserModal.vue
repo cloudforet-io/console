@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
@@ -11,8 +11,6 @@ import type { WorkspaceUser, WorkspaceGroupModel } from '@/api-clients/identity/
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -41,11 +39,8 @@ const landingPageStore = useLandingPageStore();
 const landingPageStoreState = landingPageStore.state;
 const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 
-const allReferenceStore = useAllReferenceStore();
-
 const state = reactive({
     loading: false,
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const userTableFields = [{ name: 'user_id', label: 'User ID' },

@@ -17,12 +17,8 @@ import { useNotificationChannelCreateFormStore } from '@/services/iam/store/noti
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-});
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     selectedProtocol: {},
