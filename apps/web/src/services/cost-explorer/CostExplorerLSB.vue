@@ -6,8 +6,8 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { useCurrentMenuId } from '@/common/composables/current-menu-id';
 
-import CostAdvancedSettingsLSB from '@/services/cost-explorer/components/CostAdvancedSettingsLSB.vue';
 import CostAnalysisLSB from '@/services/cost-explorer/components/CostAnalysisLSB.vue';
+import CostAnomalyDetectionLSB from '@/services/cost-explorer/components/CostAnomalyDetectionLSB.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const route = useRoute();
@@ -27,6 +27,6 @@ const state = reactive({
 <template>
     <aside class="sidebar-menu">
         <cost-analysis-l-s-b v-if="state.menuId === MENU_ID.COST_ANALYSIS" />
-        <cost-advanced-settings-l-s-b v-if="route.name.includes(MENU_ID.COST_ADVANCED_SETTINGS)" />
+        <cost-anomaly-detection-l-s-b v-if="route.name?.includes(MENU_ID.ANOMALY_DETECTION)" />
     </aside>
 </template>

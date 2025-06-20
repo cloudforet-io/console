@@ -14,7 +14,7 @@ import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin
 
 const router = useRouter();
 
-const containerName = ADMIN_COST_EXPLORER_ROUTE.COST_ADVANCED_SETTINGS._NAME;
+const containerName = ADMIN_COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME;
 
 const state = reactive({
     childrenRoute: computed(() => router.getRoutes().filter((r) => r.name?.includes(containerName) && (r.name !== containerName))),
@@ -31,7 +31,7 @@ const state = reactive({
 </script>
 
 <template>
-    <l-s-b class="cost-advanced-settings-l-s-b"
+    <l-s-b class="cost-anomaly-detection-l-s-b"
            :menu-set="state.menuSet"
     />
 </template>
