@@ -4,6 +4,7 @@ import { useCollectorReferenceDataModel } from '@/query/resource-query/reference
 import { useCostDataSourceReferenceModel } from '@/query/resource-query/reference-model/use-cost-data-source-reference-data-model';
 import { useMetricReferenceDataModel } from '@/query/resource-query/reference-model/use-metric-reference-data-model';
 import { useNamespaceReferenceDataModel } from '@/query/resource-query/reference-model/use-namespace-reference-data-model';
+import { usePluginReferenceDataModel } from '@/query/resource-query/reference-model/use-plugin-reference-data-model';
 import { useProjectGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
 import { useProjectReferenceDataModel } from '@/query/resource-query/reference-model/use-project-reference-data-model';
 import { useProtocolReferenceDataModel } from '@/query/resource-query/reference-model/use-protocol-reference-data-model';
@@ -36,6 +37,7 @@ export const useAllReferenceDataModel = () => {
     const role = useRoleReferenceDataModel();
     const region = useRegionReferenceDataModel();
     const secret = useSecretReferenceDataModel();
+    const plugin = usePluginReferenceDataModel();
     const serviceAccount = useServiceAccountReferenceDataModel();
     const trustedAccount = useTrustedAccountReferenceDataModel();
 
@@ -57,6 +59,7 @@ export const useAllReferenceDataModel = () => {
         role: role.map,
         region: region.map,
         secret: secret.map,
+        plugin: plugin.map,
         serviceAccount: serviceAccount.map,
         trustedAccount: trustedAccount.map,
     };

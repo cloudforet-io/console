@@ -107,6 +107,12 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'protocol_id',
         nameKey: 'name',
     },
+    webhook: {
+        name: 'Webhook',
+        resourceKey: 'webhook',
+        idKey: 'webhook_id',
+        nameKey: 'name',
+    },
     metric: {
         name: 'Metric',
         resourceKey: 'metric',
@@ -117,6 +123,12 @@ export const RESOURCE_CONFIG_MAP = {
         name: 'Namespace',
         resourceKey: 'namespace',
         idKey: 'namespace_id',
+        nameKey: 'name',
+    },
+    plugin: {
+        name: 'Plugin',
+        resourceKey: 'plugin',
+        idKey: 'plugin_id',
         nameKey: 'name',
     },
 } as const;

@@ -3,8 +3,8 @@ import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type {
     CollectorMetadata, CollectorOptions, Schedule, SecretFilter,
 } from '@/api-clients/inventory/collector/schema/type';
+import type { Capability } from '@/api-clients/repository/plugin/schema/type';
 import type { UpgradeMode } from '@/schema/plugin/plugin/type';
-import type { Capability } from '@/schema/repository/plugin/type';
 
 
 export interface CollectorPluginInfo {

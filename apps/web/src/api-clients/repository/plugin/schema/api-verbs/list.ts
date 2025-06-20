@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { RegistryType } from '@/schema/repository/plugin/type';
+import type { RegistryType } from '@/api-clients/repository/plugin/schema/type';
 
 export interface PluginListParameters {
     query?: Query;

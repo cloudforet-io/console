@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { Capability } from '@/schema/repository/plugin/type';
+import type { Capability } from '@/api-clients/repository/plugin/schema/type';
 
 export interface PluginUpdateParameters {
     plugin_id: string;
