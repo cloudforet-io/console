@@ -1,6 +1,7 @@
+import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-model/composables/use-reference-data-model';
-import type { ReferenceItem, ReferenceMap } from '@/query/resource-query/reference-model/types/reference-type';
+import type { ReferenceDataModelFetchConfig, ReferenceItem, ReferenceMap } from '@/query/resource-query/reference-model/types/reference-type';
 import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 
@@ -17,8 +18,12 @@ export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroup
 export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 
 export const useProjectGroupReferenceModel = () => {
-    const fetchOptions = {
-        only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id', 'users'],
+    const { projectGroupAPI } = useProjectGroupApi();
+    const fetchConfig: ReferenceDataModelFetchConfig<ProjectGroupModel> = {
+        listFetcher: projectGroupAPI.list,
+        query: {
+            only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id', 'users'],
+        },
     };
 
 
@@ -33,7 +38,7 @@ export const useProjectGroupReferenceModel = () => {
                 parentGroupId: projectGroupInfo.parent_group_id,
             },
         }),
-        fetchOptions,
+        fetchConfig,
     );
 
     const projectGroupReferenceProxyMap = makeReferenceProxy<ProjectGroupReferenceMap>({} as ProjectGroupReferenceMap, (_, id: string) => {

@@ -1,6 +1,8 @@
+import { useCloudServiceTypeApi } from '@/api-clients/inventory/cloud-service-type/composables/use-cloud-service-type-api';
 import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-model/composables/use-reference-data-model';
 import type {
+    ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
 } from '@/query/resource-query/reference-model/types/reference-type';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
@@ -12,8 +14,12 @@ export type CloudServiceTypeReferenceItem = ReferenceItem<CloudServiceTypeModel>
 export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeReferenceItem>;
 
 export const useCloudServiceTypeReferenceModel = () => {
-    const fetchOptions = {
-        only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'cloud_service_type_key'],
+    const { cloudServiceTypeAPI } = useCloudServiceTypeApi();
+    const fetchConfig: ReferenceDataModelFetchConfig<CloudServiceTypeModel> = {
+        listFetcher: cloudServiceTypeAPI.list,
+        query: {
+            only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'cloud_service_type_key'],
+        },
     };
 
     const {
@@ -31,7 +37,7 @@ export const useCloudServiceTypeReferenceModel = () => {
                 cloud_service_type_key: cloudServiceTypeInfo.cloud_service_type_key,
             },
         }),
-        fetchOptions,
+        fetchConfig,
     );
 
     return {

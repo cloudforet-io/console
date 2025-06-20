@@ -1,6 +1,6 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { MetricType } from '@/schema/inventory/metric/type';
+import type { MetricType } from '@/api-clients/inventory/metric/schema/type';
 
 
 export interface MetricCreateParameters {
