@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import { PTextInput } from '@cloudforet/mirinae';
 
+import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookDeleteParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/delete';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n as _i18n } from '@/translations';
@@ -29,7 +31,6 @@ const emit = defineEmits<{(e: 'close'): void,
 }>();
 
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     inputWebhookName: '',
     isNameValid: computed<boolean>(() => {
@@ -39,20 +40,22 @@ const state = reactive({
     }),
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.webhook.delete<WebhookDeleteParameters>({
-            webhook_id: props.selectedItem?.webhook_id || '',
-        });
+const { webhookAPI } = useWebhookApi();
+const { mutateAsync: deleteWebhook, isPending: deleteWebhookLoading } = useMutation({
+    mutationFn: (params: WebhookDeleteParameters) => webhookAPI.delete(params),
+    onSuccess: () => {
         showSuccessMessage(_i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DELETE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const handleConfirm = () => {
+    deleteWebhook({
+        webhook_id: props.selectedItem?.webhook_id || '',
+    });
 };
 </script>
 
@@ -61,7 +64,7 @@ const handleConfirm = async () => {
                   :confirm-text="$t('ALERT_MANAGER.WEBHOOK.MODAL_DELETE_BUTTON')"
                   :visible.sync="state.proxyVisible"
                   :disabled="!state.isNameValid"
-                  :loading="state.loading"
+                  :loading="deleteWebhookLoading"
                   @confirm="handleConfirm"
     >
         <template #default>
