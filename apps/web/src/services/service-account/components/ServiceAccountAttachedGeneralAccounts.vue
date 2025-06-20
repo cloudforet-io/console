@@ -39,7 +39,6 @@ import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -67,7 +66,6 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
 const { getReferenceLocation } = useReferenceRouter();
@@ -153,11 +151,7 @@ const getProjectDetailLocation = (id: string) => getReferenceLocation(id, { reso
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
-        await Promise.allSettled([
-            userWorkspaceStore.load(),
-            allReferenceStore.load('project'),
-            allReferenceStore.load('service_account'),
-        ]);
+        await userWorkspaceStore.load();
         const convertOptions = {
             ...options,
             sortBy: state.sortBy,
