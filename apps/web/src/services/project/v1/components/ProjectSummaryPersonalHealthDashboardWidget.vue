@@ -20,7 +20,6 @@ import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -60,7 +59,6 @@ const state = reactive({
     loading: false,
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     timezone: computed<string|undefined>(() => userStore.state.timezone),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     pageStart: 1,
     pageLimit: 5,
