@@ -162,7 +162,8 @@ const handleTagDelete = (idx: number) => {
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.selectedMemberItems = value;
 };
-const handleChangeRadio = () => {
+const handleChangeRadio = (idx: number) => {
+    state.selectedRadioIdx = idx;
     state.defaultMemberItems = [];
     state.selectedMemberItems = {} as Record<MembersType, string[]>;
 };
@@ -253,7 +254,7 @@ watch(() => props.selectedItem, (selectedItem) => {
                                     <p-radio-group>
                                         <p-radio v-for="(item, idx) in state.radioMenuList"
                                                  :key="`notification-scope-${idx}`"
-                                                 v-model="state.selectedRadioIdx"
+                                                 :selected="state.selectedRadioIdx"
                                                  :value="idx"
                                                  @change="handleChangeRadio"
                                         >

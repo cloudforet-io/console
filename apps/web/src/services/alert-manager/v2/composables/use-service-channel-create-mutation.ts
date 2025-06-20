@@ -1,10 +1,11 @@
 import type { ComputedRef } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import type { ServiceChannelCreateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create';
 import type { ServiceChannelCreateForwardChannelParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create-forward-channel';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -22,6 +23,9 @@ interface ServiceChannelCreateMutationOptions {
 
 export const useServiceChannelCreateMutation = (options?: ServiceChannelCreateMutationOptions) => {
     const { serviceChannelAPI } = useServiceChannelApi();
+    const queryClient = useQueryClient();
+
+    const { withSuffix: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
 
     return useMutation({
         mutationFn: (params: ServiceChannelCreateParametersType) => {
@@ -31,6 +35,8 @@ export const useServiceChannelCreateMutation = (options?: ServiceChannelCreateMu
             return serviceChannelAPI.create(params as ServiceChannelCreateParameters);
         },
         onSuccess: async (data, variables) => {
+            const _serviceId = { service_id: variables.service_id };
+            queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey(_serviceId) });
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
             if (options?.onSuccess) await options.onSuccess(data, variables);
         },
