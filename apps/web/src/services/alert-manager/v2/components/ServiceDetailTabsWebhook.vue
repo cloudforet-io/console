@@ -125,8 +125,7 @@ const filterState = reactive({
     sortDesc: true,
 });
 
-const webhookListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
-    .setPage(1, 15);
+const webhookListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
@@ -188,7 +187,10 @@ const {
             ...queryTagHelper.filters.value,
         ]);
         return {
-            query: webhookListApiQueryHelper.data,
+            query: {
+                ...webhookListApiQueryHelper.data,
+                sort: [{ key: filterState.sortKey, desc: filterState.sortDesc }],
+            },
             service_id: storeState.serviceId,
         };
     }),

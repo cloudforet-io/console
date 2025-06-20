@@ -99,7 +99,7 @@ const tabState = reactive({
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
 });
 const state = reactive({
-    webhookInfo: {} as WebhookModel,
+    webhookInfo: computed<WebhookModel>(() => webhookDetailData.value || {} as WebhookModel),
     rawDataModalVisible: false,
     rawData: {} as Record<string, any>,
     selectedPlugin: {} as PluginModel,
@@ -134,11 +134,9 @@ const { data: webhookDetailData } = useScopedQuery({
     queryFn: async () => webhookAPI.get(webhookDetailQueryParams.value),
     enabled: computed(() => !!storeState.selectedWebhookId),
     gcTime: 1000 * 60 * 2,
-    staleTime: 1000 * 60 * 2,
 }, ['WORKSPACE']);
 
-const errorListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
-    .setPage(1, 15);
+const errorListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS });
 const { queryTags } = queryTagHelper;
 
@@ -187,16 +185,10 @@ const handleChange = async (options: any = {}) => {
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
 };
 
-const fetchWebhookDetail = async () => {
+const setWebhookDetail = () => {
     if (!storeState.selectedWebhookId) return;
-    try {
-        state.webhookInfo = webhookDetailData.value;
-        messageState.formatList = state.webhookInfo.message_formats || [];
-        messageState.formats = state.webhookInfo.message_formats?.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.webhookInfo = {} as WebhookModel;
-    }
+    messageState.formatList = state.webhookInfo.message_formats || [];
+    messageState.formats = state.webhookInfo.message_formats?.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
 };
 const getRepositoryID = async () => {
     const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
@@ -220,9 +212,8 @@ const fetchPluginInfo = async () => {
 const { mutateAsync: updateMessageFormat, isPending: updateMessageFormatLoading } = useMutation({
     mutationFn: (params: WebhookUpdateMessageFormatParameters) => webhookAPI.updateMessageFormat(params),
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: webhookDetailQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: webhookDetailQueryKey.value });
         await handleEditMessageFormat(false);
-        await fetchWebhookDetail();
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
@@ -238,13 +229,15 @@ const fetchMessageUpdate = (tags) => {
     });
 };
 
+watch(() => webhookDetailData.value, () => {
+    setWebhookDetail();
+});
 watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
     if (activeTab === WEBHOOK_DETAIL_TABS.ERROR) {
         queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value });
     }
 });
 watch(() => storeState.selectedWebhookId, async () => {
-    await fetchWebhookDetail();
     if (isEmpty(state.webhookInfo)) return;
     if (!state.webhookInfo.plugin_info?.plugin_id) return;
     await fetchPluginInfo();
