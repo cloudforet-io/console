@@ -7,6 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
@@ -14,7 +15,6 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -39,6 +39,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 const userStore = useUserStore();
+const referenceMap = useAllReferenceDataModel();
 
 
 const state = reactive({
@@ -64,7 +65,6 @@ const state = reactive({
         { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
         { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
     ]),
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     data: computed<Partial<AlertModel>>(() => alertPageState.alertData ?? {}),
     escalationPolicyName: '',
@@ -144,7 +144,7 @@ const getEscalationPolicy = async () => {
                 <alert-triggered-by :value="value"
                                     :project-id="state.data.project_id"
                                     :webhook-reference="state.webhooks[value]"
-                                    :user-reference="state.users[value]"
+                                    :user-reference="referenceMap.user[value]"
                                     disable-link
                 />
             </template>

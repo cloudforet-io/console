@@ -14,10 +14,8 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceGroupReferenceMap } from '@/store/reference/workspace-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -32,14 +30,14 @@ const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
+
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     loading: false,
     workspaceDropdownFilter: computed<ConsoleFilter[]>(() => [
         { k: 'workspace_id', v: workspaceTabState.workspacesInSelectedGroup.map((w) => w.workspace_id) || [], o: '!=' },
     ]),
-    workspaceGroups: computed<WorkspaceGroupReferenceMap>(() => allReferenceStore.getters.workspaceGroup),
     menuIds: computed<string[]>(() => menuList.value.map((item) => item.name)),
     isSelectDropdownVisible: false,
     isEllipsisMap: {} as Record<string, boolean>,
@@ -190,7 +188,7 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
                                                       :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
                                                 >{{ item.label }}</span>
                                             </span>
-                                            <span class="workspace-group-label">{{ state.workspaceGroups[item.workspace_group_id]?.label }}</span>
+                                            <span class="workspace-group-label">{{ referenceMap.workspaceGroup[item.workspace_group_id]?.label || item.workspace_group_id }}</span>
                                         </div>
                                     </div>
                                 </template>

@@ -11,9 +11,8 @@ import {
 
 import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -33,11 +32,9 @@ interface UserItem {
     user_name: string;
 }
 
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
-const storeState = reactive({
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     fields: [
         { label: 'User ID', name: 'user_id' },
@@ -47,7 +44,7 @@ const state = reactive({
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
-            user_name: storeState.users[d]?.name ?? d,
+            user_name: referenceMap.user[d]?.name || d,
         }));
         return users.filter((d) => {
             const searchText = state.searchText.toLowerCase();

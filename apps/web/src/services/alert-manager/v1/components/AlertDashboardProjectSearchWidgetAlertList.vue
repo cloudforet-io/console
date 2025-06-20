@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    reactive, watch,
 } from 'vue';
 
 
@@ -11,12 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -27,10 +26,10 @@ const props = defineProps<{
     projectId: string;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     loading: true,
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     items: [] as AlertModelV1[],
     totalCount: 0,
 });
@@ -80,7 +79,7 @@ watch(() => props.projectId, async (projectId) => {
             <alert-list-item v-if="index < 15"
                              :item="item"
                              :show-status-message="true"
-                             :user-reference="state.users[item.assignee]"
+                             :user-reference="referenceMap.user[item.assignee]"
             />
             <div v-else
                  class="view-all-text"

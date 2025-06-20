@@ -18,6 +18,7 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import type { AlertListParameters, AlertListResponse } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
@@ -28,7 +29,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -95,10 +95,11 @@ const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone || ''),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
 });
 
@@ -512,7 +513,7 @@ initPage();
                     <alert-triggered-by :value="value"
                                         :project-id="item.project_id"
                                         :webhook-reference="storeState.webhooks[value]"
-                                        :user-reference="storeState.users[value]"
+                                        :user-reference="referenceMap.user[value]"
                                         disable-link
                     />
                 </template>

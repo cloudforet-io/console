@@ -20,9 +20,8 @@ import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/sche
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
@@ -44,8 +43,8 @@ const props = defineProps<{
     tag?: string;
 }>();
 
-const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const referenceMap = useAllReferenceDataModel();
 
 /* toolbox */
 const search = ref<string>('');
@@ -279,10 +278,10 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
                 />
             </template>
             <template #col-assignee-format="{value}">
-                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+                {{ referenceMap.user[value]?.label || referenceMap.user[value]?.name || value }}
             </template>
             <template #col-created_by-format="{value}">
-                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+                {{ referenceMap.user[value]?.label || referenceMap.user[value]?.name || value }}
             </template>
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}
