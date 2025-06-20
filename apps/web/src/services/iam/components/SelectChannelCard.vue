@@ -3,8 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -16,16 +15,12 @@ const userGroupPageState = userGroupPageStore.state;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-});
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
-        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
+        icon: referenceMap.plugin[protocol.plugin_info.plugin_id]?.icon || '',
         label: protocol.name,
         value: protocol.protocol_id,
     }))),

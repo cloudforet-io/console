@@ -13,6 +13,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
@@ -76,6 +77,7 @@ interface ChannelItem {
 const isDeleteAble = ref<boolean>(false);
 const isScheduleTagged = ref<boolean>(false);
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
@@ -118,7 +120,7 @@ const state = reactive({
     loading: false,
     channelName: '',
     protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList?.map((protocol) => ({
-        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
+        icon: referenceMap.plugin[protocol.plugin_info.plugin_id]?.icon || '',
         label: protocol.name,
         value: protocol.protocol_id,
     })) ?? []),

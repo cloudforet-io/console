@@ -17,6 +17,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ProtocolListParameters } from '@/api-clients/notification/protocol/schema/api-verbs/list';
 import type { ProtocolModel } from '@/api-clients/notification/protocol/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
 import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import type { UserChannelListParameters } from '@/schema/alert-manager/user-channel/api-verbs/list';
@@ -27,8 +28,6 @@ import type { UserChannelListParameters as UserChannelListParametersV1 } from '@
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
@@ -49,11 +48,10 @@ interface EnrichedProtocolItem extends ProtocolModel {
     icon: any;
     id: string;
 }
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
-
+const referenceMap = useAllReferenceDataModel();
 const props = withDefaults(defineProps<{
     projectId?: string;
     manageDisabled?: boolean;
@@ -76,7 +74,6 @@ const state = reactive({
     protocolList: computed<EnrichedProtocolItem[]>(() => (
         state.defaultProtocolResp.map((d) => createProtocolItem(d))
     )),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 
 const createProtocolItem = (d) => {
@@ -94,7 +91,7 @@ const createProtocolItem = (d) => {
         protocolType: d.protocol_type,
         tags: d.tags,
         plugin_info: d.plugin_info,
-        icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
+        icon: referenceMap.plugin[d.plugin_info?.plugin_id]?.icon || '',
         name: d.name,
     };
 };
