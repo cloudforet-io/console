@@ -1,10 +1,12 @@
+import { computed } from 'vue';
+
 import type { DynamicFieldProps } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { SpaceRouter } from '@/router';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
@@ -15,41 +17,43 @@ interface FieldFormatter {
 type FormatterMap = Record<ResourceType, FieldFormatter>;
 
 export const useReferenceFieldFormatter = () => {
-    const allReferenceStore = useAllReferenceStore();
     const { getReferenceLocation } = useReferenceRouter();
+    const referenceDataMap = useAllReferenceDataModel();
 
     const getFormatterMap = (): FormatterMap => ({
-        'identity.Provider': () => allReferenceStore.getters.provider,
+        'identity.Provider': (data) => ({
+            data: computed(() => referenceDataMap.provider[data]?.label || data),
+        }),
         'inventory.Server': (data, reference) => ({
             data,
             link: SpaceRouter.router.resolve(getReferenceLocation(data, reference)).href,
         }),
         'identity.Project': (data, reference) => ({
-            data: allReferenceStore.getters.project[data]?.label || data,
+            data: computed(() => referenceDataMap.project[data]?.label || data),
             options: {
                 link: SpaceRouter.router.resolve(getReferenceLocation(data, reference)).href,
             },
         }),
         'inventory.Collector': (data, reference) => ({
-            data: allReferenceStore.getters.collector[data]?.label || data,
+            data: computed(() => referenceDataMap.collector[data]?.label || data),
             options: {
                 link: SpaceRouter.router.resolve(getReferenceLocation(data, reference)).href,
             },
         }),
         'identity.ServiceAccount': (data, reference) => ({
-            data: allReferenceStore.getters.serviceAccount[data]?.label || data,
+            data: computed(() => referenceDataMap.serviceAccount[data]?.label || data),
             options: {
                 link: SpaceRouter.router.resolve(getReferenceLocation(data, reference)).href,
             },
         }),
         'identity.TrustedAccount': (data, reference) => ({
-            data: allReferenceStore.getters.trustedAccount[data]?.label || data,
+            data: computed(() => referenceDataMap.trustedAccount[data]?.label || data),
             options: {
                 link: SpaceRouter.router.resolve(getReferenceLocation(data, reference)).href,
             },
         }),
         'inventory.Region': (data) => ({
-            data: allReferenceStore.getters.region[data]?.label || data,
+            data: computed(() => referenceDataMap.region[data]?.label || data),
         }),
         'inventory.CloudService': (data, reference) => ({
             options: {
@@ -57,7 +61,7 @@ export const useReferenceFieldFormatter = () => {
             },
         }),
         'secret.Secret': (data) => ({
-            data: allReferenceStore.getters.secret[data]?.label || data,
+            data: computed(() => referenceDataMap.secret[data]?.label || data),
         }),
     });
 

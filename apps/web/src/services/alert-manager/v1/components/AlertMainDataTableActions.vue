@@ -17,7 +17,6 @@ import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -71,9 +70,11 @@ const emit = defineEmits<{(e: 'refresh'): void;
 const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 const userStore = useUserStore();
+
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     timezone: computed(() => userStore.state.timezone),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     selectedItemsState: computed(() => props.selectedItems.map((selectedItem) => selectedItem.state)),
     isSelectedNone: computed(() => props.selectedItems.length === 0),
@@ -207,7 +208,7 @@ const onConfirmResolve = () => {
             </template>
             <template #col-project_id-format="{ value }">
                 <template v-if="value">
-                    {{ state.projects[value] ? state.projects[value].label : value }}
+                    {{ referenceMap.project[value]?.label || value }}
                 </template>
             </template>
             <template #col-created_at-format="{value, field}">

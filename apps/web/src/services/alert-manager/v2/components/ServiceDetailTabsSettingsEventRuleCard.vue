@@ -23,7 +23,6 @@ import type {
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
@@ -57,9 +56,9 @@ const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-    cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actionSetting: getActionSettingI18n(),
@@ -97,7 +96,7 @@ const state = reactive({
                             result[type].push({
                                 label: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE'),
                                 name: 'asset_types',
-                                value: matchAssetValue.asset_types.map((i) => (storeState.cloudServiceType[i] ? storeState.cloudServiceType[i].label : i)).join(', '),
+                                value: matchAssetValue.asset_types.map((i) => (referenceMap.cloudServiceType[i]?.label || i)).join(', '),
                             });
                         }
                         if (matchAssetValue.key) {

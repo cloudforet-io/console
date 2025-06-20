@@ -13,13 +13,11 @@ import {
 import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
 import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
 import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,13 +38,10 @@ const handleStartMonthPickerClosed = () => {
 };
 const domainStore = useDomainStore();
 const domainState = domainStore.state;
-const allReferenceStore = useAllReferenceStore();
 
 const originUnifiedCostConfig = computed<UnifiedCostConfig|undefined>(() => domainState.config?.settings?.unified_cost_config);
 
-const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
-const serviceAccount = computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount);
-
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     selectedCurrency: originUnifiedCostConfig.value?.currency ?? DEFAULT_UNIFIED_COST_CURRENCY,
     exchangeRateSourceOptions: [YAHOO_FINANCE_ID],

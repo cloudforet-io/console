@@ -9,6 +9,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -55,6 +56,7 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -107,7 +109,7 @@ const state = reactive({
     }),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
-            const _labelsInfo = storeState.metrics[state.selectedMetricId]?.data?.labels_info || [];
+            const _labelsInfo = referenceMap.metric[state.selectedMetricId]?.data?.labels_info || [];
             return _labelsInfo.map((d) => ({ name: d.key, label: d.name }));
         }
         return costDataSourceFilterMenuItems.value;
@@ -137,7 +139,7 @@ const state = reactive({
                 });
             } else {
                 // provider case
-                const providerData = storeState.providers[group];
+                const providerData = referenceMap.provider[group];
                 if (providerData) {
                     _groupMenuItems.push({
                         type: 'item',

@@ -19,7 +19,6 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -70,7 +69,6 @@ const {
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     costTypeItems: computed(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.SPECIFIC_PROVIDER'),
