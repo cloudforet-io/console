@@ -11,11 +11,11 @@ import {
 } from '@cloudforet/mirinae';
 
 
+import type { MetricUpdateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/update';
+import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
 import type { MetricExampleCreateParameters } from '@/schema/inventory/metric-example/api-verbs/create';
 import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
-import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

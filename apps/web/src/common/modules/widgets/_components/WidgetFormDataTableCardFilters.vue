@@ -17,7 +17,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { MetricLabelKey } from '@/schema/inventory/metric/type';
+import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
