@@ -2,21 +2,19 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
-
 import { PI, PTextButton } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import type { RoleInfo } from '@/store/authorization/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import {
     green, indigo, peacock, violet,
 } from '@/styles/colors';
 
+import {
+    useWorkspaceHomeProjectListQuery,
+} from '@/services/workspace-home/composables/use-workspace-home-project-list-query';
 import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/shared/constants/summary-type-constant';
 import type { EmptyData } from '@/services/workspace-home/shared/types/empty-data-type';
 import type { SummaryDataType } from '@/services/workspace-home/shared/types/summary-type';
@@ -37,18 +35,16 @@ const props = withDefaults(defineProps<Props>(), {
     type: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const authorizationStore = useAuthorizationStore();
 
 const router = useRouter();
 
-const storeState = reactive({
-    getCurrentRoleInfo: computed<RoleInfo|undefined>(() => authorizationStore.state.currentRoleInfo),
-    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-});
+const currentRoleInfo = computed(() => authorizationStore.state.currentRoleInfo);
+
+const { data: projectList } = useWorkspaceHomeProjectListQuery();
 const state = reactive({
-    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isNoProjects: computed<boolean>(() => !projectList.value?.length),
+    isWorkspaceMember: computed(() => currentRoleInfo.value?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     icon: computed<IconInfo>(() => {
         if (props.type === SUMMARY_DATA_TYPE.ASSET) {
             return {
@@ -62,7 +58,7 @@ const state = reactive({
                 color: indigo[700],
             };
         }
-        if (state.isWorkspaceMember && isEmpty(storeState.projects)) {
+        if (state.isWorkspaceMember && state.isNoProjects) {
             return {
                 name: 'ic_service_project',
                 color: violet[700],
@@ -88,7 +84,7 @@ const handleClickButton = () => {
          :style="{ backgroundImage: `url(${props.imageUrl})` }"
          :class="{
              [props.type ? props.type.toLowerCase() : '']: true,
-             'no-project-data': state.isWorkspaceMember && isEmpty(storeState.projects)
+             'no-project-data': state.isWorkspaceMember && state.isNoProjects
          }"
     >
         <div class="icon-wrapper">
