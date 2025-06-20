@@ -6,6 +6,7 @@ import { range } from 'lodash';
 
 import { PFieldGroup, PFieldTitle } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -18,6 +19,8 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const userStore = useUserStore();
 const hoursMatrix: number[] = range(24);
+const referenceMap = useAllReferenceDataModel();
+
 
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
@@ -37,7 +40,7 @@ const state = reactive({
     <div class="service-account-auto-sync-detail">
         <p class="mb-6">
             {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAIN_DESCRIPTION', {
-                provider: serviceAccountPageStore.getters.selectedProviderItem.label,
+                provider: referenceMap.provider[serviceAccountPageStore.state.selectedProvider]?.label || serviceAccountPageStore.state.selectedProvider,
             }) }}
         </p>
 

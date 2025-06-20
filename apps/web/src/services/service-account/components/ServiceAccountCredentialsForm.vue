@@ -22,6 +22,7 @@ import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -58,6 +59,7 @@ interface State {
     baseInformationSchema: ComputedRef<JsonSchema|undefined>;
 }
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     language: computed<string|undefined>(() => userStore.state.language),
     currentProviderSchemaList: computed<SchemaModel[]>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList),
@@ -65,7 +67,10 @@ const storeState = reactive({
     trustedAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustedAccountSchema),
     generalAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.generalAccountSchema),
     secretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.secretSchema),
-    providerName: computed(() => serviceAccountSchemaStore.getters.currentProviderData?.name ?? ''),
+    providerName: computed(() => {
+        if (!serviceAccountSchemaStore.state.currentProvider) return '';
+        return referenceMap.provider[serviceAccountSchemaStore.state.currentProvider]?.name || serviceAccountSchemaStore.state.currentProvider || '';
+    }),
     provider: computed(() => serviceAccountPageStore.state.selectedProvider),
 });
 const state = reactive<State>({

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
@@ -8,14 +8,12 @@ import type { WorkspaceGroupUpdateParameters } from '@/api-clients/identity/work
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceGroupReferenceMap } from '@/store/reference/workspace-group-reference-store';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useWorkspaceGroupNameListQuery } from '@/services/advanced/composables/use-workspace-group-name-list-query';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
@@ -23,16 +21,14 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
-    workspaceGroups: computed<WorkspaceGroupReferenceMap>(() => allReferenceStore.getters.workspace_group),
-    workspaceGroupNames: computed(() => Object.values(state.workspaceGroups).map((item:any) => item.name)),
 });
 
+const { data: workspaceGroupNameList } = useWorkspaceGroupNameListQuery();
 const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
@@ -44,7 +40,7 @@ const {
         if (!value?.length) {
             return false;
         }
-        if (state.workspaceGroupNames.includes(value.trim())) {
+        if (workspaceGroupNameList.value?.includes(value.trim())) {
             return i18n.t('IAM.WORKSPACE_GROUP.MODAL.CREATE_NAME_INVALID_DUPLICATED');
         }
 
