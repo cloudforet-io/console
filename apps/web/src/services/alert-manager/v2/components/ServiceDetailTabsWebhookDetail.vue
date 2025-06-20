@@ -16,13 +16,13 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
 import type { WebhookListErrorSParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
 import type { WebhookUpdateMessageFormatParameters } from '@/schema/alert-manager/webhook/api-verbs/update-message-format';
 import type { WebhookModel, WebhookListErrorsModel } from '@/schema/alert-manager/webhook/model';
 import type { WebhookMessageFormatType } from '@/schema/alert-manager/webhook/type';
-import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
-import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';

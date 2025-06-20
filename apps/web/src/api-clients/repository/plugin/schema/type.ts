@@ -1,5 +1,5 @@
+import type { PLUGIN_STATE, REGISTRY_TYPE } from '@/api-clients/repository/plugin/schema/constant';
 import type { MonitoringType } from '@/schema/monitoring/data-source/type';
-import type { PLUGIN_STATE, REGISTRY_TYPE } from '@/schema/repository/plugin/constant';
 
 
 

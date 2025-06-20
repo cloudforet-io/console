@@ -9,9 +9,9 @@ import {
     PDefinitionTable, PButton, PStatus, PMarkdown, PLazyImg, PLink,
 } from '@cloudforet/mirinae';
 
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
 import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
-import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
