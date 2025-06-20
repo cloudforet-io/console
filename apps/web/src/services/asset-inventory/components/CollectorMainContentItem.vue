@@ -5,7 +5,7 @@ import {
     PButton, PCard, PLazyImg, PBadge,
 } from '@cloudforet/mirinae';
 
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

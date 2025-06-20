@@ -68,9 +68,9 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
 
-import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { CollectorOptions } from '@/schema/inventory/collector/type';
+import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { STATE } from '@/schema/inventory/collector/constant';
+import type { STATE } from '@/api-clients/inventory/collector/schema/constant';
 
 export interface CollectorOptions {
     [key: string]: any;

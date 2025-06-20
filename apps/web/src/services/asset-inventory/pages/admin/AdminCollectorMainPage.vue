@@ -14,9 +14,9 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CollectorListParameters } from '@/api-clients/inventory/collector/schema/api-verbs/list';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { SpaceRouter } from '@/router';
-import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

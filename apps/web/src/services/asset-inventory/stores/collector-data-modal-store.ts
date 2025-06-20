@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type {
     CollectorModel,
-} from '@/schema/inventory/collector/model';
+} from '@/api-clients/inventory/collector/schema/model';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
 import type { SecretModel } from '@/schema/secret/secret/model';

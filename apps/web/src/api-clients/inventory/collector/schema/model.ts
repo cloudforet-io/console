@@ -2,7 +2,7 @@ import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type {
     CollectorMetadata, CollectorOptions, Schedule, SecretFilter,
-} from '@/schema/inventory/collector/type';
+} from '@/api-clients/inventory/collector/schema/type';
 import type { UpgradeMode } from '@/schema/plugin/plugin/type';
 import type { Capability } from '@/schema/repository/plugin/type';
 

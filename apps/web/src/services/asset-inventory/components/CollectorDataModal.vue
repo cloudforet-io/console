@@ -41,7 +41,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
+import type { CollectorCollectParameters } from '@/api-clients/inventory/collector/schema/api-verbs/collect';
 import type { JobModel } from '@/schema/inventory/job/model';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
