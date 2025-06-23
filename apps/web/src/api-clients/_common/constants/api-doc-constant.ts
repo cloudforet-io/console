@@ -490,6 +490,14 @@ export const API_DOC = {
         ],
     },
     inventory: {
+        'cloud-service': [
+            'analyze',
+            'get',
+            'list',
+        ],
+        'cloud-service-query-set': [
+            'list',
+        ],
         'cloud-service-type': [
             'list',
             'stat',
@@ -520,18 +528,6 @@ export const API_DOC = {
         ],
         region: [
             'list',
-        ],
-    },
-    notification: {
-        protocol: [
-            'create',
-            'delete',
-            'disable',
-            'enable',
-            'get',
-            'list',
-            'update-plugin',
-            'update',
         ],
     },
     monitoring: {

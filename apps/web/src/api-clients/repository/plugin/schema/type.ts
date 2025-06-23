@@ -1,5 +1,5 @@
+import type { MonitoringType } from '@/api-clients/monitoring/data-source/schema/type';
 import type { PLUGIN_STATE, REGISTRY_TYPE } from '@/api-clients/repository/plugin/schema/constant';
-import type { MonitoringType } from '@/schema/monitoring/data-source/type';
 
 export type PluginState = typeof PLUGIN_STATE[keyof typeof PLUGIN_STATE];
 

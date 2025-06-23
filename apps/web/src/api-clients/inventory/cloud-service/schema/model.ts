@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { CloudServiceState } from '@/schema/inventory/cloud-service/type';
+import type { CloudServiceState } from '@/api-clients/inventory/cloud-service/schema/type';
 
 export interface CloudServiceModel {
     cloud_service_id:string;

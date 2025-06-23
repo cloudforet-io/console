@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CloudServiceQueryType, CloudServiceQuerySetState } from '@/schema/inventory/cloud-service-query-set/type';
+import type { CloudServiceQueryType, CloudServiceQuerySetState } from '@/api-clients/inventory/cloud-service-query-set/schema/type';
 
 
 export interface CloudServiceQuerySetListParameters {

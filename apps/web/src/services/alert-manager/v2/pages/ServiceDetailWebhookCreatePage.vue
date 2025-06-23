@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router/composables';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { i18n } from '@/translations';
 
 import WebhookCreateForm from '@/services/alert-manager/v2/components/WebhookCreateForm.vue';

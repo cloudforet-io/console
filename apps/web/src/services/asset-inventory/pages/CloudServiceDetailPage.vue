@@ -27,10 +27,10 @@ import type {
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';
 

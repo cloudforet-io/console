@@ -1,4 +1,4 @@
-import type { CloudServiceQuerySetModel } from '@/schema/inventory/cloud-service-query-set/model';
+import type { CloudServiceQuerySetModel } from '@/api-clients/inventory/cloud-service-query-set/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

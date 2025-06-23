@@ -8,10 +8,10 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
+import type { AlertState } from '@/api-clients/monitoring/alert/schema/type';
+import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
 import type { PluginListParameters } from '@/api-clients/repository/plugin/schema/api-verbs/list';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { AlertState } from '@/schema/monitoring/alert/type';
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 

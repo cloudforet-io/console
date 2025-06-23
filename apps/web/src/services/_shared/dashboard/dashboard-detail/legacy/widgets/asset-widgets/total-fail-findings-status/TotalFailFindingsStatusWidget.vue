@@ -13,7 +13,7 @@ import {
 } from '@cloudforet/mirinae';
 import { getRGBFromHex, numberFormatter } from '@cloudforet/utils';
 
-import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+import type { CloudServiceAnalyzeParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/analyze';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
