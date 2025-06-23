@@ -15,7 +15,6 @@ import { useAllReferenceDataModel } from '@/query/resource-query/reference-model
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { arrayToQueryString, objectToQueryString } from '@/lib/router-query-string';
@@ -55,7 +54,6 @@ const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
         const res: Record<string, CloudServiceTypeItem> = {};
@@ -124,7 +122,7 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
     }
 
     if (provider) {
-        const icon = state.providers[provider]?.icon;
+        const icon = referenceMap.provider[provider]?.icon;
         if (icon) return assetUrlConverter(icon);
     }
 
