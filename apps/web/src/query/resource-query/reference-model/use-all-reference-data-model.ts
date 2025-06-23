@@ -1,8 +1,12 @@
+import { useAlertManagerEscalationPolicyReferenceDataModel } from '@/query/resource-query/reference-model/use-alert-manager-escalation-policy-reference-data-model';
+import { useAlertManagerWebhookReferenceDataModel } from '@/query/resource-query/reference-model/use-alert-manager-webhook-reference-data-model';
 import { useAppReferenceDataModel } from '@/query/resource-query/reference-model/use-app-reference-data-model';
 import { useCloudServiceTypeReferenceDataModel } from '@/query/resource-query/reference-model/use-cloud-service-type-reference-data-model';
 import { useCollectorReferenceDataModel } from '@/query/resource-query/reference-model/use-collector-reference-data-model';
 import { useCostDataSourceReferenceModel } from '@/query/resource-query/reference-model/use-cost-data-source-reference-data-model';
 import { useMetricReferenceDataModel } from '@/query/resource-query/reference-model/use-metric-reference-data-model';
+import { useMonitoringEscalationPolicyReferenceDataModel } from '@/query/resource-query/reference-model/use-monitoring-escalation-policy-reference-data-model';
+import { useMonitoringWebhookReferenceDataModel } from '@/query/resource-query/reference-model/use-monitoring-webhook-reference-data-model';
 import { useNamespaceReferenceDataModel } from '@/query/resource-query/reference-model/use-namespace-reference-data-model';
 import { usePluginReferenceDataModel } from '@/query/resource-query/reference-model/use-plugin-reference-data-model';
 import { useProjectGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
@@ -13,6 +17,7 @@ import { useRegionReferenceDataModel } from '@/query/resource-query/reference-mo
 import { useRoleReferenceDataModel } from '@/query/resource-query/reference-model/use-role-reference-data-model';
 import { useSecretReferenceDataModel } from '@/query/resource-query/reference-model/use-secret-reference-data-model';
 import { useServiceAccountReferenceDataModel } from '@/query/resource-query/reference-model/use-service-account-reference-data-model';
+import { useServiceReferenceDataModel } from '@/query/resource-query/reference-model/use-service-reference-data-model';
 import { useTrustedAccountReferenceDataModel } from '@/query/resource-query/reference-model/use-trusted-account-reference-data-model';
 import { useUserGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-user-group-reference-data-model';
 import { useUserReferenceDataModel } from '@/query/resource-query/reference-model/use-user-reference-data-model';
@@ -40,7 +45,11 @@ export const useAllReferenceDataModel = () => {
     const plugin = usePluginReferenceDataModel();
     const serviceAccount = useServiceAccountReferenceDataModel();
     const trustedAccount = useTrustedAccountReferenceDataModel();
-
+    const alertManagerWebhook = useAlertManagerWebhookReferenceDataModel();
+    const monitoringWebhook = useMonitoringWebhookReferenceDataModel();
+    const service = useServiceReferenceDataModel();
+    const alertManagerEscalationPolicy = useAlertManagerEscalationPolicyReferenceDataModel();
+    const monitoringEscalationPolicy = useMonitoringEscalationPolicyReferenceDataModel();
     return {
         app: app.map,
         workspace: workspace.map,
@@ -62,5 +71,10 @@ export const useAllReferenceDataModel = () => {
         plugin: plugin.map,
         serviceAccount: serviceAccount.map,
         trustedAccount: trustedAccount.map,
+        alertManagerWebhook: alertManagerWebhook.map,
+        monitoringWebhook: monitoringWebhook.map,
+        service: service.map,
+        alertManagerEscalationPolicy: alertManagerEscalationPolicy.map,
+        monitoringEscalationPolicy: monitoringEscalationPolicy.map,
     };
 };

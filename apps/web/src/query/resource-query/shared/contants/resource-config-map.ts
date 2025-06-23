@@ -113,6 +113,18 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'webhook_id',
         nameKey: 'name',
     },
+    service: {
+        name: 'Service',
+        resourceKey: 'service',
+        idKey: 'service_id',
+        nameKey: 'name',
+    },
+    escalationPolicy: {
+        name: 'Escalation Policy',
+        resourceKey: 'escalationPolicy',
+        idKey: 'escalation_policy_id',
+        nameKey: 'name',
+    },
     metric: {
         name: 'Metric',
         resourceKey: 'metric',
