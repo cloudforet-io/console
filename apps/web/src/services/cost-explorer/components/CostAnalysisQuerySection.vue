@@ -17,7 +17,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
 import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

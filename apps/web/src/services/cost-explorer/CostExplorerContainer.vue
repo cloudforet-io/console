@@ -9,7 +9,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';

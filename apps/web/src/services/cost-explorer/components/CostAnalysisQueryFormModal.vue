@@ -13,7 +13,7 @@ import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/c
 import type { CostQuerySetCreateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/create';
 import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
