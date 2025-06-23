@@ -12,7 +12,7 @@ import {
 import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
 import type { ServiceCreateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/create';
 import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -4,8 +4,8 @@ import { computed } from 'vue';
 import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
 import { NOTIFICATION_URGENCY, RECOVERY_MODE, SERVICE_ALERTS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import type { AlertsInfoType, AlertsType } from '@/api-clients/alert-manager/service/schema/type';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 

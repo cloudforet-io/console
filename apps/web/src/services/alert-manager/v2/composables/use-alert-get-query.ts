@@ -3,8 +3,8 @@ import { computed } from 'vue';
 
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseAlertGetQueryReturn {
     alertData: Ref<AlertModel | undefined>;

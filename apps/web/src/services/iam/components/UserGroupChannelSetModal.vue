@@ -13,7 +13,7 @@ import type { UserGroupChannelUpdateParameters } from '@/api-clients/alert-manag
 import type {
     UserGroupChannelScheduleInfoType,
 } from '@/api-clients/alert-manager/user-group-channel/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
 import type { ServiceUpdateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/update';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

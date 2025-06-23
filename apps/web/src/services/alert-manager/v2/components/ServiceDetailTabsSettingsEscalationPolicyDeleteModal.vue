@@ -11,7 +11,7 @@ import {
 
 import { useEscalationPolicyApi } from '@/api-clients/alert-manager/escalation-policy/composables/use-escalation-policy-api';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

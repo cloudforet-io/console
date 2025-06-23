@@ -9,8 +9,8 @@ import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-a
 import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
 import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useUserStore } from '@/store/user/user-store';
 

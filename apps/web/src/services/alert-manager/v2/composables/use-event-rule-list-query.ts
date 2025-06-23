@@ -5,8 +5,8 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseEventRuleListQueryReturn {
     eventRuleListData: Ref<EventRuleModel[]>;

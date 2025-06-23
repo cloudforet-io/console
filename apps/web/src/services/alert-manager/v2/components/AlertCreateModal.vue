@@ -11,7 +11,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

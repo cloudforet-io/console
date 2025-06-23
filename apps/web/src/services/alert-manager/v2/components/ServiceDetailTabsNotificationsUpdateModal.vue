@@ -18,7 +18,7 @@ import type { ServiceChannelUpdateParameters } from '@/api-clients/alert-manager
 import { SERVICE_CHANNEL_FORWARD_TYPE, SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

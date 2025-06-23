@@ -5,7 +5,7 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
 import type { UserGroupChannelDeleteParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/delete';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
