@@ -217,7 +217,7 @@ onMounted(async () => {
                              class="notification-align notification-rules-content"
                         >
                             <p-text-input :value="rule.threshold"
-                                          :placeholder="$t('COST_EXPLORER.ANOMALY_DETECTION.NOTIFICATION_RULES.AMOUNT')"
+                                          type="number"
                                           :disabled="!hasReadWriteAccess"
                                           block
                                           @update:value="handleUpdateNotificationRules('threshold', $event, index)"
