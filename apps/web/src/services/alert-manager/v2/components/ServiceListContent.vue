@@ -8,13 +8,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
-
 
 import { gray, green } from '@/styles/colors';
 
@@ -32,18 +27,13 @@ const props = withDefaults(defineProps<Props>(), {
     type: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 
 const route = useRoute();
 const router = useRouter();
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     isCollapsed: false,
     title: computed<TranslateResult>(() => {
@@ -54,13 +44,12 @@ const state = reactive({
     }),
 });
 
-const getEscalationPolicyLabel = (id: string): string => storeState.escalationPolicy[id]?.label || '';
+const getEscalationPolicyLabel = (id: string): string => referenceMap.alertManagerEscalationPolicy[id]?.label || '';
 const getWebhookIcon = (id: string): string|undefined => {
-    const webhook = storeState.webhook[id]?.data;
+    const webhook = referenceMap.alertManagerWebhook[id]?.data;
     if (!webhook) return undefined;
-    return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
+    return referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon || '';
 };
-
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };

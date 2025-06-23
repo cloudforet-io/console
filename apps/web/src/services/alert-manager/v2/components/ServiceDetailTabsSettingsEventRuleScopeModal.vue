@@ -14,10 +14,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
 import type { EventRuleScopeType } from '@/api-clients/alert-manager/event-rule/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -44,10 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectedWebhook: '',
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 
 const route = useRoute();
 const serviceId = computed<string>(() => route.params.serviceId as string);
@@ -57,11 +52,8 @@ const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:scope'): void;
     (e: 'update:show-form-card'): void;
 }>();
+const referenceMap = useAllReferenceDataModel();
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
-});
 const state = reactive({
     loading: false,
     proxySelectedWebhook: useProxyValue('selectedWebhook', props, emit),
@@ -87,7 +79,7 @@ const state = reactive({
 const getWebhookIcon = (id: string): string|undefined => {
     const webhook = (webhookListData.value || []).find((i) => i.webhook_id === id);
     if (!webhook) return undefined;
-    return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
+    return referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon || '';
 };
 const handleClickCancel = () => {
     state.proxySelectedScope = undefined;

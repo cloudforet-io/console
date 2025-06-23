@@ -15,11 +15,8 @@ import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type'
 import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 import type { EventRuleChangeOrderParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/change-order';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -42,8 +39,6 @@ const props = withDefaults(defineProps<Props>(), {
     hideSidebar: false,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
@@ -58,12 +53,11 @@ const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
 
 const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleListData } = useEventRuleListQuery(serviceId);
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 
 const state = reactive({
@@ -151,8 +145,8 @@ const initSidebar = async () => {
     await replaceUrlQuery({ webhookId: scope, eventRuleId: state.selectedTreeId });
 };
 const getWebhookIcon = (id: string): string | undefined => {
-    const webhook = storeState.webhook[id]?.data;
-    return webhook ? storeState.plugins[webhook.plugin_info.plugin_id]?.icon : undefined;
+    const webhook = referenceMap.alertManagerWebhook[id]?.data;
+    return webhook ? referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon : undefined;
 };
 const clickResizer = () => {
     state.proxyHideSidebar = !state.proxyHideSidebar;
@@ -285,7 +279,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                         width="1rem"
                                         height="1rem"
                             />
-                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
+                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : referenceMap.alertManagerWebhook[title.id]?.label || title.id }}</span>
                         </div>
                         <draggable v-if="title.isOpen"
                                    v-model="title.children"

@@ -27,11 +27,8 @@ import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/api-clients/al
 import type {
     EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -63,10 +60,10 @@ const props = withDefaults(defineProps<Props>(), {
     selectedScope: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
+
+const referenceMap = useAllReferenceDataModel();
 
 const route = useRoute();
 const serviceId = computed<string>(() => route.params.serviceId as string);
@@ -80,8 +77,6 @@ const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery(servi
 
 const storeState = reactive({
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 const state = reactive({
     method: 'create' as 'create' | 'update',
@@ -261,9 +256,9 @@ const updateStateFromEventRuleInfo = () => {
 };
 const getWebhookIcon = (): string|undefined => {
     if (!props.selectedWebhook) return undefined;
-    const webhook = storeState.webhook[props.selectedWebhook]?.data;
+    const webhook = referenceMap.alertManagerWebhook[props.selectedWebhook]?.data;
     if (!webhook) return undefined;
-    return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
+    return referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon || '';
 };
 
 const handleChangeActionForm = (value: EventRuleActionsType) => {
@@ -381,7 +376,7 @@ watch(() => storeState.isEventRuleEditMode, (isEventRuleEditMode) => {
                                                 height="1rem"
                                                 class="icon"
                                     />
-                                    <span>{{ storeState.webhook[props.selectedWebhook]?.label }}</span>
+                                    <span>{{ referenceMap.alertManagerWebhook[props.selectedWebhook]?.label || props.selectedWebhook }}</span>
                                 </p>
                             </div>
                         </p-field-group>

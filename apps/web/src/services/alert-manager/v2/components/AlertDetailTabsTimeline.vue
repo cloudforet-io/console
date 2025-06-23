@@ -16,13 +16,10 @@ import { ALERT_HISTORY_ACTION } from '@/api-clients/alert-manager/alert/schema/c
 import type { AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertHistoryActionType } from '@/api-clients/alert-manager/alert/schema/type';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { AppReferenceMap } from '@/store/reference/app-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import VerticalTimelineItem from '@/common/components/vertical-timeline/VerticalTimelineItem.vue';
@@ -38,18 +35,14 @@ type HistoryItemInfo = {
 
 const userStore = useUserStore();
 const userState = userStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const route = useRoute();
 
 const { alertData } = useAlertGetQuery(route.params.alertId as string);
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    app: computed<AppReferenceMap>(() => allReferenceGetters.app),
-    user: computed<UserReferenceMap>(() => allReferenceGetters.user),
 });
 const state = reactive({
     slicedHistoryList: computed<AlertHistoryModel[]>(() => {
@@ -98,15 +91,17 @@ const { key: alertHistoryQueryKey, params: alertHistoryQueryParams } = useServic
 
 const getCreatedByNames = (createdBy: string): string => {
     if (createdBy.includes('webhook')) {
-        return storeState.webhook[createdBy].label || createdBy;
+        return referenceMap.alertManagerWebhook[createdBy]?.label || createdBy;
     }
     if (createdBy.includes('app')) {
-        return storeState.app[createdBy].label || createdBy;
+        return referenceMap.app[createdBy]?.label || createdBy;
     }
     if (createdBy.includes('SYSTEM')) {
         return createdBy;
     }
-    return storeState.user[createdBy]?.name ? `${storeState.user[createdBy]?.name} (${storeState.user[createdBy]?.key})` : storeState.user[createdBy]?.key || createdBy;
+    return referenceMap.workspaceUser[createdBy]
+        ? `${referenceMap.workspaceUser[createdBy]?.name} (${referenceMap.workspaceUser[createdBy]?.key})`
+        : referenceMap.workspaceUser[createdBy]?.key || createdBy;
 };
 const getItemInfo = (item: AlertHistoryActionType): HistoryItemInfo => {
     let styleType: string|undefined;

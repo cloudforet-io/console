@@ -9,11 +9,10 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { ALERT_URGENCY, ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertStatusType, AlertUrgencyType } from '@/api-clients/alert-manager/alert/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -28,17 +27,15 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-co
 
 const userStore = useUserStore();
 const userState = userStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const route = useRoute();
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { alertData } = useAlertGetQuery(route.params.alertId as string);
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),
-    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
 });
 const state = reactive({
     alertStatus: 'TRIGGERED',
@@ -59,7 +56,7 @@ const state = reactive({
     ])),
 });
 
-const getEscalationInfo = (id: string) => storeState.escalationPolicy[id]?.label || '';
+const getEscalationInfo = (id: string|undefined) => (id ? referenceMap.alertManagerEscalationPolicy[id]?.label : '');
 
 
 const { mutate: alertUpdateMutate } = useAlertUpdateMutation();
@@ -139,7 +136,7 @@ watch(() => alertData.value, (alertInfo) => {
         </div>
         <div class="content-wrapper">
             <span class="title">{{ $t('ALERT_MANAGER.ESCALATION_POLICY.TITLE') }}</span>
-            <p-link :text="getEscalationInfo(alertData?.escalation_policy_id || '')"
+            <p-link :text="getEscalationInfo(alertData?.escalation_policy_id)"
                     action-icon="internal-link"
                     new-tab
                     :to="{

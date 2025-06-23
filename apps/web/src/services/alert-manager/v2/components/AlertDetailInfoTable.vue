@@ -19,9 +19,6 @@ import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -38,8 +35,6 @@ type BadgeInfo = {
 
 const userStore = useUserStore();
 const userState = userStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const referenceMap = useAllReferenceDataModel();
 
@@ -51,9 +46,7 @@ const { alertData } = useAlertGetQuery(route.params.alertId as string);
 const queryHelper = new QueryHelper();
 
 const storeState = reactive({
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     timezone: computed<string>(() => userState.timezone || 'UTC'),
-    serviceMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
@@ -73,7 +66,7 @@ const tableState = reactive({
 
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
-        return storeState.webhook[id]?.label || id;
+        return referenceMap.alertManagerWebhook[id]?.label || id;
     }
     return id || '--';
 };
