@@ -11,7 +11,7 @@ interface UseBudgetCreateMutationOptions {
 }
 
 export const useBudgetCreateMutation = (options: UseBudgetCreateMutationOptions) => {
-    const { budgetAPI } = useBudgetQuery();
+    const { budgetAPI, invalidateBudgetListQuery } = useBudgetQuery();
 
     const {
         onSuccess, onError, onSettled,
@@ -20,7 +20,10 @@ export const useBudgetCreateMutation = (options: UseBudgetCreateMutationOptions)
     return useMutation({
         mutationFn: budgetAPI.create,
         onSuccess: async (data) => {
-            if (onSuccess) await onSuccess(data);
+            if (onSuccess) {
+                await onSuccess(data);
+                invalidateBudgetListQuery();
+            }
         },
         onError: async (error) => {
             if (onError) await onError(error);

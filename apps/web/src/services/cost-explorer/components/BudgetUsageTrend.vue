@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { PCard } from '@cloudforet/mirinae';
 
 import BudgetUsageTrendMonthly from '@/services/cost-explorer/components/BudgetUsageTrendMonthly.vue';
@@ -12,7 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 </script>
 
 <template>

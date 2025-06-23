@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
@@ -9,19 +10,23 @@ import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 const STALE_TIME = 1000 * 60 * 5;
 
-export const useBudgetGetQuery = (budgetId: string) => {
+export const useBudgetGetQuery = (budgetId: ComputedRef<string>) => {
     const { budgetAPI } = useBudgetApi();
 
-    const { withSuffix: budgetGetQueryKey } = useServiceQueryKey('cost-analysis', 'budget', 'get');
+    const { key: budgetGetQueryKey, params: budgetGetQueryParams } = useServiceQueryKey('cost-analysis', 'budget', 'get', {
+        params: computed(() => ({
+            budget_id: budgetId.value,
+        })),
+    });
 
     const budgetDataQuery = useScopedQuery({
-        queryKey: budgetGetQueryKey(budgetId),
-        queryFn: () => budgetAPI.get({ budget_id: budgetId }),
+        queryKey: budgetGetQueryKey,
+        queryFn: () => budgetAPI.get(budgetGetQueryParams.value),
         select: (data) => data,
         initialData: undefined,
         initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
-        enabled: computed(() => !!budgetId),
+        enabled: computed(() => !!budgetId.value),
     }, ['DOMAIN', 'WORKSPACE']);
 
     const isFetching = computed<boolean>(() => budgetDataQuery.isFetching.value);
@@ -29,11 +34,11 @@ export const useBudgetGetQuery = (budgetId: string) => {
     const queryClient = useQueryClient();
 
     const setQueryData = (newData: BudgetModel) => {
-        queryClient.setQueryData([budgetGetQueryKey(budgetId)], newData);
+        queryClient.setQueryData([budgetGetQueryKey], newData);
     };
 
     const invalidateBudgetGetQuery = () => {
-        queryClient.invalidateQueries({ queryKey: budgetGetQueryKey(budgetId) });
+        queryClient.invalidateQueries({ queryKey: budgetGetQueryKey });
     };
 
     return {

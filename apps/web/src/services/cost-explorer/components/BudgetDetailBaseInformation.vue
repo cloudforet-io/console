@@ -38,7 +38,7 @@ const props = defineProps<Props>();
 
 const {
     budgetData: _budgetData, isFetching, invalidateBudgetGetQuery,
-} = useBudgetGetQuery(props.budgetId);
+} = useBudgetGetQuery(computed(() => props.budgetId));
 
 
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
@@ -107,6 +107,9 @@ const { mutate: updateBudgetManager, isPending: isUpdateBudgetManagerPending } =
 const { mutate: updateBudgetPlan, isPending: isUpdateBudgetPlanPending } = useBudgetUpdateMutation({
     context: {
         type: 'BUDGET_PLAN',
+    },
+    onSuccess: () => {
+        invalidateBudgetGetQuery();
     },
     onError: (error: any) => {
         showErrorMessage(error.code, error.message);

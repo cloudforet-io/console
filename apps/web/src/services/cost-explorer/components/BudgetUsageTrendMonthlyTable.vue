@@ -26,7 +26,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const appContextStore = useAppContextStore();
-const { budgetData: _budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData: _budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const budgetData = computed(() => _budgetData.value);
 

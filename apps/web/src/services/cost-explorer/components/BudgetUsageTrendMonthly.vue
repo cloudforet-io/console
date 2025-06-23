@@ -15,7 +15,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 const { budgetUsageAPI } = useBudgetUsageQuery();
 
 const state = reactive({

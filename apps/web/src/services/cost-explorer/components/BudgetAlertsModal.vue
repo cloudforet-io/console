@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -18,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
     budgetOnOffValue: false,
 });
 
-const { budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;

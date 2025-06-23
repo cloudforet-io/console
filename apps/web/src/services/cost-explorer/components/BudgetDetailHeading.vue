@@ -38,7 +38,7 @@ const authorizationStore = useAuthorizationStore();
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
-const { budgetData, isFetching } = useBudgetGetQuery(props.budgetId);
+const { budgetData, isFetching } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
