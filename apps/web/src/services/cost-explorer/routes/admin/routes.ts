@@ -21,6 +21,7 @@ const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplore
 const AdminAdvancedSettingsPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsPage.vue');
 const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetMainPage.vue');
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
+const AdminAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/admin/AdminAnomalyDetectionConfigurationPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
@@ -96,6 +97,23 @@ const adminCostExplorerRoutes: RouteConfig = {
                     },
                     props: true,
                     component: AdminCostAnalysisPage as any,
+                },
+            ],
+        },
+        // Temporary page for client support (to be redeveloped later)
+        {
+            path: 'anomaly-detection',
+            meta: {
+                menuId: MENU_ID.ANOMALY_DETECTION,
+                translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION].translationId,
+            },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: ADMIN_COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+                    meta: { menuId: MENU_ID.ANOMALY_DETECTION },
+                    component: AdminAnomalyDetectionConfigurationPage as any,
                 },
             ],
         },
