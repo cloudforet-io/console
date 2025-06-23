@@ -17,11 +17,12 @@ import { i18n } from '@/translations';
 import { queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
 import CostAnalysisCustomDateRangeModal from '@/services/cost-explorer/components/CostAnalysisCustomDateRangeModal.vue';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import {
     PERIOD_DROPDOWN_MENU, PERIOD_DROPDOWN_MENU_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-analysis-period-constant';
 import {
-    GRANULARITY,
+    GRANULARITY, UNIFIED_COST_KEY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import {
@@ -29,11 +30,11 @@ import {
     initiatePeriodByGranularity,
 } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { PeriodDropdownMenu } from '@/services/cost-explorer/types/cost-analysis-period-type';
 import type {
     Granularity, Period, RelativePeriod,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
-
 
 const today = dayjs.utc();
 interface PeriodItem extends SelectDropdownMenuItem {
@@ -47,6 +48,18 @@ interface PeriodItem extends SelectDropdownMenuItem {
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
+
+// Cost Query Set Query
+const { selectedQuerySet } = useCostQuerySetQuery({
+    data_source_id: computed(() => {
+        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
+        return costQuerySetState.selectedDataSourceId || '';
+    }),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -146,13 +159,13 @@ const setSelectedItemByGranularity = (granularity: Granularity, period?: Period)
     costAnalysisPageStore.setRelativePeriod(defaultRelativePeriod);
     state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
 };
-const init = (querySet?: CostQuerySetModel) => {
-    if (querySet) {
+const init = (_selectedQuerySet?: CostQuerySetModel) => {
+    if (_selectedQuerySet) {
         // set selected item by query set
-        if (querySet.options?.relative_period) {
-            state.selectedPeriod = getPeriodItemNameByRelativePeriod(querySet.options?.relative_period);
-        } else if (querySet.options?.granularity === GRANULARITY.DAILY) {
-            const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item:PeriodItem) => isEqual(item.period, querySet.options?.period));
+        if (_selectedQuerySet.options?.relative_period) {
+            state.selectedPeriod = getPeriodItemNameByRelativePeriod(_selectedQuerySet.options?.relative_period);
+        } else if (_selectedQuerySet.options?.granularity === GRANULARITY.DAILY) {
+            const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item:PeriodItem) => isEqual(item.period, _selectedQuerySet.options?.period));
             state.selectedPeriod = selectedPeriodItem?.name;
         } else {
             state.selectedPeriod = 'custom';
@@ -195,8 +208,8 @@ const handleCustomRangeModalConfirm = (period: Period) => {
     state.customRangeModalVisible = false;
 };
 
-watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) => {
-    init(selectedQuerySet);
+watch(() => selectedQuerySet.value, async (_selectedQuerySet) => {
+    init(_selectedQuerySet);
 }, { immediate: true });
 watch(() => costAnalysisPageState.granularity, (granularity) => {
     if (granularity) {

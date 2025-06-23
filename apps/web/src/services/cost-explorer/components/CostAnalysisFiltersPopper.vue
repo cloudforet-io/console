@@ -5,13 +5,16 @@ import {
 
 import { cloneDeep } from 'lodash';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type {
+    ConsoleFilter, ConsoleFilterValue,
+} from '@cloudforet/core-lib/query/type';
 import {
     PSelectDropdown, PTextButton,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -42,19 +45,30 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
-import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { GROUP_BY, UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
-
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
+
+// Cost Query Set Query
+const { selectedQuerySet } = useCostQuerySetQuery({
+    data_source_id: computed(() => {
+        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
+        return costQuerySetState.selectedDataSourceId || '';
+    }),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
+});
 
 interface VariableOption {
     key: ManagedVariableModelKey;
@@ -85,9 +99,11 @@ const GROUP_BY_TO_VAR_MODELS_FOR_UNIFIED_COST: Record<string, VariableOption> = 
 
 const getInitialSelectedItemsMap = (): Record<string, MenuItem[]> => ({});
 
-const props = defineProps<{
-    visible: boolean;
-}>();
+const props = withDefaults(defineProps<{
+    visible?: boolean;
+}>(), {
+    visible: false,
+});
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -96,7 +112,7 @@ const storeState = reactive({
 });
 const { managedGroupByItems, additionalInfoGroupByItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
-    costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
+    costDataSource: computed(() => storeState.costDataSource[costQuerySetState.selectedDataSourceId ?? '']),
 });
 const state = reactive({
     randomId: '',
@@ -116,9 +132,9 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
-    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
+    isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
     primaryCostOptions: computed<Record<string, any>>(() => ({
-        ...(!state.isUnifiedCost && { data_source_id: costAnalysisPageGetters.selectedDataSourceId }),
+        ...(!state.isUnifiedCost && { data_source_id: costQuerySetState.selectedDataSourceId }),
     })),
     selectedItemsMap: {} as Record<string, MenuItem[]>,
     handlerMap: computed(() => {
@@ -128,6 +144,16 @@ const state = reactive({
         });
         return handlerMaps;
     }),
+});
+const convertedOriginFilter = computed<Record<string, ConsoleFilterValue | ConsoleFilterValue[]>>(() => {
+    const originFilters:ConsoleFilter[] = selectedQuerySet.value?.options?.filters ?? [];
+    const _selectedItemsMap: Record<string, ConsoleFilterValue | ConsoleFilterValue[]> = {};
+    (originFilters ?? []).forEach((queryFilter:ConsoleFilter) => {
+        if (queryFilter.k) {
+            _selectedItemsMap[queryFilter.k] = queryFilter.v;
+        }
+    });
+    return _selectedItemsMap;
 });
 
 /* Util */
@@ -175,14 +201,14 @@ const getMenuHandler = (groupBy: string, modelOptions: Record<string, any>, prim
     }
 };
 const initSelectedFilters = (isReset = false) => {
-    const _filters = isReset ? costAnalysisPageGetters.convertedOriginFilter : costAnalysisPageState.filters;
+    const _filters = isReset ? convertedOriginFilter.value : costAnalysisPageState.filters;
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
         if (storeState.isAdminMode && !costAnalysisPageState.isAllWorkspaceSelected && groupBy === GROUP_BY.WORKSPACE) {
             _selectedItemsMap[groupBy] = [];
             return;
         }
-        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d, label: d })) ?? [];
+        _selectedItemsMap[groupBy] = _filters?.[groupBy]?.map((d) => ({ name: d, label: d })) ?? [];
         const isGroupByExist = costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1;
         if (isGroupByExist) {
             costAnalysisPageStore.setEnabledFiltersProperties([
@@ -217,7 +243,7 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
 };
 const handleClickResetFilters = () => {
     initSelectedFilters(true);
-    const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageGetters.selectedQuerySet?.options?.filters;
+    const _originConsoleFilters: ConsoleFilter[]|undefined = selectedQuerySet.value?.options?.filters;
     const _originFilters: Record<string, string[]> = {};
     if (_originConsoleFilters?.length) {
         _originConsoleFilters.forEach((d) => {
@@ -228,7 +254,11 @@ const handleClickResetFilters = () => {
     state.randomId = getRandomId();
 };
 
-watch([() => costAnalysisPageGetters.selectedQueryId, () => costAnalysisPageGetters.isUnifiedCost, () => costAnalysisPageGetters.selectedDataSourceId], () => {
+watch([
+    () => costQuerySetState.selectedQuerySetId,
+    () => costQuerySetState.isUnifiedCostOn,
+    () => costQuerySetState.selectedDataSourceId,
+], () => {
     initSelectedFilters();
 }, { immediate: true });
 

@@ -56,9 +56,12 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const router = useRouter();
 
 /* Query */
-const { costQuerySetList, refetch: refreshCostQuerySets, selectedQuerySet } = useCostQuerySetQuery({
-    data_source_id: costQuerySetState.selectedDataSourceId || '',
-    isUnifiedCostOn: costQuerySetState.isUnifiedCostOn,
+const {
+    refetch: refreshCostQuerySets, selectedQuerySet, managedCostQuerySets,
+} = useCostQuerySetQuery({
+    data_source_id: computed(() => costQuerySetState.selectedDataSourceId || ''),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
 const queryClient = useQueryClient();
 const { costQuerySetAPI } = useCostQuerySetApi();
@@ -71,9 +74,8 @@ const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => selectedQuerySet.value?.name ?? state.defaultTitle),
     dataSourceImage: computed(() => costAnalysisPageGetters.dataSourceImageUrl),
-    managedCostQuerySetList: computed(() => costQuerySetList.value || []),
     isManagedCostQuerySet: computed<boolean>(() => (costQuerySetState.selectedQuerySetId
-        ? state.managedCostQuerySetList.some((item) => item.cost_query_set_id === costQuerySetState.selectedQuerySetId)
+        ? managedCostQuerySets.value?.some((item) => item.cost_query_set_id === costQuerySetState.selectedQuerySetId)
         : false)),
     itemIdForDeleteQuery: '',
     selectedQuerySetId: undefined as string|undefined,
@@ -100,7 +102,7 @@ const { mutate: deleteCostQuerySet } = useMutation({
             name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: costQuerySetState.selectedDataSourceId as string,
-                costQuerySetId: state.managedCostQuerySetList[0]?.cost_query_set_id || '',
+                costQuerySetId: managedCostQuerySets.value?.[0]?.cost_query_set_id || '',
             },
         }).catch(() => {});
 
@@ -166,7 +168,7 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
                                  width="2rem"
                                  height="2rem"
                             />
-                            <p-i v-if="state.managedCostQuerySetList.some((item) => item.name === (state.title || ''))"
+                            <p-i v-if="managedCostQuerySets?.some((item) => item.name === (state.title || ''))"
                                  name="ic_main-filled"
                                  width="1rem"
                                  height="1rem"

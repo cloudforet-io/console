@@ -19,15 +19,16 @@ import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 
 const state = reactive({
-    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
     granularityItems: computed<MenuItem[]>(() => (([
         {
             type: 'item',
@@ -44,8 +45,8 @@ const state = reactive({
             name: GRANULARITY.YEARLY,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
         },
-    ] as MenuItem[]).filter((item) => !(state.isUnifiedCost && item.name === GRANULARITY.DAILY)))),
-    showPeriodBadge: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
+    ] as MenuItem[]).filter((item) => !(costQuerySetState.isUnifiedCostOn && item.name === GRANULARITY.DAILY)))),
+    showPeriodBadge: computed<boolean>(() => costQuerySetState.selectedQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
     periodBadgeText: computed<string>(() => {
         if (!costAnalysisPageState.period) return '';
         let startDateFormat = 'MMM D';

@@ -62,8 +62,9 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 const router = useRouter();
 
 const { managedCostQuerySets, refetch: refreshCostQuerySets } = useCostQuerySetQuery({
-    data_source_id: costQuerySetState.selectedDataSourceId || '',
-    isUnifiedCostOn: costQuerySetState.isUnifiedCostOn,
+    data_source_id: computed(() => costQuerySetState.selectedDataSourceId || ''),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
 
 const queryClient = useQueryClient();

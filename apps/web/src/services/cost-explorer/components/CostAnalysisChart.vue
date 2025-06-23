@@ -26,6 +26,7 @@ import {
     GRANULARITY, GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { CostAnalyzeRawData } from '@/services/cost-explorer/types/cost-analyze-type';
 import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {
@@ -36,6 +37,8 @@ import type {
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 
 const state = reactive({
     loading: true,
@@ -53,14 +56,14 @@ const state = reactive({
     showHideAll: computed(() => Object.values(state.legend).some((d) => d)),
     showAccumulatedToggle: computed(() => costAnalysisPageState.granularity === GRANULARITY.DAILY),
     isAccumulated: false,
-    analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost ? unifiedCostAnalyze : fetchCostAnalyze)),
+    analyzeFetcher: computed(() => (costQuerySetState.isUnifiedCostOn ? unifiedCostAnalyze : fetchCostAnalyze)),
 });
 
 /* Util */
 const getValueSumKey = (dataType:string) => {
     switch (dataType) {
     case 'cost':
-        return costAnalysisPageGetters.isUnifiedCost ? `cost.${costAnalysisPageGetters.currency}` : 'cost';
+        return costQuerySetState.isUnifiedCostOn ? `cost.${costAnalysisPageGetters.currency}` : 'cost';
     case 'usage':
         return 'usage_quantity';
     default:
@@ -78,7 +81,7 @@ const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<Cost
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const { status, response } = await state.analyzeFetcher({
-            data_source_id: costAnalysisPageGetters.isUnifiedCost ? undefined : costAnalysisPageGetters.selectedDataSourceId,
+            data_source_id: costQuerySetState.isUnifiedCostOn ? undefined : costQuerySetState.selectedDataSourceId,
             query: {
                 granularity: costAnalysisPageState.granularity,
                 group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
@@ -136,9 +139,9 @@ const handleToggleAccumulated = (value: boolean) => {
 /* Watcher */
 watch([
     () => costAnalysisPageState,
-    () => costAnalysisPageGetters.selectedDataSourceId,
-    () => costAnalysisPageGetters.selectedQueryId,
-    () => costAnalysisPageGetters.isUnifiedCost,
+    () => costQuerySetState.selectedDataSourceId,
+    () => costQuerySetState.selectedQuerySetId,
+    () => costQuerySetState.isUnifiedCostOn,
 ], ([, selectedDataSourceId, , isUnifiedCost]) => {
     if (costAnalysisPageState.period && (selectedDataSourceId || isUnifiedCost)) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });

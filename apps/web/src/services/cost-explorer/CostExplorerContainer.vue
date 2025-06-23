@@ -4,9 +4,10 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -22,12 +23,12 @@ import CostExplorerLSB from '@/services/cost-explorer/CostExplorerLSB.vue';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
-
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+const queryClient = useQueryClient();
 
 const route = useRoute();
 const setCostParams = async () => {
@@ -58,8 +59,10 @@ const setCostParams = async () => {
         if (dataSourceId !== UNIFIED_COST_KEY) costQuerySetStore.setSelectedDataSourceId(dataSourceId);
         costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
     }
-    await costQuerySetStore.listCostQuerySets();
+
+    await queryClient.invalidateQueries({ queryKey: ['cost-explorer', 'cost-query-set', 'list'] });
 };
+
 const changeCostQuerySet = () => {
     const { dataSourceId, costQuerySetId } = route.params;
     if (dataSourceId && costQuerySetId) {
@@ -67,6 +70,7 @@ const changeCostQuerySet = () => {
         costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
     }
 };
+
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], setCostParams);
 
 watch(() => route.params, async (after, before) => {

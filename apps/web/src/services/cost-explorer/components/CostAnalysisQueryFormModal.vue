@@ -20,6 +20,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
@@ -46,6 +47,12 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
 
+/* Query */
+const { costQuerySetList } = useCostQuerySetQuery({
+    data_source_id: computed(() => costQuerySetState.selectedDataSourceId || ''),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
+});
 const queryClient = useQueryClient();
 const { costQuerySetAPI } = useCostQuerySetApi();
 
@@ -56,7 +63,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     selectedQuerySet: computed<CostQuerySetModel|undefined>(() => {
         if (props.requestType === 'EDIT') {
-            return costQuerySetState.costQuerySetList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
+            return costQuerySetList.value?.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
         }
         return undefined;
     }),
@@ -77,7 +84,7 @@ const state = reactive({
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
     managedCostQuerySetIdList: [...MANAGED_COST_QUERY_SET_ID_LIST],
-    existingCostQuerySetNameList: computed(() => costQuerySetState.costQuerySetList.map((query) => query.name)),
+    existingCostQuerySetNameList: computed(() => costQuerySetList.value?.map((query) => query.name) ?? []),
     mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
     isLoading: computed(() => isCreating.value || isUpdating.value),
 });
