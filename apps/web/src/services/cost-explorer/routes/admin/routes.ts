@@ -20,8 +20,9 @@ const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplore
 
 const AdminAdvancedSettingsPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsPage.vue');
 const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetMainPage.vue');
-const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
 const AdminAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/admin/AdminAnomalyDetectionConfigurationPage.vue');
+
+const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 
 const CostAnalysisPage = () => import('@/services/cost-explorer/pages/CostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
@@ -148,18 +149,12 @@ const adminCostExplorerRoutes: RouteConfig = {
                     meta: { menuId: MENU_ID.BUDGET },
                     component: AdminBudgetMainPage as any,
                 },
-                // {
-                //     path: 'create',
-                //     name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                //     meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET' },
-                //     component: AdminBudgetCreatePage as any,
-                // },
                 {
                     path: ':budgetId',
                     name: ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                     props: true,
                     meta: { label: ({ params }) => params.budgetId, copiable: true },
-                    component: AdminBudgetDetailPage as any,
+                    component: BudgetDetailPage as any,
                 },
             ],
         },

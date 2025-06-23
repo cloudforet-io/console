@@ -5,13 +5,11 @@ import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput, PButton, PIconButton,
 } from '@cloudforet/mirinae';
 
 import type { BudgetCreateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/create';
-import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -20,9 +18,9 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useBudgetCreateMutation } from '@/services/cost-explorer/composables/use-budget-create-mutation';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
-
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -77,50 +75,60 @@ const handleFormatRecipients = (value: Record<string, any>) => {
     }
 };
 
-const createBudget = async (type: 'skip' | 'set') => {
-    if (budgetCreatePageState.loading) return;
+const handleGoBack = () => {
+    budgetCreatePageState.currentStep = 2;
+};
 
-    try {
-        budgetCreatePageState.loading = true;
-        const params: BudgetCreateParameters = {
-            name: budgetCreatePageState.name,
-            limit: budgetCreatePageState.limit,
-            planned_limits: budgetCreatePageState.planned_limits,
-            currency: budgetCreatePageState.currency ?? 'USD',
-            time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
-            start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
-            end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
-            notification: type === 'set' ? {
-                state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
-                    ? 'ENABLED' : 'DISABLED',
-                plans: budgetCreatePageState.thresholds.length > 0 ? budgetCreatePageState.thresholds.map((threshold) => ({
-                    unit: 'PERCENT',
-                    threshold: threshold.value === 0 ? 0 : Number(threshold.value),
-                })) : [],
-                recipients: {
-                    users: budgetCreatePageState.recipients.users,
-                },
-            } : {
-                state: 'DISABLED',
-            },
-            tags: {},
-            resource_group: 'PROJECT',
-            project_id: budgetCreatePageState.project,
-            service_account_id: budgetCreatePageState.scope.serviceAccount,
-            budget_manager_id: budgetCreatePageState.budgetManager,
-        };
-        await SpaceConnector.clientV2.costAnalysis.budget.create<BudgetCreateParameters, BudgetModel>(params);
-
+const { mutate: _createBudget, isPending: isCreatingBudget } = useBudgetCreateMutation({
+    onSuccess: () => {
         router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-    } catch (error: any) {
+    },
+    onError: (error) => {
         showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'), error.message);
         budgetCreatePageState.currentStep = 1;
-    } finally {
-        budgetCreatePageState.loading = false;
-    }
+    },
+    onSettled: () => {
+        isCreatingBudget.value = false;
+    },
+});
+
+const createBudget = (type: 'skip' | 'create') => {
+    if (budgetCreatePageState.loading) return;
+
+    isCreatingBudget.value = true;
+
+    const params: BudgetCreateParameters = {
+        name: budgetCreatePageState.name,
+        limit: budgetCreatePageState.limit,
+        planned_limits: budgetCreatePageState.planned_limits,
+        currency: budgetCreatePageState.currency ?? 'USD',
+        time_unit: budgetCreatePageState.time_unit === 'TOTAL' ? 'TOTAL' : 'MONTHLY',
+        start: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
+        end: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+        notification: type === 'create' ? {
+            state: budgetCreatePageState.thresholds.filter((threshold) => threshold.value && threshold.value > 0).length > 0
+                ? 'ENABLED' : 'DISABLED',
+            plans: budgetCreatePageState.thresholds.length > 0 ? budgetCreatePageState.thresholds.map((threshold) => ({
+                unit: 'PERCENT',
+                threshold: threshold.value === 0 ? 0 : Number(threshold.value),
+            })) : [],
+            recipients: {
+                users: budgetCreatePageState.recipients.users,
+            },
+        } : {
+            state: 'DISABLED',
+        },
+        tags: {},
+        resource_group: 'PROJECT',
+        project_id: budgetCreatePageState.project,
+        service_account_id: budgetCreatePageState.scope.serviceAccount,
+        budget_manager_id: budgetCreatePageState.budgetManager,
+    };
+
+    _createBudget(params);
 };
 </script>
 
@@ -182,18 +190,24 @@ const createBudget = async (type: 'skip' | 'set') => {
             />
         </p-field-group>
         <div class="mt-8 flex justify-end gap-4">
+            <p-button icon-left="ic_arrow-left"
+                      style-type="transparent"
+                      @click="handleGoBack"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.GO_BACK') }}
+            </p-button>
             <p-button style-type="tertiary"
-                      :loading="budgetCreatePageState.loading"
+                      :loading="isCreatingBudget"
                       @click="createBudget('skip')"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SKIP_FOR_LATER') }}
             </p-button>
             <p-button class="substitutive"
                       :disabled="invalidThreshold.includes(true) || !isAlertRecipientsSelected"
-                      :loading="budgetCreatePageState.loading"
-                      @click="createBudget('set')"
+                      :loading="isCreatingBudget"
+                      @click="createBudget('create')"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SET') }}
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
             </p-button>
         </div>
     </div>

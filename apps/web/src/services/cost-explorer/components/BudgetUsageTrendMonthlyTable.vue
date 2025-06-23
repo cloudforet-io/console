@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 
 import { PDataTable, PToggleButton, PLink } from '@cloudforet/mirinae';
 
-
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -13,24 +12,24 @@ import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-
 
 interface Props {
     data: any;
+    budgetId: string;
 }
 
 const props = defineProps<Props>();
 
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
 const appContextStore = useAppContextStore();
+const { budgetData: _budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
-const budgetData = computed(() => budgetPageState.budgetData);
+const budgetData = computed(() => _budgetData.value);
+
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
 const formatNumberToShort = (number: number) => {
@@ -193,12 +192,12 @@ const handleToggleOriginalData = (value: boolean) => {
                         filters: arrayToQueryString([
                             {
                                 k: 'project_id',
-                                v: budgetPageState.budgetData?.project_id ? [budgetPageState.budgetData.project_id] : [],
+                                v: budgetData?.project_id ? [budgetData.project_id] : [],
                                 o: '',
                             },
                             {
                                 k: 'service_account_id',
-                                v: budgetPageState.budgetData?.service_account_id ? [budgetPageState.budgetData.service_account_id] : [],
+                                v: budgetData?.service_account_id ? [budgetData.service_account_id] : [],
                                 o: '',
                             },
                         ]),

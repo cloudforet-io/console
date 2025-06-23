@@ -9,8 +9,6 @@ import { init } from 'echarts/core';
 import type { EChartsType } from 'echarts/core';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -19,21 +17,27 @@ import {
     indigo, red, yellow,
 } from '@/styles/colors';
 
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetData = computed(() => budgetPageStore.$state.budgetData);
-
-const chartContext = ref<HTMLElement|null>(null);
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
+import { useBudgetUsageQuery } from '@/services/cost-explorer/composables/use-budget-usage-query';
 
 interface Props {
     data: any;
+    budgetId: string;
 }
 
 const props = defineProps<Props>();
 
+
+const { budgetData: _budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
+const budgetData = computed(() => _budgetData.value);
+
+const { budgetUsageAPI } = useBudgetUsageQuery();
+
+const chartContext = ref<HTMLElement|null>(null);
+
+
 const state = reactive({
-    data: props.data,
+    data: computed(() => props.data),
     xAxisData: computed(() => state.data.map((d) => dayjs.utc(d.date).format('MMM YYYY'))),
     yAxisData: computed(() => [0, 25, 50, 75, 100]),
     chart: null as EChartsType | null,
@@ -107,7 +111,7 @@ const state = reactive({
 
 const fetchBudgetUsageAnalyze = async () => {
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        const { results } = await budgetUsageAPI.analyze({
             budget_id: budgetData.value?.budget_id,
             query: {
                 group_by: ['name', 'date', 'currency'],
@@ -171,11 +175,11 @@ const drawChart = (data: any) => {
 
 watch(() => state.data, () => {
     drawChart(state.data);
-}, { deep: true, immediate: true });
+}, { immediate: true });
 
 watch(() => budgetData, async () => {
     await fetchBudgetUsageAnalyze();
-}, { deep: true, immediate: true });
+}, { immediate: true });
 
 const handleResize = () => {
     state.chart?.resize();
@@ -227,7 +231,7 @@ onBeforeUnmount(() => {
 
     .chart {
         height: 100%;
-        min-width: 700px;
+        min-width: 43.75rem;
     }
 }
 </style>

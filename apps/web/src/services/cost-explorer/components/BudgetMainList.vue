@@ -10,7 +10,6 @@ import dayjs from 'dayjs';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -19,7 +18,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
+import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -33,7 +32,6 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import type { ListResponse } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -41,15 +39,13 @@ import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BudgetDeleteCheckModal from '@/services/cost-explorer/components/BudgetDeleteCheckModal.vue';
 import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToolset.vue';
+import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
 import { BUDGET_SEARCH_HANDLERS } from '@/services/cost-explorer/constants/budget-constant';
 import { BUDGET_EXCEL_FIELDS } from '@/services/cost-explorer/constants/budget-table-constant';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-
-
 
 interface Props {
   modalVisible: boolean;
@@ -72,6 +68,7 @@ interface BudgetMainListState {
     isDeleteable: ComputedRef<boolean>;
     selectedBudgetIds: string[];
     addRequests: any;
+    totalCount: number;
 }
 
 interface BudgetQuery {
@@ -82,6 +79,10 @@ interface BudgetQuery {
     serviceAccountList: any[];
     utilization?: string;
 }
+
+/* Query */
+const { budgetUsageAPI } = useBudgetUsageApi();
+const { budgetAPI, isFetching } = useBudgetQuery();
 
 const props = withDefaults(defineProps<Props>(), {
     modalVisible: false,
@@ -95,8 +96,6 @@ const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
 const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
-const budgetCreatePageStore = useBudgetCreatePageStore();
-const budgetCreatePageState = budgetCreatePageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
 const projectReferenceStore = useProjectReferenceStore();
@@ -112,7 +111,7 @@ const state = reactive<BudgetMainListState>({
     modalVisible: false,
     queryFilters: queryHelper.setFiltersAsRawQueryString(currentRoute.query.filters).filters,
     pageStart: 1,
-    pageLimit: 24,
+    pageLimit: 15,
     period: {},
     query: undefined,
     isExpiredBudgetsHidden: false,
@@ -121,6 +120,7 @@ const state = reactive<BudgetMainListState>({
     isDeleteable: computed<boolean>(() => state.selectedIndex.length > 0),
     selectedBudgetIds: [],
     addRequests: undefined,
+    totalCount: 0,
 });
 
 const tableState = reactive({
@@ -232,13 +232,11 @@ const handleQuery = (query: BudgetQuery) => {
 };
 
 const handleDeleteConfirm = async () => {
-    budgetCreatePageState.loading = true;
     try {
         await fetchBudgets();
         await listBudgetUsages();
     } finally {
         state.selectedIndex = [];
-        budgetCreatePageState.loading = false;
     }
 };
 
@@ -343,7 +341,8 @@ const fetchBudgetUsages = async () => {
                 v: RESOURCE_GROUP.WORKSPACE,
             });
         }
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+
+        return await budgetUsageAPI.analyze({
             query: {
                 group_by: ['budget_id', 'name', 'date', 'currency', 'limit'],
                 fields: {
@@ -368,20 +367,28 @@ const fetchBudgetUsages = async () => {
     }
 };
 
-
 const fetchBudgets = async () => {
-    if (state.loading) return;
-
     const filters = getBudgetFilters();
+    const originalQuery = budgetApiQueryHelper.data;
 
-    const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>({
+    const mergedFilters = [
+        ...(originalQuery.filter ?? []),
+        ...filters,
+    ];
+
+    /**
+     * 💡 Merge filters from the original query and the new filters to ensure that
+     * both pre-existing query conditions(queryTag) and additional user-defined filters(from BudgetToolset) are applied.
+     */
+    const { results, total_count } = await budgetAPI.list({
         query: {
-            filter: filters,
-            ...budgetApiQueryHelper.data,
+            ...originalQuery,
+            filter: mergedFilters,
         },
     });
 
     state.budgets = results;
+    state.totalCount = total_count ?? 0;
 };
 
 const listBudgetUsages = async () => {
@@ -421,11 +428,14 @@ const handleChange = async (options: any = {}) => {
             budgetSortKey = 'time_unit';
         }
 
-        budgetApiQueryHelper.setSort(budgetSortKey, desc);
+        budgetApiQueryHelper.setPage(state.pageStart, state.pageLimit).setSort(budgetSortKey, desc);
         budgetUsageApiQueryHelper.setSort(usageSortKey, desc);
     }
 
-    budgetApiQueryHelper.setFilters(state.queryFilters);
+    budgetApiQueryHelper
+        .setFilters(state.queryFilters)
+        .setPage(state.pageStart, state.pageLimit);
+
     await fetchBudgets();
     await listBudgetUsages();
 };
@@ -486,10 +496,12 @@ onMounted(async () => {
                              sortable
                              sort-desc
                              sort-by="utilization_rate"
-                             pagination-visible
                              exportable
                              search-type="query"
                              searchable
+                             :page-size="state.pageLimit"
+                             :total-count="state.totalCount"
+                             :loading="isFetching"
                              :select-index="state.selectedIndex"
                              :key-item-sets="BUDGET_SEARCH_HANDLERS"
                              :value-handler-map="tableState.valueHandlerMap"

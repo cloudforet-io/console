@@ -11,7 +11,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
@@ -25,7 +24,9 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import BudgetCreateManagerSelect from '@/services/cost-explorer/components/BudgetCreateManagerSelect.vue';
 import BudgetCreateScopeSelect from '@/services/cost-explorer/components/BudgetCreateScopeSelect.vue';
+import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+
 
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
@@ -39,13 +40,15 @@ interface BudgetCreateStep1State {
     projectList: any[];
     selectedProject: string;
     serviceAccountList: string[];
-    budgetList: BudgetModel[];
+    budgetList: ComputedRef<BudgetModel[]>;
     budgetNames: string[];
     existingProjectIds: string[];
     existingBudgetYears: number[];
     projectInvalidText: ComputedRef<string|TranslateResult>;
     projectInvalid: ComputedRef<boolean>;
 }
+
+const { budgetList } = useBudgetQuery();
 
 const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
 
@@ -56,7 +59,7 @@ const state = reactive<BudgetCreateStep1State>({
     projectList: [],
     selectedProject: '',
     serviceAccountList: [],
-    budgetList: [],
+    budgetList: computed(() => budgetList.value),
     budgetNames: [],
     existingProjectIds: [],
     existingBudgetYears: [],
@@ -131,23 +134,13 @@ const getServiceAccountIncludedinProjectInfo = async () => {
     }
 };
 
-const fetchBudget = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>();
-        state.budgetList = results;
-        state.budgetNames = results?.map((result) => result.name) ?? [];
-        state.existingProjectIds = results?.map((result) => result.project_id) ?? [];
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
-
 watch(() => budgetCreatePageState.project, async () => {
     await getServiceAccountIncludedinProjectInfo();
 }, { deep: true, immediate: true });
 
 watchEffect(async () => {
-    await fetchBudget();
+    state.budgetNames = state.budgetList?.map((result) => result.name) ?? [];
+    state.existingProjectIds = state.budgetList.map((result) => result.project_id) ?? [];
 });
 </script>
 
@@ -155,6 +148,8 @@ watchEffect(async () => {
     <div class="flex flex-col">
         <div class="contents-container">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
+                           :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
+                           :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.NAME_INVALID_TEXT')"
                            required
             >
                 <p-text-input block
@@ -166,8 +161,6 @@ watchEffect(async () => {
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT')"
                            required
             >
-                <!-- :invalid="!state.projectInvalid"
-                           :invalid-text="state.projectInvalidText" -->
                 <project-select-dropdown
                     show-delete-all-button
                     :project-group-selectable="false"
@@ -187,6 +180,7 @@ watchEffect(async () => {
             </p-button>
             <p-button icon-right="ic_arrow-right"
                       :disabled="!state.isContinueAble"
+                      style-type="substitutive"
                       @click="handleNext"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.CONTINUE') }}

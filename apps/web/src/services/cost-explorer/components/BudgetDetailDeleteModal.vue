@@ -1,21 +1,22 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDoubleCheckModal } from '@cloudforet/mirinae';
 
-
-import type { BudgetDeleteParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useBudgetDeleteMutation } from '@/services/cost-explorer/composables/use-budget-delete-mutation';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+const router = useRouter();
 
 interface Props {
     visible: boolean;
+    budgetName: string;
+    budgetId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
@@ -25,24 +26,19 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
     (e: 'confirm'): void;
 }>();
 
-const verificationText = computed(() => budgetPageState.budgetData?.name || '');
+const verificationText = computed<string>(() => props.budgetName);
 
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
-
-
-const handleConfirm = async () => {
-    try {
-        await SpaceConnector.clientV2.costAnalysis.budget.delete<BudgetDeleteParameters>({
-            budget_id: budgetPageState.budgetData?.budget_id ?? '',
-        });
-        emit('update:visible', false);
-        emit('confirm');
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_SUCCESS'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
+const { mutate: deleteBudgets, isPending } = useBudgetDeleteMutation({
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DELETE_SUCCESS'), '');
+    },
+    onError: (error: any) => {
+        showErrorMessage(error.code, error.message);
+    },
+    onSettled: () => {
+        router.replace({ name: COST_EXPLORER_ROUTE.BUDGET._NAME });
+    },
+});
 
 const handleUpdate = () => {
     emit('update:visible', false);
@@ -54,9 +50,9 @@ const handleUpdate = () => {
                           :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.DELETE_BUDGET')"
                           :verification-text="verificationText"
                           modal-size="sm"
-                          @confirm="handleConfirm"
+                          :loading="isPending"
+                          @confirm="deleteBudgets({ budget_id: props.budgetId ?? '' })"
                           @cancel="handleUpdate"
                           @close="handleUpdate"
     />
 </template>
-

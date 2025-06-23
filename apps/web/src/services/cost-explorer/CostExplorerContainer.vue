@@ -22,6 +22,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import CostExplorerLSB from '@/services/cost-explorer/CostExplorerLSB.vue';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
@@ -114,6 +115,7 @@ onUnmounted(() => {
         </vertical-page-layout>
         <centered-page-layout v-else-if="$route.meta?.centeredLayout"
                               class="cost-centered-layout"
+                              :class="{'landing-page': route?.name === COST_EXPLORER_ROUTE.LANDING._NAME}"
                               has-nav-bar
         >
             <router-view />
@@ -131,11 +133,13 @@ onUnmounted(() => {
     }
 }
 .cost-centered-layout {
-    &::before {
-        opacity: 1;
-        background-position: 50% 0;
-        background-size: 90rem auto;
-        background-repeat: no-repeat;
+    &.landing-page {
+        &::before {
+            opacity: 1;
+            background-position: 50% 0;
+            background-size: 90rem auto;
+            background-repeat: no-repeat;
+        }
     }
 }
 </style>
