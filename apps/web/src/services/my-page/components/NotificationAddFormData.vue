@@ -13,6 +13,7 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
 import { useProtocolApi } from '@/api-clients/notification/protocol/composables/use-protocol-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import { i18n } from '@/translations';
@@ -22,6 +23,7 @@ import { useUserStore } from '@/store/user/user-store';
 import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
+
 
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 const userStore = useUserStore();

@@ -12,6 +12,7 @@ import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-
 import type {
     EscalationPolicyFinishCondition,
 } from '@/api-clients/monitoring/escalation-policy/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
@@ -21,6 +22,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertStateBadgeStyleTypeFormatter, alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager/v1/helpers/alert-badge-helper';
+
 
 const props = withDefaults(defineProps<{
     loading?: boolean;

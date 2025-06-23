@@ -10,11 +10,10 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { EscalationPolicyGetParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/get';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -33,7 +32,6 @@ const props = defineProps<{
     hasReadWriteAccess?: boolean;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
@@ -64,7 +62,6 @@ const state = reactive({
         { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
         { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
     ]),
-    webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     data: computed<Partial<AlertModel>>(() => alertPageState.alertData ?? {}),
     escalationPolicyName: '',
     timezone: computed<string|undefined>(() => userStore.state.timezone),
@@ -142,7 +139,7 @@ const getEscalationPolicy = async () => {
             <template #data-triggered_by="{ value }">
                 <alert-triggered-by :value="value"
                                     :project-id="state.data.project_id"
-                                    :webhook-reference="state.webhooks[value]"
+                                    :webhook-reference="referenceMap.monitoringWebhook[value]"
                                     :user-reference="referenceMap.user[value]"
                                     disable-link
                 />

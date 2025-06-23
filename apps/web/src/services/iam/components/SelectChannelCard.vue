@@ -8,7 +8,6 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -18,8 +17,7 @@ import { useNotificationChannelCreateFormStore } from '@/services/iam/store/noti
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 
-const referenceMap = useAllReferenceDataModel();
-
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     selectedProtocol: {},
 });
@@ -33,9 +31,9 @@ const { data: notificationProtocolListData } = useScopedQuery({
     select: (data) => data.results?.map((i) => ({
         label: i.name,
         value: i.protocol_id,
-        icon: storeState.plugins[i.plugin_info.plugin_id]?.icon || '',
+        icon: allReferenceStore.getters.plugin[i.plugin_info.plugin_id]?.icon || '',
     })),
-    enabled: computed(() => Object.keys(storeState.plugins).length > 0),
+    enabled: computed(() => Object.keys(allReferenceStore.getters.plugin).length > 0),
     gcTime: 1000 * 60 * 2,
     staleTime: 1000 * 30,
 }, ['DOMAIN', 'WORKSPACE']);

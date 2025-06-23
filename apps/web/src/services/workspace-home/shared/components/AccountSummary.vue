@@ -45,7 +45,7 @@ const authorizationStore = useAuthorizationStore();
 
 const totalChartContext = ref<HTMLElement|null>(null);
 const providerChartContext = ref<HTMLElement|null>(null);
-const { provider } = useAllReferenceDataModel();
+const referenceMap = useAllReferenceDataModel();
 
 const { serviceAccountAPI } = useServiceAccountApi();
 const { key: serviceAccountQueryKey, params } = useServiceQueryKey('identity', 'service-account', 'list', {
@@ -135,7 +135,7 @@ const state = reactive({
         name: item.provider,
         value: item.count,
         itemStyle: {
-            color: provider[item.provider]?.color,
+            color: referenceMap.provider[item.provider]?.color,
         },
     }))),
     providerChart: null as EChartsType | null,
@@ -146,7 +146,7 @@ const state = reactive({
             trigger: 'item',
             position: 'right',
             formatter: (p) => {
-                const _name = provider[p.name]?.label || '';
+                const _name = referenceMap.provider[p.name]?.label || '';
                 const _value = numberFormatter(p.value) || '';
                 const percent = getPercent(p.value, state.itemsTotalCount);
                 return `${p.marker} ${_name}: <b>${_value}</b> (${percent}%)`;
@@ -255,7 +255,7 @@ const serviceAccountPageFiltersQueryString = computed(() => {
                                      class="provider-item"
                                 >
                                     <div class="image-wrapper">
-                                        <p-lazy-img :src="assetUrlConverter(provider[item.provider]?.icon || '')"
+                                        <p-lazy-img :src="assetUrlConverter(referenceMap.provider[item.provider]?.icon || '')"
                                                     width="1.5rem"
                                                     height="1.5rem"
                                                     class="provider-image"
@@ -263,7 +263,7 @@ const serviceAccountPageFiltersQueryString = computed(() => {
                                     </div>
                                     <div class="percent-wrapper">
                                         <div class="info">
-                                            <span>{{ provider[item.provider]?.label || item.provider }}</span>
+                                            <span>{{ referenceMap.provider[item.provider]?.label || item.provider }}</span>
                                             <p>
                                                 <span>
                                                     <span class="percent">{{ getPercent(item.count, state.itemsTotalCount) }}</span>%
@@ -272,7 +272,7 @@ const serviceAccountPageFiltersQueryString = computed(() => {
                                             </p>
                                         </div>
                                         <p-progress-bar :percentage="getPercent(item.count, state.itemsTotalCount)"
-                                                        :color="provider[item.provider]?.color"
+                                                        :color="referenceMap.provider[item.provider]?.color"
                                                         size="md"
                                                         height="0.375rem"
                                         />

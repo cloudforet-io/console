@@ -58,9 +58,7 @@ const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 
-const {
-    provider,
-} = useAllReferenceDataModel();
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
@@ -87,7 +85,7 @@ const state = reactive({
     providerId: computed(() => state.originServiceAccountItem?.provider),
     provider: computed(() => {
         if (!state.loading) {
-            return provider[state.providerId] || undefined;
+            return referenceMap.provider[state.providerId] || undefined;
         }
         return undefined;
     }),

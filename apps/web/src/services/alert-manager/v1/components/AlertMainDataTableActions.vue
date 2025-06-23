@@ -14,10 +14,9 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 import type { AlertDeleteParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/delete';
 import { ALERT_STATE, ALERT_URGENCY } from '@/api-clients/monitoring/alert/schema/constants';
 import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -67,7 +66,6 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(e: 'refresh'): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
 const projectDetailPageStore = useProjectDetailPageStore();
 const userStore = useUserStore();
 
@@ -75,7 +73,6 @@ const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     timezone: computed(() => userStore.state.timezone),
-    webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     selectedItemsState: computed(() => props.selectedItems.map((selectedItem) => selectedItem.state)),
     isSelectedNone: computed(() => props.selectedItems.length === 0),
     isSelectedOne: computed(() => props.selectedItems.length === 1),
@@ -220,7 +217,7 @@ const onConfirmResolve = () => {
                 </template>
             </template>
             <template #col-webhook_id-format="{ value }">
-                {{ value ? (state.webhooks[value] ? state.webhooks[value].label : value) : ' ' }}
+                {{ value ? (referenceMap.monitoringWebhook[value] ? referenceMap.monitoringWebhook[value]?.label : value) : ' ' }}
             </template>
         </p-table-check-modal>
 
