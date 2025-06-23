@@ -20,10 +20,8 @@ export const useBudgetCreateMutation = (options: UseBudgetCreateMutationOptions)
     return useMutation({
         mutationFn: budgetAPI.create,
         onSuccess: async (data) => {
-            if (onSuccess) {
-                await onSuccess(data);
-                invalidateBudgetListQuery();
-            }
+            invalidateBudgetListQuery();
+            if (onSuccess) await onSuccess(data);
         },
         onError: async (error) => {
             if (onError) await onError(error);
