@@ -57,16 +57,6 @@ const route = useRoute();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
-// Cost Query Set Query
-const { costQuerySetList, managedCostQuerySets } = useCostQuerySetQuery({
-    data_source_id: computed(() => {
-        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
-        return costQuerySetState.selectedDataSourceId || Object.keys(storeState.dataSourceMap)[0] || '';
-    }),
-    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
-    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
-});
-
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
@@ -148,6 +138,16 @@ const state = reactive({
         ...state.adminMenuSet,
         ...state.queryMenuSet,
     ]),
+});
+
+/* Query */
+const { costQuerySetList, managedCostQuerySets } = useCostQuerySetQuery({
+    data_source_id: computed(() => {
+        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
+        return costQuerySetState.selectedDataSourceId || Object.keys(storeState.dataSourceMap)[0] || '';
+    }),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
 
 const dataSourceState = reactive({
