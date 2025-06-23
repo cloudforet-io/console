@@ -79,7 +79,7 @@ watch(() => props.projectId, async (projectId) => {
             <alert-list-item v-if="index < 15"
                              :item="item"
                              :show-status-message="true"
-                             :user-reference="referenceMap.user[item.assignee]"
+                             :user-reference="referenceMap.workspaceUser[item.assignee]"
             />
             <div v-else
                  class="view-all-text"

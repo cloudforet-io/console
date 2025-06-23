@@ -218,16 +218,17 @@ watch(() => notificationItemState.isEditMode, (mode) => {
                     <span v-if="notificationItemState.dataForEdit?.users?.includes('*')">
                         {{ $t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS') }}
                     </span>
-                    <p-badge v-for="(userId, index) in notificationItemState.dataForEdit?.users"
-                             v-else
-                             :key="`users-${index}`"
-                             badge-type="subtle"
-                             style-type="gray200"
-                             shape="square"
-                             class="mr-2 rounded"
-                    >
-                        {{ referenceMap.user[userId]?.label || userId }}
-                    </p-badge>
+                    <template v-else>
+                        <p-badge v-for="(userId, index) in notificationItemState.dataForEdit?.users"
+                                 :key="`users-${index}`"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                                 shape="square"
+                                 class="mr-2 rounded"
+                        >
+                            {{ referenceMap.workspaceUser[userId]?.label || userId }}
+                        </p-badge>
+                    </template>
                 </div>
                 <div v-else-if="state.isSecretData"
                      class="inline"

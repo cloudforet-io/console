@@ -5,9 +5,8 @@ import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
 import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -17,7 +16,7 @@ import { useNotificationChannelCreateFormStore } from '@/services/iam/store/noti
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     selectedProtocol: {},
 });
@@ -25,18 +24,19 @@ const state = reactive({
 const { notificationProtocolAPI } = useNotificationProtocolApi();
 const { key: notificationProtocolListQueryKey } = useServiceQueryKey('alert-manager', 'notification-protocol', 'list');
 
-const { data: notificationProtocolListData } = useScopedQuery({
+const { data: notificationProtocolList } = useScopedQuery({
     queryKey: notificationProtocolListQueryKey,
     queryFn: async () => notificationProtocolAPI.list(),
-    select: (data) => data.results?.map((i) => ({
-        label: i.name,
-        value: i.protocol_id,
-        icon: allReferenceStore.getters.plugin[i.plugin_info.plugin_id]?.icon || '',
-    })),
-    enabled: computed(() => Object.keys(allReferenceStore.getters.plugin).length > 0),
+    select: (data) => data?.results || [],
     gcTime: 1000 * 60 * 2,
     staleTime: 1000 * 30,
 }, ['DOMAIN', 'WORKSPACE']);
+
+const notificationProtocolCardList = computed(() => (notificationProtocolList.value || []).map((item) => ({
+    label: item.name,
+    value: item.protocol_id,
+    icon: referenceMap.plugin[item.plugin_info.plugin_id]?.icon || '',
+})));
 
 /* Component */
 const handleSelectChannel = (selectedProtocol) => {
@@ -52,7 +52,7 @@ const handleSelectChannel = (selectedProtocol) => {
 
 <template>
     <div class="select-channel-card">
-        <p-select-card v-for="(channel, idx) in notificationProtocolListData"
+        <p-select-card v-for="(channel, idx) in notificationProtocolCardList"
                        :key="`channel-${idx}`"
                        v-model="state.selectedProtocol"
                        :selected="state.selectedProtocol"

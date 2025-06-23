@@ -293,7 +293,7 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                         <alert-list-item :item="item"
                                          :show-project-link="true"
                                          :project-reference="referenceMap.project[item.project_id]"
-                                         :user-reference="referenceMap.user[item.assignee]"
+                                         :user-reference="referenceMap.workspaceUser[item.assignee]"
                         />
                     </template>
                     <template #no-data>

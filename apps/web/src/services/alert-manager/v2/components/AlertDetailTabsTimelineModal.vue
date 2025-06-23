@@ -82,7 +82,7 @@ const state = reactive({
             } else if (type === TYPE.USER_GROUP) {
                 target = info.user_group_id ? (referenceMap.userGroup[info.user_group_id]?.label || info.user_group_id) : undefined;
             } else if (type === TYPE.USER) {
-                target = info.user_id ? (referenceMap.user[info.user_id]?.label || info.user_id) : undefined;
+                target = info.user_id ? (referenceMap.workspaceUser[info.user_id]?.label || info.user_id) : undefined;
             }
             return {
                 type,

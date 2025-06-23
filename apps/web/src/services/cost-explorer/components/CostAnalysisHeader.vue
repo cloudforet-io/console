@@ -11,7 +11,7 @@ import {
 
 import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
 import type { CostQuerySetDeleteParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/delete';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

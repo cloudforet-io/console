@@ -223,7 +223,7 @@ const handleClickAssign = () => {
 const assigneeName = computed<string>(() => {
     const userId = originTask.value?.assignee;
     if (!userId) return '--';
-    const user = referenceMap.user[userId];
+    const user = referenceMap.workspaceUser[userId];
     return user?.label || user?.name || userId;
 });
 

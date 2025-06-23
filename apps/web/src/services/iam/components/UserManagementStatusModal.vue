@@ -16,14 +16,12 @@ import type { UserDisableParameters } from '@/api-clients/identity/user/schema/a
 import type { UserEnableParameters } from '@/api-clients/identity/user/schema/api-verbs/enable';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useServiceListQuery } from '@/services/iam/composables/use-service-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
@@ -33,13 +31,9 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const storeState = reactive({
-    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
     selectedUsers: computed(() => userPageGetters.selectedUsers),
 });
 
@@ -161,18 +155,20 @@ const disableUser = async (userId?: string): Promise<boolean> => {
     }
 };
 
+const serviceListQuery = useServiceListQuery();
+
 /* Watcher */
-watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
+watch([serviceListQuery.data, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
     if (nv_service_list) {
         const list: UserListItemType[] | (UserListItemType & { service: string; })[] = [];
         nv_selected_users.forEach((selectedUser) => {
             Object.values(nv_service_list).forEach((service) => {
-                if (service && service.data && service.data.members) {
-                    if (Object.keys(service.data.members).includes('USER')) {
-                        if (selectedUser.user_id && service.data.members.USER.includes(selectedUser.user_id)) {
+                if (service && service.members) {
+                    if (Object.keys(service.members).includes('USER')) {
+                        if (selectedUser.user_id && service.members.USER.includes(selectedUser.user_id)) {
                             list.push({
                                 ...selectedUser,
-                                service: service.label,
+                                service: service.name,
                             });
                         }
                     } else {

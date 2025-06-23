@@ -140,7 +140,7 @@ const getEscalationPolicy = async () => {
                 <alert-triggered-by :value="value"
                                     :project-id="state.data.project_id"
                                     :webhook-reference="referenceMap.monitoringWebhook[value]"
-                                    :user-reference="referenceMap.user[value]"
+                                    :user-reference="referenceMap.workspaceUser[value]"
                                     disable-link
                 />
             </template>

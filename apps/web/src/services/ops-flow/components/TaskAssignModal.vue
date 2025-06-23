@@ -44,7 +44,7 @@ const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.va
 const allUserItems = computed<SelectDropdownMenuItem[]>(() => {
     const assigneePool = taskAssignStore.state.currentAssigneePool;
     if (assigneePool && assigneePool.length > 0) {
-        return assigneePool.map((d) => ({ name: d, label: referenceMap.user[d]?.label || referenceMap.user[d]?.name || d }));
+        return assigneePool.map((d) => ({ name: d, label: referenceMap.workspaceUser[d]?.label || referenceMap.workspaceUser[d]?.name || d }));
     }
     return allUserReferenceItems.value;
 });

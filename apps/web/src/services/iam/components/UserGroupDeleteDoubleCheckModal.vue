@@ -13,14 +13,12 @@ import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/mo
 import type { UserGroupListItemType } from '@/api-clients/identity/user-group/schema/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
+import { useServiceListQuery } from '@/services/iam/composables/use-service-list-query';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -36,14 +34,10 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-
 const storeState = reactive({
     selectedUserGroupList: computed<UserGroupListItemType[]>(() => userGroupPageGetters.selectedUserGroups),
     selectedUserGroupIds: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.user_group_id)),
     selectedUserGroupNames: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.name)),
-    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 
 const state = reactive({
@@ -109,18 +103,20 @@ const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) 
     }
 };
 
+const serviceListQuery = useServiceListQuery();
+
 /* Watcher */
-watch([() => storeState.serviceList, () => storeState.selectedUserGroupList], ([nv_service_list, nv_user_group_list]) => {
+watch([serviceListQuery.data, () => storeState.selectedUserGroupList], ([nv_service_list, nv_user_group_list]) => {
     if (nv_service_list) {
         const list: any = [];
         nv_user_group_list.forEach((userGroup) => {
             Object.values(nv_service_list).forEach((service) => {
-                if (service && service.data && service.data.members) {
-                    if (Object.keys(service.data.members).includes('USER_GROUP')) {
-                        if (service.data.members.USER_GROUP.includes(userGroup.user_group_id)) {
+                if (service && service.members) {
+                    if (Object.keys(service.members).includes('USER_GROUP')) {
+                        if (service.members.USER_GROUP.includes(userGroup.user_group_id)) {
                             list.push({
                                 user_group: userGroup.name,
-                                service: service.label,
+                                service: service.name,
                                 description: userGroup.description,
                             });
                         }

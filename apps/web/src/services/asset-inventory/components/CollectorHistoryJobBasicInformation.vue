@@ -51,13 +51,11 @@ import {
 import { PLink, PLazyImg, PPaneLayout } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { JobModel } from '@/schema/inventory/job/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 
@@ -70,7 +68,6 @@ interface Props {
     job: JobModel;
 }
 
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -79,10 +76,9 @@ const props = withDefaults(defineProps<Props>(), {
     job: undefined,
 });
 
+const referenceMap = useAllReferenceDataModel();
 
 const storeState = reactive({
-    collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
 const state = reactive({
@@ -90,7 +86,7 @@ const state = reactive({
         const id = props.job.collector_id || '';
         return {
             id,
-            label: storeState.collectors[id]?.label || id,
+            label: id ? referenceMap.collector[id]?.label || id : id || '',
             linkLocation: {
                 name: appContextStore.getters.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                 params: {
@@ -104,8 +100,8 @@ const state = reactive({
         const id = props.job.plugin_id || '';
         return {
             id,
-            label: storeState.plugins[id]?.label || id,
-            icon: storeState.plugins[id]?.icon,
+            label: referenceMap.plugin[id]?.label || id,
+            icon: referenceMap.plugin[id]?.icon,
         };
     }),
 

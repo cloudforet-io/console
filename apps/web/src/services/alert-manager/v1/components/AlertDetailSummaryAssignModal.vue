@@ -51,7 +51,7 @@ const state = reactive({
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = alertAssignUserState.userIds.map((d) => ({
             user_id: d,
-            user_name: referenceMap.user[d]?.label || d,
+            user_name: referenceMap.workspaceUser[d]?.label || d,
         }));
         const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();

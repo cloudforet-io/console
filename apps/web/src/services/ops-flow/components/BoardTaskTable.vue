@@ -18,6 +18,7 @@ import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/sche
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { i18n } from '@/translations';
 
@@ -33,6 +34,7 @@ import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
+
 
 
 const props = defineProps<{
@@ -271,10 +273,10 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
                 />
             </template>
             <template #col-assignee-format="{value}">
-                {{ referenceMap.user[value]?.label || referenceMap.user[value]?.name || value }}
+                {{ referenceMap.workspaceUser[value]?.label || referenceMap.workspaceUser[value]?.name || value }}
             </template>
             <template #col-created_by-format="{value}">
-                {{ referenceMap.user[value]?.label || referenceMap.user[value]?.name || value }}
+                {{ referenceMap.workspaceUser[value]?.label || referenceMap.workspaceUser[value]?.name || value }}
             </template>
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}

@@ -513,7 +513,7 @@ initPage();
                     <alert-triggered-by :value="value"
                                         :project-id="item.project_id"
                                         :webhook-reference="storeState.webhooks[value]"
-                                        :user-reference="referenceMap.user[value]"
+                                        :user-reference="referenceMap.workspaceUser[value]"
                                         disable-link
                     />
                 </template>

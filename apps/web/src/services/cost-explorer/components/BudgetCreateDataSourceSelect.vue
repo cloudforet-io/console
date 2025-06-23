@@ -4,11 +4,12 @@ import { computed, reactive, watch } from 'vue';
 import { PFieldGroup, PSelectDropdown, PLazyImg } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -33,9 +34,10 @@ const {
 
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
@@ -48,7 +50,7 @@ const state = reactive({
         return _costDataSourceList.map(([key, dataSource]) => ({
             name: key,
             label: dataSource.label,
-            imageUrl: storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon ? storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
+            imageUrl: referenceMap.plugin[dataSource.data.plugin_info.plugin_id]?.icon || 'error',
         }));
     }),
 });
