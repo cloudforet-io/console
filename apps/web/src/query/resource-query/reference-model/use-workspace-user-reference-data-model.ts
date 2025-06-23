@@ -20,7 +20,10 @@ export const useWorkspaceUserReferenceDataModel = () => {
     const fetchConfig: ReferenceDataModelFetchConfig<WorkspaceUserModel> = {
         listFetcher: workspaceUserAPI.list,
         query: {
-            only: ['user_id', 'name', 'role_binding_info'],
+            only: [
+                'user_id', 'name',
+                // 'role_binding_info'
+            ],
         },
     };
 

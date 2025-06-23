@@ -22,7 +22,7 @@ vi.mock('@/store/app-context/app-context-store', () => ({
     }),
 }));
 // Mock useQueryKeyAppContext
-vi.mock('@/query/query-key/_composable/use-app-context-query-key', () => ({
+vi.mock('@/query/core/query-key/_composable/use-app-context-query-key', () => ({
     useQueryKeyAppContext: () => ({
         value: ['workspace', 'workspace-123'] as const,
     }),

@@ -95,6 +95,12 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'user_id',
         nameKey: 'name',
     },
+    workspaceUser: {
+        name: 'Workspace User',
+        resourceKey: 'workspaceUser',
+        idKey: 'user_id',
+        nameKey: 'name',
+    },
     userGroup: {
         name: 'User Group',
         resourceKey: 'userGroup',
