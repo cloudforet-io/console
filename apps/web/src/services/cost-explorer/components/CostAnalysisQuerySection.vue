@@ -17,6 +17,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
 import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -50,6 +51,7 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 const appContextStore = useAppContextStore();
 
 const filtersPopperRef = ref<any|null>(null);
@@ -62,13 +64,20 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 const router = useRouter();
 
 const { managedCostQuerySets, refetch: refreshCostQuerySets } = useCostQuerySetQuery({
-    data_source_id: computed(() => costQuerySetState.selectedDataSourceId || ''),
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
     isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
     selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
 
 const queryClient = useQueryClient();
 const { costQuerySetAPI } = useCostQuerySetApi();
+
+// Service Query Key for invalidation - target specific data source
+const { key: costQuerySetListKey } = useServiceQueryKey('cost-analysis', 'cost-query-set', 'list', {
+    params: computed(() => ({
+        data_source_id: costQuerySetGetters.dataSourceId,
+    })),
+});
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -117,7 +126,7 @@ onClickOutside(rightPartRef, hideContextMenu);
 const { mutate: updateCostQuerySet } = useMutation({
     mutationFn: (params: CostQuerySetUpdateParameters) => costQuerySetAPI.update(params),
     onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: ['cost-explorer', 'cost-query-set', 'list'] });
+        await queryClient.invalidateQueries({ queryKey: costQuerySetListKey.value });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
     },
     onError: (error) => {

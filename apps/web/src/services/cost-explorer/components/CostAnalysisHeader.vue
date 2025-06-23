@@ -11,6 +11,7 @@ import {
 
 import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
 import type { CostQuerySetDeleteParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/delete';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -46,6 +47,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -59,12 +61,19 @@ const router = useRouter();
 const {
     refetch: refreshCostQuerySets, selectedQuerySet, managedCostQuerySets,
 } = useCostQuerySetQuery({
-    data_source_id: computed(() => costQuerySetState.selectedDataSourceId || ''),
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
     isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
     selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
 const queryClient = useQueryClient();
 const { costQuerySetAPI } = useCostQuerySetApi();
+
+// Service Query Key for invalidation - target specific data source
+const { key: costQuerySetListKey } = useServiceQueryKey('cost-analysis', 'cost-query-set', 'list', {
+    params: computed(() => ({
+        data_source_id: costQuerySetGetters.dataSourceId,
+    })),
+});
 
 const storeState = reactive({
     isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
@@ -95,7 +104,7 @@ const state = reactive({
 const { mutate: deleteCostQuerySet } = useMutation({
     mutationFn: (params: CostQuerySetDeleteParameters) => costQuerySetAPI.delete(params),
     onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: ['cost-explorer', 'cost-query-set', 'list'] });
+        await queryClient.invalidateQueries({ queryKey: costQuerySetListKey.value });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
 
         await router.push({

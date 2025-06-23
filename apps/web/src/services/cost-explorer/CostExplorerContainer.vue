@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    onUnmounted, watch,
+    onUnmounted, watch, computed,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -8,6 +8,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
+
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -25,12 +27,21 @@ import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 const queryClient = useQueryClient();
 
 const route = useRoute();
+
+// Service Query Key for invalidation - target specific data source
+const { key: costQuerySetListKey } = useServiceQueryKey('cost-analysis', 'cost-query-set', 'list', {
+    params: computed(() => ({
+        data_source_id: costQuerySetGetters.dataSourceId,
+    })),
+});
+
 const setCostParams = async () => {
     // Case - Directly access Budget Page
     if (!costQuerySetState.selectedDataSourceId) {
@@ -60,7 +71,7 @@ const setCostParams = async () => {
         costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
     }
 
-    await queryClient.invalidateQueries({ queryKey: ['cost-explorer', 'cost-query-set', 'list'] });
+    await queryClient.invalidateQueries({ queryKey: costQuerySetListKey.value });
 };
 
 const changeCostQuerySet = () => {
@@ -91,7 +102,7 @@ onUnmounted(() => {
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lsbVisible"
+        <vertical-page-layout v-if="$route.meta?.lsbVisible"
                               class="cost-explorer-container"
         >
             <template #sidebar>
@@ -101,7 +112,7 @@ onUnmounted(() => {
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-else-if="$route.meta.centeredLayout"
+        <centered-page-layout v-else-if="$route.meta?.centeredLayout"
                               class="cost-centered-layout"
                               has-nav-bar
         >
