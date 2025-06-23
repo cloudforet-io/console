@@ -44,7 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
 const route = useRoute();
 const serviceId = computed<string>(() => route.params.serviceId as string);
 
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 

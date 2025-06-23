@@ -76,7 +76,7 @@ const { width } = useWindowSize();
 const queryClient = useQueryClient();
 const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleData, eventRuleQueryKey } = useEventRuleGetQuery();
-const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery(serviceId.value);
+const { eventRuleListData, eventRuleListQueryKey } = useEventRuleListQuery(serviceId);
 
 const storeState = reactive({
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),

@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
@@ -15,12 +15,12 @@ interface UseWebhookListQueryReturn {
     webhookListQueryKey: Ref<QueryKey>;
 }
 
-export const useWebhookListQuery = (serviceId: string): UseWebhookListQueryReturn => {
+export const useWebhookListQuery = (serviceId: ComputedRef<string>): UseWebhookListQueryReturn => {
     const { webhookAPI } = useWebhookApi();
 
     const { key: webhookListQueryKey, params: webhookListQueryParams } = useServiceQueryKey('alert-manager', 'webhook', 'list', {
         params: computed(() => ({
-            service_id: serviceId,
+            service_id: serviceId.value,
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },

@@ -33,7 +33,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const storeState = reactive({
     serviceListMap: computed<ServiceReferenceMap>(() => serviceDetailPageGetters.serviceReferenceMap),

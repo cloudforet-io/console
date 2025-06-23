@@ -61,7 +61,7 @@ const handleClickWebhookItem = (id: string) => {
     serviceDetailPageStore.setSelectedWebhookId(id);
 };
 
-const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId.value);
+const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId);
 </script>
 
 <template>

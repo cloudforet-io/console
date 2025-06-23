@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
@@ -14,19 +14,19 @@ interface UseEventRuleListQueryReturn {
     eventRuleListQueryKey: Ref<QueryKey>;
 }
 
-export const useEventRuleListQuery = (serviceId: string): UseEventRuleListQueryReturn => {
+export const useEventRuleListQuery = (serviceId: ComputedRef<string>): UseEventRuleListQueryReturn => {
     const { eventRuleAPI } = useEventRuleApi();
 
     const { key: eventRuleListQueryKey, params: eventRuleListQueryParams } = useServiceQueryKey('alert-manager', 'event-rule', 'list', {
         params: computed(() => ({
-            service_id: serviceId,
+            service_id: serviceId.value,
         })),
     });
 
     const { data: queryData, isFetching: eventRuleListFetching } = useScopedQuery({
         queryKey: eventRuleListQueryKey,
         queryFn: async () => eventRuleAPI.list(eventRuleListQueryParams.value),
-        enabled: computed(() => !!serviceId),
+        enabled: computed(() => !!serviceId.value),
         gcTime: 1000 * 60 * 2,
         staleTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);

@@ -57,7 +57,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
 
 const { eventRuleAPI } = useEventRuleApi();
-const { eventRuleListData } = useEventRuleListQuery(serviceId.value);
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
 
 const storeState = reactive({
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),

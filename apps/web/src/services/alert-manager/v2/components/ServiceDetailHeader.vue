@@ -37,8 +37,8 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const { eventRuleListData } = useEventRuleListQuery(serviceId.value);
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const state = reactive({
     isSettingMode: computed<boolean>(() => route.query?.mode !== 'eventRule'),

@@ -45,8 +45,8 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const route = useRoute();
 const serviceId = computed<string>(() => route.params.serviceId as string);
 
-const { eventRuleListData } = useEventRuleListQuery(serviceId.value);
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const state = reactive({
     selectModalVisible: false,

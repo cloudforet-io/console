@@ -109,7 +109,7 @@ const handleClickConfirm = () => {
     });
 };
 
-const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId.value);
+const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId);
 
 onMounted(() => {
     if (props.visible) {

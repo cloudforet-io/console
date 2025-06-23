@@ -34,7 +34,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 const queryClient = useQueryClient();
 const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleData } = useEventRuleGetQuery();
-const { eventRuleListQueryKey } = useEventRuleListQuery(serviceId.value);
+const { eventRuleListQueryKey } = useEventRuleListQuery(serviceId);
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),

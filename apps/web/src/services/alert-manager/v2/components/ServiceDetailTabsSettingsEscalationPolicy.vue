@@ -59,7 +59,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 const defaultEscalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
 
 const tableState = reactive({

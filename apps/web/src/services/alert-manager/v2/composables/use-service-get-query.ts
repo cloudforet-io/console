@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
 import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
@@ -13,12 +13,12 @@ interface UseServiceGetQueryReturn {
     serviceData: Ref<Partial<Service> | undefined>;
 }
 
-export const useServiceGetQuery = (serviceId: string): UseServiceGetQueryReturn => {
+export const useServiceGetQuery = (serviceId: ComputedRef<string>): UseServiceGetQueryReturn => {
     const { serviceAPI } = useServiceApi();
 
     const { key: serviceQueryKey, params: serviceQueryParams } = useServiceQueryKey('alert-manager', 'service', 'get', {
         params: computed(() => ({
-            service_id: serviceId,
+            service_id: serviceId.value,
             details: true,
         })),
     });

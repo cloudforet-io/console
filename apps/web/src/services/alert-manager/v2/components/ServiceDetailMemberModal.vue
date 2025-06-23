@@ -65,7 +65,7 @@ const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const route = useRoute();
 const serviceId = computed<string>(() => route.params.serviceId as string);
 
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const { width } = useWindowSize();
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -129,7 +129,7 @@ const queryClient = useQueryClient();
 const { serviceAPI } = useServiceApi();
 const { withSuffix: serviceQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
 
-const { serviceChannelListData } = useServiceChannelListQuery(serviceId.value);
+const { serviceChannelListData } = useServiceChannelListQuery(serviceId);
 const { mutate: changeMemegers } = useMutation({
     mutationFn: (params: ServiceChangeMembersParameters) => serviceAPI.changeMembers(params),
     onSuccess: async (_, variables) => {

@@ -54,7 +54,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 

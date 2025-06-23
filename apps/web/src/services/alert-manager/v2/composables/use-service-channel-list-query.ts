@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
 import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
@@ -11,12 +11,12 @@ interface UseServiceChannelListQueryReturn {
     serviceChannelListFetching: Ref<boolean>;
 }
 
-export const useServiceChannelListQuery = (serviceId: string): UseServiceChannelListQueryReturn => {
+export const useServiceChannelListQuery = (serviceId: ComputedRef<string>): UseServiceChannelListQueryReturn => {
     const { serviceChannelAPI } = useServiceChannelApi();
 
     const { key: serviceChannelListQueryKey, params: serviceChannelListQueryParams } = useServiceQueryKey('alert-manager', 'service-channel', 'list', {
         params: computed(() => ({
-            service_id: serviceId,
+            service_id: serviceId.value,
             query: {
                 sort: [{ key: 'created_at', desc: true }],
             },

@@ -33,7 +33,7 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const { width } = useWindowSize();
 
 const { eventRuleData } = useEventRuleGetQuery();
-const { eventRuleListData, eventRuleListFetching } = useEventRuleListQuery(serviceId.value);
+const { eventRuleListData, eventRuleListFetching } = useEventRuleListQuery(serviceId);
 
 const storeState = reactive({
     modalVisible: computed<boolean>(() => serviceDetailPageState.eventRuleScopeModalVisible),

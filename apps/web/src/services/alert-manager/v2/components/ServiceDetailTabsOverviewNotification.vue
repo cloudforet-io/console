@@ -41,7 +41,7 @@ const state = reactive({
     pageMax: computed<number>(() => Math.max(serviceChannelListData.value.length - state.visibleCount, 0)),
 });
 
-const { serviceChannelListData, serviceChannelListFetching } = useServiceChannelListQuery(serviceId.value);
+const { serviceChannelListData, serviceChannelListFetching } = useServiceChannelListQuery(serviceId);
 
 const handleClickArrowButton = (increment: number) => {
     const element = {

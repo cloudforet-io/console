@@ -50,7 +50,7 @@ const { width } = useWindowSize();
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
 const { eventRuleData } = useEventRuleGetQuery();
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 const defaultEscalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
 
 const storeState = reactive({

@@ -35,7 +35,7 @@ const emit = defineEmits<{(event: 'update:selected-ids', value: string[]): void;
 }>();
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
-const { serviceChannelListData } = useServiceChannelListQuery(serviceId.value);
+const { serviceChannelListData } = useServiceChannelListQuery(serviceId);
 
 const state = reactive({
     loading: false,

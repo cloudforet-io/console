@@ -78,7 +78,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([

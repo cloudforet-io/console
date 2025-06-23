@@ -131,7 +131,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_
 const { queryTags } = queryTagHelper;
 
 const queryClient = useQueryClient();
-const { webhookListQueryKey } = useWebhookListQuery(serviceId.value);
+const { webhookListQueryKey } = useWebhookListQuery(serviceId);
 
 const handleCloseModal = () => {
     state.selectIndex = undefined;

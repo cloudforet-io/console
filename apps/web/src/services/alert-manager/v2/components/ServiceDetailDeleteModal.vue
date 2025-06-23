@@ -34,7 +34,7 @@ const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
-const { serviceData } = useServiceGetQuery(serviceId.value);
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
