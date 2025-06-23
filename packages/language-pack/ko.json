@@ -2156,7 +2156,7 @@
 		},
 		"ANOMALY_DETECTION": {
 			"NOTIFICATION_RULES": {
-				"AMOUNT": "계정",
+				"AMOUNT": "임계값 입력",
 				"NOTIFY_LEVEL": "알림 레벨",
 				"SELECT_LEVEL": "레벨 선택",
 				"SELECT_UNIT": "단위 선택",
