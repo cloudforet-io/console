@@ -508,11 +508,11 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
             >
                 {{ budgetCreatePageState.scope.type === 'project'
                     ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
-                        project: project[budgetCreatePageState.project].name,
+                        project: referenceMap.project[budgetCreatePageState.project]?.name || budgetCreatePageState.project,
                         month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                     }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
-                        project: project[budgetCreatePageState.project].name,
-                        serviceAccount: serviceAccount[budgetCreatePageState.scope.serviceAccount ?? ''].name,
+                        project: referenceMap.project[budgetCreatePageState.project]?.name || budgetCreatePageState.project,
+                        serviceAccount: referenceMap.serviceAccount[budgetCreatePageState.scope.serviceAccount]?.name || budgetCreatePageState.scope.serviceAccount,
                         month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                     }) }}
             </span>
