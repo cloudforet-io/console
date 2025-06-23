@@ -3,6 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -44,15 +45,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
 }>();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-});
 const state = reactive({
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     headerTitle: computed<TranslateResult>(() => {
@@ -140,7 +140,7 @@ const handleClickConfirm = async () => {
         finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
     };
     if (props.type === 'CREATE') {
-        params.service_id = storeState.serviceId;
+        params.service_id = serviceId.value;
     } else {
         params.escalation_policy_id = props.selectedItem?.escalation_policy_id || '';
     }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -26,13 +26,13 @@ import {
     alertStatusBadgeStyleTypeFormatter,
     getAlertStateI18n, getAlertUrgencyI18n,
 } from '@/services/alert-manager/v2/composables/alert-table-data';
+import { useAlertListQuery } from '@/services/alert-manager/v2/composables/use-alert-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { SERVICE_ALERT_TABLE_FIELDS } from '@/services/alert-manager/v2/constants/service-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
-import { useAlertListQuery } from '../composables/use-alert-list-query';
 
 type AlertStatusInfoType = {
     status: TranslateResult,
@@ -45,34 +45,36 @@ type AlertStatusInfoType = {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
-
 const router = useRouter();
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const storeState = reactive({
-    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
 });
 const state = reactive({
     alertStatusInfo: computed<AlertStatusInfoType[]>(() => [
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED'),
-            total: storeState.serviceInfo.alerts.TRIGGERED.HIGH + storeState.serviceInfo.alerts.TRIGGERED.LOW,
-            high: storeState.serviceInfo.alerts.TRIGGERED.HIGH,
-            low: storeState.serviceInfo.alerts.TRIGGERED?.LOW,
+            total: (serviceData.value?.alerts?.TRIGGERED.HIGH || 0) + (serviceData.value?.alerts?.TRIGGERED.LOW || 0),
+            high: serviceData.value?.alerts?.TRIGGERED.HIGH || 0,
+            low: serviceData.value?.alerts?.TRIGGERED.LOW || 0,
             name: SERVICE_ALERTS_TYPE.TRIGGERED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.ACKNOWLEDGED'),
-            total: storeState.serviceInfo.alerts.ACKNOWLEDGED.HIGH + storeState.serviceInfo.alerts.ACKNOWLEDGED.LOW,
-            high: storeState.serviceInfo.alerts.ACKNOWLEDGED.HIGH,
-            low: storeState.serviceInfo.alerts.ACKNOWLEDGED.LOW,
+            total: (serviceData.value?.alerts?.ACKNOWLEDGED.HIGH || 0) + (serviceData.value?.alerts?.ACKNOWLEDGED.LOW || 0),
+            high: serviceData.value?.alerts?.ACKNOWLEDGED.HIGH || 0,
+            low: serviceData.value?.alerts?.ACKNOWLEDGED.LOW || 0,
             name: SERVICE_ALERTS_TYPE.ACKNOWLEDGED,
         },
         {
             status: i18n.t('ALERT_MANAGER.ALERTS.RESOLVED'),
-            total: storeState.serviceInfo.alerts.RESOLVED.HIGH + storeState.serviceInfo.alerts.RESOLVED.LOW,
-            high: storeState.serviceInfo.alerts.RESOLVED.HIGH,
-            low: storeState.serviceInfo.alerts.RESOLVED.LOW,
+            total: (serviceData.value?.alerts?.RESOLVED.HIGH || 0) + (serviceData.value?.alerts?.RESOLVED.LOW || 0),
+            high: serviceData.value?.alerts?.RESOLVED.HIGH || 0,
+            low: serviceData.value?.alerts?.RESOLVED.LOW || 0,
             name: SERVICE_ALERTS_TYPE.RESOLVED,
         },
     ]),
@@ -99,7 +101,7 @@ const {
     alertListData, alertListTotalCount, alertListFetching, alertListQueryKey,
 } = useAlertListQuery({
     params: computed(() => ({
-        service_id: storeState.serviceInfo.service_id,
+        service_id: serviceId.value,
         status: state.selectedStatus,
         urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
         query: alertListApiQueryHelper.data,
@@ -114,7 +116,7 @@ const handleRouteAlerts = (id: string) => {
         name: ALERT_MANAGER_ROUTE.ALERTS.DETAIL._NAME,
         params: {
             alertId: id,
-            serviceId: storeState.serviceInfo.service_id,
+            serviceId: serviceId.value,
         },
     }).catch(() => {});
 };
@@ -140,12 +142,6 @@ const handleChangeToolbox = async (sortBy:string, sortDesc:boolean) => {
     alertListApiQueryHelper.setSort(sortBy, sortDesc);
     await refetchAlertList();
 };
-
-watch(() => storeState.serviceInfo.service_id, async (serviceId) => {
-    if (serviceId) {
-        await refetchAlertList();
-    }
-});
 </script>
 
 <template>

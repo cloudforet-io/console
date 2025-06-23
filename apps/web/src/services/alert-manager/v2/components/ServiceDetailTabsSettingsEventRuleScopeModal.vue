@@ -3,6 +3,7 @@ import {
     computed, onMounted, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
@@ -48,6 +49,9 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:selected-webhook'): void;
     (e: 'update:scope'): void;
@@ -57,7 +61,6 @@ const emit = defineEmits<{(e: 'update:visible'): void;
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
     loading: false,
@@ -106,7 +109,7 @@ const handleClickConfirm = () => {
     });
 };
 
-const { webhookListData, webhookListFetching } = useWebhookListQuery();
+const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId);
 
 onMounted(() => {
     if (props.visible) {

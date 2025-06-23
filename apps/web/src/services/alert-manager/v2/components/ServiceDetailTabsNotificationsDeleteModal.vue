@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -11,7 +12,6 @@ import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channe
 import type { ServiceChannelDeleteParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/delete';
 import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
-import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -26,7 +26,6 @@ import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/compos
 import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -41,17 +40,14 @@ const emit = defineEmits<{(e: 'close'): void,
     (e: 'update:visible'): void
 }>();
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const queryClient = useQueryClient();
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
 const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
-const storeState = reactive({
-    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
-});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
@@ -70,7 +66,7 @@ const tableState = reactive({
 
 const { escalationPolicyListData } = useEscalationPolicyListQuery({
     params: computed(() => ({
-        service_id: storeState.service.service_id,
+        service_id: serviceId.value,
     })),
 });
 

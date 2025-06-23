@@ -23,9 +23,10 @@ import ServiceDetailTabsSettingsEscalationPolicy
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicy.vue';
 import ServiceDetailTabsSettingsModal from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsUpdateModal.vue';
 import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { ServiceDetailSettingCardType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 type CardItemType = {
     title: TranslateResult,
@@ -38,17 +39,15 @@ type CardValueInfoType = {
 };
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
-const { eventRuleListData } = useEventRuleListQuery();
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
+const { serviceData } = useServiceGetQuery(serviceId);
 
-const storeState = reactive({
-    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
-});
 const state = reactive({
     selectModalVisible: false,
     modalType: undefined as ServiceDetailSettingCardType|undefined,
@@ -66,8 +65,8 @@ const state = reactive({
             type: SERVICE_SETTING_CARD.EVENT_RULE,
         },
     ]),
-    notificationPolicy: computed<NotificationUrgencyType>(() => storeState.serviceInfo.options.notification_urgency),
-    autoRecovery: computed<RecoveryModeType>(() => storeState.serviceInfo.options.recovery_mode),
+    notificationPolicy: computed<NotificationUrgencyType>(() => serviceData.value?.options?.notification_urgency || NOTIFICATION_URGENCY.ALL),
+    autoRecovery: computed<RecoveryModeType>(() => serviceData.value?.options?.recovery_mode || RECOVERY_MODE.MANUAL),
 });
 
 const getCardValueInfo = (type: ServiceDetailSettingCardType): CardValueInfoType|undefined => {

@@ -2,6 +2,7 @@
 import {
     reactive, computed, watch, onUnmounted,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -40,6 +41,7 @@ import ServiceDetailTabsSettingsEscalationPolicyFormModal
 import ServiceDetailTabsSettingsEscalationPolicyStateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
 import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { ALERT_STATUS_FILTERS } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -52,7 +54,13 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { serviceData } = useServiceGetQuery(serviceId);
+const defaultEscalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -60,23 +68,21 @@ const tableState = reactive({
             type: 'item',
             name: 'STATE',
             label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.DEFAULT'),
-            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
+            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === defaultEscalationPolicyId.value,
         },
         {
             type: 'item',
             name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
-            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
+            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === defaultEscalationPolicyId.value,
         },
     ])),
     fields: ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('alert_manager.EscalationPolicy', 'name', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+        name: makeDistinctValueHandler('alert_manager.EscalationPolicy', 'name', 'string', [{ k: 'service_id', v: serviceId.value, o: 'eq' }]),
     })),
 });
 const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
-    defaultEscalationPolicyId: computed<string>(() => serviceDetailPageState.serviceInfo.escalation_policy_id),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     selectedEscalationPolicyId: computed<string|undefined>(() => serviceDetailPageState.selectedEscalationPolicyId),
 });
@@ -110,7 +116,7 @@ const {
             .setFilters([...queryTagHelper.filters.value]);
         return {
             query: escalationPolicyListApiQueryHelper.data,
-            service_id: storeState.serviceId,
+            service_id: serviceId.value,
         };
     }),
 });
@@ -139,7 +145,7 @@ const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/escalation-policy/list',
         param: {
-            service_id: storeState.serviceId,
+            service_id: serviceId.value,
             query: { ...escalationPolicyListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,
@@ -234,7 +240,7 @@ onUnmounted(() => {
             <template #col-name-format="{value, item}">
                 <div>
                     <span>{{ value }}</span>
-                    <p-badge v-if="item.escalation_policy_id === storeState.defaultEscalationPolicyId"
+                    <p-badge v-if="item.escalation_policy_id === defaultEscalationPolicyId"
                              style-type="safe"
                              badge-type="solid-outline"
                              class="ml-2"

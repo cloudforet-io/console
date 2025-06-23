@@ -3,6 +3,7 @@ import { useElementSize } from '@vueuse/core/index';
 import {
     computed, reactive, ref,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
@@ -25,11 +26,13 @@ const itemEl = ref<null | HTMLElement>(null);
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
 });
 const state = reactive({
     pageStart: 0,
@@ -58,7 +61,7 @@ const handleClickWebhookItem = (id: string) => {
     serviceDetailPageStore.setSelectedWebhookId(id);
 };
 
-const { webhookListData, webhookListFetching } = useWebhookListQuery();
+const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId);
 </script>
 
 <template>

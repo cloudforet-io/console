@@ -2,7 +2,7 @@
 import {
     reactive, computed, watch, onUnmounted,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -65,6 +65,8 @@ const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const router = useRouter();
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -98,15 +100,14 @@ const tableState = reactive({
     ])),
     fields: WEBHOOK_MANAGEMENT_TABLE_FIELDS,
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('alert_manager.Webhook', 'name', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+        name: makeDistinctValueHandler('alert_manager.Webhook', 'name', 'string', [{ k: 'service_id', v: serviceId.value, o: 'eq' }]),
         state: makeEnumValueHandler(WEBHOOK_STATE),
-        'plugin_info.plugin_id': makeDistinctValueHandler('alert_manager.Webhook', 'plugin_info.plugin_id', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+        'plugin_info.plugin_id': makeDistinctValueHandler('alert_manager.Webhook', 'plugin_info.plugin_id', 'string', [{ k: 'service_id', v: serviceId.value, o: 'eq' }]),
     })),
 });
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     selectedWebhookId: computed<string|undefined>(() => serviceDetailPageState.selectedWebhookId),
 });
 const state = reactive({
@@ -130,7 +131,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_
 const { queryTags } = queryTagHelper;
 
 const queryClient = useQueryClient();
-const { webhookListQueryKey } = useWebhookListQuery();
+const { webhookListQueryKey } = useWebhookListQuery(serviceId);
 
 const handleCloseModal = () => {
     state.selectIndex = undefined;
@@ -160,7 +161,7 @@ const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/webhook/list',
         param: {
-            service_id: storeState.serviceId,
+            service_id: serviceId.value,
             query: { ...webhookListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,
@@ -191,7 +192,7 @@ const {
                 ...webhookListApiQueryHelper.data,
                 sort: [{ key: filterState.sortKey, desc: filterState.sortDesc }],
             },
-            service_id: storeState.serviceId,
+            service_id: serviceId.value,
         };
     }),
 });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -27,10 +28,13 @@ const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:visible'): void;
 }>();
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const queryClient = useQueryClient();
 const { eventRuleAPI } = useEventRuleApi();
 const { eventRuleData } = useEventRuleGetQuery();
-const { eventRuleListQueryKey } = useEventRuleListQuery();
+const { eventRuleListQueryKey } = useEventRuleListQuery(serviceId);
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),

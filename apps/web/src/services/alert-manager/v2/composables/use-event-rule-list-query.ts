@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 
 import type { QueryKey } from '@tanstack/vue-query';
@@ -8,21 +8,14 @@ import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/sche
 import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-
 interface UseEventRuleListQueryReturn {
     eventRuleListData: Ref<EventRuleModel[]>;
     eventRuleListFetching: Ref<boolean>;
     eventRuleListQueryKey: Ref<QueryKey>;
 }
 
-export const useEventRuleListQuery = (): UseEventRuleListQueryReturn => {
-    const serviceDetailPageStore = useServiceDetailPageStore();
-    const serviceDetailPageState = serviceDetailPageStore.state;
-
+export const useEventRuleListQuery = (serviceId: ComputedRef<string>): UseEventRuleListQueryReturn => {
     const { eventRuleAPI } = useEventRuleApi();
-
-    const serviceId = computed<string>(() => serviceDetailPageState.serviceInfo.service_id);
 
     const { key: eventRuleListQueryKey, params: eventRuleListQueryParams } = useServiceQueryKey('alert-manager', 'event-rule', 'list', {
         params: computed(() => ({

@@ -52,14 +52,14 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
 const router = useRouter();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
 
 const { eventRuleAPI } = useEventRuleApi();
-const { eventRuleListData } = useEventRuleListQuery();
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
 
 const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
