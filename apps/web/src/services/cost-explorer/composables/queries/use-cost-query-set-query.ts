@@ -1,4 +1,7 @@
-import { computed, type Ref, type ComputedRef } from 'vue';
+import { toValue } from '@vueuse/core';
+import {
+    computed, type ComputedRef,
+} from 'vue';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -15,9 +18,9 @@ import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explor
 import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_IDS, MANAGED_COST_QUERY_SET_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 
 interface UseCostQuerySetQueryOptions {
-    data_source_id: string | Ref<string> | ComputedRef<string>;
-    isUnifiedCostOn?: boolean | Ref<boolean> | ComputedRef<boolean>;
-    selectedQuerySetId?: string | Ref<string> | ComputedRef<string> | Ref<string | undefined> | ComputedRef<string | undefined>;
+    data_source_id: ComputedRef<string>;
+    isUnifiedCostOn?: ComputedRef<boolean>;
+    selectedQuerySetId?: ComputedRef<string | undefined>;
 }
 
 export const useCostQuerySetQuery = (options: UseCostQuerySetQueryOptions) => {
@@ -28,18 +31,9 @@ export const useCostQuerySetQuery = (options: UseCostQuerySetQueryOptions) => {
     const _workspaceId = computed<string|undefined>(() => appContextStore.getters.workspaceId);
 
     // Convert options to computed refs for reactivity
-    const _dataSourceId = computed(() => {
-        const value = typeof options.data_source_id === 'string' ? options.data_source_id : options.data_source_id.value;
-        return value;
-    });
-    const _isUnifiedCostOn = computed(() => {
-        const value = options.isUnifiedCostOn;
-        return typeof value === 'boolean' ? value : value?.value ?? false;
-    });
-    const _selectedQuerySetId = computed(() => {
-        const value = options.selectedQuerySetId;
-        return typeof value === 'string' ? value : value?.value;
-    });
+    const _dataSourceId = computed(() => toValue(options.data_source_id));
+    const _isUnifiedCostOn = computed(() => toValue(options.isUnifiedCostOn) ?? false);
+    const _selectedQuerySetId = computed(() => toValue(options.selectedQuerySetId));
 
     // Check if query should be enabled
     const isQueryEnabled = computed(() => !!_dataSourceId.value && _dataSourceId.value.trim() !== '');
