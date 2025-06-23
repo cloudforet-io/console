@@ -3,6 +3,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { cloneDeep } from 'lodash';
 
@@ -16,8 +17,12 @@ import type { DomainConfigGetParameters } from '@/api-clients/config/domain-conf
 import type { DomainConfigSetParameters } from '@/api-clients/config/domain-config/schema/api-verbs/set';
 import { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
 import type { DomainConfigModel } from '@/api-clients/config/domain-config/schema/model';
+import { PUBLIC_CONFIG_NAMES } from '@/api-clients/config/public-config/schema/constant';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 
+import { ERROR_ROUTE } from '@/router/constant';
+
+import { usePublicConfigStore } from '@/store/config/public-config-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -38,11 +43,15 @@ interface State {
     notifyLevelMenu: ComputedRef<MenuItem[]>;
     recipients: boolean;
     hasReadWriteAccess?: ComputedRef<boolean|undefined>;
+    isSupportDomainConfig?: ComputedRef<boolean>;
 }
 
 const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const publicConfigStore = usePublicConfigStore();
+
+const router = useRouter();
 
 const state = reactive<State>({
     statusToggle: false,
@@ -63,6 +72,10 @@ const state = reactive<State>({
         iconColor: level.color,
     }))),
     recipients: false,
+    isSupportDomainConfig: computed(() => {
+        const extraMenu = publicConfigStore.getters[PUBLIC_CONFIG_NAMES.EXTRA_MENU].data;
+        return extraMenu?.anomaly_detection?.enabled ?? false;
+    }),
 });
 
 
@@ -157,6 +170,10 @@ onMounted(async () => {
             state.notificationRules = [{ variation: ALL_VALUE }];
         }
         state.recipients = savedConfig.recipients?.role_types.includes('WORKSPACE_OWNER') ?? false;
+    }
+
+    if (!state.isSupportDomainConfig) {
+        router.push({ name: ERROR_ROUTE._NAME, params: { errorCode: '404' } });
     }
 });
 

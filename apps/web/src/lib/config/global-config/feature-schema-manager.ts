@@ -31,7 +31,8 @@ export class FeatureSchemaManager {
         const routeMetadataSchema = this.createRouteMetadata();
         const uiAffectSchema = this.createUiAffectsSchema();
 
-        await dynamicSchemaManager.updateSchema(
+        await dynamicSchemaManager.initialize();
+        await dynamicSchemaManager.applySchema(
             menuSchema,
             routeSchema,
             routeMetadataSchema,

@@ -112,7 +112,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: ADMIN_COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
-                    meta: { menuId: MENU_ID.ANOMALY_DETECTION, lsbVisible: true },
+                    meta: { menuId: MENU_ID.ANOMALY_DETECTION },
                     component: AdminAnomalyDetectionConfigurationPage as any,
                 },
             ],
