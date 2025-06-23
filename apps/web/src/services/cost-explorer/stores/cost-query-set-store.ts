@@ -16,6 +16,12 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         selectedDataSourceId: undefined as string|undefined,
         isUnifiedCostOn: _state.isAdminMode as boolean,
     });
+    const getters = {
+        dataSourceId: computed(() => {
+            if (state.isUnifiedCostOn) return 'unified-cost';
+            return state.selectedDataSourceId || '';
+        }),
+    };
 
     /* Mutations */
     const setSelectedDataSourceId = (dataSourceId?: string): void => {
@@ -45,6 +51,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
     };
     return {
         state,
+        getters,
         ...mutations,
         ...actions,
     };

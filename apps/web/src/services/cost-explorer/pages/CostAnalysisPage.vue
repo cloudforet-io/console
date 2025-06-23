@@ -18,7 +18,6 @@ import CostAnalysisGroupBy from '@/services/cost-explorer/components/CostAnalysi
 import CostAnalysisHeader from '@/services/cost-explorer/components/CostAnalysisHeader.vue';
 import CostAnalysisQuerySection from '@/services/cost-explorer/components/CostAnalysisQuerySection.vue';
 import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
-import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
@@ -33,13 +32,11 @@ const router = useRouter();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 
 // Cost Query Set Query
 const { selectedQuerySet } = useCostQuerySetQuery({
-    data_source_id: computed(() => {
-        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
-        return costQuerySetState.selectedDataSourceId || '';
-    }),
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
     isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
     selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });

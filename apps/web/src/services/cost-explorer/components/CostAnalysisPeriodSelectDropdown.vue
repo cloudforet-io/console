@@ -22,7 +22,7 @@ import {
     PERIOD_DROPDOWN_MENU, PERIOD_DROPDOWN_MENU_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-analysis-period-constant';
 import {
-    GRANULARITY, UNIFIED_COST_KEY,
+    GRANULARITY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import {
@@ -50,13 +50,11 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 
 // Cost Query Set Query
 const { selectedQuerySet } = useCostQuerySetQuery({
-    data_source_id: computed(() => {
-        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
-        return costQuerySetState.selectedDataSourceId || '';
-    }),
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
     isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
     selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
