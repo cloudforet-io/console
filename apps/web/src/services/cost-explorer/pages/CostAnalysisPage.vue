@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    onUnmounted, watch,
+    computed, onUnmounted, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -17,19 +17,29 @@ import CostAnalysisDataTable from '@/services/cost-explorer/components/CostAnaly
 import CostAnalysisGroupBy from '@/services/cost-explorer/components/CostAnalysisGroupBy.vue';
 import CostAnalysisHeader from '@/services/cost-explorer/components/CostAnalysisHeader.vue';
 import CostAnalysisQuerySection from '@/services/cost-explorer/components/CostAnalysisQuerySection.vue';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/types/cost-analysis-url-query-type';
 import type {
     Granularity,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
-
 const route = useRoute();
 const router = useRouter();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
+
+// Cost Query Set Query
+const { selectedQuerySet } = useCostQuerySetQuery({
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
+});
 
 /* util */
 const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetModel['options'] => ({
@@ -43,9 +53,9 @@ onUnmounted(() => {
     costAnalysisPageStore.reset();
 });
 
-watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) => {
-    if (selectedQuerySet) {
-        costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
+watch(() => selectedQuerySet.value, async (_selectedQuerySet) => {
+    if (_selectedQuerySet) {
+        costAnalysisPageStore.setQueryOptions(_selectedQuerySet.options);
     } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
         const currentQuery = router.currentRoute.query;
         const costQuerySetOptions = getQueryOptionsFromUrlQuery(currentQuery);
