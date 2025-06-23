@@ -7,10 +7,8 @@ import { useRoute } from 'vue-router/composables';
 
 import { PHeading } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
@@ -21,17 +19,13 @@ import type {
 
 const route = useRoute();
 
-const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-});
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     protocolLabel: asyncComputed<string>(async () => {
         const labelFromQuery = queryStringToString(route.query?.protocolLabel);
         if (labelFromQuery) return labelFromQuery;
-        const protocols = allReferenceStore.getters.protocol;
-        return protocols[state.protocolId]?.label;
+        return referenceMap.protocol[state.protocolId]?.label || state.protocolId;
     }, '', { lazy: true, onError: (e) => console.error(e) }),
     pageTitle: computed(() => (state.protocolType === 'INTERNAL'
         ? i18n.t('IAM.USER.NOTIFICATION.ASSOCIATED_MEMBER')
@@ -46,7 +40,6 @@ const state = reactive({
         }
         return undefined;
     }),
-    project: computed<ProjectReferenceItem>(() => storeState.projects[state.projectId]),
 });
 </script>
 

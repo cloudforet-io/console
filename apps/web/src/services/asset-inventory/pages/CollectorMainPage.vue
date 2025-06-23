@@ -14,12 +14,9 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CollectorListParameters } from '@/api-clients/inventory/collector/schema/api-verbs/list';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { SpaceRouter } from '@/router';
-import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
@@ -27,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
-import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
+import CollectorProviderList from '@/services/asset-inventory/components/CollectorProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type {
@@ -38,15 +35,10 @@ import type {
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
-const allReferenceStore = useAllReferenceStore();
 
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-});
 const state = reactive({
     initLoading: true,
     hasCollectorList: false,
-    providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
 });
 
 /* Url Query String */
@@ -132,19 +124,16 @@ onMounted(async () => {
                 </router-link>
             </template>
         </p-heading-layout>
-        <p-data-loader
-            :data="state.hasCollectorList"
-            :loading="state.initLoading"
-            loader-backdrop-color="gray.100"
-            class="collector-loader-wrapper"
+        <p-data-loader :data="state.hasCollectorList"
+                       :loading="state.initLoading"
+                       loader-backdrop-color="gray.100"
+                       class="collector-loader-wrapper"
         >
-            <div v-if="state.hasCollectorList && state.providerList.length > 1"
+            <div v-if="state.hasCollectorList"
                  class="collector-contents-wrapper"
             >
-                <provider-list
-                    :provider-list="state.providerList"
-                    :selected-provider="collectorPageState.selectedProvider"
-                    @change-provider="handleSelectedProvider"
+                <collector-provider-list :selected-provider="collectorPageState.selectedProvider"
+                                         @update:selected-provider="handleSelectedProvider"
                 />
                 <collector-contents />
             </div>

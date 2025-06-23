@@ -15,8 +15,8 @@ import {
 } from '@/api-clients/alert-manager/service-channel/schema/constants';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/api-clients/alert-manager/service-channel/schema/type';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';

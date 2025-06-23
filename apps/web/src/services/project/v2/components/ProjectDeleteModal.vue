@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

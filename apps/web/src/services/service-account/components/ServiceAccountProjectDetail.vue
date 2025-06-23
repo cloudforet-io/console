@@ -35,11 +35,11 @@ import {
 
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 export default {
     name: 'ServiceAccountProjectDetail',
@@ -59,18 +59,15 @@ export default {
         },
     },
     setup(props) {
-        const allReferenceStore = useAllReferenceStore();
         const userWorkspaceStore = useUserWorkspaceStore();
         const router = useRouter();
 
         const { getReferenceLocation } = useReferenceRouter();
 
-        const storeState = reactive({
-            projects: computed(() => allReferenceStore.getters.project),
-        });
+        const referenceMap = useAllReferenceDataModel();
         const state = reactive({
             projectName: computed(() => {
-                if (props.projectId) return storeState.projects[props.projectId]?.label ?? '';
+                if (props.projectId) return referenceMap.project[props.projectId]?.label || props.projectId;
                 return '';
             }),
             projectLink: computed(() => {

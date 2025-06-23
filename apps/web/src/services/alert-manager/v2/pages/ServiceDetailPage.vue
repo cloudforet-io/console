@@ -5,14 +5,10 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
-
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -32,14 +28,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const gnbStore = useGnbStore();
 const serviceDetailPageStore = useServiceDetailPageStore();
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const router = useRouter();
 
-const storeState = reactive({
-    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.SERVICE,
@@ -48,7 +41,7 @@ const state = reactive({
     pageNavigation: computed<Route[]>(() => [
         { name: i18n.t('MENU.ALERT_MANAGER') as string, to: { name: ALERT_MANAGER_ROUTE._NAME } },
         { name: i18n.t('MENU.ALERT_MANAGER_SERVICE') as string, to: { name: ALERT_MANAGER_ROUTE.SERVICE._NAME } },
-        { name: storeState.serviceList[props.serviceId].label },
+        { name: referenceMap.service[props.serviceId]?.label || props.serviceId },
     ]),
 });
 
@@ -56,9 +49,8 @@ watch(() => props.serviceId, async (serviceId) => {
     if (!serviceId) return;
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
-watch(() => storeState.serviceList, async (serviceList) => {
-    if (isEmpty(serviceList)) return;
-    gnbStore.setBreadcrumbs(state.pageNavigation);
+watch(() => state.pageNavigation, async (changed) => {
+    gnbStore.setBreadcrumbs(changed);
 }, { immediate: true });
 
 onMounted(() => {

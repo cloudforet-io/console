@@ -21,17 +21,15 @@ import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/u
 import type { WebhookUpdateMessageFormatParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update-message-format';
 import type { WebhookModel, WebhookListErrorsModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { WebhookMessageFormatType } from '@/api-clients/alert-manager/webhook/schema/type';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
-import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -53,8 +51,6 @@ import type { WebhookDetailTabsType } from '@/services/alert-manager/v2/types/al
 
 const EXTRA_WIDTH = 315; // created_at width + show_button width + padding
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
@@ -66,7 +62,6 @@ const errorTableRef = ref<HTMLElement|null>(null);
 const { width } = useElementSize(errorTableRef);
 
 const storeState = reactive({
-    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     language: computed<string>(() => serviceDetailPageGetters.language),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
@@ -183,6 +178,9 @@ const handleChange = async (options: any = {}) => {
     if (options.sortBy !== undefined) messageState.sortBy = options.sortBy;
     if (options.sortDesc !== undefined) messageState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+};
+const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value });
 };
 
 const setWebhookDetail = () => {
@@ -349,7 +347,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                                  :items="state.refinedErrorList"
                                  class="w-full border-none"
                                  @change="handleChange"
-                                 @refresh="queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value })"
+                                 @refresh="handleRefresh"
                 >
                     <template #col-created_at-format="{ value }">
                         {{ iso8601Formatter(value, storeState.timezone) }}

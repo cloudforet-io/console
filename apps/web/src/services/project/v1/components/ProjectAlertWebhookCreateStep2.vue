@@ -14,7 +14,7 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WebhookCreateParameters } from '@/api-clients/monitoring/webhook/schema/api-verbs/create';
 import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
-import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
+import type { PluginGetVersionsParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get-versions';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

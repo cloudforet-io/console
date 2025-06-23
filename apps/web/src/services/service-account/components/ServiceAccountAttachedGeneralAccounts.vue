@@ -32,13 +32,13 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import { SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -66,15 +66,16 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
 const { getReferenceLocation } = useReferenceRouter();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
+
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
-    project: computed(() => allReferenceStore.getters.project),
     loading: true,
     syncReqLoading: false,
     items: [] as any,
@@ -150,11 +151,7 @@ const getProjectDetailLocation = (id: string) => getReferenceLocation(id, { reso
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
-        await Promise.allSettled([
-            userWorkspaceStore.load(),
-            allReferenceStore.load('project'),
-            allReferenceStore.load('service_account'),
-        ]);
+        await userWorkspaceStore.load();
         const convertOptions = {
             ...options,
             sortBy: state.sortBy,
@@ -368,7 +365,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                         <router-link :to="getProjectDetailLocation(value)"
                                      target="_blank"
                         >
-                            <span>{{ state.project[value]?.label }}</span>
+                            <span>{{ referenceMap.project[value]?.label || value }}</span>
                             <p-i name="ic_arrow-right-up"
                                  width="0.75rem"
                                  height="0.75rem"

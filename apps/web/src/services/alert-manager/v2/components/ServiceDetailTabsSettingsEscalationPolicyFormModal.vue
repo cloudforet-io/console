@@ -18,7 +18,7 @@ import type { EscalationPolicyUpdateParameters } from '@/api-clients/alert-manag
 import { ESCALATION_POLICY_STATE } from '@/api-clients/alert-manager/escalation-policy/schema/constants';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

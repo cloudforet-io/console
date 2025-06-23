@@ -5,8 +5,8 @@ import type { QueryKey } from '@tanstack/vue-query';
 
 import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseWebhookListQueryReturn {
     webhookListData: Ref<WebhookModel[]>;

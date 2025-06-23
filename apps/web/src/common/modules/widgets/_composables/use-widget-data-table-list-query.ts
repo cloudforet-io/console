@@ -7,8 +7,8 @@ import { usePrivateDataTableApi } from '@/api-clients/dashboard/private-data-tab
 import { usePublicDataTableApi } from '@/api-clients/dashboard/public-data-table/composables/use-public-data-table-api';
 import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 

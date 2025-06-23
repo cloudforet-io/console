@@ -14,12 +14,12 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
+import type { MetricCreateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/create';
+import type { MetricDeleteParameters } from '@/api-clients/inventory/metric/schema/api-verbs/delete';
+import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
 import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';
 import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
-import type { MetricDeleteParameters } from '@/schema/inventory/metric/api-verbs/delete';
-import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

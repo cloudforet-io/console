@@ -6,10 +6,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PBadge, PDataTable } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -17,7 +16,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification-timezone-helper';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 
 const getBadgeColor = (level: string) => {
@@ -44,6 +42,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
 });
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     loading: false,
     fields: computed(() => [
@@ -55,7 +55,6 @@ const state = reactive({
     ]),
     items: [] as NotiChannelItem[],
     timezone: computed<string|undefined>(() => userStore.state.timezone),
-    protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
 });
 
 const apiQueryHelper = new ApiQueryHelper();
@@ -78,8 +77,6 @@ const listNotificationsChannel = async () => {
     }
 };
 
-const protocolFormatter = (val) => state.protocols[val]?.name || val;
-
 (async () => {
     await listNotificationsChannel();
 })();
@@ -94,7 +91,7 @@ const protocolFormatter = (val) => state.protocols[val]?.name || val;
         class="budget-detail-notifications-channel-table"
     >
         <template #col-protocol_id-format="{value}">
-            {{ protocolFormatter(value) }}
+            {{ referenceMap.protocol[value]?.name || value }}
         </template>
         <template #col-data-format="{ index, item }">
             <p v-if="item.secret_id">

@@ -3,8 +3,8 @@ import { computed } from 'vue';
 
 import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseServiceChannelListQueryReturn {
     serviceChannelListData: Ref<ServiceChannelModel[]>;

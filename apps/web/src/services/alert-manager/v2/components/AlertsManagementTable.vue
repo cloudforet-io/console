@@ -23,8 +23,8 @@ import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/exp
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

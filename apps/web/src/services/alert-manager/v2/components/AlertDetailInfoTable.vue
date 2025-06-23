@@ -13,15 +13,12 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertSeverityType } from '@/api-clients/alert-manager/alert/schema/type';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -38,9 +35,8 @@ type BadgeInfo = {
 
 const userStore = useUserStore();
 const userState = userStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
+const referenceMap = useAllReferenceDataModel();
 
 const router = useRouter();
 const route = useRoute();
@@ -50,10 +46,7 @@ const { alertData } = useAlertGetQuery(route.params.alertId as string);
 const queryHelper = new QueryHelper();
 
 const storeState = reactive({
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     timezone: computed<string>(() => userState.timezone || 'UTC'),
-    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
-    serviceMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
@@ -73,7 +66,7 @@ const tableState = reactive({
 
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
-        return storeState.webhook[id]?.label || id;
+        return referenceMap.alertManagerWebhook[id]?.label || id;
     }
     return id || '--';
 };
@@ -212,8 +205,8 @@ const handleRouteViewButton = async (id: string, type?: string) => {
                 <span>{{ getCreatedByNames(value) }}</span>
             </template>
             <template #data-service_id="{ value }">
-                <p-link v-if="storeState.serviceMap[value]?.label "
-                        :text="storeState.serviceMap[value]?.label"
+                <p-link v-if="referenceMap.service[value]?.label "
+                        :text="referenceMap.service[value]?.label"
                         :to="{
                             name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                             params: {

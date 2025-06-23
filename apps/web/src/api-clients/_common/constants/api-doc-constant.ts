@@ -183,28 +183,13 @@ export const API_DOC = {
         ],
         'cost-report-config': [
             'list',
+            'run',
             'update-recipients',
             'update',
         ],
         'cost-report-data': [
             'analyze',
             'list',
-        ],
-        'report-adjustment-policy': [
-            'create',
-            'delete',
-            'get',
-            'list',
-            'update',
-            'change-order',
-        ],
-        'report-adjustment': [
-            'create',
-            'delete',
-            'get',
-            'list',
-            'update',
-            'change-order',
         ],
         'data-source': [
             'get',
@@ -221,6 +206,23 @@ export const API_DOC = {
         job: [
             'cancel',
             'list',
+        ],
+        'report-adjustment': [
+            'change-order',
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+        ],
+        'report-adjustment-policy': [
+            'change-order',
+            'create',
+            'delete',
+            'get',
+            'list',
+            'sync-currency',
+            'update',
         ],
         'unified-cost': [
             'analyze',
@@ -488,8 +490,44 @@ export const API_DOC = {
         ],
     },
     inventory: {
+        'cloud-service': [
+            'analyze',
+            'get',
+            'list',
+        ],
+        'cloud-service-query-set': [
+            'list',
+        ],
+        'cloud-service-type': [
+            'list',
+            'stat',
+        ],
+        collector: [
+            'collect',
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update-plugin',
+            'update',
+        ],
+        metric: [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'run',
+            'update',
+        ],
         'metric-data': [
             'analyze',
+        ],
+        namespace: [
+            'get',
+            'list',
+        ],
+        region: [
+            'list',
         ],
     },
     monitoring: {
@@ -606,6 +644,24 @@ export const API_DOC = {
         'dashboard-template': [
             'list',
             'register',
+        ],
+        plugin: [
+            'deregister',
+            'disable',
+            'enable',
+            'get-versions',
+            'get',
+            'list',
+            'register',
+            'stat',
+            'update',
+        ],
+    },
+    secret: {
+        secret: [
+            'create',
+            'get',
+            'list',
         ],
     },
 } as const;

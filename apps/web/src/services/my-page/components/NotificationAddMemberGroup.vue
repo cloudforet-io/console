@@ -1,24 +1,17 @@
 <script lang="ts" setup>
 import { useElementBounding } from '@vueuse/core';
 import {
-    computed, reactive, ref, watch,
+    reactive, ref, watch,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PSelectDropdown } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
-
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
-import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -39,27 +32,9 @@ const { top } = useElementBounding(dropdownRef);
 
 const emit = defineEmits<{(e: 'change', member: string[]): void; }>();
 
-const allReferenceStore = useAllReferenceStore();
-const userStore = useUserStore();
-const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    userId: computed<string|undefined>(() => userStore.state.userId),
-});
 const state = reactive({
     loading: true,
     targetProject: null as ProjectModel|null,
-    projectMemberIdList: computed<string[]>(() => {
-        if (!state.targetProject) return [];
-        if (state.targetProject.project_type === 'PUBLIC') return Object.keys(storeState.users);
-        const _users = new Set([storeState.userId, ...(state.targetProject.users ?? [])]);
-        return [..._users];
-    }),
-    allMemberItems: computed<SelectDropdownMenuItem[]>(() => state.projectMemberIdList.map((d) => ({
-        name: d,
-        label: storeState.users[d]?.label ?? d,
-        type: 'item',
-    }))),
     selectedMemberItems: props.users.map((d) => ({ name: d, label: d })),
     workspaceUsers: [] as WorkspaceUserModel[],
     visibleMenu: false,

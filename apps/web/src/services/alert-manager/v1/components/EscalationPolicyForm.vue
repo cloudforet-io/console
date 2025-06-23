@@ -13,13 +13,13 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/api-clients/monitoring/escalation-policy/schema/constants';
 import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
 import type { EscalationPolicyFinishCondition } from '@/api-clients/monitoring/escalation-policy/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
@@ -31,6 +31,7 @@ import { useEscalationPolicyFormStore } from '@/services/alert-manager/v1/stores
 import type { ActionMode } from '@/services/alert-manager/v1/types/alert-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
+
 const props = withDefaults(defineProps<{
     mode: ActionMode;
     showResourceGroup?: boolean;
@@ -41,16 +42,15 @@ const props = withDefaults(defineProps<{
     escalationPolicyData: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const authorizationStore = useAuthorizationStore();
 const { getReferenceLocation } = useReferenceRouter();
 
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
-    //
     resourceGroupLabels: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
@@ -171,7 +171,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                                      resource_type: 'identity.Project',
                                      workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                                  })"
-                                 :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
+                                 :text="referenceMap.project[escalationPolicyFormState.projectId]?.label || escalationPolicyFormState.projectId"
                                  highlight
                         />)
                     </span>

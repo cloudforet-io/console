@@ -10,13 +10,12 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { MENU_ID } from '@/lib/menu/config';
@@ -59,8 +58,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
@@ -69,6 +66,7 @@ const router = useRouter();
 const serviceRouter = useServiceRouter(router);
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
+const referenceMap = useAllReferenceDataModel();
 
 /* Tabs */
 const state = reactive({
@@ -228,7 +226,7 @@ const monitoringState: MonitoringProps = reactive({
                                    size="md"
                                    @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
                     >
-                        {{ allReferenceGetters.workspace[value]?.label }}
+                        {{ referenceMap.workspace[value]?.label || value }}
                         <p-i name="ic_arrow-right-up"
                              class="link-mark"
                              height="0.875rem"
@@ -242,7 +240,7 @@ const monitoringState: MonitoringProps = reactive({
                                    size="md"
                                    @click="handleClickLinkButton('project', item.workspace_id, value)"
                     >
-                        {{ allReferenceGetters.project[value]?.label }}
+                        {{ referenceMap.project[value]?.label || value }}
                         <p-i name="ic_arrow-right-up"
                              class="link-mark"
                              height="0.875rem"

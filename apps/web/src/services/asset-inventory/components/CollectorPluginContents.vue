@@ -72,7 +72,7 @@ import {
 
 
 
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 

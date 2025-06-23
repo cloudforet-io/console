@@ -7,8 +7,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginGetVersionsParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get-versions';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

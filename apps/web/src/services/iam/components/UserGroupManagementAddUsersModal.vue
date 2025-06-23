@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
@@ -9,14 +9,13 @@ import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/mo
 import type { MembersType } from '@/api-clients/identity/user-group/schema/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useUserGroupUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -26,12 +25,7 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-
-const storeState = reactive({
-    userReferenceMap: computed<UserReferenceMap>(() => allReferenceGetters.user),
-});
+const { data: userList } = useUserGroupUserListQuery();
 
 const state = reactive({
     loading: false,
@@ -42,8 +36,9 @@ const state = reactive({
 });
 
 /* Watcher */
-watch(() => storeState.userReferenceMap, (userReferenceStore) => {
-    state.userPool = Object.keys(userReferenceStore);
+watch(userList, (_userList) => {
+    if (!_userList) return;
+    state.userPool = _userList.map((user) => user.user_id);
 }, { deep: true, immediate: true });
 
 watch(() => userGroupPageGetters.selectedUserGroups, (nv_selected_user_group) => {

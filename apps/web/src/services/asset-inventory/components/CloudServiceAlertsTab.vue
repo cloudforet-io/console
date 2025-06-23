@@ -17,12 +17,11 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
 import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -52,13 +51,12 @@ const props = withDefaults(defineProps<Props>(), {
     cloudServiceId: '',
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const userStore = useUserStore();
 const userState = userStore.state;
 
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
     timezone: computed<string>(() => userState.timezone || ''),
 });
 const state = reactive({
@@ -147,7 +145,7 @@ const refreshhAlertData = () => {
 };
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
-        return storeState.webhook[id]?.label || id;
+        return referenceMap.alertManagerWebhook[id]?.label || id;
     }
     return id;
 };

@@ -4,8 +4,8 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorGetParameters } from '@/api-clients/inventory/collector/schema/api-verbs/get';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 

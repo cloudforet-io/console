@@ -12,16 +12,17 @@ import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-
 import type {
     EscalationPolicyFinishCondition,
 } from '@/api-clients/monitoring/escalation-policy/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertStateBadgeStyleTypeFormatter, alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager/v1/helpers/alert-badge-helper';
+
 
 const props = withDefaults(defineProps<{
     loading?: boolean;
@@ -40,12 +41,12 @@ const emit = defineEmits<{(e: 'update:select-index', value: number[]): void;
     (e: 'change', value: { sortBy: string; sortDesc?: boolean }): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const { getReferenceLocation } = useReferenceRouter();
 
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
     finishConditions: computed<Record<EscalationPolicyFinishCondition, TranslateResult>>(() => ({
         ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ACKNOWLEDGED'),
         RESOLVED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.RESOLVED'),
@@ -143,7 +144,7 @@ const onChangeSort = (sortBy: string, sortDesc?: boolean) => {
                                 workspace_id: userWorkspaceStore.getters.currentWorkspaceId,
                             })"
                 >
-                    {{ state.projects[value] ? state.projects[value].label : value }}
+                    {{ referenceMap.project[value]?.label || value }}
                 </p-link>
             </template>
             <span v-else-if="value === '*'" />

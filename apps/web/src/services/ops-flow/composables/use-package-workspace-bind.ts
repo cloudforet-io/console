@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

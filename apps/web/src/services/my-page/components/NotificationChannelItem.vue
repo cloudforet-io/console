@@ -10,9 +10,10 @@ import {
 
 
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
+import type { UserChannelDeleteParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/delete';
 import type { UserChannelDisableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/disable';
 import type { UserChannelEnableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/enable';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
 import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
 import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
@@ -38,7 +39,6 @@ import NotificationChannelItemTopic
     from '@/services/my-page/components/NotificationChannelItemTopic.vue';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 
-import type { UserChannelDeleteParameters } from '@/schema/alert-manager/user-channel/api-verbs/delete';
 
 type ChannelIdType = {
     channel_id?: string;

@@ -5,8 +5,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { Schedule } from '@/schema/inventory/collector/type';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
 import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
 

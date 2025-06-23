@@ -18,12 +18,10 @@ import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/cons
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { TrustedAccountGetParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/get';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -55,15 +53,13 @@ const props = defineProps<{
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
-const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
@@ -89,7 +85,7 @@ const state = reactive({
     providerId: computed(() => state.originServiceAccountItem?.provider),
     provider: computed(() => {
         if (!state.loading) {
-            return storeState.providers[state.providerId] || undefined;
+            return referenceMap.provider[state.providerId] || undefined;
         }
         return undefined;
     }),
@@ -160,9 +156,9 @@ onMounted(async () => {
     await serviceAccountPageStore.fetchCostReportConfig();
 });
 
-watch(() => state.providerId, async (provider) => {
-    serviceAccountPageStore.setProvider(provider ?? '');
-    await serviceAccountSchemaStore.setProviderSchema(provider ?? '');
+watch(() => state.providerId, async (providerId) => {
+    serviceAccountPageStore.setProvider(providerId ?? '');
+    await serviceAccountSchemaStore.setProviderSchema(providerId ?? '');
 });
 /* Watcher */
 watch(() => props.serviceAccountId, async (serviceAccountId) => {

@@ -10,12 +10,11 @@ import {
     PRadioGroup, PRadio, PLazyImg,
 } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
@@ -24,6 +23,9 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
+import {
+    useCloudServiceProviderListQuery,
+} from '@/services/asset-inventory/composables/use-cloud-service-provider-list-query';
 import {
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY, UNIDENTIFIED_PROVIDER,
@@ -46,17 +48,17 @@ const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
 const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 const router = useRouter();
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
+const { data: providerList } = useCloudServiceProviderListQuery();
 const state = reactive({
     currentPath: computed(() => route.fullPath),
     isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
@@ -149,16 +151,16 @@ const state = reactive({
 const providerState = reactive({
     contextMenuItems: computed(() => [
         { name: 'all', label: 'All', icon: undefined },
-        ...Object.keys(storeState.providers).map((k) => ({
-            label: storeState.providers[k].label,
-            name: storeState.providers[k].key,
+        ...(providerList.value || []).map((item) => ({
+            label: item.alias || item.name,
+            name: item.provider,
         })),
     ]),
     selectedItem: computed(() => {
         if (UNIDENTIFIED_PROVIDER === cloudServicePageState.selectedProvider) return UNIDENTIFIED_PROVIDER;
-        const item = storeState.providers[cloudServicePageState.selectedProvider];
-        if (item) {
-            return storeState.providers[cloudServicePageState.selectedProvider].key;
+        const selelcted = referenceMap.provider[cloudServicePageState.selectedProvider];
+        if (selelcted) {
+            return selelcted.key;
         } return 'all';
     }),
 });
@@ -229,7 +231,7 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
                         <p-lazy-img width="1rem"
                                     height="1rem"
                                     error-icon="ic_cloud-filled"
-                                    :src="storeState.providers[item.name]?.icon"
+                                    :src="referenceMap.provider[item.name]?.icon"
                                     class="mr-1"
                         /><span>{{ item.label }}</span>
                     </span>

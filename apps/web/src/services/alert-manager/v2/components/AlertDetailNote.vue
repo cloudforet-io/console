@@ -12,8 +12,8 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { useNoteApi } from '@/api-clients/alert-manager/note/composables/use-note-api';
 import type { NoteCreateParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/create';
 import type { NoteDeleteParameters } from '@/api-clients/alert-manager/note/schema/api-verbs/delete';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

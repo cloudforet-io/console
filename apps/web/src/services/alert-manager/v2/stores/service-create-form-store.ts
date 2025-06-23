@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 
 import type { ProtocolCardItemType, Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 

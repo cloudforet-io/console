@@ -14,7 +14,7 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
-import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+import type { CloudServiceAnalyzeParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/analyze';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

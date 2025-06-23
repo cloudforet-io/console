@@ -4,6 +4,8 @@ import { computed, reactive, watch } from 'vue';
 
 import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -83,6 +85,8 @@ const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
     additionalOptionUiByProvider: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider] ?? {}),
@@ -95,7 +99,7 @@ const state = reactive({
     isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
     mappingItems: computed(() => (state.isDomainForm ? [
         {
-            imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
+            imageUrl: referenceMap.provider[serviceAccountPageStore.state.selectedProvider]?.icon,
             name: 'provider',
         },
         {

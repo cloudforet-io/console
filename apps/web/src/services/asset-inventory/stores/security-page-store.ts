@@ -8,7 +8,7 @@ import { defineStore } from 'pinia';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+import type { CloudServiceAnalyzeParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/analyze';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';

@@ -26,8 +26,8 @@ import { computed, reactive, watch } from 'vue';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n as i18nTranslator } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

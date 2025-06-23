@@ -4,8 +4,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { useBudgetApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-api';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 const DEFAULT_LIST_DATA = { results: [] };
 const STALE_TIME = 1000 * 60 * 5;

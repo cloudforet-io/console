@@ -20,14 +20,8 @@ import type {
     EventRuleActionsMatchAssetType, EventRuleActionsType,
     EventRuleActionsMergeAssetLabelsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
-import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
@@ -43,8 +37,6 @@ import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/us
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 
 const { width } = useWindowSize();
@@ -53,13 +45,7 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const { eventRuleData, eventRuleLoading } = useEventRuleGetQuery();
 
-const storeState = reactive({
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-    cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
-    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
-});
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     actionSetting: getActionSettingI18n(),
@@ -97,7 +83,7 @@ const state = reactive({
                             result[type].push({
                                 label: i18n.t('ALERT_MANAGER.EVENT_RULE.ASSET_TYPE'),
                                 name: 'asset_types',
-                                value: matchAssetValue.asset_types.map((i) => (storeState.cloudServiceType[i] ? storeState.cloudServiceType[i].label : i)).join(', '),
+                                value: matchAssetValue.asset_types.map((i) => (referenceMap.cloudServiceType[i]?.label || i)).join(', '),
                             });
                         }
                         if (matchAssetValue.key) {
@@ -165,9 +151,9 @@ const formatOperator = (value: string): TranslateResult => {
 };
 const getWebhookIcon = (): string|undefined => {
     if (!eventRuleData.value?.webhook_id) return undefined;
-    const webhook = storeState.webhook[eventRuleData.value?.webhook_id]?.data;
+    const webhook = referenceMap.alertManagerWebhook[eventRuleData.value.webhook_id]?.data;
     if (!webhook) return undefined;
-    return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
+    return referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon || '';
 };
 
 const handleEditEventRule = () => {
@@ -238,7 +224,7 @@ const handleDeleteEventRule = () => {
                                                     height="1rem"
                                                     class="icon"
                                         />
-                                        <span>: {{ storeState.webhook[eventRuleData?.webhook_id || '']?.label }}</span>
+                                        <span>: {{ eventRuleData ? (referenceMap.alertManagerWebhook[eventRuleData.webhook_id]?.label || eventRuleData?.webhook_id) : '' }}</span>
                                     </p>
                                 </div>
                             </p-field-group>
@@ -341,7 +327,7 @@ const handleDeleteEventRule = () => {
                                     <p>
                                         <span class="action-paragraph">
                                             <template v-if="action.name === 'change_service'">
-                                                {{ storeState.service[action.value]?.label || action.value }}
+                                                {{ referenceMap.service[action.value]?.label || action.value }}
                                             </template>
                                             <template v-else-if="action.name === 'key'">
                                                 <span>{{ action.value || '--' }}</span>
@@ -353,7 +339,7 @@ const handleDeleteEventRule = () => {
                                                 {{ formatState(action.value) }}
                                             </template>
                                             <template v-else-if="action.name === 'change_escalation_policy'">
-                                                {{ storeState.escalationPolicy[action.value]?.label || action.value }}
+                                                {{ referenceMap.alertManagerEscalationPolicy[action.value]?.label || action.value }}
                                             </template>
                                             <template v-else-if="action.name === 'set_labels'">
                                                 {{ action.value.join(', ') }}

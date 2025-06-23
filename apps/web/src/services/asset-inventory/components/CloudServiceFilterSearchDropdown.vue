@@ -8,21 +8,24 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { RegionReferenceMap, RegionReferenceItem } from '@/store/reference/region-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
+import {
+    useCloudServiceRegionListQuery,
+} from '@/services/asset-inventory/composables/use-cloud-service-region-list-query';
 import {
     CLOUD_SERVICE_CATEGORY,
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY,
 } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { RegionMenuItem } from '@/services/asset-inventory/helpers/cloud-service-filter-helper';
-import { getRegionFilterMenuItem } from '@/services/asset-inventory/helpers/cloud-service-filter-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
 
@@ -56,12 +59,13 @@ const allReferenceStore = useAllReferenceStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
 });
+
+const { data: regionList } = useCloudServiceRegionListQuery();
 const state = reactive({
     searchTerm: '',
     selectedItems: computed<SelectDropdownMenuItem[]>(() => props.selected.map((selectedName) => {
@@ -72,16 +76,39 @@ const state = reactive({
             ...selected,
         };
     })),
-    sortedRegions: computed<RegionReferenceItem[]>(() => {
-        const _sortedRegionItems: RegionReferenceItem[] = Object.values(storeState.regions).sort((a, b) => {
-            if (a.data.provider < b.data.provider) return -1;
-            if (a.data.provider > b.data.provider) return 1;
+    sortedRegions: computed<RegionModel[]>(() => {
+        const _sortedRegionItems: RegionModel[] = (regionList.value || []).sort((a, b) => {
+            if (a.provider < b.provider) return -1;
+            if (a.provider > b.provider) return 1;
             return 0;
         });
         if (cloudServicePageState.selectedProvider === 'all') return _sortedRegionItems;
-        return _sortedRegionItems.filter((r) => r.data.provider === cloudServicePageState.selectedProvider);
+        return _sortedRegionItems.filter((r) => r.provider === cloudServicePageState.selectedProvider);
     }),
-    regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, storeState.regions, storeState.providers))),
+    regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => {
+        const regionKey = d.region_code === 'global' ? `${d.region_code}-${d.provider}` : d.region_code;
+        const region = referenceMap.region[regionKey];
+        if (!region) {
+            return {
+                name: regionKey,
+                label: regionKey,
+                regionName: regionKey,
+                provider: '',
+                color: '',
+                continentLabel: '',
+            };
+        }
+        const continentLabel = region.continent?.continent_label ?? '';
+        const provider = region.data?.provider ? referenceMap.provider[region.data.provider] : undefined;
+        return {
+            name: regionKey,
+            label: `${provider?.label} ${region.name} ${continentLabel}`,
+            regionName: region.name,
+            provider: region?.data?.provider,
+            color: provider?.color,
+            continentLabel,
+        };
+    })),
     menuItems: computed<SelectDropdownMenuItem[]|RegionMenuItem[]>(() => {
         if (props.type === CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT) {
             return Object.values(storeState.projects).map((d) => ({
@@ -144,7 +171,7 @@ const handleChangeSelected = (selected: SelectDropdownMenuItem[]) => {
                 <div class="region-type">
                     <text-highlighting class="region-provider"
                                        :style="{color: item.color}"
-                                       :text="storeState.providers[item.provider] ? storeState.providers[item.provider].label : item.provider"
+                                       :text="referenceMap.provider[item.provider]?.label || item.provider"
                                        :term="state.searchTerm"
                                        style-type="secondary"
                     />

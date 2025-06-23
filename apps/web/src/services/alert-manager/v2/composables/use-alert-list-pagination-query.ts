@@ -10,8 +10,8 @@ import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-a
 import type { AlertListParameters } from '@/api-clients/alert-manager/alert/schema/api-verbs/list';
 import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 
 import { useUserStore } from '@/store/user/user-store';
 

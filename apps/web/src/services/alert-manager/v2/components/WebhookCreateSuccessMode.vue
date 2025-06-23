@@ -11,7 +11,7 @@ import {
 
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

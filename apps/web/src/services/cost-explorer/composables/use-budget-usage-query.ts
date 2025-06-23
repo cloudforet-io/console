@@ -4,8 +4,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
 import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 const DEFAULT_LIST_DATA = { results: [] };
 const STALE_TIME = 1000 * 60 * 5;

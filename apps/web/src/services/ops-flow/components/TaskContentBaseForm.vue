@@ -12,10 +12,10 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
 import type { TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -40,6 +40,9 @@ import { useTaskContentFormStore } from '@/services/ops-flow/stores/task-content
 import {
     useTaskManagementTemplateStore,
 } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
+
+/* reference data */
+const referenceMap = useAllReferenceDataModel();
 
 /* glob stores */
 const userStore = useUserStore();
@@ -206,7 +209,6 @@ watch([isOriginTaskLoading, targetStatusOption, defaultStatusOption], ([loading,
 }, { immediate: true });
 
 /* assignee */
-const userReferenceStore = useUserReferenceStore();
 const handleClickAssign = () => {
     if (!currentTaskType.value) {
         ErrorHandler.handleError(new Error('Task type is not selected'));
@@ -221,7 +223,7 @@ const handleClickAssign = () => {
 const assigneeName = computed<string>(() => {
     const userId = originTask.value?.assignee;
     if (!userId) return '--';
-    const user = userReferenceStore.getters.userItems[userId];
+    const user = referenceMap.workspaceUser[userId];
     return user?.label || user?.name || userId;
 });
 

@@ -24,16 +24,16 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import {
@@ -76,8 +76,6 @@ const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -86,9 +84,9 @@ const userStore = useUserStore();
 
 const router = useRouter();
 const serviceRouter = useServiceRouter(router);
+const referenceMap = useAllReferenceDataModel();
 
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
-
 const state = reactive({
     data: undefined as any,
     loading: true,
@@ -404,7 +402,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                            size="md"
                                            @click="handleClickLinkButton('workspace', value)"
                             >
-                                {{ allReferenceGetters.workspace[value]?.label }}
+                                {{ referenceMap.workspace[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"
@@ -418,7 +416,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                            size="md"
                                            @click="handleClickLinkButton('project', value)"
                             >
-                                {{ allReferenceGetters.project[value]?.label }}
+                                {{ referenceMap.project[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"

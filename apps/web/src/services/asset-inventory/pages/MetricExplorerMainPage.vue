@@ -9,10 +9,10 @@ import {
 import MetricImgAlert from '@/assets/images/metric/img_alert.png';
 import MetricImgHowToUse from '@/assets/images/metric/img_how-to-use.png';
 import MetricImgVisualization from '@/assets/images/metric/img_visualization.png';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -26,17 +26,15 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const allReferenceStore = useAllReferenceStore();
 const router = useRouter();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const userStore = useUserStore();
 
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     language: computed<string|undefined>(() => userStore.state.language),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    namespace: computed(() => allReferenceStore.getters.namespace),
-    metric: computed(() => allReferenceStore.getters.metric),
 });
 
 const state = reactive({
@@ -62,8 +60,8 @@ const state = reactive({
     ]),
     recentList: [] as RecentItem[],
     recentMetricCardList: computed(() => state.recentList.map((recent) => {
-        const metric = storeState.metric[recent.data.id];
-        const namespace = storeState.namespace[metric?.data?.namespace_id ?? ''];
+        const metric = referenceMap.metric[recent.data.id];
+        const namespace = metric?.data?.namespace_id ? referenceMap.namespace[metric?.data?.namespace_id] : undefined;
         if (metric?.label === undefined) return undefined;
         return ({
             id: recent.data.id,

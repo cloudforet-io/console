@@ -1,35 +1,3 @@
-<template>
-    <div class="collector-data-modal">
-        <p-button-modal :visible="collectorDataModalState.visible && !collectorDataModalState.initLoading"
-                        :header-title="state.headerTitle"
-                        :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
-                        :loading="state.loading"
-                        :disabled="!state.secretsCount"
-                        size="sm"
-                        @confirm="handleClickConfirm"
-                        @cancel="handleClickCancel"
-                        @close="handleClickCancel"
-        >
-            <template #body>
-                <div v-if="state.isDuplicateJobs">
-                    <collector-data-duplication-inner :name="state.accountName"
-                                                      :icon="state.provider?.icon"
-                    />
-                </div>
-                <collector-data-default-inner v-else
-                                              :name="state.accountName"
-                                              :icon="state.provider?.icon"
-                                              :secrets-count="state.secretsCount"
-                />
-            </template>
-            <template #confirm-button>
-                <span v-if="state.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
-                <span v-else>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
-            </template>
-        </p-button-modal>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, onUnmounted, reactive, watch,
@@ -41,15 +9,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
+import type { CollectorCollectParameters } from '@/api-clients/inventory/collector/schema/api-verbs/collect';
+import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
+import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import type { JobModel } from '@/schema/inventory/job/model';
-import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
-import type { SecretModel } from '@/schema/secret/secret/model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -66,12 +31,8 @@ import {
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
-const allReferenceStore = useAllReferenceStore();
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-});
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     loading: false,
@@ -88,10 +49,9 @@ const state = reactive({
         }
         return recentJob.status === JOB_STATE.IN_PROGRESS;
     }),
-    serviceAccountReferenceMap: computed(() => allReferenceStore.getters.serviceAccount),
     provider: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
-        return selectedCollector?.provider ? storeState.providers[selectedCollector.provider] : undefined;
+        return selectedCollector?.provider ? referenceMap.provider[selectedCollector.provider] : undefined;
     }),
     accountName: computed(() => {
         const collectDataType = collectorDataModalState.collectDataType;
@@ -102,7 +62,7 @@ const state = reactive({
         const selectedSecret = collectorDataModalState.selectedSecret;
         if (!selectedSecret) return '';
         const id = selectedSecret.service_account_id;
-        return state.serviceAccountReferenceMap[id].name ?? id;
+        return referenceMap.serviceAccount[id]?.name || id;
     }),
     secretFilter: computed(() => collectorDataModalState.selectedCollector?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
@@ -173,3 +133,35 @@ onUnmounted(() => {
     collectorDataModalStore.$dispose();
 });
 </script>
+
+<template>
+    <div class="collector-data-modal">
+        <p-button-modal :visible="collectorDataModalState.visible && !collectorDataModalState.initLoading"
+                        :header-title="state.headerTitle"
+                        :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
+                        :loading="state.loading"
+                        :disabled="!state.secretsCount"
+                        size="sm"
+                        @confirm="handleClickConfirm"
+                        @cancel="handleClickCancel"
+                        @close="handleClickCancel"
+        >
+            <template #body>
+                <div v-if="state.isDuplicateJobs">
+                    <collector-data-duplication-inner :name="state.accountName"
+                                                      :icon="state.provider?.icon"
+                    />
+                </div>
+                <collector-data-default-inner v-else
+                                              :name="state.accountName"
+                                              :icon="state.provider?.icon"
+                                              :secrets-count="state.secretsCount"
+                />
+            </template>
+            <template #confirm-button>
+                <span v-if="state.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
+                <span v-else>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
+            </template>
+        </p-button-modal>
+    </div>
+</template>

@@ -27,16 +27,15 @@ import type {
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
+import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -86,8 +85,6 @@ const props = withDefaults(defineProps<Props>(), {
     isSecurityPage: false,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
@@ -102,10 +99,7 @@ const router = useRouter();
 const serviceRouter = useServiceRouter(router);
 
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
-
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-});
+const referenceMap = useAllReferenceDataModel();
 
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
@@ -540,7 +534,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                            @click-back-button="$router.go(-1)"
                 />
                 <p-heading v-else-if="props.isSecurityPage"
-                           :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
+                           :title="props.provider ? `[${referenceMap.provider[props.provider]?.label || props.provider}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
                            use-total-count
                            use-selected-count
                            :total-count="typeOptionState.totalCount"
@@ -629,7 +623,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                                            size="md"
                                            @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
                             >
-                                {{ allReferenceGetters.workspace[value]?.label }}
+                                {{ referenceMap.workspace[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"
@@ -639,11 +633,11 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                             </p-text-button>
                         </template>
                         <template #col-provider-format="{value}">
-                            <p-badge v-if="storeState.providers[value]"
-                                     :background-color="storeState.providers[value]?.color"
+                            <p-badge v-if="referenceMap.provider[value]"
+                                     :background-color="referenceMap.provider[value]?.color"
                                      text-color="white"
                             >
-                                {{ storeState.providers[value]?.label }}
+                                {{ referenceMap.provider[value]?.label || value }}
                             </p-badge>
                         </template>
                         <template #col-project_id-format="{value, item}">
@@ -651,7 +645,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                                            size="md"
                                            @click="handleClickLinkButton('project', item.workspace_id, value)"
                             >
-                                {{ allReferenceGetters.project[value]?.label }}
+                                {{ referenceMap.project[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"

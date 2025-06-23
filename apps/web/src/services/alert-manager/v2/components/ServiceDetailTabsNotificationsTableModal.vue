@@ -13,7 +13,7 @@ import type { ServiceChannelDisableParameters } from '@/api-clients/alert-manage
 import type { ServiceChannelEnableParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/enable';
 import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

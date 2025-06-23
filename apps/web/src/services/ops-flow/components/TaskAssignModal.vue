@@ -12,7 +12,8 @@ import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import type { UserReferenceItem } from '@/store/reference/user-reference-store';
@@ -32,6 +33,9 @@ const userReferenceStore = useUserReferenceStore();
 const taskAssignStore = useTaskAssignStore();
 const taskDetailPageStore = useTaskDetailPageStore();
 
+/* reference data */
+const referenceMap = useAllReferenceDataModel();
+
 /* user items */
 const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.values<UserReferenceItem>(userReferenceStore.getters.userItems).map((u) => ({
     name: u.key,
@@ -40,9 +44,7 @@ const allUserReferenceItems = computed<SelectDropdownMenuItem[]>(() => Object.va
 const allUserItems = computed<SelectDropdownMenuItem[]>(() => {
     const assigneePool = taskAssignStore.state.currentAssigneePool;
     if (assigneePool && assigneePool.length > 0) {
-        return assigneePool.map((d) => (userReferenceStore.getters.userItems[d]
-            ? { name: d, label: userReferenceStore.getters.userItems[d].label || userReferenceStore.getters.userItems[d].name }
-            : { name: d, label: d }));
+        return assigneePool.map((d) => ({ name: d, label: referenceMap.workspaceUser[d]?.label || referenceMap.workspaceUser[d]?.name || d }));
     }
     return allUserReferenceItems.value;
 });

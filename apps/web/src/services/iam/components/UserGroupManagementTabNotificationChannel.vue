@@ -18,9 +18,9 @@ import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/api-clients/alert-manager/us
 import type {
     UserGroupChannelScheduleInfoType,
 } from '@/api-clients/alert-manager/user-group-channel/schema/type';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

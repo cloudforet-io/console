@@ -10,24 +10,17 @@ import {
 
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { gray } from '@/styles/colors';
 
 import BudgetDetailInfoAmountPlanningTypePopover from '@/services/cost-explorer/components/BudgetDetailInfoAmountPlanningTypePopover.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
-
-const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
-
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -37,11 +30,7 @@ const { getReferenceLocation } = useReferenceRouter();
 const costTypeWrapperRef = ref<HTMLElement|null>(null);
 const costTypeRef = ref<HTMLElement|null>(null);
 
-const storeState = reactive({
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-});
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     isProjectTarget: computed(() => state.budgetData?.resource_group === 'PROJECT'),
@@ -49,19 +38,19 @@ const state = reactive({
         if (!budgetPageState.budgetData) return '';
         const providerFilter = budgetPageState.budgetData?.provider_filter;
         if (providerFilter?.state === 'DISABLED') return 'All';
-        return changeToLabelList(providerFilter?.providers ?? []);
+        return (providerFilter?.providers ?? []).map((_provider) => referenceMap.provider[_provider]?.label ?? '').join(', ') || 'All';
     }),
     targetLabel: computed<{ group?: string, name: string }>(() => {
         const targetId = state.isProjectTarget ? state.budgetData?.project_id : state.budgetData?.workspace_id;
         if (state.isProjectTarget) {
-            const project = storeState.projects[targetId];
+            const project = referenceMap.project[targetId];
             return {
                 group: project?.data?.groupInfo?.name ?? '',
                 name: project?.name ?? targetId,
             };
         }
         return {
-            name: storeState.workspaces[targetId]?.name ?? targetId,
+            name: referenceMap.workspace[targetId]?.name ?? targetId,
         };
     }),
     targetLocation: computed<Location|undefined>(() => {

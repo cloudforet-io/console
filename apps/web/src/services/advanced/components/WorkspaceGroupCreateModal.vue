@@ -15,10 +15,8 @@ import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceGroupReferenceMap } from '@/store/reference/workspace-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -27,6 +25,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
+import { useWorkspaceGroupNameListQuery } from '@/services/advanced/composables/use-workspace-group-name-list-query';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
@@ -35,20 +34,17 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
-const allReferenceStore = useAllReferenceStore();
-
 const emit = defineEmits<{(e: 'confirm'): void,
 }>();
 
 const state = reactive({
-    workspaceGroups: computed<WorkspaceGroupReferenceMap>(() => allReferenceStore.getters.workspace_group),
-    workspaceGroupNames: computed(() => Object.values(state.workspaceGroups).map((item:any) => item.name)),
     loading: false,
     menuIds: computed<string[]>(() => menuList.value.map((item) => item.name)),
     isSelectDropdownVisible: false,
     isEllipsisMap: {} as Record<string, boolean>,
 });
-
+const referenceMap = useAllReferenceDataModel();
+const { data: workspaceGroupNameList } = useWorkspaceGroupNameListQuery();
 const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
@@ -59,7 +55,7 @@ const {
         if (!value.length) {
             return false;
         }
-        if (state.workspaceGroupNames.includes(value.trim())) {
+        if (workspaceGroupNameList.value?.includes(value.trim())) {
             return i18n.t('IAM.WORKSPACE_GROUP.MODAL.CREATE_NAME_INVALID_DUPLICATED');
         }
 
@@ -217,7 +213,7 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
                                             <span v-else
                                                   :class="{'label-text': true, 'group-exist': !item?.workspace_group_id}"
                                             >{{ item.label }}</span>
-                                            <span>{{ state.workspaceGroups[item.workspace_group_id]?.label }}</span>
+                                            <span>{{ referenceMap.workspaceGroup[item.workspace_group_id]?.label || item.workspace_group_id }}</span>
                                         </div>
                                     </div>
                                 </template>

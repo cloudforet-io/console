@@ -4,7 +4,6 @@ import { computed, reactive, watch } from 'vue';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
@@ -19,8 +18,6 @@ import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { Currency } from '@/store/display/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -29,11 +26,8 @@ import type { BaseInformationForm, CredentialForm } from '@/services/service-acc
 
 
 interface Getters {
-    autoSyncAdditionalOptionsSchema: ComputedRef<JsonSchema|undefined>;
-    selectedProviderItem: ComputedRef<ProviderItem>;
     scheduleHours: ComputedRef<number[]>;
     isAllValidToCreate: ComputedRef<boolean>;
-    supportAutoSync: ComputedRef<boolean>;
     isOriginAutoSyncEnabled: ComputedRef<boolean>;
     isMainProvider: ComputedRef<boolean>;
     lastSuccessSynced: ComputedRef<string>;
@@ -69,7 +63,6 @@ interface FormState {
 const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
 
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
-    const allReferenceStore = useAllReferenceStore();
     const appContextStore = useAppContextStore();
     const userStore = useUserStore();
 
@@ -103,11 +96,8 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     });
 
     const getters = reactive<Getters>({
-        selectedProviderItem: computed(() => allReferenceStore.getters.provider[state.selectedProvider]),
-        autoSyncAdditionalOptionsSchema: computed(() => getters.selectedProviderItem?.data?.plugin_info?.metadata?.additional_options_schema),
         scheduleHours: computed(() => formState.scheduleHours),
         isAllValidToCreate: computed(() => getters.isAutoSyncFormValid),
-        supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
         isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem?.schedule?.state === 'ENABLED')),
         isMainProvider: computed(() => MAIN_PROVIDER.includes(state.selectedProvider ?? '')),
         lastSuccessSynced: computed(() => state.syncJobList.find((job) => job.status === 'SUCCESS')?.finished_at ?? ''),

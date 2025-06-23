@@ -23,7 +23,7 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';

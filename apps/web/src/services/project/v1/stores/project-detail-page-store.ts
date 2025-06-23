@@ -10,8 +10,8 @@ import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import type { AlertState } from '@/api-clients/monitoring/alert/schema/type';
 import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
-import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginListParameters } from '@/api-clients/repository/plugin/schema/api-verbs/list';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
 

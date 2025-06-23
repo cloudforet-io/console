@@ -6,7 +6,7 @@ import {
 import { useQueryClient } from '@tanstack/vue-query';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';

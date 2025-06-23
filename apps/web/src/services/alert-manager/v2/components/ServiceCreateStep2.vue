@@ -2,7 +2,7 @@
 import { computed, onUnmounted, reactive } from 'vue';
 
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 
 import ServiceCreateStepContainer from '@/services/alert-manager/v2/components/ServiceCreateStepContainer.vue';
 import WebhookCreateForm from '@/services/alert-manager/v2/components/WebhookCreateForm.vue';

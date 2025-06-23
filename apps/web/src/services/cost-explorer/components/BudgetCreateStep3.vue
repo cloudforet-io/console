@@ -10,9 +10,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { BudgetCreateParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/create';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -24,7 +23,8 @@ import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
-const userReferenceStore = useUserReferenceStore();
+
+const referenceMap = useAllReferenceDataModel();
 
 const router = useRouter();
 
@@ -174,8 +174,8 @@ const createBudget = (type: 'skip' | 'create') => {
         </p-button>
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ALERT_RECIPIENTS')"
                        :help-text="`${$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADD_RECIPIENTS_TEXT')} ${budgetCreatePageState.budgetManager}
-                            ${userReferenceStore.getters.userItems[budgetCreatePageState.budgetManager]?.name
-                       ? `(${userReferenceStore.getters.userItems[budgetCreatePageState.budgetManager].name})` : ''}`"
+                            ${referenceMap.user[budgetCreatePageState.budgetManager]?.name
+                       ? `(${referenceMap.user[budgetCreatePageState.budgetManager]?.name || budgetCreatePageState.budgetManager || ''})` : ''}`"
                        class="mt-8 flex flex-col gap-1"
                        required
         >

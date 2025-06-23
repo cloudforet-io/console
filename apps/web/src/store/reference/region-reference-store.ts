@@ -6,8 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
-import type { RegionModel } from '@/schema/inventory/region/model';
+import type { RegionListParameters } from '@/api-clients/inventory/region/schema/api-verbs/list';
+import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {

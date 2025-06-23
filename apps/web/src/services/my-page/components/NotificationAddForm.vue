@@ -11,7 +11,7 @@ import {
 
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelCreateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/create';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelCreateParameters } from '@/schema/notification/project-channel/api-verbs/create';
 import type { ChannelSchedule } from '@/schema/notification/type';

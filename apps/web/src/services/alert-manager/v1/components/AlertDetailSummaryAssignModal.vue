@@ -5,9 +5,8 @@ import {
 
 import { PButtonModal, PToolboxTable } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -35,10 +34,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
 const alertAssignUserStore = useAlertAssignUserStore();
 const alertAssignUserState = alertAssignUserStore.state;
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -52,7 +51,7 @@ const state = reactive({
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = alertAssignUserState.userIds.map((d) => ({
             user_id: d,
-            user_name: allReferenceStore.getters.user[d]?.label ?? d,
+            user_name: referenceMap.workspaceUser[d]?.label || d,
         }));
         const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();

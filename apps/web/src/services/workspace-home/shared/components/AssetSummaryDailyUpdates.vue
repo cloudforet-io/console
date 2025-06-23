@@ -8,9 +8,6 @@ import {
     PFieldTitle, PIconButton, PEmpty,
 } from '@cloudforet/mirinae';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
-
 import AssetSummaryDailyUpdateItem from '@/services/workspace-home/shared/components/AssetSummaryDailyUpdateItem.vue';
 import type { DailyUpdateItem } from '@/services/workspace-home/shared/types/asset-daily-updates-type';
 
@@ -27,18 +24,10 @@ const props = withDefaults(defineProps<{
     dailyUpdates: () => [],
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
-
-const storeState = reactive({
-    cloudServiceTypeMap: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloud_service_type),
-});
-
 const state = reactive({
-    cloudServiceTypeList: computed<CloudServiceTypeItem[]>(() => Object.values(storeState.cloudServiceTypeMap)),
     pageStart: 0,
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_PADDING) / DAILY_UPDATE__DEFAULT_WIDTH)),
     pageMax: computed<number>(() => Math.max(props.dailyUpdates.length - state.visibleCount, 0)),

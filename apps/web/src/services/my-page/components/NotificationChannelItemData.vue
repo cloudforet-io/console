@@ -8,10 +8,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
@@ -34,8 +33,8 @@ const emit = defineEmits<{(event: 'change'): void;
     (event: 'edit', value?: Record<string, any>): void;
 }>();
 
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
+const referenceMap = useAllReferenceDataModel();
 
 const {
     state: notificationItemState,
@@ -54,7 +53,6 @@ const state = reactive({
     keyListForRead: [],
     valueList: [],
     //
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     language: computed<string|undefined>(() => userStore.state.language),
     schema: props.channelData.schema,
     isSecretData: computed<boolean>(() => !!props.channelData.secret_id),
@@ -220,16 +218,17 @@ watch(() => notificationItemState.isEditMode, (mode) => {
                     <span v-if="notificationItemState.dataForEdit?.users?.includes('*')">
                         {{ $t('PROJECT.DETAIL.NOTIFICATION_ALL_USERS') }}
                     </span>
-                    <p-badge v-for="(userId, index) in notificationItemState.dataForEdit?.users"
-                             v-else
-                             :key="`users-${index}`"
-                             badge-type="subtle"
-                             style-type="gray200"
-                             shape="square"
-                             class="mr-2 rounded"
-                    >
-                        {{ state.users[userId] ? state.users[userId].label : userId }}
-                    </p-badge>
+                    <template v-else>
+                        <p-badge v-for="(userId, index) in notificationItemState.dataForEdit?.users"
+                                 :key="`users-${index}`"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                                 shape="square"
+                                 class="mr-2 rounded"
+                        >
+                            {{ referenceMap.workspaceUser[userId]?.label || userId }}
+                        </p-badge>
+                    </template>
                 </div>
                 <div v-else-if="state.isSecretData"
                      class="inline"

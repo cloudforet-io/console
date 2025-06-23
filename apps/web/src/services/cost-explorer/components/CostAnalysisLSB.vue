@@ -7,13 +7,13 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
@@ -57,10 +57,11 @@ const route = useRoute();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
     isAdminUser: computed<boolean>(() => userStore.state.roleType === 'DOMAIN_ADMIN'),
@@ -156,7 +157,7 @@ const dataSourceState = reactive({
         return Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
-            imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
+            imageUrl: referenceMap.plugin[value.data.plugin_info?.plugin_id]?.icon || 'error',
         }));
     }),
     selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),

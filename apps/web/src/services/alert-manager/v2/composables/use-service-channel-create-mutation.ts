@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import type { ServiceChannelCreateParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create';
 import type { ServiceChannelCreateForwardChannelParameters } from '@/api-clients/alert-manager/service-channel/schema/api-verbs/create-forward-channel';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

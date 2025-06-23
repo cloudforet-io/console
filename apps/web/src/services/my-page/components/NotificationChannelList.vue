@@ -18,17 +18,14 @@ import type { Tags } from '@/api-clients/_common/schema/model';
 import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
-import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
-import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
@@ -41,6 +38,9 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
+import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
+import type { ProtocolModel } from '@/schema/notification/protocol/model';
+
 interface EnrichedProtocolItem extends ProtocolModel {
     label: TranslateResult;
     link: Partial<Location>;
@@ -49,11 +49,10 @@ interface EnrichedProtocolItem extends ProtocolModel {
     icon: any;
     id: string;
 }
-const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
 
-
+const referenceMap = useAllReferenceDataModel();
 const props = withDefaults(defineProps<{
     projectId?: string;
     manageDisabled?: boolean;
@@ -76,7 +75,6 @@ const state = reactive({
     protocolList: computed<EnrichedProtocolItem[]>(() => (
         state.defaultProtocolResp.map((d) => createProtocolItem(d))
     )),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 
 const createProtocolItem = (d) => {
@@ -94,7 +92,7 @@ const createProtocolItem = (d) => {
         protocolType: d.protocol_type,
         tags: d.tags,
         plugin_info: d.plugin_info,
-        icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
+        icon: referenceMap.plugin[d.plugin_info?.plugin_id]?.icon || '',
         name: d.name,
     };
 };
