@@ -4,12 +4,9 @@ import dayjs from 'dayjs';
 import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { CostQuerySetCreateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/create';
-import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
@@ -23,7 +20,6 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import {
     useCostDataSourceFilterMenuItems,
 } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     DEFAULT_UNIFIED_COST_CURRENCY, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP,
@@ -47,7 +43,6 @@ const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, str
 export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => {
     const allReferenceStore = useAllReferenceStore();
     const costQuerySetStore = useCostQuerySetStore();
-    const costQuerySetGetters = costQuerySetStore.getters;
     const costQuerySetState = costQuerySetStore.state;
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -78,22 +73,6 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
     const getters = reactive({
         workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
         defaultWorkspaceScope: computed<string|undefined>(() => (workspaceStoreGetters.workspaceList[0]?.workspace_id)),
-        selectedQueryId: computed(() => costQuerySetState.selectedQuerySetId),
-        costQueryList: computed(() => costQuerySetState.costQuerySetList),
-        selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
-        convertedOriginFilter: computed<Record<string, ConsoleFilterValue | ConsoleFilterValue[]>>(() => {
-            const originFilters:ConsoleFilter[] = getters.selectedQuerySet?.options?.filters ?? [];
-            const _selectedItemsMap: Record<string, ConsoleFilterValue | ConsoleFilterValue[]> = {};
-            (originFilters ?? []).forEach((queryFilter:ConsoleFilter) => {
-                if (queryFilter.k) {
-                    _selectedItemsMap[queryFilter.k] = queryFilter.v;
-                }
-            });
-            return _selectedItemsMap;
-        }),
-        selectedDataSourceId: computed(() => costQuerySetState.selectedDataSourceId),
-        isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
-        managedCostQuerySetList: computed(() => costQuerySetGetters.managedCostQuerySets),
         currency: computed<Currency>(() => {
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
@@ -236,59 +215,14 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             state.enabledFiltersProperties = getters.visibleGroupByItems.map((d) => d.name);
         }
     };
-    const saveQuery = async (name: string): Promise<CostQuerySetModel|undefined> => {
-        const options: CostQuerySetModel['options'] = {
-            granularity: state.granularity,
-            period: state.period,
-            relative_period: state.relativePeriod,
-            group_by: state.groupBy,
-            filters: getters.consoleFilters,
-            display_data_type: state.displayDataType,
-            workspace_scope: state.workspaceScope,
-            is_all_workspace_selected: state.isAllWorkspaceSelected,
-            metadata: { filters_schema: { enabled_properties: state.enabledFiltersProperties ?? [] } },
-        };
-        let createdData;
-        try {
-            createdData = await SpaceConnector.clientV2.costAnalysis.costQuerySet.create<CostQuerySetCreateParameters, CostQuerySetModel>({
-                name,
-                data_source_id: costQuerySetState.selectedDataSourceId as string,
-                options,
-            });
-            selectQueryId(createdData.cost_query_set_id);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-        return createdData;
-    };
     const selectQueryId = (querySetId: string|undefined) => {
         costQuerySetStore.setSelectedQuerySetId(querySetId);
-    };
-    const editQuery = async (querySetId: string, name: string): Promise<CostQuerySetModel> => {
-        let updatedQueryData;
-        if (costQuerySetGetters.selectedQuerySet?.name !== name) {
-            try {
-                updatedQueryData = await SpaceConnector.clientV2.costAnalysis.costQuerySet.update<CostQuerySetUpdateParameters, CostQuerySetModel>({
-                    cost_query_set_id: querySetId,
-                    name,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        }
-        return updatedQueryData;
-    };
-    const listCostQueryList = async () => {
-        await costQuerySetStore.listCostQuerySets();
     };
 
     const actions = {
         reset,
         setQueryOptions,
-        saveQuery,
         selectQueryId,
-        editQuery,
-        listCostQueryList,
     };
     const mutations = {
         setChartGroupBy,
