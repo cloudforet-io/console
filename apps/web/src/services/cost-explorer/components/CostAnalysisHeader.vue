@@ -3,11 +3,13 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PIconButton, PHeading, PLazyImg, PDivider, PI, PHeadingLayout, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
 import type { CostQuerySetDeleteParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/delete';
 import { i18n } from '@/translations';
 
@@ -27,20 +29,23 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray } from '@/styles/colors';
 
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
-
 const gnbStore = useGnbStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -50,30 +55,67 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
 
+/* Query */
+const { costQuerySetList, refetch: refreshCostQuerySets, selectedQuerySet } = useCostQuerySetQuery({
+    data_source_id: costQuerySetState.selectedDataSourceId || '',
+    isUnifiedCostOn: costQuerySetState.isUnifiedCostOn,
+});
+const queryClient = useQueryClient();
+const { costQuerySetAPI } = useCostQuerySetApi();
+
 const storeState = reactive({
-    isUnifiedCost: computed(() => costAnalysisPageGetters.isUnifiedCost),
+    isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-    title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? state.defaultTitle),
+    title: computed<string>(() => selectedQuerySet.value?.name ?? state.defaultTitle),
     dataSourceImage: computed(() => costAnalysisPageGetters.dataSourceImageUrl),
-    managedCostQuerySetList: computed(() => costAnalysisPageGetters.managedCostQuerySetList),
-    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageGetters.selectedQueryId
-        ? state.managedCostQuerySetList.some((item) => item.cost_query_set_id === costAnalysisPageGetters.selectedQueryId)
+    managedCostQuerySetList: computed(() => costQuerySetList.value || []),
+    isManagedCostQuerySet: computed<boolean>(() => (costQuerySetState.selectedQuerySetId
+        ? state.managedCostQuerySetList.some((item) => item.cost_query_set_id === costQuerySetState.selectedQuerySetId)
         : false)),
     itemIdForDeleteQuery: '',
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
-    isEditableQuerySet: computed<boolean>(() => (hasReadWriteAccess.value || false) && costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
+    isEditableQuerySet: computed<boolean>(() => (hasReadWriteAccess.value || false) && costQuerySetState.selectedQuerySetId !== DYNAMIC_COST_QUERY_SET_PARAMS),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.COST_ANALYSIS,
         id: state.isManagedCostQuerySet
-            ? getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId || '', costAnalysisPageGetters.selectedQueryId || '')
-            : costAnalysisPageGetters.selectedQueryId || '',
+            ? getCompoundKeyWithManagedCostQuerySetFavoriteKey(costQuerySetState.selectedDataSourceId || '', costQuerySetState.selectedQuerySetId || '')
+            : costQuerySetState.selectedQuerySetId || '',
     })),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
+
+/* Mutation */
+const { mutate: deleteCostQuerySet } = useMutation({
+    mutationFn: (params: CostQuerySetDeleteParameters) => costQuerySetAPI.delete(params),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['cost-explorer', 'cost-query-set', 'list'] });
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
+
+        await router.push({
+            name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: costQuerySetState.selectedDataSourceId as string,
+                costQuerySetId: state.managedCostQuerySetList[0]?.cost_query_set_id || '',
+            },
+        }).catch(() => {});
+
+        const isFavoriteItem = favoriteGetters.costAnalysisItems.find((item) => item.itemId === state.itemIdForDeleteQuery);
+        if (isFavoriteItem) {
+            await favoriteStore.deleteFavorite({
+                itemType: FAVORITE_TYPE.COST_ANALYSIS,
+                workspaceId: state.currentWorkspaceId || '',
+                itemId: state.itemIdForDeleteQuery,
+            });
+        }
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
+    },
 });
 
 /* Event Handlers */
@@ -88,33 +130,12 @@ const handleClickEditQuery = (id: string) => {
 };
 
 const handleUpdateQuery = () => {
-    costAnalysisPageStore.listCostQueryList();
+    refreshCostQuerySets();
 };
 
 const handleDeleteQueryConfirm = async () => {
     state.queryDeleteModalVisible = false;
-    try {
-        await SpaceConnector.clientV2.costAnalysis.costQuerySet.delete<CostQuerySetDeleteParameters>({ cost_query_set_id: state.itemIdForDeleteQuery });
-        await costAnalysisPageStore.listCostQueryList();
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
-        await router.push({
-            name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-            params: {
-                dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
-                costQuerySetId: costAnalysisPageGetters.managedCostQuerySetList[0].cost_query_set_id,
-            },
-        }).catch(() => {});
-        const isFavoriteItem = favoriteGetters.costAnalysisItems.find((item) => item.itemId === state.itemIdForDeleteQuery);
-        if (isFavoriteItem) {
-            await favoriteStore.deleteFavorite({
-                itemType: FAVORITE_TYPE.COST_ANALYSIS,
-                workspaceId: state.currentWorkspaceId || '',
-                itemId: state.itemIdForDeleteQuery,
-            });
-        }
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
-    }
+    deleteCostQuerySet({ cost_query_set_id: state.itemIdForDeleteQuery });
 };
 
 const handleRouteToUnifiedCostSettings = () => {
@@ -153,16 +174,16 @@ watch(() => state.favoriteOptions, async (favoriteOptions) => {
                             />
                         </div>
                     </template>
-                    <template v-if="costAnalysisPageGetters.selectedQueryId && state.isEditableQuerySet && !state.isManagedCostQuerySet"
+                    <template v-if="costQuerySetState.selectedQuerySetId && state.isEditableQuerySet && !state.isManagedCostQuerySet"
                               #title-right-extra
                     >
                         <p-icon-button name="ic_edit-text"
                                        size="md"
-                                       @click.stop="handleClickEditQuery(costAnalysisPageGetters.selectedQueryId)"
+                                       @click.stop="handleClickEditQuery(costQuerySetState.selectedQuerySetId)"
                         />
                         <p-icon-button name="ic_delete"
                                        size="md"
-                                       @click.stop="handleClickDeleteQuery(costAnalysisPageGetters.selectedQueryId)"
+                                       @click.stop="handleClickDeleteQuery(costQuerySetState.selectedQuerySetId)"
                         />
                     </template>
                 </p-heading>

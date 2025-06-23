@@ -7,13 +7,15 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButton, PContextMenu, PIconButton, PPopover, PBadge, PSelectDropdown, PFieldTitle,
     useContextMenuController, PCheckbox, PButtonModal, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
 import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
@@ -30,6 +32,7 @@ import CostAnalysisDataTypeDropdown from '@/services/cost-explorer/components/Co
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
     from '@/services/cost-explorer/components/CostAnalysisGranularityPeriodDropdown.vue';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_ID_LIST,
@@ -37,6 +40,7 @@ import {
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
@@ -44,6 +48,8 @@ const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/compon
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 const appContextStore = useAppContextStore();
 
 const filtersPopperRef = ref<any|null>(null);
@@ -54,6 +60,14 @@ const targetRef = ref<HTMLElement | null>(null);
 const { hasReadWriteAccess } = usePageEditableStatus();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 const router = useRouter();
+
+const { managedCostQuerySets, refetch: refreshCostQuerySets } = useCostQuerySetQuery({
+    data_source_id: costQuerySetState.selectedDataSourceId || '',
+    isUnifiedCostOn: costQuerySetState.isUnifiedCostOn,
+});
+
+const queryClient = useQueryClient();
+const { costQuerySetAPI } = useCostQuerySetApi();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -68,9 +82,8 @@ const state = reactive({
             label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
         },
     ])),
-    selectedQuerySetId: computed(() => costAnalysisPageGetters.selectedQueryId),
-    isManagedQuerySet: computed(() => costAnalysisPageGetters.managedCostQuerySetList.map((d) => d.cost_query_set_id).includes(state.selectedQuerySetId)),
-    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
+    isManagedQuerySet: computed(() => managedCostQuerySets.value?.map((d) => d.cost_query_set_id).includes(costQuerySetState.selectedQuerySetId ?? '') || false),
+    isDynamicQuerySet: computed<boolean>(() => costQuerySetState.selectedQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     isPeriodInvalid: computed<boolean>(() => costAnalysisPageGetters.isPeriodInvalid),
@@ -99,30 +112,36 @@ const {
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
-/* event */
-const handleSaveQuerySet = async () => {
-    try {
-        const filters = costAnalysisPageState.isAllWorkspaceSelected ? costAnalysisPageGetters.consoleFilters : costAnalysisPageGetters.consoleFilters.filter((d) => d.k !== GROUP_BY.WORKSPACE);
-
-        await SpaceConnector.clientV2.costAnalysis.costQuerySet.update<CostQuerySetUpdateParameters>({
-            cost_query_set_id: costAnalysisPageGetters.selectedQueryId as string,
-            options: {
-                granularity: costAnalysisPageState.granularity,
-                period: costAnalysisPageState.period,
-                relative_period: costAnalysisPageState.relativePeriod,
-                group_by: costAnalysisPageState.groupBy,
-                filters,
-                display_data_type: costAnalysisPageState.displayDataType,
-                workspace_scope: costAnalysisPageState.workspaceScope,
-                is_all_workspace_selected: costAnalysisPageState.isAllWorkspaceSelected,
-                metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
-            },
-        });
-        await costAnalysisPageStore.listCostQueryList();
+/* Mutation */
+const { mutate: updateCostQuerySet } = useMutation({
+    mutationFn: (params: CostQuerySetUpdateParameters) => costQuerySetAPI.update(params),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['cost-explorer', 'cost-query-set', 'list'] });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
+    },
+});
+
+/* Event */
+const handleSaveQuerySet = async () => {
+    const filters = costAnalysisPageState.isAllWorkspaceSelected ? costAnalysisPageGetters.consoleFilters : costAnalysisPageGetters.consoleFilters.filter((d) => d.k !== GROUP_BY.WORKSPACE);
+
+    updateCostQuerySet({
+        cost_query_set_id: costQuerySetState.selectedQuerySetId as string,
+        options: {
+            granularity: costAnalysisPageState.granularity,
+            period: costAnalysisPageState.period,
+            relative_period: costAnalysisPageState.relativePeriod,
+            group_by: costAnalysisPageState.groupBy,
+            filters,
+            display_data_type: costAnalysisPageState.displayDataType,
+            workspace_scope: costAnalysisPageState.workspaceScope,
+            is_all_workspace_selected: costAnalysisPageState.isAllWorkspaceSelected,
+            metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
+        },
+    });
 };
 const handleClickMoreMenuButton = () => {
     if (visibleContextMenu.value) hideContextMenu();
@@ -132,12 +151,12 @@ const handleClickSaveAsButton = () => {
     state.queryFormModalVisible = true;
 };
 const handleUpdateQuery = async (updatedQueryId: string) => {
-    await costAnalysisPageStore.listCostQueryList();
+    await refreshCostQuerySets();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
     await router.push({
         name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
-            dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
+            dataSourceId: costQuerySetState.selectedDataSourceId as string,
             costQuerySetId: updatedQueryId,
         },
     }).catch(() => {});
@@ -148,7 +167,11 @@ const handleClickFilter = () => {
 const handleUpdateWorkspaceScope = (selectedItems: string) => {
     costAnalysisPageStore.setWorkspaceScope(selectedItems);
 };
-watch([() => costAnalysisPageGetters.selectedQueryId, () => costAnalysisPageGetters.isUnifiedCost, () => costAnalysisPageGetters.selectedDataSourceId], ([updatedQueryId]) => {
+watch([
+    () => costQuerySetState.selectedQuerySetId,
+    () => costQuerySetState.isUnifiedCostOn,
+    () => costQuerySetState.selectedDataSourceId,
+], ([updatedQueryId]) => {
     if (updatedQueryId !== '' || MANAGED_COST_QUERY_SET_ID_LIST.includes(updatedQueryId)) {
         state.filtersPopoverVisible = false;
     }
@@ -314,7 +337,7 @@ onMounted(async () => {
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
                                         request-type="SAVE"
-                                        :selected-query-set-id="costAnalysisPageGetters.selectedQueryId"
+                                        :selected-query-set-id="costQuerySetState.selectedQuerySetId"
                                         @update-query="handleUpdateQuery"
         />
         <p-button-modal
