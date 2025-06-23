@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectedProvider: 'all',
 });
 
-const emit = defineEmits<{(e: 'udpate:selected-provider', value: string): void}>();
+const emit = defineEmits<{(e: 'update:selected-provider', value: string): void}>();
 
 const { providerAPI } = useProviderApi();
 const { key: providerListKey, params: providerListParams } = useServiceQueryKey('identity', 'provider', 'list', {
