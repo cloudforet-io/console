@@ -131,6 +131,7 @@ const state = reactive({
             return props.userGroupPool?.map((userGroupId) => ({
                 name: userGroupId,
                 label: storeState.userGroupReferenceMap[userGroupId]?.label || storeState.userGroupReferenceMap[userGroupId]?.name || userGroupId,
+                members: storeState.userGroupReferenceMap[userGroupId]?.data.users?.length,
             }));
         }
         const list = props.excludedSelectedIds
