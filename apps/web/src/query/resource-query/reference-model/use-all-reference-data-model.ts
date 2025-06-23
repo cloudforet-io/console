@@ -23,12 +23,14 @@ import { useUserGroupReferenceDataModel } from '@/query/resource-query/reference
 import { useUserReferenceDataModel } from '@/query/resource-query/reference-model/use-user-reference-data-model';
 import { useWorkspaceGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-group-reference-data-model';
 import { useWorkspaceReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-reference-data-model';
+import { useWorkspaceUserReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-user-reference-data-model';
 
 export const useAllReferenceDataModel = () => {
     const app = useAppReferenceDataModel();
     const workspace = useWorkspaceReferenceDataModel();
     const workspaceGroup = useWorkspaceGroupReferenceDataModel();
     const user = useUserReferenceDataModel();
+    const workspaceUser = useWorkspaceUserReferenceDataModel();
     const userGroup = useUserGroupReferenceDataModel();
     const provider = useProvodierReferenceDataModel();
     const protocol = useProtocolReferenceDataModel();
@@ -55,6 +57,7 @@ export const useAllReferenceDataModel = () => {
         workspace: workspace.map,
         workspaceGroup: workspaceGroup.map,
         user: user.map,
+        workspaceUser: workspaceUser.map,
         userGroup: userGroup.map,
         provider: provider.map,
         protocol: protocol.map,
