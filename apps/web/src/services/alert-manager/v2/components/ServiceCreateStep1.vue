@@ -3,14 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PFieldGroup, PTextInput, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import type { ServiceCreateParameters } from '@/schema/alert-manager/service/api-verbs/create';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { MembersType } from '@/schema/alert-manager/service/type';
+import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
+import type { ServiceCreateParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/create';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -36,7 +38,6 @@ const storeState = reactive({
     serviceListMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
 });
 const state = reactive({
-    loading: false,
     isFocusedKey: false,
 });
 
@@ -81,6 +82,22 @@ const {
     },
 });
 
+const queryClient = useQueryClient();
+const { serviceAPI } = useServiceApi();
+const { key: serviceListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'list');
+const { mutate: createService, isPending: createServiceLoading } = useMutation({
+    mutationFn: (params: ServiceCreateParameters) => serviceAPI.create(params),
+    onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: serviceListBaseQueryKey.value });
+        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_CREATE_SERVICE'), '');
+        serviceCreateFormStore.setCreatedService(data);
+        serviceCreateFormStore.setCurrentStep(2);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     dropdownState.selectedMemberItems = value;
 };
@@ -98,25 +115,15 @@ const handleChangeInput = (label: 'name'|'key'|'description', value?: string) =>
 };
 
 const handleCreateService = async () => {
-    state.loading = true;
-    try {
-        const createdServiceInfo = await SpaceConnector.clientV2.alertManager.service.create<ServiceCreateParameters, ServiceModel>({
-            name: name.value,
-            service_key: key.value,
-            members: {
-                USER: dropdownState.selectedMemberItems.USER,
-                USER_GROUP: dropdownState.selectedMemberItems.USER_GROUP,
-            },
-            description: description.value,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_CREATE_SERVICE'), '');
-        serviceCreateFormStore.setCreatedService(createdServiceInfo);
-        serviceCreateFormStore.setCurrentStep(2);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    createService({
+        name: name.value,
+        service_key: key.value,
+        members: {
+            USER: dropdownState.selectedMemberItems.USER,
+            USER_GROUP: dropdownState.selectedMemberItems.USER_GROUP,
+        },
+        description: description.value,
+    });
 };
 
 watch(() => state.isFocusedKey, (isFocusedKey) => {
@@ -129,7 +136,7 @@ watch(() => state.isFocusedKey, (isFocusedKey) => {
 <template>
     <service-create-step-container class="service-create-step1"
                                    :is-all-form-valid="isAllValid"
-                                   :loading="state.loading"
+                                   :loading="createServiceLoading"
                                    @create="handleCreateService"
     >
         <div>

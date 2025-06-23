@@ -15,9 +15,9 @@ import {
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
+import type { AlertListParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/list';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

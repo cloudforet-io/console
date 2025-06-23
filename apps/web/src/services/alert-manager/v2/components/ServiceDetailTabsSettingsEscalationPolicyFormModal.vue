@@ -3,18 +3,22 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PTextInput, PRadio, PFieldGroup, PRadioGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { EscalationPolicyCreateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/create';
-import type { EscalationPolicyUpdateParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/update';
-import { ESCALATION_POLICY_STATE } from '@/schema/alert-manager/escalation-policy/constants';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import { useEscalationPolicyApi } from '@/api-clients/alert-manager/escalation-policy/composables/use-escalation-policy-api';
+import type { EscalationPolicyCreateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/create';
+import type { EscalationPolicyUpdateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/update';
+import { ESCALATION_POLICY_STATE } from '@/api-clients/alert-manager/escalation-policy/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -41,17 +45,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
 }>();
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-});
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     headerTitle: computed<TranslateResult>(() => {
         if (props.type === 'CREATE') return i18n.t('ALERT_MANAGER.ESCALATION_POLICY.MODAL_CREATE_TITLE');
@@ -93,6 +95,32 @@ const {
     },
 });
 
+const queryClient = useQueryClient();
+const { escalationPolicyAPI } = useEscalationPolicyApi();
+const { key: escalationPolicyLisBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
+
+const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
+    mutationFn: (params: Partial<EscalationPolicyCreateParameters | EscalationPolicyUpdateParameters>) => {
+        if (props.type === 'CREATE') {
+            return escalationPolicyAPI.create(params as EscalationPolicyCreateParameters);
+        }
+        return escalationPolicyAPI.update(params as EscalationPolicyUpdateParameters);
+    },
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: escalationPolicyLisBaseQueryKey.value });
+        if (props.type === 'CREATE') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
+        } else {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_UPDATE_POLICY'), '');
+        }
+        handleClose();
+        emit('close');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 const handleClose = () => {
     state.proxyVisible = false;
 };
@@ -100,38 +128,24 @@ const handleRouteDetail = () => {
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS);
     handleClose();
 };
+
 const handleClickConfirm = async () => {
-    state.loading = true;
-    try {
-        const params = {
-            name: name.value,
-            rules: state.rules,
-            repeat: {
-                state: ESCALATION_POLICY_STATE.DISABLED,
-                count: state.repeatCount,
-            },
-            finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
-        };
-        if (props.type === 'CREATE') {
-            await SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters>({
-                service_id: storeState.serviceId,
-                ...params,
-            });
-            showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
-        } else {
-            await SpaceConnector.clientV2.alertManager.escalationPolicy.update<EscalationPolicyUpdateParameters>({
-                escalation_policy_id: props.selectedItem?.escalation_policy_id || '',
-                ...params,
-            });
-            showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_UPDATE_POLICY'), '');
-        }
-        handleClose();
-        emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
+    const params: Partial<EscalationPolicyCreateParameters | EscalationPolicyUpdateParameters> = {
+        name: name.value,
+        rules: state.rules,
+        repeat: {
+            state: ESCALATION_POLICY_STATE.DISABLED,
+            count: state.repeatCount,
+        },
+        finish_condition: state.radioMenuList[state.selectedRadioIdx].name,
+    };
+    if (props.type === 'CREATE') {
+        params.service_id = serviceId.value;
+    } else {
+        params.escalation_policy_id = props.selectedItem?.escalation_policy_id || '';
     }
+
+    escalationPolicyMutation(params);
 };
 
 watch(() => props.type, (type) => {
@@ -148,7 +162,7 @@ watch(() => props.type, (type) => {
                     :header-title="state.headerTitle"
                     :fade="true"
                     :backdrop="true"
-                    :loading="state.loading"
+                    :loading="escalationPolicyMutationPending"
                     :visible.sync="state.proxyVisible"
                     :disabled="!state.isModalValid"
                     @confirm="handleClickConfirm"

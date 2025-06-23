@@ -10,7 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ServiceChannelScheduleType } from '@/schema/alert-manager/service-channel/type';
+import type { ServiceChannelScheduleType } from '@/api-clients/alert-manager/service-channel/schema/type';
 import { i18n } from '@/translations';
 
 import { timezoneList } from '@/store/user/constant';

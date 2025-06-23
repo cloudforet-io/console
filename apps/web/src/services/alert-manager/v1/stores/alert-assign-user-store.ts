@@ -8,10 +8,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertAssignUserParameters } from '@/schema/monitoring/alert/api-verbs/assign-user';
-import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import type { AlertAssignUserParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/assign-user';
+import type { AlertUpdateParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/update';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -42,9 +42,9 @@ export const useAlertAssignUserStore = defineStore('alert-user-assign-store', ()
                 throw new Error(alertId);
             }
         },
-        async assignUserToAlert(alertId: string, assignee: string): Promise<AlertModel> {
+        async assignUserToAlert(alertId: string, assignee: string): Promise<AlertModelV1> {
             try {
-                const alertData = await SpaceConnector.clientV2.monitoring.alert.assignUser<AlertAssignUserParameters, AlertModel>({
+                const alertData = await SpaceConnector.clientV2.monitoring.alert.assignUser<AlertAssignUserParameters, AlertModelV1>({
                     alert_id: alertId,
                     assignee,
                 });

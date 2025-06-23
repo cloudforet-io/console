@@ -3,16 +3,17 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal, PButton, PLazyImg } from '@cloudforet/mirinae';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { UserGroupChannelCreateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/create';
-import type { UserGroupChannelUpdateParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/update';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
+import type { UserGroupChannelCreateParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/create';
+import type { UserGroupChannelUpdateParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/update';
 import type {
     UserGroupChannelScheduleInfoType,
-} from '@/schema/alert-manager/user-group-channel/type';
+} from '@/api-clients/alert-manager/user-group-channel/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -38,12 +39,15 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 interface ChannelSetModalState {
   loading: boolean;
   channelName: string;
-  selectedProtocolData?: NotificationProtocolModel | undefined,
   scheduleInfo: UserGroupChannelScheduleInfoType;
 }
 
 const isCreateAble = ref<boolean>(false);
 const isSchemaValid = ref<boolean>(false);
+
+const queryClient = useQueryClient();
+const { userGroupChannelAPI } = useUserGroupChannelApi();
+const { key: userGroupChannelListQueryKey } = useServiceQueryKey('alert-manager', 'user-group-channel', 'list');
 
 const storeState = reactive({
     protocolIcon: computed<string>(() => notificationChannelCreateFormState.selectedProtocol.icon),
@@ -54,8 +58,37 @@ const storeState = reactive({
 const state = reactive<ChannelSetModalState>({
     loading: false,
     channelName: '',
-    selectedProtocolData: {},
     scheduleInfo: notificationChannelCreateFormState.scheduleInfo,
+});
+
+// TODO: Distinguishing conditions using modal types, etc.
+const { mutate: userGroupChannelMutate } = useMutation({
+    mutationFn: (params: UserGroupChannelCreateParameters|UserGroupChannelUpdateParameters) => {
+        if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
+            return userGroupChannelAPI.create(params as UserGroupChannelCreateParameters);
+        }
+        return userGroupChannelAPI.update(params as UserGroupChannelUpdateParameters);
+    },
+    onSuccess: () => {
+        emit('confirm');
+        queryClient.invalidateQueries({ queryKey: userGroupChannelListQueryKey.value });
+        if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.SUCCESS_MESSAGE'));
+        } else {
+            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_SUCCESS_MESSAGE'));
+        }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
+        notificationChannelCreateFormStore.initState();
+        userGroupPageState.modal = {
+            type: '',
+            title: '',
+            themeColor: 'primary',
+        };
+    },
 });
 
 /* Component */
@@ -72,40 +105,22 @@ const handleSchemaValid = (value: boolean) => {
 };
 
 const handleConfirm = async () => {
-    try {
-        state.loading = true;
-        if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')) {
-            await fetchCreateUserGroupChannel({
-                protocol_id: notificationChannelCreateFormState.selectedProtocol.protocol_id,
-                name: state.channelName,
-                schedule: notificationChannelCreateFormState.scheduleInfo,
-                data: {
-                    ...notificationChannelCreateFormState.protocolSchemaForm,
-                },
-                tags: {},
-                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            });
-            emit('confirm');
-            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.SUCCESS_MESSAGE'));
-        } else if (userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_TITLE')) {
-            await fetchUpdateUserGroupChannel({
-                channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
-                name: state.channelName,
-                data: {},
-                schedule: notificationChannelCreateFormState.scheduleInfo,
-            });
-            emit('confirm');
-            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.UPDATE_SUCCESS_MESSAGE'));
-        }
-    } finally {
-        state.loading = false;
-        notificationChannelCreateFormStore.initState();
-        userGroupPageState.modal = {
-            type: '',
-            title: '',
-            themeColor: 'primary',
-        };
-    }
+    const params: UserGroupChannelCreateParameters|UserGroupChannelUpdateParameters = userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE') ? {
+        protocol_id: notificationChannelCreateFormState.selectedProtocol.protocol_id,
+        name: state.channelName,
+        schedule: notificationChannelCreateFormState.scheduleInfo,
+        data: {
+            ...notificationChannelCreateFormState.protocolSchemaForm,
+        },
+        tags: {},
+        user_group_id: userGroupPageGetters.selectedUserGroups[0]?.user_group_id,
+    } as UserGroupChannelCreateParameters : {
+        channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
+        name: state.channelName,
+        data: {},
+        schedule: notificationChannelCreateFormState.scheduleInfo,
+    } as UserGroupChannelUpdateParameters;
+    userGroupChannelMutate(params);
 };
 
 const handleCancel = () => {
@@ -128,25 +143,6 @@ const handleClose = () => {
         title: '',
         themeColor: 'primary',
     };
-};
-
-/* API */
-const fetchCreateUserGroupChannel = async (params: UserGroupChannelCreateParameters) => {
-    try {
-        return await SpaceConnector.clientV2.alertManager.userGroupChannel.create<UserGroupChannelCreateParameters, UserGroupChannelModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        return {};
-    }
-};
-
-const fetchUpdateUserGroupChannel = async (params: UserGroupChannelUpdateParameters) => {
-    try {
-        return await SpaceConnector.clientV2.alertManager.userGroupChannel.update<UserGroupChannelUpdateParameters, UserGroupChannelModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        return {};
-    }
 };
 
 /* Watcher */

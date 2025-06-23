@@ -7,9 +7,9 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { EscalationPolicyGetParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/get';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

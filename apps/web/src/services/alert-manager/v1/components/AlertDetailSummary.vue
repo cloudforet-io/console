@@ -8,8 +8,8 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/type';
+import { ALERT_STATE, ALERT_URGENCY } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertState, AlertUrgency } from '@/api-clients/monitoring/alert/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

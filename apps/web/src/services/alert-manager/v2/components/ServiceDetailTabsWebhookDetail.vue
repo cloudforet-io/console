@@ -4,6 +4,7 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -16,11 +17,13 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookGetParameters } from '@/schema/alert-manager/webhook/api-verbs/get';
-import type { WebhookListErrorSParameters } from '@/schema/alert-manager/webhook/api-verbs/list-errors';
-import type { WebhookUpdateMessageFormatParameters } from '@/schema/alert-manager/webhook/api-verbs/update-message-format';
-import type { WebhookModel, WebhookListErrorsModel } from '@/schema/alert-manager/webhook/model';
-import type { WebhookMessageFormatType } from '@/schema/alert-manager/webhook/type';
+import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
+import type { WebhookUpdateMessageFormatParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update-message-format';
+import type { WebhookModel, WebhookListErrorsModel } from '@/api-clients/alert-manager/webhook/schema/model';
+import type { WebhookMessageFormatType } from '@/api-clients/alert-manager/webhook/schema/type';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
@@ -96,31 +99,73 @@ const tabState = reactive({
     activeWebhookDetailTab: WEBHOOK_DETAIL_TABS.DETAIL as WebhookDetailTabsType,
 });
 const state = reactive({
-    webhookInfo: {} as WebhookModel,
+    webhookInfo: computed<WebhookModel>(() => webhookDetailData.value || {} as WebhookModel),
     rawDataModalVisible: false,
     rawData: {} as Record<string, any>,
     selectedPlugin: {} as PluginModel,
-    errorListLoading: false,
     errorList: [] as WebhookListErrorsModel[],
-    refinedErrorList: computed<WebhookListErrorsModel[]>(() => state.errorList.map((i, idx) => ({
+    refinedErrorList: computed<WebhookListErrorsModel[]>(() => (webhookErrorListData.value?.results || []).map((i, idx) => ({
         number: idx + 1,
         ...i,
     }))),
     errorTotalCount: 0,
 });
 const messageState = reactive({
-    loading: false,
     formatList: [] as WebhookMessageFormatType[],
     editFormVisible: false,
     sortBy: 'created_at',
     sortDesc: true,
     formats: {},
+    pagination: {
+        thisPage: 1,
+        pageLimit: 15,
+    },
 });
 
-const errorListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
-    .setPage(1, 15);
+const queryClient = useQueryClient();
+const { webhookAPI } = useWebhookApi();
+const { key: webhookDetailQueryKey, params: webhookDetailQueryParams } = useServiceQueryKey('alert-manager', 'webhook', 'get', {
+    params: computed(() => ({
+        webhook_id: storeState.selectedWebhookId || '',
+    })),
+});
+const { data: webhookDetailData } = useScopedQuery({
+    queryKey: webhookDetailQueryKey,
+    queryFn: async () => webhookAPI.get(webhookDetailQueryParams.value),
+    enabled: computed(() => !!storeState.selectedWebhookId),
+    gcTime: 1000 * 60 * 2,
+}, ['WORKSPACE']);
+
+const errorListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS });
 const { queryTags } = queryTagHelper;
+
+const { key: webhookErrorListQueryKey, params: webhookErrorListQueryParams } = useServiceQueryKey('alert-manager', 'webhook', 'list-errors', {
+    params: computed(() => {
+        errorListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        return {
+            webhook_id: storeState.selectedWebhookId || '',
+            query: {
+                ...errorListApiQueryHelper.data,
+                sort: [{ key: messageState.sortBy, desc: messageState.sortDesc }],
+            },
+        };
+    }),
+    pagination: true,
+});
+const { data: webhookErrorListData, isLoading: webhookErrorListFetching, totalCount: webhookErrorListTotalCount } = useScopedPaginationQuery({
+    queryKey: webhookErrorListQueryKey,
+    queryFn: webhookAPI.listErrors,
+    params: webhookErrorListQueryParams,
+    gcTime: 1000 * 60 * 2,
+    enabled: true,
+}, {
+    thisPage: computed(() => messageState.pagination.thisPage),
+    pageSize: computed(() => messageState.pagination.pageLimit),
+    verb: 'list',
+}, ['WORKSPACE']);
 
 const handleClickShowRawData = (item) => {
     state.rawDataModalVisible = true;
@@ -135,25 +180,15 @@ const handleChangeMessageSort = (sortBy, sortDesc) => {
     messageState.formatList = sortTableItems<WebhookMessageFormatType>(messageState.formatList, sortBy, sortDesc);
 };
 const handleChange = async (options: any = {}) => {
-    if (options.sortBy !== undefined) errorListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy !== undefined) messageState.sortBy = options.sortBy;
+    if (options.sortDesc !== undefined) messageState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
-    if (options.pageStart !== undefined) errorListApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) errorListApiQueryHelper.setPageLimit(options.pageLimit);
-    await fetchWebhookErrorList();
 };
 
-const fetchWebhookDetail = async () => {
+const setWebhookDetail = () => {
     if (!storeState.selectedWebhookId) return;
-    try {
-        state.webhookInfo = await SpaceConnector.clientV2.alertManager.webhook.get<WebhookGetParameters, WebhookModel>({
-            webhook_id: storeState.selectedWebhookId,
-        });
-        messageState.formatList = state.webhookInfo.message_formats || [];
-        messageState.formats = state.webhookInfo.message_formats?.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.webhookInfo = {} as WebhookModel;
-    }
+    messageState.formatList = state.webhookInfo.message_formats || [];
+    messageState.formats = state.webhookInfo.message_formats?.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
 };
 const getRepositoryID = async () => {
     const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
@@ -173,55 +208,37 @@ const fetchPluginInfo = async () => {
         state.selectedPlugin = {} as PluginModel;
     }
 };
-const fetchWebhookErrorList = async () => {
-    if (!storeState.selectedWebhookId) return;
-    state.errorListLoading = true;
-    try {
-        errorListApiQueryHelper.setFilters([
-            ...queryTagHelper.filters.value,
-        ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.webhook.listErrors<WebhookListErrorSParameters, ListResponse<WebhookListErrorsModel>>({
-            webhook_id: storeState.selectedWebhookId,
-            query: errorListApiQueryHelper.data,
-        });
-        state.errorList = results || [];
-        state.errorTotalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.errorList = [];
-        state.errorTotalCount = 0;
-    } finally {
-        state.errorListLoading = false;
-    }
-};
-const fetchMessageUpdate = async (tags) => {
-    messageState.loading = true;
-    try {
-        await SpaceConnector.clientV2.alertManager.webhook.updateMessageFormat<WebhookUpdateMessageFormatParameters, WebhookModel>({
-            webhook_id: state.webhookInfo.webhook_id,
-            message_formats: Object.entries(tags).map(([key, value]) => ({
-                from: key,
-                to: value,
-            })) as WebhookMessageFormatType[],
-        });
+
+const { mutateAsync: updateMessageFormat, isPending: updateMessageFormatLoading } = useMutation({
+    mutationFn: (params: WebhookUpdateMessageFormatParameters) => webhookAPI.updateMessageFormat(params),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: webhookDetailQueryKey.value });
         await handleEditMessageFormat(false);
-        await fetchWebhookDetail();
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        messageState.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const fetchMessageUpdate = (tags) => {
+    updateMessageFormat({
+        webhook_id: state.webhookInfo.webhook_id,
+        message_formats: Object.entries(tags).map(([key, value]) => ({
+            from: key,
+            to: value,
+        })) as WebhookMessageFormatType[],
+    });
 };
 
+watch(() => webhookDetailData.value, () => {
+    setWebhookDetail();
+});
 watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
     if (activeTab === WEBHOOK_DETAIL_TABS.ERROR) {
-        fetchWebhookErrorList();
+        queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value });
     }
 });
 watch(() => storeState.selectedWebhookId, async () => {
-    await fetchWebhookDetail();
     if (isEmpty(state.webhookInfo)) return;
-    await fetchWebhookErrorList();
     if (!state.webhookInfo.plugin_info?.plugin_id) return;
     await fetchPluginInfo();
 }, { immediate: true });
@@ -312,7 +329,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                     <template #heading>
                         <p-heading :title="$t('ALERT_MANAGER.WEBHOOK.ERROR_LIST')"
                                    use-total-count
-                                   :total-count="state.errorTotalCount"
+                                   :total-count="webhookErrorListTotalCount"
                                    heading-type="sub"
                                    class="heading error"
                         />
@@ -324,13 +341,15 @@ watch(() => storeState.selectedWebhookId, async () => {
                                  search-type="query"
                                  sort-by="created_at"
                                  :query-tags="queryTags"
-                                 :loading="state.errorListLoading"
-                                 :total-count="state.errorTotalCount"
+                                 :loading="webhookErrorListFetching"
+                                 :total-count="webhookErrorListTotalCount"
+                                 :this-page.sync="messageState.pagination.thisPage"
+                                 :page-size.sync="messageState.pagination.pageLimit"
                                  :fields="tabState.webhookErrorTableFields"
                                  :items="state.refinedErrorList"
                                  class="w-full border-none"
                                  @change="handleChange"
-                                 @refresh="fetchWebhookErrorList"
+                                 @refresh="queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value })"
                 >
                     <template #col-created_at-format="{ value }">
                         {{ iso8601Formatter(value, storeState.timezone) }}
@@ -391,7 +410,7 @@ watch(() => storeState.selectedWebhookId, async () => {
                 <transition name="slide-up">
                     <service-detail-tabs-webhook-detail-message-overlay v-if="messageState.editFormVisible"
                                                                         :formats="messageState.formats"
-                                                                        :loading="messageState.loading"
+                                                                        :loading="updateMessageFormatLoading"
                                                                         @close="handleEditMessageFormat(false)"
                                                                         @confirm="fetchMessageUpdate"
                     />

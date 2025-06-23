@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PBadge, PI,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ServiceChannelGetParameters } from '@/schema/alert-manager/service-channel/api-verbs/get';
+import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import {
     SERVICE_CHANNEL_FORWARD_TYPE,
     SERVICE_CHANNEL_SCHEDULE_TYPE, SERVICE_CHANNEL_TYPE,
-} from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/schema/alert-manager/service-channel/type';
+} from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import type { ServiceChannelScheduleInfoType, ServiceChannelScheduleDayType } from '@/api-clients/alert-manager/service-channel/schema/type';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
@@ -23,14 +24,14 @@ import type { UserGroupReferenceMap } from '@/store/reference/user-group-referen
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import type { DayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { alertManagerStateFormatter } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import {
     NOTIFICATIONS_DETAIL_TABS,
 } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolInfo, WebhookDetailTabsType, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { WebhookDetailTabsType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 type ScheduleInfo = {
     styleType: string;
@@ -44,6 +45,9 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceChannelAPI } = useServiceChannelApi();
+
 const tabState = reactive({
     notificationsDetailTabs: computed<TabItem[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.DETAILS'), name: NOTIFICATIONS_DETAIL_TABS.DETAIL },
@@ -52,11 +56,23 @@ const tabState = reactive({
 });
 const storeState = reactive({
     selectedNotificationId: computed<string|undefined>(() => serviceDetailPageState.selectedNotificationId),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
     userGroup: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
 });
+
+const { key: serviceChannelGetQueryKey, params: serviceChannelGetQueryParams } = useServiceQueryKey('alert-manager', 'service-channel', 'get', {
+    params: computed(() => ({
+        channel_id: storeState.selectedNotificationId || '',
+    })),
+});
+const { data: serviceChannelData } = useScopedQuery({
+    queryKey: serviceChannelGetQueryKey,
+    queryFn: () => serviceChannelAPI.get(serviceChannelGetQueryParams.value),
+    enabled: computed(() => !!storeState.selectedNotificationId),
+    gcTime: 1000 * 60 * 2,
+}, ['WORKSPACE']);
+
 const state = reactive({
-    notificationInfo: {} as ServiceChannelModel,
+    notificationInfo: computed<ServiceChannelModel>(() => serviceChannelData.value || {} as ServiceChannelModel),
     refinedNotificationInfo: computed<ServiceChannelModel>(() => {
         if (state.notificationInfo.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) {
             return {
@@ -87,25 +103,6 @@ const state = reactive({
     }),
 });
 
-const getProtocolInfo = (id: string): ProtocolInfo => {
-    if (id === 'forward') {
-        if (state.notificationInfo.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.ALL_MEMBER) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_ALL_MEMBER') };
-        }
-        if (state.notificationInfo.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER_GROUP) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER_GROUP') };
-        }
-        if (state.notificationInfo.data?.FORWARD_TYPE === SERVICE_CHANNEL_FORWARD_TYPE.USER) {
-            return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.NOTIFY_TO_USER') };
-        }
-        return { name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER') };
-    }
-    const protocol = storeState.notificationProtocolList.find((item) => item.protocol_id === id);
-    return {
-        name: protocol?.name || '',
-        icon: protocol?.icon || '',
-    };
-};
 const getUserGroupName = (userGroup: string[] = []): string => userGroup.map((group) => {
     const _userGroup = storeState.userGroup[group];
     return _userGroup?.name || '';
@@ -163,21 +160,6 @@ const getScheduleInfo = (schedule: ServiceChannelScheduleInfoType): ScheduleInfo
         days: scheduleInfo.days.join(', '),
     };
 };
-const fetchNotificationDetail = async (selectedId: string) => {
-    try {
-        state.notificationInfo = await SpaceConnector.clientV2.alertManager.serviceChannel.get<ServiceChannelGetParameters, ServiceChannelModel>({
-            channel_id: selectedId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.notificationInfo = {} as ServiceChannelModel;
-    }
-};
-
-watch(() => storeState.selectedNotificationId, async (selectedId) => {
-    if (!selectedId) return;
-    await fetchNotificationDetail(selectedId);
-}, { immediate: true });
 </script>
 
 <template>
@@ -212,12 +194,12 @@ watch(() => storeState.selectedNotificationId, async (selectedId) => {
                              height="1rem"
                         />
                         <p-lazy-img v-else
-                                    :src="assetUrlConverter(getProtocolInfo(value).icon)"
+                                    :src="assetUrlConverter(getProtocolInfo(value, notificationProtocolListData).icon || '')"
                                     width="1rem"
                                     height="1rem"
                                     class="service-img"
                         />
-                        <span>{{ getProtocolInfo(value).name }}</span>
+                        <span>{{ getProtocolInfo(value, notificationProtocolListData).name }}</span>
                     </div>
                 </template>
                 <template #data-data="{value}">

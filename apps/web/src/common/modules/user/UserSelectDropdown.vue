@@ -13,7 +13,7 @@ import type {
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { MembersType } from '@/schema/alert-manager/service/type';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

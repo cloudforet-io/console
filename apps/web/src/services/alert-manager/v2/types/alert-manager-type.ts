@@ -7,16 +7,16 @@ import type {
     AlertHistoryNotificationChannelInfoType,
     AlertStatusType,
     AlertUrgencyType,
-} from '@/schema/alert-manager/alert/type';
+} from '@/api-clients/alert-manager/alert/schema/type';
 import type {
     EventRuleConditionsPolicyType,
     EventRuleConditionsKeyType,
     EventRuleConditionsOperatorType, EventRuleUrgencyType, EventRuleConditionsType,
-} from '@/schema/alert-manager/event-rule/type';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/schema/alert-manager/service-channel/type';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { AlertsInfoType, AlertsType } from '@/schema/alert-manager/service/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
+import type { NotificationProtocolModel } from '@/api-clients/alert-manager/notification-protocol/schema/model';
+import type { ServiceChannelDataType, ServiceChannelScheduleInfoType } from '@/api-clients/alert-manager/service-channel/schema/type';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import type { AlertsInfoType, AlertsType } from '@/api-clients/alert-manager/service/schema/type';
 
 import type { ALERT_PERIOD_DROPDOWN_MENU } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import type {
@@ -74,7 +74,6 @@ export type createHeaderInfoByStep = {
 
 export interface Service extends ServiceModel {
     alerts: Record<AlertsType, AlertsInfoType>;
-    rules: number;
 }
 
 export type CreatedNotificationInfoType = {

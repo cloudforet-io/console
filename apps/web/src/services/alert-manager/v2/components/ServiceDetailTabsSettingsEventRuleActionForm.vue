@@ -3,7 +3,7 @@ import { reactive, watch } from 'vue';
 
 import { isUndefined, omitBy } from 'lodash';
 
-import type { EventRuleActionsType } from '@/schema/alert-manager/event-rule/type';
+import type { EventRuleActionsType } from '@/api-clients/alert-manager/event-rule/schema/type';
 
 import ServiceDetailTabsSettingsEventRuleActionAlert
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEventRuleActionAlert.vue';
