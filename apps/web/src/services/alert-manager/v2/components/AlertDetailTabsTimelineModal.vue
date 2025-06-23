@@ -7,18 +7,15 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
 import {
     ALERT_HISTORY_ACTION,
     ALERT_HISTORY_NOTIFICATION_STATE,
 } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertHistoryActionType, AlertHistoryNotificationInfoType, AlertHistoryNotificationChannelInfoType } from '@/api-clients/alert-manager/alert/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { copyAnyData } from '@/lib/helper/copy-helper';
@@ -51,20 +48,11 @@ const TYPE = {
     USER: 'user_channels',
 } as const;
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-
 const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
 }>();
 
 const referenceMap = useAllReferenceDataModel();
 
-const storeState = reactive({
-    pluginInfo: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-    userGroup: computed<UserGroupReferenceMap>(() => allReferenceGetters.user_group),
-    user: computed<UserReferenceMap>(() => allReferenceGetters.user),
-});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     typeFields: computed<SelectDropdownMenuItem[]>(() => ([
@@ -90,11 +78,11 @@ const state = reactive({
             const info = channelInfo as AlertHistoryNotificationChannelInfoType;
             let target: string | undefined = '';
             if (type === TYPE.SERVICE) {
-                target = storeState.service[props.serviceId]?.label || props.serviceId;
+                target = props.serviceId ? (referenceMap.service[props.serviceId]?.label || props.serviceId) : undefined;
             } else if (type === TYPE.USER_GROUP) {
-                target = storeState.userGroup[info.user_group_id || '']?.label || info.user_group_id;
+                target = info.user_group_id ? (referenceMap.userGroup[info.user_group_id]?.label || info.user_group_id) : undefined;
             } else if (type === TYPE.USER) {
-                target = storeState.user[info.user_id || '']?.label || info.user_id;
+                target = info.user_id ? (referenceMap.user[info.user_id]?.label || info.user_id) : undefined;
             }
             return {
                 type,
@@ -188,7 +176,7 @@ const handleClickCopy = () => {
                         </template>
                         <template #col-name-format="{value, item}">
                             <div class="flex items-center gap-1">
-                                <p-lazy-img :src="assetUrlConverter(storeState.pluginInfo[item.plugin_id]?.icon || '')"
+                                <p-lazy-img :src="assetUrlConverter(referenceMap.plugin[item.plugin_id]?.icon || '')"
                                             width="1rem"
                                             height="1rem"
                                 />

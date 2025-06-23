@@ -14,12 +14,13 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { AlertListParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/list';
 import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
 import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
-
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertListItem from '@/services/alert-manager/v1/components/AlertListItem.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
+
 
 const props = defineProps<{
     projectId: string;
