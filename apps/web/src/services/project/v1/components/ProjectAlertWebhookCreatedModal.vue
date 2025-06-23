@@ -10,7 +10,7 @@ import {
     PIconModal, PDefinitionTable, PButton, PStatus, PMarkdown,
 } from '@cloudforet/mirinae';
 
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

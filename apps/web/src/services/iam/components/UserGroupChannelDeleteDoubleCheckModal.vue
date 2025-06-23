@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupChannelDeleteParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/delete';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
+import type { UserGroupChannelDeleteParameters } from '@/api-clients/alert-manager/user-group-channel/schema/api-verbs/delete';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -19,28 +19,36 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
+const queryClient = useQueryClient();
+const { userGroupChannelAPI } = useUserGroupChannelApi();
+const { key: userGroupChannelListQueryKey } = useServiceQueryKey('alert-manager', 'user-group-channel', 'list');
+
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const state = reactive({
-    loading: false,
+const { mutate: userGroupChannelDeleteMutate, isPending: userGroupChannelDeletePending } = useMutation({
+    mutationFn: (params: UserGroupChannelDeleteParameters) => userGroupChannelAPI.delete(params),
+    onSuccess: () => {
+        emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'));
+        userGroupPageState.userGroupChannels.selectedIndices = [];
+        queryClient.invalidateQueries({ queryKey: userGroupChannelListQueryKey.value });
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
+        handleCancel();
+    },
 });
 
 /* Component */
-const handleConfirm = async () => {
-    try {
-        state.loading = true;
-        if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel && userGroupPageGetters.selectedUserGroups[0].notification_channel.length > 0) {
-            await fetchDeleteNotificationChannel({
-                channel_id: userGroupPageGetters.selectedUserGroups[0].notification_channel[userGroupPageState.userGroupChannels.selectedIndices[0]].channel_id,
-            });
-            emit('confirm');
-            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'));
-            userGroupPageState.userGroupChannels.selectedIndices = [];
-        }
-    } finally {
-        state.loading = false;
-        handleCancel();
+const handleConfirm = () => {
+    if (!userGroupPageGetters.selectedUserGroupChannel?.[0]?.channel_id) {
+        return;
     }
+    userGroupChannelDeleteMutate({
+        channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
+    });
 };
 
 const handleCancel = () => {
@@ -50,21 +58,12 @@ const handleCancel = () => {
         themeColor: 'primary',
     };
 };
-
-/* API */
-const fetchDeleteNotificationChannel = async (params: UserGroupChannelDeleteParameters) => {
-    try {
-        await SpaceConnector.clientV2.alertManager.userGroupChannel.delete<UserGroupChannelDeleteParameters, UserGroupChannelModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
-};
 </script>
 
 <template>
     <p-button-modal size="sm"
                     :header-title="userGroupPageState.modal.title"
-                    :loading="state.loading"
+                    :loading="userGroupChannelDeletePending"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.DELETE_NOTIFICATION_CHANNEL"
                     :theme-color="userGroupPageState.modal.themeColor"
                     @confirm="handleConfirm"

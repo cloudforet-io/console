@@ -7,7 +7,7 @@ import {
     PSelectCard, PI, PLazyImg, PDivider, PTextButton,
 } from '@cloudforet/mirinae';
 
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -4,21 +4,16 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PCenteredLayoutHeader } from '@cloudforet/mirinae';
 
-import type { WebhookCreateParameters } from '@/schema/alert-manager/webhook/api-verbs/create';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WebhookCreateForm from '@/services/alert-manager/v2/components/WebhookCreateForm.vue';
 import WebhookCreateSuccessMode from '@/services/alert-manager/v2/components/WebhookCreateSuccessMode.vue';
 import WebhookCreateTypeSelector from '@/services/alert-manager/v2/components/WebhookCreateTypeSelector.vue';
+import { useWebhookCreateMutation } from '@/services/alert-manager/v2/composables/use-webhook-create-mutation';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
@@ -44,7 +39,6 @@ const storeState = reactive({
     webhookVersion: computed<string|undefined>(() => serviceCreateFormState.webhookVersion || ''),
 });
 const state = reactive({
-    loading: false,
     currentStep: 1,
     isAllFormValid: computed<boolean>(() => {
         if (state.currentStep === 1) return storeState.selectedWebhookTypeId !== '';
@@ -67,6 +61,16 @@ const state = reactive({
         };
     }),
     succeedWebhook: undefined as undefined|WebhookModel,
+});
+
+const { mutateAsync: createWebhook, isPending: createWebhookLoading } = useWebhookCreateMutation({
+    onSuccess: (data) => {
+        state.succeedWebhook = data as WebhookModel;
+        state.currentStep = 3;
+    },
+    onError: () => {
+        state.succeedWebhook = undefined;
+    },
 });
 
 const handleClickCancelButton = () => {
@@ -98,24 +102,14 @@ const handleActionButton = () => {
 };
 
 const fetchCreateWebhook = async () => {
-    state.loading = true;
-    try {
-        state.succeedWebhook = await SpaceConnector.clientV2.alertManager.webhook.create<WebhookCreateParameters, WebhookModel>({
-            name: storeState.webhookName,
-            plugin_info: {
-                plugin_id: storeState.selectedWebhookType?.plugin_id || '',
-                version: storeState.webhookVersion,
-            },
-            service_id: props.serviceId,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
-        state.currentStep = 3;
-    } catch (e) {
-        state.succeedWebhook = undefined;
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    createWebhook({
+        name: storeState.webhookName,
+        plugin_info: {
+            plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+            version: storeState.webhookVersion,
+        },
+        service_id: props.serviceId,
+    });
 };
 
 onUnmounted(() => {
@@ -169,7 +163,7 @@ onUnmounted(() => {
                       style-type="substitutive"
                       size="lg"
                       class="ml-4"
-                      :loading="state.loading"
+                      :loading="createWebhookLoading"
                       @click="handleActionButton"
             >
                 {{ state.currentStep === 1 ? $t('ALERT_MANAGER.CONTINUE') : $t('ALERT_MANAGER.CREATE') }}

@@ -37,7 +37,6 @@ import { initWorkspace } from '@/lib/site-initializer/workspace';
 
 import { useTaskManagementTemplateStore } from '@/services/ops-flow/task-management-templates/stores/use-task-management-template-store';
 
-
 const initQueryHelper = () => {
     const userStore = useUserStore(pinia);
     QueryHelper.init(computed(() => userStore.state.timezone));

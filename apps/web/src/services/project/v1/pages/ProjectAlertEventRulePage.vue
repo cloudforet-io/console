@@ -10,10 +10,10 @@ import {
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EventRuleChangeOrderParameters } from '@/schema/monitoring/event-rule/api-verbs/change-order';
-import type { EventRuleDeleteParameters } from '@/schema/monitoring/event-rule/api-verbs/delete';
-import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
-import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
+import type { EventRuleChangeOrderParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/change-order';
+import type { EventRuleDeleteParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/delete';
+import type { EventRuleListParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/list';
+import type { EventRuleModel } from '@/api-clients/monitoring/event-rule/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

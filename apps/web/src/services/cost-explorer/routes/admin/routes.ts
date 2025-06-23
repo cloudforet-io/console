@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostDataSourceListParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/list';
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
+import type { DataSourceModel } from '@/api-clients/monitoring/data-source/schema/model';
 
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -20,6 +20,7 @@ const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplore
 
 const AdminAdvancedSettingsPage = () => import('@/services/cost-explorer/pages/admin/AdminAdvancedSettingsPage.vue');
 const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetMainPage.vue');
+const AdminAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/admin/AdminAnomalyDetectionConfigurationPage.vue');
 
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 
@@ -97,6 +98,23 @@ const adminCostExplorerRoutes: RouteConfig = {
                     },
                     props: true,
                     component: CostAnalysisPage as any,
+                },
+            ],
+        },
+        // Temporary page for client support (to be redeveloped later)
+        {
+            path: 'anomaly-detection',
+            meta: {
+                menuId: MENU_ID.ANOMALY_DETECTION,
+                translationId: MENU_INFO_MAP[MENU_ID.ANOMALY_DETECTION].translationId,
+            },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: ADMIN_COST_EXPLORER_ROUTE.ANOMALY_DETECTION._NAME,
+                    meta: { menuId: MENU_ID.ANOMALY_DETECTION },
+                    component: AdminAnomalyDetectionConfigurationPage as any,
                 },
             ],
         },

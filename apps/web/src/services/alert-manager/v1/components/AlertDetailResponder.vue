@@ -12,10 +12,10 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
-import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
+import type { EscalationPolicyGetParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/get';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
+import type { EscalationPolicyRule } from '@/api-clients/monitoring/escalation-policy/schema/type';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import { i18n } from '@/translations';

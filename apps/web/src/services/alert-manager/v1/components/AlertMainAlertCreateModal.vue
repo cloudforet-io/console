@@ -10,11 +10,11 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { AlertCreateParameters } from '@/schema/monitoring/alert/api-verbs/create';
-import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
-import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { AlertCreateParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/create';
+import { ALERT_URGENCY } from '@/api-clients/monitoring/alert/schema/constants';
+import type { ProjectAlertConfigCreateParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/create';
+import type { ProjectAlertConfigGetParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/get';
+import type { ProjectAlertConfigModel } from '@/api-clients/monitoring/project-alert-config/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,6 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { ProjectTreeNodeData } from '@/common/modules/project/project-tree-type';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
 
 
 const props = defineProps<{

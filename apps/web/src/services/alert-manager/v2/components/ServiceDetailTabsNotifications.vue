@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import {
-    reactive, computed, watch, onUnmounted,
+    reactive, computed, onUnmounted,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
@@ -20,21 +21,20 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceChannelListParameters } from '@/schema/alert-manager/service-channel/api-verbs/list';
+import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
 import {
     SERVICE_CHANNEL_STATE,
     SERVICE_CHANNEL_TYPE,
-} from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+} from '@/api-clients/alert-manager/service-channel/schema/constants';
+import type { ServiceChannelModel } from '@/api-clients/alert-manager/service-channel/schema/model';
+import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -45,6 +45,8 @@ import ServiceDetailTabsNotificationsTableModal
 import ServiceDetailTabsNotificationsUpdateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsNotificationsUpdateModal.vue';
 import { alertManagerStateFormatter, getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -54,7 +56,7 @@ import {
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { NotificationsModalType, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { NotificationsModalType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     tableHeight: number;
@@ -65,13 +67,18 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 const serviceCreateFormStore = useServiceCreateFormStore();
 
+const route = useRoute();
 const router = useRouter();
 
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -103,19 +110,15 @@ const tableState = reactive({
     ])),
     fields: NOTIFICATION_MANAGEMENT_TABLE_FIELDS,
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('alert_manager.ServiceChannel', 'name', 'string', [{ k: 'service_id', v: storeState.service.service_id, o: 'eq' }]),
+        name: makeDistinctValueHandler('alert_manager.ServiceChannel', 'name', 'string', [{ k: 'service_id', v: serviceId.value, o: 'eq' }]),
         state: makeEnumValueHandler(SERVICE_CHANNEL_STATE),
     })),
 });
 const storeState = reactive({
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
-    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
 });
 const state = reactive({
-    loading: false,
-    items: [] as ServiceChannelModel[],
-    refinedItems: computed<ServiceChannelModel[]>(() => state.items.map((i) => {
+    refinedItems: computed<ServiceChannelModel[]>(() => (serviceChannelListData.value?.results || []).map((i) => {
         if (i.channel_type === SERVICE_CHANNEL_TYPE.FORWARD) {
             return {
                 ...i,
@@ -124,9 +127,16 @@ const state = reactive({
         }
         return i;
     })),
-    totalCount: 0,
     selectIndex: undefined as number|undefined,
     selectedItem: computed<ServiceChannelModel>(() => state.refinedItems[state.selectIndex]),
+});
+const paginationState = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
+const sortState = reactive({
+    sortKey: 'created_at',
+    sortDesc: true,
 });
 const modalState = reactive({
     visible: false,
@@ -138,14 +148,46 @@ const notificationsListApiQueryHelper = new ApiQueryHelper().setSort('created_at
 const queryTagHelper = useQueryTags({ keyItemSets: NOTIFICATION_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
+const queryClient = useQueryClient();
+const { serviceChannelAPI } = useServiceChannelApi();
+const { key: serviceChannelListQueryKey, params: serviceChannelListQueryParams } = useServiceQueryKey('alert-manager', 'service-channel', 'list', {
+    params: computed(() => {
+        notificationsListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        return {
+            query: {
+                ...notificationsListApiQueryHelper.data,
+                sort: [{ key: sortState.sortKey, desc: sortState.sortDesc }],
+            },
+            service_id: serviceId.value,
+        };
+    }),
+    pagination: true,
+});
+const { data: serviceChannelListData, isLoading: serviceChannelListFetching, totalCount: serviceChannelListTotalCount } = useScopedPaginationQuery({
+    queryKey: serviceChannelListQueryKey,
+    queryFn: serviceChannelAPI.list,
+    params: serviceChannelListQueryParams,
+    gcTime: 1000 * 60 * 2,
+    enabled: true,
+}, {
+    thisPage: computed(() => paginationState.thisPage),
+    pageSize: computed(() => paginationState.pageSize),
+    verb: 'list',
+}, ['WORKSPACE']);
+
+const refreshServiceChannelList = () => {
+    queryClient.invalidateQueries({ queryKey: serviceChannelListQueryKey.value });
+};
+
 const handleCloseModal = () => {
     state.selectIndex = undefined;
-    fetchNotificationList();
     serviceDetailPageStore.setSelectedNotificationId(undefined);
 };
 const handleClickCreateButton = () => {
     if (!hasReadWriteAccess) return;
-    serviceCreateFormStore.setCreatedService(storeState.service);
+    serviceCreateFormStore.setCreatedService(serviceData.value || {});
     router.push({
         name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL.NOTIFICATIONS.CREATE._NAME,
     }).catch(() => {});
@@ -155,17 +197,15 @@ const handleSelectDropdownItem = (name: NotificationsModalType) => {
     modalState.type = name;
 };
 const handleChangeToolbox = async (options: any = {}) => {
-    if (options.sortBy !== undefined) notificationsListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy !== undefined) sortState.sortKey = options.sortBy;
+    if (options.sortDesc !== undefined) sortState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
-    if (options.pageStart !== undefined) notificationsListApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) notificationsListApiQueryHelper.setPageLimit(options.pageLimit);
-    await fetchNotificationList();
 };
 const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/service-channel/list',
         param: {
-            service_id: storeState.service.service_id,
+            service_id: serviceId.value,
             query: { ...notificationsListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,
@@ -178,32 +218,6 @@ const handleSelectTableRow = (item:number[]) => {
     state.selectIndex = item[0];
     serviceDetailPageStore.setSelectedNotificationId(state.refinedItems[item[0]].channel_id);
 };
-
-const fetchNotificationList = async () => {
-    state.loading = true;
-    try {
-        notificationsListApiQueryHelper.setFilters([
-            ...queryTagHelper.filters.value,
-        ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.serviceChannel.list<ServiceChannelListParameters, ListResponse<ServiceChannelModel>>({
-            query: notificationsListApiQueryHelper.data,
-            service_id: storeState.service.service_id,
-        });
-        state.items = results || [];
-        state.totalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => storeState.service.service_id, (id) => {
-    if (!id) return;
-    fetchNotificationList();
-}, { immediate: true });
 
 onUnmounted(() => {
     serviceDetailPageStore.setSelectedNotificationId(undefined);
@@ -219,8 +233,10 @@ onUnmounted(() => {
                          sortable
                          exportable
                          :multi-select="false"
-                         :loading="state.loading"
-                         :total-count="state.totalCount"
+                         :loading="serviceChannelListFetching"
+                         :total-count="serviceChannelListTotalCount"
+                         :this-page.sync="paginationState.thisPage"
+                         :page-size.sync="paginationState.pageSize"
                          :items="state.refinedItems"
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
@@ -229,7 +245,7 @@ onUnmounted(() => {
                          :value-handler-map="tableState.valueHandlerMap"
                          :style="{height: `${props.tableHeight - SERVICE_TAB_HEIGHT}px`}"
                          @change="handleChangeToolbox"
-                         @refresh="handleChangeToolbox()"
+                         @refresh="refreshServiceChannelList"
                          @export="handleExportExcel"
                          @select="handleSelectTableRow"
         >
@@ -238,7 +254,7 @@ onUnmounted(() => {
                     <template #heading>
                         <p-heading heading-type="sub"
                                    use-total-count
-                                   :total-count="state.totalCount"
+                                   :total-count="serviceChannelListTotalCount"
                                    :title="$t('ALERT_MANAGER.NOTIFICATIONS.TITLE')"
                         />
                     </template>
@@ -277,11 +293,11 @@ onUnmounted(() => {
                          height="1rem"
                     />
                     <p-lazy-img v-else
-                                :src="assetUrlConverter(getProtocolInfo(value, storeState.notificationProtocolList).icon || '')"
+                                :src="assetUrlConverter(getProtocolInfo(value, notificationProtocolListData).icon || '')"
                                 width="1rem"
                                 height="1rem"
                     />
-                    <span>{{ getProtocolInfo(value, storeState.notificationProtocolList, item.data).name }}</span>
+                    <span>{{ getProtocolInfo(value, notificationProtocolListData, item.data).name }}</span>
                 </div>
             </template>
         </p-toolbox-table>

@@ -3,8 +3,9 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PToolboxTable, PSelectStatus, PBadge, PDivider, PLink, PI,
@@ -13,10 +14,11 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/schema/alert-manager/alert/api-verbs/list';
-import { ALERT_STATUS, ALERT_URGENCY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
+import { useAlertApi } from '@/api-clients/alert-manager/alert/composables/use-alert-api';
+import { ALERT_STATUS, ALERT_URGENCY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -26,7 +28,6 @@ import { useUserStore } from '@/store/user/user-store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
@@ -43,10 +44,6 @@ import {
 } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import type { AlertFilterType } from '@/services/alert-manager/v2/types/alert-manager-type';
-
-
-
-
 
 interface Props {
     cloudServiceId?: string;
@@ -66,22 +63,21 @@ const storeState = reactive({
 });
 const state = reactive({
     fields: ALERT_MANAGEMENT_TABLE_FIELDS,
-    items: [] as AlertModel[],
-    refinedItems: computed<AlertModel[]>(() => state.items.map((alert:AlertModel) => ({
-        ...alert,
-        created_at: iso8601Formatter(alert.created_at, storeState.timezone),
-    }))),
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
-    loading: true,
     totalCount: 0,
     searchText: '',
     pageLimit: 15,
     pageStart: 1,
+    listTotalCount: 0,
     visibleCustomFieldModal: false,
 });
 
 const filterState = reactive({
+    pageStart: 1,
+    pageLimit: 15,
+    sortKey: 'created_at',
+    sortDesc: true,
     selectedServiceId: '',
     statusFields: computed<AlertFilterType[]>(() => ([
         { label: i18n.t('ALERT_MANAGER.ALERTS.OPEN'), name: ALERT_STATUS_FILTERS.OPEN },
@@ -102,45 +98,52 @@ const filterState = reactive({
     selectedLabels: [] as SelectDropdownMenuItem[],
 });
 
-
-const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
-    .setPage(1, 15);
 const queryTagHelper = useQueryTags({ keyItemSets: ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets });
 const { queryTags } = queryTagHelper;
-const getAlertsFilter = ():AlertListParameters => {
-    alertListApiQueryHelper.setFilters(queryTagHelper.filters.value);
-    if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
-        alertListApiQueryHelper.addFilter({ k: 'status', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
-    } else if (filterState.selectedStatusFilter !== 'ALL') {
-        alertListApiQueryHelper.addFilter({ k: 'status', v: filterState.selectedStatusFilter, o: '=' });
-    }
-    if (filterState.selectedUrgencyFilter !== 'ALL') {
-        alertListApiQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
-    }
-    if (filterState.selectedLabels.length > 0) {
-        alertListApiQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
-    }
 
-    return ({
-        query: alertListApiQueryHelper.data,
-        asset_id: props.cloudServiceId,
-    });
-};
+const queryClient = useQueryClient();
+const { alertAPI } = useAlertApi();
+const alertListApiQueryHelper = new ApiQueryHelper();
+const { key: alertListBaseQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
+const { key: alertListQueryKey, params: alertListQueryParams } = useServiceQueryKey('alert-manager', 'alert', 'list', {
+    params: computed(() => {
+        alertListApiQueryHelper
+            .setPage(filterState.pageStart, filterState.pageLimit)
+            .setSort(filterState.sortKey, filterState.sortDesc)
+            .setFilters(queryTagHelper.filters.value);
+        if (filterState.selectedStatusFilter === ALERT_STATUS_FILTERS.OPEN) {
+            alertListApiQueryHelper.addFilter({ k: 'status', v: [ALERT_STATUS_FILTERS.TRIGGERED, ALERT_STATUS_FILTERS.ACKNOWLEDGED], o: '=' });
+        } else if (filterState.selectedStatusFilter !== 'ALL') {
+            alertListApiQueryHelper.addFilter({ k: 'status', v: filterState.selectedStatusFilter, o: '=' });
+        }
+        if (filterState.selectedUrgencyFilter !== 'ALL') {
+            alertListApiQueryHelper.addFilter({ k: 'urgency', v: filterState.selectedUrgencyFilter, o: '=' });
+        }
+        if (filterState.selectedLabels.length > 0) {
+            alertListApiQueryHelper.addFilter({ k: 'labels', v: filterState.selectedLabels.map((i) => i.name), o: '=' });
+        }
 
-const fetchAlerts = async () => {
-    state.loading = true;
-    const params:AlertListParameters = getAlertsFilter();
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.alert.list<AlertListParameters, ListResponse<AlertModel>>(params);
-        state.items = results || [];
-        state.totalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
+        return ({
+            query: alertListApiQueryHelper.data,
+            asset_id: props.cloudServiceId,
+        });
+    }),
+});
+const { data: alertListData, isFetching: alertListLoading } = useScopedQuery({
+    queryKey: alertListQueryKey,
+    queryFn: async () => alertAPI.list(alertListQueryParams.value),
+    select: (data) => ({
+        results: (data.results ?? []).map((alert:AlertModel) => ({
+            ...alert,
+            created_at: iso8601Formatter(alert.created_at, storeState.timezone),
+        })),
+        totalCount: data.total_count ?? 0,
+    }),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
+const refreshhAlertData = () => {
+    queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey.value });
 };
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
@@ -159,14 +162,11 @@ const handleCustomFieldUpdate = (fields: DataTableFieldType[]) => {
 };
 
 const handleChange = async (options: any = {}) => {
-    if (options.sortBy !== undefined) alertListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy !== undefined) filterState.sortKey = options.sortBy;
+    if (options.sortDesc !== undefined) filterState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
-    if (options.pageStart !== undefined) alertListApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) alertListApiQueryHelper.setPageLimit(options.pageLimit);
-    await fetchAlerts();
-};
-const handleRefreshAlertData = async () => {
-    await fetchAlerts();
+    if (options.pageStart !== undefined) filterState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) filterState.pageLimit = options.pageLimit;
 };
 
 const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
@@ -175,7 +175,6 @@ const handleSelectFilter = (type: 'status' | 'urgency', value: string) => {
     } else {
         filterState.selectedUrgencyFilter = value;
     }
-    fetchAlerts();
 };
 
 const handleExport = async () => {
@@ -191,10 +190,12 @@ const handleExport = async () => {
 };
 
 watch(() => props.cloudServiceId, (after, before) => {
-    if (!after) {
-        state.projectUserIdList = [];
-    } else if (after !== before) fetchAlerts();
+    if (after !== before) refreshhAlertData();
 }, { immediate: true });
+watch(alertListData, (d) => {
+    if (!d || !d.totalCount || state.listTotalCount === d.totalCount) return;
+    state.listTotalCount = d.totalCount || 0;
+});
 </script>
 
 <template>
@@ -203,7 +204,7 @@ watch(() => props.cloudServiceId, (after, before) => {
                    heading-type="sub"
                    use-total-count
                    :title="$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_ALERTS')"
-                   :total-count="state.totalCount"
+                   :total-count="state.listTotalCount"
         />
         <p-toolbox-table class="toolbox"
                          searchable
@@ -213,16 +214,16 @@ watch(() => props.cloudServiceId, (after, before) => {
                          sort-by="created_at"
                          :sort-desc="true"
                          :query-tags="queryTags"
-                         :loading="state.loading"
-                         :total-count="state.totalCount"
+                         :loading="alertListLoading"
+                         :total-count="state.listTotalCount"
                          :fields="state.fields"
-                         :items="state.refinedItems"
+                         :items="alertListData?.results"
                          :key-item-sets="ALERT_MANAGEMENT_TABLE_HANDLER.keyItemSets"
                          :value-handler-map="ALERT_MANAGEMENT_TABLE_HANDLER.valueHandlerMap"
                          settings-visible
                          @change="handleChange"
                          @click-settings="handleClickSettings"
-                         @refresh="handleRefreshAlertData"
+                         @refresh="refreshhAlertData"
                          @export="handleExport"
         >
             <template #toolbox-bottom>
@@ -304,7 +305,7 @@ watch(() => props.cloudServiceId, (after, before) => {
                             resource-type="cloudService.alert"
                             :default-field="ALERT_MANAGEMENT_TABLE_FIELDS"
                             @update:visible="handleVisibleCustomFieldModal"
-                            @complete="fetchAlerts"
+                            @complete="refreshhAlertData"
                             @custom-field-loaded="handleCustomFieldUpdate"
         />
     </div>

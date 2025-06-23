@@ -2,13 +2,15 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import { PTableCheckModal, PLazyImg, PStatus } from '@cloudforet/mirinae';
 
-import type { WebhookDisableParameters } from '@/schema/alert-manager/webhook/api-verbs/disable';
-import type { WebhookEnableParameters } from '@/schema/alert-manager/webhook/api-verbs/enable';
-import { WEBHOOK_STATE } from '@/schema/alert-manager/webhook/constants';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
+import type { WebhookDisableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/disable';
+import type { WebhookEnableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/enable';
+import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -43,7 +45,6 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const state = reactive({
-    loading: false,
     headerTitle: computed<TranslateResult>(() => {
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             return i18n.t('ALERT_MANAGER.WEBHOOK.MODAL_DISABLE_TITLE');
@@ -53,27 +54,31 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
+const { webhookAPI } = useWebhookApi();
+const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = useMutation({
+    mutationFn: (params: WebhookDisableParameters|WebhookEnableParameters) => {
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
-            await SpaceConnector.clientV2.alertManager.webhook.disable<WebhookDisableParameters>({
-                webhook_id: props.selectedItem?.webhook_id || '',
-            });
+            return webhookAPI.disable(params);
+        }
+        return webhookAPI.enable(params);
+    },
+    onSuccess: () => {
+        if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DISABLE_WEBHOOK'), '');
         } else {
-            await SpaceConnector.clientV2.alertManager.webhook.enable<WebhookEnableParameters>({
-                webhook_id: props.selectedItem?.webhook_id || '',
-            });
             showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_ENABLE_WEBHOOK'), '');
         }
         state.proxyVisible = false;
         emit('close');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const handleConfirm = async () => {
+    webhookStatusMutation({
+        webhook_id: props.selectedItem?.webhook_id || '',
+    });
 };
 </script>
 
@@ -82,7 +87,7 @@ const handleConfirm = async () => {
                          :header-title="state.headerTitle"
                          :theme-color="props.selectedItem?.state === WEBHOOK_STATE.ENABLED ? 'alert' : 'primary'"
                          :fields="WEBHOOK_MANAGEMENT_TABLE_FIELDS"
-                         :loading="state.loading"
+                         :loading="webhookStatusLoading"
                          :items="[props.selectedItem]"
                          modal-size="md"
                          @confirm="handleConfirm"

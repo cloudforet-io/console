@@ -2,9 +2,11 @@
 import {
     reactive, computed, watch, onUnmounted,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable,
@@ -19,16 +21,14 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import type { EscalationPolicyRulesType } from '@/schema/alert-manager/escalation-policy/type';
+import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import type { EscalationPolicyRulesType } from '@/api-clients/alert-manager/escalation-policy/schema/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n as _i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -40,6 +40,8 @@ import ServiceDetailTabsSettingsEscalationPolicyFormModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicyFormModal.vue';
 import ServiceDetailTabsSettingsEscalationPolicyStateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicyStateModal.vue';
+import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { ALERT_STATUS_FILTERS } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -52,7 +54,13 @@ const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { serviceData } = useServiceGetQuery(serviceId);
+const defaultEscalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
 
 const tableState = reactive({
     actionMenu: computed<MenuItem[]>(() => ([
@@ -60,45 +68,61 @@ const tableState = reactive({
             type: 'item',
             name: 'STATE',
             label: _i18n.t('ALERT_MANAGER.ESCALATION_POLICY.DEFAULT'),
-            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
+            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === defaultEscalationPolicyId.value,
         },
         {
             type: 'item',
             name: 'DELETE',
             label: _i18n.t('ALERT_MANAGER.DELETE'),
-            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === storeState.defaultEscalationPolicyId,
+            disabled: !state.selectedItem || state.selectedItem?.escalation_policy_id === defaultEscalationPolicyId.value,
         },
     ])),
     fields: ESCALATION_POLICY_MANAGEMENT_TABLE_FIELDS,
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('alert_manager.EscalationPolicy', 'name', 'string', [{ k: 'service_id', v: storeState.serviceId, o: 'eq' }]),
+        name: makeDistinctValueHandler('alert_manager.EscalationPolicy', 'name', 'string', [{ k: 'service_id', v: serviceId.value, o: 'eq' }]),
     })),
 });
 const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
-    defaultEscalationPolicyId: computed<string>(() => serviceDetailPageState.serviceInfo.escalation_policy_id),
     timezone: computed<string>(() => serviceDetailPageGetters.timezone),
     selectedEscalationPolicyId: computed<string|undefined>(() => serviceDetailPageState.selectedEscalationPolicyId),
 });
 const state = reactive({
-    loading: false,
-    items: [] as EscalationPolicyModel[],
-    totalCount: 0,
     selectIndex: undefined as number|undefined,
-    selectedItem: computed<EscalationPolicyModel>(() => state.items[state.selectIndex]),
+    selectedItem: computed<EscalationPolicyModel>(() => escalationPolicyListData.value[state.selectIndex]),
+    sortBy: 'created_at',
+    sortDesc: true,
+    pageStart: 1,
+    pageLimit: 15,
+    listTotalCount: 0,
 });
 const modalState = reactive({
     visible: false,
     type: 'CREATE' as EscalationPolicyModalType,
 });
 
-const escalationPolicyListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
-    .setPage(1, 15);
+const escalationPolicyListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
+const queryClient = useQueryClient();
+const { key: escalationPolicyListBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
+const {
+    escalationPolicyListData, escalationPolicyListTotalCount, escalationPolicyListFetching,
+} = useEscalationPolicyListQuery({
+    params: computed(() => {
+        escalationPolicyListApiQueryHelper
+            .setSort(state.sortBy, state.sortDesc)
+            .setPage(state.pageStart, state.pageLimit)
+            .setFilters([...queryTagHelper.filters.value]);
+        return {
+            query: escalationPolicyListApiQueryHelper.data,
+            service_id: serviceId.value,
+        };
+    }),
+});
+
 const initSelectedEscalationPolicy = () => {
-    state.selectIndex = state.items.findIndex((item) => item.escalation_policy_id === storeState.selectedEscalationPolicyId);
+    state.selectIndex = escalationPolicyListData.value.findIndex((item) => item.escalation_policy_id === storeState.selectedEscalationPolicyId);
 };
 const getConnectChannelCount = (rules: EscalationPolicyRulesType[]): { step: number; connectedChannelCnt: number; }[] => rules.map((rule, stepIdx) => ({
     step: stepIdx + 1,
@@ -109,17 +133,19 @@ const handleActionModal = (type: EscalationPolicyModalType) => {
     modalState.type = type;
 };
 const handleChangeToolbox = async (options: any = {}) => {
-    if (options.sortBy !== undefined) escalationPolicyListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy !== undefined) {
+        state.sortBy = options.sortBy;
+        state.sortDesc = options.sortDesc;
+    }
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
-    if (options.pageStart !== undefined) escalationPolicyListApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) escalationPolicyListApiQueryHelper.setPageLimit(options.pageLimit);
-    await fetchEscalationPolicyList();
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
 };
 const handleExportExcel = async () => {
     await downloadExcel({
         url: '/alert-manager/escalation-policy/list',
         param: {
-            service_id: storeState.serviceId,
+            service_id: serviceId.value,
             query: { ...escalationPolicyListApiQueryHelper.data, only: ALERT_EXCEL_FIELDS.map((d) => d.key) },
         },
         fields: ALERT_EXCEL_FIELDS,
@@ -132,37 +158,18 @@ const handleSelectTableRow = (selectedItems: number[]) => {
 };
 const handleCloseModal = () => {
     state.selectIndex = undefined;
-    fetchEscalationPolicyList();
+};
+const refreshEscalationPolicyList = () => {
+    queryClient.invalidateQueries({ queryKey: escalationPolicyListBaseQueryKey.value });
 };
 
-const fetchEscalationPolicyList = async () => {
-    state.loading = true;
-    try {
-        escalationPolicyListApiQueryHelper.setFilters([
-            ...queryTagHelper.filters.value,
-        ]);
-        const { results, total_count } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
-            query: escalationPolicyListApiQueryHelper.data,
-            service_id: storeState.serviceId,
-        });
-        state.items = results || [];
-        state.totalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch([() => storeState.selectedEscalationPolicyId, () => state.items], ([id]) => {
+watch(escalationPolicyListTotalCount, (totalCount) => {
+    if (!totalCount || state.listTotalCount === totalCount) return;
+    state.listTotalCount = totalCount || 0;
+});
+watch([() => storeState.selectedEscalationPolicyId, () => escalationPolicyListData.value], ([id]) => {
     if (!id) return;
     initSelectedEscalationPolicy();
-}, { immediate: true });
-watch(() => storeState.serviceId, (id) => {
-    if (!id) return;
-    fetchEscalationPolicyList();
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -178,16 +185,16 @@ onUnmounted(() => {
                          sortable
                          exportable
                          :multi-select="false"
-                         :loading="state.loading"
-                         :total-count="state.totalCount"
-                         :items="state.items"
+                         :loading="escalationPolicyListFetching"
+                         :total-count="state.listTotalCount"
+                         :items="escalationPolicyListData"
                          :fields="tableState.fields"
                          :select-index="[state.selectIndex]"
                          :query-tags="queryTags"
                          :key-item-sets="ESCALATION_POLICY_MANAGEMENT_TABLE_KEY_ITEMS_SETS"
                          :value-handler-map="tableState.valueHandlerMap"
                          @change="handleChangeToolbox"
-                         @refresh="handleChangeToolbox()"
+                         @refresh="refreshEscalationPolicyList"
                          @export="handleExportExcel"
                          @select="handleSelectTableRow"
         >
@@ -196,7 +203,7 @@ onUnmounted(() => {
                     <template #heading>
                         <p-heading heading-type="sub"
                                    use-total-count
-                                   :total-count="state.totalCount"
+                                   :total-count="state.listTotalCount"
                                    :title="$t('ALERT_MANAGER.ESCALATION_POLICY.TITLE')"
                         />
                     </template>
@@ -233,7 +240,7 @@ onUnmounted(() => {
             <template #col-name-format="{value, item}">
                 <div>
                     <span>{{ value }}</span>
-                    <p-badge v-if="item.escalation_policy_id === storeState.defaultEscalationPolicyId"
+                    <p-badge v-if="item.escalation_policy_id === defaultEscalationPolicyId"
                              style-type="safe"
                              badge-type="solid-outline"
                              class="ml-2"

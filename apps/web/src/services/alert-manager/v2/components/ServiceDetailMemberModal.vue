@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { partition, reject, map } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PPaneLayout, PFieldGroup, PFieldTitle, PDataLoader, PIconButton, PAvatar, screens, PEmpty, PScopedNotification, PLink,
 } from '@cloudforet/mirinae';
 
+import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
+import type { ServiceChangeMembersParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/change-members';
+import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
-import type { ServiceChangeMembersParameters } from '@/schema/alert-manager/service/api-verbs/chagne-members';
-import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
-import type { MembersType } from '@/schema/alert-manager/service/type';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
@@ -30,10 +32,11 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import { indigo } from '@/styles/colors';
 
+import { useServiceChannelListQuery } from '@/services/alert-manager/v2/composables/use-service-channel-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
 type modalMode = 'member' | 'invitation';
@@ -57,8 +60,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const { width } = useWindowSize();
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -66,10 +73,8 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
 const storeState = reactive({
-    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
     userMap: computed<UserReferenceMap>(() => serviceDetailPageGetters.userReferenceMap),
     userGroupMap: computed<UserGroupReferenceMap>(() => serviceDetailPageGetters.userGroupReferenceMap),
-    serviceChannelList: computed<ServiceChannelModel[]>(() => serviceDetailPageState.serviceChannelList),
 });
 const state = reactive({
     loading: false,
@@ -94,7 +99,7 @@ const state = reactive({
         }
     }),
     memberList: computed<MemberInfoType[]>(() => {
-        const userList = storeState.serviceInfo.members.USER.map((i) => {
+        const userList = (serviceData.value?.members?.USER || []).map((i) => {
             const user = storeState.userMap[i];
             return {
                 roleType: user?.data.roleInfo?.role_type,
@@ -103,7 +108,7 @@ const state = reactive({
                 key: user?.key,
             };
         });
-        const userGroupList = storeState.serviceInfo.members.USER_GROUP.map((i) => {
+        const userGroupList = (serviceData.value?.members?.USER_GROUP || []).map((i) => {
             const userGroup = storeState.userGroupMap[i];
             return {
                 label: userGroup?.name || '',
@@ -118,6 +123,25 @@ const state = reactive({
     excludedSelectedIds: [] as string[],
     formattedMemberItems: {} as Record<MembersType, string[]>,
     selectedDeleteMember: {} as MemberInfoType,
+});
+
+const queryClient = useQueryClient();
+const { serviceAPI } = useServiceApi();
+const { withSuffix: serviceQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
+
+const { serviceChannelListData } = useServiceChannelListQuery(serviceId);
+const { mutate: changeMemegers } = useMutation({
+    mutationFn: (params: ServiceChangeMembersParameters) => serviceAPI.changeMembers(params),
+    onSuccess: async (_, variables) => {
+        const _serviceId = { service_id: variables.service_id };
+        if (state.mode === 'invitation') {
+            showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
+        }
+        queryClient.invalidateQueries({ queryKey: serviceQueryKey(_serviceId) });
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
 });
 
 const formatRoleType = (roleType: RoleType) => roleType?.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
@@ -142,7 +166,7 @@ const handleConfirm = async () => {
         await inviteMember();
     }
 };
-const hasForwardValue = (): boolean => storeState.serviceChannelList.some((item) => {
+const hasForwardValue = (): boolean => serviceChannelListData.value.some((item) => {
     const forwardType = item.data?.FORWARD_TYPE;
     const forwardData = item.data?.[forwardType];
     return Array.isArray(forwardData) && forwardData.includes(state.selectedDeleteMember.key);
@@ -186,26 +210,14 @@ const getNotificationLink = () => ({
 });
 
 const fetcherChangeMembers = async (userData: string[], userGroupData: string[]) => {
-    try {
-        await SpaceConnector.clientV2.alertManager.service.changeMembers<ServiceChangeMembersParameters>({
-            service_id: storeState.serviceInfo.service_id,
-            members: {
-                USER: userData,
-                USER_GROUP: userGroupData,
-            },
-        });
-        if (state.mode === 'invitation') {
-            showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_INVITE_MEMBER'), '');
-        }
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
+    changeMemegers({
+        service_id: serviceId.value,
+        members: {
+            USER: userData,
+            USER_GROUP: userGroupData,
+        },
+    });
 };
-
-onMounted(() => {
-    serviceDetailPageStore.fetchServiceChannelList(storeState.serviceInfo.service_id);
-});
 </script>
 
 <template>

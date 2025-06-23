@@ -17,9 +17,9 @@ import {
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import { ESCALATION_POLICY_FINISH_CONDITION } from '@/api-clients/monitoring/escalation-policy/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
+import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/api-clients/monitoring/escalation-policy/schema/type';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import { i18n as _i18n } from '@/translations';

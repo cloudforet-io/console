@@ -9,16 +9,16 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { EventRuleCreateParameters } from '@/schema/monitoring/event-rule/api-verbs/create';
-import type { EventRuleGetParameters } from '@/schema/monitoring/event-rule/api-verbs/get';
-import type { EventRuleUpdateParameters } from '@/schema/monitoring/event-rule/api-verbs/update';
-import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
+import type { EventRuleCreateParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/create';
+import type { EventRuleGetParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/get';
+import type { EventRuleUpdateParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/update';
+import type { EventRuleModel } from '@/api-clients/monitoring/event-rule/schema/model';
 import type {
     EventRuleActions,
     EventRuleCondition,
     EventRuleConditionsPolicy,
     EventRuleOptions,
-} from '@/schema/monitoring/event-rule/type';
+} from '@/api-clients/monitoring/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
