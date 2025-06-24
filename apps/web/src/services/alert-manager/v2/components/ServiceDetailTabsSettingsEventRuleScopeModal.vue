@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PSelectCard, PI, PFieldGroup, PSelectDropdown, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { EVENT_RULE_SCOPE } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleScopeType } from '@/schema/alert-manager/event-rule/type';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import { EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleScopeType } from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -24,9 +21,9 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useWebhookListQuery } from '@/services/alert-manager/v2/composables/use-webhook-list-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
 
@@ -52,6 +49,9 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'update:selected-webhook'): void;
     (e: 'update:scope'): void;
@@ -61,15 +61,12 @@ const emit = defineEmits<{(e: 'update:visible'): void;
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
 });
 const state = reactive({
     loading: false,
-    dropdownLoading: false,
-    webhook: [] as WebhookModel[],
     proxySelectedWebhook: useProxyValue('selectedWebhook', props, emit),
     proxySelectedScope: useProxyValue('scope', props, emit),
-    webhookDropdownList: computed<SelectDropdownMenuItem[]>(() => state.webhook.map((i) => ({
+    webhookDropdownList: computed<SelectDropdownMenuItem[]>(() => (webhookListData.value || []).map((i) => ({
         name: i.webhook_id,
         label: i.name,
     }))),
@@ -88,7 +85,7 @@ const state = reactive({
 });
 
 const getWebhookIcon = (id: string): string|undefined => {
-    const webhook = state.webhook.find((i) => i.webhook_id === id);
+    const webhook = (webhookListData.value || []).find((i) => i.webhook_id === id);
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
@@ -112,25 +109,7 @@ const handleClickConfirm = () => {
     });
 };
 
-const fetchWebhookList = async () => {
-    state.dropdownLoading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
-            service_id: storeState.serviceId,
-        });
-        state.webhook = results || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.webhook = [];
-    } finally {
-        state.dropdownLoading = false;
-    }
-};
-
-watch(() => storeState.serviceId, (id) => {
-    if (!id) return;
-    fetchWebhookList();
-}, { immediate: true });
+const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId);
 
 onMounted(() => {
     if (props.visible) {
@@ -182,7 +161,7 @@ onMounted(() => {
                 >
                     <p-select-dropdown :menu="state.webhookDropdownList"
                                        :selected="state.proxySelectedWebhook"
-                                       :loading="state.dropdownLoading"
+                                       :loading="webhookListFetching"
                                        use-fixed-menu-style
                                        block
                                        @update:selected="handleUpdateSelectWebhook"

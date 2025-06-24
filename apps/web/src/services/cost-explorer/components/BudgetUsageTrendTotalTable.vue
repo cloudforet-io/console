@@ -37,7 +37,7 @@ interface DataByMonth {
 
 const props = defineProps<Props>();
 
-const { budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const appContextStore = useAppContextStore();
 

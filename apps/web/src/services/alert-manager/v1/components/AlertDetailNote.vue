@@ -10,10 +10,10 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/create';
-import type { NoteDeleteParameters } from '@/schema/monitoring/note/api-verbs/delete';
-import type { NoteListParameters } from '@/schema/monitoring/note/api-verbs/list';
-import type { NoteModel } from '@/schema/monitoring/note/model';
+import type { NoteCreateParameters } from '@/api-clients/monitoring/note/schema/api-verbs/create';
+import type { NoteDeleteParameters } from '@/api-clients/monitoring/note/schema/api-verbs/delete';
+import type { NoteListParameters } from '@/api-clients/monitoring/note/schema/api-verbs/list';
+import type { NoteModel } from '@/api-clients/monitoring/note/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

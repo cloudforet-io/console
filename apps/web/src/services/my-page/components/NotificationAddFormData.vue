@@ -4,27 +4,22 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useProtocolApi } from '@/api-clients/notification/protocol/composables/use-protocol-api';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
-import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
-import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 import { useUserStore } from '@/store/user/user-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
 import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
@@ -62,7 +57,9 @@ const state = reactive({
     channelName: undefined as string|undefined,
     notificationLevel: 'LV1' as NotificationLevel,
     schemaForm: {} as Record<string, any>,
-    schema: null as null|JsonSchema,
+    schema: computed<JsonSchema|null>(() => (props.visibleUserNotification
+        ? notificationProtocolData.value?.plugin_info.metadata.data.schema ?? null
+        : protocolData.value?.plugin_info.metadata.data.schema ?? null)),
     isSchemaFormValid: false,
     nameInvalidText: computed<TranslateResult|undefined>(() => {
         if (state.channelName !== undefined && state.channelName.length === 0) {
@@ -93,22 +90,33 @@ const state = reactive({
     selectedRadioIdx: 0,
 });
 
-const apiQuery = new ApiQueryHelper();
-const getSchema = async (): Promise<JsonSchema|null> => {
-    try {
-        apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
-        const fetcher = props.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>
-            : SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>;
-        const res = await fetcher({
-            query: apiQuery.data,
-        });
-        return res.results?.[0]?.plugin_info.metadata.data.schema ?? {};
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return null;
-    }
-};
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+const { protocolAPI } = useProtocolApi();
+const { key: notificationProtocolQueryKey, params: notificationProtocolQueryParams } = useServiceQueryKey('alert-manager', 'notification-protocol', 'get', {
+    params: computed(() => ({
+        protocol_id: props.protocolId,
+    })),
+});
+const { key: protocolQueryKey, params: protocolQueryParams } = useServiceQueryKey('notification', 'protocol', 'get', {
+    params: computed(() => ({
+        protocol_id: props.protocolId,
+    })),
+});
+
+const { data: notificationProtocolData } = useScopedQuery({
+    queryKey: notificationProtocolQueryKey,
+    queryFn: () => notificationProtocolAPI.get(notificationProtocolQueryParams.value),
+    enabled: computed(() => props.visibleUserNotification && !!props.protocolId),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['USER']);
+const { data: protocolData } = useScopedQuery({
+    queryKey: protocolQueryKey,
+    queryFn: () => protocolAPI.get(protocolQueryParams.value),
+    enabled: computed(() => !props.visibleUserNotification && !!props.protocolId),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['USER']);
 
 const emitChange = () => {
     emit('change', !props.visibleUserNotification ? {
@@ -156,14 +164,11 @@ const initStates = () => {
     state.schemaForm = {};
     state.isSchemaFormValid = false;
     state.selectedMember = ['*'];
-    state.schema = null;
 };
 
-watch([() => props.protocolId, () => props.protocolType], async ([protocolId, protocolType]) => {
+watch(() => props.protocolId, async (protocolId) => {
     if (!protocolId) return;
     initStates();
-    if (!props.visibleUserNotification && protocolType !== PROTOCOL_TYPE.EXTERNAL) return;
-    state.schema = await getSchema();
 }, { immediate: true });
 </script>
 

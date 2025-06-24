@@ -59,6 +59,7 @@ import {
     getTimeUnitByGranularity,
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type {
     Granularity,
     Period,
@@ -83,6 +84,8 @@ const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 const router = useRouter();
 
 const { getReferenceLocation } = useReferenceRouter();
@@ -90,7 +93,7 @@ const { getReferenceLocation } = useReferenceRouter();
 const getValueSumKey = (dataType: string) => {
     switch (dataType) {
     case 'cost':
-        return costAnalysisPageGetters.isUnifiedCost
+        return costQuerySetState.isUnifiedCostOn
             ? `cost.${costAnalysisPageGetters.currency}`
             : 'cost';
     case 'usage':
@@ -153,7 +156,7 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
-    analyzeFetcher: computed(() => (costAnalysisPageGetters.isUnifiedCost
+    analyzeFetcher: computed(() => (costQuerySetState.isUnifiedCostOn
         ? unifiedCostAnalyze
         : fetchCostAnalyze)),
     visibleGroupByItems: computed<MenuItem[]>(() => costAnalysisPageGetters.visibleGroupByItems),
@@ -360,9 +363,9 @@ const listCostAnalysisTableData = async (): Promise<
                 tableState.pageSize,
             );
         const { status, response } = await state.analyzeFetcher({
-            data_source_id: costAnalysisPageGetters.isUnifiedCost
+            data_source_id: costQuerySetState.isUnifiedCostOn
                 ? undefined
-                : costAnalysisPageGetters.selectedDataSourceId,
+                : costQuerySetState.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
@@ -384,9 +387,9 @@ const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
             costAnalysisPageGetters.consoleFilters,
         );
         const { status, response } = await state.analyzeFetcher({
-            data_source_id: costAnalysisPageGetters.isUnifiedCost
+            data_source_id: costQuerySetState.isUnifiedCostOn
                 ? undefined
-                : costAnalysisPageGetters.selectedDataSourceId,
+                : costQuerySetState.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 filter: costAnalyzeExportQueryHelper.apiQuery.filter,
@@ -477,9 +480,9 @@ const reduce = (arr: (number & undefined)[] | any) => arr.reduce((acc, value) =>
 watch(
     [
         () => costAnalysisPageState,
-        () => costAnalysisPageGetters.selectedDataSourceId,
-        () => costAnalysisPageGetters.selectedQueryId,
-        () => costAnalysisPageGetters.isUnifiedCost,
+        () => costQuerySetState.selectedDataSourceId,
+        () => costQuerySetState.selectedQuerySetId,
+        () => costQuerySetState.isUnifiedCostOn,
     ],
     async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;

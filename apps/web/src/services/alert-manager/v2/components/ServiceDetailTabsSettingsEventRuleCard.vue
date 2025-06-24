@@ -9,18 +9,17 @@ import {
     PCard, PFieldTitle, PFieldGroup, PDataLoader, PDivider, PLazyImg, PI, PIconButton, screens,
 } from '@cloudforet/mirinae';
 
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
 import {
     EVENT_RULE_CONDITIONS_POLICY,
     EVENT_RULE_SCOPE,
     EVENT_RULE_URGENCY,
-} from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+} from '@/api-clients/alert-manager/event-rule/schema/constants';
 import type {
     EventRuleActionsMatchAssetType, EventRuleActionsType,
     EventRuleActionsMergeAssetLabelsType,
-} from '@/schema/alert-manager/event-rule/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -40,17 +39,19 @@ import {
     getActionSettingTypeI18n,
     getActionSettingI18n,
 } from '@/services/alert-manager/v2/composables/event-rule-action-data';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type { EventRuleActionsItemValueType, EventRuleActionsItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
 
 const { width } = useWindowSize();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { eventRuleData, eventRuleLoading } = useEventRuleGetQuery();
 
 const storeState = reactive({
     webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
@@ -58,8 +59,6 @@ const storeState = reactive({
     service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
     cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
-    eventRuleInfoLoading: computed<boolean>(() => serviceDetailPageState.eventRuleInfoLoading),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -80,9 +79,9 @@ const state = reactive({
             'add_additional_info',
         ];
 
-        if (storeState.eventRuleInfo.actions) {
+        if (eventRuleData.value?.actions) {
             actionOrder.forEach((actionKey) => {
-                const actionValue = storeState.eventRuleInfo.actions[actionKey];
+                const actionValue = eventRuleData.value?.actions[actionKey];
                 const setting = state.actionSetting[actionKey];
 
                 if (setting && actionValue) {
@@ -165,7 +164,8 @@ const formatOperator = (value: string): TranslateResult => {
     }
 };
 const getWebhookIcon = (): string|undefined => {
-    const webhook = storeState.webhook[storeState.eventRuleInfo?.webhook_id]?.data;
+    if (!eventRuleData.value?.webhook_id) return undefined;
+    const webhook = storeState.webhook[eventRuleData.value?.webhook_id]?.data;
     if (!webhook) return undefined;
     return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
 };
@@ -181,8 +181,8 @@ const handleDeleteEventRule = () => {
 
 <template>
     <p-data-loader class="service-detail-tabs-settings-event-rule-card"
-                   :loading="storeState.eventRuleInfoLoading"
-                   :data="storeState.eventRuleInfo"
+                   :loading="eventRuleLoading"
+                   :data="eventRuleData"
                    :class="{ 'is-mobile': state.isMobileSize }"
     >
         <p-card :header="$t('ALERT_MANAGER.EVENT_RULE.TITLE')">
@@ -215,7 +215,7 @@ const handleDeleteEventRule = () => {
                             <p-field-group class="input-form"
                                            required
                             >
-                                <span>{{ storeState.eventRuleInfo.name }}</span>
+                                <span>{{ eventRuleData?.name }}</span>
                             </p-field-group>
                         </div>
                         <div class="input-form-wrapper">
@@ -227,9 +227,9 @@ const handleDeleteEventRule = () => {
                             <p-field-group class="input-form scope">
                                 <div class="flex items-center gap-1 text-label-md">
                                     <span class="text-label-lg text-gray-500">
-                                        {{ storeState.eventRuleInfo.scope === EVENT_RULE_SCOPE.GLOBAL ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL_SCOPE') : $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}
+                                        {{ eventRuleData?.scope === EVENT_RULE_SCOPE.GLOBAL ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL_SCOPE') : $t('ALERT_MANAGER.EVENT_RULE.WEBHOOK_SCOPE') }}
                                     </span>
-                                    <p v-if="storeState.eventRuleInfo.scope !== EVENT_RULE_SCOPE.GLOBAL"
+                                    <p v-if="eventRuleData?.scope !== EVENT_RULE_SCOPE.GLOBAL"
                                        class="scope-wrapper"
                                     >
                                         <p-lazy-img :src="getWebhookIcon()"
@@ -238,7 +238,7 @@ const handleDeleteEventRule = () => {
                                                     height="1rem"
                                                     class="icon"
                                         />
-                                        <span>: {{ storeState.webhook[storeState.eventRuleInfo.webhook_id]?.label }}</span>
+                                        <span>: {{ storeState.webhook[eventRuleData?.webhook_id || '']?.label }}</span>
                                     </p>
                                 </div>
                             </p-field-group>
@@ -247,7 +247,7 @@ const handleDeleteEventRule = () => {
                     </div>
                 </div>
                 <div class="form-wrapper">
-                    <div v-if="storeState.eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS"
+                    <div v-if="eventRuleData?.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ALWAYS"
                          class="input-form-wrapper"
                     >
                         <p-field-title :label="$t('ALERT_MANAGER.EVENT_RULE.ALWAYS')"
@@ -266,7 +266,7 @@ const handleDeleteEventRule = () => {
                          class="flex flex-col gap-1"
                     >
                         <div class="input-form-wrapper">
-                            <p-field-title :label="storeState.eventRuleInfo.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
+                            <p-field-title :label="eventRuleData?.conditions_policy === EVENT_RULE_CONDITIONS_POLICY.ANY
                                                ? $t('ALERT_MANAGER.EVENT_RULE.ANY')
                                                : $t('ALERT_MANAGER.EVENT_RULE.ALL')"
                                            size="lg"
@@ -280,7 +280,7 @@ const handleDeleteEventRule = () => {
                             </p-field-group>
                         </div>
                         <div class="border-section">
-                            <div v-for="(condition, idx) in storeState.eventRuleInfo.conditions"
+                            <div v-for="(condition, idx) in eventRuleData?.conditions"
                                  :key="`action-${idx}`"
                                  class="condition-list"
                             >
@@ -378,7 +378,7 @@ const handleDeleteEventRule = () => {
                                        class="divider"
                             />
                         </div>
-                        <div v-if="storeState.eventRuleInfo.options">
+                        <div v-if="eventRuleData?.options">
                             <p-divider v-if="!isEmpty(state.actions)"
                                        class="divider option"
                             />
@@ -394,7 +394,7 @@ const handleDeleteEventRule = () => {
                                     <span class="text-label-md text-gray-700">{{ $t('ALERT_MANAGER.EVENT_RULE.THEN_STOP_PROCESSING') }}</span>
                                 </div>
                                 <p class="text-paragraph-md text-blue-800 ml-2">
-                                    {{ storeState.eventRuleInfo?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
+                                    {{ eventRuleData?.options?.stop_processing ? $t('ALERT_MANAGER.EVENT_RULE.TRUE') : $t('ALERT_MANAGER.EVENT_RULE.FALSE') }}
                                 </p>
                             </div>
                         </div>

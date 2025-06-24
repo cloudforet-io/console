@@ -1,10 +1,15 @@
 <script lang="ts" setup>
-import { onUnmounted, watch } from 'vue';
+import {
+    onUnmounted, watch, computed,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
+
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -21,14 +26,23 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
-
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+const queryClient = useQueryClient();
 
 const route = useRoute();
+
+// Service Query Key for invalidation - target specific data source
+const { key: costQuerySetListKey } = useServiceQueryKey('cost-analysis', 'cost-query-set', 'list', {
+    params: computed(() => ({
+        data_source_id: costQuerySetGetters.dataSourceId,
+    })),
+});
+
 const setCostParams = async () => {
     // Case - Directly access Budget Page
     if (!costQuerySetState.selectedDataSourceId) {
@@ -57,8 +71,10 @@ const setCostParams = async () => {
         if (dataSourceId !== UNIFIED_COST_KEY) costQuerySetStore.setSelectedDataSourceId(dataSourceId);
         costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
     }
-    await costQuerySetStore.listCostQuerySets();
+
+    await queryClient.invalidateQueries({ queryKey: costQuerySetListKey.value });
 };
+
 const changeCostQuerySet = () => {
     const { dataSourceId, costQuerySetId } = route.params;
     if (dataSourceId && costQuerySetId) {
@@ -66,6 +82,7 @@ const changeCostQuerySet = () => {
         costQuerySetStore.setSelectedQuerySetId(costQuerySetId);
     }
 };
+
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], setCostParams);
 
 watch(() => route.params, async (after, before) => {
@@ -86,7 +103,7 @@ onUnmounted(() => {
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="route?.meta?.lsbVisible"
+        <vertical-page-layout v-if="$route.meta?.lsbVisible"
                               class="cost-explorer-container"
         >
             <template #sidebar>
@@ -96,7 +113,7 @@ onUnmounted(() => {
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-else-if="route?.meta?.centeredLayout"
+        <centered-page-layout v-else-if="$route.meta?.centeredLayout"
                               class="cost-centered-layout"
                               :class="{'landing-page': route?.name === COST_EXPLORER_ROUTE.LANDING._NAME}"
                               has-nav-bar

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onActivated, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
@@ -15,15 +15,15 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { UserChannelListParameters } from '@/schema/alert-manager/user-channel/api-verbs/list';
-import type { UserChannelModel } from '@/schema/alert-manager/user-channel/model';
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
+import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
-import type { UserChannelListParameters as UserChannelListParametersV1 } from '@/schema/notification/user-channel/api-verbs/list';
 import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
@@ -100,28 +100,40 @@ const createProtocolItem = (d) => {
 };
 
 const apiQuery = new ApiQueryHelper();
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+const { key: notificationProtocolListQueryKey, params: notificationProtocolListQueryParams } = useServiceQueryKey('alert-manager', 'notification-protocol', 'list', {
+    params: computed(() => ({
+        query: apiQuery.data,
+    })),
+});
+const { data: notificationProtocolListData, isFetching: notificationProtocolListFetching } = useScopedQuery({
+    queryKey: notificationProtocolListQueryKey,
+    queryFn: async () => notificationProtocolAPI.list(notificationProtocolListQueryParams.value),
+    enabled: computed(() => state.visibleUserNotification),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['USER']);
 
 const listProtocol = async () => {
     try {
-        state.loading = true;
         if (!state.visibleUserNotification && props.projectId) {
             apiQuery.setFilters([])
                 .setSort('protocol_type');
         } else if (!state.visibleUserNotification) {
             apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
         }
-        const fetcher = state.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>
-            : SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>;
-        const res = await fetcher({
+
+        const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
             query: apiQuery.data,
         });
-        state.protocolResp = res.results ?? [];
+        if (state.visibleUserNotification) {
+            state.protocolResp = notificationProtocolListData.value?.results ?? [];
+        } else {
+            state.protocolResp = res.results ?? [];
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
         state.protocolResp = [];
-    } finally {
-        state.loading = false;
     }
 };
 
@@ -137,27 +149,34 @@ const injectProtocolSchema = (channel: UserChannelModel|UserChannelModelV1|Proje
 };
 
 const channelApiQuery = new ApiQueryHelper();
-const listUserChannel = async () => {
-    try {
-        state.channelLoading = true;
+const { userChannelAPI } = useUserChannelApi();
+const { key: userChannelListQueryKey, params: userChannelListQueryParams } = useServiceQueryKey('alert-manager', 'user-channel', 'list', {
+    params: computed(() => {
         channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
-        const fetcher = state.visibleUserNotification
-            ? SpaceConnector.clientV2.alertManager.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>
-            : SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParametersV1, ListResponse<UserChannelModelV1>>;
-        const res = await fetcher({
+        return {
             query: channelApiQuery.data,
-        });
-        state.channelList = res.results?.map((d) => ({
-            ...d,
-            protocol_name: injectProtocolName(d),
-            schema: injectProtocolSchema(d),
-        })) ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.channelList = [];
-    } finally {
-        state.channelLoading = false;
-    }
+        };
+    }),
+});
+const { data: userChannelListData, isFetching: serviceChannelListFetching } = useScopedQuery({
+    queryKey: userChannelListQueryKey,
+    queryFn: async () => {
+        if (state.visibleUserNotification) {
+            return userChannelAPI.list(userChannelListQueryParams.value);
+        }
+        return SpaceConnector.clientV2.notification.userChannel.list(userChannelListQueryParams.value);
+    },
+    enabled: computed(() => state.visibleUserNotification && !props.projectId),
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+}, ['USER']);
+
+const listUserChannel = () => {
+    state.channelList = userChannelListData.value?.results?.map((d) => ({
+        ...d,
+        protocol_name: injectProtocolName(d),
+        schema: injectProtocolSchema(d),
+    })) ?? [];
 };
 
 const listProjectChannel = async () => {
@@ -181,23 +200,18 @@ const listProjectChannel = async () => {
 };
 
 const listChannel = async () => {
+    await listProtocol();
     if (!state.visibleUserNotification && props.projectId) await listProjectChannel();
-    else await listUserChannel();
+    else if (userChannelListData.value) await listUserChannel();
 };
 
 const onChangeChannelItem = async () => {
     await listChannel();
 };
 
-(async () => {
-    await listProtocol();
+watch(userChannelListData, async () => {
     await listChannel();
-})();
-
-onActivated(async () => {
-    await listProtocol();
-    await listChannel();
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -207,7 +221,7 @@ onActivated(async () => {
                 {{ $t('MY_PAGE.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
             <p-data-loader :data="state.protocolList"
-                           :loading="state.loading"
+                           :loading="notificationProtocolListFetching"
             >
                 <div class="channel-list-wrapper">
                     <ul v-for="item in state.protocolList"
@@ -277,7 +291,7 @@ onActivated(async () => {
             <p-divider class="divider" />
             <p-data-loader class="flex-grow"
                            :data="state.channelList"
-                           :loading="state.channelLoading"
+                           :loading="!state.visibleUserNotification && props.projectId ? state.channelLoading : serviceChannelListFetching"
             >
                 <div style="min-height: 6.5rem;">
                     <ul v-for="item in state.channelList"

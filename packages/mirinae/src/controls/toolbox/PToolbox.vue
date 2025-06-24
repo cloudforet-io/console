@@ -290,8 +290,14 @@ export default defineComponent({
         };
 
         const onChangePageSize = (pageSize) => {
-            proxyState.pageSize = pageSize;
-            emitChange({ pageLimit: pageSize });
+            const converted = Number(pageSize);
+
+            if (Number.isNaN(converted)) {
+                console.warn('[PToolbox] pageSizeOptions must be the array of number:', pageSize);
+                return;
+            }
+            proxyState.pageSize = converted;
+            emitChange({ pageLimit: converted });
         };
 
         const onChangeSortBy = (sortBy) => {

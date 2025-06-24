@@ -3,11 +3,17 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
+import { useCostQuerySetApi } from '@/api-clients/cost-analysis/cost-query-set/composables/use-cost-query-set-api';
+import type { CostQuerySetCreateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/create';
+import type { CostQuerySetUpdateParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/update';
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -15,8 +21,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 
 type RequestType = 'SAVE' | 'EDIT';
@@ -37,6 +45,25 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
+
+/* Query */
+const { costQuerySetList } = useCostQuerySetQuery({
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
+});
+const queryClient = useQueryClient();
+const { costQuerySetAPI } = useCostQuerySetApi();
+
+// Service Query Key for invalidation - target specific data source
+const { key: costQuerySetListKey } = useServiceQueryKey('cost-analysis', 'cost-query-set', 'list', {
+    params: computed(() => ({
+        data_source_id: costQuerySetGetters.dataSourceId,
+    })),
+});
 
 const formState = reactive({
     queryName: undefined as undefined | string,
@@ -45,7 +72,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     selectedQuerySet: computed<CostQuerySetModel|undefined>(() => {
         if (props.requestType === 'EDIT') {
-            return costAnalysisPageGetters.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
+            return costQuerySetList.value?.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
         }
         return undefined;
     }),
@@ -66,39 +93,73 @@ const state = reactive({
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
     managedCostQuerySetIdList: [...MANAGED_COST_QUERY_SET_ID_LIST],
-    existingCostQuerySetNameList: computed(() => costAnalysisPageGetters.costQueryList.map((query) => query.name)),
+    existingCostQuerySetNameList: computed(() => costQuerySetList.value?.map((query) => query.name) ?? []),
     mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
+    isLoading: computed(() => isCreating.value || isUpdating.value),
 });
 
-const saveQuery = async () => {
-    if (!formState.queryName) return;
-    try {
-        const updatedQuery = await costAnalysisPageStore.saveQuery(formState.queryName);
-        if (!updatedQuery) return;
+/* Mutation */
+const { mutate: createCostQuerySet, isPending: isCreating } = useMutation({
+    mutationFn: (params: CostQuerySetCreateParameters) => costQuerySetAPI.create(params),
+    onSuccess: async (data: CostQuerySetModel) => {
+        await queryClient.invalidateQueries({ queryKey: costQuerySetListKey.value });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_AS_QUERY'), '');
-        emit('update-query', updatedQuery.cost_query_set_id);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
-    }
+        costAnalysisPageStore.selectQueryId(data.cost_query_set_id);
+        emit('update-query', data.cost_query_set_id);
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
+    },
+});
+
+const { mutate: updateCostQuerySet, isPending: isUpdating } = useMutation({
+    mutationFn: (params: CostQuerySetUpdateParameters) => costQuerySetAPI.update(params),
+    onSuccess: async (data: CostQuerySetModel) => {
+        await queryClient.invalidateQueries({ queryKey: costQuerySetListKey.value });
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
+        emit('update-query', data.cost_query_set_id);
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
+    },
+});
+
+const saveQuery = () => {
+    if (!formState.queryName) return;
+
+    const options: CostQuerySetModel['options'] = {
+        granularity: costAnalysisPageStore.state.granularity,
+        period: costAnalysisPageStore.state.period,
+        relative_period: costAnalysisPageStore.state.relativePeriod,
+        group_by: costAnalysisPageStore.state.groupBy,
+        filters: costAnalysisPageGetters.consoleFilters,
+        display_data_type: costAnalysisPageStore.state.displayDataType,
+        workspace_scope: costAnalysisPageStore.state.workspaceScope,
+        is_all_workspace_selected: costAnalysisPageStore.state.isAllWorkspaceSelected,
+        metadata: { filters_schema: { enabled_properties: costAnalysisPageStore.state.enabledFiltersProperties ?? [] } },
+    };
+
+    createCostQuerySet({
+        name: formState.queryName,
+        data_source_id: costQuerySetState.selectedDataSourceId as string,
+        options,
+    });
 };
 
-const editQuery = async () => {
-    if (!formState.queryName) return;
-    try {
-        const updatedQuery = await costAnalysisPageStore.editQuery(props.selectedQuerySetId, formState.queryName);
-        if (!updatedQuery) return;
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
-        emit('update-query', updatedQuery.cost_query_set_id);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
-    }
+const editQuery = () => {
+    if (!formState.queryName || !props.selectedQuerySetId) return;
+
+    updateCostQuerySet({
+        cost_query_set_id: props.selectedQuerySetId,
+        name: formState.queryName,
+    });
 };
 
 /* Event */
 const handleFormConfirm = async () => {
     if (!state.isAllValid) return;
-    if (props.requestType === 'SAVE') await saveQuery();
-    else await editQuery();
+    if (props.requestType === 'SAVE') saveQuery();
+    else editQuery();
     state.proxyVisible = false;
 };
 
@@ -128,7 +189,8 @@ watch(() => state.proxyVisible, (visible) => {
         fade
         backdrop
         :visible.sync="state.proxyVisible"
-        :disabled="!state.isAllValid || !formState.queryName"
+        :disabled="!state.isAllValid || !formState.queryName || state.isLoading"
+        :loading="state.isLoading"
         @confirm="handleFormConfirm"
     >
         <template #body>

@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { computed } from 'vue';
+
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -23,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 
-const { invalidateBudgetGetQuery } = useBudgetGetQuery(props.budgetId);
+const { invalidateBudgetGetQuery } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const {
     forms: { budgetName },

@@ -5,34 +5,30 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { PHeadingLayout, PHeading, PSelectDropdown } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import AlertDetailDeleteModal from '@/services/alert-manager/v2/components/AlertDetailDeleteModal.vue';
 import AlertDetailEditModal from '@/services/alert-manager/v2/components/AlertDetailEditModal.vue';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 import { ALERT_PERIOD_DROPDOWN_MENU } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
 import type { Period } from '@/services/alert-manager/v2/types/alert-manager-type';
-
 
 type ModalType = 'edit' | 'delete';
 
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
 
 const router = useRouter();
 const route = useRoute();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const storeState = reactive({
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
     selectedServiceId: computed<string>(() => alertPageState.selectedServiceId),
     selectedStatus: computed<string>(() => alertPageState.selectedStatus),
     selectedUrgency: computed<string>(() => alertPageState.selectedUrgency),
@@ -88,7 +84,7 @@ const handleSelectDropdownMenu = (type: ModalType) => {
     <div class="alerts-detail-page pb-6">
         <p-heading-layout>
             <template #heading>
-                <p-heading :title="storeState.alertInfo.title || ''"
+                <p-heading :title="alertData?.title || ''"
                            show-back-button
                            @click-back-button="handleRouteBackButton"
                 >
@@ -109,9 +105,12 @@ const handleSelectDropdownMenu = (type: ModalType) => {
         </p-heading-layout>
         <div v-if="hasReadWriteAccess && modalState.modalVisible">
             <alert-detail-edit-modal v-if="modalState.type === 'edit'"
+                                     :alert-title="alertData?.title || ''"
+                                     :alert-id="alertData?.alert_id || ''"
                                      :visible.sync="modalState.modalVisible"
             />
             <alert-detail-delete-modal v-if="modalState.type === 'delete'"
+                                       :alert-id="alertData?.alert_id || ''"
                                        :visible.sync="modalState.modalVisible"
             />
         </div>

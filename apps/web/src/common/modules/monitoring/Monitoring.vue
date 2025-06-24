@@ -121,7 +121,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
+import { MONITORING_TYPE } from '@/api-clients/monitoring/data-source/schema/constants';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 

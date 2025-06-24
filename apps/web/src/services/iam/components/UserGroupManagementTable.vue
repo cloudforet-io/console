@@ -12,6 +12,10 @@ import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
+import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-group-channel/schema/model';
+import { useScopedQuery } from '@/query/composables/use-scoped-query';
+import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -40,6 +44,16 @@ let userGroupListApiQuery = userGroupListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
 
+const { userGroupChannelAPI } = useUserGroupChannelApi();
+const { key: userGroupChannelListQueryKey, params: userGroupChannelListQueryParams } = useServiceQueryKey('alert-manager', 'user-group-channel', 'list');
+const { data: userGroupChannelListData } = useScopedQuery({
+    queryKey: userGroupChannelListQueryKey,
+    queryFn: async () => userGroupChannelAPI.list(userGroupChannelListQueryParams.value),
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+}, ['DOMAIN', 'WORKSPACE']);
+
+
 const storeState = reactive({
     loading: computed<boolean>(() => userGroupPageState.loading),
 });
@@ -47,6 +61,7 @@ const storeState = reactive({
 const state = reactive({
     userGroupItems: computed(() => userGroupPageState.userGroups.map((userGroup) => ({
         ...userGroup,
+        notification_channel: countChannelsByUserGroupId(userGroupChannelListData.value?.results || [], userGroup.user_group_id || ''),
     }))),
 });
 
@@ -93,6 +108,16 @@ const dropdownState = reactive({
 });
 
 /* Component */
+const countChannelsByUserGroupId = (channels: UserGroupChannelModel[], targetId: string): number => {
+    const grouped = channels.reduce<Record<string, UserGroupChannelModel[]>>((acc, item) => {
+        const groupId = item.user_group_id;
+        if (!acc[groupId]) acc[groupId] = [];
+        acc[groupId].push(item);
+        return acc;
+    }, {});
+
+    return grouped[targetId]?.length ?? 0;
+};
 const handleSelect = async (index) => {
     userGroupPageState.selectedIndices = index;
 };
@@ -186,7 +211,7 @@ onMounted(async () => {
                 />
             </template>
             <template #col-notification_channel-format="{value}">
-                {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
+                {{ value }}
             </template>
             <template #col-users-format="{value}">
                 {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}

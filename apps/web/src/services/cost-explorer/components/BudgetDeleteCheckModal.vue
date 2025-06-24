@@ -6,6 +6,9 @@ import { i18n } from '@/translations';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useBudgetDeleteMutation } from '@/services/cost-explorer/composables/use-budget-delete-mutation';
+import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
+
+const { invalidateBudgetListQuery } = useBudgetQuery();
 
 interface Props {
     visible: boolean;
@@ -42,6 +45,7 @@ const deleteBudgets = async (budgetIds: string[]) => {
         await Promise.all(budgetIds.map((budgetId) => _deleteBudgets({
             budget_id: budgetId,
         })));
+        invalidateBudgetListQuery();
         emit('confirm');
         emit('update:visible', false);
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DELETE_SUCCESS'), '');

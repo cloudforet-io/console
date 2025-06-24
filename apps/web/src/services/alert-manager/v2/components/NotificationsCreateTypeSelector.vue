@@ -1,37 +1,26 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PSelectCard, PLazyImg, PDataLoader, PI,
 } from '@cloudforet/mirinae';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import type { ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 const serviceCreateFormStore = useServiceCreateFormStore();
-const serviceCreateFormState = serviceCreateFormStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    protocolList: computed<NotificationProtocolModel[]>(() => serviceCreateFormState.protocolList),
-});
+const { notificationProtocolListData, notificationProtocolListFetching } = useNotificationProtocolListQuery();
+
 const state = reactive({
     loading: true,
     protocolCardList: computed<ProtocolCardItemType[]>(() => [
-        ...storeState.protocolList.map((item) => ({
-            ...item,
-            icon: storeState.plugins[item.plugin_info.plugin_id]?.icon || '',
-        })),
+        ...notificationProtocolListData.value,
         {
             protocol_id: 'forward',
             name: i18n.t('ALERT_MANAGER.NOTIFICATIONS.ASSOCIATED_MEMBER'),
@@ -44,20 +33,11 @@ const state = reactive({
 const handleSelectProtocol = () => {
     serviceCreateFormStore.setSelectedProtocol(state.selectedProtocol);
 };
-
-onMounted(async () => {
-    state.loading = true;
-    try {
-        await serviceCreateFormStore.fetchNotificationProtocolList();
-    } finally {
-        state.loading = false;
-    }
-});
 </script>
 
 <template>
     <p-data-loader class="service-create-step3-select-protocol"
-                   :loading="state.loading"
+                   :loading="notificationProtocolListFetching"
                    :data="state.protocolCardList"
                    loader-backdrop-color="transparent"
     >

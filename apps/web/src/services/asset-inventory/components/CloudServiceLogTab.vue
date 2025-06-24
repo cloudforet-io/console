@@ -89,10 +89,10 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { DataSourceListParameters } from '@/schema/monitoring/data-source/api-verbs/list';
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
-import type { MonitoringLogListParameters } from '@/schema/monitoring/log/api-verbs/list';
-import type { LogDataModel } from '@/schema/monitoring/log/model';
+import type { DataSourceListParameters } from '@/api-clients/monitoring/data-source/schema/api-verbs/list';
+import type { DataSourceModel } from '@/api-clients/monitoring/data-source/schema/model';
+import type { MonitoringLogListParameters } from '@/api-clients/monitoring/log/schema/api-verbs/list';
+import type { LogDataModel } from '@/api-clients/monitoring/log/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

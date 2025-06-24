@@ -31,7 +31,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { budgetData } = useBudgetGetQuery(props.budgetId);
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const chartContext = ref<HTMLElement|null>(null);
 

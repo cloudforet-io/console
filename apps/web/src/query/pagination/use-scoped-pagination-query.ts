@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import type { InfiniteData } from '@tanstack/vue-query';
-import { type UseInfiniteQueryOptions } from '@tanstack/vue-query';
+import { useQueryClient, type UseInfiniteQueryOptions } from '@tanstack/vue-query';
 
 import type { GrantScope } from '@/api-clients/identity/token/schema/type';
 import { useScopedInfiniteQuery } from '@/query/composables/use-scoped-infinite-query';
@@ -32,7 +32,7 @@ import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
  * @param pageOptions - Pagination control:
  *  - thisPage: current page number (1-based)
  *  - pageSize: number of items per page
- *  - verb: one of 'list' | 'stat' | 'analyze' | 'load' (used to insert page info in correct param structure)
+ *  - verb: one of 'list' | 'load' (used to insert page info in correct param structure)
  *
  * @param requiredScopes - A list of **required grant scopes** to determine if the query should execute.
  *
@@ -53,8 +53,9 @@ type PaginatableBaseData = {
 
 type UsePaginationQueryOptions<TParams extends object, TPageData, TError> = Omit<
     UseInfiniteQueryOptions<TPageData, TError, InfiniteData<TPageData>, TPageData, QueryKeyArray, number>,
-    'initialPageParam' | 'queryFn' | 'getNextPageParam'
+    'initialPageParam' | 'queryFn' | 'getNextPageParam' | 'select'
 > & {
+    queryKey: ComputedRef<QueryKeyArray>
     queryFn: (params: TParams) => Promise<TPageData>;
     params: ComputedRef<TParams>;
     initialPageParam?: number;
@@ -63,7 +64,7 @@ type UsePaginationQueryOptions<TParams extends object, TPageData, TError> = Omit
 interface UsePaginationQueryPageOptions {
     thisPage: ComputedRef<number>;
     pageSize: ComputedRef<number>;
-    verb: 'list' | 'stat' | 'analyze' | 'load';
+    verb: 'list' | 'load';
 }
 
 export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData, TError = unknown>(
@@ -71,6 +72,7 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
     pageOptions: UsePaginationQueryPageOptions,
     requiredScopes: [GrantScope, ...GrantScope[]],
 ) => {
+    const queryClient = useQueryClient();
     const { thisPage, pageSize, verb } = pageOptions;
     const {
         queryFn, params, initialPageParam = 1, ...restOptions
@@ -103,12 +105,27 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
 
     // Watches the `thisPage` ref and automatically fetches all pages up to that index
     // Ensures that the page requested by the consumer is available in the data list
-    watch(thisPage, async (val) => {
-        const currentLength = query.data.value?.pages?.length ?? 0;
-        if (val > currentLength && !query.isFetchingNextPage.value) {
-            const calls = Array.from({ length: val - currentLength });
-            await Promise.all(calls.map(() => query.fetchNextPage()));
+    const fetchUntilPageLoaded = (targetPage: number) => {
+        const current = query.data.value?.pages?.length ?? 0;
+
+        if (current >= targetPage) return;
+
+        if (!query.isFetchingNextPage.value) {
+            query.fetchNextPage().then(() => {
+                setTimeout(() => fetchUntilPageLoaded(targetPage), 0);
+            });
+        } else {
+            setTimeout(() => fetchUntilPageLoaded(targetPage), 50);
         }
+    };
+
+    watch(thisPage, (val) => {
+        fetchUntilPageLoaded(val);
+    });
+
+    // Clear cached pages when page size changes to avoid inconsistent pagination data
+    watch(pageSize, () => {
+        queryClient.resetQueries({ queryKey: options.queryKey.value });
     });
 
     return {

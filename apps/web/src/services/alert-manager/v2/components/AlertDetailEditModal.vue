@@ -1,33 +1,29 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
-
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
+import { useAlertUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-update-mutation';
+
 
 interface Props {
     visible: boolean;
+    alertTitle?: string;
+    alertId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    alertTitle: '',
+    alertId: '',
 });
-
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
-const storeState = reactive({
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
-});
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const {
@@ -38,7 +34,7 @@ const {
     invalidState,
     isAllValid,
 } = useFormValidator({
-    name: storeState.alertInfo.title,
+    name: props.alertTitle,
 }, {
     name(value: string) {
         if (!value) return ' ';
@@ -46,21 +42,21 @@ const {
     },
 });
 
+const { mutate: alertUpdateMutate, isPending } = useAlertUpdateMutation({
+    onSettled: () => {
+        handleClose();
+    },
+});
+
 const handleClose = () => {
     state.proxyVisible = false;
 };
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await alertDetailPageStore.updateAlertDetail({
-            alert_id: storeState.alertInfo.alert_id,
-            title: name.value,
-        });
-    } finally {
-        state.loading = false;
-        handleClose();
-    }
+const handleConfirm = () => {
+    alertUpdateMutate({
+        alert_id: props.alertId,
+        title: name.value,
+    });
 };
 </script>
 
@@ -72,7 +68,7 @@ const handleConfirm = async () => {
                     :backdrop="true"
                     :visible="state.proxyVisible"
                     :disabled="!isAllValid"
-                    :loading="state.loading"
+                    :loading="isPending"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

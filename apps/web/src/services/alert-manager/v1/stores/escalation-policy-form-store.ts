@@ -1,9 +1,10 @@
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
-import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import { ESCALATION_POLICY_FINISH_CONDITION } from '@/api-clients/monitoring/escalation-policy/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
+import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/api-clients/monitoring/escalation-policy/schema/type';
+
 
 interface EscalationPolicyFormState {
     escalationPolicyData?: EscalationPolicyModel|undefined;

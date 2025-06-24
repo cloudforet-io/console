@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PLazyImg, PSelectDropdown, PI, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { i18n } from '@/translations';
 
@@ -31,6 +31,7 @@ import {
 } from '@/styles/colors';
 
 
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
 import {
     DEFAULT_UNIFIED_COST_CURRENCY, UNIFIED_COST_KEY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -43,7 +44,6 @@ const DATA_SOURCE_MENU_ID = 'data-source';
 const STARRED_MENU_ID = 'starred';
 
 const costQuerySetStore = useCostQuerySetStore();
-const costQuerySetGetters = costQuerySetStore.getters;
 const costQuerySetState = costQuerySetStore.state;
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
@@ -64,12 +64,11 @@ const storeState = reactive({
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
     isAdminUser: computed<boolean>(() => userStore.state.roleType === 'DOMAIN_ADMIN'),
-    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
-    currentQueryMenuList: computed<LSBMenu>(() => costQuerySetState.costQuerySetList.map((d) => {
+    currentQueryMenuList: computed<LSBMenu>(() => (costQuerySetList.value || []).map((d) => {
         if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
             return {
                 type: 'item',
@@ -82,7 +81,7 @@ const state = reactive({
                 to: {
                     name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
-                        dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
+                        dataSourceId: costQuerySetState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                         costQuerySetId: d.cost_query_set_id,
                     },
                 },
@@ -99,7 +98,7 @@ const state = reactive({
             to: {
                 name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
-                    dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
+                    dataSourceId: costQuerySetState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                     costQuerySetId: d.cost_query_set_id,
                 },
             },
@@ -141,8 +140,18 @@ const state = reactive({
     ]),
 });
 
+/* Query */
+const { costQuerySetList, managedCostQuerySets } = useCostQuerySetQuery({
+    data_source_id: computed(() => {
+        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
+        return costQuerySetState.selectedDataSourceId || Object.keys(storeState.dataSourceMap)[0] || '';
+    }),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
+});
+
 const dataSourceState = reactive({
-    items: computed<MenuItem[]>(() => {
+    items: computed<SelectDropdownMenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = storeState.dataSourceMap;
         return Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
@@ -157,14 +166,15 @@ const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.f
     && menu.type === MENU_ITEM_TYPE.ITEM);
 
 // s
-const handleSelectDataSource = (selected: string) => {
-    if (!selected) return;
-    costQuerySetStore.setSelectedDataSourceId(selected);
+const handleSelectDataSource = (selected: string | number | SelectDropdownMenuItem[]) => {
+    if (!selected || Array.isArray(selected)) return;
+    const selectedString = typeof selected === 'string' ? selected : selected.toString();
+    costQuerySetStore.setSelectedDataSourceId(selectedString);
     router.push({
         name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
-            dataSourceId: selected,
-            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
+            dataSourceId: selectedString,
+            costQuerySetId: managedCostQuerySets.value[0]?.cost_query_set_id,
         },
     }).catch(() => {});
 };
@@ -175,7 +185,7 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
         name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: value ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? UNIFIED_COST_KEY),
-            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
+            costQuerySetId: managedCostQuerySets.value[0]?.cost_query_set_id,
         },
     }).catch(() => {});
 };
