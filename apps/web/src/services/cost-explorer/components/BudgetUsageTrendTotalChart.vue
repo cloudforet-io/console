@@ -238,7 +238,7 @@ watch([() => state.data, () => budgetPageState], () => {
                  class="chart"
             />
         </div>
-        <div class="legend-custom flex gap-4 mb-6 ml-4 font-normal text-xs text-gray-700">
+        <div class="legend-custom">
             <div class="flex items-center gap-1">
                 <img src="/images/budget-charts/ic_planned_budget.svg"
                      alt="Planned Budget"
@@ -276,6 +276,15 @@ watch([() => state.data, () => budgetPageState], () => {
         height: 100%;
         min-width: 62.5rem;
         width: 100%;
+    }
+}
+
+.legend-custom {
+    @apply flex gap-4 mb-6 ml-4 font-normal text-xs text-gray-700;
+
+    @screen mobile {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 </style>

@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
                  class="chart"
             />
         </div>
-        <div class="legend-custom flex gap-4 mb-6 ml-4 font-normal text-xs text-gray-700">
+        <div class="legend-custom">
             <div class="flex items-center gap-1">
                 <div class="w-3 h-3 rounded-full bg-indigo-100" />
                 <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET') }}</span>
@@ -226,12 +226,19 @@ onBeforeUnmount(() => {
 .chart-wrapper {
     height: 20rem;
     overflow-x: auto;
-    overflow: visible;
-    position: relative;
 
     .chart {
         height: 100%;
         min-width: 43.75rem;
+        width: 100%;
+    }
+}
+.legend-custom {
+    @apply flex gap-4 mb-6 ml-4 font-normal text-xs text-gray-700;
+
+    @screen mobile {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 </style>
