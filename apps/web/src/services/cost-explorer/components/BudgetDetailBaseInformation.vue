@@ -408,7 +408,9 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                     </div>
                 </template>
                 <template #data-budgetAlerts="{ data }">
-                    <div class="budget-alerts-wrapper">
+                    <div class="budget-alerts-wrapper"
+                         :class="{'alerts-wrapper-isEditing': state.budgetAlertEdit}"
+                    >
                         <div class="budget-alerts-content flex items-start gap-2">
                             <p-toggle-button :value.sync="state.isBudgetAlertsEnabled"
                                              show-state-text
@@ -442,7 +444,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div :class="{'alerts-button-wrapper': state.budgetAlertEdit}">
                             <p-button v-if="!isSetBudgetAlertPending &&!state.budgetAlertEdit && !storeState.isAdminMode && hasReadWriteAccess"
                                       class="tertiary"
                                       size="sm"
@@ -609,8 +611,22 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
 
 .budget-alerts-wrapper {
     @apply flex justify-between items-center;
+
+    &.alerts-wrapper-isEditing {
+        @screen mobile {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+
+            .alerts-button-wrapper {
+                @screen mobile {
+                    align-self: flex-end;
+                }
+            }
+        }
+    }
+
     .budget-alerts-content {
-        /* @apply items-center; */
         @screen tablet {
             flex-direction: column;
         }
@@ -618,7 +634,6 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
             @apply flex gap-2 items-start;
 
             @screen tablet {
-                /* flex gap-2 items-start */
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
