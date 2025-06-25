@@ -1,21 +1,17 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import dayjs from 'dayjs';
-import { isEqual } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
 import {
     PDataLoader, PSelectButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { CostReportDataAnalyzeParameters } from '@/api-clients/cost-analysis/cost-report-data/schema/api-verbs/analyze';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -23,14 +19,11 @@ import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
+import { useCostReportDataAnalyzeQuery } from '@/services/cost-explorer/composables/use-cost-report-data-analyze-query';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-
-
 
 type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
@@ -40,6 +33,7 @@ type CostReportDataAnalyzeResult = {
     }>;
     _total_value_sum?: number;
 };
+
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const costReportPageState = costReportPageStore.state;
@@ -47,9 +41,8 @@ const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
+
 const state = reactive({
-    loading: true,
-    data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     dateSelectDropdown: computed<SelectDropdownMenuItem[]>(() => {
         const _defaultStart = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
         const _defaultEnd = costReportPageState.recentReportMonth;
@@ -73,9 +66,9 @@ const state = reactive({
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     previousTotalAmount: computed<number>(() => {
         if (!costReportPageState.recentReportMonth) return 0;
-        return getPreviousTotalAmount(costReportPageState.recentReportMonth, state.data?.results);
+        return getPreviousTotalAmount(costReportPageState.recentReportMonth, costReportDataAnalyzeData.value?.results);
     }),
-    last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(state.data?.results)),
+    last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(costReportDataAnalyzeData.value?.results)),
     period: computed(() => {
         if (state.selectedDate === 'last12Months') {
             const start = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
@@ -86,13 +79,37 @@ const state = reactive({
         const end = `${state.selectedDate}-12`;
         return { start, end };
     }),
-    //
     selectedPeriodTranslation: computed(() => {
         if (state.selectedDate === 'last12Months') {
             return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_THE_LAST_12_MONTHS');
         }
         return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: dayjs.utc(state.selectedDate).year() });
     }),
+});
+
+/* Query */
+const queryParams = computed<AnalyzeQuery|null>(() => ({
+    granularity: GRANULARITY.MONTHLY,
+    group_by: [state.selectedTarget, 'is_adjusted'],
+    field_group: ['date'],
+    start: state.period.start,
+    end: state.period.end,
+    fields: {
+        value_sum: {
+            key: `cost.${costReportPageGetters.currency}`,
+            operator: 'sum',
+        },
+    },
+    sort: [{
+        key: '_total_value_sum',
+        desc: true,
+    }],
+}));
+
+const { costReportDataAnalyzeData, isLoading } = useCostReportDataAnalyzeQuery({
+    cost_report_config_id: computed(() => costReportPageState.costReportConfig?.cost_report_config_id || ''),
+    is_confirmed: true,
+    query: queryParams,
 });
 
 /* Util */
@@ -116,39 +133,6 @@ const getLast12MonthsAverage = (results?: CostReportDataAnalyzeResult[]): number
     return _totalAmount / 12;
 };
 
-/* Api */
-const analyzeTrendData = async () => {
-    state.loading = true;
-    try {
-        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
-            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
-            is_confirmed: true,
-            query: {
-                granularity: GRANULARITY.MONTHLY,
-                group_by: [state.selectedTarget, 'is_adjusted'],
-                field_group: ['date'],
-                start: state.period.start,
-                end: state.period.end,
-                fields: {
-                    value_sum: {
-                        key: `cost.${costReportPageGetters.currency}`,
-                        operator: 'sum',
-                    },
-                },
-                sort: [{
-                    key: '_total_value_sum',
-                    desc: true,
-                }],
-            },
-        });
-    } catch (e) {
-        state.data = undefined;
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
-
 /* Event */
 const handleSelectDate = (date: string) => {
     state.selectedDate = date;
@@ -156,17 +140,6 @@ const handleSelectDate = (date: string) => {
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
 };
-
-/* Watcher */
-watch([
-    () => state.period,
-    () => state.selectedTarget,
-    () => costReportPageGetters.currency,
-    () => costReportPageState.costReportConfig?.cost_report_config_id,
-], async (after, before) => {
-    if (isEqual(after, before) || !costReportPageGetters.currency || !costReportPageState.costReportConfig?.cost_report_config_id) return;
-    await analyzeTrendData();
-}, { immediate: true });
 </script>
 
 <template>
@@ -199,8 +172,8 @@ watch([
             </div>
         </template>
         <template #content>
-            <p-data-loader :loading="state.loading"
-                           :data="state.data"
+            <p-data-loader :loading="isLoading"
+                           :data="costReportDataAnalyzeData"
                            :min-loading-time="500"
             >
                 <div class="summary-wrapper">
@@ -209,8 +182,8 @@ watch([
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
                         </div>
                         <div class="summary-value">
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                            <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency || 'USD'] }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency || 'USD', style: 'decimal'}) }}</span>
                         </div>
                     </div>
                     <div class="summary-item">
@@ -218,16 +191,16 @@ watch([
                             {{ state.selectedPeriodTranslation }}
                         </div>
                         <div class="summary-value">
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                            <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency || 'USD'] }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency || 'USD', style: 'decimal'}) }}</span>
                         </div>
                     </div>
                 </div>
                 <cost-report-overview-cost-trend-chart
                     :group-by="state.selectedTarget"
                     :period="state.period"
-                    :data="state.data"
-                    :loading="state.loading"
+                    :data="costReportDataAnalyzeData"
+                    :loading="isLoading"
                 />
             </p-data-loader>
         </template>
