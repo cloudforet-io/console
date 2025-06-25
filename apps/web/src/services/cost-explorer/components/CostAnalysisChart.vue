@@ -7,21 +7,18 @@ import type { XYChart } from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
 import {
     PButton, PSelectButton,
     PSelectDropdown, PToggleButton, PFieldTitle,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/components/CostAnalysisStackedColumnChart.vue';
+import { useCostAnalyzeQuery } from '@/services/cost-explorer/composables/queries/use-cost-analyze-query';
+import { useUnifiedCostAnalyzeQuery } from '@/services/cost-explorer/composables/queries/use-unified-cost-analyze-query';
 import {
     GRANULARITY, GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -29,21 +26,18 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-a
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { CostAnalyzeRawData } from '@/services/cost-explorer/types/cost-analyze-type';
 import type { CostXYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
-import type {
-    Period,
-} from '@/services/cost-explorer/types/cost-explorer-query-type';
-
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
+const costQuerySetGetters = costQuerySetStore.getters;
 
 const state = reactive({
     loading: true,
     legend: {} as Record<string, boolean>,
-    data: {} as AnalyzeResponse<CostAnalyzeRawData>,
+    data: [] as CostAnalyzeRawData[],
     chartData: [] as CostXYChartData[],
     chart: null as XYChart | null,
     groupByMenuItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
@@ -56,7 +50,6 @@ const state = reactive({
     showHideAll: computed(() => Object.values(state.legend).some((d) => d)),
     showAccumulatedToggle: computed(() => costAnalysisPageState.granularity === GRANULARITY.DAILY),
     isAccumulated: false,
-    analyzeFetcher: computed(() => (costQuerySetState.isUnifiedCostOn ? unifiedCostAnalyze : fetchCostAnalyze)),
 });
 
 /* Util */
@@ -71,45 +64,41 @@ const getValueSumKey = (dataType:string) => {
     }
 };
 
-/* Api */
-const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const unifiedCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze);
+/* Query */
 const analyzeApiQueryHelper = new ApiQueryHelper();
-const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>|undefined> => {
-    try {
-        analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
-        let dateFormat = 'YYYY-MM';
-        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-        const { status, response } = await state.analyzeFetcher({
-            data_source_id: costQuerySetState.isUnifiedCostOn ? undefined : costQuerySetState.selectedDataSourceId,
-            query: {
-                granularity: costAnalysisPageState.granularity,
-                group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
-                start: dayjs.utc(period.start).format(dateFormat),
-                end: dayjs.utc(period.end).format(dateFormat),
-                fields: {
-                    value_sum: {
-                        key: getValueSumKey(costAnalysisPageState.displayDataType),
-                        operator: 'sum',
-                    },
-                },
-                sort: [{ key: '_total_value_sum', desc: true }],
-                field_group: ['date'],
-                ...analyzeApiQueryHelper.data,
+const queryParams = computed<AnalyzeQuery|null>(() => {
+    if (!costAnalysisPageState.period) return null;
+
+    analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
+    let dateFormat = 'YYYY-MM';
+    if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
+
+    return {
+        granularity: costAnalysisPageState.granularity,
+        group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
+        start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
+        end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
+        fields: {
+            value_sum: {
+                key: getValueSumKey(costAnalysisPageState.displayDataType),
+                operator: 'sum',
             },
-        });
-        if (status === 'succeed') return response;
-        return undefined;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return { more: false, results: [] };
-    }
-};
-const setChartData = debounce(async (period:Period) => {
-    state.loading = true;
-    const res = await listCostAnalysisData(period);
-    if (res) {
-        state.data = res;
+        },
+        sort: [{ key: '_total_value_sum', desc: true }],
+        field_group: ['date'],
+        ...analyzeApiQueryHelper.data,
+    };
+});
+
+const { costAnalyzeData, isLoading } = (costQuerySetState.isUnifiedCostOn ? useUnifiedCostAnalyzeQuery : useCostAnalyzeQuery)({
+    data_source_id: computed(() => costQuerySetGetters.dataSourceId),
+    query: computed(() => queryParams.value ?? {}),
+});
+
+const setChartData = debounce(async () => {
+    if (costAnalyzeData.value) {
+        state.loading = true;
+        state.data = costAnalyzeData.value.results ?? [];
         state.loading = false;
     }
 }, 0);
@@ -142,8 +131,11 @@ watch([
     () => costQuerySetState.selectedDataSourceId,
     () => costQuerySetState.selectedQuerySetId,
     () => costQuerySetState.isUnifiedCostOn,
-], ([, selectedDataSourceId, , isUnifiedCost]) => {
-    if (costAnalysisPageState.period && (selectedDataSourceId || isUnifiedCost)) setChartData(costAnalysisPageState.period);
+    () => isLoading.value,
+], ([, , , , loading]) => {
+    if (costAnalysisPageState.period && !loading) {
+        setChartData();
+    }
 }, { immediate: true, deep: true });
 watch(() => state.groupByMenuItems, (after) => {
     if (!after.length) {
@@ -188,7 +180,7 @@ watch(() => costAnalysisPageState.granularity, () => {
         </div>
         <div class="bottom-part">
             <div class="bottom-right-part">
-                <p v-if="state.data?.more"
+                <p v-if="costAnalyzeData?.more"
                    class="too-many-text"
                 >
                     {{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}

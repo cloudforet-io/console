@@ -17,8 +17,6 @@ import {
 } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     getDateLabelFormat,
@@ -39,14 +37,14 @@ import {
 
 interface Props {
     loading: boolean;
-    data: AnalyzeResponse<CostAnalyzeRawData>;
+    data: CostAnalyzeRawData[];
     legend?: Record<string, boolean>;
     accumulated?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
-    data: () => ({}),
+    data: () => ([]),
     legend: () => ({}),
     accumulated: false,
 });
@@ -162,26 +160,26 @@ const getSeriesData = (slicedData: CostAnalyzeRawData[], etcData: CostAnalyzeRaw
     }
     return _seriesData;
 };
-const getGroupByData = (rawData: AnalyzeResponse<CostAnalyzeRawData>, accumulated: boolean): BarSeriesOption[] => {
-    const _slicedData = rawData.results?.slice(0, LIMIT) ?? [];
-    const _etcData = rawData.results?.slice(LIMIT) ?? [];
+const getGroupByData = (rawData: CostAnalyzeRawData[], accumulated: boolean): BarSeriesOption[] => {
+    const _slicedData = rawData.slice(0, LIMIT);
+    const _etcData = rawData.slice(LIMIT);
     return getSeriesData(_slicedData, _etcData, accumulated);
 };
-const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>, accumulated: boolean) => {
+const getTotalData = (rawData: CostAnalyzeRawData[], accumulated: boolean) => {
     let _data;
     if (accumulated) {
         let _accumulatedData = 0;
         const _today = dayjs.utc();
         _data = state.xAxisData.map((d) => {
             if (dayjs.utc(d).isAfter(_today)) return 0;
-            const _elem = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
+            const _elem = rawData[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
             const _value = _elem?.value ?? 0;
             _accumulatedData += _value;
             return _accumulatedData;
         });
     } else {
         _data = state.xAxisData.map((d) => {
-            const _elem = rawData.results?.[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
+            const _elem = rawData[0]?.value_sum?.find((v) => v[DATE_FIELD_NAME] === d);
             return _elem ? _elem.value : 0;
         });
     }
@@ -192,7 +190,7 @@ const getTotalData = (rawData: AnalyzeResponse<CostAnalyzeRawData>, accumulated:
         data: _data,
     }];
 };
-const drawChart = (rawData: AnalyzeResponse<CostAnalyzeRawData>, updateLegend = false) => {
+const drawChart = (rawData: CostAnalyzeRawData[], updateLegend = false) => {
     if (isEmpty(rawData)) return;
 
     if (costAnalysisPageState.chartGroupBy) {
