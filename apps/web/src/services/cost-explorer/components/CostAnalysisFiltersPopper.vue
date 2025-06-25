@@ -45,7 +45,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
-import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';

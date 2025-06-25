@@ -17,8 +17,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/components/CostAnalysisStackedColumnChart.vue';
-import { useCostAnalyzeQuery } from '@/services/cost-explorer/composables/queries/use-cost-analyze-query';
-import { useUnifiedCostAnalyzeQuery } from '@/services/cost-explorer/composables/queries/use-unified-cost-analyze-query';
+import { useCostAnalyzeQuery } from '@/services/cost-explorer/composables/use-cost-analyze-query';
+import { useUnifiedCostAnalyzeQuery } from '@/services/cost-explorer/composables/use-unified-cost-analyze-query';
 import {
     GRANULARITY, GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';

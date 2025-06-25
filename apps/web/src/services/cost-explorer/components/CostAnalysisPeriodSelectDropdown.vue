@@ -17,7 +17,7 @@ import { i18n } from '@/translations';
 import { queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
 import CostAnalysisCustomDateRangeModal from '@/services/cost-explorer/components/CostAnalysisCustomDateRangeModal.vue';
-import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import {
     PERIOD_DROPDOWN_MENU, PERIOD_DROPDOWN_MENU_ITEM_MAP,
 } from '@/services/cost-explorer/constants/cost-analysis-period-constant';

@@ -35,7 +35,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import AdvancedSettingsSetAdjustmentsOverlay from '@/services/cost-explorer/components/AdvancedSettingsSetAdjustmentsOverlay.vue';
-import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
 import { getUpcomingIssueDate, getUpcomingConfirmationDate } from '@/services/cost-explorer/helpers/cost-report-issue-date-helper';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 

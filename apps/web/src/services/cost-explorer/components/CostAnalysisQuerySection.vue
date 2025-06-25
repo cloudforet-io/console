@@ -33,7 +33,7 @@ import CostAnalysisDataTypeDropdown from '@/services/cost-explorer/components/Co
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
     from '@/services/cost-explorer/components/CostAnalysisGranularityPeriodDropdown.vue';
-import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_ID_LIST,

@@ -31,7 +31,7 @@ import {
 } from '@/styles/colors';
 
 
-import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import {
     DEFAULT_UNIFIED_COST_CURRENCY, UNIFIED_COST_KEY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';

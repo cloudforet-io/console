@@ -39,8 +39,8 @@ import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useCostAnalyzeQuery } from '@/services/cost-explorer/composables/queries/use-cost-analyze-query';
-import { useUnifiedCostAnalyzeQuery } from '@/services/cost-explorer/composables/queries/use-unified-cost-analyze-query';
+import { useCostAnalyzeQuery } from '@/services/cost-explorer/composables/use-cost-analyze-query';
+import { useUnifiedCostAnalyzeQuery } from '@/services/cost-explorer/composables/use-unified-cost-analyze-query';
 import {
     GRANULARITY,
     GROUP_BY,
