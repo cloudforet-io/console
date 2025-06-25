@@ -325,7 +325,12 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        fetchOptionsMap[state.fetchOptionKey] = options;
+        const prev = fetchOptionsMap[state.fetchOptionKey] ?? {};
+        fetchOptionsMap[state.fetchOptionKey] = {
+            ...prev,
+            ...options,
+            queryTags: options.queryTags ?? prev.queryTags ?? [],
+        };
         fetchData();
     },
     select(selectIndex) {
