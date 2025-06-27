@@ -61,9 +61,9 @@ const state = reactive<State>({
         { label: 'Fixed Amount', name: 'FIXED_AMOUNT' },
     ]),
     variationMenu: computed(() => [
-        { label: 'All', name: 'all' },
+        // { label: 'All', name: 'all' },
         { label: 'Increase (>=)', name: JSON.stringify(['gte']) },
-        { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
+        // { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
     ]),
     notifyLevelMenu: computed(() => Object.values(NOTIFY_LEVEL_MAP).map((level) => ({
         label: level.label,
