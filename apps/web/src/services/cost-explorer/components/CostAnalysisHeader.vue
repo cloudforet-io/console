@@ -30,7 +30,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray } from '@/styles/colors';
 
-import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';

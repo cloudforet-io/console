@@ -26,9 +26,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AdvancedSettingsAdjustmentGroupForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentGroupForm.vue';
-import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/queries/use-cost-report-config-query';
-import { useReportAdjustmentPolicyQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-policy-query';
-import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
+import { useReportAdjustmentPolicyQuery } from '@/services/cost-explorer/composables/use-report-adjustment-policy-query';
+import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 import type { AdjustmentType, AdjustmentData, AdjustmentPolicyData } from '@/services/cost-explorer/types/report-adjustment-type';
 

@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
-import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/queries/use-report-adjustment-query';
+import { useReportAdjustmentQuery } from '@/services/cost-explorer/composables/use-report-adjustment-query';
 import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/advanced-settings-page-store';
 import type { AdjustmentData, AdjustmentType } from '@/services/cost-explorer/types/report-adjustment-type';
 

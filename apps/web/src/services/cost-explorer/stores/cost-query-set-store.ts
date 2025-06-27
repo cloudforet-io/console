@@ -4,6 +4,8 @@ import { defineStore } from 'pinia';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+
 export const useCostQuerySetStore = defineStore('cost-query-set', () => {
     const appContextStore = useAppContextStore();
 
@@ -18,7 +20,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
     });
     const getters = {
         dataSourceId: computed(() => {
-            if (state.isUnifiedCostOn) return 'unified-cost';
+            if (state.isUnifiedCostOn) return UNIFIED_COST_KEY;
             return state.selectedDataSourceId || '';
         }),
     };

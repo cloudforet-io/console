@@ -17,7 +17,7 @@ import CostAnalysisDataTable from '@/services/cost-explorer/components/CostAnaly
 import CostAnalysisGroupBy from '@/services/cost-explorer/components/CostAnalysisGroupBy.vue';
 import CostAnalysisHeader from '@/services/cost-explorer/components/CostAnalysisHeader.vue';
 import CostAnalysisQuerySection from '@/services/cost-explorer/components/CostAnalysisQuerySection.vue';
-import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/queries/use-cost-query-set-query';
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
