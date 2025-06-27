@@ -38,7 +38,6 @@ const state = reactive({
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
-    additionalOptions: {},
     isScheduleHoursValid: computed(() => ((state.isAutoSyncEnabled) ? !!serviceAccountPageFormState.scheduleHours.length : true)),
     isAdditionalOptionsValid: false,
     isAllValid: computed(() => {
@@ -83,10 +82,9 @@ const handleChangeToggle = (e:boolean) => {
         _state.formState.isAutoSyncEnabled = e;
     });
 };
-
-watch(() => state.additionalOptions, (additionalOptions) => {
-    serviceAccountPageStore.setFormState('additionalOptions', additionalOptions);
-});
+const handleChangeAdditionalOptions = (formData: Record<string, any>) => {
+    serviceAccountPageStore.setFormState('additionalOptions', formData);
+};
 
 watch(() => state.isAllValid, (isAllValid) => {
     serviceAccountPageStore.$patch((_state) => {
@@ -118,9 +116,10 @@ watch(() => state.isAllValid, (isAllValid) => {
                 <p-pane-layout class="p-4 mb-8">
                     <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                                         class="p-json-schema-form"
-                                        :form-data.sync="state.additionalOptions"
+                                        :form-data="serviceAccountPageFormState.additionalOptions"
                                         :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                                         :language="state.language"
+                                        @update:form-data="handleChangeAdditionalOptions"
                                         @validate="handleAdditionalOptionsValidate"
                     />
                 </p-pane-layout>
