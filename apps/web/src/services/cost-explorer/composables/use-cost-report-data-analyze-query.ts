@@ -6,6 +6,7 @@ import { isEmpty } from 'lodash';
 import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
 
 import { useCostReportDataApi } from '@/api-clients/cost-analysis/cost-report-data/composables/use-cost-report-data-api';
+import type { CostReportDataAnalyzeParameters } from '@/api-clients/cost-analysis/cost-report-data/schema/api-verbs/analyze';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
@@ -21,9 +22,9 @@ export const useCostReportDataAnalyzeQuery = ({
 }, isUserScope = false) => {
     const { costReportDataAPI } = useCostReportDataApi();
     const { key, params } = useServiceQueryKey('cost-analysis', 'cost-report-data', 'analyze', {
-        params: computed(() => {
-            const baseParams: any = {
-                query: query?.value,
+        params: computed<CostReportDataAnalyzeParameters>(() => {
+            const baseParams: CostReportDataAnalyzeParameters = {
+                query: query?.value || undefined,
             };
 
             if (cost_report_config_id?.value) {

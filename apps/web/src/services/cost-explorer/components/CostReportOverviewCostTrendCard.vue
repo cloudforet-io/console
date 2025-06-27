@@ -86,6 +86,7 @@ const state = reactive({
         return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: dayjs.utc(state.selectedDate).year() });
     }),
 });
+const currencySymbol = computed<string>(() => CURRENCY_SYMBOL?.[costReportPageGetters.currency || 'USD']);
 
 /* Query */
 const queryParams = computed<AnalyzeQuery|null>(() => ({
@@ -182,7 +183,7 @@ const handleChangeTarget = (target: string) => {
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
                         </div>
                         <div class="summary-value">
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency || 'USD'] }}</span>
+                            <span class="currency-symbol">{{ currencySymbol }}</span>
                             <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency || 'USD', style: 'decimal'}) }}</span>
                         </div>
                     </div>
@@ -191,7 +192,7 @@ const handleChangeTarget = (target: string) => {
                             {{ state.selectedPeriodTranslation }}
                         </div>
                         <div class="summary-value">
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency || 'USD'] }}</span>
+                            <span class="currency-symbol">{{ currencySymbol }}</span>
                             <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency || 'USD', style: 'decimal'}) }}</span>
                         </div>
                     </div>
