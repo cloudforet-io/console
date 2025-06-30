@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.isEditableCollector"
                                          :total-count="state.totalCount"
                                          @click-edit="handleClickEdit"
         />
@@ -67,14 +67,11 @@ import AttachedServiceAccounts
     from '@/services/asset-inventory/components/CollectorDetailAttachedServiceAccounts.vue';
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const { collectorAPI } = useCollectorApi();
-const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const props = defineProps<{
     manageDisabled?: boolean;

@@ -68,7 +68,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -83,7 +82,6 @@ const collectorFormState = collectorFormStore.state;
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorDetailPageStore = useCollectorDetailPageStore();
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
 const { collectorAPI } = useCollectorApi();
@@ -110,7 +108,6 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
@@ -221,7 +218,6 @@ onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
@@ -229,9 +225,6 @@ onMounted(async () => {
     if (collector) {
         collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
-        collectorDetailPageStore.$patch((_state) => {
-            _state.state.collector = collector;
-        });
         resume();
     }
 });
@@ -240,17 +233,12 @@ onUnmounted(() => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.reset();
 });
-
-
-
-
 </script>
 <template>
     <div class="collector-detail-page">
         <portal to="page-top-notification">
-            <p-scoped-notification v-if="state.isNotiVisible"
+            <p-scoped-notification v-if="!collectorFormState.isEditableCollector"
                                    type="information"
                                    :title="$t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
                                    icon="ic_info-circle"
@@ -277,7 +265,7 @@ onUnmounted(() => {
                                 width="20rem"
                                 height="1.5rem"
                     />
-                    <template v-if="state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                    <template v-if="state.collectorName && collectorFormState.isEditableCollector"
                               #title-right-extra
                     >
                         <span class="title-right-button-wrapper">

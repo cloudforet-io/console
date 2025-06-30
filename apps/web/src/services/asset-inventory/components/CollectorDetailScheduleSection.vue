@@ -2,13 +2,13 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !state.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !collectorFormState.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
         <div class="schedule-wrapper">
             <collector-schedule-form :hours-readonly="!state.isEditMode"
-                                     :readonly="!props.hasReadWriteAccess || !state.isEditableCollector"
+                                     :readonly="!props.hasReadWriteAccess || !collectorFormState.isEditableCollector"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
             />
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import {
     PButton, PPaneLayout,
@@ -53,9 +53,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
-import CollectorScheduleForm
-    from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+import CollectorScheduleForm from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -66,12 +64,11 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-const collectorDetailPageStore = useCollectorDetailPageStore();
+
 const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
     isEditMode: false,
-    isEditableCollector: computed(() => collectorDetailPageStore.getters.isEditableCollector),
     updateLoading: false,
 });
 

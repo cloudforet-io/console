@@ -11,7 +11,7 @@
                                 width="20rem"
                                 height="1.5rem"
                     />
-                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorFormState.isEditableCollector"
                               #title-right-extra
                     >
                         <span class="title-right-button-wrapper">
@@ -144,7 +144,6 @@ import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/a
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -162,7 +161,6 @@ const collectorFormState = collectorFormStore.state;
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const authorizationStore = useAuthorizationStore();
 
@@ -189,7 +187,6 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
@@ -299,7 +296,6 @@ onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
@@ -307,7 +303,6 @@ onMounted(async () => {
     if (collector) {
         collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
-        collectorDetailPageStore.state.collector = collector;
         resume();
     }
 });
@@ -316,7 +311,6 @@ onUnmounted(() => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.reset();
 });
 
 
