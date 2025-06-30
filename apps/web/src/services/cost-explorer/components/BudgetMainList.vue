@@ -60,7 +60,6 @@ interface BudgetMainListState {
     loading: boolean;
     modalVisible: boolean;
     queryFilters: ConsoleFilter[];
-    pageStart?: number;
     pageLimit: number;
     thisPage: number;
     period: Period;
