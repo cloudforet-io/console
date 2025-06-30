@@ -25,59 +25,32 @@ import { useWorkspaceGroupReferenceDataModel } from '@/query/resource-query/refe
 import { useWorkspaceReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-reference-data-model';
 import { useWorkspaceUserReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-user-reference-data-model';
 
-export const useAllReferenceDataModel = () => {
-    const app = useAppReferenceDataModel();
-    const workspace = useWorkspaceReferenceDataModel();
-    const workspaceGroup = useWorkspaceGroupReferenceDataModel();
-    const user = useUserReferenceDataModel();
-    const workspaceUser = useWorkspaceUserReferenceDataModel();
-    const userGroup = useUserGroupReferenceDataModel();
-    const provider = useProvodierReferenceDataModel();
-    const protocol = useProtocolReferenceDataModel();
-    const cloudServiceType = useCloudServiceTypeReferenceDataModel();
-    const collector = useCollectorReferenceDataModel();
-    const costDataSource = useCostDataSourceReferenceModel();
-    const metric = useMetricReferenceDataModel();
-    const namespace = useNamespaceReferenceDataModel();
-    const project = useProjectReferenceDataModel();
-    const projectGroup = useProjectGroupReferenceDataModel();
-    const role = useRoleReferenceDataModel();
-    const region = useRegionReferenceDataModel();
-    const secret = useSecretReferenceDataModel();
-    const plugin = usePluginReferenceDataModel();
-    const serviceAccount = useServiceAccountReferenceDataModel();
-    const trustedAccount = useTrustedAccountReferenceDataModel();
-    const alertManagerWebhook = useAlertManagerWebhookReferenceDataModel();
-    const monitoringWebhook = useMonitoringWebhookReferenceDataModel();
-    const service = useServiceReferenceDataModel();
-    const alertManagerEscalationPolicy = useAlertManagerEscalationPolicyReferenceDataModel();
-    const monitoringEscalationPolicy = useMonitoringEscalationPolicyReferenceDataModel();
-    return {
-        app: app.map,
-        workspace: workspace.map,
-        workspaceGroup: workspaceGroup.map,
-        user: user.map,
-        workspaceUser: workspaceUser.map,
-        userGroup: userGroup.map,
-        provider: provider.map,
-        protocol: protocol.map,
-        cloudServiceType: cloudServiceType.map,
-        collector: collector.map,
-        costDataSource: costDataSource.map,
-        metric: metric.map,
-        namespace: namespace.map,
-        project: project.map,
-        projectGroup: projectGroup.map,
-        role: role.map,
-        region: region.map,
-        secret: secret.map,
-        plugin: plugin.map,
-        serviceAccount: serviceAccount.map,
-        trustedAccount: trustedAccount.map,
-        alertManagerWebhook: alertManagerWebhook.map,
-        monitoringWebhook: monitoringWebhook.map,
-        service: service.map,
-        alertManagerEscalationPolicy: alertManagerEscalationPolicy.map,
-        monitoringEscalationPolicy: monitoringEscalationPolicy.map,
-    };
-};
+export const useAllReferenceDataModel = () => ({
+    app: useAppReferenceDataModel().map,
+    workspace: useWorkspaceReferenceDataModel().map,
+    workspaceGroup: useWorkspaceGroupReferenceDataModel().map,
+    user: useUserReferenceDataModel().map,
+    workspaceUser: useWorkspaceUserReferenceDataModel().map,
+    userGroup: useUserGroupReferenceDataModel().map,
+    provider: useProvodierReferenceDataModel().map,
+    protocol: useProtocolReferenceDataModel().map,
+    cloudServiceType: useCloudServiceTypeReferenceDataModel().map,
+    collector: useCollectorReferenceDataModel().map,
+    costDataSource: useCostDataSourceReferenceModel().map,
+    metric: useMetricReferenceDataModel().map,
+    namespace: useNamespaceReferenceDataModel().map,
+    project: useProjectReferenceDataModel().map,
+    projectGroup: useProjectGroupReferenceDataModel().map,
+    role: useRoleReferenceDataModel().map,
+    region: useRegionReferenceDataModel().map,
+    secret: useSecretReferenceDataModel().map,
+    plugin: usePluginReferenceDataModel().map,
+    serviceAccount: useServiceAccountReferenceDataModel().map,
+    trustedAccount: useTrustedAccountReferenceDataModel().map,
+    alertManagerWebhook: useAlertManagerWebhookReferenceDataModel().map,
+    monitoringWebhook: useMonitoringWebhookReferenceDataModel().map,
+    service: useServiceReferenceDataModel().map,
+    alertManagerEscalationPolicy: useAlertManagerEscalationPolicyReferenceDataModel().map,
+    monitoringEscalationPolicy: useMonitoringEscalationPolicyReferenceDataModel().map,
+});
+
