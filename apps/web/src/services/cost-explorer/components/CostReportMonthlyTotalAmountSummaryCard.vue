@@ -13,7 +13,6 @@ import {
     isEmpty, sum, throttle,
 } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
 import {
     PSelectButton, PDatePagination, PDataTable, PTextButton, PI, PTooltip, PDataLoader,
@@ -23,9 +22,7 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CostReportListParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/list';
-import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
+import { useCostReportApi } from '@/api-clients/cost-analysis/cost-report/composables/use-cost-report-api';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -76,6 +73,8 @@ const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const { costReportAPI } = useCostReportApi();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
@@ -195,7 +194,7 @@ const getLegendColor = (field: string, value: string, rowIndex: number) => {
 /* Api */
 const listCostReport = async () => {
     try {
-        const res = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+        const res = await costReportAPI.list({
             query: {
                 filter: [
                     { k: 'report_month', v: state.currentDate?.format('YYYY-MM'), o: 'eq' },
@@ -240,8 +239,8 @@ const handleChangeTarget = (target: string) => {
 };
 const handleClickDetailsLink = async () => {
     try {
-        const reportUrl = await costReportPageStore.getCostReportUrl({
-            cost_report_id: state.currentReportId,
+        const reportUrl = await costReportAPI.getUrl({
+            cost_report_id: state.currentReportId ?? '',
         });
         window.open(reportUrl, '_blank');
     } catch (e: any) {

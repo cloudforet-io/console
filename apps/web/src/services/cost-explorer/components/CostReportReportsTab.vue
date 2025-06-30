@@ -6,7 +6,6 @@ import {
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -15,6 +14,8 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
+import { useCostReportApi } from '@/api-clients/cost-analysis/cost-report/composables/use-cost-report-api';
+import type { CostReportListParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/list';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -32,6 +33,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
+import { useCostReportListQuery } from '@/services/cost-explorer/composables/use-cost-report-list-query';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -39,6 +41,7 @@ const allReferenceStore = useAllReferenceStore();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const appContextStore = useAppContextStore();
+const { costReportAPI } = useCostReportApi();
 
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 const workspaces = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
@@ -63,8 +66,8 @@ const state = reactive({
     resendModalVisible: false,
 });
 const tableState = reactive({
-    pageStart: 0,
-    pageLimit: 15,
+    thisPage: 1,
+    pageSize: 15,
     searchFilters: [] as ConsoleFilter[],
     field: [
         { label: 'Issue Date', name: 'issue_date' },
@@ -89,10 +92,7 @@ const tableState = reactive({
     },
 });
 
-
-
-const costReportListApiQueryHelper = new ApiQueryHelper()
-    .setSort('issue_date', true);
+const costReportListApiQueryHelper = new ApiQueryHelper().setSort('issue_date', true);
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -123,7 +123,7 @@ const handleConfirmCustomPeriod = (start: string, end: string): void => {
 };
 const handleClickCopyButton = async (id: string) => {
     try {
-        const response = await costReportPageStore.getCostReportUrl({
+        const response = await costReportAPI.getUrl({
             cost_report_id: id,
         });
         copyAnyData(response);
@@ -138,56 +138,44 @@ const handleClickResendButton = async (id: string): Promise<void> => {
         return;
     }
     try {
-        await costReportPageStore.fetchCostReport({
-            cost_report_id: id,
-        });
-        const reportUrl = await costReportPageStore.getCostReportUrl({
-            cost_report_id: id,
-        });
-        costReportPageState.reportItem = {
-            ...costReportPageState.reportItem,
-            report_url: reportUrl || undefined,
-        };
+        costReportPageStore.setSelectedCostReportId(id);
         state.resendModalVisible = true;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 const handleChange = (options: any = {}) => {
-    getCostReportsList(options);
+    if (options.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
+    }
 };
 const handleClickLinkButton = async (id: string) => {
     try {
-        const response = await costReportPageStore.getCostReportUrl({
+        const response = await costReportAPI.getUrl({
             cost_report_id: id,
         });
-        window.open(response, '_blank');
+        window.open(response.cost_report_link, '_blank');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
 
-/* API */
-const getCostReportsList = (options: any = {}) => {
-    setApiQueryWithToolboxOptions(costReportListApiQueryHelper, options);
-    if (options.queryTags !== undefined) {
-        queryTagHelper.setQueryTags(options.queryTags);
-        tableState.searchFilters = costReportListApiQueryHelper.filters;
-    }
-    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
-    costReportListApiQueryHelper.setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit);
-    if (!isAdminMode.value) {
-        costReportListApiQueryHelper.setFilters([
-            { k: 'status', v: ['DONE'], o: '' },
-        ]);
-    }
-    costReportPageStore.fetchCostReportsList({
-        query: costReportListApiQueryHelper.data,
-    });
-};
+/* Query */
+const { costReportListData, isLoading: isCostReportListLoading, totalCount } = useCostReportListQuery({
+    thisPage: computed(() => tableState.thisPage),
+    pageSize: computed(() => tableState.pageSize),
+    params: computed<CostReportListParameters>(() => {
+        costReportListApiQueryHelper.setFilters(queryTagHelper.filters.value);
+        costReportListApiQueryHelper.addFilter({ k: 'cost_report_config_id', v: costReportPageState.costReportConfig?.cost_report_config_id || '', o: '=' });
+        costReportListApiQueryHelper.addFilter({ k: 'status', v: ['DONE'], o: '=' });
+        return {
+            query: {
+                ...costReportListApiQueryHelper.data,
+            },
+        };
+    }),
+});
 
-/* Watcher */
 watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, customPeriod]) => {
     const filters = [...tableState.searchFilters];
 
@@ -199,11 +187,7 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
             filters.push({ k: 'report_month', v: dayjs.utc(selectedPeriod).subtract(1, 'month').format('YYYY-MM'), o: '=' });
         }
     }
-
     costReportListApiQueryHelper.setFilters(filters);
-    getCostReportsList({
-        pageStart: 0,
-    });
 });
 watch(() => costReportPageState.activeTab, (activeTab) => {
     if (activeTab === 'reports') {
@@ -211,7 +195,7 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
         tableState.searchFilters = [];
         state.selectedPeriod = 'all';
         state.customPeriod = undefined;
-        getCostReportsList();
+        costReportListApiQueryHelper.setFilters([]);
     }
 }, { immediate: true });
 </script>
@@ -219,15 +203,18 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
 <template>
     <div>
         <p-toolbox-table class="cost-report-reports-tab"
+                         searchable
                          search-type="query"
                          :multi-select="false"
-                         :loading="costReportPageState.reportListLoading"
-                         :total-count="costReportPageState.reportListTotalCount"
-                         :items="costReportPageState.reportListItems"
+                         :loading="isCostReportListLoading"
+                         :total-count="totalCount"
+                         :items="costReportListData?.results || []"
                          :fields="tableState.field"
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
+                         :this-page.sync="tableState.thisPage"
+                         :page-size.sync="tableState.pageSize"
                          @change="handleChange"
                          @refresh="handleChange()"
         >
@@ -236,7 +223,7 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                     <template #heading>
                         <p-heading heading-type="sub"
                                    use-total-count
-                                   :total-count="costReportPageState.reportListTotalCount"
+                                   :total-count="costReportListData?.total_count || 0"
                                    :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORTS')"
                         />
                     </template>

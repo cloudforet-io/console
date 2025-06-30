@@ -18,7 +18,7 @@ import {
 import type { DataTableFieldType, DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { CostReportGetParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/get';
+import { useCostReportApi } from '@/api-clients/cost-analysis/cost-report/composables/use-cost-report-api';
 import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
 import { setI18nLocale } from '@/translations';
 
@@ -82,6 +82,7 @@ const props = withDefaults(defineProps<Props>(), {
 const chartContext = ref<HTMLElement|null>(null);
 const providerReferenceStore = useProviderReferenceStore();
 const domainStore = useDomainStore();
+const { costReportAPI } = useCostReportApi();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
@@ -299,7 +300,7 @@ const fetchReportData = async () => {
     try {
         const { costReportId } = props;
         if (!costReportId) return;
-        state.baseInfo = await SpaceConnector.clientV2.costAnalysis.costReport.get<CostReportGetParameters, CostReportModel>({
+        state.baseInfo = await costReportAPI.get({
             cost_report_id: costReportId,
         });
     } catch (e: any) {
