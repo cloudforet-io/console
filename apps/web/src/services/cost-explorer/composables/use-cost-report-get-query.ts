@@ -20,7 +20,6 @@ export const useCostReportGetQuery = (costReportId: ComputedRef<string | undefin
     const { data, isLoading, error } = useScopedQuery({
         queryKey: key,
         queryFn: () => costReportAPI.get(params.value),
-        select: (d) => d,
         enabled: computed(() => !!costReportId.value),
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 1, // 1 minutes

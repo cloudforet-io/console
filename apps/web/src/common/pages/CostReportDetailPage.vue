@@ -142,13 +142,16 @@ const projectQueryParams = computed<AnalyzeQuery|null>(() => createBaseQueryPara
 
 const { costReportDataAnalyzeData: providerData } = useCostReportDataAnalyzeQuery({
     query: providerQueryParams,
-}, true);
+    isCostReportPage: false,
+});
 const { costReportDataAnalyzeData: productData } = useCostReportDataAnalyzeQuery({
     query: productQueryParams,
-}, true);
+    isCostReportPage: false,
+});
 const { costReportDataAnalyzeData: projectData } = useCostReportDataAnalyzeQuery({
     query: projectQueryParams,
-}, true);
+    isCostReportPage: false,
+});
 
 /* Computed */
 const totalCost = computed<number>(() => sum(costByProviderTableData.value.map((d) => d.value_sum)));

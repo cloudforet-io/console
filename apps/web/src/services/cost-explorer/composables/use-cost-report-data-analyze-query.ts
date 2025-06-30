@@ -15,11 +15,13 @@ export const useCostReportDataAnalyzeQuery = ({
     cost_report_config_id,
     is_confirmed,
     query,
+    isCostReportPage = true,
 }: {
     cost_report_config_id?: ComputedRef<string>;
     is_confirmed?: boolean;
     query: ComputedRef<AnalyzeQuery | null>;
-}, isUserScope = false) => {
+    isCostReportPage?: boolean;
+}) => {
     const { costReportDataAPI } = useCostReportDataApi();
     const { key, params } = useServiceQueryKey('cost-analysis', 'cost-report-data', 'analyze', {
         params: computed<CostReportDataAnalyzeParameters>(() => {
@@ -45,7 +47,7 @@ export const useCostReportDataAnalyzeQuery = ({
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 1, // 1 minutes
         enabled: computed(() => !isEmpty(query.value)),
-    }, isUserScope ? ['USER'] : ['DOMAIN', 'WORKSPACE']);
+    }, isCostReportPage ? ['DOMAIN', 'WORKSPACE'] : ['USER']);
 
     return {
         costReportDataAnalyzeData: data, isLoading, error,

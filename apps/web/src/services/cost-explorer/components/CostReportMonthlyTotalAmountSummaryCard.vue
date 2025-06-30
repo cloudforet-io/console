@@ -46,19 +46,12 @@ import {
     GROUP_BY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 
-
-type CostReportDataAnalyzeResult = {
-    [groupBy: string]: string | any;
-    value_sum: Array<{
-        [key: string]: number;
-    }>;
-    _total_value_sum: number;
-};
 type RefinedCostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
     amount: number;
@@ -82,7 +75,6 @@ const storeState = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
 const state = reactive({
-    refinedData: [] as RefinedCostReportDataAnalyzeResult[],
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     currentDate: undefined as Dayjs | undefined,
     currentReportId: undefined as string|undefined,
@@ -119,6 +111,10 @@ const { costReportDataAnalyzeData, isLoading } = useCostReportDataAnalyzeQuery({
 });
 
 /* Computed */
+const refinedData = computed<RefinedCostReportDataAnalyzeResult[]>(() => {
+    if (!costReportDataAnalyzeData.value) return [];
+    return getRefinedAnalyzeData(costReportDataAnalyzeData.value);
+});
 const currentDateRangeText = computed<string>(() => {
     if (!state.currentDate) return '';
     return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
@@ -177,8 +173,8 @@ const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>
     res.results?.forEach((d) => {
         _results.push({
             [state.selectedTarget]: d[state.selectedTarget],
-            amount: d._total_value_sum,
-            adjusted_amount: d.value_sum.find((v) => !!v?.is_adjusted)?.value,
+            amount: d._total_value_sum ?? 0,
+            adjusted_amount: d.value_sum?.find((v) => !!v?.is_adjusted)?.value,
         });
     });
     return _results;
@@ -218,7 +214,7 @@ const drawChart = (rawData?: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
     rawData.results?.forEach((d) => {
         let _color = state.selectedTarget === GROUP_BY.PROVIDER ? storeState.providers[d[state.selectedTarget]]?.color : undefined;
         if (d[state.selectedTarget] === OTHER_CATEGORY) _color = gray[500];
-        const _value = sum(d.value_sum.map((v) => v.value));
+        const _value = sum(d.value_sum?.map((v) => v.value) ?? []);
         _seriesData.push({
             name: d[state.selectedTarget],
             value: _value,
@@ -257,12 +253,6 @@ watch([() => chartContext.value, () => isLoading.value, () => costReportDataAnal
         drawChart(rawData);
     }
 });
-
-watch(() => costReportDataAnalyzeData.value, (newData) => {
-    if (newData) {
-        state.refinedData = getRefinedAnalyzeData(newData);
-    }
-}, { immediate: true });
 
 watch(() => costReportPageState.recentReportMonth, async (after) => {
     if (!after) return;
@@ -346,7 +336,7 @@ useResizeObserver(chartContext, throttle(() => {
                     </div>
                     <div class="right-part">
                         <p-data-table :fields="tableFields"
-                                      :items="state.refinedData"
+                                      :items="refinedData"
                                       :loading="isLoading"
                                       table-style-type="simple"
                                       class="summary-data-table"
