@@ -90,6 +90,7 @@ class ReferenceRepository<T extends Record<string, any>> {
     }
 
     requestItem(id: string) {
+        if (this.queryClient.getQueryData<ResourceCacheType<T>>(this.queryKey)?.[id]) return;
         this.idBatcher.enqueue(id);
     }
 }
