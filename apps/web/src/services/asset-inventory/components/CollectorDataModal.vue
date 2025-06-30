@@ -9,11 +9,10 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CollectorCollectParameters } from '@/api-clients/inventory/collector/schema/api-verbs/collect';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -29,10 +28,13 @@ import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 
+
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
 const referenceMap = useAllReferenceDataModel();
+
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
     loading: false,
@@ -85,7 +87,7 @@ const handleClickConfirm = async () => {
 
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
+        await collectorAPI.collect({
             collector_id: collectorDataModalState.selectedCollector.collector_id,
             secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });

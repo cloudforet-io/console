@@ -39,12 +39,11 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n } from '@/translations';
@@ -68,6 +67,8 @@ const props = defineProps<{
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const collectorDetailPageStore = useCollectorDetailPageStore();
+const { collectorAPI } = useCollectorApi();
+
 const state = reactive({
     isEditMode: false,
     isEditableCollector: computed(() => collectorDetailPageStore.getters.isEditableCollector),
@@ -83,7 +84,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             hours: collectorFormState.scheduleHours,
         },
     };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 const handleClickEdit = () => {

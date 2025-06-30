@@ -7,8 +7,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorListParameters } from '@/api-clients/inventory/collector/schema/api-verbs/list';
-import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
 import type { JobModel } from '@/schema/inventory/job/model';
@@ -26,6 +26,7 @@ import type { JobAnalyzeInfo } from '@/services/asset-inventory/types/collector-
 export const useCollectorPageStore = defineStore('page-collector', () => {
     const appContextStore = useAppContextStore();
     const appContextGetters = appContextStore.getters;
+    const { collectorAPI } = useCollectorApi();
 
     const state = reactive({
         loading: {
@@ -131,7 +132,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         async updateCollectorSchedule(params) {
             try {
-                const response = await SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+                const response = await collectorAPI.update(params);
                 const updatedCollectorIndex = state.collectors.findIndex((collector) => collector.collector_id === response.collector_id);
                 state.collectors[updatedCollectorIndex] = response;
                 showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');

@@ -60,14 +60,13 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout, PDefinitionTable, PEmpty,
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
@@ -89,6 +88,7 @@ const props = defineProps<{
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const collectorDetailPageStore = useCollectorDetailPageStore();
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
     loading: computed<boolean>(() => !collectorFormState.originCollector),
@@ -125,7 +125,7 @@ const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
         collector_id: collectorFormState.collectorId,
         options: collectorFormState.options,
     };
-    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
+    return collectorAPI.updatePlugin(params);
 };
 const handleClickEdit = () => {
     state.isEditMode = true;

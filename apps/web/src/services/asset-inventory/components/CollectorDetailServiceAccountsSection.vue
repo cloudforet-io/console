@@ -47,13 +47,11 @@ import {
     reactive,
 } from 'vue';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type {
     CollectorModel,
@@ -75,7 +73,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
+const { collectorAPI } = useCollectorApi();
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const props = defineProps<{
@@ -110,7 +108,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 

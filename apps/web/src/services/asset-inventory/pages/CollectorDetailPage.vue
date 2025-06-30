@@ -30,13 +30,11 @@ import { useRoute } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink, PHeadingLayout, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { CollectorDeleteParameters } from '@/api-clients/inventory/collector/schema/api-verbs/delete';
-import type { CollectorGetParameters } from '@/api-clients/inventory/collector/schema/api-verbs/get';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -88,7 +86,7 @@ const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDetailPageStore = useCollectorDetailPageStore();
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
-
+const { collectorAPI } = useCollectorApi();
 const route = useRoute();
 
 watch(() => collectorFormState.originCollector, async (collector) => {
@@ -141,7 +139,7 @@ defineExpose({ setPathFrom });
 const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
     try {
-        return await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
+        return await collectorAPI.get({
             collector_id: props.collectorId,
         });
     } catch (e) {
@@ -152,7 +150,7 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+const fetchDeleteCollector = async () => (collectorFormState.collectorId ? collectorAPI.delete({
     collector_id: collectorFormState.collectorId,
 }) : undefined);
 

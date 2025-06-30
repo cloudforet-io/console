@@ -54,17 +54,15 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PTextButton, PButtonModal,
 } from '@cloudforet/mirinae';
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { CollectorCollectParameters } from '@/api-clients/inventory/collector/schema/api-verbs/collect';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorCreateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/create';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
-import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -85,7 +83,9 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const appContextStore = useAppContextStore();
+const { collectorAPI } = useCollectorApi();
 const router = useRouter();
+
 const emit = defineEmits([
     'update:currentStep',
 ]);
@@ -140,7 +140,7 @@ const handleClickCreateButton = async () => {
             exclude_service_accounts: collectorFormState.serviceAccounts,
         };
         Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-        const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
+        const res:CollectorModel = await collectorAPI.create(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
@@ -165,7 +165,7 @@ const handleConfirmCreateCollector = async () => {
         state.collectLoading = true;
         // After the collector created, if the user clicks the collect button, the collector will be executed.
         if (state.createdCollectorId) {
-            await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
+            await collectorAPI.collect({
                 collector_id: state.createdCollectorId,
             });
         } else {
