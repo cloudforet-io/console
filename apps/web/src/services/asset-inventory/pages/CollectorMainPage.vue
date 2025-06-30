@@ -18,6 +18,8 @@ import type { CollectorListParameters } from '@/api-clients/inventory/collector/
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { SpaceRouter } from '@/router';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,6 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
 import CollectorProviderList from '@/services/asset-inventory/components/CollectorProviderList.vue';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type {
@@ -32,7 +35,8 @@ import type {
     CollectorMainPageQueryValue,
 } from '@/services/asset-inventory/types/collector-main-page-type';
 
-
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 
@@ -40,6 +44,7 @@ const state = reactive({
     initLoading: true,
     hasCollectorList: false,
 });
+const isAdminMode = computed(() => appContextGetters.isAdminMode);
 
 /* Url Query String */
 const urlFilterConverter = new QueryHelper();
@@ -105,15 +110,16 @@ onMounted(async () => {
     <div class="collector-page">
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading use-total-count
-                           use-selected-count
-                           :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-                           :total-count="collectorPageState.totalCount"
+                <p-heading
+                    use-total-count
+                    use-selected-count
+                    :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+                    :total-count="collectorPageState.totalCount"
                 />
             </template>
             <template #extra>
                 <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                    :to="{ name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
                 >
                     <p-button style-type="tertiary"
                               class="history-button"
@@ -124,10 +130,11 @@ onMounted(async () => {
                 </router-link>
             </template>
         </p-heading-layout>
-        <p-data-loader :data="state.hasCollectorList"
-                       :loading="state.initLoading"
-                       loader-backdrop-color="gray.100"
-                       class="collector-loader-wrapper"
+        <p-data-loader
+            :data="state.hasCollectorList"
+            :loading="state.initLoading"
+            loader-backdrop-color="gray.100"
+            class="collector-loader-wrapper"
         >
             <div v-if="state.hasCollectorList"
                  class="collector-contents-wrapper"
