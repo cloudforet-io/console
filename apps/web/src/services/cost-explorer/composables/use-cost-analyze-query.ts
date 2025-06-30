@@ -29,7 +29,7 @@ export const useCostAnalyzeQuery = ({
         queryFn: () => costAPI.analyze(params.value),
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 1, // 1 minutes
-        enabled: computed(() => !!data_source_id.value && !isEmpty(query.value)), // 조건부 활성화
+        enabled: computed(() => !!data_source_id.value && !isEmpty(query.value)),
     }, ['DOMAIN', 'WORKSPACE']);
 
     return {

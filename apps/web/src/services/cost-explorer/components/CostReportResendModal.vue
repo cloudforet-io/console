@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PDefinitionTable, PLink } from '@cloudforet/mirinae';
 
-import type { CostReportSendParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/send';
+import { useCostReportApi } from '@/api-clients/cost-analysis/cost-report/composables/use-cost-report-api';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
@@ -19,6 +18,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useCostReportGetQuery } from '@/services/cost-explorer/composables/use-cost-report-get-query';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -31,17 +31,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
-const costReportPageGetters = costReportPageStore.getters;
+const { costReportAPI } = useCostReportApi();
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string[]): void;
 }>();
 
+const { costReport, isLoading } = useCostReportGetQuery(computed(() => costReportPageState.selectedCostReportId));
+
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    item: computed(() => costReportPageGetters.reportItemData),
-    currency: computed(() => state.item.currency || 'KRW'),
+    currency: computed(() => costReport.value?.currency || 'KRW'),
+    reportUrl: undefined as string|undefined,
     fields: computed(() => [
         { name: 'issue_date', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DATE'), disableCopy: true },
         { name: 'report_number', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORT_NUMBER'), disableCopy: true },
@@ -53,8 +55,11 @@ const state = reactive({
 });
 
 /* Event */
-const handleUpdateVisible = (visible: boolean) => {
+const handleUpdateVisible = async (visible: boolean) => {
     state.proxyVisible = visible;
+    if (!visible) {
+        costReportPageStore.setSelectedCostReportId(undefined);
+    }
 };
 const handleConfirm = () => {
     postCostReportsResend();
@@ -75,10 +80,12 @@ const roleFormatter = (type: RoleType) => {
 
 /* API */
 const postCostReportsResend = async (): Promise<void> => {
+    if (!costReportPageState.selectedCostReportId) return;
+
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.costAnalysis.costReport.send<CostReportSendParameters>({
-            cost_report_id: state.item.cost_report_id,
+        await costReportAPI.send({
+            cost_report_id: costReportPageState.selectedCostReportId as string,
         });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_RESEND_REPORT'), '');
         state.proxyVisible = false;
@@ -88,6 +95,22 @@ const postCostReportsResend = async (): Promise<void> => {
         state.loading = false;
     }
 };
+
+/* Watch */
+watch(() => costReportPageState.selectedCostReportId, async (newId) => {
+    if (newId) {
+        try {
+            const response = await costReportAPI.getUrl({
+                cost_report_id: newId,
+            });
+            state.reportUrl = response.cost_report_link;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+    } else {
+        state.reportUrl = undefined;
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -103,13 +126,13 @@ const postCostReportsResend = async (): Promise<void> => {
     >
         <template #body>
             <p-definition-table :fields="state.fields"
-                                :data="state.item"
-                                :loading="costReportPageState.workspaceUserLoading"
+                                :data="costReport"
+                                :loading="isLoading"
                                 :skeleton-rows="5"
             >
                 <template #data-report_number="{value}">
                     <p-link :text="value"
-                            :href="state.item.report_url"
+                            :href="state.reportUrl"
                             new-tab
                             action-icon="internal-link"
                     />
