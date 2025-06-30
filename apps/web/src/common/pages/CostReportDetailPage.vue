@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
@@ -12,7 +13,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PLink, PDataTable, PIconButton, PI, PButton,
+    PLink, PDataTable, PIconButton, PI, PButton, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType, DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
@@ -21,7 +22,8 @@ import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/ana
 import type { CostReportDataAnalyzeParameters } from '@/api-clients/cost-analysis/cost-report-data/schema/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/get';
 import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
-import { setI18nLocale } from '@/translations';
+import type { CostReportStatus } from '@/api-clients/cost-analysis/cost-report/schema/type';
+import { i18n, setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
@@ -228,6 +230,16 @@ const getFormattedProductTotalValue = (provider: string, serviceAccount: string)
     const productData = state.productRawData.find((d) => d.provider === provider && d.service_account_name === serviceAccount);
     return currencyMoneyFormatter(productData?._total_value_sum ?? 0, numberFormatterOption.value) ?? '';
 };
+const getWarningTitle = (status: CostReportStatus): TranslateResult => {
+    if (status === 'EXPIRED') return i18n.t('COMMON.COST_REPORT.EXPIRED_REPORT_TITLE');
+    if (status === 'ADJUSTING' || status === 'IN_PROGRESS') return i18n.t('COMMON.COST_REPORT.ADJUSTING_REPORT_TITLE');
+    return '';
+};
+const getWarningDescription = (status: CostReportStatus): TranslateResult => {
+    if (status === 'EXPIRED') return i18n.t('COMMON.COST_REPORT.EXPIRED_REPORT_DESCRIPTION');
+    if (status === 'ADJUSTING' || status === 'IN_PROGRESS') return i18n.t('COMMON.COST_REPORT.ADJUSTING_REPORT_DESCRIPTION');
+    return '';
+};
 
 
 const drawChart = () => {
@@ -405,6 +417,14 @@ const handleCollapseAll = () => {
                 >
                     <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ reportDateRange }})</span>
                 </p>
+                <p-scoped-notification v-if="state.baseInfo?.status !== 'DONE'"
+                                       :title="getWarningTitle(state.baseInfo?.status)"
+                                       icon="ic_warning-filled"
+                                       type="warning"
+                                       class="expired-report-notification"
+                >
+                    {{ getWarningDescription(state.baseInfo?.status) }}
+                </p-scoped-notification>
             </div>
             <div class="total">
                 <p class="title">
@@ -671,6 +691,10 @@ const handleCollapseAll = () => {
                         @apply text-label-md text-gray-500;
                     }
                 }
+            }
+
+            .expired-report-notification {
+                margin-top: 1rem;
             }
         }
 

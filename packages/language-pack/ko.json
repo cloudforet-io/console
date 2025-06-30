@@ -1253,6 +1253,8 @@
 			"TITLE": "진행 중인 작업 종료"
 		},
 		"COST_REPORT": {
+			"ADJUSTING_REPORT_DESCRIPTION": "이 보고서는 아직 확정되지 않아 비용이 변경될 수 있습니다.",
+			"ADJUSTING_REPORT_TITLE": "보고서 미확정",
 			"COLLAPSE_ALL": "모두 접기",
 			"COST_REPORT": "비용 리포트",
 			"CURRENCY_REFERENCE": "통화 기준 ",
@@ -1260,6 +1262,8 @@
 			"DETAILS_BY_PROJECT": "프로젝트별 상세 보기 ",
 			"DETAILS_BY_PROVIDER": "프로바이더별 상세 보기 ",
 			"DETAILS_BY_SERVICE_ACCOUNT": "서비스 어카운트별 상세 보기",
+			"EXPIRED_REPORT_DESCRIPTION": "이 보고서는 만료되어 정보가 더 이상 유효하지 않을 수 있습니다.",
+			"EXPIRED_REPORT_TITLE": "보고서 만료",
 			"FROM": "발신자",
 			"INDEX": "인덱스",
 			"ISSUE_DATE": "발행일자 ",

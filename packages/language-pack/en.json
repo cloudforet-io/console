@@ -1253,6 +1253,8 @@
 			"TITLE": "Leave Process"
 		},
 		"COST_REPORT": {
+			"ADJUSTING_REPORT_DESCRIPTION": "This report is not finalized yet, so the cost may change.",
+			"ADJUSTING_REPORT_TITLE": "Report Not Finalized",
 			"COLLAPSE_ALL": "Collapse All",
 			"COST_REPORT": "Cost Report",
 			"CURRENCY_REFERENCE": "Currency reference",
@@ -1260,6 +1262,8 @@
 			"DETAILS_BY_PROJECT": "Details by Project",
 			"DETAILS_BY_PROVIDER": "Details by Provider",
 			"DETAILS_BY_SERVICE_ACCOUNT": "Details by Service Account",
+			"EXPIRED_REPORT_DESCRIPTION": "This report has expired and the information may no longer be valid.",
+			"EXPIRED_REPORT_TITLE": "Expired Report",
 			"FROM": "From",
 			"INDEX": "Index",
 			"ISSUE_DATE": "Issue Date",
