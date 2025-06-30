@@ -1,0 +1,55 @@
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
+
+import { isEmpty } from 'lodash';
+
+import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
+
+import { useCostReportDataApi } from '@/api-clients/cost-analysis/cost-report-data/composables/use-cost-report-data-api';
+import type { CostReportDataAnalyzeParameters } from '@/api-clients/cost-analysis/cost-report-data/schema/api-verbs/analyze';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
+
+
+export const useCostReportDataAnalyzeQuery = ({
+    cost_report_config_id,
+    is_confirmed,
+    query,
+    isCostReportPage = true,
+}: {
+    cost_report_config_id?: ComputedRef<string>;
+    is_confirmed?: boolean;
+    query: ComputedRef<AnalyzeQuery | null>;
+    isCostReportPage?: boolean;
+}) => {
+    const { costReportDataAPI } = useCostReportDataApi();
+    const { key, params } = useServiceQueryKey('cost-analysis', 'cost-report-data', 'analyze', {
+        params: computed<CostReportDataAnalyzeParameters>(() => {
+            const baseParams: CostReportDataAnalyzeParameters = {
+                query: query?.value || undefined,
+            };
+
+            if (cost_report_config_id?.value) {
+                baseParams.cost_report_config_id = cost_report_config_id.value;
+            }
+
+            if (is_confirmed !== undefined) {
+                baseParams.is_confirmed = is_confirmed;
+            }
+
+            return baseParams;
+        }),
+    });
+
+    const { data, isLoading, error } = useScopedQuery({
+        queryKey: key,
+        queryFn: () => costReportDataAPI.analyze(params.value),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60 * 1, // 1 minutes
+        enabled: computed(() => !isEmpty(query.value)),
+    }, isCostReportPage ? ['DOMAIN', 'WORKSPACE'] : ['USER']);
+
+    return {
+        costReportDataAnalyzeData: data, isLoading, error,
+    };
+};

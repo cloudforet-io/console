@@ -5,7 +5,8 @@ export type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
     value_sum?: Array<{
         date: string;
-        value: number
+        value: number;
+        is_adjusted?: boolean;
     }>;
     _total_value_sum?: number;
 };

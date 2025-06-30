@@ -75,7 +75,7 @@ onMounted(async () => {
                         <cost-report-overview-cost-trend-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
                                                               class="col-span-12"
                         />
-                        <cost-report-monthly-total-amount-summary-card v-if="!costReportPageState.recentReportDataLoading & costReportPageState.hasReport"
+                        <cost-report-monthly-total-amount-summary-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
                                                                        class="xl:col-span-8 lg:col-span-6 col-span-12"
                         />
                         <p-empty v-if="!costReportPageState.recentReportDataLoading && !costReportPageState.hasReport"
