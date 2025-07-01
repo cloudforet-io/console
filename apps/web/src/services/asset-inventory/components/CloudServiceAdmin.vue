@@ -1,24 +1,25 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PHeading, PToolboxTable,
 } from '@cloudforet/mirinae';
 
 
+import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
-import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -40,7 +41,7 @@ const state = reactive({
         { label: 'User ID', name: 'user_id' },
         { label: 'User Name', name: 'user_name' },
     ],
-    projectUserIdList: [] as string[],
+    projectUserIdList: computed<string[]>(() => data.value?.users ?? []),
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
@@ -52,29 +53,27 @@ const state = reactive({
                         || d.user_name.toLowerCase().includes(searchText);
         });
     }),
-    loading: true,
-    totalCount: 0,
+    totalCount: computed<number>(() => data.value?.users?.length ?? 0),
     searchText: '',
     pageLimit: 15,
     pageStart: 1,
     timezone: computed(() => userStore.state.timezone ?? 'UTC'),
 });
 
-const getProjectUserData = async () => {
-    state.loading = true;
-    try {
-        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-            project_id: props.cloudServiceProjectId,
-        });
-        state.projectUserIdList = res.users ?? [];
-        state.totalCount = res.users?.length ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.projectUserIdList = [];
-    } finally {
-        state.loading = false;
-    }
-};
+const queryClient = useQueryClient();
+const { projectAPI } = useProjectApi();
+const { key, params: queryParams } = useServiceQueryKey('identity', 'project', 'get', {
+    params: computed<ProjectGetParameters>(() => ({ project_id: props.cloudServiceProjectId })),
+});
+
+const { data, isLoading } = useScopedQuery({
+    queryKey: key,
+    queryFn: () => projectAPI.get(queryParams.value),
+    enabled: computed(() => !!props.cloudServiceProjectId),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
+}, ['DOMAIN', 'WORKSPACE']);
+
 
 const handleChangeTable = async (options: any = {}) => {
     if (options.searchText !== undefined) state.searchText = options.searchText;
@@ -83,7 +82,7 @@ const handleChangeTable = async (options: any = {}) => {
 };
 
 const handleRefreshUserData = async () => {
-    await getProjectUserData();
+    await queryClient.invalidateQueries({ queryKey: key.value });
 };
 
 const handleExport = async () => {
@@ -94,12 +93,6 @@ const handleExport = async () => {
         timezone: state.timezone,
     });
 };
-
-watch(() => props.cloudServiceProjectId, (after, before) => {
-    if (!after) {
-        state.projectUserIdList = [];
-    } else if (after !== before) getProjectUserData();
-}, { immediate: true });
 </script>
 
 <template>
@@ -111,7 +104,7 @@ watch(() => props.cloudServiceProjectId, (after, before) => {
         />
         <p-toolbox-table :fields="state.fields"
                          :items="state.refinedItems.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1)"
-                         :loading="state.loading"
+                         :loading="isLoading"
                          :total-count="state.totalCount"
                          class="member-table"
                          @export="handleExport"
