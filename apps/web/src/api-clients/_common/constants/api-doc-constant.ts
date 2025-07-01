@@ -25,6 +25,11 @@
  */
 
 export const API_DOC = {
+    'add-ons': {
+        'page-schema': [
+            'get',
+        ],
+    },
     'alert-manager': {
         alert: [
             'create',
@@ -189,7 +194,6 @@ export const API_DOC = {
         ],
         'cost-report-data': [
             'analyze',
-            'list',
         ],
         'data-source': [
             'get',

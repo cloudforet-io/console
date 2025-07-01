@@ -47,7 +47,7 @@ const _addPageToListParams = (
 });
 
 export const addPageToVerbParams = <TParams extends object>(
-    verb: 'load' | 'list' | 'analyze' | 'stat',
+    verb: 'load' | 'list' | 'analyze' | 'stat' | 'get-data',
     params: TParams,
     page: Page,
 ): TParams => {
@@ -57,6 +57,7 @@ export const addPageToVerbParams = <TParams extends object>(
     case 'list':
     case 'analyze':
     case 'stat':
+    case 'get-data':
         return _addPageToListParams(params as QueryParams, page) as TParams;
     default:
         console.warn(`[addPageToVerbParams] Unsupported verb: ${verb}`);
