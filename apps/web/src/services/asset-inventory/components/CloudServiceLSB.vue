@@ -20,8 +20,8 @@ import type {
 } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { useCloudServiceDetailLSBMenuSet } from '@/services/_shared/dashboard/dashboard-detail/composables/use-cloud-service-detail-menu-set';
 import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
+import { useCloudServiceDetailLSBMenuSet } from '@/services/asset-inventory/composables/use-cloud-service-detail-menu-set';
 import {
     useCloudServiceProviderListQuery,
 } from '@/services/asset-inventory/composables/use-cloud-service-provider-list-query';
