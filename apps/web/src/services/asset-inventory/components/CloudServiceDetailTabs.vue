@@ -4,13 +4,11 @@ import { useRouter } from 'vue-router/composables';
 
 import { get } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDynamicLayout, PTab, PEmpty, PTextButton, PI, PHeading,
 } from '@cloudforet/mirinae';
 import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
@@ -22,7 +20,6 @@ import { MENU_ID } from '@/lib/menu/config';
 import type { Reference } from '@/lib/reference/type';
 
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
@@ -57,6 +54,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const isSingleSelected = computed(() => props.tableState.selectedItems.length === 1);
 
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
 const alertManagerUiAffectsSchema = useGlobalConfigUiAffectsSchema('ALERT_MANAGER');
@@ -112,24 +111,17 @@ const multiItemTabState = reactive({
 });
 
 /* Event */
-const handleClickLinkButton = async (type: string, workspaceId: string, id: string) => {
+const handleClickLinkButton = (type: string, workspaceId: string, id: string, item: CloudServiceModel) => {
     if (type === 'workspace') {
-        try {
-            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-                cloud_service_id: id,
-            });
-            window.open(router.resolve({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: response.provider,
-                    group: response.cloud_service_group,
-                    name: response.cloud_service_type,
-                    workspaceId,
-                },
-            }).href, '_blank');
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, e.message);
-        }
+        window.open(router.resolve({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: item.provider,
+                group: item.cloud_service_group,
+                name: item.cloud_service_type,
+                workspaceId,
+            },
+        }).href, '_blank');
     } else {
         window.open(serviceRouter.resolve({
             feature: MENU_ID.PROJECT,
@@ -152,7 +144,7 @@ const monitoringState: MonitoringProps = reactive({
 </script>
 
 <template>
-    <p-tab v-if="tableState.selectedItems.length === 1"
+    <p-tab v-if="isSingleSelected"
            :tabs="singleItemTabState.tabs"
            :active-tab.sync="singleItemTabState.activeTab"
            :class="singleItemTabState.activeTab"
@@ -207,7 +199,7 @@ const monitoringState: MonitoringProps = reactive({
             />
         </template>
     </p-tab>
-    <p-tab v-else-if="props.selectedIndex > 1"
+    <p-tab v-else-if="!isSingleSelected && props.selectedIndex > 1"
            :tabs="multiItemTabState.tabs"
            :active-tab.sync="multiItemTabState.activeTab"
            :class="multiItemTabState.activeTab"
@@ -224,7 +216,7 @@ const monitoringState: MonitoringProps = reactive({
                 <template #col-workspace_id-format="{value, item}">
                     <p-text-button class="report-link"
                                    size="md"
-                                   @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
+                                   @click="handleClickLinkButton('workspace', value, item.cloud_service_id, item)"
                     >
                         {{ referenceMap.workspace[value]?.label || value }}
                         <p-i name="ic_arrow-right-up"
@@ -238,7 +230,7 @@ const monitoringState: MonitoringProps = reactive({
                 <template #col-project_id-format="{value, item}">
                     <p-text-button class="report-link"
                                    size="md"
-                                   @click="handleClickLinkButton('project', item.workspace_id, value)"
+                                   @click="handleClickLinkButton('project', item.workspace_id, value, item)"
                     >
                         {{ referenceMap.project[value]?.label || value }}
                         <p-i name="ic_arrow-right-up"
