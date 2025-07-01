@@ -50,11 +50,11 @@ import {
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PFieldTitle, PToggleButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n as i18nTranslator } from '@/translations';
@@ -79,6 +79,7 @@ const props = defineProps<{
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const userStore = useUserStore();
+const { collectorAPI } = useCollectorApi();
 
 const hoursMatrix: number[] = range(24);
 const selectedUtcHoursSet = new Set<number>();
@@ -116,7 +117,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
         },
     };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 const handleChangeToggle = async (value: boolean) => {

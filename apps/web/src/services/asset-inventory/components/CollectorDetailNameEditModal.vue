@@ -18,10 +18,9 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n } from '@/translations';
@@ -32,8 +31,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorNameForm from '@/services/asset-inventory/components/CollectorFormName.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-
-
 
 
 const props = defineProps<{
@@ -50,6 +47,7 @@ const state = reactive({
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const { collectorAPI } = useCollectorApi();
 
 const fetchUpdateCollectorName = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
@@ -57,7 +55,7 @@ const fetchUpdateCollectorName = async (): Promise<CollectorModel> => {
         collector_id: collectorFormState.collectorId,
         name: collectorFormState.name,
     };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 const handleUpdateIsValid = (value: boolean) => {

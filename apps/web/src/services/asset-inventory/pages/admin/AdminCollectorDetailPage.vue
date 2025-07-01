@@ -11,7 +11,7 @@
                                 width="20rem"
                                 height="1.5rem"
                     />
-                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
+                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorFormState.isEditableCollector"
                               #title-right-extra
                     >
                         <span class="title-right-button-wrapper">
@@ -110,17 +110,14 @@ import { useRoute } from 'vue-router/composables';
 import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { CollectorDeleteParameters } from '@/api-clients/inventory/collector/schema/api-verbs/delete';
-import type { CollectorGetParameters } from '@/api-clients/inventory/collector/schema/api-verbs/get';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
-
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
@@ -147,18 +144,16 @@ import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/a
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
-
-
-
 const props = defineProps<{
     collectorId: string;
 }>();
+
+const { collectorAPI } = useCollectorApi();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
@@ -166,7 +161,6 @@ const collectorFormState = collectorFormStore.state;
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const authorizationStore = useAuthorizationStore();
 
@@ -193,7 +187,6 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
@@ -221,7 +214,7 @@ defineExpose({ setPathFrom });
 const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
     try {
-        return await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
+        return await collectorAPI.get({
             collector_id: props.collectorId,
         });
     } catch (e) {
@@ -232,7 +225,7 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => (collectorFormState.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+const fetchDeleteCollector = async () => (collectorFormState.collectorId ? collectorAPI.delete({
     collector_id: collectorFormState.collectorId,
 }) : undefined);
 
@@ -303,7 +296,6 @@ onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
@@ -311,7 +303,6 @@ onMounted(async () => {
     if (collector) {
         collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
-        collectorDetailPageStore.state.collector = collector;
         resume();
     }
 });
@@ -320,7 +311,6 @@ onUnmounted(() => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.reset();
 });
 
 

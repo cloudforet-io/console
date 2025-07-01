@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
@@ -63,7 +63,7 @@ import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
@@ -83,10 +83,8 @@ import CollectorDetailSectionHeader from '@/services/asset-inventory/components/
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
-
 
 const props = defineProps<{
     historyLink: Location
@@ -99,7 +97,7 @@ const collectorFormState = collectorFormStore.state;
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 
-const collectorDetailPageStore = useCollectorDetailPageStore();
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
     collectorPluginInfo: computed<CollectorModel['plugin_info']|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
@@ -137,7 +135,7 @@ const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
         version: collectorFormState.version,
         upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
     };
-    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
+    return collectorAPI.updatePlugin(params);
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
@@ -145,7 +143,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         collector_id: collectorFormState.collectorId,
         tags: collectorFormState.tags,
     };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 const getRepositoryPlugin = async (pluginId: string) => {
     try {

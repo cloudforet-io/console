@@ -21,17 +21,14 @@ import CollectorAdditionalRuleContent from '@/services/asset-inventory/component
 import CollectorAdditionalRuleEmptyCase
     from '@/services/asset-inventory/components/CollectorAdditionalRuleEmptyCase.vue';
 import CollectorAdditionalRuleForm from '@/services/asset-inventory/components/CollectorAdditionalRuleForm.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
 import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
 
-
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-const collectorDetailPageStore = useCollectorDetailPageStore();
 
 interface Props {
     collectorId?: string;
@@ -52,8 +49,7 @@ const state = reactive({
     collectorProvider: computed(() => collectorFormState.originCollector?.provider),
     isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
         || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
-    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
-    isEditable: computed<boolean>(() => props.hasReadWriteAccess && state.editModeCardOrder === 0 && !state.isNotiVisible),
+    isEditable: computed<boolean>(() => props.hasReadWriteAccess && state.editModeCardOrder === 0 && collectorFormState.isEditableCollector),
 });
 
 const changeOrder = (targetData, clickedData, tempOrder) => {

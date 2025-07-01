@@ -17,6 +17,7 @@ import type { CollectorRuleListParameters } from '@/schema/inventory/collector-r
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -40,6 +41,7 @@ export type AttachedServiceAccountType = 'all'|'specific';
 export type ServiceAccountFilterOption = 'include'|'exclude';
 
 export const useCollectorFormStore = defineStore('collector-form', () => {
+    const appContextStore = useAppContextStore();
     const state = reactive({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
         repositoryPlugin: null as PluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
@@ -66,6 +68,13 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         pluginId: computed<string|undefined>(() => state.originCollector?.plugin_info?.plugin_id ?? state.repositoryPlugin?.plugin_id),
         collectorProvider: computed<string|undefined>(() => state.originCollector?.provider),
         serviceAccounts: computed<string[]>(() => state.attachedServiceAccount.map((d) => d.name as string)),
+        isEditableCollector: computed<boolean>(() => {
+            if (appContextStore.getters.isAdminMode) {
+                return true;
+            }
+            const isManagedCollector = state.originCollector?.workspace_id === '*';
+            return !isManagedCollector;
+        }),
     });
 
     const actions = {

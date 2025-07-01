@@ -2,13 +2,13 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !state.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !collectorFormState.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
         <div class="schedule-wrapper">
             <collector-schedule-form :hours-readonly="!state.isEditMode"
-                                     :readonly="!props.hasReadWriteAccess || !state.isEditableCollector"
+                                     :readonly="!props.hasReadWriteAccess || !collectorFormState.isEditableCollector"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
             />
@@ -37,14 +37,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n } from '@/translations';
@@ -54,9 +53,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
-import CollectorScheduleForm
-    from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+import CollectorScheduleForm from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -67,10 +64,11 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-const collectorDetailPageStore = useCollectorDetailPageStore();
+
+const { collectorAPI } = useCollectorApi();
+
 const state = reactive({
     isEditMode: false,
-    isEditableCollector: computed(() => collectorDetailPageStore.getters.isEditableCollector),
     updateLoading: false,
 });
 
@@ -83,7 +81,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             hours: collectorFormState.scheduleHours,
         },
     };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 const handleClickEdit = () => {

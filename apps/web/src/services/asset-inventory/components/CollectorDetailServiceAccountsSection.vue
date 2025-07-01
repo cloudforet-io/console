@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.isEditableCollector"
                                          :total-count="state.totalCount"
                                          @click-edit="handleClickEdit"
         />
@@ -47,13 +47,11 @@ import {
     reactive,
 } from 'vue';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type {
     CollectorModel,
@@ -69,14 +67,11 @@ import AttachedServiceAccounts
     from '@/services/asset-inventory/components/CollectorDetailAttachedServiceAccounts.vue';
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
-const collectorDetailPageStore = useCollectorDetailPageStore();
+const { collectorAPI } = useCollectorApi();
 
 const props = defineProps<{
     manageDisabled?: boolean;
@@ -110,7 +105,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 
