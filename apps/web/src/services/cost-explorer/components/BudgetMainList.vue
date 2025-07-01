@@ -54,8 +54,7 @@ interface Props {
 }
 
 interface BudgetMainListState {
-    budgets: ComputedRef<BudgetModel[]>;
-    budgetUsages: ComputedRef<BudgetUsageAnalyzeResult[]>;
+    budgetUsages: BudgetUsageAnalyzeResult[];
     more: boolean;
     loading: boolean;
     modalVisible: boolean;
@@ -141,8 +140,7 @@ const { data: budgetUsageAnalyzeData, refetch: refetchBudgetUsageAnalyze, isLoad
 
 
 const state = reactive<BudgetMainListState>({
-    budgets: computed<BudgetModel[]>(() => budgetList.value || []),
-    budgetUsages: computed<BudgetUsageAnalyzeResult[]>(() => budgetUsageAnalyzeData.value || []),
+    budgetUsages: budgetUsageAnalyzeData.value || [],
     more: false,
     loading: false,
     modalVisible: false,
@@ -213,7 +211,7 @@ const tableState = reactive({
             width: '7%',
         },
     ],
-    items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
+    items: computed(() => (budgetList.value || []).map((budget: BudgetModel) => {
         const startDate = dayjs.utc(budget.start, 'YYYY-MM');
         const endDate = dayjs.utc(budget.end, 'YYYY-MM');
         return {
@@ -357,7 +355,10 @@ const {
     pageSize: computed(() => state.pageLimit),
     params: computed(() => {
         const filters = getBudgetFilters();
-        const originalQuery = budgetApiQueryHelper.data;
+        const _queryHelper = new ApiQueryHelper();
+
+        _queryHelper.setFilters(state.queryFilters);
+        const originalQuery = _queryHelper.data;
 
         const mergedFilters = [
             ...(originalQuery.filter ?? []),
@@ -384,8 +385,10 @@ const handleQuery = (query: BudgetQuery) => {
 
 const handleDeleteConfirm = async () => {
     try {
-        await refreshBudgetList();
-        await refetchBudgetUsageAnalyze();
+        Promise.all([
+            refreshBudgetList(),
+            refetchBudgetUsageAnalyze(),
+        ]);
     } finally {
         state.selectedIndex = [];
     }
@@ -422,11 +425,11 @@ const handleChange = async (options: any = {}) => {
     }
 
     budgetApiQueryHelper.setFilters(state.queryFilters);
-};
 
-const handleRefresh = async () => {
-    await refreshBudgetList();
-    await refetchBudgetUsageAnalyze();
+    Promise.all([
+        refreshBudgetList(),
+        refetchBudgetUsageAnalyze(),
+    ]);
 };
 
 const handleExportToExcel = async () => {
@@ -436,11 +439,11 @@ const handleExportToExcel = async () => {
             ...item,
             target: item.target.startsWith('project-') ? `Project: ${getProjectName(item.target)}` : `Service: ${getServiceAccountName(item.target)}`,
             cycle: item.cycle === 'TOTAL' ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY'),
-            limit: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.limit}`,
-            actualSpend: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Number(item.actualSpend).toFixed(3)}`,
+            limit: `${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${item.limit}`,
+            actualSpend: `${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${Number(item.actualSpend).toFixed(3)}`,
             utilization_rate: `${item.utilization_rate}%`,
-            remaining: item.remaining < 0 ? `-${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Math.abs(item.remaining.toFixed(2)).toLocaleString()}`
-                : `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.remaining.toFixed(2).toLocaleString()}`,
+            remaining: item.remaining < 0 ? `-${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${Math.abs(item.remaining.toFixed(2)).toLocaleString()}`
+                : `${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${item.remaining.toFixed(2).toLocaleString()}`,
         })),
         file_name_prefix: FILE_NAME_PREFIX.budget,
         timezone: timeZone.value,
@@ -459,7 +462,7 @@ watch(() => state.selectedIndex, () => {
     state.selectedBudgetIds = [];
     if (state.selectedIndex.length > 0) {
         state.selectedIndex.forEach((i) => {
-            state.selectedBudgetIds.push(state.budgets[i].budget_id);
+            state.selectedBudgetIds.push(budgetList.value[i].budget_id);
         });
     }
 }, { immediate: true });
@@ -492,7 +495,7 @@ watch(() => state.selectedIndex, () => {
                              :query-tags="queryTags"
                              @update:select-index="handleUpdateSelectIndex"
                              @change="handleChange"
-                             @refresh="handleRefresh"
+                             @refresh="handleChange"
                              @export="handleExportToExcel"
             >
                 <template #toolbox-left>
@@ -509,7 +512,7 @@ watch(() => state.selectedIndex, () => {
                                 :to="{
                                     name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME : COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                                     params: {
-                                        budgetId: state.budgets[rowIndex].budget_id
+                                        budgetId: budgetList[rowIndex].budget_id
                                     }
                                 }"
                         >
@@ -521,7 +524,7 @@ watch(() => state.selectedIndex, () => {
                     <p class="flex gap-0.5"
                        :class="{ expired: item.state === 'EXPIRED' }"
                     >
-                        <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
+                        <span>{{ CURRENCY_SYMBOL[budgetList[rowIndex].currency] }}</span>
                         <span>{{ Number(value).toLocaleString() }}</span>
                     </p>
                 </template>
@@ -564,7 +567,7 @@ watch(() => state.selectedIndex, () => {
                 </template>
                 <template #col-actualSpend-format="{item, value, rowIndex}">
                     <p :class="{ expired: item.state === 'EXPIRED' }">
-                        {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
+                        {{ CURRENCY_SYMBOL[budgetList[rowIndex].currency] }}
                         {{ Number(value).toLocaleString() }}
                     </p>
                 </template>
@@ -582,7 +585,7 @@ watch(() => state.selectedIndex, () => {
                 </template>
                 <template #col-remaining-format="{item, value, rowIndex}">
                     <p :class="{exceeded: Number(value) < 0, expired: item.state === 'EXPIRED' }">
-                        {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
+                        {{ CURRENCY_SYMBOL[budgetList[rowIndex].currency] }}
                         {{ Math.abs(value.toFixed(2)).toLocaleString() }}
                     </p>
                 </template>
