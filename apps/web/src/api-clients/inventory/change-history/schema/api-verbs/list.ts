@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ChangeHistoryAction, UpdatedBy } from '@/schema/inventory/change-history/type';
+import type { ChangeHistoryAction, UpdatedBy } from '@/api-clients/inventory/change-history/schema/type';
 
 export interface ChangeHistoryListParameters {
     cloud_service_id: string;

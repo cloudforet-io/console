@@ -1,4 +1,4 @@
-import type { DiffType, ChangeHistoryAction, UpdatedBy } from '@/schema/inventory/change-history/type';
+import type { DiffType, ChangeHistoryAction, UpdatedBy } from '@/api-clients/inventory/change-history/schema/type';
 
 export interface ChangeHistoryModel {
     record_id: string;
