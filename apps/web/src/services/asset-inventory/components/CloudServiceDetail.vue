@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, watch, ref,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { find } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PDynamicLayout, PButtonTab, PTextButton, PI,
@@ -23,8 +22,9 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { PageSchemaGetParameters } from '@/api-clients/add-ons/page-schema/schema/api-verbs/get';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
+import type { CloudServiceGetDataParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get-data';
 import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -45,10 +45,14 @@ import type { Reference } from '@/lib/reference/type';
 import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCloudServiceGetDataPaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-get-data-pagination-query';
+import { useCloudServiceGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-get-query';
+import { useCloudServicePageSchemaGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-get-query';
+import { useCloudServicePaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-pagination-query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+
 
 interface Props {
     cloudServiceId: string;
@@ -72,10 +76,6 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
     searchText: '',
 };
 
-const layoutSchemaCacheMap = {};
-const fetchOptionsMap = {};
-const dataMap = {};
-
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -85,20 +85,63 @@ const userStore = useUserStore();
 const router = useRouter();
 const serviceRouter = useServiceRouter(router);
 const referenceMap = useAllReferenceDataModel();
+const { cloudServiceAPI } = useCloudServiceApi();
+
+const { data: schemaData } = useCloudServicePageSchemaGetQuery({
+    params: computed<PageSchemaGetParameters>(() => {
+        const params: Record<string, any> = {
+            schema: 'details',
+            options: {
+                cloud_service_id: props.cloudServiceId,
+                include_workspace_info: appContextGetters.isAdminMode,
+            },
+        };
+        if (props.isServerPage) {
+            params.resource_type = 'inventory.Server';
+        } else {
+            params.resource_type = 'inventory.CloudService';
+        }
+        return params as PageSchemaGetParameters;
+    }),
+});
 
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const state = reactive({
-    data: undefined as any,
-    loading: true,
-    totalCount: 0,
+    // data: undefined as any,
+    data: computed(() => {
+        if (state.currentLayout.type === 'raw-table') {
+            return cloudServiceDataForRawTable.value?.results ?? [];
+        } if (state.isTableTypeInDynamicLayout) {
+            return cloudServiceDataForDynamicLayout.value?.results ?? [];
+        }
+        return cloudServiceData.value;
+    }),
+    totalCount: computed<number>(() => {
+        if (state.currentLayout.type === 'raw-table') {
+            return cloudServiceDataForRawTableTotalCount.value ?? 0;
+        } if (state.isTableTypeInDynamicLayout) {
+            return cloudServiceDataForDynamicLayoutTotalCount.value ?? 0;
+        }
+        return 0;
+    }),
+    // loading: true,
+    loading: computed(() => {
+        if (state.currentLayout.type === 'raw-table') {
+            return isCloudServiceDataLoadingForRawTable.value;
+        } if (state.isTableTypeInDynamicLayout) {
+            return isCloudServiceDataLoadingForDynamicLayout.value;
+        }
+        return isCloudServiceDataLoading.value;
+    }),
     timezone: computed(() => userStore.state.timezone),
     selectIndex: [] as number[],
     language: computed(() => userStore.state.language),
 
     // button tab
     tabs: computed<TabItem[]>(() => {
+        if (!schemaData.value) return [];
         const local = i18n.locale;
-        return state.layouts.map((d) => ({
+        return (schemaData.value?.details || []).map((d) => ({
             label: i18n.t(d.options?.translation_id, local) || d.name,
             name: d.name,
         }));
@@ -106,10 +149,10 @@ const state = reactive({
     activeTab: '',
 
     // schema
-    layouts: [] as DynamicLayout[],
     layoutMap: computed(() => {
         const res = {};
-        state.layouts.forEach((d) => {
+        if (!schemaData.value) return res;
+        (schemaData.value.details || []).forEach((d) => {
             res[d.name] = d;
         });
         return res;
@@ -125,25 +168,19 @@ const state = reactive({
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
 });
+const fetchOptionsMap = ref(defaultFetchOptions);
 
-const handleClickLinkButton = async (type: string, id: string) => {
+const handleClickLinkButton = (type: string, id: string, item: CloudServiceModel) => {
     if (type === 'workspace') {
-        try {
-            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-                cloud_service_id: state.data.cloud_service_id,
-            });
-            window.open(router.resolve({
-                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: response.provider,
-                    group: response.cloud_service_group,
-                    name: response.cloud_service_type,
-                    workspaceId: id,
-                },
-            }).href, '_blank');
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, e.message);
-        }
+        window.open(router.resolve({
+            name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: item.provider,
+                group: item.cloud_service_group,
+                name: item.cloud_service_type,
+                workspaceId: id,
+            },
+        }).href, '_blank');
     } else {
         window.open(serviceRouter.resolve({
             feature: MENU_ID.PROJECT,
@@ -161,35 +198,6 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
         { k: 'cloud_service_id', v: props.cloudServiceId, o: '=' },
     ]).apiQuery.filter),
 );
-
-const getSchema = async () => {
-    let layouts = layoutSchemaCacheMap[props.cloudServiceId];
-    if (!layouts) {
-        try {
-            const params: Record<string, any> = {
-                schema: 'details',
-                options: {
-                    cloud_service_id: props.cloudServiceId,
-                    include_workspace_info: appContextGetters.isAdminMode,
-                },
-            };
-            if (props.isServerPage) {
-                params.resource_type = 'inventory.Server';
-            } else {
-                params.resource_type = 'inventory.CloudService';
-            }
-            const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-
-            layouts = res.details;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    }
-
-    layoutSchemaCacheMap[props.cloudServiceId] = layouts;
-    state.layouts = layouts || [];
-    if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
-};
 
 const apiQuery = new ApiQueryHelper();
 const apiQueryForGetData = new ApiQueryHelper();
@@ -217,7 +225,7 @@ const setListQuery = (options, type?:DynamicLayoutType): any => {
 };
 
 const getListApiParams = (type?: DynamicLayoutType) => {
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    const options = fetchOptionsMap.value || defaultFetchOptions;
     setListQuery(options, type);
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
@@ -247,7 +255,7 @@ const getListApiParams = (type?: DynamicLayoutType) => {
 };
 
 const getQueryForGetDataAPI = (): any => {
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    const options = fetchOptionsMap.value || defaultFetchOptions;
     if (options.sortBy !== undefined) apiQueryForGetData.setSort(options.sortBy, options.sortDesc);
     if (options.pageLimit !== undefined) apiQueryForGetData.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQueryForGetData.setPageStart(options.pageStart);
@@ -257,36 +265,29 @@ const getQueryForGetDataAPI = (): any => {
     }
     return apiQueryForGetData.data;
 };
-const fetchData = async () => {
-    state.data = dataMap[state.fetchOptionKey];
-    try {
-        if (state.currentLayout.type === 'raw-table') {
-            const params: any = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
-            const keyPath = state.currentLayout.options?.root_path;
-            if (keyPath) params.key_path = keyPath;
-            const res = await SpaceConnector.client.inventory.cloudService.getData(params);
-            if (res.total_count !== undefined) state.totalCount = res.total_count;
-            state.data = res.results;
-        } else if (state.isTableTypeInDynamicLayout) {
-            const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>(getListApiParams(state.currentLayout.type));
-            if (res.total_count !== undefined) state.totalCount = res.total_count;
-            if (state.isTableTypeInDynamicLayout) {
-                state.data = res.results ?? [];
-            } else {
-                state.data = res.results?.[0];
-            }
-        } else {
-            const res = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({ cloud_service_id: props.cloudServiceId });
-            if (res) state.data = res;
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.data = undefined;
-        state.totalCount = 0;
-    }
 
-    dataMap[state.fetchOptionKey] = state.data;
-};
+const { data: cloudServiceDataForRawTable, isLoading: isCloudServiceDataLoadingForRawTable, totalCount: cloudServiceDataForRawTableTotalCount } = useCloudServiceGetDataPaginationQuery({
+    params: computed<CloudServiceGetDataParameters>(() => {
+        const params: CloudServiceGetDataParameters = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
+        const keyPath = state.currentLayout.options?.root_path;
+        if (keyPath) params.key_path = keyPath;
+        return params;
+    }),
+    thisPage: computed(() => getThisPage(fetchOptionsMap.value?.pageStart || 1, fetchOptionsMap.value?.pageLimit || 45)),
+    pageSize: computed(() => fetchOptionsMap.value?.pageLimit || 45),
+    enabled: computed(() => state.currentLayout.type === 'raw-table'),
+});
+const { data: cloudServiceData, isLoading: isCloudServiceDataLoading } = useCloudServiceGetQuery({
+    cloudServiceId: computed(() => props.cloudServiceId),
+    enabled: computed(() => state.currentLayout.type !== 'raw-table' || !state.isTableTypeInDynamicLayout),
+});
+
+const { data: cloudServiceDataForDynamicLayout, isLoading: isCloudServiceDataLoadingForDynamicLayout, totalCount: cloudServiceDataForDynamicLayoutTotalCount } = useCloudServicePaginationQuery({
+    params: computed<CloudServiceListParameters>(() => getListApiParams(state.currentLayout.type)),
+    thisPage: computed(() => getThisPage(fetchOptionsMap.value?.pageStart || 1, fetchOptionsMap.value?.pageLimit || 45)),
+    pageSize: computed(() => fetchOptionsMap.value?.pageLimit || 45),
+    enabled: computed(() => state.currentLayout.type !== 'raw-table' && state.isTableTypeInDynamicLayout),
+});
 
 // excel
 const excelQuery = new ApiQueryHelper()
@@ -294,7 +295,7 @@ const excelQuery = new ApiQueryHelper()
 
 const unwindTableExcelDownload = async (fields: DynamicField[]) => {
     excelQuery.setFilters([{ k: 'cloud_service_id', v: props.cloudServiceId, o: '=' }]);
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    const options = fetchOptionsMap.value || defaultFetchOptions;
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
@@ -316,15 +317,14 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
             ],
             timezone: state.timezone,
         };
-        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+        return cloudServiceAPI.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
 };
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        fetchOptionsMap[state.fetchOptionKey] = options;
-        fetchData();
+        fetchOptionsMap.value = options;
     },
     select(selectIndex) {
         state.selectIndex = selectIndex;
@@ -342,28 +342,17 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
     return {};
 };
 
-const loadSchemaAndData = async () => {
-    state.loading = true;
-    await getSchema();
-    await fetchData();
-    state.loading = false;
-};
-
 const onChangeTab = async (tab) => {
     state.activeTab = tab;
-    await loadSchemaAndData();
+    // await loadSchemaAndData();
 };
 
-watch(() => props.cloudServiceId, async (after, before) => {
-    if (after && after !== before) {
-        await loadSchemaAndData();
+
+watch(schemaData, (schema) => {
+    if (schema) {
+        state.activeTab = state.tabs[0].name;
     }
-}, { immediate: false });
-
-(async () => {
-    await loadSchemaAndData();
-})();
-
+});
 
 </script>
 
@@ -375,7 +364,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                       keep-alive-all
                       @change="onChangeTab"
         >
-            <template v-for="(layout, i) in state.layouts"
+            <template v-for="(layout, i) in schemaData?.details || []"
                       :slot="layout.name"
             >
                 <div :key="`${layout.name}-${i}`"
@@ -400,7 +389,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                         <template #data-workspace_id="{value}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton('workspace', value)"
+                                           @click="handleClickLinkButton('workspace', value, state.data)"
                             >
                                 {{ referenceMap.workspace[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
@@ -414,7 +403,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                         <template #data-project_id="{value}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton('project', value)"
+                                           @click="handleClickLinkButton('project', value, state.data)"
                             >
                                 {{ referenceMap.project[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"

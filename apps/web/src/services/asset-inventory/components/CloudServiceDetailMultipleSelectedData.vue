@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, watch, ref,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { find } from 'lodash';
 
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PDynamicLayout, PButtonTab, PTextButton, PI,
@@ -19,11 +18,10 @@ import type {
 import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
+import type { PageSchemaGetParameters } from '@/api-clients/add-ons/page-schema/schema/api-verbs/get';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
 import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -42,8 +40,9 @@ import type { Reference } from '@/lib/reference/type';
 import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCloudServicePageSchemaGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-get-query';
+import { useCloudServicePaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-pagination-query';
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
@@ -68,9 +67,9 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
     searchText: '',
 };
 
-const fetchOptionsMap = {};
-const dataMap = {};
+// const dataMap = {};
 
+const { cloudServiceAPI } = useCloudServiceApi();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -80,20 +79,30 @@ const userStore = useUserStore();
 const router = useRouter();
 const serviceRouter = useServiceRouter(router);
 
+const { data: schemaData } = useCloudServicePageSchemaGetQuery({
+    params: computed<PageSchemaGetParameters>(() => ({
+        schema: 'details',
+        resource_type: 'inventory.CloudService',
+        options: {
+            cloud_service_id: props.cloudServiceIdList[0],
+            include_workspace_info: appContextGetters.isAdminMode,
+            is_multiple: true,
+        },
+    })),
+});
+
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
 const state = reactive({
-    data: undefined as any,
-    loading: true,
-    totalCount: 0,
     timezone: computed<string|undefined>(() => userStore.state.timezone),
     selectIndex: [] as number[],
     language: computed<string|undefined>(() => userStore.state.language),
 
     // button tab
     tabs: computed<TabItem[]>(() => {
+        if (!schemaData.value) return [];
         const local = i18n.locale;
-        return state.layouts.map((d) => ({
+        return (schemaData.value.details || []).map((d) => ({
             label: i18n.t(d.options?.translation_id, local) || d.name,
             name: d.name,
         }));
@@ -101,10 +110,10 @@ const state = reactive({
     activeTab: '',
 
     // schema
-    layouts: [] as DynamicLayout[],
     layoutMap: computed(() => {
+        if (!schemaData.value) return {};
         const res = {};
-        state.layouts.forEach((d) => {
+        (schemaData.value.details || []).forEach((d) => {
             res[d.name] = d;
         });
         return res;
@@ -118,26 +127,21 @@ const state = reactive({
     rootPath: computed(() => state.currentLayout.options?.unwind?.path ?? ''),
     isBaseInformationSchema: computed(() => (state.currentLayout.name === BASE_INFORMATION)),
 });
+const fetchOptionsMap = ref(defaultFetchOptions);
+
 
 /* Event */
-const handleClickLinkButton = async (type: string, workspaceId: string, id: string) => {
+const handleClickLinkButton = (type: string, workspaceId: string, id: string, item: CloudServiceModel) => {
     if (type === 'workspace') {
-        try {
-            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-                cloud_service_id: id,
-            });
-            window.open(router.resolve({
-                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: response.provider,
-                    group: response.cloud_service_group,
-                    name: response.cloud_service_type,
-                    workspaceId,
-                },
-            }).href, '_blank');
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, e.message);
-        }
+        window.open(router.resolve({
+            name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: item.provider,
+                group: item.cloud_service_group,
+                name: item.cloud_service_type,
+                workspaceId,
+            },
+        }).href, '_blank');
     } else {
         window.open(serviceRouter.resolve({
             feature: MENU_ID.PROJECT,
@@ -156,25 +160,6 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
         { k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' },
     ]).apiQuery.filter),
 );
-
-const getSchema = async () => {
-    try {
-        const params: Record<string, any> = {
-            schema: 'details',
-            resource_type: 'inventory.CloudService',
-            options: {
-                cloud_service_id: props.cloudServiceIdList[0],
-                include_workspace_info: appContextGetters.isAdminMode,
-                is_multiple: true,
-            },
-        };
-        const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-        state.layouts = res.details;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-    if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
-};
 
 const apiQuery = new ApiQueryHelper();
 const baseInformationQuery = new ApiQueryHelper();
@@ -200,8 +185,8 @@ const setListQuery = (options) => {
 };
 
 const unwindTagQuery = new ApiQueryHelper();
-const getListApiParams = () => {
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+const getListApiParams = (): CloudServiceListParameters => {
+    const options = fetchOptionsMap.value || defaultFetchOptions;
     setListQuery(options);
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
@@ -226,30 +211,18 @@ const getListApiParams = () => {
     return params;
 };
 
-
-const getData = async () => {
-    state.loading = true;
-    state.data = dataMap[state.fetchOptionKey];
-    try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>(getListApiParams());
-        state.totalCount = res.total_count;
-        state.data = res.results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.data = undefined;
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-    dataMap[state.fetchOptionKey] = state.data;
-};
+const { data: cloudServiceListData, isLoading: isCloudServiceListLoading, totalCount } = useCloudServicePaginationQuery({
+    params: computed<CloudServiceListParameters>(() => getListApiParams()),
+    thisPage: computed(() => getThisPage(fetchOptionsMap.value?.pageStart || 1, fetchOptionsMap.value?.pageLimit || 45)),
+    pageSize: computed(() => fetchOptionsMap.value?.pageLimit || 45),
+});
 
 const excelQuery = new ApiQueryHelper()
     .setMultiSortV2([{ key: 'created_at', desc: true }]);
 
 const unwindTableExcelDownload = async (fields: DynamicField[]) => {
     excelQuery.setFilters([{ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' }]);
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    const options = fetchOptionsMap.value || defaultFetchOptions;
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
@@ -271,18 +244,17 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
             ],
             timezone: state.timezone,
         };
-        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+        return cloudServiceAPI.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
 };
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        fetchOptionsMap[state.fetchOptionKey] = {
-            ...fetchOptionsMap[state.fetchOptionKey],
+        fetchOptionsMap.value = {
+            ...fetchOptionsMap.value,
             ...options,
         };
-        getData();
     },
     select(selectIndex) {
         state.selectIndex = selectIndex;
@@ -300,27 +272,16 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
     return {};
 };
 
-const loadSchemaAndData = async () => {
-    state.loading = true;
-    await getSchema();
-    await getData();
-    state.loading = false;
-};
-
 const onChangeTab = async (tab) => {
     state.activeTab = tab;
-    await loadSchemaAndData();
+    fetchOptionsMap.value = defaultFetchOptions;
 };
 
-watch(() => props.cloudServiceIdList, async (after, before) => {
-    if (after && after !== before) {
-        await loadSchemaAndData();
+watch(schemaData, (schema) => {
+    if (schema) {
+        state.activeTab = state.tabs[0].name;
     }
-}, { immediate: false });
-
-(async () => {
-    await loadSchemaAndData();
-})();
+});
 
 
 </script>
@@ -333,7 +294,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                       keep-alive-all
                       @change="onChangeTab"
         >
-            <template v-for="(layout, i) in state.layouts"
+            <template v-for="(layout, i) in schemaData?.details || []"
                       :slot="layout.name"
             >
                 <div :key="`${layout.name}-${i}`"
@@ -341,10 +302,10 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                 >
                     <p-dynamic-layout :type="layout.type"
                                       :options="state.layoutOptions"
-                                      :data="state.data"
+                                      :data="cloudServiceListData?.results || []"
                                       :type-options="{
-                                          loading:state.loading,
-                                          totalCount:state.totalCount,
+                                          loading:isCloudServiceListLoading,
+                                          totalCount,
                                           timezone:state.timezone,
                                           selectIndex:state.selectIndex,
                                           keyItemSets,
@@ -357,7 +318,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                         <template #col-workspace_id-format="{value, item}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
+                                           @click="handleClickLinkButton('workspace', value, item.cloud_service_id, item)"
                             >
                                 {{ referenceMap.workspace[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
@@ -371,7 +332,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                         <template #col-project_id-format="{value, item}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton('project', item.workspace_id, value)"
+                                           @click="handleClickLinkButton('project', item.workspace_id, value, item)"
                             >
                                 {{ referenceMap.project[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"

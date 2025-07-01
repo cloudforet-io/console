@@ -4,8 +4,6 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { get } from 'lodash';
-
 import {
     PRadioGroup, PRadio, PLazyImg,
 } from '@cloudforet/mirinae';
@@ -23,6 +21,7 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
+import { useCloudServiceDetailLSBMenuSet } from '@/services/asset-inventory/composables/use-cloud-service-detail-menu-set';
 import {
     useCloudServiceProviderListQuery,
 } from '@/services/asset-inventory/composables/use-cloud-service-provider-list-query';
@@ -59,6 +58,10 @@ const storeState = reactive({
     currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
 });
 const { data: providerList } = useCloudServiceProviderListQuery();
+
+const { menuSet: cloudServiceDetailMenuSet } = useCloudServiceDetailLSBMenuSet({
+    params: computed(() => route.params as CloudServiceDetailPageParams),
+});
 const state = reactive({
     currentPath: computed(() => route.fullPath),
     isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
@@ -100,34 +103,6 @@ const state = reactive({
             id: REGION_MENU_ID,
         },
     ])),
-    cloudServiceDetailMenuSet: computed<LSBItem[]>(() => {
-        const selectedItem = cloudServiceDetailPageState.cloudServiceTypeList[0];
-        const results: LSBItem[] = [
-            {
-                type: MENU_ITEM_TYPE.DIVIDER,
-            },
-            {
-                type: MENU_ITEM_TYPE.BUTTON_TITLE,
-                label: state.detailPageParams.group,
-                id: selectedItem?.group,
-                isBackLink: true,
-                to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
-                titleIcon: get(selectedItem, ['tags', 'spaceone:icon'], ''),
-            },
-        ];
-        cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
-            results.push({
-                type: MENU_ITEM_TYPE.ITEM,
-                label: d.name,
-                id: d.cloud_service_type_key,
-                to: {
-                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: { ...state.detailPageParams, name: d.name },
-                },
-            });
-        });
-        return results;
-    }),
     menuSet: computed<LSBMenu[]>(() => [
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
@@ -145,7 +120,7 @@ const state = reactive({
             type: MENU_ITEM_TYPE.SLOT,
             id: SERVICE_ACCOUNT_MENU_ID,
         },
-        ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
+        ...(state.isCloudServiceDetailPage ? cloudServiceDetailMenuSet.value : state.cloudServiceMainMenuSet),
     ]),
 });
 const providerState = reactive({

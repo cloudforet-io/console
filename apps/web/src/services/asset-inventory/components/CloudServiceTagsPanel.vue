@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { PBadge, PSelectStatus } from '@cloudforet/mirinae';
 
 
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
-import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
+import { useCloudServiceGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-get-query';
 import {
     CLOUD_SERVICE_TAG_TYPE,
     CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION,
@@ -22,6 +21,7 @@ import {
 import type {
     CloudServiceTagTableItem,
 } from '@/services/asset-inventory/types/cloud-service-detail-tag-type';
+
 
 type Tag = Record<string, string>;
 
@@ -38,6 +38,7 @@ const props = withDefaults(defineProps<{
 });
 
 const referenceMap = useAllReferenceDataModel();
+const queryClient = useQueryClient();
 const state = reactive({
     tagTypeList: computed(() => [
         { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.ALL') },
@@ -55,7 +56,7 @@ const state = reactive({
             name: 'provider', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.PROVIDER'), type: 'item', disableCopy: true,
         },
     ]),
-    cloudServiceTags: {} as CloudServiceTags,
+    cloudServiceTags: computed<CloudServiceTags>(() => cloudServiceData.value?.tags ?? {}),
     items: computed<CloudServiceTagTableItem[]>(() => {
         if (state.selectedTagType === 'all') {
             const items:CloudServiceTagTableItem[] = [];
@@ -83,26 +84,20 @@ const state = reactive({
     customTags: computed<Tag>(() => (state.cloudServiceTags?.custom ?? {})),
     manageTags: computed<Tag>(() => (state.cloudServiceTags[props.provider] ?? {})),
 });
+
+const { data: cloudServiceData, cloudServiceGetQueryKey } = useCloudServiceGetQuery({
+    cloudServiceId: computed(() => props.resourceId),
+    enabled: computed(() => !!props.resourceId),
+});
+
 /* event handler */
 const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
-const handleTagsUpdated = async () => { await getCloudServiceTags(); };
-
-const getCloudServiceTags = async () => {
-    try {
-        const { tags } = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-            cloud_service_id: props.resourceId,
-        });
-        state.cloudServiceTags = tags;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+const handleTagsUpdated = async () => {
+    await queryClient.invalidateQueries({ queryKey: cloudServiceGetQueryKey.value });
 };
 
 const getTagTypeBadgeOption = (tagType: keyof typeof CLOUD_SERVICE_TAG_TYPE) => CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[tagType];
 
-watch([() => props.resourceId, () => props.resourceId], () => { getCloudServiceTags(); }, {
-    immediate: true,
-});
 </script>
 
 <template>

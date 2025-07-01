@@ -5,10 +5,10 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { isEmpty, get, cloneDeep } from 'lodash';
 
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter, ConsoleFilterValue } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilterOperator } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -16,7 +16,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
-    DynamicLayoutEventListener, DynamicLayoutFetchOptions,
+    DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 import type {
@@ -26,9 +26,8 @@ import type {
 
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
-import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
+import type { PageSchemaGetParameters } from '@/api-clients/add-ons/page-schema/schema/api-verbs/get';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
@@ -50,7 +49,6 @@ import {
 } from '@/lib/router-query-string';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 
@@ -60,6 +58,8 @@ import CloudServiceDetailTabs
     from '@/services/asset-inventory/components/CloudServiceDetailTabs.vue';
 import CloudServiceMetricButton from '@/services/asset-inventory/components/CloudServiceMetricButton.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
+import { useCloudServicePageSchemaGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-get-query';
+import { useCloudServicePaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-pagination-query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
@@ -67,6 +67,8 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import type { Period } from '@/services/asset-inventory/types/type';
+
+
 
 
 interface Props {
@@ -85,6 +87,8 @@ const props = withDefaults(defineProps<Props>(), {
     isSecurityPage: false,
 });
 
+const { cloudServiceAPI } = useCloudServiceApi();
+
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
@@ -100,6 +104,31 @@ const serviceRouter = useServiceRouter(router);
 
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
+
+const { data: schemaData } = useCloudServicePageSchemaGetQuery({
+    params: computed<PageSchemaGetParameters>(() => {
+        const params: Record<string, any> = {
+            schema: 'table',
+        };
+        if (props.isServerPage) {
+            params.resource_type = 'inventory.Server';
+            params.options = {
+                include_workspace_info: appContextGetters.isAdminMode,
+                // is_default: false,
+            };
+        } else {
+            params.resource_type = 'inventory.CloudService';
+            params.options = {
+                provider: props.provider,
+                cloud_service_group: props.group,
+                cloud_service_type: props.name,
+                include_workspace_info: appContextGetters.isAdminMode,
+                // is_default: false,
+            };
+        }
+        return params as PageSchemaGetParameters;
+    }),
+});
 
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
@@ -122,7 +151,7 @@ const state = reactive({
 
 const typeOptionState = reactive({
     loading: true,
-    totalCount: 0,
+    // totalCount: 0,
     timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
     selectIndex: [] as number[],
 });
@@ -135,11 +164,32 @@ interface Condition {
     operator: ApiFilterOperator;
 }
 
+
+
+
 const tableState = reactive({
-    schema: null as null|DynamicLayout,
+    schema: computed<DynamicLayout|null>(() => {
+        if (!schemaData.value) return null;
+        const _schema = { ...schemaData.value };
+        if (!_schema.options?.fields) return _schema;
+        const workspaceIndex = _schema.options.fields.findIndex((field) => field.name === 'Workspace');
+        if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
+            _schema.options.fields.splice(workspaceIndex, 1);
+        }
+        const nameIndex = _schema.options.fields.findIndex((field) => field.name === 'Name');
+        if (props.isSecurityPage) {
+            _schema.options.fields[nameIndex] = {
+                ..._schema.options.fields[nameIndex],
+                options: {
+                    width: '28rem',
+                },
+            };
+        }
+        return _schema;
+    }),
     defaultFilter: computed<Condition[]|undefined>(() => tableState.schema?.options?.default_filter ?? []),
-    items: [],
-    selectedItems: computed(() => typeOptionState.selectIndex.map((d) => tableState.items[d])),
+    // items: [],
+    selectedItems: computed(() => typeOptionState.selectIndex.map((d) => cloudServiceTableData.value?.results?.[d])),
     consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
     multiSchema: computed<null|DynamicLayout>(() => {
         if (!tableState.schema) return null;
@@ -210,52 +260,6 @@ const handleSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
     typeOptionState.selectIndex = selectIndex;
 };
 
-const getTableSchema = async (): Promise<null|DynamicLayout> => {
-    try {
-        const params: Record<string, any> = {
-            schema: 'table',
-        };
-        if (props.isServerPage) {
-            params.resource_type = 'inventory.Server';
-            params.options = {
-                include_workspace_info: appContextGetters.isAdminMode,
-                // is_default: false,
-            };
-        } else {
-            params.resource_type = 'inventory.CloudService';
-            params.options = {
-                provider: props.provider,
-                cloud_service_group: props.group,
-                cloud_service_type: props.name,
-                include_workspace_info: appContextGetters.isAdminMode,
-                // is_default: false,
-            };
-        }
-        const response = await SpaceConnector.client.addOns.pageSchema.get(params);
-        /*
-        * NOTE: The storage for schema config is the same for both user and admin modes, making it difficult to distinguish data on the entry level.
-        * Therefore, it is segmented as follows:
-        * */
-        const workspaceIndex = response.options.fields.findIndex((field) => field.name === 'Workspace');
-        if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
-            response.options.fields.splice(workspaceIndex, 1);
-        }
-        const nameIndex = response.options.fields.findIndex((field) => field.name === 'Name');
-        if (props.isSecurityPage) {
-            response.options.fields[nameIndex] = {
-                ...response.options.fields[nameIndex],
-                options: {
-                    width: '28rem',
-                },
-            };
-        }
-        return response;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return null;
-    }
-};
-
 const resetSort = (schemaOptions: DynamicLayoutOptions) => {
     const defaultSort = schemaOptions.default_sort;
     if (defaultSort) {
@@ -266,24 +270,17 @@ const resetSort = (schemaOptions: DynamicLayoutOptions) => {
         fetchOptionState.sortDesc = true;
     }
 };
-const handleClickLinkButton = async (type: string, workspaceId: string, id: string) => {
+const handleClickLinkButton = async (type: string, workspaceId: string, id: string, item: CloudServiceModel) => {
     if (type === 'workspace') {
-        try {
-            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-                cloud_service_id: id,
-            });
-            window.open(router.resolve({
-                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: response.provider,
-                    group: response.cloud_service_group,
-                    name: response.cloud_service_type,
-                    workspaceId,
-                },
-            }).href, '_blank');
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, e.message);
-        }
+        window.open(router.resolve({
+            name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: item.provider,
+                group: item.cloud_service_group,
+                name: item.cloud_service_type,
+                workspaceId,
+            },
+        }).href, '_blank');
     } else {
         window.open(serviceRouter.resolve({
             feature: MENU_ID.PROJECT,
@@ -307,54 +304,24 @@ const getQuery = () => {
 
     const fields = tableState.schema?.options?.fields;
     if (fields) {
-        apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
+        apiQuery.setOnly(...fields.map((d) => d.key)
+            .filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider', 'cloud_service_group', 'cloud_service_type');
     }
     return apiQuery.data;
 };
 
-const listCloudServiceTableData = async (): Promise<{items: any[]; totalCount: number}> => {
-    typeOptionState.loading = true;
-    try {
+const { data: cloudServiceTableData, isLoading: isCloudServiceTableDataLoading, totalCount } = useCloudServicePaginationQuery({
+    params: computed(() => {
         const query = cloneDeep(getQuery());
         query.filter = query.filter ? query.filter.concat(tableState.defaultSearchQuery) : tableState.defaultSearchQuery;
 
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
+        return {
             query,
-        });
-
-        // filtering select index
-        typeOptionState.selectIndex = typeOptionState.selectIndex.filter((d) => !!(res.results ?? [])[d]);
-
-        return { items: res.results ?? [], totalCount: res.total_count ?? 0 };
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return { items: [], totalCount: 0 };
-    } finally {
-        typeOptionState.loading = false;
-    }
-};
-
-const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
-    if (changed.sortBy !== undefined) {
-        fetchOptionState.sortBy = changed.sortBy;
-        fetchOptionState.sortDesc = !!changed.sortDesc;
-    }
-    if (changed.pageLimit !== undefined) {
-        fetchOptionState.pageLimit = changed.pageLimit;
-        assetInventorySettingsStore.setCloudServiceTablePageLimit(changed.pageLimit);
-    }
-    if (changed.pageStart !== undefined) {
-        fetchOptionState.pageStart = changed.pageStart;
-    }
-    if (changed.queryTags !== undefined) {
-        queryTagsHelper.setQueryTags(changed.queryTags);
-    }
-
-    const { items, totalCount } = await listCloudServiceTableData();
-    tableState.items = items;
-    typeOptionState.totalCount = totalCount;
-    typeOptionState.selectIndex = [];
-};
+        };
+    }),
+    thisPage: computed(() => getThisPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)),
+    pageSize: computed(() => fetchOptionState.pageLimit),
+});
 
 // excel
 const excelState = reactive({
@@ -379,7 +346,7 @@ const exportCloudServiceData = async () => {
                     },
                 ],
             };
-            return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+            return cloudServiceAPI.export(cloudServiceExcelExportParams);
         };
         await downloadExcelByExportFetcher(excelExportFetcher);
     }
@@ -393,27 +360,14 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 };
 
 const reloadTable = async () => {
-    tableState.schema = await getTableSchema();
+    // TODO: pageSchema invalidate query
     resetSort(tableState.schema.options);
-    await fetchTableData();
 };
 
 const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
-const initPage = async (initQueryTags = false) => {
-    if (!props.isServerPage && !props.name) return;
-    if (initQueryTags) setQueryTags([]);
-    tableState.schema = await getTableSchema();
-    resetSort(tableState.schema.options);
-    if (tableState.defaultFilter?.length) {
-        queryTagsHelper.setFilters([
-            ...convertToQueryTag(tableState.defaultFilter),
-            ...searchFilters.value,
-        ]);
-    }
-    await fetchTableData();
-};
+
 const initDefaultFilter = () => {
     const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
     if (defaultSearchQuery.length) {
@@ -436,7 +390,20 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
         });
     }
     if (tableState.schema === null) return;
-    fetchTableData(changed);
+    if (changed.sortBy !== undefined) {
+        fetchOptionState.sortBy = changed.sortBy;
+        fetchOptionState.sortDesc = !!changed.sortDesc;
+    }
+    if (changed.pageLimit !== undefined) {
+        fetchOptionState.pageLimit = changed.pageLimit;
+        assetInventorySettingsStore.setCloudServiceTablePageLimit(changed.pageLimit);
+    }
+    if (changed.pageStart !== undefined) {
+        fetchOptionState.pageStart = changed.pageStart;
+    }
+    if (changed.queryTags !== undefined) {
+        queryTagsHelper.setQueryTags(changed.queryTags);
+    }
 };
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
 
@@ -458,7 +425,6 @@ const handleUpdateVisible = (visible) => {
 const handleClearDefaultFilter = async () => {
     tableState.defaultSearchQuery = [];
     replaceUrlQuery('default_filters', undefined);
-    await fetchTableData();
 };
 
 // set global filters to url query
@@ -478,7 +444,10 @@ const initGlobalFilters = (): boolean => {
 /* Watchers */
 watch(() => state.globalFilters, () => {
     const _initPage = initGlobalFilters();
-    if (_initPage) initPage();
+    if (_initPage) {
+        if (!props.isServerPage && !props.name) return;
+        setQueryTags([]);
+    }
 }, { immediate: true });
 
 watch(() => keyItemSets.value, (after) => {
@@ -489,7 +458,8 @@ watch(() => keyItemSets.value, (after) => {
 // @ts-ignore
 debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
     initGlobalFilters(); // maintain global filters when changing service menu
-    await initPage(true);
+    if (!props.isServerPage && !props.name) return;
+    setQueryTags([]);
 });
 
 
@@ -516,9 +486,23 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
     cloudServiceDetailPageStore.$patch((_state) => {
         _state.searchFilters = searchFilters.value;
     });
-
-    await initPage();
 })();
+
+watch(schemaData, (_schema) => {
+    if (_schema) {
+        resetSort(_schema.options as DynamicLayoutOptions);
+        if (tableState.defaultFilter?.length) {
+            queryTagsHelper.setFilters([
+                ...convertToQueryTag(tableState.defaultFilter),
+                ...searchFilters.value,
+            ]);
+        }
+    }
+});
+
+watch(cloudServiceTableData, () => {
+    typeOptionState.selectIndex = [];
+}, { immediate: true });
 </script>
 
 <template>
@@ -529,7 +513,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                            :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
                            use-total-count
                            use-selected-count
-                           :total-count="typeOptionState.totalCount"
+                           :total-count="totalCount"
                            :selected-count="tableState.selectedItems.length"
                            @click-back-button="$router.go(-1)"
                 />
@@ -537,7 +521,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                            :title="props.provider ? `[${referenceMap.provider[props.provider]?.label || props.provider}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
                            use-total-count
                            use-selected-count
-                           :total-count="typeOptionState.totalCount"
+                           :total-count="totalCount"
                            :selected-count="tableState.selectedItems.length"
                            @click-back-button="$router.go(-1)"
                 />
@@ -546,7 +530,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                            show-back-button
                            use-total-count
                            use-selected-count
-                           :total-count="typeOptionState.totalCount"
+                           :total-count="totalCount"
                            :selected-count="tableState.selectedItems.length"
                            @click-back-button="$router.go(-1)"
                 />
@@ -578,11 +562,11 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                 <template v-if="tableState.schema">
                     <p-dynamic-layout type="query-search-table"
                                       :options="tableState.schema.options"
-                                      :data="tableState.items"
+                                      :data="cloudServiceTableData?.results ?? []"
                                       :fetch-options="fetchOptionState"
                                       :type-options="{
-                                          loading: typeOptionState.loading,
-                                          totalCount: typeOptionState.totalCount,
+                                          loading: isCloudServiceTableDataLoading,
+                                          totalCount: totalCount,
                                           timezone: typeOptionState.timezone,
                                           selectIndex: typeOptionState.selectIndex,
                                           selectable: true,
@@ -621,7 +605,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                         <template #col-workspace_id-format="{value, item}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
+                                           @click="handleClickLinkButton('workspace', value, item.cloud_service_id, item)"
                             >
                                 {{ referenceMap.workspace[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
@@ -643,7 +627,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                         <template #col-project_id-format="{value, item}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton('project', item.workspace_id, value)"
+                                           @click="handleClickLinkButton('project', item.workspace_id, value, item)"
                             >
                                 {{ referenceMap.project[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
@@ -665,19 +649,6 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                                 {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
                             </p-button>
                         </template>
-                        <!--                        <template v-if="!props.isServerPage &&!props.isSecurityPage"-->
-                        <!--                                  #toolbox-bottom-->
-                        <!--                        >-->
-                        <!--                            <div class="mb-3">-->
-                        <!--                                <p-divider />-->
-                        <!--                            </div>-->
-                        <!--                            <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"-->
-                        <!--                                                          :filters="searchFilters"-->
-                        <!--                                                          :hidden-filters="hiddenFilters"-->
-                        <!--                                                          :period="overviewState.period"-->
-                        <!--                                                          :key-item-sets="keyItemSets"-->
-                        <!--                            />-->
-                        <!--                        </template>-->
                     </p-dynamic-layout>
                 </template>
             </template>
@@ -704,7 +675,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
                                                @complete="reloadTable"
         />
         <excel-export-option-modal :visible="excelState.visible"
-                                   :cloud-service-id="tableState.items[0]?.cloud_service_id"
+                                   :cloud-service-id="cloudServiceTableData?.results?.[0]?.cloud_service_id"
                                    :hidden-filters="hiddenFilters"
                                    :cloud-service-list-fields="tableState.dynamicTableFields"
                                    :default-filter="tableState.defaultSearchQuery"
