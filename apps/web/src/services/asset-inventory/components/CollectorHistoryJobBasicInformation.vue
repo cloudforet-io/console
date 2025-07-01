@@ -51,8 +51,8 @@ import {
 import { PLink, PLazyImg, PPaneLayout } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { JobModel } from '@/schema/inventory/job/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

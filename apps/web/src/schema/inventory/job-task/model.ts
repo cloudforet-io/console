@@ -1,4 +1,4 @@
-import type { JobStatus } from '@/schema/inventory/job/type';
+import type { JobStatus } from '@/api-clients/inventory/job/schema/type';
 
 import type { JobTaskError } from '@/services/asset-inventory/types/collector-history-job-type';
 

@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { JobStatus } from '@/schema/inventory/job/type';
+import type { JobStatus } from '@/api-clients/inventory/job/schema/type';
 
 export interface CostJobListParameters {
     query?: Query;

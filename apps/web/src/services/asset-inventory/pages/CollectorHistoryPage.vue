@@ -21,9 +21,9 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { JobListParameters } from '@/api-clients/inventory/job/schema/api-verbs/list';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import { SpaceRouter } from '@/router';
-import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
-import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

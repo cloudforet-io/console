@@ -6,7 +6,7 @@ import { PCopyButton, PFieldTitle } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

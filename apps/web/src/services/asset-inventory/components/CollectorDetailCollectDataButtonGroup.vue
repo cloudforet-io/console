@@ -8,8 +8,7 @@ import {
     PButton, PPopover, PIconButton, screens,
 } from '@cloudforet/mirinae';
 
-
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import CollectorCurrentStatus from '@/services/asset-inventory/components/CollectorCurrentStatus.vue';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';

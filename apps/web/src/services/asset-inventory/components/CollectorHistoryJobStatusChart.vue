@@ -7,7 +7,7 @@ import {
 import { PPaneLayout, PStatus, PI } from '@cloudforet/mirinae';
 
 
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import { green, red } from '@/styles/colors';
 

@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

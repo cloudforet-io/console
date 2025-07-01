@@ -89,7 +89,7 @@ import {
 } from '@cloudforet/mirinae';
 import { durationFormatter } from '@cloudforet/utils';
 
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
