@@ -1,5 +1,5 @@
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { JobStatus } from '@/schema/inventory/job/type';
+import type { JobStatus } from '@/api-clients/inventory/job/schema/type';
 
 
 export interface JobModel {

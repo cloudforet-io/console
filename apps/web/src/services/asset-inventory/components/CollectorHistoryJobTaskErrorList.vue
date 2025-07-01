@@ -67,7 +67,8 @@ import {
 
 import { PDataTable, PHeading, PCollapsibleToggle } from '@cloudforet/mirinae';
 
-import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+
+import type { JobTaskModel } from '@/api-clients/inventory/job-task/schema/model';
 
 import { resourceTypeLabels } from '@/lib/reference/type';
 

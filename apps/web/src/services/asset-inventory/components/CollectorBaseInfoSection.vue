@@ -67,9 +67,9 @@ import { useCollectorApi } from '@/api-clients/inventory/collector/composables/u
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { JobModel } from '@/schema/inventory/job/model';
 import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
 import { i18n } from '@/translations';
 

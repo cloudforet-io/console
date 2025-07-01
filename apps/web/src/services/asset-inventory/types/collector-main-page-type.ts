@@ -8,7 +8,7 @@ import type {
 
 } from '@/api-clients/inventory/collector/schema/model';
 import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
-import type { JobStatus } from '@/schema/inventory/job/type';
+import type { JobStatus } from '@/api-clients/inventory/job/schema/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 

@@ -5,18 +5,18 @@ import {
 
 
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { JobTaskListParameters } from '@/api-clients/inventory/job-task/schema/api-verbs/list';
+import type { JobTaskModel } from '@/api-clients/inventory/job-task/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
-import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
@@ -38,6 +38,7 @@ import {
     statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
 import { JOB_SELECTED_STATUS, JOB_TASK_STATE } from '@/services/asset-inventory/types/collector-history-page-type';
+
 
 interface Props {
     jobId: string;

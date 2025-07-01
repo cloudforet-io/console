@@ -10,8 +10,8 @@ import {
     PHorizontalLayout, PHeading,
 } from '@cloudforet/mirinae';
 
-import type { JobTaskModel } from '@/schema/inventory/job-task/model';
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobTaskModel } from '@/api-clients/inventory/job-task/schema/model';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

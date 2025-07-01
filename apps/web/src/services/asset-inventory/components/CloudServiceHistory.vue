@@ -103,7 +103,6 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
 
-import type { KeyItem, ValueHandler } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -111,12 +110,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
 } from '@cloudforet/mirinae';
+import type { KeyItem, ValueHandler } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { ChangeHistoryListParameters } from '@/api-clients/inventory/change-history/schema/api-verbs/list';
+import type { ChangeHistoryModel } from '@/api-clients/inventory/change-history/schema/model';
 import { SpaceRouter } from '@/router';
-import type { ChangeHistoryListParameters } from '@/schema/inventory/change-history/api-verbs/list';
-import type { ChangeHistoryModel } from '@/schema/inventory/change-history/model';
 import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
 

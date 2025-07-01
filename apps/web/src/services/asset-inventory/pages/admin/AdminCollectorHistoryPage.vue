@@ -9,7 +9,6 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,15 +16,16 @@ import {
     PHeading, PPagination, PLazyImg, PLink,
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { JobListParameters } from '@/api-clients/inventory/job/schema/api-verbs/list';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { SpaceRouter } from '@/router';
-import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
-import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
