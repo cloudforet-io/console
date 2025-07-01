@@ -5,8 +5,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { useBudgetApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-api';
 import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { useScopedPaginationQuery } from '@/query/pagination/use-scoped-pagination-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 
 interface UseBudgetListPaginationQueryOptions {
     params: ComputedRef<BudgetListParameters>;

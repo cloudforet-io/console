@@ -20,8 +20,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { BudgetUsageAnalyzeResult } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
