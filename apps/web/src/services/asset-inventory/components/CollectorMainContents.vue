@@ -19,7 +19,6 @@ import type {
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -33,6 +32,7 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
@@ -40,6 +40,7 @@ import CollectorContentItem from '@/services/asset-inventory/components/Collecto
 import CollectorListNoData from '@/services/asset-inventory/components/CollectorMainListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/components/CollectorMainScheduleModal.vue';
+import { useCollectorListQuery } from '@/services/asset-inventory/composables/use-collector-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
@@ -126,7 +127,6 @@ const excelFields: ExcelDataField[] = [
 const historyLinkQueryHelper = new QueryHelper();
 
 const state = reactive({
-    loading: computed(() => collectorPageState.loading.collectorList),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
@@ -137,21 +137,18 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    searchTags: computed(() => {
-        const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
-        return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {
-            if (d.value && d?.key?.name === 'plugin_info.plugin_id') {
-                const plugin = storeState.plugins[d.value.name];
-                r.push({ ...d, value: { label: plugin?.label, name: plugin?.key } });
-            } else {
-                r.push(d);
-            }
-            return r;
-        }, []);
-    }),
+    searchTags: computed<QueryItem[]>(() => queryTags.value.reduce((r: QueryItem[], d: any): QueryItem[] => {
+        if (d.value && d?.key?.name === 'plugin_info.plugin_id') {
+            const plugin = storeState.plugins[d.value.name];
+            r.push({ ...d, value: { label: plugin?.label, name: plugin?.key } });
+        } else {
+            r.push(d);
+        }
+        return r;
+    }, [])),
     items: computed<CollectorItemInfo[]|undefined>(() => {
         const plugins = storeState.plugins;
-        return collectorPageState.collectors?.map((d) => {
+        return collectorListData.value?.results?.map((d) => {
             historyLinkQueryHelper.setFilters([
                 {
                     k: 'collector_id',
@@ -193,38 +190,18 @@ const state = reactive({
     }),
 });
 
-const searchQueryHelper = new QueryHelper().setKeyItemSets(keyItemSets);
-const collectorApiQueryHelper = new ApiQueryHelper()
-    .setOnly(
-        'collector_id',
-        'name',
-        'last_collected_at',
-        'provider',
-        'tags',
-        'plugin_info',
-        'schedule',
-        'secret_filter',
-        'workspace_id',
-    )
-    .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
-    .setSort(collectorPageState.sortBy, true);
-
+const queryTagHelper = useQueryTags({ keyItemSets });
+const { queryTags } = queryTagHelper;
 
 /* Components */
 const routeToCreatePage = () => {
     router.push({ name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }).catch(() => {});
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
-    if (options.pageStart !== undefined) collectorApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) collectorApiQueryHelper.setPageLimit(options.pageLimit);
-
     if (options.queryTags !== undefined) {
-        // convert queryTags to filters
-        searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-        // set filters to store
-        collectorPageState.searchFilters = searchQueryHelper.filters;
+        queryTagHelper.setQueryTags(options.queryTags);
     }
-
+    collectorPageState.searchFilters = queryTagHelper.filters.value;
     fetchCollectorList();
 };
 const handleClickListItem = (detailLink) => {
@@ -233,6 +210,29 @@ const handleClickListItem = (detailLink) => {
 const handleClickCollectDataConfirm = () => {
     fetchCollectorList();
 };
+
+/* Query */
+const collectorApiQueryHelper = new ApiQueryHelper();
+const { collectorListData, isLoading, totalCount } = useCollectorListQuery({
+    thisPage: computed(() => collectorPageState.thisPage),
+    pageSize: computed(() => collectorPageState.pageSize),
+    params: computed(() => {
+        collectorApiQueryHelper
+            .setFilters(queryTagHelper.filters.value)
+            .setSort(collectorPageState.sortBy, true);
+        if (collectorPageState.selectedProvider !== 'all') {
+            collectorApiQueryHelper.addFilter({ k: 'provider', v: collectorPageState.selectedProvider, o: '=' });
+        }
+        if (storeState.isAdminMode) {
+            collectorApiQueryHelper.addFilter({ k: 'workspace_id', v: '*', o: '=' });
+        }
+        return {
+            query: {
+                ...collectorApiQueryHelper.data,
+            },
+        };
+    }),
+});
 
 /* API */
 const handleExportExcel = async () => {
@@ -245,9 +245,7 @@ const handleExportExcel = async () => {
     });
 };
 const fetchCollectorList = async () => {
-    collectorApiQueryHelper.setFilters(collectorPageStore.getters.allFilters);
     try {
-        await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
         await collectorPageStore.getJobs();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -261,11 +259,9 @@ watch(() => collectorPageState.collectors, async () => {
         await collectorPageStore.getCollectorJobs(ids);
     }
 });
-watch(() => collectorPageState.selectedProvider, async () => {
-    await fetchCollectorList();
-});
 
 onMounted(async () => {
+    queryTagHelper.setFilters(collectorPageState.searchFilters); // init url query string
     await fetchCollectorList();
 });
 </script>
@@ -279,7 +275,9 @@ onMounted(async () => {
             :key-item-sets="keyItemSets"
             :query-tags="state.searchTags"
             :value-handler-map="collectorSearchHandler.valueHandlerMap"
-            :total-count="collectorPageState.totalCount"
+            :total-count="totalCount"
+            :this-page.sync="collectorPageState.thisPage"
+            :page-size.sync="collectorPageState.pageSize"
             @change="handleChangeToolbox"
             @refresh="fetchCollectorList"
             @export="handleExportExcel"
@@ -297,7 +295,7 @@ onMounted(async () => {
             </template>
         </p-toolbox>
         <p-data-loader :data="state.items"
-                       :loading="state.loading"
+                       :loading="isLoading"
                        class="collector-list-wrapper"
         >
             <div class="collector-lists">
