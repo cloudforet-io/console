@@ -123,7 +123,6 @@ const { key: budgetUsageAnalyzeQueryKey, params: budgetUsageAnalyzeParams } = us
                         operator: 'sum',
                     },
                 },
-                page: { limit: 200 },
                 ...budgetUsageApiQueryHelper.data,
             },
         };
@@ -138,7 +137,7 @@ const { data: budgetUsageAnalyzeData, refetch: refetchBudgetUsageAnalyze, isLoad
     initialDataUpdatedAt: 0,
     staleTime: 1000 * 60 * 5,
     enabled: true,
-}, ['DOMAIN', 'WORKSPACE', 'USER']);
+}, ['DOMAIN', 'WORKSPACE']);
 
 
 const state = reactive<BudgetMainListState>({
