@@ -127,6 +127,8 @@ const excelFields: ExcelDataField[] = [
 const historyLinkQueryHelper = new QueryHelper();
 
 const state = reactive({
+    thisPage: 1,
+    pageSize: 24,
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
@@ -208,14 +210,12 @@ const handleClickListItem = (detailLink) => {
 };
 
 /* Query */
-const collectorApiQueryHelper = new ApiQueryHelper();
+const collectorApiQueryHelper = new ApiQueryHelper().setSort('name', true);
 const { collectorListData, isLoading, totalCount } = useCollectorListQuery({
-    thisPage: computed(() => collectorPageState.thisPage),
-    pageSize: computed(() => collectorPageState.pageSize),
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageSize),
     params: computed(() => {
-        collectorApiQueryHelper
-            .setFilters(queryTagHelper.filters.value)
-            .setSort(collectorPageState.sortBy, true);
+        collectorApiQueryHelper.setFilters(queryTagHelper.filters.value);
         if (collectorPageState.selectedProvider !== 'all') {
             collectorApiQueryHelper.addFilter({ k: 'provider', v: collectorPageState.selectedProvider, o: '=' });
         }
@@ -259,8 +259,8 @@ onMounted(async () => {
             :query-tags="state.searchTags"
             :value-handler-map="collectorSearchHandler.valueHandlerMap"
             :total-count="totalCount"
-            :this-page.sync="collectorPageState.thisPage"
-            :page-size.sync="collectorPageState.pageSize"
+            :this-page.sync="state.thisPage"
+            :page-size.sync="state.pageSize"
             @change="handleChangeToolbox"
             @refresh="handleChangeToolbox()"
             @export="handleExportExcel"

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core';
 import {
-    computed, onMounted,
+    computed, onMounted, reactive,
 } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -11,16 +11,18 @@ import {
     PButton, PHeading, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
 import CollectorProviderList from '@/services/asset-inventory/components/CollectorProviderList.vue';
-import { useCollectorListQuery } from '@/services/asset-inventory/composables/use-collector-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
@@ -33,12 +35,16 @@ const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
+const { collectorAPI } = useCollectorApi();
 
+const state = reactive({
+    totalCount: 0,
+    loading: false,
+});
 const isAdminMode = computed(() => appContextGetters.isAdminMode);
 
 /* Url Query String */
 const urlFilterConverter = new QueryHelper();
-
 const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
@@ -72,20 +78,27 @@ const handleSelectedProvider = (providerName: string) => {
     collectorPageState.selectedProvider = providerName;
 };
 
-/* Query */
+/* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
-const { isLoading, totalCount } = useCollectorListQuery({
-    thisPage: computed(() => collectorPageState.thisPage),
-    pageSize: computed(() => collectorPageState.pageSize),
-    params: computed(() => ({
-        query: collectorCountApiQueryHelper.data,
-    })),
-});
+const fetchCollectorCount = async () => {
+    state.loading = true;
+    try {
+        const { total_count } = await collectorAPI.list({
+            query: collectorCountApiQueryHelper.data,
+        });
+        state.totalCount = total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
 
 /* INIT */
-onMounted(async () => {
+onMounted(() => {
     collectorPageStore.reset();
     setValuesFromUrlQueryString();
+    fetchCollectorCount();
 });
 </script>
 
@@ -97,7 +110,7 @@ onMounted(async () => {
                     use-total-count
                     use-selected-count
                     :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-                    :total-count="totalCount"
+                    :total-count="state.totalCount"
                 />
             </template>
             <template #extra>
@@ -114,12 +127,12 @@ onMounted(async () => {
             </template>
         </p-heading-layout>
         <p-data-loader
-            :data="totalCount > 0"
-            :loading="isLoading"
+            :data="state.totalCount > 0"
+            :loading="state.loading"
             loader-backdrop-color="gray.100"
             class="collector-loader-wrapper"
         >
-            <div v-if="totalCount > 0"
+            <div v-if="state.totalCount > 0"
                  class="collector-contents-wrapper"
             >
                 <collector-provider-list :selected-provider="collectorPageState.selectedProvider"

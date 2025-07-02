@@ -4,7 +4,7 @@
                     size="md"
                     fade
                     backdrop
-                    :visible="collectorPageState.visible.scheduleModal"
+                    :visible="collectorPageState.scheduleModalVisible"
                     :hide-footer-close-button="state.isViewMode"
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
@@ -64,7 +64,7 @@ const { data: selectedCollectorData } = useCollectorGetQuery({
 
 /* Events */
 const closeScheduleModal = () => {
-    collectorPageState.visible.scheduleModal = false;
+    collectorPageState.scheduleModalVisible = false;
 };
 
 const handleCloseModal = () => {

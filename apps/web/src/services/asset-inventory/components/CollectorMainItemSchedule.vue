@@ -33,8 +33,8 @@ const handleChangeToggle = async (value) => {
     emit('change-toggle', value);
 };
 const handleClickSchedule = () => {
-    collectorPageStore.setSelectedCollectorId(props.collectorId);
-    collectorPageState.visible.scheduleModal = true;
+    collectorPageState.selectedCollectorId = props.collectorId;
+    collectorPageState.scheduleModalVisible = true;
     collectorPageState.scheduleModalMode = props.mode;
 };
 </script>
