@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core';
 import {
-    computed, onMounted, reactive,
+    computed, onMounted,
 } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -11,18 +11,16 @@ import {
     PButton, PHeading, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import { SpaceRouter } from '@/router';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
 import CollectorProviderList from '@/services/asset-inventory/components/CollectorProviderList.vue';
+import { useCollectorListQuery } from '@/services/asset-inventory/composables/use-collector-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
@@ -35,12 +33,7 @@ const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
-const { collectorAPI } = useCollectorApi();
 
-const state = reactive({
-    totalCount: 0,
-    loading: false,
-});
 const isAdminMode = computed(() => appContextGetters.isAdminMode);
 
 /* Url Query String */
@@ -80,25 +73,19 @@ const handleSelectedProvider = (providerName: string) => {
 
 /* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
-const fetchCollectorCount = async () => {
-    state.loading = true;
-    try {
-        const { total_count } = await collectorAPI.list({
-            query: collectorCountApiQueryHelper.data,
-        });
-        state.totalCount = total_count ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
+const { isLoading, totalCount } = useCollectorListQuery({
+    params: computed(() => ({
+        query: collectorCountApiQueryHelper.data,
+    })),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 10),
+});
 
 /* INIT */
 onMounted(() => {
     collectorPageStore.reset();
     setValuesFromUrlQueryString();
-    fetchCollectorCount();
+    // fetchCollectorCount();
 });
 </script>
 
@@ -110,7 +97,7 @@ onMounted(() => {
                     use-total-count
                     use-selected-count
                     :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-                    :total-count="state.totalCount"
+                    :total-count="totalCount"
                 />
             </template>
             <template #extra>
@@ -127,12 +114,12 @@ onMounted(() => {
             </template>
         </p-heading-layout>
         <p-data-loader
-            :data="state.totalCount > 0"
-            :loading="state.loading"
+            :data="totalCount > 0"
+            :loading="isLoading"
             loader-backdrop-color="gray.100"
             class="collector-loader-wrapper"
         >
-            <div v-if="state.totalCount > 0"
+            <div v-if="totalCount > 0"
                  class="collector-contents-wrapper"
             >
                 <collector-provider-list :selected-provider="collectorPageState.selectedProvider"
