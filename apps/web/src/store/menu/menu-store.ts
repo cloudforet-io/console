@@ -74,7 +74,7 @@ export const useMenuStore = defineStore('derived-menu', () => {
 
 
     const getters = reactive({
-        menuList: computed(() => {
+        activeModeMenuList: computed(() => {
             const refinedMenuList = _baseMenuList.value
                 .map((menu) => _applyCustomizations(menu as DisplayMenu, _menuContext.value));
 
@@ -86,7 +86,7 @@ export const useMenuStore = defineStore('derived-menu', () => {
         generateFlattenedMenuMap: computed<FlattenedMenuMap>(() => {
             const map: FlattenedMenuMap = {};
 
-            getters.menuList.forEach((menu) => {
+            getters.activeModeMenuList.forEach((menu) => {
                 _getSubMenuIdsToMap(menu, map);
             });
 

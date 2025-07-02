@@ -145,7 +145,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
     state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type);
 
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: state.pageAccess, isRolePage: true, menuList: menuStore.getters.menuList,
+        pageAccessPermissions: state.pageAccess, isRolePage: true, menuList: menuStore.getters.activeModeMenuList,
     });
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {
