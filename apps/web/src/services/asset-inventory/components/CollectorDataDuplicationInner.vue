@@ -113,7 +113,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorDataModalState = collectorDataModalStore.$state;
+const collectorDataModalState = collectorDataModalStore.state;
 const userStore = useUserStore();
 
 const definitionFields = computed(() => {

@@ -1,3 +1,5 @@
+import { reactive } from 'vue';
+
 import { defineStore } from 'pinia';
 
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
@@ -19,8 +21,8 @@ import type { CollectDataType } from '@/services/asset-inventory/types/collector
  * const collectorDataModalStore = useCollectorDataModalStore();
  */
 
-export const useCollectorDataModalStore = defineStore('collector-data-modal', {
-    state: () => ({
+export const useCollectorDataModalStore = defineStore('collector-data-modal', () => {
+    const state = reactive({
         // Required
         visible: false, // Determine the visibility of the collector-data-modal.
         selectedCollectorId: undefined as string|undefined,
@@ -28,5 +30,35 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
 
         // Optional
         selectedSecret: undefined as SecretModel|undefined, // In detail page, This state is used for API.
-    }),
+    });
+
+    const mutations = {
+        setVisible: (visible: boolean) => {
+            state.visible = visible;
+        },
+        setSelectedCollectorId: (collectorId?: string) => {
+            state.selectedCollectorId = collectorId;
+        },
+        setCollectDataType: (collectDataType: CollectDataType) => {
+            state.collectDataType = collectDataType;
+        },
+        setSelectedSecret: (secret?: SecretModel) => {
+            state.selectedSecret = secret;
+        },
+    };
+
+    const actions = {
+        reset: () => {
+            state.visible = false;
+            state.selectedCollectorId = undefined;
+            state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
+            state.selectedSecret = undefined;
+        },
+    };
+
+    return {
+        state,
+        ...actions,
+        ...mutations,
+    };
 });

@@ -263,12 +263,10 @@ const handleUpdateEditModalVisible = (value: boolean) => {
     state.editModalVisible = value;
 };
 const handleCollectData = () => {
-    collectorDataModalStore.$patch((_state) => {
-        _state.visible = true;
-        _state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
-        _state.selectedCollectorId = props.collectorId;
-        _state.selectedSecret = undefined;
-    });
+    collectorDataModalStore.setVisible(true);
+    collectorDataModalStore.setSelectedCollectorId(props.collectorId);
+    collectorDataModalStore.setCollectDataType(COLLECT_DATA_TYPE.ENTIRE);
+    collectorDataModalStore.setSelectedSecret(undefined);
 };
 const handleClickCollectDataConfirm = () => {
     // pause and resume api polling to update recent job status after collect data immediately
@@ -295,7 +293,7 @@ watch(documentVisibility, (visibility) => {
 onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.resetState();
-    collectorDataModalStore.$reset();
+    collectorDataModalStore.reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
@@ -310,7 +308,7 @@ onUnmounted(() => {
     pause();
     collectorJobStore.$reset();
     collectorFormStore.resetState();
-    collectorDataModalStore.$reset();
+    collectorDataModalStore.reset();
 });
 
 

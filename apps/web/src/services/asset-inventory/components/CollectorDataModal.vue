@@ -32,7 +32,7 @@ import {
 
 
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorDataModalState = collectorDataModalStore.$state;
+const collectorDataModalState = collectorDataModalStore.state;
 
 const referenceMap = useAllReferenceDataModel();
 
@@ -93,7 +93,7 @@ const { data: jobListData, isLoading: isJobListLoading } = useInventoryJobListQu
 
 /* Components */
 const handleClickCancel = () => {
-    collectorDataModalStore.$patch({ visible: false });
+    collectorDataModalStore.setVisible(false);
 };
 const handleClickConfirm = async () => {
     if (!selectedCollectorData.value) throw new Error('[CollectorDataModal] selectedCollector is null');
@@ -110,7 +110,7 @@ const handleClickConfirm = async () => {
         throw e;
     } finally {
         state.loading = false;
-        collectorDataModalStore.$patch({ visible: false });
+        collectorDataModalStore.setVisible(false);
     }
 };
 
@@ -136,7 +136,7 @@ const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
 
 watch([() => selectedCollectorData.value, () => collectorDataModalState.visible], async ([_selectedCollectorData, visible]) => {
     if (!visible) {
-        collectorDataModalStore.$reset();
+        collectorDataModalStore.reset();
         return;
     }
     if (!_selectedCollectorData) return;
@@ -144,7 +144,7 @@ watch([() => selectedCollectorData.value, () => collectorDataModalState.visible]
 }, { immediate: true });
 
 onUnmounted(() => {
-    collectorDataModalStore.$dispose();
+    collectorDataModalStore.reset();
 });
 </script>
 

@@ -78,10 +78,8 @@ const handleChangeToggle = async () => {
 };
 const handleClickCollectData = () => {
     if (!props.item) return;
-    collectorDataModalStore.$patch((_state) => {
-        _state.selectedCollectorId = props.item.collectorId;
-        _state.visible = true;
-    });
+    collectorDataModalStore.setSelectedCollectorId(props.item.collectorId);
+    collectorDataModalStore.setVisible(true);
 };
 
 /* API */
