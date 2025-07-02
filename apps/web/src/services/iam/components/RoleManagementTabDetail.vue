@@ -40,7 +40,7 @@ interface DetailMenuItems {
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
-const menuList = useRoleBasedMenus().value;
+const { roleBasedMenus } = useRoleBasedMenus();
 
 const detailMenuItems = computed<DetailMenuItems[]>(() => [
     { name: 'page_access', label: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS') as string },
@@ -55,10 +55,12 @@ const state = reactive({
     permissionsCode: computed<string>(() => JSON.stringify(state.permissions, null, 4)),
     pageAccess: computed<string[]>(() => (state.data.is_managed ? MANAGED_PAGE_ACCESS : state.data.page_access ?? [])),
     pageAccessDataList: [] as PageAccessMenuItem[],
-    readOnly: computed<boolean>(() => state.data.page_access.every((item) => {
+    readOnly: computed<boolean>(() => state.data.page_access?.every((item) => {
         const accessType = item.split('.*')[0].split(':')[1];
         return accessType === PAGE_ACCESS.READONLY;
     })),
+    menuList: computed(() => roleBasedMenus.value),
+
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -141,10 +143,10 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         : roleId;
 
     await getRoleDetailData(selectedRoleId);
-    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type, menuList);
+    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type, state.menuList);
 
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: state.pageAccess, menuList,
+        pageAccessPermissions: state.pageAccess, menuList: state.menuList,
     });
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {

@@ -9,7 +9,7 @@ export const SERVICE_FEATURES = {
     IAM: 'IAM',
 } as const;
 
-export const DEFAULT_VERSION = 'V1' as const;
+export const DEFAULT_VERSION = 'V1';
 
 export const DEFAULT_CONFIG = {
     DASHBOARDS: {

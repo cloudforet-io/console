@@ -1,11 +1,16 @@
-import { computed, type ComputedRef } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
 
 import { useMenuStore } from '@/store/menu/menu-store';
 
 import type { Menu } from '@/lib/menu/config';
 import { DEFAULT_MENU_LIST } from '@/lib/menu/menu-architecture';
 
-export const useRoleBasedMenus = (): ComputedRef<Menu[]> => {
+interface RoleBasedMenus {
+    roleBasedMenus: ComputedRef<Menu[]>;
+}
+
+export const useRoleBasedMenus = (): RoleBasedMenus => {
     const menuStore = useMenuStore();
 
     const baseWorkspaceMenus = computed(() => menuStore.getters.baseWorkspaceMenus);
@@ -28,5 +33,7 @@ export const useRoleBasedMenus = (): ComputedRef<Menu[]> => {
             });
     };
 
-    return computed(() => filterMenus(baseWorkspaceMenus.value, DEFAULT_MENU_LIST));
+    return {
+        roleBasedMenus: computed(() => filterMenus(baseWorkspaceMenus.value, DEFAULT_MENU_LIST)),
+    };
 };
