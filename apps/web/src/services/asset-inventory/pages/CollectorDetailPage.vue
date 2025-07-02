@@ -27,6 +27,7 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
+import { useQueryClient, useMutation } from '@tanstack/vue-query';
 import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -35,7 +36,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
-import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { CollectorDeleteParameters } from '@/api-clients/inventory/collector/schema/api-verbs/delete';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -62,6 +64,7 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/components/CollectorDetailServiceAccountsSection.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -109,9 +112,7 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
-    loading: true,
-    collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
-    collectorName: computed<string>(() => state.collector?.name ?? ''),
+    collectorName: computed<string>(() => collectorData.value?.name ?? ''),
     collectorHistoryLink: computed<Location>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
@@ -133,24 +134,6 @@ const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY
 
 defineExpose({ setPathFrom });
 
-const getCollector = async (): Promise<CollectorModel|null> => {
-    state.loading = true;
-    try {
-        return await collectorAPI.get({
-            collector_id: props.collectorId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return null;
-    } finally {
-        state.loading = false;
-    }
-};
-
-const fetchDeleteCollector = async () => (collectorFormState.collectorId ? collectorAPI.delete({
-    collector_id: collectorFormState.collectorId,
-}) : undefined);
-
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
@@ -165,21 +148,33 @@ const handleClickDeleteButton = () => {
     state.deleteModalVisible = true;
 };
 
-const handleDeleteModalConfirm = async () => {
-    state.deleteModalVisible = true;
-    try {
-        state.deleteLoading = true;
-        await fetchDeleteCollector();
-        state.deleteModalVisible = false;
+/* Query */
+const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
+
+const queryClient = useQueryClient();
+const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collector', 'list');
+const { mutate: deleteCollector } = useMutation({
+    mutationFn: (params: CollectorDeleteParameters) => collectorAPI.delete(params),
+    onMutate: () => { state.deleteLoading = true; },
+    onSuccess: () => {
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
         goBackToMainPage();
         collectorFormStore.resetState();
-    } catch (error) {
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
+    },
+    onSettled: () => {
         state.deleteModalVisible = false;
-        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
-    } finally {
         state.deleteLoading = false;
-    }
+    },
+});
+const handleDeleteModalConfirm = async () => {
+    if (!props.collectorId) return;
+    await deleteCollector({
+        collector_id: props.collectorId,
+    });
 };
 const handleUpdateEditModalVisible = (value: boolean) => {
     state.editModalVisible = value;
@@ -210,21 +205,21 @@ watch(documentVisibility, (visibility) => {
         resume();
     }
 });
-
-
-onMounted(async () => {
-    collectorJobStore.$reset();
-    collectorFormStore.resetState();
-    collectorDataModalStore.reset();
-    const collector = await getCollector();
-    collectorJobStore.$patch((_state) => {
-        _state.collector = collector;
+watch(() => collectorData.value, async (collector) => {
+    collectorJobStore.$patch({
+        collector,
     });
     if (collector) {
         collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
         resume();
     }
+}, { immediate: true });
+
+onMounted(async () => {
+    collectorJobStore.$reset();
+    collectorFormStore.resetState();
+    collectorDataModalStore.reset();
 });
 onUnmounted(() => {
     pause();
@@ -259,7 +254,7 @@ onUnmounted(() => {
                            show-back-button
                            @click-back-button="handleClickBackButton"
                 >
-                    <p-skeleton v-if="state.loading"
+                    <p-skeleton v-if="isCollectorLoading"
                                 width="20rem"
                                 height="1.5rem"
                     />
