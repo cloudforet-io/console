@@ -203,7 +203,7 @@ const handleChangeToolbox = (options?: ToolboxOptions) => {
     if (options?.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
-    collectorPageState.searchFilters = queryTagHelper.filters.value;
+    collectorPageStore.setSearchFilters(queryTagHelper.filters.value);
 };
 const handleClickListItem = (detailLink) => {
     router.push(detailLink).catch(() => {});

@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
 
 const emit = defineEmits<{(e: 'change-toggle', boolean): void}>();
 
@@ -33,9 +32,9 @@ const handleChangeToggle = async (value) => {
     emit('change-toggle', value);
 };
 const handleClickSchedule = () => {
-    collectorPageState.selectedCollectorId = props.collectorId;
-    collectorPageState.scheduleModalVisible = true;
-    collectorPageState.scheduleModalMode = props.mode;
+    collectorPageStore.setSelectedCollectorId(props.collectorId);
+    collectorPageStore.setScheduleModalVisible(true);
+    collectorPageStore.setScheduleModalMode(props.mode);
 };
 </script>
 

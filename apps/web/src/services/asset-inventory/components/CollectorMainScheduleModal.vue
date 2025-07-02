@@ -64,7 +64,7 @@ const { data: selectedCollectorData } = useCollectorGetQuery({
 
 /* Events */
 const closeScheduleModal = () => {
-    collectorPageState.scheduleModalVisible = false;
+    collectorPageStore.setScheduleModalVisible(false);
 };
 
 const handleCloseModal = () => {

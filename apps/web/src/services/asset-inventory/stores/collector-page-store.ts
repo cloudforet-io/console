@@ -13,6 +13,23 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         scheduleModalVisible: false,
         scheduleModalMode: 'view',
     });
+    const mutations = {
+        setSelectedProvider(provider: string) {
+            state.selectedProvider = provider;
+        },
+        setSearchFilters(filters: ConsoleFilter[]) {
+            state.searchFilters = filters;
+        },
+        setScheduleModalVisible(visible: boolean) {
+            state.scheduleModalVisible = visible;
+        },
+        setScheduleModalMode(mode: 'view' | 'edit') {
+            state.scheduleModalMode = mode;
+        },
+        setSelectedCollectorId(id: string) {
+            state.selectedCollectorId = id;
+        },
+    };
     const actions = {
         reset() {
             state.selectedProvider = 'all';
@@ -24,6 +41,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
     };
     return {
         state,
+        ...mutations,
         ...actions,
     };
 });
