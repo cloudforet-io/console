@@ -74,9 +74,14 @@ const handleSelectedProvider = (providerName: string) => {
 /* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
 const { isLoading, totalCount } = useCollectorListQuery({
-    params: computed(() => ({
-        query: collectorCountApiQueryHelper.data,
-    })),
+    params: computed(() => {
+        if (isAdminMode.value) {
+            collectorCountApiQueryHelper.setFilters([{ k: 'workspace_id', v: '*', o: '=' }]);
+        }
+        return {
+            query: collectorCountApiQueryHelper.data,
+        };
+    }),
     thisPage: computed(() => 1),
     pageSize: computed(() => 10),
 });
@@ -85,7 +90,6 @@ const { isLoading, totalCount } = useCollectorListQuery({
 onMounted(() => {
     collectorPageStore.reset();
     setValuesFromUrlQueryString();
-    // fetchCollectorCount();
 });
 </script>
 
