@@ -3,13 +3,13 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
+import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -24,6 +24,7 @@ import CollectorDataDefaultInner
 import CollectorDataDuplicationInner
     from '@/services/asset-inventory/components/CollectorDataDuplicationInner.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
@@ -44,13 +45,12 @@ const state = reactive({
         ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
     isDuplicateJobs: computed<boolean | undefined>(() => {
-        const recentJob = collectorDataModalState.recentJob;
         const selectedSecret = collectorDataModalState.selectedSecret;
-        if (!recentJob) return undefined;
+        if (!recentJob.value) return undefined;
         if (selectedSecret) {
-            return recentJob.secret_id === selectedSecret.secret_id && recentJob.status === JOB_STATE.IN_PROGRESS;
+            return recentJob.value.secret_id === selectedSecret.secret_id && recentJob.value.status === JOB_STATE.IN_PROGRESS;
         }
-        return recentJob.status === JOB_STATE.IN_PROGRESS;
+        return recentJob.value.status === JOB_STATE.IN_PROGRESS;
     }),
     provider: computed(() => (selectedCollectorData.value?.provider ? referenceMap.provider[selectedCollectorData.value.provider] : undefined)),
     accountName: computed(() => {
@@ -72,12 +72,24 @@ const state = reactive({
         return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
     }),
 });
+const recentJob = computed<JobModel | undefined>(() => {
+    if (collectorDataModalState.selectedSecret) {
+        const filteredJobs = jobListData.value?.results?.filter((job) => job.secret_id);
+        return filteredJobs?.[0];
+    }
+    const filteredJobs = jobListData.value?.results?.filter((job) => !job.secret_id);
+    return filteredJobs?.[0];
+});
 
 /* Query */
 const { data: selectedCollectorData } = useCollectorGetQuery({
     collectorId: computed(() => collectorDataModalState.selectedCollectorId),
 });
-
+const { data: jobListData, isLoading: isJobListLoading } = useInventoryJobListQuery({
+    params: computed(() => ({
+        collector_id: selectedCollectorData.value?.collector_id,
+    })),
+});
 
 /* Components */
 const handleClickCancel = () => {
@@ -129,7 +141,6 @@ watch([() => selectedCollectorData.value, () => collectorDataModalState.visible]
     }
     if (!_selectedCollectorData) return;
     await fetchSecrets(_selectedCollectorData.provider, state.serviceAccountsFilter);
-    await collectorDataModalStore.getJobs(_selectedCollectorData.collector_id);
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -139,7 +150,7 @@ onUnmounted(() => {
 
 <template>
     <div class="collector-data-modal">
-        <p-button-modal :visible="collectorDataModalState.visible && !collectorDataModalState.initLoading"
+        <p-button-modal :visible="collectorDataModalState.visible && !isJobListLoading"
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"

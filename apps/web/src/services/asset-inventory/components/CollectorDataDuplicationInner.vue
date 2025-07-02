@@ -47,23 +47,23 @@
             </span>
             <div class="chart-wrapper">
                 <div class="label-wrapper">
-                    <div v-if="state.recentJob.success_tasks >= 0">
+                    <div v-if="recentJob.success_tasks >= 0">
                         <p-status :icon-color="SUCCEEDED_COLOR" />
                         <span>{{ $t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') }}
-                            <strong>{{ state.recentJob.success_tasks }}</strong>
+                            <strong>{{ recentJob.success_tasks }}</strong>
                         </span>
                     </div>
-                    <div v-if="state.recentJob.failure_tasks >= 0"
+                    <div v-if="recentJob.failure_tasks >= 0"
                          class="label"
                     >
                         <p-status :icon-color="FAILED_COLOR" />
                         <span :style="{'color': FAILED_COLOR}">
                             {{ $t('INVENTORY.COLLECTOR.HISTORY.FAILURE') }}
-                            <strong>{{ state.recentJob.failure_tasks }}</strong>
+                            <strong>{{ recentJob.failure_tasks }}</strong>
                         </span>
                     </div>
                     <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
-                        <strong>{{ state.recentJob.total_tasks }}</strong>
+                        <strong>{{ recentJob.total_tasks }}</strong>
                     </span>
                 </div>
                 <div class="progress-bar">
@@ -95,6 +95,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { red, green } from '@/styles/colors';
 
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import { useCollectorDataModalStore } from '@/services/asset-inventory/stores/collector-data-modal-store';
 
@@ -139,26 +140,44 @@ const defaultJob: JobModel = {
     status: JOB_STATE.SUCCESS,
     remained_tasks: 0,
     finished_at: '',
+    secret_id: '',
+    resource_group: 'WORKSPACE',
+    workspace_id: '',
+    domain_id: '',
 };
 
 const state = reactive({
-    recentJob: computed<JobModel>(() => collectorDataModalState.recentJob ?? defaultJob),
-    duration: computed(() => durationFormatter(state.recentJob?.created_at, dayjs(), userStore.state.timezone) || '--'),
+    duration: computed(() => durationFormatter(recentJob.value?.created_at, dayjs(), userStore.state.timezone) || '--'),
     succeededPercentage: computed(() => {
-        if (state.recentJob.total_tasks > 0) {
-            return (state.recentJob.success_tasks / state.recentJob.total_tasks) * 100;
+        if (recentJob.value.total_tasks > 0) {
+            return (recentJob.value.success_tasks / recentJob.value.total_tasks) * 100;
         }
         return 0;
     }),
     failedPercentage: computed(() => {
-        if (state.recentJob.total_tasks > 0) {
-            if (state.recentJob.status === JOB_STATE.SUCCESS) {
+        if (recentJob.value.total_tasks > 0) {
+            if (recentJob.value.status === JOB_STATE.SUCCESS) {
                 return 100 - state.succeededPercentage;
             }
-            return (state.recentJob.failure_tasks / state.recentJob.total_tasks) * 100;
+            return (recentJob.value.failure_tasks / recentJob.value.total_tasks) * 100;
         }
         return 0;
     }),
+});
+const recentJob = computed<JobModel>(() => {
+    if (collectorDataModalState.selectedSecret) {
+        const filteredJobs = jobListData.value?.results?.filter((job) => job.secret_id);
+        return filteredJobs?.[0] ?? defaultJob;
+    }
+    const filteredJobs = jobListData.value?.results?.filter((job) => !job.secret_id);
+    return filteredJobs?.[0] ?? defaultJob;
+});
+
+/* Query */
+const { data: jobListData } = useInventoryJobListQuery({
+    params: computed(() => ({
+        collector_id: collectorDataModalState.selectedCollectorId,
+    })),
 });
 </script>
 
