@@ -165,7 +165,7 @@ const handleToolboxTableRefresh = async () => {
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
         _state.visible = true;
-        _state.selectedCollector = collectorFormState.originCollector;
+        _state.selectedCollectorId = collectorFormState.originCollector?.collector_id;
         _state.collectDataType = COLLECT_DATA_TYPE.SINGLE;
         _state.selectedSecret = secret;
     });

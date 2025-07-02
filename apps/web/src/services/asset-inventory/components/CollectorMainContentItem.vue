@@ -34,7 +34,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorFormStore = useCollectorFormStore();
 
@@ -75,15 +74,11 @@ const handleChangeToggle = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
-
-/* API */
 const handleClickCollectData = () => {
     if (!props.item) return;
-    collectorPageStore.setSelectedCollector(props.item.collectorId);
     collectorDataModalStore.$patch((_state) => {
-        if (!props.item) return;
+        _state.selectedCollectorId = props.item.collectorId;
         _state.visible = true;
-        _state.selectedCollector = collectorPageState.selectedCollector;
     });
 };
 

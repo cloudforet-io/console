@@ -2,11 +2,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type {
-    CollectorModel,
-} from '@/api-clients/inventory/collector/schema/model';
 import type { JobListParameters } from '@/api-clients/inventory/job/schema/api-verbs/list';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
@@ -36,7 +32,7 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
         recentJob: undefined as JobModel|null|undefined,
         // Required
         visible: false, // Determine the visibility of the collector-data-modal.
-        selectedCollector: undefined as CollectorModel|null|undefined, // This state is used for API.
+        selectedCollectorId: undefined as string|undefined,
         collectDataType: COLLECT_DATA_TYPE.ENTIRE as CollectDataType, // This is the state for distinguishing between overall collection and collection per account.
 
         // Optional

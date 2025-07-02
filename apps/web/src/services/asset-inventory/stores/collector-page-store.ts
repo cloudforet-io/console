@@ -6,7 +6,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
-import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import { i18n } from '@/translations';
@@ -23,9 +22,8 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
 
     const state = reactive({
         selectedProvider: 'all',
+        selectedCollectorId: undefined as string|undefined,
 
-        collectors: [] as CollectorModel[],
-        selectedCollector: {} as CollectorModel,
         collectorJobStatus: [] as JobAnalyzeInfo[],
         schedules: [] as Schedule[],
         recentJobs: null as JobModel[]|null, // if null, it means that the first request is not yet finished
@@ -115,8 +113,7 @@ export const useCollectorPageStore = defineStore('page-collector', () => {
         },
         reset() {
             state.selectedProvider = 'all';
-            state.collectors = [];
-            state.selectedCollector = {} as CollectorModel;
+            state.selectedCollectorId = undefined;
             state.collectorJobStatus = [];
             state.schedules = [];
             state.recentJobs = null;

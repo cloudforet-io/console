@@ -266,7 +266,7 @@ const handleCollectData = () => {
     collectorDataModalStore.$patch((_state) => {
         _state.visible = true;
         _state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
-        _state.selectedCollector = collectorFormState.originCollector;
+        _state.selectedCollectorId = props.collectorId;
         _state.selectedSecret = undefined;
     });
 };
