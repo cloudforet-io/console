@@ -66,7 +66,7 @@ const handleTooltipContent = (job: MinimalJobInfo) => {
 
 watch(() => props.recentJobs, () => {
     state.loading = !Array.isArray(props.recentJobs);
-});
+}, { immediate: true });
 </script>
 
 <template>

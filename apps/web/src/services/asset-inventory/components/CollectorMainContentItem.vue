@@ -5,12 +5,14 @@ import {
     PButton, PCard, PLazyImg, PBadge,
 } from '@cloudforet/mirinae';
 
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -22,7 +24,6 @@ import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
 
 
@@ -33,9 +34,9 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const collectorPageStore = useCollectorPageStore();
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorFormStore = useCollectorFormStore();
+const { collectorAPI } = useCollectorApi();
 
 const appContextStore = useAppContextStore();
 
@@ -58,6 +59,7 @@ const state = reactive({
     }),
 });
 
+/* Events */
 const handleChangeToggle = async () => {
     try {
         state.isScheduleActivated = !state.isScheduleActivated;
@@ -68,7 +70,7 @@ const handleChangeToggle = async () => {
                 state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
             },
         };
-        const response = await collectorPageStore.updateCollectorSchedule(params);
+        const response = await updateCollectorSchedule(params);
         if (response) await collectorFormStore.setOriginCollector(response);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
@@ -80,6 +82,18 @@ const handleClickCollectData = () => {
         _state.selectedCollectorId = props.item.collectorId;
         _state.visible = true;
     });
+};
+
+/* API */
+const updateCollectorSchedule = async (params: CollectorUpdateParameters) => {
+    try {
+        const response = await collectorAPI.update(params);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        return response;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+        return undefined;
+    }
 };
 
 /* Watcher */
