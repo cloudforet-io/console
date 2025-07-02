@@ -16,8 +16,6 @@ import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-v
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
-import { useMenuStore } from '@/store/menu/menu-store';
-
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import {
     getPageAccessMapFromRawData,
@@ -27,6 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, green } from '@/styles/colors';
 
+import { useRoleBasedMenus } from '@/services/iam/composables/role-based-menus';
 import { MANAGED_PAGE_ACCESS } from '@/services/iam/constants/role-constant';
 import { getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
@@ -41,7 +40,7 @@ interface DetailMenuItems {
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
-const menuStore = useMenuStore();
+const menuList = useRoleBasedMenus().value;
 
 const detailMenuItems = computed<DetailMenuItems[]>(() => [
     { name: 'page_access', label: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS') as string },
@@ -142,10 +141,10 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         : roleId;
 
     await getRoleDetailData(selectedRoleId);
-    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type);
+    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type, menuList);
 
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: state.pageAccess, isRolePage: true, menuList: menuStore.getters.activeModeMenuList,
+        pageAccessPermissions: state.pageAccess, menuList,
     });
 
     Object.entries(pageAccessPermissionMap).forEach(([itemId, accessible]) => {

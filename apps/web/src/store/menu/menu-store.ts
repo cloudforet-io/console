@@ -68,22 +68,18 @@ export const useMenuStore = defineStore('derived-menu', () => {
         if (mode === 'admin') {
             menuList.push(...DEFAULT_ADMIN_MENU_LIST);
         }
+        const refinedMenuList = menuList.map((menu) => _applyCustomizations(menu as DisplayMenu, _menuContext.value));
 
-        return menuList;
+        const orderedMenus = refinedMenuList.filter((menu) => menu.order !== undefined);
+        const unorderedMenus = refinedMenuList.filter((menu) => menu.order === undefined);
+
+        return [...orderBy(orderedMenus, ['order'], ['asc']), ...unorderedMenus];
     };
 
 
 
     const getters = reactive({
-        activeModeMenuList: computed(() => {
-            const refinedMenuList = generateBaseMenuList(_isAdminMode.value ? 'admin' : 'workspace')
-                .map((menu) => _applyCustomizations(menu as DisplayMenu, _menuContext.value));
-
-            const orderedMenus = refinedMenuList.filter((menu) => menu.order !== undefined);
-            const unorderedMenus = refinedMenuList.filter((menu) => menu.order === undefined);
-
-            return [...orderBy(orderedMenus, ['order'], ['asc']), ...unorderedMenus];
-        }),
+        activeModeMenuList: computed(() => generateBaseMenuList(_isAdminMode.value ? 'admin' : 'workspace')),
         baseAdminMenus: computed(() => generateBaseMenuList('admin')),
         baseWorkspaceMenus: computed(() => generateBaseMenuList('workspace')),
         generateFlattenedMenuMap: computed<FlattenedMenuMap>(() => {
