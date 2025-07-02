@@ -53,40 +53,39 @@ export const useMenuStore = defineStore('derived-menu', () => {
         templateId: taskManagementTemplateStore.state.templateId,
         enableLanding: taskManagementTemplateStore.state.enableLanding,
     }));
-    const _baseMenuList = computed<Menu[]>(() => {
-        const menuList: Menu[] = _isAdminMode.value ? [] : [...DEFAULT_MENU_LIST];
 
+    const generateBaseMenuList = (mode: 'admin' | 'workspace') => {
+        const menuList: Menu[] = mode === 'admin' ? [] : [...DEFAULT_MENU_LIST];
         Object.values(globalConfigSchemaStore.state.menuSchema).forEach((featureSetting) => {
             if (featureSetting) {
-                const menu = _isAdminMode.value ? featureSetting.adminMenu : featureSetting.menu;
-                if (menu && !menuList.some((existingMenu) => existingMenu.id === menu.id)) {
+                const menu = mode === 'admin' ? featureSetting.adminMenu : featureSetting.menu;
+                if (menu && !menuList.some((m) => m.id === menu.id)) {
                     menuList.push(menu);
                 }
             }
         });
 
-        if (_isAdminMode.value) {
+        if (mode === 'admin') {
             menuList.push(...DEFAULT_ADMIN_MENU_LIST);
         }
+        const refinedMenuList = menuList.map((menu) => _applyCustomizations(menu as DisplayMenu, _menuContext.value));
 
-        return menuList;
-    });
+        const orderedMenus = refinedMenuList.filter((menu) => menu.order !== undefined);
+        const unorderedMenus = refinedMenuList.filter((menu) => menu.order === undefined);
+
+        return [...orderBy(orderedMenus, ['order'], ['asc']), ...unorderedMenus];
+    };
+
 
 
     const getters = reactive({
-        menuList: computed(() => {
-            const refinedMenuList = _baseMenuList.value
-                .map((menu) => _applyCustomizations(menu as DisplayMenu, _menuContext.value));
-
-            const orderedMenus = refinedMenuList.filter((menu) => menu.order !== undefined);
-            const unorderedMenus = refinedMenuList.filter((menu) => menu.order === undefined);
-
-            return [...orderBy(orderedMenus, ['order'], ['asc']), ...unorderedMenus];
-        }),
+        activeModeMenuList: computed(() => generateBaseMenuList(_isAdminMode.value ? 'admin' : 'workspace')),
+        baseAdminMenus: computed(() => generateBaseMenuList('admin')),
+        baseWorkspaceMenus: computed(() => generateBaseMenuList('workspace')),
         generateFlattenedMenuMap: computed<FlattenedMenuMap>(() => {
             const map: FlattenedMenuMap = {};
 
-            getters.menuList.forEach((menu) => {
+            getters.activeModeMenuList.forEach((menu) => {
                 _getSubMenuIdsToMap(menu, map);
             });
 

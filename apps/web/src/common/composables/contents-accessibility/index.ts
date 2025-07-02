@@ -13,7 +13,7 @@ export const useContentsAccessibility = (menuId: MenuId): UseContentsAccessibili
     const menuStore = useMenuStore();
 
     const state = reactive({
-        visibleContents: computed<boolean>(() => menuStore.getters.menuList.findIndex((menu) => menu.id === menuId) !== -1),
+        visibleContents: computed<boolean>(() => menuStore.getters.activeModeMenuList.findIndex((menu) => menu.id === menuId) !== -1),
     });
 
     return {

@@ -5,12 +5,13 @@ import type { PublicConfigGetParameters } from '@/api-clients/config/public-conf
 import { PUBLIC_CONFIG_NAMES } from '@/api-clients/config/public-config/schema/constant';
 import type { PublicConfigModel } from '@/api-clients/config/public-config/schema/model';
 
+import { DEFAULT_CONFIG } from '@/lib/config/global-config/constants/constants';
 import type { GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const mergeConfig = async (config, domainId: string): Promise<GlobalServiceConfig> => {
-    const baseConfig = config.get('SERVICES') || {};
+    const baseConfig = config.get('SERVICES') || DEFAULT_CONFIG;
 
     let overrideConfig = {};
     try {
