@@ -2,6 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -17,6 +18,9 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
+import type { AppCreateParameters } from '@/api-clients/identity/app/schema/api-verbs/create';
+import type { AppUpdateParameters } from '@/api-clients/identity/app/schema/api-verbs/update';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
@@ -196,42 +200,56 @@ const fetchListRoles = async (inputText: string) => {
         dropdownState.loading = false;
     }
 };
-const handleConfirm = async () => {
-    try {
-        if (storeState.isEdit) {
-            await appPageStore.updateApp({
-                app_id: appPageStore.selectedApp.app_id,
-                name: formState.name,
-                tags: formState.tags,
-            });
-            emit('confirm');
-        } else {
-            const isProject = formState.selectedProjectId?.includes('project');
-            const isProjectGroup = formState.selectedProjectId?.includes('pg');
-            let resourceGroup:ResourceGroupType;
-            if (storeState.isAdminMode) {
-                resourceGroup = RESOURCE_GROUP.DOMAIN;
-            } else {
-                resourceGroup = (isProject || isProjectGroup) ? RESOURCE_GROUP.PROJECT : RESOURCE_GROUP.WORKSPACE;
-            }
-
-            const res = await appPageStore.createApp({
-                name: formState.name,
-                role_id: formState.role.name,
-                tags: formState.tags,
-                resource_group: resourceGroup,
-                project_id: isProject ? formState.selectedProjectId : undefined,
-                project_group_id: isProjectGroup ? formState.selectedProjectId : undefined,
-            });
-            emit('confirm', res);
-            appPageStore.$patch((_state) => {
-                _state.modal.visible.apiKey = true;
-                _state.modal = cloneDeep(_state.modal);
-            });
-        }
+const { appAPI } = useAppApi();
+const { mutate: createAppMutate, isPending: createAppMutateLoading } = useMutation({
+    mutationFn: (params: AppCreateParameters) => appAPI.create(params),
+    onSuccess: (data) => {
+        emit('confirm', data);
+        appPageStore.$patch((_state) => {
+            _state.modal.visible.apiKey = true;
+            _state.modal = cloneDeep(_state.modal);
+        });
         handleClose();
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const { mutate: updateAppMutate, isPending: updateAppMutateLoading } = useMutation({
+    mutationFn: (params: AppUpdateParameters) => appAPI.update(params),
+    onSuccess: () => {
+        emit('confirm');
+        handleClose();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const handleConfirm = async () => {
+    if (storeState.isEdit) {
+        updateAppMutate({
+            app_id: appPageStore.selectedApp.app_id,
+            name: formState.name,
+            tags: formState.tags,
+        });
+    } else {
+        const isProject = formState.selectedProjectId?.includes('project');
+        const isProjectGroup = formState.selectedProjectId?.includes('pg');
+        let resourceGroup:ResourceGroupType;
+        if (storeState.isAdminMode) {
+            resourceGroup = RESOURCE_GROUP.DOMAIN;
+        } else {
+            resourceGroup = (isProject || isProjectGroup) ? RESOURCE_GROUP.PROJECT : RESOURCE_GROUP.WORKSPACE;
+        }
+
+        createAppMutate({
+            name: formState.name,
+            role_id: formState.role.name,
+            tags: formState.tags,
+            resource_group: resourceGroup,
+            project_id: isProject ? formState.selectedProjectId : undefined,
+            project_group_id: isProjectGroup ? formState.selectedProjectId : undefined,
+        });
     }
 };
 
@@ -254,7 +272,7 @@ watch(() => storeState.isEdit, (isEdit) => {
                         :disabled="storeState.isEdit
                             ? formState.name === ''
                             : formState.name === '' || dropdownState.selectedMenuItems.length === 0 || (state.activeProject && state.selectedProjects.length === 0)"
-                        :loading="appPageState.modal.loading"
+                        :loading="createAppMutateLoading || updateAppMutateLoading"
                         @confirm="handleConfirm"
                         @cancel="handleClose"
                         @close="handleClose"
