@@ -23,6 +23,7 @@ import CollectorDataDefaultInner
     from '@/services/asset-inventory/components/CollectorDataDefaultInner.vue';
 import CollectorDataDuplicationInner
     from '@/services/asset-inventory/components/CollectorDataDuplicationInner.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
@@ -51,10 +52,7 @@ const state = reactive({
         }
         return recentJob.status === JOB_STATE.IN_PROGRESS;
     }),
-    provider: computed(() => {
-        const selectedCollector = collectorDataModalState.selectedCollector;
-        return selectedCollector?.provider ? referenceMap.provider[selectedCollector.provider] : undefined;
-    }),
+    provider: computed(() => (selectedCollectorData.value?.provider ? referenceMap.provider[selectedCollectorData.value.provider] : undefined)),
     accountName: computed(() => {
         const collectDataType = collectorDataModalState.collectDataType;
         if (collectDataType === COLLECT_DATA_TYPE.ENTIRE) {
@@ -66,7 +64,7 @@ const state = reactive({
         const id = selectedSecret.service_account_id;
         return referenceMap.serviceAccount[id]?.name || id;
     }),
-    secretFilter: computed(() => collectorDataModalState.selectedCollector?.secret_filter),
+    secretFilter: computed(() => selectedCollectorData.value?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
     serviceAccountsFilter: computed<string[]>(() => {
         if (!state.secretFilter) return [];
@@ -75,24 +73,26 @@ const state = reactive({
     }),
 });
 
-const emit = defineEmits<{(e: 'click-confirm'): void}>();
+/* Query */
+const { data: selectedCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorDataModalState.selectedCollectorId),
+});
+
 
 /* Components */
 const handleClickCancel = () => {
     collectorDataModalStore.$patch({ visible: false });
-    emit('click-confirm');
 };
 const handleClickConfirm = async () => {
-    if (!collectorDataModalState.selectedCollector) throw new Error('[CollectorDataModal] selectedCollector is null');
+    if (!selectedCollectorData.value) throw new Error('[CollectorDataModal] selectedCollector is null');
 
     state.loading = true;
     try {
         await collectorAPI.collect({
-            collector_id: collectorDataModalState.selectedCollector.collector_id,
+            collector_id: selectedCollectorData.value.collector_id,
             secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-        emit('click-confirm');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
         throw e;
@@ -122,13 +122,14 @@ const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
     }
 };
 
-watch([() => collectorDataModalState.selectedCollector, () => collectorDataModalState.visible], async ([selectedCollector, visible]) => {
-    if (!selectedCollector || !visible) {
+watch([() => selectedCollectorData.value, () => collectorDataModalState.visible], async ([_selectedCollectorData, visible]) => {
+    if (!visible) {
         collectorDataModalStore.$reset();
         return;
     }
-    await fetchSecrets(selectedCollector.provider, state.serviceAccountsFilter);
-    await collectorDataModalStore.getJobs(selectedCollector.collector_id);
+    if (!_selectedCollectorData) return;
+    await fetchSecrets(_selectedCollectorData.provider, state.serviceAccountsFilter);
+    await collectorDataModalStore.getJobs(_selectedCollectorData.collector_id);
 }, { immediate: true });
 
 onUnmounted(() => {

@@ -24,16 +24,21 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
-import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n as i18nTranslator } from '@/translations';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorScheduleForm
     from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 
@@ -42,15 +47,22 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
-const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
     isViewMode: computed(() => collectorPageState.scheduleModalMode === 'view'),
 });
 
-/* Components */
+/* Query */
+const queryClient = useQueryClient();
+const { key: collectorGetQueryKey } = useServiceQueryKey('inventory', 'collector', 'get', {
+    contextKey: computed(() => collectorPageState.selectedCollectorId),
+});
+const { data: selectedCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorPageState.selectedCollectorId),
+});
 
+/* Events */
 const closeScheduleModal = () => {
     collectorPageState.visible.scheduleModal = false;
 };
@@ -66,7 +78,6 @@ const handleConfirm = async () => {
     try {
         await fetchCollectorUpdate();
         handleCloseModal();
-        emit('refresh-collector-list');
     } catch (e) {
         collectorFormStore.resetSchedulePower();
         ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
@@ -74,7 +85,7 @@ const handleConfirm = async () => {
 };
 
 /* API */
-const fetchCollectorUpdate = async (): Promise<CollectorModel|undefined> => {
+const fetchCollectorUpdate = async () => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is not defined');
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormState.collectorId,
@@ -83,11 +94,13 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel|undefined> => {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
         },
     };
-    return collectorPageStore.updateCollectorSchedule(params);
+    await collectorAPI.update(params);
+    queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
 };
 
 /* Watcher */
-watch(() => collectorPageState.selectedCollector, async (value) => {
+watch(() => selectedCollectorData.value, async (value) => {
+    if (!value) return;
     await collectorFormStore.setOriginCollector(value);
 }, { immediate: true });
 </script>
