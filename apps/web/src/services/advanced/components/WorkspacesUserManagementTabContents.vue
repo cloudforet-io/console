@@ -39,7 +39,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: WORKSPACES_USER_SEARCH_HANDLE
 const { queryTags } = queryTagHelper;
 
 const storeState = reactive({
-    currentWorkspace: computed(() => workspacePageStore.selectedWorkspaces[0]),
+    currentWorkspace: computed(() => workspacePageStore.selectedWorkspace),
 });
 const state = reactive({
     currentWorkspaceId: computed(() => storeState.currentWorkspace?.workspace_id),
@@ -100,7 +100,7 @@ const handleClickButton = () => {
     }).href, '_blank');
 };
 
-watch(() => workspacePageStore.selectedWorkspaces, async () => {
+watch(() => workspacePageStore.selectedWorkspace, async () => {
     await handleChange();
 }, { immediate: true });
 

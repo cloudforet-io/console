@@ -37,7 +37,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', workspaceInfo: { id: string, name: string }): void;
-    (e: 'refresh'): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
@@ -64,22 +63,23 @@ const handleClickTheme = (theme: string) => {
 const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
-            const isChanged = state.name !== workspacePageStore.selectedWorkspaces[0].name
-                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description
-                || state.selectedTheme !== workspacePageStore.selectedWorkspaces[0].tags?.theme;
+            const isChanged = state.name !== workspacePageStore.selectedWorkspace.name
+                || state.description !== workspacePageStore.selectedWorkspace.tags?.description
+                || state.selectedTheme !== workspacePageStore.selectedWorkspace.tags?.theme;
             return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
         }
         return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
     }),
+    // TODO: 중복 체크 로직 추가
     isDuplicatedName: computed(() => {
         if (props.createType === 'EDIT') {
-            return workspacePageState.workspaces.filter((workspace) => workspace.name !== workspacePageStore.selectedWorkspaces[0].name).some((workspace) => workspace.name === state.name);
+            return workspacePageState.workspaces.filter((workspace) => workspace.name !== workspacePageStore.selectedWorkspace.name).some((workspace) => workspace.name === state.name);
         }
         return workspacePageState.workspaces.some((workspace) => workspace.name === state.name);
     }),
     nameInvalidText: computed(() => {
         if (props.createType === 'EDIT') {
-            if (state.name === workspacePageStore.selectedWorkspaces[0].name) return undefined;
+            if (state.name === workspacePageStore.selectedWorkspace.name) return undefined;
         }
         if (!state.name?.trim()) return i18n.t('IAM.WORKSPACES.FORM.REQUIRED_NAME');
         if (validationState.isDuplicatedName) return i18n.t('IAM.WORKSPACES.FORM.DUPLICATED_NAME');
@@ -93,10 +93,10 @@ const handleConfirm = async () => {
     try {
         if (props.createType === 'EDIT') {
             await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters>({
-                workspace_id: workspacePageStore.selectedWorkspaces[0].workspace_id,
+                workspace_id: workspacePageStore.selectedWorkspace.workspace_id,
                 name: state.name ?? '',
                 tags: {
-                    ...workspacePageStore.selectedWorkspaces[0].tags,
+                    ...workspacePageStore.selectedWorkspace.tags,
                     description: state.description ?? '',
                     theme: state.selectedTheme ?? 'blue',
                 },
@@ -135,9 +135,9 @@ watch(() => props.visible, (visible) => {
         state.description = '';
         state.selectedTheme = 'blue';
     } else {
-        state.name = workspacePageStore.selectedWorkspaces[0].name;
-        state.description = workspacePageStore.selectedWorkspaces[0].tags?.description ?? '';
-        state.selectedTheme = workspacePageStore.selectedWorkspaces[0].tags?.theme ?? 'blue';
+        state.name = workspacePageStore.selectedWorkspace.name;
+        state.description = workspacePageStore.selectedWorkspace.tags?.description ?? '';
+        state.selectedTheme = workspacePageStore.selectedWorkspace.tags?.theme ?? 'blue';
     }
 }, { immediate: true });
 

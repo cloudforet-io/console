@@ -13,7 +13,6 @@ import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -22,11 +21,8 @@ interface WorkspacePageState {
     loading: boolean;
     userLoading: boolean;
     workspaces: WorkspaceModel[];
+    selectedWorkspace: WorkspaceModel;
     totalCount: number;
-    selectedIndices: number[];
-    pageStart: number,
-    pageLimit: number,
-    searchFilters: ConsoleFilter[],
     roleBindings: RoleBindingModel[],
     selectedType: string,
     costReportConfig: CostReportConfigModel|null|undefined,
@@ -44,12 +40,9 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
     state: (): WorkspacePageState => ({
         loading: false,
         userLoading: false,
+        selectedWorkspace: {} as WorkspaceModel,
         workspaces: [] as WorkspaceModel[],
         totalCount: 0,
-        selectedIndices: [] as number[],
-        pageStart: 1,
-        pageLimit: 15,
-        searchFilters: [],
         roleBindings: [],
         selectedType: 'ALL',
         costReportConfig: null,
@@ -63,10 +56,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         roles: [],
     }),
     getters: {
-        selectedWorkspaces: (state) => state.selectedIndices.reduce((refined: WorkspaceModel[], idx: number) : WorkspaceModel[] => {
-            refined.push(state.workspaces[idx]);
-            return refined;
-        }, []),
         roleBindingList: (state) => state.roleBindings,
         roleMap: (state) => state.roles.reduce((map, role) => {
             map[role.role_id] = role;
@@ -79,13 +68,9 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
         currency: (state) => state.costReportConfig?.currency,
     },
     actions: {
-        async load(params: WorkspaceListParameters) {
+        async load() {
             this.loading = true;
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>(params);
-                this.workspaces = results || [];
-                this.totalCount = total_count || 0;
-                this.selectedIndices = [];
                 if (!this.roles.length) {
                     await this.listRoles();
                 }
@@ -94,8 +79,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
                 this.roleBindings = response.results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.workspaces = [];
-                this.totalCount = 0;
                 this.roles = [];
             } finally {
                 this.loading = false;
