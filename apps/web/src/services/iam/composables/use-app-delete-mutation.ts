@@ -21,7 +21,7 @@ export const useAppDeleteMutation = (options?: UseAppDeleteMutationOptions) => {
     return useMutation({
         mutationFn: (params: AppDeleteParameters) => appAPI.delete(params),
         onSuccess: async (data, variables) => {
-            queryClient.invalidateQueries({ queryKey: appListBaseQueryKey });
+            queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
             if (options?.onSuccess) await options.onSuccess(data, variables);
         },
         onError: (error, variables) => {

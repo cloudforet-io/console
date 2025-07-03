@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PDefinitionTable, PI, PStatus,
@@ -16,6 +16,7 @@ import type { AppDisableParameters } from '@/api-clients/identity/app/schema/api
 import type { AppEnableParameters } from '@/api-clients/identity/app/schema/api-verbs/enable';
 import type { AppGenerateClientSecretParameters } from '@/api-clients/identity/app/schema/api-verbs/generateClientSecret';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
@@ -50,6 +51,8 @@ const appPageState = appPageStore.state;
 const userStore = useUserStore();
 
 const { appAPI } = useAppApi();
+const queryClient = useQueryClient();
+const { key: appListBaseQueryKey } = useServiceQueryKey('identity', 'app', 'list');
 const { mutate: deleteAppMutate } = useAppDeleteMutation({
     onSettled: () => {
         handleClose();
@@ -58,6 +61,7 @@ const { mutate: deleteAppMutate } = useAppDeleteMutation({
 const { mutate: enableAppMutate } = useMutation({
     mutationFn: (params: AppEnableParameters) => appAPI.enable(params),
     onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
         showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');
     },
     onError: (error) => {
@@ -70,6 +74,7 @@ const { mutate: enableAppMutate } = useMutation({
 const { mutate: disableAppMutate } = useMutation({
     mutationFn: (params: AppDisableParameters) => appAPI.disable(params),
     onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
         showSuccessMessage(i18n.t('IAM.APP.ALT_S_DISABLED_APP'), '');
     },
     onError: (error) => {
@@ -83,6 +88,7 @@ const { mutate: generateClientSecretMutate } = useMutation({
     mutationFn: (params: AppGenerateClientSecretParameters) => appAPI.generateClientSecret(params),
     onSuccess: (data) => {
         emit('confirm', data);
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
         appPageStore.setModalVisible('apiKey', true);
     },
     onError: (error) => {
@@ -151,7 +157,8 @@ const definitionFields = computed(() => {
 
 /* Component */
 const handleClose = () => {
-    appPageStore.resetModal();
+    appPageStore.resetModalInfo();
+    appPageStore.setModalVisible('status', false);
     emit('confirm');
 };
 

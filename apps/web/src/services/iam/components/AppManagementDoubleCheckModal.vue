@@ -31,7 +31,8 @@ const emit = defineEmits<{(e: 'confirm', value?: AppModel): void;
 
 /* Component */
 const handleClose = () => {
-    appPageStore.resetModal();
+    appPageStore.resetModalInfo();
+    appPageStore.setModalVisible('doubleCheck', false);
     emit('confirm');
 };
 

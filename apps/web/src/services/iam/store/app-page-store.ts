@@ -31,7 +31,7 @@ export const useAppPageStore = defineStore('page-app', () => {
     const mutations = {
         setModalInfo(type: string, title: string, themeColor?: string) {
             state.modalInfo.type = type;
-            state.modalInfo.title = title;
+            state.modalInfo.title = title || '';
             state.modalInfo.themeColor = themeColor || 'primary';
         },
         setModalVisible(type: string, visible: boolean) {
@@ -40,14 +40,10 @@ export const useAppPageStore = defineStore('page-app', () => {
     };
 
     const actions = {
-        resetModal() {
+        resetModalInfo() {
             state.modalInfo.type = '';
             state.modalInfo.title = '';
             state.modalInfo.themeColor = 'primary';
-            state.modalVisible.form = false;
-            state.modalVisible.status = false;
-            state.modalVisible.apiKey = false;
-            state.modalVisible.doubleCheck = false;
         },
         async listRoles() {
             try {

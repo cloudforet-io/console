@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -24,6 +24,7 @@ import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -86,10 +87,13 @@ const validationState = reactive({
 });
 
 const { appAPI } = useAppApi();
+const queryClient = useQueryClient();
+const { key: appListBaseQueryKey } = useServiceQueryKey('identity', 'app', 'list');
 const { mutate: createAppMutate, isPending: createAppMutateLoading } = useMutation({
     mutationFn: (params: AppCreateParameters) => appAPI.create(params),
     onSuccess: (data) => {
         emit('confirm', data);
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
         appPageStore.setModalVisible('apiKey', true);
         handleClose();
     },
@@ -101,6 +105,7 @@ const { mutate: updateAppMutate, isPending: updateAppMutateLoading } = useMutati
     mutationFn: (params: AppUpdateParameters) => appAPI.update(params),
     onSuccess: () => {
         emit('confirm');
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
         handleClose();
     },
     onError: (error) => {
@@ -116,7 +121,8 @@ const menuHandler = async (inputText: string) => {
     };
 };
 const handleClose = () => {
-    appPageStore.resetModal();
+    appPageStore.resetModalInfo();
+    appPageStore.setModalVisible('form', false);
     initState();
 };
 const handleChangeInput = (event) => {

@@ -8,8 +8,11 @@ import {
     PHorizontalLayout, PHeading, PButton, PTab, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -20,7 +23,6 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import AppAPIKeyGRPCEndpointsTab from '@/services/iam/components/AppAPIKeyGRPCEndpointsTab.vue';
 import AppAPIKeyRestEndpointsTab from '@/services/iam/components/AppAPIKeyRestEndpointsTab.vue';
 import AppManagementTable from '@/services/iam/components/AppManagementTable.vue';
-import { useAppListPaginationQuery } from '@/services/iam/composables/use-app-list-pagination-query';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
@@ -48,8 +50,9 @@ const state = reactive({
     userId: computed<string|undefined>(() => userStore.state.userId),
 });
 
-const appListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
-const { totalCount: appListTotalCount } = useAppListPaginationQuery({
+const appListApiQueryHelper = new ApiQueryHelper().setCountOnly();
+const { appAPI } = useAppApi();
+const { key: appListQueryKey, params: appListQueryParams } = useServiceQueryKey('identity', 'app', 'list', {
     params: computed(() => {
         appListApiQueryHelper.setFilters([
             storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '=' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' },
@@ -58,9 +61,13 @@ const { totalCount: appListTotalCount } = useAppListPaginationQuery({
             query: appListApiQueryHelper.data,
         };
     }),
-    thisPage: computed(() => 1),
-    pageSize: computed(() => 15),
 });
+const { data: appListData } = useScopedQuery({
+    queryKey: appListQueryKey,
+    queryFn: () => appAPI.list(appListQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
 
 /* Component */
 const handleCreateApp = () => {
@@ -85,7 +92,7 @@ onUnmounted(() => {
                 <p-heading :title="$t('IAM.APP.TITLE')"
                            use-selected-count
                            use-total-count
-                           :total-count="appListTotalCount"
+                           :total-count="appListData?.total_count || 0"
                 />
             </template>
             <template #extra>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { isEmpty } from 'lodash';
 
@@ -157,6 +157,10 @@ const paginationState = reactive({
     thisPage: 1,
     pageSize: 15,
 });
+const sortState = reactive({
+    sortBy: 'created_at',
+    sortDesc: true,
+});
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
         type: 'item', name: APP_DROPDOWN_MODAL_TYPE.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: isEmpty(state.selectedApp),
@@ -189,7 +193,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
     },
 ]));
 
-const appListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
+const appListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.appSearchHandlers.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -197,7 +201,6 @@ const {
     data: appListData,
     totalCount: appListTotalCount,
     isLoading: appListFetching,
-    refresh: refreshAppList,
 } = useAppListPaginationQuery({
     thisPage: computed(() => paginationState.thisPage),
     pageSize: computed(() => paginationState.pageSize),
@@ -207,7 +210,10 @@ const {
             storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '=' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' },
         ]);
         return {
-            query: appListApiQueryHelper.data,
+            query: {
+                ...appListApiQueryHelper.data,
+                sort: [{ key: sortState.sortBy, desc: sortState.sortDesc }],
+            },
         };
     }),
 });
@@ -252,6 +258,8 @@ const handleSelect = (index: number[]) => {
     state.selectedIndex = index;
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
+    if (options.sortBy !== undefined) sortState.sortBy = options.sortBy;
+    if (options.sortDesc !== undefined) sortState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
@@ -271,18 +279,8 @@ const handleChangeModalVisible = (value) => {
 const handleConfirmButton = (value: AppModel) => {
     if (value) {
         modalState.item = value;
-        return;
     }
-    handleClickModalConfirm();
 };
-const handleClickModalConfirm = () => {
-    refreshAppList();
-};
-
-/* Watcher */
-watch(() => appPageState.modalVisible.apiKey, (visible) => {
-    modalState.apiKeyModalVisible = visible;
-});
 </script>
 
 <template>
@@ -388,10 +386,9 @@ watch(() => appPageState.modalVisible.apiKey, (visible) => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
         </p-toolbox-table>
-        <user-a-p-i-key-modal v-if="modalState.apiKeyModalVisible"
-                              :visible="modalState.apiKeyModalVisible"
+        <user-a-p-i-key-modal v-if="appPageState.modalVisible.apiKey"
+                              :visible="appPageState.modalVisible.apiKey"
                               :api-key-item="modalState.item"
-                              @clickButton="handleClickModalConfirm"
                               @update:visible="handleChangeModalVisible"
         />
         <app-management-form-modal :selected-app="state.selectedApp"
