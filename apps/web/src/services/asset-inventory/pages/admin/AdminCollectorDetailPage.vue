@@ -1,83 +1,3 @@
-<template>
-    <div class="collector-detail-page">
-        <p-heading-layout>
-            <template #heading>
-                <p-heading class="mb-6"
-                           :title="state.collectorName"
-                           show-back-button
-                           @click-back-button="handleClickBackButton"
-                >
-                    <p-skeleton v-if="isCollectorLoading"
-                                width="20rem"
-                                height="1.5rem"
-                    />
-                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorFormState.isEditableCollector"
-                              #title-right-extra
-                    >
-                        <span class="title-right-button-wrapper">
-                            <p-icon-button name="ic_edit-text"
-                                           width="1.5rem"
-                                           height="1.5rem"
-                                           @click="handleClickEditButton"
-                            />
-                            <p-icon-button name="ic_delete"
-                                           width="1.5rem"
-                                           height="1.5rem"
-                                           class="delete-button"
-                                           @click="handleClickDeleteButton"
-                            />
-                        </span>
-                    </template>
-                </p-heading>
-            </template>
-            <template #extra>
-                <div v-if="!isJobListLoading"
-                     class="collector-button-box"
-                >
-                    <collect-data-button-group v-if="state.hasReadWriteAccess"
-                                               @collect="handleCollectData"
-                    />
-                    <router-link v-if="!!jobListData?.total_count"
-                                 :to="state.collectorHistoryLink"
-                    >
-                        <p-button style-type="tertiary"
-                                  icon-left="ic_history"
-                        >
-                            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
-                        </p-button>
-                    </router-link>
-                </div>
-            </template>
-        </p-heading-layout>
-
-        <collector-base-info-section class="section"
-                                     :history-link="state.collectorHistoryLink"
-                                     :has-read-write-access="state.hasReadWriteAccess"
-        />
-        <collector-schedule-section class="section"
-                                    :has-read-write-access="state.hasReadWriteAccess"
-        />
-        <collector-options-section class="section"
-                                   data-test-id="collector-options-section"
-                                   :has-read-write-access="state.hasReadWriteAccess"
-        />
-        <collector-additional-rule class="section"
-                                   :collector-id="props.collectorId"
-        />
-        <p-double-check-modal :visible.sync="state.deleteModalVisible"
-                              :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
-                              :verification-text="state.collectorName"
-                              modal-size="sm"
-                              :loading="state.deleteLoading"
-                              @confirm="handleDeleteModalConfirm"
-        />
-        <collector-name-edit-modal :visible="state.editModalVisible"
-                                   @update:visible="handleUpdateEditModalVisible"
-        />
-        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
-    </div>
-</template>
-
 <script lang="ts">
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
@@ -161,22 +81,12 @@ const { collectorAPI } = useCollectorApi();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
-
 const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
-
-watch(() => collectorFormState.originCollector, async (collector) => {
-    if (collector) {
-        collectorJobStore.$patch({
-            collector,
-        });
-    }
-});
 
 const queryHelper = new QueryHelper();
 
@@ -222,14 +132,6 @@ const goBackToMainPage = () => {
     });
 };
 
-const handleClickEditButton = () => {
-    state.editModalVisible = true;
-};
-
-const handleClickDeleteButton = () => {
-    state.deleteModalVisible = true;
-};
-
 /* Query */
 const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
 const allJobsCountQueryHelper = new ApiQueryHelper().setCountOnly();
@@ -263,6 +165,15 @@ const { mutate: deleteCollector } = useMutation({
         state.deleteLoading = false;
     },
 });
+
+/* Event Handlers */
+const handleClickEditButton = () => {
+    state.editModalVisible = true;
+};
+
+const handleClickDeleteButton = () => {
+    state.deleteModalVisible = true;
+};
 const handleDeleteModalConfirm = async () => {
     if (!props.collectorId) return;
     await deleteCollector({
@@ -319,12 +230,86 @@ onUnmounted(() => {
     collectorFormStore.resetState();
     collectorDataModalStore.reset();
 });
-
-
-
-
 </script>
+<template>
+    <div class="collector-detail-page">
+        <p-heading-layout>
+            <template #heading>
+                <p-heading class="mb-6"
+                           :title="state.collectorName"
+                           show-back-button
+                           @click-back-button="handleClickBackButton"
+                >
+                    <p-skeleton v-if="isCollectorLoading"
+                                width="20rem"
+                                height="1.5rem"
+                    />
+                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorFormState.isEditableCollector"
+                              #title-right-extra
+                    >
+                        <span class="title-right-button-wrapper">
+                            <p-icon-button name="ic_edit-text"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           @click="handleClickEditButton"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           class="delete-button"
+                                           @click="handleClickDeleteButton"
+                            />
+                        </span>
+                    </template>
+                </p-heading>
+            </template>
+            <template #extra>
+                <div v-if="!isJobListLoading"
+                     class="collector-button-box"
+                >
+                    <collect-data-button-group v-if="state.hasReadWriteAccess"
+                                               @collect="handleCollectData"
+                    />
+                    <router-link v-if="!!jobListData?.total_count"
+                                 :to="state.collectorHistoryLink"
+                    >
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_history"
+                        >
+                            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
+                        </p-button>
+                    </router-link>
+                </div>
+            </template>
+        </p-heading-layout>
 
+        <collector-base-info-section class="section"
+                                     :history-link="state.collectorHistoryLink"
+                                     :has-read-write-access="state.hasReadWriteAccess"
+        />
+        <collector-schedule-section class="section"
+                                    :has-read-write-access="state.hasReadWriteAccess"
+        />
+        <collector-options-section class="section"
+                                   data-test-id="collector-options-section"
+                                   :has-read-write-access="state.hasReadWriteAccess"
+        />
+        <collector-additional-rule class="section"
+                                   :collector-id="props.collectorId"
+        />
+        <p-double-check-modal :visible.sync="state.deleteModalVisible"
+                              :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
+                              :verification-text="state.collectorName"
+                              modal-size="sm"
+                              :loading="state.deleteLoading"
+                              @confirm="handleDeleteModalConfirm"
+        />
+        <collector-name-edit-modal :visible="state.editModalVisible"
+                                   @update:visible="handleUpdateEditModalVisible"
+        />
+        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
+    </div>
+</template>
 <style lang="postcss" scoped>
 .section {
     margin-bottom: 1rem;

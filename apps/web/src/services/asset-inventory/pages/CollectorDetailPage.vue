@@ -81,24 +81,17 @@ const props = defineProps<{
     collectorId: string;
 }>();
 
+const { collectorAPI } = useCollectorApi();
+
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
-const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
-const { collectorAPI } = useCollectorApi();
-const route = useRoute();
+const userStore = useUserStore();
 
-watch(() => collectorFormState.originCollector, async (collector) => {
-    if (collector) {
-        collectorJobStore.$patch({
-            collector,
-        });
-    }
-});
+const route = useRoute();
 
 const queryHelper = new QueryHelper();
 
@@ -145,14 +138,6 @@ const goBackToMainPage = () => {
     });
 };
 
-const handleClickEditButton = () => {
-    state.editModalVisible = true;
-};
-
-const handleClickDeleteButton = () => {
-    state.deleteModalVisible = true;
-};
-
 /* Query */
 const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
 const allJobsCountQueryHelper = new ApiQueryHelper().setCountOnly();
@@ -186,6 +171,15 @@ const { mutate: deleteCollector } = useMutation({
         state.deleteLoading = false;
     },
 });
+
+/* Event Handlers */
+const handleClickEditButton = () => {
+    state.editModalVisible = true;
+};
+
+const handleClickDeleteButton = () => {
+    state.deleteModalVisible = true;
+};
 const handleDeleteModalConfirm = async () => {
     if (!props.collectorId) return;
     await deleteCollector({
