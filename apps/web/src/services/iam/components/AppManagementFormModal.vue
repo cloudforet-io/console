@@ -78,6 +78,32 @@ const validationState = reactive({
     invalidText: '' as TranslateResult | string,
 });
 
+const { appAPI } = useAppApi();
+const { mutate: createAppMutate, isPending: createAppMutateLoading } = useMutation({
+    mutationFn: (params: AppCreateParameters) => appAPI.create(params),
+    onSuccess: (data) => {
+        emit('confirm', data);
+        appPageStore.$patch((_state) => {
+            _state.modal.visible.apiKey = true;
+            _state.modal = cloneDeep(_state.modal);
+        });
+        handleClose();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const { mutate: updateAppMutate, isPending: updateAppMutateLoading } = useMutation({
+    mutationFn: (params: AppUpdateParameters) => appAPI.update(params),
+    onSuccess: () => {
+        emit('confirm');
+        handleClose();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 /* Component */
 const menuHandler = async (inputText: string) => {
     await fetchListRoles(inputText);
@@ -200,31 +226,7 @@ const fetchListRoles = async (inputText: string) => {
         dropdownState.loading = false;
     }
 };
-const { appAPI } = useAppApi();
-const { mutate: createAppMutate, isPending: createAppMutateLoading } = useMutation({
-    mutationFn: (params: AppCreateParameters) => appAPI.create(params),
-    onSuccess: (data) => {
-        emit('confirm', data);
-        appPageStore.$patch((_state) => {
-            _state.modal.visible.apiKey = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
-        handleClose();
-    },
-    onError: (error) => {
-        ErrorHandler.handleError(error, true);
-    },
-});
-const { mutate: updateAppMutate, isPending: updateAppMutateLoading } = useMutation({
-    mutationFn: (params: AppUpdateParameters) => appAPI.update(params),
-    onSuccess: () => {
-        emit('confirm');
-        handleClose();
-    },
-    onError: (error) => {
-        ErrorHandler.handleError(error, true);
-    },
-});
+
 const handleConfirm = async () => {
     if (storeState.isEdit) {
         updateAppMutate({
