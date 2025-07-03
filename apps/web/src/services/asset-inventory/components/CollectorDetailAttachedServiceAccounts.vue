@@ -163,12 +163,10 @@ const handleToolboxTableRefresh = async () => {
     if (collectorFormState.collectorProvider) await getSecrets(collectorFormState.collectorProvider, state.serviceAccountsFilter);
 };
 const handleClickCollect = async (secret: SecretModel) => {
-    collectorDataModalStore.$patch((_state) => {
-        _state.visible = true;
-        _state.selectedCollector = collectorFormState.originCollector;
-        _state.collectDataType = COLLECT_DATA_TYPE.SINGLE;
-        _state.selectedSecret = secret;
-    });
+    collectorDataModalStore.setVisible(true);
+    collectorDataModalStore.setSelectedCollectorId(collectorFormState.originCollector?.collector_id);
+    collectorDataModalStore.setCollectDataType(COLLECT_DATA_TYPE.SINGLE);
+    collectorDataModalStore.setSelectedSecret(secret);
 };
 
 watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {

@@ -27,15 +27,19 @@ import {
 import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
+import { useQueryClient, useMutation } from '@tanstack/vue-query';
+import dayjs from 'dayjs';
 import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink, PHeadingLayout, PScopedNotification,
 } from '@cloudforet/mirinae';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
-import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { CollectorDeleteParameters } from '@/api-clients/inventory/collector/schema/api-verbs/delete';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -62,6 +66,8 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/components/CollectorDetailServiceAccountsSection.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -69,31 +75,21 @@ import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const props = defineProps<{
     collectorId: string;
 }>();
 
+const { collectorAPI } = useCollectorApi();
+
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
-const collectorJobStore = useCollectorJobStore();
-const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
-const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
-const { collectorAPI } = useCollectorApi();
-const route = useRoute();
+const userStore = useUserStore();
 
-watch(() => collectorFormState.originCollector, async (collector) => {
-    if (collector) {
-        collectorJobStore.$patch({
-            collector,
-        });
-    }
-});
+const route = useRoute();
 
 const queryHelper = new QueryHelper();
 
@@ -109,21 +105,22 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
-    loading: true,
-    collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
-    collectorName: computed<string>(() => state.collector?.name ?? ''),
-    collectorHistoryLink: computed<Location>(() => ({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
-        query: {
-            filters: queryHelper.setFilters([
-                {
-                    k: 'collector_id',
-                    v: props.collectorId,
-                    o: '=',
-                },
-            ]).rawQueryStrings,
-        },
-    })),
+    collectorName: computed<string>(() => collectorData.value?.name ?? ''),
+    collectorHistoryLink: computed<Location|undefined>(() => {
+        if (!jobListCountData.value?.total_count) return undefined;
+        return {
+            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+            query: {
+                filters: queryHelper.setFilters([
+                    {
+                        k: 'collector_id',
+                        v: props.collectorId,
+                        o: '=',
+                    },
+                ]).rawQueryStrings,
+            },
+        };
+    }),
     deleteModalVisible: false,
     deleteLoading: false,
     editModalVisible: false,
@@ -133,30 +130,60 @@ const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY
 
 defineExpose({ setPathFrom });
 
-const getCollector = async (): Promise<CollectorModel|null> => {
-    state.loading = true;
-    try {
-        return await collectorAPI.get({
-            collector_id: props.collectorId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return null;
-    } finally {
-        state.loading = false;
-    }
-};
-
-const fetchDeleteCollector = async () => (collectorFormState.collectorId ? collectorAPI.delete({
-    collector_id: collectorFormState.collectorId,
-}) : undefined);
-
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
     });
 };
 
+/* Query */
+const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
+const jobListCountQueryHelper = new ApiQueryHelper().setCountOnly();
+const { data: jobListCountData, isLoading: isJobListLoading } = useInventoryJobListQuery({
+    params: computed(() => {
+        jobListCountQueryHelper.setFilters([
+            { k: 'collector_id', v: props.collectorId, o: '=' },
+        ]);
+        return {
+            query: jobListCountQueryHelper.data,
+        };
+    }),
+});
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { refetch: refetchRecentJobs } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: collectorFormState.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
+});
+
+const queryClient = useQueryClient();
+const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collector', 'list');
+const { mutate: deleteCollector } = useMutation({
+    mutationFn: (params: CollectorDeleteParameters) => collectorAPI.delete(params),
+    onMutate: () => { state.deleteLoading = true; },
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
+        goBackToMainPage();
+        collectorFormStore.resetState();
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
+    },
+    onSettled: () => {
+        state.deleteModalVisible = false;
+        state.deleteLoading = false;
+    },
+});
+
+/* Event Handlers */
 const handleClickEditButton = () => {
     state.editModalVisible = true;
 };
@@ -164,33 +191,20 @@ const handleClickEditButton = () => {
 const handleClickDeleteButton = () => {
     state.deleteModalVisible = true;
 };
-
 const handleDeleteModalConfirm = async () => {
-    state.deleteModalVisible = true;
-    try {
-        state.deleteLoading = true;
-        await fetchDeleteCollector();
-        state.deleteModalVisible = false;
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
-        goBackToMainPage();
-        collectorFormStore.resetState();
-    } catch (error) {
-        state.deleteModalVisible = false;
-        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
-    } finally {
-        state.deleteLoading = false;
-    }
+    if (!props.collectorId) return;
+    await deleteCollector({
+        collector_id: props.collectorId,
+    });
 };
 const handleUpdateEditModalVisible = (value: boolean) => {
     state.editModalVisible = value;
 };
 const handleCollectData = () => {
-    collectorDataModalStore.$patch((_state) => {
-        _state.visible = true;
-        _state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
-        _state.selectedCollector = collectorFormState.originCollector;
-        _state.selectedSecret = undefined;
-    });
+    collectorDataModalStore.setVisible(true);
+    collectorDataModalStore.setSelectedCollectorId(props.collectorId);
+    collectorDataModalStore.setCollectDataType(COLLECT_DATA_TYPE.ENTIRE);
+    collectorDataModalStore.setSelectedSecret(undefined);
 };
 const handleClickCollectDataConfirm = () => {
     // pause and resume api polling to update recent job status after collect data immediately
@@ -200,8 +214,7 @@ const handleClickCollectDataConfirm = () => {
 
 /* Api polling */
 const fetchRecentJob = async () => {
-    if (!collectorJobState.collector) return;
-    await collectorJobStore.getRecentJobs();
+    await refetchRecentJobs();
 };
 const { pause, resume } = useTimeoutPoll(fetchRecentJob, 5000);
 const documentVisibility = useDocumentVisibility();
@@ -212,27 +225,21 @@ watch(documentVisibility, (visibility) => {
         resume();
     }
 });
-
-
-onMounted(async () => {
-    collectorJobStore.$reset();
-    collectorFormStore.resetState();
-    collectorDataModalStore.$reset();
-    const collector = await getCollector();
-    collectorJobStore.$patch((_state) => {
-        _state.collector = collector;
-    });
+watch(() => collectorData.value, async (collector) => {
     if (collector) {
-        collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
         resume();
     }
+}, { immediate: true });
+
+onMounted(async () => {
+    collectorFormStore.resetState();
+    collectorDataModalStore.reset();
 });
 onUnmounted(() => {
     pause();
-    collectorJobStore.$reset();
     collectorFormStore.resetState();
-    collectorDataModalStore.$reset();
+    collectorDataModalStore.reset();
 });
 </script>
 <template>
@@ -261,7 +268,7 @@ onUnmounted(() => {
                            show-back-button
                            @click-back-button="handleClickBackButton"
                 >
-                    <p-skeleton v-if="state.loading"
+                    <p-skeleton v-if="isCollectorLoading"
                                 width="20rem"
                                 height="1.5rem"
                     />
@@ -284,11 +291,11 @@ onUnmounted(() => {
                     </template>
                 </p-heading>
             </template>
-            <template v-if="collectorJobStore.AllJobsInfoLoaded"
+            <template v-if="!isJobListLoading"
                       #extra
             >
                 <collect-data-button-group @collect="handleCollectData" />
-                <router-link v-if="collectorJobStore.hasJobs"
+                <router-link v-if="!!state.collectorHistoryLink"
                              :to="state.collectorHistoryLink"
                 >
                     <p-button style-type="tertiary"

@@ -38,16 +38,15 @@ const isAdminMode = computed(() => appContextGetters.isAdminMode);
 
 /* Url Query String */
 const urlFilterConverter = new QueryHelper();
-
 const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageState.selectedProvider = queryStringToString(query.provider) ?? 'all';
+    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageState.searchFilters = filters;
+        collectorPageStore.setSearchFilters(filters);
     }
 };
 
@@ -69,21 +68,26 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageState.selectedProvider = providerName;
+    collectorPageStore.setSelectedProvider(providerName);
 };
 
-/* Query */
+/* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
 const { isLoading, totalCount } = useCollectorListQuery({
-    thisPage: computed(() => collectorPageState.thisPage),
-    pageSize: computed(() => collectorPageState.pageSize),
-    params: computed(() => ({
-        query: collectorCountApiQueryHelper.data,
-    })),
+    params: computed(() => {
+        if (isAdminMode.value) {
+            collectorCountApiQueryHelper.setFilters([{ k: 'workspace_id', v: '*', o: '=' }]);
+        }
+        return {
+            query: collectorCountApiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 10),
 });
 
 /* INIT */
-onMounted(async () => {
+onMounted(() => {
     collectorPageStore.reset();
     setValuesFromUrlQueryString();
 });

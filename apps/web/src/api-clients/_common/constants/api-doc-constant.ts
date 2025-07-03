@@ -515,6 +515,10 @@ export const API_DOC = {
             'update-plugin',
             'update',
         ],
+        job: [
+            'analyze',
+            'list',
+        ],
         metric: [
             'create',
             'delete',
