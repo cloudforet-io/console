@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@cloudforet/mirinae';
-
 
 import { i18n } from '@/translations';
 
@@ -16,6 +16,7 @@ import { useUserStore } from '@/store/user/user-store';
 
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/components/CollectorJobStatusIcon.vue';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -28,24 +29,23 @@ interface MinimalJobInfo {
     finished_at: string;
 }
 interface Props {
-    recentJobs?: MinimalJobInfo[]|null;
+    collectorId?: string;
     historyLink?: CollectorLink;
     fullMode?: boolean;
 }
 
 const appContextStore = useAppContextStore();
 const props = withDefaults(defineProps<Props>(), {
-    recentJobs: undefined,
+    collectorId: undefined,
     historyLink: undefined,
 });
 
 const userStore = useUserStore();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    loading: true,
     completedJobs: computed<MinimalJobInfo[]|undefined>(() => {
-        if (Array.isArray(props.recentJobs) && props.recentJobs.length > 0) {
-            return props.recentJobs.filter((job) => job.status !== JOB_STATE.IN_PROGRESS)
+        if (Array.isArray(recentJobsData.value?.results) && recentJobsData.value.results.length > 0) {
+            return recentJobsData.value.results.filter((job) => job.status !== JOB_STATE.IN_PROGRESS)
                 .sort((a, b) => dayjs(b.finished_at).unix() - dayjs(a.finished_at).unix())
                 .slice(0, 5)
                 .reverse();
@@ -53,6 +53,21 @@ const state = reactive({
         return undefined;
     }),
     historyJobRouteName: computed(() => (state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME)),
+});
+
+/* Query */
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').startOf('day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { data: recentJobsData, isLoading: isRecentJobsLoading } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: props.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
 });
 
 const handleTooltipContent = (job: MinimalJobInfo) => {
@@ -63,10 +78,6 @@ const handleTooltipContent = (job: MinimalJobInfo) => {
     if (status === JOB_STATE.FAILURE) content = 'INVENTORY.COLLECTOR.MAIN.JOB_FAILURE';
     return i18n.t(content, { date: dayjs.utc(finished_at).tz(userStore.state.timezone).format('YYYY-MM-DD hh:mm:ss') });
 };
-
-watch(() => props.recentJobs, () => {
-    state.loading = !Array.isArray(props.recentJobs);
-}, { immediate: true });
 </script>
 
 <template>
@@ -99,7 +110,7 @@ watch(() => props.recentJobs, () => {
             </p-link>
         </div>
         <p-data-loader :data="!!state.completedJobs?.length"
-                       :loading="state.loading"
+                       :loading="isRecentJobsLoading"
                        loader-type="skeleton"
                        class="data-loader"
         >

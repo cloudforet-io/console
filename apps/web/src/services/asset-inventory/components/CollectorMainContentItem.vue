@@ -23,8 +23,7 @@ import RecentCollectorJobList from '@/services/asset-inventory/components/Recent
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
+import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 
 
 interface Props {
@@ -35,7 +34,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorFormStore = useCollectorFormStore();
 const { collectorAPI } = useCollectorApi();
 
 const appContextStore = useAppContextStore();
@@ -45,10 +43,6 @@ const state = reactive({
         const plugin = props.item.plugin;
         if (plugin) return { name: plugin.name, version: plugin.info.version };
         return null;
-    }),
-    recentJob: computed<JobAnalyzeStatus|undefined>(() => {
-        if (!props.item) return undefined;
-        return props.item.recentJobAnalyze?.[0];
     }),
     isScheduleActivated: false,
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -70,8 +64,7 @@ const handleChangeToggle = async () => {
                 state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
             },
         };
-        const response = await updateCollectorSchedule(params);
-        if (response) await collectorFormStore.setOriginCollector(response);
+        await updateCollectorSchedule(params);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
@@ -135,10 +128,10 @@ watch(() => props.item.schedule, (schedule) => {
                          class="collector-info-view"
                     >
                         <collector-current-status :hours="props.item.schedule?.hours"
-                                                  :recent-job="state.recentJob"
+                                                  :collector-id="props.item.collectorId"
                                                   :is-schedule-activated="state.isScheduleActivated"
                         />
-                        <recent-collector-job-list :recent-jobs="props.item.recentJobAnalyze"
+                        <recent-collector-job-list :collector-id="props.item.collectorId"
                                                    :history-link="props.item.historyLink"
                                                    class="collector-info-view-recent-collector"
                         />
