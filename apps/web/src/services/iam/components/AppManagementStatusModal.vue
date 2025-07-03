@@ -13,6 +13,7 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
+import type { AppDisableParameters } from '@/api-clients/identity/app/schema/api-verbs/disable';
 import type { AppEnableParameters } from '@/api-clients/identity/app/schema/api-verbs/enable';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -50,6 +51,18 @@ const { mutate: enableAppMutate } = useMutation({
     mutationFn: (params: AppEnableParameters) => appAPI.enable(params),
     onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
+        handleClose();
+    },
+});
+const { mutate: disableAppMutate } = useMutation({
+    mutationFn: (params: AppDisableParameters) => appAPI.disable(params),
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('IAM.APP.ALT_S_DISABLED_APP'), '');
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
@@ -134,8 +147,7 @@ const checkModalConfirm = async () => {
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
             enableAppMutate({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
-            await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
-            showSuccessMessage(i18n.t('IAM.APP.ALT_S_DISABLED_APP'), '');
+            disableAppMutate({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
             const res = await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
             emit('confirm', res);

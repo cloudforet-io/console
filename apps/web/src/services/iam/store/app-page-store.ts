@@ -3,7 +3,6 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AppDisableParameters } from '@/api-clients/identity/app/schema/api-verbs/disable';
 import type { AppGenerateApiKeyParameters } from '@/api-clients/identity/app/schema/api-verbs/generateApiKey';
 import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
@@ -52,17 +51,6 @@ export const useAppPageStore = defineStore('page-app', {
                 this.apps = [];
                 this.totalCount = 0;
                 throw e;
-            }
-        },
-        async disableApp(params: AppDisableParameters) {
-            this.modal.loading = true;
-            try {
-                await SpaceConnector.clientV2.identity.app.disable<AppDisableParameters, AppModel>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            } finally {
-                this.modal.loading = false;
             }
         },
         async regenerateApp(params: AppGenerateApiKeyParameters) {
