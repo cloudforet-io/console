@@ -143,7 +143,7 @@ const { data: jobListCountData, isLoading: isJobListLoading } = useInventoryJobL
         };
     }),
 });
-const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').startOf('day').toISOString();
 const recentJobsQueryHelper = new ApiQueryHelper();
 const { refetch: refetchRecentJobs } = useInventoryJobListQuery({
     params: computed(() => {
