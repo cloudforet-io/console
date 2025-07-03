@@ -322,7 +322,7 @@ export const API_DOC = {
             'delete',
             'disable',
             'enable',
-            'generateApiKey',
+            'generateClientSecret',
             'get',
             'list',
             'stat',
@@ -494,8 +494,12 @@ export const API_DOC = {
         ],
     },
     inventory: {
+        'change-history': [
+            'list',
+        ],
         'cloud-service': [
             'analyze',
+            'get-data',
             'get',
             'list',
         ],
@@ -514,6 +518,13 @@ export const API_DOC = {
             'list',
             'update-plugin',
             'update',
+        ],
+        job: [
+            'analyze',
+            'list',
+        ],
+        'job-task': [
+            'list',
         ],
         metric: [
             'create',
