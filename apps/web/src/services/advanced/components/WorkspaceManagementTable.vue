@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive,
     ref,
+    watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -80,7 +81,7 @@ const state = reactive({
         { label: i18n.t('IAM.WORKSPACES.DISABLE') as string, name: WORKSPACE_STATE.DISABLE },
         { label: i18n.t('IAM.WORKSPACES.DORMANT') as string, name: WORKSPACE_STATE.DORMANT },
     ])),
-    selectedIndex: undefined,
+    selectedIndex: 0,
 });
 const pagination = reactive({
     thisPage: 1,
@@ -195,7 +196,7 @@ const handleSelect = (index: number[]) => {
     workspacePageStore.$patch((_state) => {
         _state.selectedWorkspace = workspaceListData.value?.[index[0]];
     });
-    state.selectedIndex = index[0];
+    state.selectedIndex = index[0] ?? 0;
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
     if (options.sortBy !== undefined) sortState.sortKey = options.sortBy;
@@ -236,6 +237,15 @@ const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceModel) => 
     params: {
         workspaceId: item?.workspace_id,
     },
+});
+
+watch(() => workspaceListData.value, (newVal) => {
+    if (newVal?.length) {
+        state.selectedIndex = 0;
+        workspacePageStore.$patch((_state) => {
+            _state.selectedWorkspace = newVal[0];
+        });
+    }
 });
 
 onMounted(async () => {

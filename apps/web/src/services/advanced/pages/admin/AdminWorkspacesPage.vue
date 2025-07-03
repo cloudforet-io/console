@@ -43,13 +43,10 @@ const { key: workspaceListQueryKey, params: workspaceListQueryParams } = useServ
     })),
 });
 
-const { data: queryData } = useScopedQuery({
+const { data: workspaceListQueryData } = useScopedQuery({
     queryKey: workspaceListQueryKey,
     queryFn: async () => workspaceAPI.list(workspaceListQueryParams.value),
-    initialData: {
-        results: [],
-        total_count: 0,
-    },
+    staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
 }, ['DOMAIN']);
 
@@ -137,7 +134,7 @@ onUnmounted(() => {
         <p-heading-layout class="mb-6">
             <template #heading>
                 <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')"
-                           :total-count="queryData?.total_count || 0"
+                           :total-count="workspaceListQueryData?.total_count || 0"
                            use-total-count
                 />
             </template>
