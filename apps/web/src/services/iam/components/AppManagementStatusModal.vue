@@ -25,6 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { indigo, peacock } from '@/styles/colors';
 
 import { appStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useAppDeleteMutation } from '@/services/iam/composables/use-app-delete-mutation';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
@@ -32,6 +33,12 @@ const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 const userStore = useUserStore();
+
+const { mutate: deleteAppMutate } = useAppDeleteMutation({
+    onSettled: () => {
+        handleClose();
+    },
+});
 
 const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 }>();
@@ -102,11 +109,12 @@ const handleClose = () => {
     emit('confirm');
 };
 
+
 /* API */
 const checkModalConfirm = async () => {
     try {
         if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
-            await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
+            deleteAppMutate({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
             await appPageStore.enableApp({ app_id: appPageStore.selectedApp.app_id });
             showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');

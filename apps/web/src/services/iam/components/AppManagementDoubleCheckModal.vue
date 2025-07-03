@@ -7,14 +7,19 @@ import {
 
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useAppDeleteMutation } from '@/services/iam/composables/use-app-delete-mutation';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
 
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
+
+const { mutate: deleteAppMutate } = useAppDeleteMutation({
+    onSettled: () => {
+        handleClose();
+    },
+});
 
 const emit = defineEmits<{(e: 'confirm', value?: AppModel): void;
 }>();
@@ -31,14 +36,8 @@ const handleClose = () => {
 
 /* API */
 const handleConfirm = async () => {
-    try {
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
-            await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
-        }
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
-    } finally {
-        handleClose();
+    if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+        deleteAppMutate({ app_id: appPageStore.selectedApp.app_id });
     }
 };
 </script>
