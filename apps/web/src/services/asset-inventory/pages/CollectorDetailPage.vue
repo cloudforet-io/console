@@ -109,7 +109,7 @@ const state = reactive({
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
     collectorName: computed<string>(() => collectorData.value?.name ?? ''),
     collectorHistoryLink: computed<Location|undefined>(() => {
-        if (!jobListData.value?.total_count) return undefined;
+        if (!jobListCountData.value?.total_count) return undefined;
         return {
             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
             query: {
@@ -140,14 +140,14 @@ const goBackToMainPage = () => {
 
 /* Query */
 const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
-const allJobsCountQueryHelper = new ApiQueryHelper().setCountOnly();
-const { data: jobListData, isLoading: isJobListLoading } = useInventoryJobListQuery({
+const jobListCountQueryHelper = new ApiQueryHelper().setCountOnly();
+const { data: jobListCountData, isLoading: isJobListLoading } = useInventoryJobListQuery({
     params: computed(() => {
-        allJobsCountQueryHelper.setFilters([
+        jobListCountQueryHelper.setFilters([
             { k: 'collector_id', v: props.collectorId, o: '=' },
         ]);
         return {
-            query: allJobsCountQueryHelper.data,
+            query: jobListCountQueryHelper.data,
         };
     }),
 });

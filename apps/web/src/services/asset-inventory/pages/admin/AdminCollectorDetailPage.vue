@@ -103,7 +103,7 @@ const state = reactive({
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     collectorName: computed<string>(() => collectorData.value?.name ?? ''),
     collectorHistoryLink: computed<Location|undefined>(() => {
-        if (!jobListData.value?.total_count) return undefined;
+        if (!jobListCountData.value?.total_count) return undefined;
         return {
             name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
             query: {
@@ -134,14 +134,14 @@ const goBackToMainPage = () => {
 
 /* Query */
 const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
-const allJobsCountQueryHelper = new ApiQueryHelper().setCountOnly();
-const { data: jobListData, isLoading: isJobListLoading } = useInventoryJobListQuery({
+const jobListCountQueryHelper = new ApiQueryHelper().setCountOnly();
+const { data: jobListCountData, isLoading: isJobListLoading } = useInventoryJobListQuery({
     params: computed(() => {
-        allJobsCountQueryHelper.setFilters([
+        jobListCountQueryHelper.setFilters([
             { k: 'collector_id', v: props.collectorId, o: '=' },
         ]);
         return {
-            query: allJobsCountQueryHelper.data,
+            query: jobListCountQueryHelper.data,
         };
     }),
 });
@@ -270,7 +270,7 @@ onUnmounted(() => {
                     <collect-data-button-group v-if="state.hasReadWriteAccess"
                                                @collect="handleCollectData"
                     />
-                    <router-link v-if="!!jobListData?.total_count"
+                    <router-link v-if="!!jobListCountData?.total_count"
                                  :to="state.collectorHistoryLink"
                     >
                         <p-button style-type="tertiary"
