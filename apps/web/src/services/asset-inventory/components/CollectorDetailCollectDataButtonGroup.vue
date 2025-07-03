@@ -4,6 +4,9 @@ import {
     reactive, defineEmits, computed, watch,
 } from 'vue';
 
+import dayjs from 'dayjs';
+
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PPopover, PIconButton, screens,
 } from '@cloudforet/mirinae';
@@ -11,28 +14,52 @@ import {
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import CollectorCurrentStatus from '@/services/asset-inventory/components/CollectorCurrentStatus.vue';
-import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
+import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
 const emit = defineEmits<{(e: 'collect'): void;
 }>();
 
-const collectorJobStore = useCollectorJobStore();
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.state;
 
 const { width } = useWindowSize();
 
 const state = reactive({
     isPopoverOpen: false,
-    recentJob: computed<JobModel|null>(() => collectorJobStore.recentJobForAllAccounts),
     showStatus: computed(() => width.value > screens.mobile.max),
+    recentJobWithNoSecret: computed<JobModel|null>(() => {
+        if (Array.isArray(recentJobsData.value?.results) && recentJobsData.value.results.length > 0) {
+            const filteredJobs = recentJobsData.value.results.filter((job) => !job.secret_id);
+            return filteredJobs[0] ?? null;
+        }
+        return null;
+    }),
 });
+
+/* Query */
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { data: recentJobsData } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: collectorFormState.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
+});
+
 const handleClickCollectDataButton = () => {
     emit('collect');
 };
 const handleUpdatePopoverVisible = (visible: boolean) => {
     state.isPopoverOpen = visible;
 };
-watch(() => state.recentJob, (recentJob, prevJob) => {
+watch(() => state.recentJobWithNoSecret, (recentJob, prevJob) => {
     if (recentJob?.status === 'IN_PROGRESS') {
         if (prevJob && recentJob.job_id === prevJob.job_id && recentJob.status === prevJob.status) return;
         state.isPopoverOpen = true;
@@ -68,7 +95,7 @@ watch(() => state.recentJob, (recentJob, prevJob) => {
                 <div class="collect-status-wrapper">
                     <collector-current-status
                         :hours="collectorJobStore.schedule?.hours"
-                        :recent-job="state.recentJob"
+                        :recent-job="state.recentJobWithNoSecret"
                         :is-schedule-activated="collectorJobStore.schedule?.state === 'ENABLED'"
                         :is-popover-mode="true"
                     />

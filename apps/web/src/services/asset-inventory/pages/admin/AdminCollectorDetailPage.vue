@@ -28,6 +28,7 @@ import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
 import { useQueryClient, useMutation } from '@tanstack/vue-query';
+import dayjs from 'dayjs';
 import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -70,7 +71,6 @@ import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const props = defineProps<{
@@ -81,8 +81,6 @@ const { collectorAPI } = useCollectorApi();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-const collectorJobStore = useCollectorJobStore();
-const collectorJobState = collectorJobStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const authorizationStore = useAuthorizationStore();
 
@@ -145,6 +143,19 @@ const { data: jobListCountData, isLoading: isJobListLoading } = useInventoryJobL
         };
     }),
 });
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { refetch: refetchRecentJobs } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: collectorFormState.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
+});
 
 const queryClient = useQueryClient();
 const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collector', 'list');
@@ -197,8 +208,7 @@ const handleClickCollectDataConfirm = () => {
 
 /* Api polling */
 const fetchRecentJob = async () => {
-    if (!collectorJobState.collector) return;
-    await collectorJobStore.getRecentJobs();
+    await refetchRecentJobs();
 };
 const { pause, resume } = useTimeoutPoll(fetchRecentJob, 5000);
 const documentVisibility = useDocumentVisibility();
@@ -210,9 +220,6 @@ watch(documentVisibility, (visibility) => {
     }
 });
 watch(() => collectorData.value, async (collector) => {
-    collectorJobStore.$patch({
-        collector,
-    });
     if (collector) {
         await collectorFormStore.setOriginCollector(collector);
         resume();
@@ -220,13 +227,11 @@ watch(() => collectorData.value, async (collector) => {
 }, { immediate: true });
 
 onMounted(async () => {
-    collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.reset();
 });
 onUnmounted(() => {
     pause();
-    collectorJobStore.$reset();
     collectorFormStore.resetState();
     collectorDataModalStore.reset();
 });

@@ -13,7 +13,7 @@
                                           :collector="collectorFormState.originCollector"
             />
             <plugin-summary-cards :collector="collectorFormState.originCollector"
-                                  :recent-jobs="state.recentJobs"
+                                  :recent-jobs="recentJobsData?.results"
                                   :history-link="props.historyLink"
             />
             <collector-tags :tags="collectorFormState.originCollector?.tags" />
@@ -58,7 +58,10 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
+import dayjs from 'dayjs';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
@@ -67,7 +70,6 @@ import { useCollectorApi } from '@/api-clients/inventory/collector/composables/u
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
-import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
@@ -83,8 +85,8 @@ import CollectorDetailSectionHeader from '@/services/asset-inventory/components/
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
 const props = defineProps<{
     historyLink?: Location
@@ -93,9 +95,6 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
-const collectorJobStore = useCollectorJobStore();
-const collectorJobState = collectorJobStore.$state;
 
 const { collectorAPI } = useCollectorApi();
 
@@ -110,7 +109,6 @@ const state = reactive({
         if (latestVersion) return latestVersion === version;
         return false;
     }),
-    recentJobs: computed<JobModel[]|null>(() => collectorJobState.recentJobs),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
@@ -125,6 +123,21 @@ const state = reactive({
     }),
     isAllValid: computed(() => (state.isPluginUpdated || state.isTagsUpdated) && state.isVersionValid && state.isTagsValid),
     updateLoading: false,
+});
+
+/* Query */
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { data: recentJobsData } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: collectorFormState.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
 });
 
 
