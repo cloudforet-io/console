@@ -11,8 +11,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import type { AppListParameters } from '@/api-clients/identity/app/schema/api-verbs/list';
-import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
@@ -38,7 +36,6 @@ import type {
 interface WorkspaceHomeState {
     // info
     workspaceUserTotalCount: number|undefined;
-    appsTotalCount: number|undefined;
     // bookmark
     bookmarkFolderData: BookmarkItem[];
     bookmarkData: BookmarkItem[];
@@ -58,7 +55,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
 
     const state = reactive<WorkspaceHomeState>({
         workspaceUserTotalCount: undefined,
-        appsTotalCount: undefined,
 
         bookmarkFolderData: [],
         bookmarkData: [],
@@ -117,7 +113,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
     const actions = {
         resetState: () => {
             state.workspaceUserTotalCount = undefined;
-            state.appsTotalCount = undefined;
             state.bookmarkFolderData = [];
             state.bookmarkData = [];
             state.isFullMode = false;
@@ -250,17 +245,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     query: listCountQueryHelper.data,
                 });
                 state.workspaceUserTotalCount = total_count || undefined;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        },
-        fetchAppList: async () => {
-            try {
-                const { total_count } = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>({
-                    workspace_id: _getters.currentWorkspaceId,
-                    query: listCountQueryHelper.data,
-                });
-                state.appsTotalCount = total_count || undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

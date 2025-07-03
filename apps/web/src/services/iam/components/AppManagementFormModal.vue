@@ -3,7 +3,6 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { useMutation } from '@tanstack/vue-query';
-import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -43,16 +42,24 @@ interface AppDropdownMenuItem extends SelectDropdownMenuItem {
     role_type?: string;
 }
 
+interface Props {
+    selectedApp: AppModel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    selectedApp: () => ({}) as AppModel,
+});
+
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
-const appPageState = appPageStore.$state;
+const appPageState = appPageStore.state;
 
 const emit = defineEmits<{(e: 'confirm', value?: AppModel): void;
 }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isEdit: computed(() => appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.EDIT),
+    isEdit: computed(() => appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.EDIT),
 });
 const state = reactive({
     activeProject: false,
@@ -83,10 +90,7 @@ const { mutate: createAppMutate, isPending: createAppMutateLoading } = useMutati
     mutationFn: (params: AppCreateParameters) => appAPI.create(params),
     onSuccess: (data) => {
         emit('confirm', data);
-        appPageStore.$patch((_state) => {
-            _state.modal.visible.apiKey = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
+        appPageStore.setModalVisible('apiKey', true);
         handleClose();
     },
     onError: (error) => {
@@ -112,11 +116,7 @@ const menuHandler = async (inputText: string) => {
     };
 };
 const handleClose = () => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = '';
-        _state.modal.visible.form = false;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.resetModal();
     initState();
 };
 const handleChangeInput = (event) => {
@@ -156,8 +156,8 @@ const handleSelectItem = (item: AppDropdownMenuItem) => {
     formState.role = item;
 };
 const setFormState = () => {
-    formState.name = appPageStore.selectedApp.name;
-    formState.tags = appPageStore.selectedApp.tags as Tags;
+    formState.name = props.selectedApp.name;
+    formState.tags = props.selectedApp.tags as Tags;
     formState.selectedTags = getInputItemsFromTagKeys(formState.tags);
 };
 const handleSelectedProject = (projectTreeNodeData: ProjectTreeNodeData[]) => {
@@ -230,7 +230,7 @@ const fetchListRoles = async (inputText: string) => {
 const handleConfirm = async () => {
     if (storeState.isEdit) {
         updateAppMutate({
-            app_id: appPageStore.selectedApp.app_id,
+            app_id: props.selectedApp.app_id,
             name: formState.name,
             tags: formState.tags,
         });
@@ -266,11 +266,11 @@ watch(() => storeState.isEdit, (isEdit) => {
 <template>
     <div>
         <p-button-modal class="app-management-form-modal"
-                        :header-title="appPageState.modal.title"
+                        :header-title="appPageState.modalInfo.title"
                         size="sm"
                         :fade="true"
                         :backdrop="true"
-                        :visible="appPageState.modal.visible.form"
+                        :visible="appPageState.modalVisible.form"
                         :disabled="storeState.isEdit
                             ? formState.name === ''
                             : formState.name === '' || dropdownState.selectedMenuItems.length === 0 || (state.activeProject && state.selectedProjects.length === 0)"

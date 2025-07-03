@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -37,6 +36,7 @@ import {
     appStateFormatter,
     calculateTime, useRoleFormatter,
 } from '@/services/iam/composables/refined-table-data';
+import { useAppListPaginationQuery } from '@/services/iam/composables/use-app-list-pagination-query';
 import {
     APP_DROPDOWN_MODAL_TYPE,
     APP_STATE,
@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
-const appPageState = appPageStore.$state;
+const appPageState = appPageStore.state;
 const userStore = useUserStore();
 
 const referenceMap = useAllReferenceDataModel();
@@ -102,8 +102,7 @@ const tableState = reactive({
     })),
 });
 const state = reactive({
-    loading: false,
-    refinedAppItems: computed(() => appPageState.apps.map((app) => {
+    refinedAppItems: computed(() => appListData.value.map((app) => {
         let projectLabel = '';
         if (app.project_group_id) {
             projectLabel = referenceMap.projectGroup[app.project_group_id]?.label;
@@ -147,49 +146,71 @@ const state = reactive({
             { name: 'created_at', label: 'Created' },
         ];
     }),
+    selectedIndex: [] as number[],
+    selectedApp: computed(() => state.selectedIndex && appListData.value[state.selectedIndex[0]] || {} as AppModel),
 });
 const modalState = reactive({
     apiKeyModalVisible: false,
     item: {} as AppModel,
 });
+const paginationState = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
-        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: isEmpty(appPageStore.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: isEmpty(state.selectedApp),
     },
     {
-        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.DELETE, label: i18n.t('IAM.APP.DELETE'), disabled: isEmpty(appPageStore.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.DELETE, label: i18n.t('IAM.APP.DELETE'), disabled: isEmpty(state.selectedApp),
     },
     { type: 'divider' },
     {
-        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.REGENERATE, label: i18n.t('IAM.APP.REGENERATE'), disabled: isEmpty(appPageStore.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.REGENERATE, label: i18n.t('IAM.APP.REGENERATE'), disabled: isEmpty(state.selectedApp),
     },
     { type: 'divider' },
     {
         type: 'item',
         name: APP_DROPDOWN_MODAL_TYPE.ENABLE,
         label: i18n.t('IAM.APP.ENABLE'),
-        disabled: isEmpty(appPageStore.selectedApp)
-            || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
-                || appPageStore.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
+        disabled: isEmpty(state.selectedApp)
+            || (state.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
+                || state.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
         ,
     },
     {
         type: 'item',
         name: APP_DROPDOWN_MODAL_TYPE.DISABLE,
         label: i18n.t('IAM.APP.DISABLE'),
-        disabled: isEmpty(appPageStore.selectedApp)
-            || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
-                || appPageStore.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
+        disabled: isEmpty(state.selectedApp)
+            || (state.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
+                || state.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
         ,
     },
 ]));
 
-const appListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(appPageState.pageStart).setPageLimit(appPageState.pageLimit)
-    .setSort('name', true);
-let appListApiQuery = appListApiQueryHelper.data;
+const appListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.appSearchHandlers.keyItemSets });
 const { queryTags } = queryTagHelper;
+
+const {
+    data: appListData,
+    totalCount: appListTotalCount,
+    isLoading: appListFetching,
+    refresh: refreshAppList,
+} = useAppListPaginationQuery({
+    thisPage: computed(() => paginationState.thisPage),
+    pageSize: computed(() => paginationState.pageSize),
+    params: computed(() => {
+        appListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+            storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '=' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' },
+        ]);
+        return {
+            query: appListApiQueryHelper.data,
+        };
+    }),
+});
 
 /* Component */
 const handleSelectDropdown = (name) => {
@@ -202,7 +223,7 @@ const handleSelectDropdown = (name) => {
         break;
     case APP_DROPDOWN_MODAL_TYPE.DELETE: clickFormModal({
         name,
-        title: i18n.t('IAM.APP.MODAL.DELETE_TITLE', { app: appPageStore.selectedApp.name }) as string,
+        title: i18n.t('IAM.APP.MODAL.DELETE_TITLE', { app: state.selectedApp.name }) as string,
         isForm: false,
     });
         break;
@@ -228,40 +249,24 @@ const handleSelectDropdown = (name) => {
     }
 };
 const handleSelect = (index: number[]) => {
-    appPageStore.$patch({ selectedIndex: index });
+    state.selectedIndex = index;
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    appListApiQuery = getApiQueryWithToolboxOptions(appListApiQueryHelper, options) ?? appListApiQuery;
-    if (options.pageStart !== undefined) appPageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) appPageStore.$patch({ pageLimit: options.pageLimit });
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
-    await getListApps();
 };
 const clickFormModal = ({ name, title, isForm }) => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = name;
-        _state.modal.title = title;
-        _state.modal.visible.form = isForm;
-        _state.modal.visible.doubleCheck = !isForm;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.setModalInfo(name, title);
+    appPageStore.setModalVisible('form', isForm);
+    appPageStore.setModalVisible('doubleCheck', !isForm);
 };
 const clickStatusModal = ({ name, title, theme }) => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = name;
-        _state.modal.title = title;
-        _state.modal.visible.status = true;
-        _state.modal.themeColor = theme;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.setModalInfo(name, title, theme);
+    appPageStore.setModalVisible('status', true);
 };
 const handleChangeModalVisible = (value) => {
-    appPageStore.$patch((_state) => {
-        _state.modal.visible.apiKey = value;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.setModalVisible('apiKey', value);
 };
 const handleConfirmButton = (value: AppModel) => {
     if (value) {
@@ -270,36 +275,14 @@ const handleConfirmButton = (value: AppModel) => {
     }
     handleClickModalConfirm();
 };
-const handleClickModalConfirm = async () => {
-    await getListApps();
-};
-
-/* API */
-const getListApps = async () => {
-    state.loading = true;
-    try {
-        appListApiQueryHelper
-            .setFilters([
-                ...queryTagHelper.filters.value,
-                storeState.isAdminMode ? { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '=' } : { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' },
-            ]);
-        await appPageStore.listApps({
-            query: appListApiQueryHelper.data,
-        });
-    } finally {
-        state.loading = false;
-    }
+const handleClickModalConfirm = () => {
+    refreshAppList();
 };
 
 /* Watcher */
-watch(() => appPageState.modal.visible.apiKey, (visible) => {
+watch(() => appPageState.modalVisible.apiKey, (visible) => {
     modalState.apiKeyModalVisible = visible;
 });
-
-/* Init */
-(async () => {
-    await getListApps();
-})();
 </script>
 
 <template>
@@ -307,17 +290,19 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
         <p-toolbox-table search-type="query"
                          :selectable="props.hasReadWriteAccess"
                          sortable
-                         :loading="state.loading"
+                         :loading="appListFetching"
                          disabled
                          :multi-select="false"
                          :items="state.refinedAppItems"
                          :fields="state.fields"
                          sort-by="name"
-                         :select-index="appPageState.selectedIndex"
+                         :this-page.sync="paginationState.thisPage"
+                         :page-size.sync="paginationState.pageSize"
+                         :select-index="state.selectedIndex"
                          :key-item-sets="tableState.appSearchHandlers.keyItemSets"
                          :value-handler-map="tableState.appSearchHandlers.valueHandlerMap"
                          :sort-desc="true"
-                         :total-count="appPageState.totalCount"
+                         :total-count="appListTotalCount"
                          :query-tags="queryTags"
                          :style="{height: `${props.tableHeight}px`}"
                          @select="handleSelect"
@@ -409,9 +394,15 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                               @clickButton="handleClickModalConfirm"
                               @update:visible="handleChangeModalVisible"
         />
-        <app-management-form-modal @confirm="handleConfirmButton" />
-        <app-management-status-modal @confirm="handleConfirmButton" />
-        <app-management-double-check-modal @confirm="handleConfirmButton" />
+        <app-management-form-modal :selected-app="state.selectedApp"
+                                   @confirm="handleConfirmButton"
+        />
+        <app-management-status-modal :selected-app="state.selectedApp"
+                                     @confirm="handleConfirmButton"
+        />
+        <app-management-double-check-modal :selected-app="state.selectedApp"
+                                           @confirm="handleConfirmButton"
+        />
     </section>
 </template>
 

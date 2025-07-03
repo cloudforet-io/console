@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { cloneDeep } from 'lodash';
-
 import {
     PDoubleCheckModal,
 } from '@cloudforet/mirinae';
@@ -11,9 +9,16 @@ import { useAppDeleteMutation } from '@/services/iam/composables/use-app-delete-
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
+interface Props {
+    selectedApp: AppModel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    selectedApp: () => ({}) as AppModel,
+});
 
 const appPageStore = useAppPageStore();
-const appPageState = appPageStore.$state;
+const appPageState = appPageStore.state;
 
 const { mutate: deleteAppMutate } = useAppDeleteMutation({
     onSettled: () => {
@@ -26,29 +31,25 @@ const emit = defineEmits<{(e: 'confirm', value?: AppModel): void;
 
 /* Component */
 const handleClose = () => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = '';
-        _state.modal.visible.doubleCheck = false;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.resetModal();
     emit('confirm');
 };
 
 /* API */
 const handleConfirm = async () => {
-    if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
-        deleteAppMutate({ app_id: appPageStore.selectedApp.app_id });
+    if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+        deleteAppMutate({ app_id: props.selectedApp.app_id });
     }
 };
 </script>
 
 <template>
     <p-double-check-modal class="app-management-double-check-modal"
-                          :header-title="appPageState.modal.title"
+                          :header-title="appPageState.modalInfo.title"
                           modal-size="sm"
-                          :verification-text="appPageStore.selectedApp.name"
-                          :visible="appPageState.modal.visible.doubleCheck"
-                          :loading="appPageState.modal.loading"
+                          :verification-text="props.selectedApp.name"
+                          :visible="appPageState.modalVisible.doubleCheck"
+                          :loading="appPageState.modalInfo.loading"
                           @confirm="handleConfirm"
                           @cancel="handleClose"
     >

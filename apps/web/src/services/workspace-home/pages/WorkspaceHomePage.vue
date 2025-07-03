@@ -5,8 +5,13 @@ import {
 
 import { isEmpty } from 'lodash';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
@@ -59,6 +64,22 @@ const state = reactive({
     isNoCollectors: computed<boolean>(() => !collectorList.value?.length),
 });
 
+const { appAPI } = useAppApi();
+const listCountQueryHelper = new ApiQueryHelper().setCountOnly();
+const { key: appListQueryKey, params: appListQueryParams } = useServiceQueryKey('identity', 'app', 'list', {
+    params: computed(() => ({
+        workspace_id: storeState.currentWorkspaceId,
+        query: listCountQueryHelper.data,
+    })),
+});
+const { data: appListData } = useScopedQuery({
+    queryKey: appListQueryKey,
+    queryFn: () => appAPI.list(appListQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+    enabled: computed(() => state.accessAppMenu),
+}, ['DOMAIN', 'WORKSPACE']);
+
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.resetState();
     if (!currentWorkspaceId) return;
@@ -74,9 +95,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     // workspace info
     if (state.accessUserMenu) {
         await workspaceHomePageStore.fetchWorkspaceUserList();
-    }
-    if (state.accessAppMenu) {
-        await workspaceHomePageStore.fetchAppList();
     }
     // bookmark
     await workspaceHomePageStore.fetchBookmarkFolderList();
@@ -94,6 +112,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
         <div class="page-contents">
             <workspace-info :access-user-menu="state.accessUserMenu"
                             :access-app-menu="state.accessAppMenu"
+                            :app-total-count="appListData?.total_count || 0"
             />
             <welcome
                 v-if="!state.loading

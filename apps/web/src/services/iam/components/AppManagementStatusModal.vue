@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import { useMutation } from '@tanstack/vue-query';
-import { cloneDeep } from 'lodash';
 
 import {
     PButtonModal, PDefinitionTable, PI, PStatus,
@@ -34,12 +33,20 @@ import { useAppDeleteMutation } from '@/services/iam/composables/use-app-delete-
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
+interface Props {
+    selectedApp: AppModel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    selectedApp: () => ({}) as AppModel,
+});
+
 const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 }>();
 
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
-const appPageState = appPageStore.$state;
+const appPageState = appPageStore.state;
 const userStore = useUserStore();
 
 const { appAPI } = useAppApi();
@@ -76,10 +83,7 @@ const { mutate: generateClientSecretMutate } = useMutation({
     mutationFn: (params: AppGenerateClientSecretParameters) => appAPI.generateClientSecret(params),
     onSuccess: (data) => {
         emit('confirm', data);
-        appPageStore.$patch((_state) => {
-            _state.modal.visible.apiKey = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
+        appPageStore.setModalVisible('apiKey', true);
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
@@ -97,32 +101,32 @@ const storeState = reactive({
 });
 const state = reactive({
     confirmButton: computed(() => {
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+        if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
             return i18n.t('IAM.APP.DELETE');
         }
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+        if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
             return i18n.t('IAM.APP.ENABLE');
         }
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+        if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
             return i18n.t('IAM.APP.DISABLE');
         }
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
+        if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
             return i18n.t('IAM.APP.MODAL.BTN_REGENERATE');
         }
         return '';
     }),
     selectedApp: computed(() => {
         let projectLabel = '';
-        if (appPageStore.selectedApp.project_group_id) {
-            projectLabel = referenceMap.projectGroup[appPageStore.selectedApp.project_group_id]?.label;
-        } else if (appPageStore.selectedApp.project_id) {
-            projectLabel = referenceMap.project[appPageStore.selectedApp.project_id]?.label;
+        if (props.selectedApp.project_group_id) {
+            projectLabel = referenceMap.projectGroup[props.selectedApp.project_group_id]?.label;
+        } else if (props.selectedApp.project_id) {
+            projectLabel = referenceMap.project[props.selectedApp.project_id]?.label;
         }
         return {
-            ...appPageStore.selectedApp,
-            project: appPageStore.selectedApp.project_group_id || appPageStore.selectedApp.project_id ? {
-                icon: appPageStore.selectedApp.project_group_id ? 'ic_folder-filled' : 'ic_document-filled',
-                color: appPageStore.selectedApp.project_id ? peacock[600] : indigo[500],
+            ...props.selectedApp,
+            project: props.selectedApp.project_group_id || props.selectedApp.project_id ? {
+                icon: props.selectedApp.project_group_id ? 'ic_folder-filled' : 'ic_document-filled',
+                color: props.selectedApp.project_id ? peacock[600] : indigo[500],
                 label: projectLabel,
             } : undefined,
         };
@@ -131,7 +135,7 @@ const state = reactive({
 
 const definitionFields = computed(() => {
     const projectFields: DefinitionField[] = [];
-    if (appPageStore.selectedApp.project_group_id || appPageStore.selectedApp.project_id) {
+    if (props.selectedApp.project_group_id || props.selectedApp.project_id) {
         projectFields.push({ label: i18n.t('IAM.APP.MODAL.COL_PROJECT'), name: 'project' });
     }
     return [
@@ -147,34 +151,30 @@ const definitionFields = computed(() => {
 
 /* Component */
 const handleClose = () => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = '';
-        _state.modal.visible.status = false;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.resetModal();
     emit('confirm');
 };
 
 
 /* API */
 const checkModalConfirm = async () => {
-    if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
-        deleteAppMutate({ app_id: appPageStore.selectedApp.app_id });
-    } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
-        enableAppMutate({ app_id: appPageStore.selectedApp.app_id });
-    } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
-        disableAppMutate({ app_id: appPageStore.selectedApp.app_id });
-    } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
-        generateClientSecretMutate({ app_id: appPageStore.selectedApp.app_id });
+    if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+        deleteAppMutate({ app_id: props.selectedApp.app_id });
+    } else if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+        enableAppMutate({ app_id: props.selectedApp.app_id });
+    } else if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+        disableAppMutate({ app_id: props.selectedApp.app_id });
+    } else if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
+        generateClientSecretMutate({ app_id: props.selectedApp.app_id });
     }
 };
 </script>
 
 <template>
-    <p-button-modal :visible="appPageState.modal.visible.status"
-                    :header-title="appPageState.modal.title"
-                    :theme-color="appPageState.modal.themeColor"
-                    :loading="appPageState.modal.loading"
+    <p-button-modal :visible="appPageState.modalVisible.status"
+                    :header-title="appPageState.modalInfo.title"
+                    :theme-color="appPageState.modalInfo.themeColor"
+                    :loading="appPageState.modalInfo.loading"
                     size="md"
                     class="app-management-status-modal"
                     @confirm="checkModalConfirm"
