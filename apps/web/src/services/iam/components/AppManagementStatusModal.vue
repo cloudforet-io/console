@@ -3,6 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -11,6 +12,8 @@ import {
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
+import type { AppEnableParameters } from '@/api-clients/identity/app/schema/api-verbs/enable';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
@@ -29,19 +32,32 @@ import { useAppDeleteMutation } from '@/services/iam/composables/use-app-delete-
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 
+const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
+}>();
+
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 const userStore = useUserStore();
 
+const { appAPI } = useAppApi();
 const { mutate: deleteAppMutate } = useAppDeleteMutation({
     onSettled: () => {
         handleClose();
     },
 });
-
-const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
-}>();
+const { mutate: enableAppMutate } = useMutation({
+    mutationFn: (params: AppEnableParameters) => appAPI.enable(params),
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
+        handleClose();
+    },
+});
 
 const referenceMap = useAllReferenceDataModel();
 
@@ -116,8 +132,7 @@ const checkModalConfirm = async () => {
         if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
             deleteAppMutate({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
-            await appPageStore.enableApp({ app_id: appPageStore.selectedApp.app_id });
-            showSuccessMessage(i18n.t('IAM.APP.ALT_S_ENABLED_APP'), '');
+            enableAppMutate({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
             await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
             showSuccessMessage(i18n.t('IAM.APP.ALT_S_DISABLED_APP'), '');
