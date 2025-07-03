@@ -14,7 +14,7 @@
             />
             <plugin-summary-cards :collector="collectorFormState.originCollector"
                                   :recent-jobs="state.recentJobs"
-                                  :history-link="collectorJobStore.hasJobs ? props.historyLink : undefined"
+                                  :history-link="props.historyLink"
             />
             <collector-tags :tags="collectorFormState.originCollector?.tags" />
         </div>
@@ -87,7 +87,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
 const props = defineProps<{
-    historyLink: Location
+    historyLink?: Location
     hasReadWriteAccess?: boolean
 }>();
 

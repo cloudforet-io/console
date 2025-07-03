@@ -31,13 +31,13 @@
                 </p-heading>
             </template>
             <template #extra>
-                <div v-if="collectorJobStore.AllJobsInfoLoaded"
+                <div v-if="!isJobListLoading"
                      class="collector-button-box"
                 >
                     <collect-data-button-group v-if="state.hasReadWriteAccess"
                                                @collect="handleCollectData"
                     />
-                    <router-link v-if="collectorJobStore.hasJobs"
+                    <router-link v-if="!!jobListData?.total_count"
                                  :to="state.collectorHistoryLink"
                     >
                         <p-button style-type="tertiary"
@@ -111,6 +111,7 @@ import { useQueryClient, useMutation } from '@tanstack/vue-query';
 import { clone } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PHeadingLayout,
 } from '@cloudforet/mirinae';
@@ -142,6 +143,7 @@ import CollectorOptionsSection
     from '@/services/asset-inventory/components/CollectorDetailOptionsSection.vue';
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import {
@@ -190,18 +192,21 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     collectorName: computed<string>(() => collectorData.value?.name ?? ''),
-    collectorHistoryLink: computed<Location>(() => ({
-        name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
-        query: {
-            filters: queryHelper.setFilters([
-                {
-                    k: 'collector_id',
-                    v: props.collectorId,
-                    o: '=',
-                },
-            ]).rawQueryStrings,
-        },
-    })),
+    collectorHistoryLink: computed<Location|undefined>(() => {
+        if (!jobListData.value?.total_count) return undefined;
+        return {
+            name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+            query: {
+                filters: queryHelper.setFilters([
+                    {
+                        k: 'collector_id',
+                        v: props.collectorId,
+                        o: '=',
+                    },
+                ]).rawQueryStrings,
+            },
+        };
+    }),
     deleteModalVisible: false,
     deleteLoading: false,
     editModalVisible: false,
@@ -227,6 +232,17 @@ const handleClickDeleteButton = () => {
 
 /* Query */
 const { data: collectorData, isLoading: isCollectorLoading } = useCollectorGetQuery({ collectorId: computed(() => props.collectorId) });
+const allJobsCountQueryHelper = new ApiQueryHelper().setCountOnly();
+const { data: jobListData, isLoading: isJobListLoading } = useInventoryJobListQuery({
+    params: computed(() => {
+        allJobsCountQueryHelper.setFilters([
+            { k: 'collector_id', v: props.collectorId, o: '=' },
+        ]);
+        return {
+            query: allJobsCountQueryHelper.data,
+        };
+    }),
+});
 
 const queryClient = useQueryClient();
 const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collector', 'list');
@@ -287,7 +303,6 @@ watch(() => collectorData.value, async (collector) => {
         collector,
     });
     if (collector) {
-        collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
         resume();
     }
