@@ -29,14 +29,15 @@ const { width } = useWindowSize();
 const state = reactive({
     isPopoverOpen: false,
     showStatus: computed(() => width.value > screens.mobile.max),
-    recentJobWithNoSecret: computed<JobModel|null>(() => {
-        if (Array.isArray(recentJobsData.value?.results) && recentJobsData.value.results.length > 0) {
-            const filteredJobs = recentJobsData.value.results.filter((job) => !job.secret_id);
-            return filteredJobs[0] ?? null;
-        }
-        return null;
-    }),
 });
+const recentJobWithNoSecret = computed<JobModel|null>(() => {
+    if (Array.isArray(recentJobsData.value?.results) && recentJobsData.value.results.length > 0) {
+        const filteredJobs = recentJobsData.value.results.filter((job) => !job.secret_id);
+        return filteredJobs[0] ?? null;
+    }
+    return null;
+});
+const schedule = computed(() => collectorFormState.originCollector?.schedule);
 
 /* Query */
 const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
@@ -53,13 +54,16 @@ const { data: recentJobsData } = useInventoryJobListQuery({
     }),
 });
 
+/* Event Handlers */
 const handleClickCollectDataButton = () => {
     emit('collect');
 };
 const handleUpdatePopoverVisible = (visible: boolean) => {
     state.isPopoverOpen = visible;
 };
-watch(() => state.recentJobWithNoSecret, (recentJob, prevJob) => {
+
+/* Watchers */
+watch(() => recentJobWithNoSecret.value, (recentJob, prevJob) => {
     if (recentJob?.status === 'IN_PROGRESS') {
         if (prevJob && recentJob.job_id === prevJob.job_id && recentJob.status === prevJob.status) return;
         state.isPopoverOpen = true;
@@ -94,9 +98,9 @@ watch(() => state.recentJobWithNoSecret, (recentJob, prevJob) => {
             <template #content>
                 <div class="collect-status-wrapper">
                     <collector-current-status
-                        :hours="collectorJobStore.schedule?.hours"
-                        :recent-job="state.recentJobWithNoSecret"
-                        :is-schedule-activated="collectorJobStore.schedule?.state === 'ENABLED'"
+                        :hours="schedule?.hours"
+                        :recent-job="recentJobWithNoSecret"
+                        :is-schedule-activated="schedule?.state === 'ENABLED'"
                         :is-popover-mode="true"
                     />
                 </div>
