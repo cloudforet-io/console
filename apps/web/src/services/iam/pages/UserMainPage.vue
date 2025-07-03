@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -38,25 +37,23 @@ const storeState = reactive({
     grantInfo: computed(() => authorizationStore.state.currentGrantInfo),
 });
 
-const userListApiQueryHelper = new ApiQueryHelper()
-    .setSort('name', true);
+const totalCount = ref(0);
+
+// const userListApiQueryHelper = new ApiQueryHelper()
+//     .setSort('name', true);
 
 /* API */
-const refreshUserList = async () => {
-    userPageState.loading = true;
-    userListApiQueryHelper
-        .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
-        .setFilters(userPageState.searchFilters);
-    try {
-        if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
-            await userPageStore.listUsers({ query: userListApiQueryHelper.data });
-        } else if (storeState.grantInfo.scope === 'WORKSPACE') {
-            await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
-        }
-    } finally {
-        userPageState.loading = false;
-    }
-};
+// const refreshUserList = async () => {
+//     try {
+//         if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
+//             await userPageStore.listUsers({ query: userListApiQueryHelper.data });
+//         } else if (storeState.grantInfo.scope === 'WORKSPACE') {
+//             await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
+//         }
+//     } finally {
+//         userPageState.loading = false;
+//     }
+// };
 
 /* Watcher */
 watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
@@ -66,7 +63,7 @@ watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
 
 const init = async () => {
     await userPageStore.listRoles();
-    await refreshUserList();
+    // await refreshUserList();
 };
 const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], init);
 callApiWithGrantGuard();
@@ -79,30 +76,24 @@ onUnmounted(() => {
 
 <template>
     <section class="user-page">
-        <user-management-header :has-read-write-access="hasReadWriteAccess" />
+        <user-management-header :has-read-write-access="hasReadWriteAccess"
+                                :total-count="totalCount"
+        />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height"
                                        :has-read-write-access="hasReadWriteAccess"
-                                       @confirm="refreshUserList"
+                                       @update="e => totalCount = e"
                 />
             </template>
         </p-horizontal-layout>
         <user-management-tab :has-read-write-access="hasReadWriteAccess" />
-        <user-management-add-modal v-if="hasReadWriteAccess"
-                                   @confirm="refreshUserList"
-        />
+        <user-management-add-modal v-if="hasReadWriteAccess" />
         <user-management-only-remove-workspace-group-type-modal v-if="hasReadWriteAccess" />
         <user-management-remove-mixed-type-modal v-if="hasReadWriteAccess" />
-        <user-management-status-modal v-if="hasReadWriteAccess"
-                                      @confirm="refreshUserList"
-        />
-        <user-management-form-modal v-if="hasReadWriteAccess"
-                                    @confirm="refreshUserList"
-        />
-        <user-assign-to-group-modal v-if="hasReadWriteAccess"
-                                    @confirm="refreshUserList"
-        />
+        <user-management-status-modal v-if="hasReadWriteAccess" />
+        <user-management-form-modal v-if="hasReadWriteAccess" />
+        <user-assign-to-group-modal v-if="hasReadWriteAccess" />
     </section>
 </template>
 

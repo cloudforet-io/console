@@ -13,6 +13,7 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 interface Props {
     hasReadWriteAccess?: boolean;
+    totalCount: number;
 }
 
 const props = defineProps<Props>();
@@ -106,7 +107,7 @@ watch(() => route.query, (query) => {
                 <p-heading :title="$t('IAM.USER.TITLE')"
                            use-selected-count
                            use-total-count
-                           :total-count="userPageState.totalCount"
+                           :total-count="props.totalCount"
                            :selected-count="userPageState.selectedIndices.length"
                 />
             </template>
