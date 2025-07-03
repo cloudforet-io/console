@@ -40,7 +40,7 @@ const recentJobWithNoSecret = computed<JobModel|null>(() => {
 const schedule = computed(() => collectorFormState.originCollector?.schedule);
 
 /* Query */
-const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').startOf('day').toISOString();
 const recentJobsQueryHelper = new ApiQueryHelper();
 const { data: recentJobsData } = useInventoryJobListQuery({
     params: computed(() => {
