@@ -17,7 +17,6 @@ import type { CollectorRuleListParameters } from '@/schema/inventory/collector-r
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -41,9 +40,8 @@ export type AttachedServiceAccountType = 'all'|'specific';
 export type ServiceAccountFilterOption = 'include'|'exclude';
 
 export const useCollectorFormStore = defineStore('collector-form', () => {
-    const appContextStore = useAppContextStore();
     const state = reactive({
-        originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
+        collectorId: undefined as string|undefined,
         repositoryPlugin: null as PluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
         provider: undefined as string|undefined,
         tags: {} as Tag,
@@ -64,23 +62,12 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         additionalRules: [] as CollectorRuleModel[],
 
         // getters
-        collectorId: computed<string|undefined>(() => state.originCollector?.collector_id),
-        pluginId: computed<string|undefined>(() => state.originCollector?.plugin_info?.plugin_id ?? state.repositoryPlugin?.plugin_id),
-        collectorProvider: computed<string|undefined>(() => state.originCollector?.provider),
         serviceAccounts: computed<string[]>(() => state.attachedServiceAccount.map((d) => d.name as string)),
-        isEditableCollector: computed<boolean>(() => {
-            if (appContextStore.getters.isAdminMode) {
-                return true;
-            }
-            const isManagedCollector = state.originCollector?.workspace_id === '*';
-            return !isManagedCollector;
-        }),
     });
 
     const actions = {
-        async setOriginCollector(collector: CollectorModel) {
-            state.originCollector = collector;
-            await this.resetForm();
+        setCollectorId(collectorId?: string) {
+            state.collectorId = collectorId;
         },
         setRepositoryPlugin(pluginInfo: PluginModel|null) {
             state.repositoryPlugin = pluginInfo;
@@ -88,7 +75,7 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         async setOriginCollectorRules(id?: string) {
             try {
                 const res = await SpaceConnector.clientV2.inventory.collectorRule.list<CollectorRuleListParameters, ListResponse<CollectorRuleModel>>({
-                    collector_id: state.originCollector?.collector_id ?? id,
+                    collector_id: state.collectorId ?? id,
                 });
                 state.originCollectorRules = res?.results ?? [];
                 state.additionalRules = state.originCollectorRules;
@@ -98,13 +85,17 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_RULE_TITLE'));
             }
         },
-        async resetForm() {
-            actions.resetName();
-            actions.resetTags();
-            actions.resetVersion();
-            actions.resetSchedule();
-            actions.resetOptions();
-            await this.resetAttachedServiceAccount();
+        initForm(originCollector?: CollectorModel) {
+            state.name = originCollector?.name ?? '';
+            state.tags = originCollector?.tags ?? {};
+            state.version = originCollector?.plugin_info?.version ?? '';
+            state.options = originCollector?.plugin_info?.options ?? {};
+
+            const pluginUpgradeMode = originCollector?.plugin_info?.upgrade_mode ?? 'AUTO';
+            state.autoUpgrade = pluginUpgradeMode === 'AUTO';
+
+            actions.resetSchedule(originCollector);
+            actions.resetAttachedServiceAccount(originCollector);
         },
         setProvider(provider: string) {
             state.provider = provider;
@@ -112,52 +103,36 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         setTags(tags: Tag) {
             state.tags = tags;
         },
-        resetTags() {
-            state.tags = state.originCollector?.tags ?? {};
-        },
         setName(name: string) {
             state.name = name;
-        },
-        resetName() {
-            state.name = state.originCollector?.name ?? '';
         },
         setVersion(version: string) {
             state.version = version;
         },
-        resetVersion() {
-            state.version = state.originCollector?.plugin_info?.version ?? '';
-        },
         setAutoUpgrade(autoUpgrade: boolean) {
             state.autoUpgrade = autoUpgrade;
         },
-        resetAutoUpgrade() {
-            const pluginUpgradeMode = state.originCollector?.plugin_info.upgrade_mode ?? 'AUTO';
-            state.autoUpgrade = pluginUpgradeMode === 'AUTO';
-        },
-        resetSchedule(hoursOnly = false) {
-            state.scheduleHours = state.originCollector?.schedule?.hours ?? [];
+        resetSchedule(originCollector?: CollectorModel, hoursOnly = false) {
+            state.scheduleHours = originCollector?.schedule?.hours ?? [];
             state.isScheduleError = false;
-            if (!hoursOnly) state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED';
+            if (!hoursOnly) state.schedulePower = originCollector?.schedule?.state === 'ENABLED';
         },
-        resetSchedulePower() {
-            state.schedulePower = state.originCollector?.schedule?.state === 'ENABLED';
+        resetSchedulePower(originCollector?: CollectorModel) {
+            state.schedulePower = originCollector?.schedule?.state === 'ENABLED';
         },
-        async resetAttachedServiceAccount() {
+        resetAttachedServiceAccount(originCollector?: CollectorModel) {
             const allReferenceStore = useAllReferenceStore();
             const accountItems = allReferenceStore.getters.serviceAccount;
-            const secretFilter = state.originCollector?.secret_filter;
+            const secretFilter = originCollector?.secret_filter;
             const attachedServiceAccount = state.selectedServiceAccountFilterOption === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
             state.attachedServiceAccount = (attachedServiceAccount ?? []).map((d) => ({
                 label: accountItems[d]?.label ?? d,
                 name: d,
             })) ?? [];
-            state.attachedServiceAccountType = state.originCollector?.secret_filter?.state === 'ENABLED' ? 'specific' : 'all';
+            state.attachedServiceAccountType = originCollector?.secret_filter?.state === 'ENABLED' ? 'specific' : 'all';
         },
         setOptions(options: CollectorOptions) {
             state.options = options;
-        },
-        resetOptions() {
-            state.options = state.originCollector?.plugin_info?.options ?? {};
         },
         async getVersions(pluginId: string) {
             try {
@@ -171,7 +146,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
             }
         },
         resetState() {
-            state.originCollector = null;
             state.repositoryPlugin = null;
             state.provider = undefined;
             state.tags = {};

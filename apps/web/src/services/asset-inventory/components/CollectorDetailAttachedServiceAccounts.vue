@@ -27,6 +27,7 @@ import { useUserStore } from '@/store/user/user-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
@@ -79,7 +80,7 @@ const state = reactive({
     sortBy: 'name',
     sortDesc: true,
     totalCount: 0,
-    secretFilter: computed(() => collectorFormState.originCollector?.secret_filter),
+    secretFilter: computed(() => originCollectorData.value?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
     serviceAccountsFilter: computed<string[]>(() => {
         if (!state.secretFilter) return [];
@@ -107,6 +108,11 @@ const querySearchHandlers = {
         project_id: makeReferenceValueHandler('identity.Project'),
     },
 };
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
 
 const queryTagHelper = useQueryTags({ keyItemSets: querySearchHandlers.keyItemSets });
 const { queryTags } = queryTagHelper;
@@ -157,19 +163,19 @@ const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
 
-    if (collectorFormState.collectorProvider) await getSecrets(collectorFormState.collectorProvider, state.serviceAccountsFilter);
+    if (originCollectorData.value?.provider) await getSecrets(originCollectorData.value.provider, state.serviceAccountsFilter);
 };
 const handleToolboxTableRefresh = async () => {
-    if (collectorFormState.collectorProvider) await getSecrets(collectorFormState.collectorProvider, state.serviceAccountsFilter);
+    if (originCollectorData.value?.provider) await getSecrets(originCollectorData.value.provider, state.serviceAccountsFilter);
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.setVisible(true);
-    collectorDataModalStore.setSelectedCollectorId(collectorFormState.originCollector?.collector_id);
+    collectorDataModalStore.setSelectedCollectorId(collectorFormState.collectorId);
     collectorDataModalStore.setCollectDataType(COLLECT_DATA_TYPE.SINGLE);
     collectorDataModalStore.setSelectedSecret(secret);
 };
 
-watch([() => collectorFormState.collectorProvider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
+watch([() => originCollectorData.value?.provider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
     if (!provider) return;
     await getSecrets(provider, serviceAccounts);
 }, { immediate: true });

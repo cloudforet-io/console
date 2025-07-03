@@ -40,6 +40,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
@@ -53,7 +54,6 @@ const emit = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
 
 const state = reactive({
-    pluginId: computed<string|undefined>(() => collectorFormState.pluginId),
     versionItems: computed<MenuItem[]>(() => collectorFormState.versions.map((value, index) => {
         if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
         return { type: 'item', label: value, name: value };
@@ -67,11 +67,17 @@ const state = reactive({
     }),
     isVersionValid: computed(() => !state.versionInvalidText || collectorFormState.autoUpgrade),
 });
+const collectorPluginId = computed<string|undefined>(() => originCollectorData.value?.plugin_info?.plugin_id ?? collectorFormState.repositoryPlugin?.plugin_id);
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
 
 const initSelectedVersion = () => {
-    if (collectorFormState.originCollector) {
-        const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
-        const originVersion = collectorFormState.originCollector?.plugin_info?.version;
+    if (originCollectorData.value) {
+        const originAutoUpgrade = originCollectorData.value?.plugin_info?.upgrade_mode === 'AUTO';
+        const originVersion = originCollectorData.value?.plugin_info?.version;
         collectorFormStore.$patch((_state) => {
             _state.state.version = originVersion ?? collectorFormState.versions[0] ?? '';
             _state.state.autoUpgrade = originAutoUpgrade ?? true;
@@ -101,7 +107,7 @@ watch(() => state.isVersionValid, (value) => {
 }, { immediate: true });
 
 // get version list when pluginId changed and init selected version
-watch(() => state.pluginId, async (pluginId) => {
+watch(() => collectorPluginId.value, async (pluginId) => {
     if (!pluginId) return;
     if (props.getVersionsOnPluginIdChange) await collectorFormStore.getVersions(pluginId);
     initSelectedVersion();

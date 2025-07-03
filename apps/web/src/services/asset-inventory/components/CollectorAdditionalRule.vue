@@ -13,6 +13,8 @@ import type { CollectorRuleUpdateParameters } from '@/schema/inventory/collector
 import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -21,14 +23,16 @@ import CollectorAdditionalRuleContent from '@/services/asset-inventory/component
 import CollectorAdditionalRuleEmptyCase
     from '@/services/asset-inventory/components/CollectorAdditionalRuleEmptyCase.vue';
 import CollectorAdditionalRuleForm from '@/services/asset-inventory/components/CollectorAdditionalRuleForm.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
 import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
 
-
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const appContextStore = useAppContextStore();
 
 interface Props {
     collectorId?: string;
@@ -46,12 +50,14 @@ const state = reactive({
     }),
     isEmptyCase: computed<boolean>(() => collectorFormState.additionalRules.length === 0),
     editModeCardOrder: 0,
-    collectorProvider: computed(() => collectorFormState.originCollector?.provider),
     isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
         || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
-    isEditable: computed<boolean>(() => props.hasReadWriteAccess && state.editModeCardOrder === 0 && collectorFormState.isEditableCollector),
+    isEditable: computed<boolean>(() => props.hasReadWriteAccess && state.editModeCardOrder === 0 && isEditableCollector.value),
 });
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
 
+/* Utils */
 const changeOrder = (targetData, clickedData, tempOrder) => {
     if (targetData.order < clickedData.order) {
         targetData.order = tempOrder;
@@ -61,6 +67,13 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
         clickedData.order = tempOrder + 1;
     }
 };
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => props.collectorId),
+});
+
+/* Event Handlers */
 const handleClickUpButton = async (data:CollectorRuleModel) => {
     const tempCardData = [...collectorFormState.additionalRules];
     const tempOrder = data.order;
@@ -124,9 +137,10 @@ const handleClickAddEventRule = async () => {
     state.editModeCardOrder = collectorFormState.additionalRules.length;
 };
 const createCollectorRule = async (data:CollectorRuleForm) => {
+    if (!props.collectorId) throw new Error('collector_id is not defined');
     try {
         await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
-            collector_id: collectorFormState.originCollector.collector_id,
+            collector_id: props.collectorId,
             conditions: data.conditions,
             conditions_policy: data.conditions_policy,
             actions: data.actions,
@@ -251,7 +265,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                              class="edit-card"
                         >
                             <collector-additional-rule-form :data="data"
-                                                            :provider="state.collectorProvider"
+                                                            :provider="originCollectorData?.provider"
                                                             @click-done="handleSetRule"
                                                             @click-cancel="handleCancelSetRule"
                             />

@@ -22,7 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -30,7 +32,6 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
-import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n as i18nTranslator } from '@/translations';
 
 
@@ -55,11 +56,8 @@ const state = reactive({
 
 /* Query */
 const queryClient = useQueryClient();
-const { key: collectorGetQueryKey } = useServiceQueryKey('inventory', 'collector', 'get', {
-    contextKey: computed(() => collectorPageState.selectedCollectorId),
-});
-const { data: selectedCollectorData } = useCollectorGetQuery({
-    collectorId: computed(() => collectorPageState.selectedCollectorId),
+const { data: originCollectorData, isLoading: isOriginCollectorLoading, collectorGetQueryKey } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
 /* Events */
@@ -79,7 +77,7 @@ const handleConfirm = async () => {
         await fetchCollectorUpdate();
         handleCloseModal();
     } catch (e) {
-        collectorFormStore.resetSchedulePower();
+        collectorFormStore.resetSchedulePower(originCollectorData.value);
         ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
@@ -95,12 +93,13 @@ const fetchCollectorUpdate = async () => {
         },
     };
     await collectorAPI.update(params);
-    queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+    queryClient.invalidateQueries({ queryKey: collectorGetQueryKey });
 };
 
 /* Watcher */
-watch(() => selectedCollectorData.value, async (value) => {
-    if (!value) return;
-    await collectorFormStore.setOriginCollector(value);
+watch([() => collectorFormState.collectorId, () => isOriginCollectorLoading.value], async ([collectorId, isLoading]) => {
+    if (!collectorId || isLoading) return;
+    collectorFormStore.resetSchedule(originCollectorData.value);
+    collectorFormStore.resetSchedulePower(originCollectorData.value);
 }, { immediate: true });
 </script>
