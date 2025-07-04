@@ -105,6 +105,10 @@ const serviceRouter = useServiceRouter(router);
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
 
+const schemaGetEnabled = computed(() => {
+    if (props.isServerPage) return true;
+    return !!(!!props.provider && !!props.group && !!props.name);
+});
 const { data: schemaData } = useCloudServicePageSchemaGetQuery({
     params: computed<PageSchemaGetParameters>(() => {
         const params: Record<string, any> = {
@@ -128,6 +132,7 @@ const { data: schemaData } = useCloudServicePageSchemaGetQuery({
         }
         return params as PageSchemaGetParameters;
     }),
+    enabled: computed(() => schemaGetEnabled.value),
 });
 
 /* Main Table */
