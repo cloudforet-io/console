@@ -181,9 +181,9 @@ const handleClickAddEventRule = async () => {
     };
     state.editModeCardOrder = newOrder;
 };
-const handleSaveRule = async (data: CollectorRuleModel | CollectorRuleForm) => {
+const handleSaveRule = (data: CollectorRuleModel | CollectorRuleForm) => {
     if (data.collector_rule_id) {
-        await updateCollectorRule({
+        updateCollectorRule({
             collector_rule_id: data.collector_rule_id,
             conditions: data.conditions,
             conditions_policy: data.conditions_policy,
@@ -191,7 +191,7 @@ const handleSaveRule = async (data: CollectorRuleModel | CollectorRuleForm) => {
             options: data.options,
         });
     } else {
-        await createCollectorRule({
+        createCollectorRule({
             collector_id: props.collectorId || '',
             conditions: data.conditions,
             conditions_policy: data.conditions_policy,
