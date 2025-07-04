@@ -20,7 +20,7 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import { gray, indigo } from '@/styles/colors';
 
-import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
+import CloudServices from '@/services/project/v1/components/CloudServices.vue';
 import ProjectSummaryAlertWidget from '@/services/project/v1/components/ProjectSummaryAlertWidget.vue';
 import ProjectSummaryAllSummaryWidget from '@/services/project/v1/components/ProjectSummaryAllSummaryWidget.vue';
 import ProjectSummaryBillingWidget from '@/services/project/v1/components/ProjectSummaryBillingWidget.vue';
