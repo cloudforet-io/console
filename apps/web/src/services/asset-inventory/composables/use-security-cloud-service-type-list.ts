@@ -19,7 +19,7 @@ interface CloudServiceTypeListItem {
 export const useSecurityCloudServiceTypeList = () => {
     const { data: cloudServiceAnalyzeListData, isFetching: isCloudServiceAnalyzeListLoading } = useCloudServiceAnalyzeQuery({
         params: computed(() => ({
-            query: getCloudServiceAnalyzeQuery([]),
+            query: getCloudServiceAnalyzeQuery([{ k: 'ref_cloud_service_type.labels', v: ['CSPM'], o: '=' }]),
         })),
     });
 
@@ -36,9 +36,9 @@ export const useSecurityCloudServiceTypeList = () => {
         if (cloudServiceAnalyzeList && _cloudServiceTypeList) {
             return Object.values(groupBy(cloudServiceAnalyzeList, 'cloud_service_group')).map((group) => {
                 const items = flatMap(group, (listItem) => {
-                    const referenceItem = _cloudServiceTypeList.filter((dataItem) => dataItem.group === listItem.cloud_service_group
+                    const cloudServiceTypeItem = _cloudServiceTypeList.filter((dataItem) => dataItem.group === listItem.cloud_service_group
                         && dataItem.provider === listItem.provider);
-                    return uniqBy(referenceItem || [], 'name');
+                    return uniqBy(cloudServiceTypeItem || [], 'name');
                 });
 
                 return {

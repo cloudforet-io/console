@@ -105,7 +105,7 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 interface Props {
     provider: string;
     cloudServiceId: string;
-    date: string;
+    date?: string;
 }
 type PeriodType = 'last1day' | 'last3days' | 'last1week' | 'last2weeks' | 'last1month' | 'last3months' | 'last1year';
 interface PeriodItem {
