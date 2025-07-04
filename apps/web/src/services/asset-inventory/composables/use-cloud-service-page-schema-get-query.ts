@@ -8,18 +8,20 @@ import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseCloudServicePageSchemaGetQueryOptions {
     params: ComputedRef<PageSchemaGetParameters>;
+    enabled?: ComputedRef<boolean>;
 }
 
-export const useCloudServicePageSchemaGetQuery = (options: UseCloudServicePageSchemaGetQueryOptions) => {
+export const useCloudServicePageSchemaGetQuery = ({ params, enabled }: UseCloudServicePageSchemaGetQueryOptions) => {
     const { pageSchemaAPI } = usePageSchemaApi();
-    const { key, params } = useServiceQueryKey('add-ons', 'page-schema', 'get', {
-        params: computed<PageSchemaGetParameters>(() => options.params.value),
+    const { key, params: queryParams } = useServiceQueryKey('add-ons', 'page-schema', 'get', {
+        params: computed<PageSchemaGetParameters>(() => params.value),
+        contextKey: computed(() => [params.value.schema, params.value.resource_type]),
     });
 
     return useScopedQuery({
-        queryKey: key,
-        queryFn: () => pageSchemaAPI.get(params.value),
-        enabled: computed(() => !!params.value),
+        queryKey: computed(() => key.value),
+        queryFn: () => pageSchemaAPI.get(queryParams.value),
+        enabled: computed(() => !!params.value && (enabled?.value ?? true)),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 5,
     }, ['DOMAIN', 'WORKSPACE']);

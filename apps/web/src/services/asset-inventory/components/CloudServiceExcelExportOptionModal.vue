@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButtonModal, PToggleButton, PFieldTitle,
@@ -14,7 +13,9 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
-import type { CloudServiceAnalyzeParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/analyze';
+import { usePageSchemaApi } from '@/api-clients/add-ons/page-schema/composables/use-page-schema-api';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
+import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '@/api-clients/inventory/cloud-service/schema/type';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -29,11 +30,14 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
+import { useCloudServiceAnalyzeQuery } from '@/services/asset-inventory/composables/use-cloud-service-analyze-query';
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type { Period } from '@/services/asset-inventory/types/type';
+
+
+type CloudServiceResource = CloudServiceAnalyzeResultResource & Pick<CloudServiceAnalyzeResult, 'provider' | 'cloud_service_group'>;
 
 const props = defineProps<{
     visible: boolean;
@@ -43,7 +47,10 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
+const { cloudServiceAPI } = useCloudServiceApi();
+const { pageSchemaAPI } = usePageSchemaApi();
 const cloudServicePageStore = useCloudServicePageStore();
+const cloudServicePageGetters = cloudServicePageStore.getters;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
@@ -60,7 +67,7 @@ const state = reactive({
     downloadOptions: [DEFAULT_CONTENTS, DETAIL_CONTENTS] as string[],
     allOptionValue: false,
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
-    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
+    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageGetters.allFilters, ...cloudServiceLSBStore.getters.allFilters]
         .filter((f: any) => ![
             'service_code',
         ].includes(f.k)).map((f) => {
@@ -70,6 +77,12 @@ const state = reactive({
             return ({ ...f });
         })),
 });
+
+const cloudServiceResources = computed<CloudServiceResource[]>(() => (cloudServiceAnalyzeData.value?.results || []).map((d) => d.resources?.map((r) => ({
+    ...r,
+    provider: d.provider,
+    cloud_service_group: d.cloud_service_group,
+})) ?? []).flat());
 
 const getCloudServiceResourcesPayload = (): ExportOption => {
     const query = getCloudServiceAnalyzeQuery(state.cloudServiceFilters, undefined, props.period, state.allOptionValue);
@@ -85,38 +98,22 @@ const getCloudServiceResourcesPayload = (): ExportOption => {
     };
 };
 
-const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
-    try {
-        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
-            query: getCloudServiceAnalyzeQuery(
-                cloudServicePageStore.allFilters,
-                undefined,
-                props.period,
-                state.allOptionValue,
-            ),
-        });
-        return (results as CloudServiceAnalyzeResult[]).map((d) => d.resources?.map((r) => ({
-            ...r,
-            provider: d.provider,
-            cloud_service_group: d.cloud_service_group,
-        })) ?? []).flat();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
-
-interface CloudServiceResource {
-    provider?: string;
-    cloud_service_group?: string;
-    cloud_service_type?: string
-}
+const { data: cloudServiceAnalyzeData } = useCloudServiceAnalyzeQuery({
+    params: computed(() => ({
+        query: getCloudServiceAnalyzeQuery(
+            cloudServicePageGetters.allFilters,
+            undefined,
+            props.period,
+            state.allOptionValue,
+        ),
+    })),
+});
 
 const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataField[]> => {
     let schema: DynamicLayout;
     let excelField;
     try {
-        schema = await SpaceConnector.client.addOns.pageSchema.get({
+        schema = await pageSchemaAPI.get({
             resource_type: 'inventory.CloudService',
             schema: 'table',
             options: {
@@ -151,8 +148,7 @@ const getExcelQuery = (data) => {
 
 const getExcelPayloadList = async (): Promise<ExportOption[]> => {
     const excelPayloadList: ExportOption[] = [];
-    const excelItems = await getCloudServiceResources();
-    const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map((d) => getExcelFields(d)));
+    const excelFieldList: Array<ExcelDataField[]> = await Promise.all(cloudServiceResources.value.map((d) => getExcelFields(d)));
 
 
     const errorString = ['/', '\\', '?', '*', '[', ']'];
@@ -164,18 +160,18 @@ const getExcelPayloadList = async (): Promise<ExportOption[]> => {
         return result;
     };
     excelFieldList.forEach((excelField, idx) => {
-        let sheetName = `${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
+        let sheetName = `${cloudServiceResources.value[idx].cloud_service_group}.${cloudServiceResources.value[idx].cloud_service_type}`;
         sheetName = removeErrorString(sheetName);
 
-        const provider = excelItems[idx]?.provider ?? '';
+        const provider = cloudServiceResources.value[idx]?.provider ?? '';
         const providerName = state.providers[provider]?.label || provider;
 
         excelPayloadList.push({
             name: sheetName,
-            title: `[${providerName}] ${excelItems[idx].cloud_service_group} ${excelItems[idx].cloud_service_type}`,
+            title: `[${providerName}] ${cloudServiceResources.value[idx].cloud_service_group} ${cloudServiceResources.value[idx].cloud_service_type}`,
             query_type: QueryType.SEARCH,
             search_query: {
-                ...getExcelQuery(excelItems[idx]),
+                ...getExcelQuery(cloudServiceResources.value[idx]),
                 fields: excelField,
             },
         });
@@ -194,7 +190,7 @@ const handleConfirm = async () => {
                 ...excelPayloadList,
             ],
         };
-        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+        return cloudServiceAPI.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
     emits('update:visible', false);

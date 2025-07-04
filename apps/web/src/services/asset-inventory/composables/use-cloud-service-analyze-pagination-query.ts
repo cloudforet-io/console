@@ -2,37 +2,33 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
-import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
+import type { CloudServiceAnalyzeParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/analyze';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 
-interface UseCloudServicePaginationQueryOptions {
-    params: ComputedRef<CloudServiceListParameters>;
+interface UseCloudServiceAnalyzePaginationQueryOptions {
+    params: ComputedRef<CloudServiceAnalyzeParameters>;
     thisPage: ComputedRef<number>;
     pageSize: ComputedRef<number>;
-    enabled?: ComputedRef<boolean>;
 }
 
-export const useCloudServicePaginationQuery = ({
-    params, thisPage, pageSize, enabled,
-}: UseCloudServicePaginationQueryOptions) => {
+export const useCloudServiceAnalyzePaginationQuery = ({ params, thisPage, pageSize }: UseCloudServiceAnalyzePaginationQueryOptions) => {
     const { cloudServiceAPI } = useCloudServiceApi();
-
-    const { key, params: queryParams } = useServiceQueryKey('inventory', 'cloud-service', 'list', {
+    const { key, params: queryParams } = useServiceQueryKey('inventory', 'cloud-service', 'analyze', {
         params: computed(() => params.value),
         pagination: true,
     });
 
     return useScopedPaginationQuery({
         queryKey: key,
-        queryFn: cloudServiceAPI.list,
+        queryFn: cloudServiceAPI.analyze,
         params: queryParams,
         staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60 * 5,
-        enabled: computed(() => enabled?.value ?? true),
+        gcTime: 1000 * 60 * 10,
+        enabled: computed(() => !!params.value),
     }, {
         thisPage,
         pageSize,
-        verb: 'list',
+        verb: 'analyze',
     }, ['DOMAIN', 'WORKSPACE']);
 };

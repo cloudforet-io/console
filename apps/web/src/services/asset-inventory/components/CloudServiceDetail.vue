@@ -24,7 +24,6 @@ import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
 import type { PageSchemaGetParameters } from '@/api-clients/add-ons/page-schema/schema/api-verbs/get';
 import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
-import type { CloudServiceGetDataParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get-data';
 import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -46,7 +45,6 @@ import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 
-import { useCloudServiceGetDataPaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-get-data-pagination-query';
 import { useCloudServiceGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-get-query';
 import { useCloudServicePageSchemaGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-get-query';
 import { useCloudServicePaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-pagination-query';
@@ -77,6 +75,7 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
 };
 
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageGetters = cloudServiceDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
@@ -109,26 +108,19 @@ const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const state = reactive({
     // data: undefined as any,
     data: computed(() => {
-        if (state.currentLayout.type === 'raw-table') {
-            return cloudServiceDataForRawTable.value?.results ?? [];
-        } if (state.isTableTypeInDynamicLayout) {
+        if (state.isTableTypeInDynamicLayout) {
             return cloudServiceDataForDynamicLayout.value?.results ?? [];
         }
         return cloudServiceData.value;
     }),
     totalCount: computed<number>(() => {
-        if (state.currentLayout.type === 'raw-table') {
-            return cloudServiceDataForRawTableTotalCount.value ?? 0;
-        } if (state.isTableTypeInDynamicLayout) {
+        if (state.isTableTypeInDynamicLayout) {
             return cloudServiceDataForDynamicLayoutTotalCount.value ?? 0;
         }
         return 0;
     }),
-    // loading: true,
     loading: computed(() => {
-        if (state.currentLayout.type === 'raw-table') {
-            return isCloudServiceDataLoadingForRawTable.value;
-        } if (state.isTableTypeInDynamicLayout) {
+        if (state.isTableTypeInDynamicLayout) {
             return isCloudServiceDataLoadingForDynamicLayout.value;
         }
         return isCloudServiceDataLoading.value;
@@ -200,7 +192,6 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
 );
 
 const apiQuery = new ApiQueryHelper();
-const apiQueryForGetData = new ApiQueryHelper();
 const listTypeQuery = new ApiQueryHelper();
 const unwindTagQuery = new ApiQueryHelper();
 
@@ -254,39 +245,17 @@ const getListApiParams = (type?: DynamicLayoutType) => {
     return params;
 };
 
-const getQueryForGetDataAPI = (): any => {
-    const options = fetchOptionsMap.value || defaultFetchOptions;
-    if (options.sortBy !== undefined) apiQueryForGetData.setSort(options.sortBy, options.sortDesc);
-    if (options.pageLimit !== undefined) apiQueryForGetData.setPageLimit(options.pageLimit);
-    if (options.pageStart !== undefined) apiQueryForGetData.setPageStart(options.pageStart);
-    if (options.searchText !== undefined) apiQueryForGetData.setFilters([{ v: options.searchText }]);
-    if (options.queryTags !== undefined) {
-        apiQueryForGetData.setFiltersAsQueryTag(options.queryTags);
-    }
-    return apiQueryForGetData.data;
-};
 
-const { data: cloudServiceDataForRawTable, isLoading: isCloudServiceDataLoadingForRawTable, totalCount: cloudServiceDataForRawTableTotalCount } = useCloudServiceGetDataPaginationQuery({
-    params: computed<CloudServiceGetDataParameters>(() => {
-        const params: CloudServiceGetDataParameters = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
-        const keyPath = state.currentLayout.options?.root_path;
-        if (keyPath) params.key_path = keyPath;
-        return params;
-    }),
-    thisPage: computed(() => getThisPage(fetchOptionsMap.value?.pageStart || 1, fetchOptionsMap.value?.pageLimit || 45)),
-    pageSize: computed(() => fetchOptionsMap.value?.pageLimit || 45),
-    enabled: computed(() => state.currentLayout.type === 'raw-table'),
-});
 const { data: cloudServiceData, isLoading: isCloudServiceDataLoading } = useCloudServiceGetQuery({
     cloudServiceId: computed(() => props.cloudServiceId),
-    enabled: computed(() => state.currentLayout.type !== 'raw-table' || !state.isTableTypeInDynamicLayout),
+    enabled: computed(() => !state.isTableTypeInDynamicLayout),
 });
 
 const { data: cloudServiceDataForDynamicLayout, isLoading: isCloudServiceDataLoadingForDynamicLayout, totalCount: cloudServiceDataForDynamicLayoutTotalCount } = useCloudServicePaginationQuery({
     params: computed<CloudServiceListParameters>(() => getListApiParams(state.currentLayout.type)),
     thisPage: computed(() => getThisPage(fetchOptionsMap.value?.pageStart || 1, fetchOptionsMap.value?.pageLimit || 45)),
     pageSize: computed(() => fetchOptionsMap.value?.pageLimit || 45),
-    enabled: computed(() => state.currentLayout.type !== 'raw-table' && state.isTableTypeInDynamicLayout),
+    enabled: computed(() => state.isTableTypeInDynamicLayout),
 });
 
 // excel
@@ -300,7 +269,7 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
         const cloudServiceExcelExportParams: ExportParameter = {
-            file_name: props.isServerPage ? 'cloud_service_export' : cloudServiceDetailPageStore.sheetNamePrefix,
+            file_name: props.isServerPage ? 'cloud_service_export' : cloudServiceDetailPageGetters.sheetNamePrefix,
             options: [
                 {
                     name: state.currentLayout.name,
@@ -324,7 +293,10 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        fetchOptionsMap.value = options;
+        fetchOptionsMap.value = {
+            ...fetchOptionsMap.value,
+            ...options,
+        };
     },
     select(selectIndex) {
         state.selectIndex = selectIndex;
@@ -344,15 +316,15 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 
 const onChangeTab = async (tab) => {
     state.activeTab = tab;
-    // await loadSchemaAndData();
+    fetchOptionsMap.value = defaultFetchOptions;
 };
 
 
 watch(schemaData, (schema) => {
-    if (schema) {
-        state.activeTab = state.tabs[0].name;
+    if (schema?.details?.length && schema.details.length > 0) {
+        state.activeTab = schema.details[0].name;
     }
-});
+}, { immediate: true });
 
 </script>
 
