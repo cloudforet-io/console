@@ -2,7 +2,7 @@ import type { Tags } from '@/api-clients/_common/schema/model';
 import type {
     CollectorRuleConditionPolicy, CollectorRuleType, CollectorResourceGroup, CollectorRuleConditionOperator,
     CollectorRuleConditionKey,
-} from '@/schema/inventory/collector-rule/type';
+} from '@/api-clients/inventory/collector-rule/schema/type';
 
 export interface AdditionalRuleCondition {
     key: CollectorRuleConditionKey;

@@ -6,6 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { CollectorRuleListParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/list';
+import type { CollectorRuleModel } from '@/api-clients/inventory/collector-rule/schema/model';
 import type {
     CollectorModel,
 
@@ -13,8 +15,6 @@ import type {
 import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
 import type { PluginGetVersionsParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get-versions';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { CollectorRuleListParameters } from '@/schema/inventory/collector-rule/api-verbs/list';
-import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

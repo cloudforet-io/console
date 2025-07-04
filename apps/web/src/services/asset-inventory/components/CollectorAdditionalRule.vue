@@ -6,11 +6,11 @@ import {
     PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
-import type { CollectorRuleChangeOrderParameters } from '@/schema/inventory/collector-rule/api-verbs/change-order';
-import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
-import type { CollectorRuleDeleteParameters } from '@/schema/inventory/collector-rule/api-verbs/delete';
-import type { CollectorRuleUpdateParameters } from '@/schema/inventory/collector-rule/api-verbs/update';
-import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import type { CollectorRuleChangeOrderParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/change-order';
+import type { CollectorRuleCreateParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/create';
+import type { CollectorRuleDeleteParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/delete';
+import type { CollectorRuleUpdateParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/update';
+import type { CollectorRuleModel } from '@/api-clients/inventory/collector-rule/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
