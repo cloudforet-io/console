@@ -494,8 +494,12 @@ export const API_DOC = {
         ],
     },
     inventory: {
+        'change-history': [
+            'list',
+        ],
         'cloud-service': [
             'analyze',
+            'get-data',
             'get',
             'list',
         ],
@@ -515,6 +519,13 @@ export const API_DOC = {
             'update-plugin',
             'update',
         ],
+        job: [
+            'analyze',
+            'list',
+        ],
+        'job-task': [
+            'list',
+        ],
         metric: [
             'create',
             'delete',
@@ -529,6 +540,12 @@ export const API_DOC = {
         namespace: [
             'get',
             'list',
+        ],
+        note: [
+            'create',
+            'delete',
+            'list',
+            'update',
         ],
         region: [
             'list',
