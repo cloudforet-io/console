@@ -19,6 +19,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { red } from '@/styles/colors';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import type {
     AttachedServiceAccount,
     AttachedServiceAccountType, ServiceAccountFilterOption,
@@ -61,8 +62,8 @@ const state = reactive({
         return !invalidState.selectedAttachedServiceAccount;
     }),
     handlerParams: computed(() => {
-        if (collectorFormState.collectorProvider) {
-            queryHelper.addFilter({ k: 'provider', v: collectorFormState.collectorProvider, o: '=' });
+        if (originCollectorData.value?.provider) {
+            queryHelper.addFilter({ k: 'provider', v: originCollectorData.value.provider, o: '=' });
         } else if (collectorFormState.provider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormState.provider, o: '=' });
         } else if (collectorFormState.repositoryPlugin?.provider) {
@@ -131,6 +132,11 @@ const {
         }
         return true;
     },
+});
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
 const handleChangeAttachedServiceAccountType = (selectedValue: AttachedServiceAccountType) => {

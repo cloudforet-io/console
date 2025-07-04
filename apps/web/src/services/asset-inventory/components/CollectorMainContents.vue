@@ -160,7 +160,6 @@ const state = reactive({
             ]);
 
             const matchedJob = jobAnalyzeData.value?.results?.find((status) => status.collector_id === d.collector_id);
-            const recentJobAnalyze = matchedJob ? matchedJob?.job_status : [];
             return {
                 collectorId: d.collector_id,
                 workspaceId: d.workspace_id,
@@ -184,7 +183,6 @@ const state = reactive({
                     },
                 },
                 schedule: d.schedule,
-                recentJobAnalyze,
                 resourceGroup: d.resource_group,
                 hasJobList: !!matchedJob,
             };

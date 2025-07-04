@@ -64,14 +64,15 @@ import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PI, PProgressBar, PLink } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-
 import { peacock } from '@/styles/colors';
 
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -82,9 +83,9 @@ const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
     hours?: number[];
-    recentJob?: JobAnalyzeStatus|null;
     isScheduleActivated?: boolean;
     isPopoverMode?: boolean;
+    collectorId?: string;
 }
 
 
@@ -93,7 +94,7 @@ const appContextStore = useAppContextStore();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    status: computed<string|undefined>(() => props.recentJob?.status),
+    status: computed<string|undefined>(() => recentJob.value?.status),
     diffSchedule: computed(() => {
         if (props.hours) {
             const current = dayjs.utc();
@@ -116,8 +117,8 @@ const state = reactive({
     }),
     remainedTasksPercentage: computed<number>(() => {
         if (state.status === JOB_STATE.IN_PROGRESS) {
-            const remainedTasks = props.recentJob?.remained_tasks ?? 0;
-            const totalTasks = props.recentJob?.total_tasks ?? 0;
+            const remainedTasks = recentJob.value?.remained_tasks ?? 0;
+            const totalTasks = recentJob.value?.total_tasks ?? 0;
             return totalTasks > 0 ? ((totalTasks - remainedTasks) / totalTasks) * 100 : 100;
         }
         return 0;
@@ -128,8 +129,27 @@ const state = reactive({
     }),
     detailJobLink: computed(() => ({
         name: state.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-        params: { jobId: props.recentJob?.job_id ?? '' },
+        params: { jobId: recentJob.value?.job_id ?? '' },
     })),
+});
+const recentJob = computed<JobAnalyzeStatus|undefined>(() => {
+    if (!props.collectorId) return undefined;
+    return recentJobsData.value?.results?.[0];
+});
+
+/* Query */
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').startOf('day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { data: recentJobsData } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: props.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
 });
 </script>
 

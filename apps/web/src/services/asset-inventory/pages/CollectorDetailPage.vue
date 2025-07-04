@@ -43,6 +43,7 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -69,6 +70,7 @@ import CollectorServiceAccountsSection
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
@@ -88,6 +90,7 @@ const collectorFormState = collectorFormStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const authorizationStore = useAuthorizationStore();
 const userStore = useUserStore();
+const appContextStore = useAppContextStore();
 
 const route = useRoute();
 
@@ -125,6 +128,8 @@ const state = reactive({
     deleteLoading: false,
     editModalVisible: false,
 });
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, collectorData.value));
 
 const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
 
@@ -172,7 +177,6 @@ const { mutate: deleteCollector } = useMutation({
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
         queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
         goBackToMainPage();
-        collectorFormStore.resetState();
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
@@ -227,13 +231,13 @@ watch(documentVisibility, (visibility) => {
 });
 watch(() => collectorData.value, async (collector) => {
     if (collector) {
-        await collectorFormStore.setOriginCollector(collector);
+        await collectorFormStore.initForm(collector);
         resume();
     }
 }, { immediate: true });
 
 onMounted(async () => {
-    collectorFormStore.resetState();
+    collectorFormStore.setCollectorId(props.collectorId);
     collectorDataModalStore.reset();
 });
 onUnmounted(() => {
@@ -245,7 +249,7 @@ onUnmounted(() => {
 <template>
     <div class="collector-detail-page">
         <portal to="page-top-notification">
-            <p-scoped-notification v-if="!collectorFormState.isEditableCollector"
+            <p-scoped-notification v-if="!isEditableCollector"
                                    type="information"
                                    :title="$t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
                                    icon="ic_info-circle"
@@ -272,7 +276,7 @@ onUnmounted(() => {
                                 width="20rem"
                                 height="1.5rem"
                     />
-                    <template v-if="state.collectorName && collectorFormState.isEditableCollector"
+                    <template v-if="state.collectorName && isEditableCollector"
                               #title-right-extra
                     >
                         <span class="title-right-button-wrapper">

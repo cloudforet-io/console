@@ -6,7 +6,6 @@ import { PCopyButton, PFieldTitle } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
-import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
@@ -15,7 +14,6 @@ import RecentCollectorJobList from '@/services/asset-inventory/components/Recent
 
 const props = defineProps<{
     collector?: CollectorModel|null;
-    recentJobs?: JobModel[]|null;
     historyLink?: Location
 }>();
 
@@ -52,7 +50,7 @@ const state = reactive({
             </div>
         </div>
         <div class="plugin-summary-card">
-            <recent-collector-job-list :recent-jobs="props.recentJobs"
+            <recent-collector-job-list :collector-id="props.collector?.collector_id"
                                        :history-link="props.historyLink"
                                        full-mode
             />

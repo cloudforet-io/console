@@ -166,7 +166,6 @@ const { mutate: deleteCollector } = useMutation({
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
         queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
         goBackToMainPage();
-        collectorFormStore.resetState();
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
@@ -221,13 +220,13 @@ watch(documentVisibility, (visibility) => {
 });
 watch(() => collectorData.value, async (collector) => {
     if (collector) {
-        await collectorFormStore.setOriginCollector(collector);
+        await collectorFormStore.initForm(collector);
         resume();
     }
 }, { immediate: true });
 
 onMounted(async () => {
-    collectorFormStore.resetState();
+    collectorFormStore.setCollectorId(props.collectorId);
     collectorDataModalStore.reset();
 });
 onUnmounted(() => {
@@ -249,7 +248,7 @@ onUnmounted(() => {
                                 width="20rem"
                                 height="1.5rem"
                     />
-                    <template v-if="state.hasReadWriteAccess && state.collectorName && collectorFormState.isEditableCollector"
+                    <template v-if="state.hasReadWriteAccess && state.collectorName"
                               #title-right-extra
                     >
                         <span class="title-right-button-wrapper">
