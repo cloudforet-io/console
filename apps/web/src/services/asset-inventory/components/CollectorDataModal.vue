@@ -19,10 +19,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import CollectorDataDefaultInner
-    from '@/services/asset-inventory/components/CollectorDataDefaultInner.vue';
-import CollectorDataDuplicationInner
-    from '@/services/asset-inventory/components/CollectorDataDuplicationInner.vue';
+import CollectorDataModalDefaultInner
+    from '@/services/asset-inventory/components/CollectorDataModalDefaultInner.vue';
+import CollectorDataModalDuplicationInner
+    from '@/services/asset-inventory/components/CollectorDataModalDuplicationInner.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
 import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
@@ -162,14 +162,16 @@ onUnmounted(() => {
         >
             <template #body>
                 <div v-if="state.isDuplicateJobs">
-                    <collector-data-duplication-inner :name="state.accountName"
-                                                      :icon="state.provider?.icon"
+                    <collector-data-modal-duplication-inner
+                        :name="state.accountName"
+                        :icon="state.provider?.icon"
                     />
                 </div>
-                <collector-data-default-inner v-else
-                                              :name="state.accountName"
-                                              :icon="state.provider?.icon"
-                                              :secrets-count="state.secretsCount"
+                <collector-data-modal-default-inner
+                    v-else
+                    :name="state.accountName"
+                    :icon="state.provider?.icon"
+                    :secrets-count="state.secretsCount"
                 />
             </template>
             <template #confirm-button>
