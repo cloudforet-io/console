@@ -1,4 +1,5 @@
-import type { ComputedRef } from 'vue';
+import type { MaybeRef } from '@vueuse/core';
+import { toValue } from '@vueuse/core';
 import { computed } from 'vue';
 
 import { useCloudServiceTypeApi } from '@/api-clients/inventory/cloud-service-type/composables/use-cloud-service-type-api';
@@ -6,34 +7,28 @@ import type { CloudServiceTypeListParameters } from '@/api-clients/inventory/clo
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
-import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
-
 const DEFAULT_LIST_DATA = { results: [] };
-
 interface UseCloudServiceTypeListQueryOptions {
-    provider: ComputedRef<string>;
-    group: ComputedRef<string>;
-    name: ComputedRef<string | undefined>;
+    params: MaybeRef<CloudServiceTypeListParameters>;
+    enabled?: MaybeRef<boolean>;
 }
 
-export const useCloudServiceTypeListQuery = (options: UseCloudServiceTypeListQueryOptions) => {
-    const { provider, group, name } = options;
+
+export const useCloudServiceTypeListQuery = ({ params, enabled }: UseCloudServiceTypeListQueryOptions) => {
     const { cloudServiceTypeAPI } = useCloudServiceTypeApi();
 
-    const { key, params } = useServiceQueryKey('inventory', 'cloud-service-type', 'list', {
-        params: computed<CloudServiceTypeListParameters>(() => ({
-            query: getCloudServiceTypeQuery(provider.value, group.value),
-        })),
+    const { key, params: queryParams } = useServiceQueryKey('inventory', 'cloud-service-type', 'list', {
+        params: computed(() => toValue(params)),
     });
 
     return useScopedQuery({
         queryKey: key,
-        queryFn: () => cloudServiceTypeAPI.list(params.value),
+        queryFn: () => cloudServiceTypeAPI.list(queryParams.value),
         select: (data) => data.results || [],
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 5,
-        enabled: computed(() => !!provider.value && !!group.value && !!name.value),
+        enabled: computed(() => (toValue(enabled) ?? true)),
     }, ['DOMAIN', 'WORKSPACE']);
 };
