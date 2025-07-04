@@ -22,7 +22,7 @@ const visible = computed(() => projectPageModalStore.state.projectRenameModalVis
 const targetId = computed(() => projectPageModalStore.state.targetId);
 
 const projectListStore = useProjectListStore();
-const projectNames = computed(() => projectListStore.projects.filter((item) => item.key !== targetId.value).map((p) => p.name));
+const projectNames = computed(() => projectListStore.projects.filter((item) => item.project_id !== targetId.value).map((p) => p.name));
 
 /* form */
 const {
