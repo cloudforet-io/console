@@ -14,18 +14,18 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CloudServiceTypeStatParameters } from '@/api-clients/inventory/cloud-service-type/schema/api-verbs/stat';
-import type { RegionListParameters } from '@/api-clients/inventory/region/schema/api-verbs/list';
-import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
 import {
     COLLECTOR_RULE_CONDITION_KEY, COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_POLICY,
-} from '@/schema/inventory/collector-rule/constant';
-import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
+} from '@/api-clients/inventory/collector-rule/schema/constant';
+import type { AdditionalRuleCondition, CollectorRuleModel, AdditionalRuleAction } from '@/api-clients/inventory/collector-rule/schema/model';
 import type {
     CollectorRuleConditionKey,
     CollectorRuleConditionOperator,
     CollectorRuleConditionPolicy,
-} from '@/schema/inventory/collector-rule/type';
+} from '@/api-clients/inventory/collector-rule/schema/type';
+import type { RegionListParameters } from '@/api-clients/inventory/region/schema/api-verbs/list';
+import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -151,7 +151,7 @@ const state = reactive({
     selectedActionRadioIdx: 'change_project' as ActionPolicy,
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     selectedWorkspaceId: [] as SelectDropdownMenuItem[],
-    isStopProcessingChecked: false,
+    isStopProcessingChecked: props.data?.options?.stop_processing ?? false,
     sourceInput: '',
     targetInput: '',
     isAllValid: computed(() => {

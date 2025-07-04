@@ -20,7 +20,7 @@ export const useInventoryJobListQuery = ({
     return useScopedQuery({
         queryKey: key,
         queryFn: async () => jobAPI.list(jobParams.value),
-        gcTime: 1000 * 60 * 2,
-        staleTime: 1000 * 30,
-    }, ['WORKSPACE']);
+        staleTime: 1000 * 60 * 2, // 2 minutes
+        gcTime: 1000 * 60 * 2, // 2 minutes
+    }, ['DOMAIN', 'WORKSPACE']);
 };

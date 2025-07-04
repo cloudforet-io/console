@@ -1,7 +1,7 @@
 import type {
     COLLECTOR_RULE_TYPE, COLLECTOR_RULE_CONDITION_POLICY, COLLECTOR_RESOURCE_GROUP, COLLECTOR_RULE_CONDITION_OPERATOR,
     COLLECTOR_RULE_CONDITION_KEY,
-} from '@/schema/inventory/collector-rule/constant';
+} from '@/api-clients/inventory/collector-rule/schema/constant';
 
 export type CollectorRuleType = typeof COLLECTOR_RULE_TYPE[keyof typeof COLLECTOR_RULE_TYPE];
 
