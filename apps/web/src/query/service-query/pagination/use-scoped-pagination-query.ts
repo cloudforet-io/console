@@ -39,7 +39,7 @@ import { useScopedInfiniteQuery } from '@/query/service-query/use-scoped-infinit
  *
 * @returns {
 *   data: ComputedRef<TPageData | undefined> - Data for the current page (1-based index)
-*   totalCount: ComputedRef<number> - Total number of items (from first page)
+*   totalCount: ComputedRef<number> - Total number of items (from first page, except for 'analyze' verb)
 *   isReady: ComputedRef<boolean> - Whether the current page is loaded
 *   isLoading: ComputedRef<boolean> - Whether the current page is being fetched
 *   query: Return value of useScopedInfiniteQuery - includes all raw query states
@@ -48,6 +48,7 @@ import { useScopedInfiniteQuery } from '@/query/service-query/use-scoped-infinit
 
 type PaginatableBaseData = {
     results?: any[];
+    more?: boolean; // for 'analyze' verb without 'total_count'
     total_count?: number;
 };
 
@@ -64,7 +65,7 @@ type UsePaginationQueryOptions<TParams extends object, TPageData, TError> = Omit
 interface UsePaginationQueryPageOptions {
     thisPage: ComputedRef<number>;
     pageSize: ComputedRef<number>;
-    verb: 'list' | 'load' | 'get-data';
+    verb: 'list' | 'load' | 'get-data' | 'analyze';
 }
 
 export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData, TError = unknown>(
@@ -95,6 +96,7 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
         initialPageParam,
         getNextPageParam: (lastPage, allPages) => {
             const loadedCount = allPages.reduce((acc, page) => acc + (page?.results?.length || 0), 0);
+            if (verb === 'analyze') return lastPage?.more ? loadedCount + 1 : undefined;
             return loadedCount < (lastPage?.total_count || 0) ? loadedCount + 1 : undefined;
         },
         // getPreviousPageParam: (firstPage, allPages) => {
@@ -130,7 +132,8 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
 
     return {
         data: computed(() => query.data.value?.pages?.[thisPage.value - 1]),
-        totalCount: computed(() => query.data.value?.pages?.[0]?.total_count ?? 0),
+        totalCount: computed(() => query.data.value?.pages?.[0]?.total_count ?? 0), // except for 'analyze' verb
+        more: computed(() => query.data.value?.pages?.[0]?.more ?? false), // for 'analyze' verb without 'total_count'
         isReady: computed(() => !!query.data.value?.pages?.[thisPage.value - 1]),
         isLoading: computed(() => !query.data.value?.pages?.[thisPage.value - 1] && query.isFetchingNextPage.value),
         query,
