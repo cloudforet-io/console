@@ -6,5 +6,5 @@ export interface CloudServiceAnalyzeResult {
     provider?: string;
     cloud_service_group?: string;
     resources?: CloudServiceAnalyzeResultResource[];
-    _total_resources
+    _total_resources?: number;
 }

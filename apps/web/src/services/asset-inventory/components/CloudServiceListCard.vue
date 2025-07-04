@@ -10,17 +10,17 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLazyImg, PDivider, PTooltip } from '@cloudforet/mirinae';
 
+import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { arrayToQueryString, objectToQueryString } from '@/lib/router-query-string';
 
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
+import { useCloudServiceTypeListQuery } from '@/services/asset-inventory/composables/use-cloud-service-type-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
@@ -28,6 +28,7 @@ import { useCloudServicePageStore } from '@/services/asset-inventory/stores/clou
 import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { Period } from '@/services/asset-inventory/types/type';
+
 
 interface Props {
     item: CloudServiceAnalyzeResult;
@@ -48,17 +49,20 @@ const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 
-const allReferenceStore = useAllReferenceStore();
-
 const referenceMap = useAllReferenceDataModel();
+
+const { data: cloudServiceTypeList } = useCloudServiceTypeListQuery({
+    params: computed(() => ({
+        query: { only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'] },
+    })),
+});
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
-        const res: Record<string, CloudServiceTypeItem> = {};
-        Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
-            res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
+        const res: Record<string, CloudServiceTypeModel> = {};
+        cloudServiceTypeList.value?.forEach((item) => {
+            res[`${item.provider}:${item.group}:${item.name}`] = item;
         });
         return res;
     }),
@@ -117,7 +121,7 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
 
     if (cloudServiceType && provider && group) {
         const key = `${provider}:${group}:${cloudServiceType}`;
-        const icon = state.cloudServiceTypeToItemMap[key]?.icon;
+        const icon = state.cloudServiceTypeToItemMap[key]?.tags?.['spaceone:icon'];
         if (icon) return assetUrlConverter(icon);
     }
 

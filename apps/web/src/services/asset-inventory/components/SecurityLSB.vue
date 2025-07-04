@@ -8,7 +8,6 @@ import { useAllReferenceDataModel } from '@/query/resource-query/reference-model
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -26,10 +25,6 @@ import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
-
-
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
@@ -63,7 +58,7 @@ const state = reactive({
             d.items?.forEach((i) => {
                 defaultMenuSet.push({
                     type: MENU_ITEM_TYPE.ITEM,
-                    label: `[${allReferenceGetters.provider[i.provider].label}] ${i.name}`,
+                    label: `[${referenceMap.provider[i.provider]?.label || i.provider}] ${i.name}`,
                     id: i.cloud_service_type_id,
                     to: {
                         name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
