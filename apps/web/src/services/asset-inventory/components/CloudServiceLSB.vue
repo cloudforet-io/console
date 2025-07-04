@@ -25,15 +25,17 @@ import { useCloudServiceDetailLSBMenuSet } from '@/services/asset-inventory/comp
 import {
     useCloudServiceProviderListQuery,
 } from '@/services/asset-inventory/composables/use-cloud-service-provider-list-query';
+import { useCloudServiceTypeListQuery } from '@/services/asset-inventory/composables/use-cloud-service-type-list-query';
 import {
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY, UNIDENTIFIED_PROVIDER,
 } from '@/services/asset-inventory/constants/cloud-service-constant';
+import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+
 
 const PROJECT_MENU_ID = 'project';
 const SERVICE_ACCOUNT_MENU_ID = 'service-account';
@@ -44,9 +46,7 @@ const REGION_MENU_ID = 'region';
 
 const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
-const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
+const cloudServicePageState = cloudServicePageStore.state;
 const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
@@ -140,35 +140,44 @@ const providerState = reactive({
     }),
 });
 
-const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) => {
-    cloudServiceDetailPageStore.setProviderGroupName(params);
-    await cloudServiceDetailPageStore.listCloudServiceTypeData();
-};
+const { data: cloudServiceTypeList } = useCloudServiceTypeListQuery({
+    params: computed(() => ({
+        query: getCloudServiceTypeQuery(route.params.provider, route.params.group),
+    })),
+    enabled: computed(() => !!route.params.provider && !!route.params.group && !!route.params.name),
+});
 
-const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
+const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams, name: string) => {
     await router.replace({
         name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: params.provider,
             group: params.group,
-            name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
+            name,
         },
         query: route.query,
     }).catch(() => {
     });
-    await cloudServiceDetailPageStore.setSelectedCloudServiceType();
 };
 const handleSelectProvider = (selected: string) => {
     if (!selected) return;
+    const selectedProvider = providerList.value?.find((item) => item.provider === selected);
+    if (!selectedProvider && selected !== UNIDENTIFIED_PROVIDER) {
+        cloudServicePageStore.setSelectedProvider('all');
+        return;
+    }
     cloudServicePageStore.setSelectedProvider(selected);
 };
 
 /* Watchers */
-watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async ([params, grantInfo]) => {
+watch([
+    () => state.detailPageParams,
+    () => storeState.currentGrantInfo,
+    () => cloudServiceTypeList.value,
+], async ([params, grantInfo, _cloudServiceTypeList]) => {
     if (grantInfo?.scope === 'USER') return;
     if (!params) return;
-    await initCloudServiceDetailLSB(params);
-    if (!params.name) await routeToFirstCloudServiceType(params);
+    if (!params.name && _cloudServiceTypeList?.[0]?.name) await routeToFirstCloudServiceType(params, _cloudServiceTypeList[0].name);
 }, { immediate: true });
 </script>
 

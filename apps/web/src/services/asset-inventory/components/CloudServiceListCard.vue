@@ -45,7 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServicePageState = cloudServicePageStore.state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 
 const allReferenceStore = useAllReferenceStore();

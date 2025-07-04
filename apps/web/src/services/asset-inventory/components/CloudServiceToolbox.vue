@@ -38,13 +38,14 @@ const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): v
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServicePageGetters = cloudServicePageStore.getters;
+const cloudServicePageState = cloudServicePageStore.state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
 const state = reactive({
     queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
-    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters]
+    cloudServiceFilters: computed<ConsoleFilter[]>(() => [...cloudServicePageGetters.allFilters, ...cloudServiceLSBStore.getters.allFilters]
         .filter((f: any) => ![
             'labels',
             'service_code',
@@ -61,9 +62,7 @@ const excelState = reactive({
 const handleChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-        cloudServicePageStore.$patch((_state) => {
-            _state.searchFilters = searchQueryHelper.filters;
-        });
+        cloudServicePageStore.setSearchFilters(searchQueryHelper.filters);
     }
     if (options.pageStart !== undefined || options.pageLimit !== undefined) {
         emit('update-pagination', options);

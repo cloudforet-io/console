@@ -1,64 +1,100 @@
+import type { ComputedRef } from 'vue';
+import { computed, reactive } from 'vue';
+
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-
-import { CLOUD_SERVICE_FILTER_KEY, UNIDENTIFIED_PROVIDER } from '@/services/asset-inventory/constants/cloud-service-constant';
+import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
-export const useCloudServicePageStore = defineStore('page-cloud-service', {
-    state: () => ({
+interface CloudServicePageState {
+    selectedProvider: string;
+    additionalFilters: CloudServiceFilterMap;
+    searchFilters: ConsoleFilter[];
+    period: Period | undefined;
+}
+
+interface CloudServicePageGetters {
+    selectedCategories: ComputedRef<CloudServiceCategory[]>;
+    selectedRegions: ComputedRef<string[]>;
+    allFilters: ComputedRef<ConsoleFilter[]>;
+}
+
+export const useCloudServicePageStore = defineStore('page-cloud-service', () => {
+    const state = reactive<CloudServicePageState>({
         selectedProvider: 'all',
         additionalFilters: {
             [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: [],
             [CLOUD_SERVICE_FILTER_KEY.REGION]: [],
         } as CloudServiceFilterMap,
         searchFilters: [] as ConsoleFilter[],
-    }),
-    getters: {
-        selectedCategories: (state): CloudServiceCategory[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY] ?? [],
-        selectedRegions: (state): string[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [],
-        allFilters(state): ConsoleFilter[] {
+        period: undefined as Period | undefined,
+    });
+
+    const getters = reactive<CloudServicePageGetters>({
+        selectedCategories: computed(() => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY] ?? []),
+        selectedRegions: computed(() => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? []),
+        allFilters: computed(() => {
             const filters: ConsoleFilter[] = [
                 { k: 'ref_cloud_service_type.labels', v: ['CSPM'], o: '!=' },
             ];
             if (state.selectedProvider !== 'all') {
                 filters.push({ k: 'provider', v: [state.selectedProvider, 'google'], o: '=' });
             }
-            if (this.selectedRegions.length) {
-                filters.push({ k: CLOUD_SERVICE_FILTER_KEY.REGION, v: this.selectedRegions, o: '=' });
+            if (getters.selectedRegions.length) {
+                filters.push({ k: CLOUD_SERVICE_FILTER_KEY.REGION, v: getters.selectedRegions, o: '=' });
             }
-            if (this.selectedCategories.length) {
-                filters.push({ k: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, v: this.selectedCategories, o: '=' });
+            if (getters.selectedCategories.length) {
+                filters.push({ k: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, v: getters.selectedCategories, o: '=' });
             }
             return filters.concat(state.searchFilters);
+        }),
+    });
+
+    const mutations = {
+        setSelectedProvider(provider: string) {
+            state.selectedProvider = provider;
         },
-    },
-    actions: {
-        async setSelectedProvider(provider = 'all') {
-            const allReferenceStore = useAllReferenceStore();
-            const providers: ProviderReferenceMap = allReferenceStore.getters.provider;
-
-            const providerReference = providers[provider];
-
-            if (!providerReference && provider !== UNIDENTIFIED_PROVIDER) {
-                this.selectedProvider = 'all';
-                return;
-            }
-
-            this.selectedProvider = provider;
+        setPeriod(period: Period | undefined) {
+            state.period = period;
         },
+        setAdditionalFilters(additionalFilters: CloudServiceFilterMap) {
+            state.additionalFilters = additionalFilters;
+        },
+        setSearchFilters(searchFilters: ConsoleFilter[]) {
+            state.searchFilters = searchFilters;
+        },
+    };
+
+    const actions = {
         setSelectedCategoriesToFilters(categories: CloudServiceCategory[] = []) {
-            const additionalFilters = { ...this.additionalFilters };
+            const additionalFilters = { ...state.additionalFilters };
             additionalFilters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY] = categories;
-            this.additionalFilters = additionalFilters;
+            state.additionalFilters = additionalFilters;
         },
         setSelectedRegionsToFilters(regions: string[] = []) {
-            const additionalFilters = { ...this.additionalFilters };
+            const additionalFilters = { ...state.additionalFilters };
             additionalFilters[CLOUD_SERVICE_FILTER_KEY.REGION] = regions;
-            this.additionalFilters = additionalFilters;
+            state.additionalFilters = additionalFilters;
         },
-    },
+        reset() {
+            state.selectedProvider = 'all';
+            state.additionalFilters = {
+                [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: [],
+                [CLOUD_SERVICE_FILTER_KEY.REGION]: [],
+            };
+            state.searchFilters = [];
+            state.period = undefined;
+        },
+    };
+
+
+    return {
+        state,
+        getters,
+        ...mutations,
+        ...actions,
+    };
 });
