@@ -151,7 +151,7 @@ const state = reactive({
     selectedActionRadioIdx: 'change_project' as ActionPolicy,
     selectedProjectId: props.data?.actions?.change_project ? [props.data?.actions?.change_project ?? ''] : undefined,
     selectedWorkspaceId: [] as SelectDropdownMenuItem[],
-    isStopProcessingChecked: false,
+    isStopProcessingChecked: props.data?.options?.stop_processing ?? false,
     sourceInput: '',
     targetInput: '',
     isAllValid: computed(() => {
