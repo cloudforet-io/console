@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup,
@@ -9,6 +9,7 @@ import {
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -16,7 +17,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useProjectQuery } from '@/services/project/v2/composables/queries/use-project-query';
-import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
 const projectPageModalStore = useProjectPageModalStore();
@@ -42,8 +42,9 @@ watch([visible, project], ([v, prj]) => {
 }, { immediate: true });
 
 /* mutations */
-const projectListStore = useProjectListStore();
 const { projectAPI } = useProjectApi();
+const queryClient = useQueryClient();
+const { key: projectListQueryKey } = useServiceQueryKey('identity', 'project', 'list');
 const { mutateAsync: updateProjectType, isPending: isUpdatingProjectType } = useMutation({
     mutationFn: ({ projectId, projectType }: { projectId: string; projectType: ProjectType }) => projectAPI.updateProjectType({
         project_id: projectId,
@@ -52,7 +53,7 @@ const { mutateAsync: updateProjectType, isPending: isUpdatingProjectType } = use
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
         setQueryData(data);
-        projectListStore.syncProject(data);
+        queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));

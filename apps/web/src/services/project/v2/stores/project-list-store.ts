@@ -2,56 +2,52 @@ import { computed } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 
-import type { ProjectGroupReferenceItem } from '@/store/reference/project-group-reference-store';
-import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
-import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useProjectGroupListQuery } from '@/services/project/v2/composables/queries/use-project-group-list-query';
+import { useProjectListQuery } from '@/services/project/v2/composables/queries/use-project-list-query';
 
-export interface ProjectData extends ProjectReferenceItem {
+export interface ProjectData extends ProjectModel {
     type: 'PROJECT';
+    key: string;
 }
 
-export interface ProjectGroupData extends ProjectGroupReferenceItem {
+export interface ProjectGroupData extends ProjectGroupModel {
     type: 'PROJECT_GROUP';
+    key: string;
 }
 
 export const useProjectListStore = defineStore('project-list', () => {
-    const projectGroupReferenceStore = useProjectGroupReferenceStore();
-    const projectReferenceStore = useProjectReferenceStore();
-
+    const { data: projectList, isFetching: isFetchingProjectList } = useProjectListQuery();
+    const { data: projectGroupList, isFetching: isFetchingProjectGroupList } = useProjectGroupListQuery();
     /* loading state */
-    const isLoading = computed(() => !projectGroupReferenceStore.state.items || !projectReferenceStore.state.items);
-
-    /* cached data */
-    const projectGroupMap = computed(() => projectGroupReferenceStore.getters.projectGroupItems);
-    const projectGroups = computed<ProjectGroupReferenceItem[]>(() => Object.values(projectGroupMap.value));
-    const projectMap = computed(() => projectReferenceStore.getters.projectItems);
-    const projects = computed<ProjectReferenceItem[]>(() => Object.values(projectMap.value));
+    const isLoading = computed(() => isFetchingProjectList.value || isFetchingProjectGroupList.value);
 
     /* filtered data by parent group */
     const getItemsByParentGroupId = computed(() => {
-        const pgList = projectGroups.value;
-        const prjList = projects.value;
+        const pgList = projectGroupList.value ?? [];
+        const prjList = projectList.value ?? [];
         return (parentGroupId?: string) => {
             const items: Array<ProjectData|ProjectGroupData> = [];
 
             pgList.forEach((group) => {
-                const parentId = group.data.parentGroupInfo?.id;
+                const parentId = group.parent_group_id;
                 if (parentId !== parentGroupId) return;
                 items.push({
                     ...group,
                     type: 'PROJECT_GROUP',
+                    key: group.project_group_id,
                 });
             });
 
             prjList.forEach((project) => {
-                const groupId = project.data.groupInfo?.id;
+                const groupId = project.project_group_id;
                 if (groupId !== parentGroupId) return;
                 items.push({
                     ...project,
                     type: 'PROJECT',
+                    key: project.project_id,
                 });
             });
 
@@ -61,35 +57,28 @@ export const useProjectListStore = defineStore('project-list', () => {
 
     /* filtered projects by group */
     const getProjectsByGroupId = computed(() => {
-        const prjList = projects.value;
+        const prjList = projectList.value ?? [];
         return (groupId?: string) => {
             if (!groupId) return prjList;
-            return prjList.filter((project) => project.data.groupInfo?.id === groupId);
+            return prjList.filter((project) => project.project_group_id === groupId);
         };
     });
 
     /* filtered project groups by parent */
     const getProjectGroupsByParentId = computed(() => {
-        const pgList = projectGroups.value;
+        const pgList = projectGroupList.value ?? [];
         return (parentId?: string) => {
             if (!parentId) return pgList;
-            return pgList.filter((group) => group.data.parentGroupInfo?.id === parentId);
+            return pgList.filter((group) => group.parent_group_id === parentId);
         };
     });
 
-    const syncProject = (project: ProjectModel) => {
-        projectReferenceStore.sync(project);
-    };
-
     return {
         isLoading,
-        projectGroups,
-        projects,
-        projectMap,
-        projectGroupMap,
+        projectGroups: computed(() => projectGroupList.value ?? []),
+        projects: computed(() => projectList.value ?? []),
         getItemsByParentGroupId,
         getProjectsByGroupId,
         getProjectGroupsByParentId,
-        syncProject,
     };
 });

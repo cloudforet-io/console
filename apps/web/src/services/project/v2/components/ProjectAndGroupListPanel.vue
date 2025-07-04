@@ -13,6 +13,7 @@ import {
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';
@@ -23,6 +24,8 @@ import { useProjectPageModalStore } from '@/services/project/v2/stores/project-p
 const props = defineProps<{
     projectGroupId?: string;
 }>();
+
+const referenceMap = useAllReferenceDataModel();
 
 /* ui */
 const isCollapsed = ref(false);
@@ -118,8 +121,8 @@ const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccoun
                 </p-field-title>
                 <div class="card-contents">
                     <project-group-card v-for="(pg) in projectGroups"
-                                        :key="pg.key"
-                                        :project-group-id="pg.key"
+                                        :key="pg.project_group_id"
+                                        :project-group-id="pg.project_group_id"
                                         :name="pg.name"
                     />
                 </div>
@@ -134,12 +137,12 @@ const getDistinctProviders = (projectId: string): string[] => uniq(serviceAccoun
                 </p-field-title>
                 <div class="card-contents">
                     <project-card v-for="(p) in projects"
-                                  :key="p.key"
-                                  :project-id="p.key"
-                                  :group-name="p.data.groupInfo?.name"
+                                  :key="p.project_id"
+                                  :project-id="p.project_id"
+                                  :group-name="referenceMap.projectGroup[p.project_group_id]?.name"
                                   :name="p.name"
-                                  :project-type="p.data.projectType"
-                                  :service-account-provider-list="getDistinctProviders(p.key)"
+                                  :project-type="p.project_type"
+                                  :service-account-provider-list="getDistinctProviders(p.project_id)"
                     />
                 </div>
             </div>

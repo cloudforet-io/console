@@ -2,6 +2,7 @@
 import { computed, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -17,12 +18,8 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import ProjectLSB from '@/services/project/v2/ProjectLSB.vue';
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
-import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 
-/* project list store */
-const projectListStore = useProjectListStore();
-const projectMap = computed(() => projectListStore.projectMap);
-const projectGroupMap = computed(() => projectListStore.projectGroupMap);
+const referenceMap = useAllReferenceDataModel();
 
 /* routed project or project group */
 const route = useRoute();
@@ -32,11 +29,11 @@ const { projectGroupId, projectId } = useProjectOrGroupId(computed(() => route.p
 const parentIds = computed<string[]>(() => {
     const pids: string[] = [];
     let currentGroupId: string|undefined;
-    if (projectId.value) currentGroupId = projectMap.value[projectId.value]?.data.groupInfo?.id;
+    if (projectId.value) currentGroupId = referenceMap.project[projectId.value]?.data?.groupInfo?.id;
     else currentGroupId = projectGroupId.value;
     while (currentGroupId) {
         pids.unshift(currentGroupId);
-        currentGroupId = projectGroupMap.value[currentGroupId]?.data.parentGroupInfo?.id;
+        currentGroupId = referenceMap.projectGroup[currentGroupId]?.data?.parentGroupInfo?.id;
     }
     return pids;
 });
@@ -53,7 +50,7 @@ const projectGroupBreadcrumbs = computed<Breadcrumb[]>(() => {
         { name: i18n.t('MENU.PROJECT'), to: { name: PROJECT_ROUTE_V2._NAME } },
     ];
     breadcrumbs.push(...parentIds.value.map((id) => ({
-        name: projectGroupMap.value[id]?.name ?? id,
+        name: referenceMap.projectGroup[id]?.name ?? id,
         to: {
             name: PROJECT_ROUTE_V2._NAME,
             params: {
@@ -63,7 +60,7 @@ const projectGroupBreadcrumbs = computed<Breadcrumb[]>(() => {
     })));
     if (projectId.value) {
         breadcrumbs.push({
-            name: projectMap.value[projectId.value]?.name ?? projectId.value,
+            name: referenceMap.project[projectId.value]?.name ?? projectId.value,
             to: {
                 name: PROJECT_ROUTE_V2._NAME,
                 params: {
