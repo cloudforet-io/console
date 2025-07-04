@@ -23,7 +23,7 @@ import CollectorProviderList from '@/services/asset-inventory/components/Collect
 import { useCollectorListQuery } from '@/services/asset-inventory/composables/use-collector-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 import type {
     CollectorMainPageQuery,
     CollectorMainPageQueryValue,
@@ -31,8 +31,8 @@ import type {
 
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
+const collectorMainPageStore = useCollectorMainPageStore();
+const collectorMainPageState = collectorMainPageStore.state;
 
 const isAdminMode = computed(() => appContextGetters.isAdminMode);
 
@@ -42,17 +42,17 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
+    collectorMainPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.setSearchFilters(filters);
+        collectorMainPageStore.setSearchFilters(filters);
     }
 };
 
 const collectorMainPageQueryValue = computed<Required<CollectorMainPageQueryValue>>(() => ({
-    provider: collectorPageState.selectedProvider,
-    filters: collectorPageState.searchFilters,
+    provider: collectorMainPageState.selectedProvider,
+    filters: collectorMainPageState.searchFilters,
 }));
 
 watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
@@ -68,7 +68,7 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
+    collectorMainPageStore.setSelectedProvider(providerName);
 };
 
 /* API */
@@ -88,7 +88,7 @@ const { isLoading, totalCount } = useCollectorListQuery({
 
 /* INIT */
 onMounted(() => {
-    collectorPageStore.reset();
+    collectorMainPageStore.reset();
     setValuesFromUrlQueryString();
 });
 </script>
@@ -126,7 +126,7 @@ onMounted(() => {
             <div v-if="totalCount > 0"
                  class="collector-contents-wrapper"
             >
-                <collector-provider-list :selected-provider="collectorPageState.selectedProvider"
+                <collector-provider-list :selected-provider="collectorMainPageState.selectedProvider"
                                          @update:selected-provider="handleSelectedProvider"
                 />
                 <collector-contents />
