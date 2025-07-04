@@ -1,6 +1,6 @@
 import type { Route } from 'vue-router/types/router';
 
-import type { NoteModel } from '@/schema/inventory/note/model';
+import type { NoteModel } from '@/api-clients/inventory/note/schema/model';
 
 // export interface CloudServiceDetailPageParams {
 //     provider: string;

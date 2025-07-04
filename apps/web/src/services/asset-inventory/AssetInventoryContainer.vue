@@ -46,10 +46,8 @@ assetInventorySettingsStore.$onAction((action) => {
 
 onUnmounted(() => {
     cloudServiceLSBStore.init();
-    cloudServicePageStore.$dispose();
-    cloudServicePageStore.$reset();
-    cloudServiceDetailPageStore.$dispose();
-    cloudServiceDetailPageStore.$reset();
+    cloudServicePageStore.reset();
+    cloudServiceDetailPageStore.reset();
 });
 </script>
 
