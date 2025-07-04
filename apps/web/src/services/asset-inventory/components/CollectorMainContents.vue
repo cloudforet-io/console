@@ -43,7 +43,7 @@ import { useCollectorListQuery } from '@/services/asset-inventory/composables/us
 import { useInventoryJobAnalyzeQuery } from '@/services/asset-inventory/composables/use-inventory-job-analyze-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -78,8 +78,8 @@ const makePluginReferenceValueHandler = (distinct: string, plugins: PluginRefere
     };
 };
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
+const collectorMainPageStore = useCollectorMainPageStore();
+const collectorMainPageState = collectorMainPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
@@ -201,7 +201,7 @@ const handleChangeToolbox = (options?: ToolboxOptions) => {
     if (options?.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
-    collectorPageStore.setSearchFilters(queryTagHelper.filters.value);
+    collectorMainPageStore.setSearchFilters(queryTagHelper.filters.value);
 };
 const handleClickListItem = (detailLink) => {
     router.push(detailLink).catch(() => {});
@@ -214,8 +214,8 @@ const { collectorListData, isLoading, totalCount } = useCollectorListQuery({
     pageSize: computed(() => state.pageSize),
     params: computed(() => {
         collectorApiQueryHelper.setFilters(queryTagHelper.filters.value);
-        if (collectorPageState.selectedProvider !== 'all') {
-            collectorApiQueryHelper.addFilter({ k: 'provider', v: collectorPageState.selectedProvider, o: '=' });
+        if (collectorMainPageState.selectedProvider !== 'all') {
+            collectorApiQueryHelper.addFilter({ k: 'provider', v: collectorMainPageState.selectedProvider, o: '=' });
         }
         if (storeState.isAdminMode) {
             collectorApiQueryHelper.addFilter({ k: 'workspace_id', v: '*', o: '=' });
@@ -243,7 +243,7 @@ const handleExportExcel = async () => {
 };
 
 onMounted(async () => {
-    queryTagHelper.setFilters(collectorPageState.searchFilters); // init url query string
+    queryTagHelper.setFilters(collectorMainPageState.searchFilters); // init url query string
 });
 </script>
 

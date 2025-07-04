@@ -19,16 +19,19 @@ export const useCollectorGetQuery = ({
             collector_id: collectorId?.value as string,
         })),
     });
-    return useScopedQuery({
-        queryKey: key,
-        queryFn: () => {
-            if (!collectorParams.value.collector_id) {
-                throw new Error('Collector ID is required for fetching collector');
-            }
-            return collectorAPI.get(collectorParams.value);
-        },
-        enabled: computed(() => !!collectorId?.value),
-        staleTime: 1000 * 60 * 2, // 2 minutes
-        gcTime: 1000 * 60 * 2, // 2 minutes
-    }, ['DOMAIN', 'WORKSPACE']);
+    return {
+        ...useScopedQuery({
+            queryKey: key,
+            queryFn: () => {
+                if (!collectorParams.value.collector_id) {
+                    throw new Error('Collector ID is required for fetching collector');
+                }
+                return collectorAPI.get(collectorParams.value);
+            },
+            enabled: computed(() => !!collectorId?.value),
+            staleTime: 1000 * 60 * 2, // 2 minutes
+            gcTime: 1000 * 60 * 2, // 2 minutes
+        }, ['DOMAIN', 'WORKSPACE']),
+        collectorGetQueryKey: key,
+    };
 };

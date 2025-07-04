@@ -4,7 +4,7 @@
                     size="md"
                     fade
                     backdrop
-                    :visible="collectorPageState.scheduleModalVisible"
+                    :visible="collectorMainPageState.scheduleModalVisible"
                     :hide-footer-close-button="state.isViewMode"
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
@@ -41,17 +41,17 @@ import CollectorScheduleForm
     from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
+const collectorMainPageStore = useCollectorMainPageStore();
+const collectorMainPageState = collectorMainPageStore.state;
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
-    isViewMode: computed(() => collectorPageState.scheduleModalMode === 'view'),
+    isViewMode: computed(() => collectorMainPageState.scheduleModalMode === 'view'),
 });
 
 /* Query */
@@ -62,7 +62,7 @@ const { data: originCollectorData, isLoading: isOriginCollectorLoading, collecto
 
 /* Events */
 const closeScheduleModal = () => {
-    collectorPageStore.setScheduleModalVisible(false);
+    collectorMainPageStore.setScheduleModalVisible(false);
 };
 
 const handleCloseModal = () => {

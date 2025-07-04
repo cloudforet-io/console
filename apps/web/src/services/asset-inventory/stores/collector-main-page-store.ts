@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
-export const useCollectorPageStore = defineStore('page-collector', () => {
+export const useCollectorMainPageStore = defineStore('page-collector-main', () => {
     const state = reactive({
         selectedProvider: 'all',
         selectedCollectorId: undefined as string|undefined,

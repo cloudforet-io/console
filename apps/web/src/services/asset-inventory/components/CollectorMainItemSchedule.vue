@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { PToggleButton, PI } from '@cloudforet/mirinae';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 
 interface Props {
     collectorId?: string;
@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
     mode: 'view',
 });
 
-const collectorPageStore = useCollectorPageStore();
+const collectorMainPageStore = useCollectorMainPageStore();
 const collectorFormStore = useCollectorFormStore();
 
 const emit = defineEmits<{(e: 'change-toggle', boolean): void}>();
@@ -35,8 +35,8 @@ const handleChangeToggle = async (value) => {
 };
 const handleClickSchedule = () => {
     collectorFormStore.setCollectorId(props.collectorId);
-    collectorPageStore.setScheduleModalVisible(true);
-    collectorPageStore.setScheduleModalMode(props.mode);
+    collectorMainPageStore.setScheduleModalVisible(true);
+    collectorMainPageStore.setScheduleModalMode(props.mode);
 };
 </script>
 
