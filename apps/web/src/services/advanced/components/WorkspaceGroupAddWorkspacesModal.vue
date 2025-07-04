@@ -10,9 +10,8 @@ import {
     PButtonModal, PFieldGroup, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
@@ -32,6 +31,8 @@ const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const referenceMap = useAllReferenceDataModel();
+
+const { workspaceAPI } = useWorkspaceApi();
 
 const state = reactive({
     loading: false,
@@ -59,7 +60,7 @@ const {
         workspace_group_id: _workspace.workspace_group_id,
         disabled: !!_workspace.workspace_group_id,
     }),
-    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+    fetcher: (apiQueryHelper) => workspaceAPI.list({
         query: apiQueryHelper.data,
     }),
     filter: workspaceDropdownFilter,

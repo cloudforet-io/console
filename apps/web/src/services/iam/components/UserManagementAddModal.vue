@@ -46,8 +46,6 @@ const domainStore = useDomainStore();
 
 const route = useRoute();
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
-
 const storeState = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
@@ -112,7 +110,6 @@ const handleConfirm = async () => {
         } else {
             showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.ALT_S_ADD_USER'), '');
         }
-        emit('confirm');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     } finally {

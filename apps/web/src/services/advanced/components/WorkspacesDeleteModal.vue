@@ -29,13 +29,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'refresh'): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
 
 const storeState = reactive({
-    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspaces[0]),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspace),
 });
 
 const referenceMap = useAllReferenceDataModel();
@@ -56,7 +55,6 @@ const handleConfirm = async () => {
             workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
         });
         state.proxyVisible = false;
-        emit('refresh');
     } catch (e) {
         ErrorHandler.handleError(e, true);
     }

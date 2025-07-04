@@ -6,16 +6,21 @@ import { useRouter } from 'vue-router/composables';
 
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PStatus, PToolboxTable, PHeading, PTooltip, PButton, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { useRoleBindingApi } from '@/api-clients/identity/role-binding/composables/use-role-binding-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
+
 import { useUserStore } from '@/store/user/user-store';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { useWorkspaceUserListPaginationQuery } from '@/services/advanced/composables/use-workspace-user-list-pagination-query';
 import { WORKSPACE_STATE, WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/advanced/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 import {
@@ -24,28 +29,37 @@ import {
 import { USER_STATE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
-
 const userStore = useUserStore();
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
 
 const router = useRouter();
 
-const workspaceUserListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(workspacePageState.usersPageStart).setPageLimit(workspacePageState.usersPageLimit)
-    .setSort('name', true);
-let workspaceUserListApiQuery = workspaceUserListApiQueryHelper.data;
-const queryTagHelper = useQueryTags({ keyItemSets: WORKSPACES_USER_SEARCH_HANDLERS.keyItemSets });
-const { queryTags } = queryTagHelper;
+const referenceMap = useAllReferenceDataModel();
+
+const { roleBindingAPI } = useRoleBindingApi();
+
+const { key: roleBindingListQueryKey, params: roleBindingListQueryParams } = useServiceQueryKey('identity', 'role-binding', 'list');
+
+const { data: roleBindingListQueryData } = useScopedQuery({
+    queryKey: roleBindingListQueryKey,
+    queryFn: async () => roleBindingAPI.list(roleBindingListQueryParams.value),
+    enabled: computed(() => !!workspacePageStore.selectedWorkspace),
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+}, ['DOMAIN']);
 
 const storeState = reactive({
-    currentWorkspace: computed(() => workspacePageStore.selectedWorkspaces[0]),
+    currentWorkspace: computed(() => workspacePageStore.selectedWorkspace),
 });
 const state = reactive({
     currentWorkspaceId: computed(() => storeState.currentWorkspace?.workspace_id),
-    refinedUserItems: computed(() => workspacePageState.workspaceUsers.map((user) => ({
+    roleBindingMap: computed(() => roleBindingListQueryData?.value?.results?.reduce((map, roleBinding) => {
+        map[roleBinding.role_binding_id] = roleBinding;
+        return map;
+    }, {})),
+    refinedUserItems: computed(() => workspaceUserListQueryData.value?.map((user) => ({
         ...user,
-        role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id]?.role_id],
+        role: referenceMap.role[state.roleBindingMap[user.role_binding_info.role_binding_id]?.role_id],
         last_accessed_at: calculateTime(user?.last_accessed_at, userStore.state.timezone),
     }))),
 });
@@ -76,20 +90,44 @@ const tableState = reactive({
         };
     }),
 });
+const pagination = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
+const sort = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+
+const workspaceUserListApiQueryHelper = new ApiQueryHelper();
+const queryTagHelper = useQueryTags({ keyItemSets: WORKSPACES_USER_SEARCH_HANDLERS.keyItemSets });
+const { queryTags } = queryTagHelper;
+const {
+    data: workspaceUserListQueryData,
+    totalCount: workspaceUserListQueryTotalCount,
+    isLoading: isWorkspaceUserListFetching,
+    refresh: refreshWorkspaceUserList,
+} = useWorkspaceUserListPaginationQuery({
+    params: computed(() => {
+        workspaceUserListApiQueryHelper.setFilters([
+            ...queryTagHelper.filters.value,
+        ]);
+        return {
+            query: {
+                ...workspaceUserListApiQueryHelper.data,
+                sort: [{ key: sort.sortKey, desc: sort.sortDesc }],
+            },
+            workspace_id: state.currentWorkspaceId,
+        };
+    }),
+    thisPage: computed(() => pagination.thisPage),
+    pageSize: computed(() => pagination.pageSize),
+});
 
 const handleChange = async (options: any = {}) => {
-    workspaceUserListApiQuery = getApiQueryWithToolboxOptions(workspaceUserListApiQueryHelper, options) ?? workspaceUserListApiQuery;
     if (options.queryTags !== undefined) {
-        workspacePageStore.$patch((_state) => {
-            _state.usersSearchfilters = workspaceUserListApiQueryHelper.filters;
-        });
+        queryTagHelper.setQueryTags(options.queryTags);
     }
-    if (options.pageStart !== undefined) workspacePageStore.$patch({ usersPageStart: options.pageStart });
-    if (options.pageLimit !== undefined) workspacePageStore.$patch({ usersPageLimit: options.pageLimit });
-    await workspacePageStore.listWorkspaceUsers({
-        workspace_id: state.currentWorkspaceId,
-        query: workspaceUserListApiQuery,
-    });
 };
 const handleClickButton = () => {
     window.open(router.resolve({
@@ -100,7 +138,7 @@ const handleClickButton = () => {
     }).href, '_blank');
 };
 
-watch(() => workspacePageStore.selectedWorkspaces, async () => {
+watch(() => workspacePageStore.selectedWorkspace, async () => {
     await handleChange();
 }, { immediate: true });
 
@@ -113,7 +151,7 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
                 <p-heading :title="$t('IAM.WORKSPACES.DETAIL.USERS')"
                            use-total-count
                            heading-type="sub"
-                           :total-count="workspacePageState.usersTotalCount"
+                           :total-count="workspaceUserListQueryTotalCount"
                 />
             </template>
             <template #extra>
@@ -131,17 +169,19 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
             search-type="query"
             searchable
             sortable
-            :loading="workspacePageState.workspaceUsersLoading"
+            :loading="isWorkspaceUserListFetching"
             :items="state.refinedUserItems"
             :fields="tableState.workspaceUserTableFields"
             sort-by="name"
             :sort-desc="true"
-            :total-count="workspacePageState.usersTotalCount"
+            :this-page.sync="pagination.thisPage"
+            :page-size.sync="pagination.pageSize"
+            :total-count="workspaceUserListQueryTotalCount"
             :key-item-sets="WORKSPACES_USER_SEARCH_HANDLERS.keyItemSets"
             :value-handler-map="tableState.valueHandlerMap"
             :query-tags="queryTags"
             @change="handleChange"
-            @refresh="handleChange()"
+            @refresh="refreshWorkspaceUserList"
         >
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
@@ -151,10 +191,10 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
             <template #col-role-format="{value}">
                 <div class="role-type-wrapper">
                     <p-tooltip position="bottom"
-                               :contents="useRoleFormatter(value.role_type).name"
+                               :contents="useRoleFormatter(value.data.role_type).name"
                                class="tooltip"
                     >
-                        <img :src="useRoleFormatter(value.role_type).image"
+                        <img :src="useRoleFormatter(value.data.role_type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >

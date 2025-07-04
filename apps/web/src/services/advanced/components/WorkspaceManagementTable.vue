@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import {
     computed, onMounted, reactive,
+    ref,
+    watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import {
-    getApiQueryWithToolboxOptions,
-} from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -37,6 +36,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useWorkspaceListPaginationQuery } from '@/services/advanced/composables/use-workspace-list-pagination-query';
 import {
     EXCEL_TABLE_FIELDS,
     WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
@@ -64,27 +64,14 @@ const workspacePageState = workspacePageStore.$state;
 
 const route = useRoute();
 
-const workspaceListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(workspacePageState.pageStart).setPageLimit(workspacePageState.pageLimit)
-    .setSort('name', true);
-let workspaceListApiQuery = workspaceListApiQueryHelper.data;
-
 const queryTagsHelper = useQueryTags({ keyItemSets: WORKSPACE_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagsHelper;
-if (route.query.selectedWorkspaceId) {
-    queryTagsHelper.setFilters([
-        {
-            k: 'workspace_id',
-            v: route.query.selectedWorkspaceId,
-            o: '=',
-        },
-    ]);
-}
+
+const workspaceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
     timezone: computed(() => userStore.state.timezone ?? 'UTC'),
     selectedType: computed<string>(() => workspacePageState.selectedType),
-    searchFilters: computed<ConsoleFilter[]>(() => workspacePageState.searchFilters),
     currency: computed<Currency|undefined>(() => workspacePageStore.currency),
 });
 const state = reactive({
@@ -94,20 +81,30 @@ const state = reactive({
         { label: i18n.t('IAM.WORKSPACES.DISABLE') as string, name: WORKSPACE_STATE.DISABLE },
         { label: i18n.t('IAM.WORKSPACES.DORMANT') as string, name: WORKSPACE_STATE.DORMANT },
     ])),
+    selectedIndex: 0,
 });
+const pagination = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
+const sortState = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+const searchFilters = ref<ConsoleFilter[]>([]);
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
         type: 'item',
         name: 'enable',
         label: i18n.t('IAM.WORKSPACES.ENABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'ENABLED'),
+        disabled: workspacePageStore.selectedWorkspace?.state === 'ENABLED',
     },
     {
         type: 'item',
         name: 'disable',
         label: i18n.t('IAM.WORKSPACES.DISABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'DISABLED'),
+        disabled: workspacePageStore.selectedWorkspace?.state === 'DISABLED',
     },
     {
         type: 'divider',
@@ -116,15 +113,43 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.WORKSPACES.EDIT'),
-        disabled: workspacePageState.selectedIndices.length !== 1,
+        disabled: !!workspacePageState.selectedWorkspace,
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.WORKSPACES.DELETE'),
-        disabled: workspacePageState.selectedIndices.length !== 1,
+        disabled: !!workspacePageState.selectedWorkspace,
     },
 ]));
+
+const {
+    data: workspaceListData,
+    totalCount: workspaceListTotalCount,
+    refresh: refreshWorkspaceList,
+} = useWorkspaceListPaginationQuery({
+    thisPage: computed(() => pagination.thisPage),
+    pageSize: computed(() => pagination.pageSize),
+    params: computed(() => {
+        workspaceListApiQueryHelper.setFilters([
+            ...searchFilters.value,
+            ...queryTagsHelper.filters.value,
+        ]);
+        if (route.query.selectedWorkspaceId) {
+            workspaceListApiQueryHelper.addFilter({
+                k: 'workspace_id',
+                v: route.query.selectedWorkspaceId,
+                o: '=',
+            });
+        }
+        return {
+            query: {
+                ...workspaceListApiQueryHelper.data,
+                sort: [{ key: sortState.sortKey, desc: sortState.sortDesc }],
+            },
+        };
+    }),
+});
 
 const getRowSelectable = (item) => item.role_type !== ROLE_TYPE.SYSTEM_ADMIN;
 
@@ -134,8 +159,8 @@ const handleSelectDropdown = (name: string) => {
 
 const handleSelectType = async (value: string) => {
     const filters = workspaceListApiQueryHelper.filters;
-    const statusFilterIndex = storeState.searchFilters.findIndex((filter) => filter.k === 'state');
-    const dormantFilterIndex = storeState.searchFilters.findIndex((filter) => filter.k === 'is_dormant');
+    const statusFilterIndex = searchFilters.value.findIndex((filter) => filter.k === 'state');
+    const dormantFilterIndex = searchFilters.value.findIndex((filter) => filter.k === 'is_dormant');
 
     const isDormantSelected = value === WORKSPACE_STATE.DORMANT;
     const isAllSelected = value === 'ALL';
@@ -161,31 +186,30 @@ const handleSelectType = async (value: string) => {
     }
 
     workspaceListApiQueryHelper.setFilters(filters);
+    searchFilters.value = workspaceListApiQueryHelper.filters;
     workspacePageStore.$patch((_state) => {
         _state.selectedType = value;
-        _state.searchFilters = workspaceListApiQueryHelper.filters;
     });
-    await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
+    await refreshWorkspaceList();
 };
 const handleSelect = (index: number[]) => {
-    workspacePageStore.$patch({ selectedIndices: index });
+    workspacePageStore.$patch((_state) => {
+        _state.selectedWorkspace = workspaceListData.value?.[index[0]];
+    });
+    state.selectedIndex = index[0] ?? 0;
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    workspaceListApiQuery = getApiQueryWithToolboxOptions(workspaceListApiQueryHelper, options) ?? workspaceListApiQuery;
+    if (options.sortBy !== undefined) sortState.sortKey = options.sortBy;
+    if (options.sortDesc !== undefined) sortState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) {
-        workspacePageStore.$patch((_state) => {
-            _state.searchFilters = workspaceListApiQueryHelper.filters;
-        });
+        queryTagsHelper.setQueryTags(options.queryTags);
     }
-    if (options.pageStart !== undefined) workspacePageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) workspacePageStore.$patch({ pageLimit: options.pageLimit });
-    await workspacePageStore.load({ query: workspaceListApiQuery });
 };
 
 const handleExport = async () => {
     try {
         await downloadExcel({
-            data: workspacePageState.workspaces,
+            data: workspaceListData.value || [],
             fields: EXCEL_TABLE_FIELDS,
             file_name_prefix: FILE_NAME_PREFIX.workspace,
             timezone: storeState.timezone,
@@ -215,6 +239,15 @@ const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceModel) => 
     },
 });
 
+watch(() => workspaceListData.value, (newVal) => {
+    if (newVal?.length) {
+        state.selectedIndex = 0;
+        workspacePageStore.$patch((_state) => {
+            _state.selectedWorkspace = newVal[0];
+        });
+    }
+});
+
 onMounted(async () => {
     await workspacePageStore.fetchCostReportConfig();
 });
@@ -238,13 +271,15 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :loading="false"
                          :multi-select="false"
                          :show-footer="true"
+                         :this-page.sync="pagination.thisPage"
+                         :page-size.sync="pagination.pageSize"
                          disabled
-                         :items="workspacePageState.workspaces"
-                         :select-index="workspacePageState.selectedIndices"
+                         :items="workspaceListData"
+                         :select-index="[state.selectedIndex]"
                          :fields="WORKSPACE_TABLE_FIELDS"
                          sort-by="name"
                          :sort-desc="true"
-                         :total-count="workspacePageState.totalCount"
+                         :total-count="workspaceListTotalCount"
                          :key-item-sets="WORKSPACE_SEARCH_HANDLERS.keyItemSets"
                          :value-handler-map="WORKSPACE_SEARCH_HANDLERS.valueHandlerMap"
                          :query-tags="queryTags"
@@ -252,7 +287,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :get-row-selectable="getRowSelectable"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refreshWorkspaceList"
                          @export="handleExport"
         >
             <template #toolbox-bottom>
