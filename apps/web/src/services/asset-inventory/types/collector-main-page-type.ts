@@ -41,7 +41,6 @@ export interface CollectorItemInfo {
     historyLink: CollectorLink,
     detailLink: CollectorLink;
     schedule?: Schedule;
-    recentJobAnalyze?: JobAnalyzeStatus[];
     resourceGroup: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     hasJobList?: boolean
 }

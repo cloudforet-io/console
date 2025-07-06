@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    onMounted, computed, reactive, watch,
+    onMounted, computed, reactive,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -31,7 +31,6 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import CollectorDataModal
@@ -41,9 +40,10 @@ import CollectorListNoData from '@/services/asset-inventory/components/Collector
 import CollectorScheduleModal
     from '@/services/asset-inventory/components/CollectorMainScheduleModal.vue';
 import { useCollectorListQuery } from '@/services/asset-inventory/composables/use-collector-list-query';
+import { useInventoryJobAnalyzeQuery } from '@/services/asset-inventory/composables/use-inventory-job-analyze-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -78,8 +78,8 @@ const makePluginReferenceValueHandler = (distinct: string, plugins: PluginRefere
     };
 };
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
+const collectorMainPageStore = useCollectorMainPageStore();
+const collectorMainPageState = collectorMainPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
@@ -127,6 +127,8 @@ const excelFields: ExcelDataField[] = [
 const historyLinkQueryHelper = new QueryHelper();
 
 const state = reactive({
+    thisPage: 1,
+    pageSize: 24,
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
@@ -157,8 +159,7 @@ const state = reactive({
                 },
             ]);
 
-            const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
-            const recentJobAnalyze = matchedJob ? matchedJob.job_status : [];
+            const matchedJob = jobAnalyzeData.value?.results?.find((status) => status.collector_id === d.collector_id);
             return {
                 collectorId: d.collector_id,
                 workspaceId: d.workspace_id,
@@ -182,11 +183,10 @@ const state = reactive({
                     },
                 },
                 schedule: d.schedule,
-                recentJobAnalyze,
                 resourceGroup: d.resource_group,
                 hasJobList: !!matchedJob,
             };
-        });
+        }) || [];
     }),
 });
 
@@ -197,31 +197,25 @@ const { queryTags } = queryTagHelper;
 const routeToCreatePage = () => {
     router.push({ name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }).catch(() => {});
 };
-const handleChangeToolbox = (options: ToolboxOptions) => {
-    if (options.queryTags !== undefined) {
+const handleChangeToolbox = (options?: ToolboxOptions) => {
+    if (options?.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
-    collectorPageState.searchFilters = queryTagHelper.filters.value;
-    fetchCollectorList();
+    collectorMainPageStore.setSearchFilters(queryTagHelper.filters.value);
 };
 const handleClickListItem = (detailLink) => {
     router.push(detailLink).catch(() => {});
 };
-const handleClickCollectDataConfirm = () => {
-    fetchCollectorList();
-};
 
 /* Query */
-const collectorApiQueryHelper = new ApiQueryHelper();
+const collectorApiQueryHelper = new ApiQueryHelper().setSort('name', true);
 const { collectorListData, isLoading, totalCount } = useCollectorListQuery({
-    thisPage: computed(() => collectorPageState.thisPage),
-    pageSize: computed(() => collectorPageState.pageSize),
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageSize),
     params: computed(() => {
-        collectorApiQueryHelper
-            .setFilters(queryTagHelper.filters.value)
-            .setSort(collectorPageState.sortBy, true);
-        if (collectorPageState.selectedProvider !== 'all') {
-            collectorApiQueryHelper.addFilter({ k: 'provider', v: collectorPageState.selectedProvider, o: '=' });
+        collectorApiQueryHelper.setFilters(queryTagHelper.filters.value);
+        if (collectorMainPageState.selectedProvider !== 'all') {
+            collectorApiQueryHelper.addFilter({ k: 'provider', v: collectorMainPageState.selectedProvider, o: '=' });
         }
         if (storeState.isAdminMode) {
             collectorApiQueryHelper.addFilter({ k: 'workspace_id', v: '*', o: '=' });
@@ -232,6 +226,9 @@ const { collectorListData, isLoading, totalCount } = useCollectorListQuery({
             },
         };
     }),
+});
+const { data: jobAnalyzeData } = useInventoryJobAnalyzeQuery({
+    collectorIds: computed(() => collectorListData.value?.results?.map((d) => d.collector_id) || []),
 });
 
 /* API */
@@ -244,25 +241,9 @@ const handleExportExcel = async () => {
         timezone: storeState.timezone,
     });
 };
-const fetchCollectorList = async () => {
-    try {
-        await collectorPageStore.getJobs();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-/* Watcher */
-watch(() => collectorPageState.collectors, async () => {
-    const ids = state.items?.map((item) => item.collectorId) || [];
-    if (ids.length > 0) {
-        await collectorPageStore.getCollectorJobs(ids);
-    }
-});
 
 onMounted(async () => {
-    queryTagHelper.setFilters(collectorPageState.searchFilters); // init url query string
-    await fetchCollectorList();
+    queryTagHelper.setFilters(collectorMainPageState.searchFilters); // init url query string
 });
 </script>
 
@@ -276,10 +257,10 @@ onMounted(async () => {
             :query-tags="state.searchTags"
             :value-handler-map="collectorSearchHandler.valueHandlerMap"
             :total-count="totalCount"
-            :this-page.sync="collectorPageState.thisPage"
-            :page-size.sync="collectorPageState.pageSize"
+            :this-page.sync="state.thisPage"
+            :page-size.sync="state.pageSize"
             @change="handleChangeToolbox"
-            @refresh="fetchCollectorList"
+            @refresh="handleChangeToolbox()"
             @export="handleExportExcel"
         >
             <template v-if="state.hasReadWriteAccess"
@@ -312,8 +293,8 @@ onMounted(async () => {
                 <collector-list-no-data class="collector-no-data" />
             </template>
         </p-data-loader>
-        <collector-schedule-modal @refresh-collector-list="fetchCollectorList" />
-        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
+        <collector-schedule-modal />
+        <collector-data-modal />
     </div>
 </template>
 

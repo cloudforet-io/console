@@ -2,12 +2,12 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || state.isCollectorOptionsSchemaEmpty || !collectorFormState.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || state.isCollectorOptionsSchemaEmpty || !isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
                             :fields="state.fields"
-                            :loading="state.loading"
+                            :loading="isOriginCollectorLoading"
                             :data="state.collectorOptions"
                             style-type="white"
         >
@@ -72,12 +72,16 @@ import type { CollectorModel } from '@/api-clients/inventory/collector/schema/mo
 import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
@@ -87,13 +91,13 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const appContextStore = useAppContextStore();
 
 const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
-    loading: computed<boolean>(() => !collectorFormState.originCollector),
-    collectorOptions: computed<CollectorOptions>(() => collectorFormState.originCollector?.plugin_info?.options ?? {}),
-    collectorOptionsSchema: computed<JsonSchema>(() => collectorFormState.originCollector?.plugin_info?.metadata?.options_schema ?? {
+    collectorOptions: computed<CollectorOptions>(() => originCollectorData.value?.plugin_info?.options ?? {}),
+    collectorOptionsSchema: computed<JsonSchema>(() => originCollectorData.value?.plugin_info?.metadata?.options_schema ?? {
         type: 'object',
         properties: {},
     }),
@@ -117,6 +121,13 @@ const state = reactive({
     isEditMode: false,
     isOptionsValid: false,
     isUpdating: false,
+});
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+
+/* Query */
+const { data: originCollectorData, isLoading: isOriginCollectorLoading } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
@@ -142,12 +153,11 @@ const handleClickCancel = () => {
 const handleClickSave = async () => {
     try {
         state.isUpdating = true;
-        const collector = await fetchCollectorPluginUpdate();
-        collectorFormStore.setOriginCollector(collector);
+        await fetchCollectorPluginUpdate();
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR_OPTIONS'), '');
         state.isEditMode = false;
     } catch (error) {
-        collectorFormStore.resetOptions();
+        collectorFormStore.setOptions(originCollectorData.value?.plugin_info?.options ?? {});
         ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR_OPTIONS'));
     } finally {
         state.isUpdating = false;

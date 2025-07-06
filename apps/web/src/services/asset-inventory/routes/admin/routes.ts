@@ -24,7 +24,7 @@ const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const AdminCollectorCreatePage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorCreatePage.vue');
 const AdminCollectorHistoryPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorHistoryPage.vue');
-const AdminCollectHistoryJobPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectHistoryJobPage.vue');
+const CollectHistoryJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
 const AdminCollectorDetailPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorDetailPage.vue');
 
 
@@ -143,7 +143,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                             name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
                             meta: { label: ({ params }) => params.jobId, copiable: true },
                             props: true,
-                            component: AdminCollectHistoryJobPage as any,
+                            component: CollectHistoryJobPage as any,
                         },
                     ],
                 },
