@@ -31,7 +31,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: ':update:visible'): void,
-    (e: 'refresh'): void,
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
@@ -57,7 +56,7 @@ const state = reactive({
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
-    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspaces[0]),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspace),
 });
 
 const handleConfirm = async () => {
@@ -73,7 +72,6 @@ const handleConfirm = async () => {
             });
         }
         state.proxyVisible = false;
-        emit('refresh');
     } catch (error) {
         ErrorHandler.handleError(error);
     } finally {

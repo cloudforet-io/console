@@ -9,11 +9,10 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { WorkspaceGroupCreateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/create';
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
@@ -29,8 +28,6 @@ import { useWorkspaceGroupNameListQuery } from '@/services/advanced/composables/
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
-
-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
@@ -44,6 +41,7 @@ const state = reactive({
     isEllipsisMap: {} as Record<string, boolean>,
 });
 const referenceMap = useAllReferenceDataModel();
+const { workspaceAPI } = useWorkspaceApi();
 const { data: workspaceGroupNameList } = useWorkspaceGroupNameListQuery();
 const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
@@ -74,7 +72,7 @@ const {
         workspace_group_id: _workspace.workspace_group_id,
         disabled: !!_workspace.workspace_group_id,
     }),
-    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+    fetcher: (apiQueryHelper) => workspaceAPI.list({
         query: apiQueryHelper.data,
     }),
 });

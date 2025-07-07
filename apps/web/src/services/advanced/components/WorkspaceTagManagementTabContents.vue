@@ -20,7 +20,6 @@ import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vu
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
 
 interface TableItem {
     project_id?: string;
@@ -42,8 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     items: [] as TableItem[],
-    selectedWorkspace: computed(() => workspacePageStore.selectedWorkspaces[0]),
-    selectedIdx: computed(() => workspacePageState.selectedIndices[0]),
+    selectedWorkspace: computed(() => workspacePageStore.selectedWorkspace),
     sortBy: 'key',
     sortDesc: true,
 });
@@ -84,9 +82,7 @@ const handleTagUpdate = async (newTags:Tags) => {
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
         tableState.tagEditPageVisible = false;
         state.items = convertUserTagsToKeyValueArray(newTags);
-        workspacePageStore.$patch((_state) => {
-            _state.workspaces[state.selectedIdx].tags = newTags;
-        });
+        // TODO: get query tag
         tableState.tags = newTags;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));

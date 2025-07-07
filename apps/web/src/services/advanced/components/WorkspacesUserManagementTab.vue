@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import { PTab } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
@@ -31,7 +33,7 @@ const tabState = reactive({
 
 <template>
     <section>
-        <p-tab v-if="workspacePageState.selectedIndices.length === 1"
+        <p-tab v-if="!isEmpty(workspacePageState.selectedWorkspace)"
                :tabs="tabState.tabs"
                :active-tab.sync="tabState.activeTab"
         >
