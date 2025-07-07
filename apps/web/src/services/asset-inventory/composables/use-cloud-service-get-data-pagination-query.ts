@@ -26,12 +26,16 @@ export const useCloudServiceGetDataPaginationQuery = ({
     });
 
     return useScopedPaginationQuery({
+        enabled: computed(() => {
+            const _enabled = enabled.value;
+            return _enabled;
+        }),
         queryKey: key,
         queryFn: cloudServiceAPI.getData,
         params: queryParams,
-        enabled: computed(() => enabled.value),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 5,
+        retry: 100,
     }, {
         thisPage,
         pageSize,

@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -8,15 +9,25 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { CLOUD_SERVICE_GLOBAL_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceGlobalFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
 
+interface CloudServiceLSBState {
+    globalFilters: CloudServiceGlobalFilterMap;
+}
+
+interface CloudServiceLSBGetters {
+    selectedProjects: ComputedRef<string[]>;
+    selectedServiceAccounts: ComputedRef<string[]>;
+    allFilters: ComputedRef<ConsoleFilter[]>;
+}
+
 export const useCloudServiceLSBStore = defineStore('cloud-service-l-s-b', () => {
-    const state = reactive({
+    const state = reactive<CloudServiceLSBState>({
         globalFilters: {
             [CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT]: [],
             [CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT]: [],
         } as CloudServiceGlobalFilterMap,
     });
 
-    const getters = reactive({
+    const getters = reactive<CloudServiceLSBGetters>({
         selectedProjects: computed((): string[] => state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.PROJECT] ?? []),
         selectedServiceAccounts: computed((): string[] => state.globalFilters[CLOUD_SERVICE_GLOBAL_FILTER_KEY.SERVICE_ACCOUNT] ?? []),
         allFilters: computed<ConsoleFilter[]>(() => {

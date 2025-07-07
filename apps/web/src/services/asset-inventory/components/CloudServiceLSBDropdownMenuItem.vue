@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServicePageState = cloudServicePageStore.state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const cloudServiceLSBState = cloudServiceLSBStore.state;
 
@@ -37,9 +37,7 @@ const handleFilterUpdate = (name: string, selected: string[]) => {
         cloudServiceLSBStore.setGloablFilters({ ...state.filters, [name]: selected } as CloudServiceGlobalFilterMap);
         return;
     }
-    cloudServicePageStore.$patch((_state) => {
-        _state.additionalFilters = { ...state.filters, [name]: selected } as CloudServiceFilterMap;
-    });
+    cloudServicePageStore.setAdditionalFilters({ ...state.filters, [name]: selected } as CloudServiceFilterMap);
 };
 </script>
 

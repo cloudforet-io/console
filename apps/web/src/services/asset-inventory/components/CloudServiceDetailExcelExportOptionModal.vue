@@ -7,7 +7,6 @@ import { cloneDeep } from 'lodash';
 
 import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
@@ -18,6 +17,7 @@ import type { DynamicLayout } from '@cloudforet/mirinae/types/data-display/dynam
 
 import { QueryType } from '@/api-clients/_common/schema/api-verbs/export';
 import type { ExportOption, ExportParameter } from '@/api-clients/_common/schema/api-verbs/export';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -26,17 +26,10 @@ import { useUserStore } from '@/store/user/user-store';
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useCloudServicePageSchemaGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-get-query';
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
-
-interface CloudServiceDetailSchema {
-    name: string;
-    type: string;
-    options: any;
-}
 
 
 const props = defineProps<{
@@ -50,8 +43,10 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
+const { cloudServiceAPI } = useCloudServiceApi();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
+const cloudServiceDetailPageState = cloudServiceDetailPageStore.state;
+const cloudServiceDetailPageGetters = cloudServiceDetailPageStore.getters;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
@@ -62,22 +57,21 @@ const MAIN_TABLE = 'Main Table';
 const state = reactive({
     isValid: computed<boolean>(() => !!state.selectedSubDataIds.length),
     downloadLoading: false,
-    isSubDataLoading: false,
-    subDataList: computed(() => [
+    subDataList: computed<string[]>(() => [
         MAIN_TABLE,
-        ...state.detailSchemaList.map((schema:CloudServiceDetailSchema) => schema.name),
+        ...state.detailSchemaList.map((schema:DynamicLayout) => schema.name),
     ]),
     selectedSubDataIds: [MAIN_TABLE] as string[],
-    selectedSubDataSchemas: computed<CloudServiceDetailSchema[]>(() => state.detailSchemaList.filter((schema:CloudServiceDetailSchema) => state.selectedSubDataIds.includes(schema.name))),
+    selectedSubDataSchemas: computed<DynamicLayout[]>(() => state.detailSchemaList.filter((schema:DynamicLayout) => state.selectedSubDataIds.includes(schema.name))),
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
-    detailSchemaList: [] as CloudServiceDetailSchema[],
+    detailSchemaList: computed<DynamicLayout[]>(() => (schemaData.value?.details || []).filter((schema: DynamicLayout) => isTableTypeInDynamicLayoutType(schema.type))),
 });
 
 
 const apiQuery = new ApiQueryHelper();
 const getCloudServiceListQuery = () => {
     apiQuery.setMultiSortV2([{ key: 'created_at', desc: true }])
-        .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageStoreState.searchFilters))
+        .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageState.searchFilters))
         .addFilter(...cloudServiceLSBStore.getters.allFilters);
     return apiQuery.data;
 };
@@ -125,11 +119,11 @@ const handleConfirm = async () => {
         }) as ExportOption : undefined;
 
         const cloudServiceExcelExportParams: ExportParameter = {
-            file_name: cloudServiceDetailPageStore.sheetNamePrefix,
+            file_name: cloudServiceDetailPageGetters.sheetNamePrefix,
             options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
             timezone: state.timezone,
         };
-        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+        return cloudServiceAPI.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
     emits('update:visible', false);
@@ -139,30 +133,21 @@ const handleUpdateVisible = (visible: boolean) => {
     emits('update:visible', visible);
 };
 
-const getSchema = async () => {
-    state.isSubDataLoading = true;
-    try {
-        const params: Record<string, any> = {
-            schema: 'details',
-            resource_type: 'inventory.CloudService',
-            options: {
-                cloud_service_id: props.cloudServiceId,
-                include_workspace_info: appContextGetters.isAdminMode,
-                is_multiple: true,
-            },
-        };
-        const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-        state.detailSchemaList = res.details.filter((schema: CloudServiceDetailSchema) => isTableTypeInDynamicLayoutType(schema.type));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.isSubDataLoading = false;
-    }
-};
+const { data: schemaData, isFetching: isSchemaLoading } = useCloudServicePageSchemaGetQuery({
+    params: computed(() => ({
+        schema: 'details',
+        resource_type: 'inventory.CloudService',
+        options: {
+            cloud_service_id: props.cloudServiceId,
+            include_workspace_info: appContextGetters.isAdminMode,
+            is_multiple: true,
+        },
+    })),
+    enabled: computed(() => !!props.cloudServiceId),
+});
 
 
 watch(() => props.visible, () => {
-    if (props.cloudServiceId) getSchema();
     state.selectedSubDataIds = [MAIN_TABLE];
 });
 
@@ -182,7 +167,7 @@ watch(() => props.visible, () => {
                 {{ i18n.t('INVENTORY.CLOUD_SERVICE.EXCEL_EXPORT_MODAL.DESCRIPTION') }}
             </p>
             <p-data-loader class="sub-data-section"
-                           :loading="state.isSubDataLoading"
+                           :loading="isSchemaLoading"
                            :data="state.subDataList"
             >
                 <p-checkbox-group direction="vertical">

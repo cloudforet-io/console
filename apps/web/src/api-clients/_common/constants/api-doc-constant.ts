@@ -548,6 +548,12 @@ export const API_DOC = {
             'get',
             'list',
         ],
+        note: [
+            'create',
+            'delete',
+            'list',
+            'update',
+        ],
         region: [
             'list',
         ],

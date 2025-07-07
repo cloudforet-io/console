@@ -105,6 +105,10 @@ const serviceRouter = useServiceRouter(router);
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
 
+const schemaGetEnabled = computed(() => {
+    if (props.isServerPage) return true;
+    return !!(!!props.provider && !!props.group && !!props.name);
+});
 const { data: schemaData } = useCloudServicePageSchemaGetQuery({
     params: computed<PageSchemaGetParameters>(() => {
         const params: Record<string, any> = {
@@ -128,6 +132,7 @@ const { data: schemaData } = useCloudServicePageSchemaGetQuery({
         }
         return params as PageSchemaGetParameters;
     }),
+    enabled: computed(() => schemaGetEnabled.value),
 });
 
 /* Main Table */
@@ -385,9 +390,7 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
     if (changed.queryTags !== undefined) {
         apiQuery.setFiltersAsQueryTag(changed.queryTags);
         excelQuery.setFiltersAsQueryTag(changed.queryTags);
-        cloudServiceDetailPageStore.$patch((_state) => {
-            _state.searchFilters = excelQuery.filters;
-        });
+        cloudServiceDetailPageStore.setSearchFilters(excelQuery.filters);
     }
     if (tableState.schema === null) return;
     if (changed.sortBy !== undefined) {
@@ -483,9 +486,7 @@ const convertToQueryTag = (filter: Condition[]): ConsoleFilter[] => filter.map((
     };
     cloudServiceLSBStore.setSelectedProjectsToFilters(urlQueryValue.project);
     cloudServiceLSBStore.setSelectedServiceAccountsToFilters(urlQueryValue.service_account);
-    cloudServiceDetailPageStore.$patch((_state) => {
-        _state.searchFilters = searchFilters.value;
-    });
+    cloudServiceDetailPageStore.setSearchFilters(searchFilters.value);
 })();
 
 watch(schemaData, (_schema) => {
@@ -662,7 +663,8 @@ watch(cloudServiceTableData, () => {
                                    :selected-index="typeOptionState.selectIndex.length ?? 0"
                                    :timezone="typeOptionState.timezone ?? 'UTC'"
         />
-        <custom-field-modal-for-dynamic-layout :visible="tableState.visibleCustomFieldModal"
+        <custom-field-modal-for-dynamic-layout v-if="tableState.visibleCustomFieldModal"
+                                               :visible="tableState.visibleCustomFieldModal"
                                                resource-type="inventory.CloudService"
                                                :options="{
                                                    provider: props.provider,

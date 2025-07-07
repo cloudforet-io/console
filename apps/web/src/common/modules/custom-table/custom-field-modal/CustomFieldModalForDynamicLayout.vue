@@ -2,11 +2,11 @@
 import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
 } from '@cloudforet/mirinae';
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicLayoutOptions, QuerySearchTableOptions } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { UserType } from '@/api-clients/identity/user/schema/type';
 import { i18n } from '@/translations';
@@ -18,15 +18,22 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useCustomTableSchemaGetQuery } from '@/common/modules/custom-table/custom-field-modal/composables/use-custom-table-schema-get-query';
+import { useCustomTableSchemaUpdate } from '@/common/modules/custom-table/custom-field-modal/composables/use-custom-table-schema-update';
+import { useServiceAccountTableSchemaGetQuery } from '@/common/modules/custom-table/custom-field-modal/composables/use-service-account-table-schema-get-query';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItemForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItemForDynamicLayout.vue';
 
+import { useCloudServicePageSchemaGetQuery } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-get-query';
+import { useCloudServicePageSchemaUpdateMutation } from '@/services/asset-inventory/composables/use-cloud-service-page-schema-update-mutation';
 import { convertAgentModeOptions } from '@/services/service-account/helpers/agent-mode-helper';
-import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
+import { getAccountFields } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
+import { getDefaultSearchSchema, getDefaultTableSchema } from '@/services/service-account/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
 import type {
-    GetSchemaParams,
+    QuerySearchTableLayout,
     ResourceType,
 } from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
+
 
 const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
 const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
@@ -75,8 +82,6 @@ const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
 
-let schema: any = {};
-
 const storeState = reactive({
     userId: computed<string|undefined>(() => userStore.state.userId),
     userType: computed<UserType|undefined>(() => userStore.state.userType),
@@ -86,8 +91,6 @@ const state = reactive({
     search: '',
     isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
     loading: true,
-    availableColumns: [] as DynamicField[], // all default fields including optional fields.
-    currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
     allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
     selectedColumnMap: {} as SelectedColumnMap,
     selectedColumns: computed<DynamicField[]>({
@@ -150,69 +153,129 @@ const onChangeAllSelect = (val) => {
     }
 };
 
-const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
-    try {
-        const options: GetSchemaParams['options'] = {
-            include_optional_fields: includeOptionalFields,
-            isAdminMode: appContextGetters.isAdminMode,
-        };
-        const {
-            provider, cloudServiceGroup, cloudServiceType, include_workspace_info,
-        } = props.options;
-        if (provider)options.provider = provider;
-        if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-        if (cloudServiceType) options.cloud_service_type = cloudServiceType;
-        if (include_workspace_info) options.include_workspace_info = include_workspace_info;
+const { data: serviceAccountTableSchema, isFetching: isFetchingServiceAccountTableSchema } = useServiceAccountTableSchemaGetQuery({
+    options: computed(() => props.options),
+    resourceType: computed(() => props.resourceType),
+    enabled: computed(() => state.isServiceAccountTable && !!props.resourceType),
+});
 
-        let res;
-        if (state.isServiceAccountTable && props.resourceType) {
-            res = await getServiceAccountTableSchema({
-                userData: {
-                    userType: storeState.userType ?? 'USER',
-                    userId: storeState.userId ?? '',
-                },
-                resourceType: props.resourceType,
-                options,
-            });
-            // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
-            if (props.options?.provider === 'kubernetes') res.options = convertAgentModeOptions(res.options ?? {});
-        } else {
-            res = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                schema: 'table',
-                options,
-            });
-        }
-        /*
-        * NOTE: The storage for schema config is the same for both user and admin modes, making it difficult to distinguish data on the entry level.
-        * Therefore, it is segmented as follows:
-        * */
-        const workspaceIndex = res.options.fields.findIndex((field) => field.name === 'Workspace');
-        if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
-            res.options.fields.splice(workspaceIndex, 1);
-        }
-        schema = res;
-        delete schema.options?.search;
-        return res.options?.fields || [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        schema = {};
-        return [];
+const { data: customTableSchema, isFetching: isFetchingCustomTableSchema } = useCustomTableSchemaGetQuery({
+    userData: computed(() => ({ userType: storeState.userType ?? 'USER', userId: storeState.userId ?? '' })),
+    resourceType: computed(() => props.resourceType),
+    provider: computed(() => serviceAccountTableSchema.value?.provider),
+    enabled: computed(() => state.isServiceAccountTable && !!props.resourceType && !!serviceAccountTableSchema.value?.provider),
+});
+
+const { data: cloudServiceTableSchemaWithIncludeOptionalFields, isFetching: isFetchingCloudServiceTableSchemaWithIncludeOptionalFields } = useCloudServicePageSchemaGetQuery({
+    params: computed(() => ({
+        resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType ?? '',
+        schema: 'table',
+        options: {
+            provider: props.options?.provider,
+            cloud_service_group: props.options?.cloudServiceGroup,
+            cloud_service_type: props.options?.cloudServiceType,
+            include_workspace_info: props.options?.include_workspace_info,
+            include_optional_fields: true,
+            isAdminMode: appContextGetters.isAdminMode,
+        },
+    })),
+    enabled: computed(() => !state.isServiceAccountTable || !props.resourceType),
+});
+
+const { data: cloudServiceTableSchemaWithoutIncludeOptionalFields, isFetching: isFetchingCloudServiceTableSchemaWithoutIncludeOptionalFields } = useCloudServicePageSchemaGetQuery({
+    params: computed(() => {
+        console.debug('[[[[FALSEFLASES params]]]]');
+        return {
+            resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType ?? '',
+            schema: 'table',
+            options: {
+                provider: props.options?.provider,
+                cloud_service_group: props.options?.cloudServiceGroup,
+                cloud_service_type: props.options?.cloudServiceType,
+                include_workspace_info: props.options?.include_workspace_info,
+                include_optional_fields: false,
+                isAdminMode: appContextGetters.isAdminMode,
+            },
+        };
+    }),
+    enabled: computed(() => !state.isServiceAccountTable || !props.resourceType),
+});
+
+const schemaDataIncludeOptionalFields = computed<QuerySearchTableLayout| undefined>(() => {
+    if (!state.isServiceAccountTable || !props.resourceType) return undefined;
+    const fields:DynamicField[] = getAccountFields(serviceAccountTableSchema.value);
+    const schema = getDefaultTableSchema(fields, {
+        isTrustedAccount: props.resourceType === 'identity.TrustedAccount',
+        isAdminMode: appContextGetters.isAdminMode,
+    });
+    if (schema.options) schema.options.search = getDefaultSearchSchema(fields, props.resourceType === 'identity.TrustedAccount').search;
+    if (props.options?.provider === 'kubernetes') schema.options = convertAgentModeOptions(schema.options as DynamicLayoutOptions);
+    return schema;
+});
+
+const schemaDataExcludeOptionalFields = computed<QuerySearchTableLayout| undefined>(() => {
+    if (!state.isServiceAccountTable || !props.resourceType) return undefined;
+    const fields:DynamicField[] = getAccountFields(serviceAccountTableSchema.value);
+    let schema = getDefaultTableSchema(fields, {
+        isTrustedAccount: props.resourceType === 'identity.TrustedAccount',
+        isAdminMode: appContextGetters.isAdminMode,
+    });
+    if (serviceAccountTableSchema.value?.provider && customTableSchema.value) schema = customTableSchema.value;
+    if (schema.options) schema.options.search = getDefaultSearchSchema(fields, props.resourceType === 'identity.TrustedAccount').search;
+    if (props.options?.provider === 'kubernetes') schema.options = convertAgentModeOptions(schema.options as DynamicLayoutOptions);
+    return schema;
+});
+
+// all default fields including optional fields.
+const availableSchemaColumns = computed<DynamicField[]>(() => {
+    let schema;
+    if (state.isServiceAccountTable && props.resourceType) schema = schemaDataIncludeOptionalFields.value;
+    else schema = cloudServiceTableSchemaWithIncludeOptionalFields.value;
+    const workspaceIndex = schema?.options?.fields?.findIndex((field) => field.name === 'Workspace');
+    if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
+        schema?.options?.fields?.splice(workspaceIndex, 1);
     }
-};
+    return schema?.options?.fields || [];
+});
+
+// if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
+const currentSchemaColumns = computed<DynamicField[]>(() => {
+    let schema;
+    if (state.isServiceAccountTable && props.resourceType) schema = schemaDataExcludeOptionalFields.value;
+    else schema = cloudServiceTableSchemaWithoutIncludeOptionalFields.value;
+    return schema?.options?.fields || [];
+});
 
 const setColumnsDefault = async () => {
-    state.allColumns = state.availableColumns;
-    state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
+    state.allColumns = availableSchemaColumns.value;
+    state.selectedColumns = availableSchemaColumns.value.filter((d) => !d.options?.is_optional);
     sortByRecommendation();
 };
 
-const updatePageSchema = async () => {
-    state.loading = true;
+const { updateCustomTableSchema: updateCustomTableSchemaMutation, isPending: isPendingUpdateCustomTableSchema } = useCustomTableSchemaUpdate({
+    userData: computed(() => ({ userType: storeState.userType ?? 'USER', userId: storeState.userId ?? '' })),
+    resourceType: computed(() => props.resourceType),
+    provider: computed(() => props.options.provider ?? ''),
+});
 
-    const data = { ...schema };
-    if (!data.options) data.options = {};
-    data.options.fields = state.selectedColumns;
+const { mutateAsync: updateCloudServicePageSchema, isPending: isPendingUpdateCloudServicePageSchema } = useCloudServicePageSchemaUpdateMutation({
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
+        emit('complete');
+        state.proxyVisible = false;
+    },
+});
+const updatePageSchema = async () => {
+    const data: QuerySearchTableLayout = {
+        ...(schemaDataExcludeOptionalFields.value ?? {}),
+        name: schemaDataExcludeOptionalFields.value?.name ?? '',
+        type: schemaDataExcludeOptionalFields.value?.type ?? '',
+        options: {
+            ...(schemaDataExcludeOptionalFields.value?.options ?? {}),
+            search: schemaDataExcludeOptionalFields.value?.options?.search ?? [],
+            fields: state.selectedColumns,
+        } as QuerySearchTableOptions,
+    };
 
     const options: any = {};
     const { provider, cloudServiceGroup, cloudServiceType } = props.options;
@@ -222,18 +285,10 @@ const updatePageSchema = async () => {
 
     try {
         if (state.isServiceAccountTable && props.resourceType) {
-            await updateCustomTableSchema(
-                {
-                    userType: storeState.userType ?? 'USER',
-                    userId: storeState.userId ?? '',
-                },
-                props.resourceType,
-                props.options.provider ?? '',
-                data,
-            );
+            await updateCustomTableSchemaMutation(data);
         } else {
-            await SpaceConnector.client.addOns.pageSchema.update({
-                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+            await updateCloudServicePageSchema({
+                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType ?? '',
                 schema: 'table',
                 data,
                 options,
@@ -244,11 +299,8 @@ const updatePageSchema = async () => {
         state.proxyVisible = false;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
-    } finally {
-        state.loading = false;
     }
 };
-
 
 const updateSelectedKeys = (keys: string[]) => {
     state.selectedColumns = keys.map((key) => {
@@ -263,7 +315,7 @@ const updateSelectedKeys = (keys: string[]) => {
                 },
             } as DynamicField;
         }
-        return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
+        return state.allColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
     });
 };
 
@@ -280,19 +332,20 @@ const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
     updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
 };
 
-/* Init */
-const initColumns = async () => {
-    state.loading = true;
-    const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
-    state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
-    state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
-    state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
-    state.selectedColumns = [...state.currentColumns];
-    state.loading = false;
-};
-watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
-    if (visible && resourceType) {
-        initColumns();
+const isLoading = computed<boolean>(() => isFetchingServiceAccountTableSchema.value || isFetchingCustomTableSchema.value
+    || isFetchingCloudServiceTableSchemaWithIncludeOptionalFields.value || isFetchingCloudServiceTableSchemaWithoutIncludeOptionalFields.value
+    || isPendingUpdateCustomTableSchema.value || isPendingUpdateCloudServicePageSchema.value);
+
+
+watch([
+    () => props.visible,
+    () => props.resourceType,
+    () => currentSchemaColumns.value,
+    () => availableSchemaColumns.value,
+], ([visible, resourceType, currentColumns, availableColumns]) => {
+    if (visible && resourceType && currentColumns.length > 0) {
+        state.selectedColumns = [...currentColumns];
+        state.allColumns = mergeFields(currentColumns, availableColumns);
     }
 }, { immediate: true });
 
@@ -301,12 +354,12 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
 <template>
     <p-button-modal :visible.sync="state.proxyVisible"
                     :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
-                    :loading="state.loading"
+                    :loading="isLoading"
                     :disabled="!state.isValid"
                     @confirm="updatePageSchema"
     >
         <template #body>
-            <p-data-loader :loading="state.loading"
+            <p-data-loader :loading="isLoading"
                            :min-loading-time="500"
             >
                 <div class="contents-wrapper">

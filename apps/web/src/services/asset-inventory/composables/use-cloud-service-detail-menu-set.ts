@@ -9,6 +9,7 @@ import type { LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { useCloudServiceTypeListQuery } from '@/services/asset-inventory/composables/use-cloud-service-type-list-query';
+import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
@@ -26,9 +27,10 @@ export const useCloudServiceDetailLSBMenuSet = ({ params }: UseCloudServiceDetai
     const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 
     const { data: cloudServiceTypeList } = useCloudServiceTypeListQuery({
-        provider,
-        group,
-        name: computed(() => params.value?.name),
+        params: computed(() => ({
+            query: getCloudServiceTypeQuery(provider.value, group.value),
+        })),
+        enabled: computed(() => !!provider.value && !!group.value && !!params.value?.name),
     });
 
     const menuSet = computed<LSBItem[]>(() => {

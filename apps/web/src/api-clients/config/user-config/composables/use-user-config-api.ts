@@ -11,11 +11,11 @@ import type { UserConfigModel } from '@/api-clients/config/user-config/schema/mo
 
 export const useUserConfigApi = () => {
     const actions = {
-        create: SpaceConnector.clientV2.config.userConfig.create<UserConfigCreateParameters, UserConfigModel>,
-        update: SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>,
+        create: <T = Record<string, any>>(params: UserConfigCreateParameters) => SpaceConnector.clientV2.config.userConfig.create<UserConfigCreateParameters, UserConfigModel<T>>(params),
+        update: <T = Record<string, any>>(params: UserConfigUpdateParameters) => SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel<T>>(params),
         delete: SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>,
-        get: SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>,
-        list: SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>,
+        get: <T = Record<string, any>>(params: UserConfigGetParameters) => SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel<T>>(params),
+        list: <T = Record<string, any>>(params: UserConfigListParameters) => SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<T>>>(params),
         set: SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>,
     };
 

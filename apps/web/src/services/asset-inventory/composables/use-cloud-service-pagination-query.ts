@@ -27,6 +27,8 @@ export const useCloudServicePaginationQuery = ({
         queryKey: key,
         queryFn: cloudServiceAPI.list,
         params: queryParams,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 5,
         enabled: computed(() => enabled?.value ?? true),
     }, {
         thisPage,

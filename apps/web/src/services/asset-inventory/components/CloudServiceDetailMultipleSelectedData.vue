@@ -71,6 +71,7 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
 
 const { cloudServiceAPI } = useCloudServiceApi();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageGetters = cloudServiceDetailPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
@@ -227,7 +228,7 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
         const cloudServiceExcelExportParams: ExportParameter = {
-            file_name: cloudServiceDetailPageStore.sheetNamePrefix,
+            file_name: cloudServiceDetailPageGetters.sheetNamePrefix,
             options: [
                 {
                     name: state.currentLayout.name,

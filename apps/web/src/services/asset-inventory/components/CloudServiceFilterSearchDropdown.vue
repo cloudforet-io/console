@@ -57,7 +57,7 @@ const emit = defineEmits<{(e: 'select', value: string[]): void;
 
 const allReferenceStore = useAllReferenceStore();
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServicePageState = cloudServicePageStore.state;
 
 const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
