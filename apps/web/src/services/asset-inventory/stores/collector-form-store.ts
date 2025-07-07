@@ -13,8 +13,6 @@ import type {
 import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
 import type { PluginGetVersionsParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get-versions';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { CollectorRuleListParameters } from '@/schema/inventory/collector-rule/api-verbs/list';
-import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -57,10 +55,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         versions: [] as string[],
         isScheduleError: false,
 
-        // additional rules form
-        originCollectorRules: [] as CollectorRuleModel[]|null,
-        additionalRules: [] as CollectorRuleModel[],
-
         // getters
         serviceAccounts: computed<string[]>(() => state.attachedServiceAccount.map((d) => d.name as string)),
     });
@@ -71,19 +65,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         },
         setRepositoryPlugin(pluginInfo: PluginModel|null) {
             state.repositoryPlugin = pluginInfo;
-        },
-        async setOriginCollectorRules(id?: string) {
-            try {
-                const res = await SpaceConnector.clientV2.inventory.collectorRule.list<CollectorRuleListParameters, ListResponse<CollectorRuleModel>>({
-                    collector_id: state.collectorId ?? id,
-                });
-                state.originCollectorRules = res?.results ?? [];
-                state.additionalRules = state.originCollectorRules;
-            } catch (e) {
-                state.originCollectorRules = [];
-                state.additionalRules = [];
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_RULE_TITLE'));
-            }
         },
         initForm(originCollector?: CollectorModel) {
             state.name = originCollector?.name ?? '';
@@ -158,7 +139,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
             state.attachedServiceAccountType = 'all';
             state.selectedServiceAccountFilterOption = 'include';
             state.options = {};
-            state.additionalRules = [];
             state.versions = [];
             state.isScheduleError = false;
         },

@@ -1,6 +1,6 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { AdditionalRuleAction, AdditionalRuleCondition } from '@/schema/inventory/collector-rule/model';
-import type { CollectorRuleConditionPolicy } from '@/schema/inventory/collector-rule/type';
+import type { AdditionalRuleAction, AdditionalRuleCondition } from '@/api-clients/inventory/collector-rule/schema/model';
+import type { CollectorRuleConditionPolicy } from '@/api-clients/inventory/collector-rule/schema/type';
 
 // collector api parameters
 export interface CollectorRuleUpdateParameters {

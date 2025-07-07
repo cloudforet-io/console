@@ -1,7 +1,7 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { AdditionalRuleAction, AdditionalRuleCondition } from '@/schema/inventory/collector-rule/model';
-import type { CollectorRuleConditionPolicy } from '@/schema/inventory/collector-rule/type';
+import type { AdditionalRuleAction, AdditionalRuleCondition } from '@/api-clients/inventory/collector-rule/schema/model';
+import type { CollectorRuleConditionPolicy } from '@/api-clients/inventory/collector-rule/schema/type';
 
 export interface Period {
     start?: string;

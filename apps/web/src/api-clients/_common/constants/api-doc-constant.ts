@@ -519,6 +519,13 @@ export const API_DOC = {
             'update-plugin',
             'update',
         ],
+        'collector-rule': [
+            'list',
+            'change-order',
+            'create',
+            'delete',
+            'update',
+        ],
         job: [
             'analyze',
             'list',
