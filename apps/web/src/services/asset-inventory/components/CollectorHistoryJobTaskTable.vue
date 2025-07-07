@@ -158,6 +158,7 @@ const getQuery = () => {
 
 /* Components */
 const handleSelect = (selectedIndexes: number) => {
+    if (!items.value || !items.value.length) return;
     emit('select', items.value[selectedIndexes[0]]);
 };
 const handleChange = async (options: any = {}) => {
