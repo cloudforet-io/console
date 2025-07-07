@@ -205,12 +205,12 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[
     }];
 };
 const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const namespaceMap = {};
+    const namespaceMap: Record<string, LSBCollapsibleItem<NamespaceSubItemType>> = {};
     namespaces.filter((namespace) => namespace.group !== 'common').forEach((namespace) => {
         const group = namespace.group || '';
         const providerData = storeState.providers[group];
         if (namespaceMap[group]) {
-            namespaceMap[group].subItems.push({
+            namespaceMap[group]?.subItems?.push({
                 label: namespace.name,
                 name: namespace.namespace_id,
                 group: namespace.group,

@@ -71,7 +71,10 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currentMetricId: computed<string>(() => route.params.metricId),
-    isDuplicateEnabled: computed<boolean>(() => namespaceList.value?.find((d) => d.namespace_id === storeState.currentMetric?.namespace_id)?.group !== 'common'),
+    isDuplicateEnabled: computed<boolean>(() => {
+        if (!namespaceList.value) return false;
+        return namespaceList.value.find((d) => d.namespace_id === storeState.currentMetric?.namespace_id)?.group !== 'common';
+    }),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     isManagedMetric: computed<boolean>(() => (metricExplorerPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
