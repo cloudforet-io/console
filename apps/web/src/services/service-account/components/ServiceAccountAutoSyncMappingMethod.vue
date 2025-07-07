@@ -4,11 +4,13 @@ import { computed, reactive, watch } from 'vue';
 
 import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
+
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
 import MappingMethod from '@/common/components/mapping-method/MappingMethod.vue';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -108,7 +110,6 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
         } else { // normal single workspace case
             state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE;
         }
-        state.selectedWorkspace = item.sync_options?.single_workspace_id ?? undefined;
         state.projectGroupMapping = !item.sync_options?.skip_project_group;
     }
 }, { immediate: true });
@@ -144,6 +145,11 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                             >
                                 {{ `${option.label} ➔ ${(option.value === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE) ?
                                     'Single Workspace' : 'Multiple Workspaces'}` }}
+                                <info-tooltip v-if="option.info"
+                                              :tooltip-contents="option.info"
+                                              width="0.875rem"
+                                              height="0.875rem"
+                                />
                             </p-radio>
                         </div>
                         <div>

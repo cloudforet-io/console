@@ -35,6 +35,7 @@ export const CSP_AUTO_SYNC_OPTIONS_MAP = {
             {
                 label: 'Azure Management Group',
                 value: WORKSPACE_MAPPING_OPTIONS_MAP.MULTI_MANAGEMENT_GROUP_FOR_AZURE,
+                info: 'This option is only available for Azure Management Group.',
             },
             {
                 label: 'Azure Tenant',
