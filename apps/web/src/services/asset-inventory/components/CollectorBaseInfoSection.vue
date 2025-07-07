@@ -89,6 +89,7 @@ import CollectorTagForm from '@/services/asset-inventory/components/CollectorFor
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
+import { usePluginGetVersionsQuery } from '@/services/asset-inventory/composables/use-plugin-get-versions-query';
 import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
@@ -110,7 +111,7 @@ const state = reactive({
     isLatestVersion: computed<boolean>(() => {
         const version = state.collectorPluginInfo?.version;
         if (!version) return false;
-        const latestVersion = collectorFormState.versions[0];
+        const latestVersion = pluginVersionsData.value?.[0];
         if (latestVersion) return latestVersion === version;
         return false;
     }),
@@ -150,7 +151,9 @@ const { data: recentJobsData } = useInventoryJobListQuery({
         };
     }),
 });
-
+const { data: pluginVersionsData } = usePluginGetVersionsQuery({
+    pluginId: computed(() => collectorPluginId.value ?? ''),
+});
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
@@ -218,10 +221,6 @@ const handleClickSave = async () => {
         state.isEditMode = false;
     }
 };
-
-watch(() => collectorPluginId.value, async (pluginId) => {
-    if (pluginId) await collectorFormStore.getVersions(pluginId);
-}, { immediate: true });
 
 watch(() => state.collectorPluginInfo, async (pluginInfo) => {
     if (pluginInfo?.plugin_id) await getRepositoryPlugin(pluginInfo.plugin_id);
