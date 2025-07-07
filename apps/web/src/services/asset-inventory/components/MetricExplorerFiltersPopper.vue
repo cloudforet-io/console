@@ -10,8 +10,8 @@ import type {
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
 import getRandomId from '@/lib/random-id-generator';
 import { VariableModelFactory } from '@/lib/variable-models';
