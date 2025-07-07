@@ -12,7 +12,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { MetricExampleDeleteParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/delete';
 import type { MetricExampleUpdateParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/update';
@@ -24,7 +23,6 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import type { MenuId } from '@/lib/menu/config';
@@ -37,6 +35,7 @@ import { gray } from '@/styles/colors';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
 import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
+import { useNamespaceListQuery } from '@/services/asset-inventory/composables/use-namespace-list-query';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -50,7 +49,6 @@ const targetRef = ref<HTMLElement | null>(null);
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const authorizationStore = useAuthorizationStore();
 
@@ -58,7 +56,6 @@ const router = useRouter();
 const route = useRoute();
 
 const storeState = reactive({
-    namespaces: computed(() => allReferenceStore.getters.namespace),
     currentMetric: computed(() => metricExplorerPageState.metric),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
@@ -74,7 +71,10 @@ const state = reactive({
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currentMetricId: computed<string>(() => route.params.metricId),
-    isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
+    isDuplicateEnabled: computed<boolean>(() => {
+        if (!namespaceList.value) return false;
+        return namespaceList.value.find((d) => d.namespace_id === storeState.currentMetric?.namespace_id)?.group !== 'common';
+    }),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     isManagedMetric: computed<boolean>(() => (metricExplorerPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
@@ -157,6 +157,9 @@ const getDuplicatedMetricName = (name: string): string => {
 
     return _name;
 };
+
+/* Query */
+const { data: namespaceList } = useNamespaceListQuery({});
 
 /* Api */
 const duplicateMetric = async () => {
