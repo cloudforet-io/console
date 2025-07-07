@@ -12,12 +12,12 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
+import type { NamespaceModel } from '@/api-clients/inventory/namespace/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
-import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
@@ -33,6 +33,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
+import { useNamespaceListQuery } from '@/services/asset-inventory/composables/use-namespace-list-query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -56,7 +57,6 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
     favoriteItems: computed(() => [
         ...favoriteGetters.metricItems,
@@ -155,17 +155,16 @@ const namespaceState = reactive({
     inputValue: '',
     collapsed: true,
     selectedMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
-    namespaces: computed<NamespaceReferenceItem[]>(() => Object.values(storeState.namespaces)),
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
-        if (!keyword) return namespaceState.namespaces;
-        return namespaceState.namespaces.filter((namespace) => namespace.name.toLowerCase().includes(keyword));
+        if (!keyword) return namespaceList.value ?? [];
+        return namespaceList.value?.filter((namespace) => namespace.name.toLowerCase().includes(keyword)) ?? [];
     }),
     namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
         if (isEmpty(storeState.providers)) return [];
         return [
-            ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
-            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+            ...convertCommonNamespaceToLSBCollapsibleItems(namespaceList.value ?? []),
+            ...convertNamespaceToLSBCollapsibleItems(namespaceList.value ?? []),
         ];
     }),
     namespaceItemsByKeyword: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
@@ -182,15 +181,19 @@ const guidePopoverState = reactive({
     noMore: false,
 });
 
+/* Query */
+const { data: namespaceList } = useNamespaceListQuery({
+    params: computed(() => ({})),
+});
 
 /* Helper */
-const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const commonNamespaces = namespaces.filter((namespace) => namespace.data.group === 'common').map((namespace) => ({
+const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+    const commonNamespaces = namespaces.filter((namespace) => namespace.group === 'common').map((namespace) => ({
         label: namespace.name,
-        name: namespace.key,
-        category: namespace.data.category,
-        group: namespace.data.group || 'common',
-        resourceType: namespace.data.resource_type,
+        name: namespace.namespace_id,
+        category: namespace.category,
+        group: namespace.group || 'common',
+        resourceType: namespace.resource_type,
         icon: 'COMMON',
     }));
     if (commonNamespaces.length === 0) return [];
@@ -201,18 +204,18 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
         subItems: commonNamespaces,
     }];
 };
-const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.data.group !== 'common').forEach((namespace) => {
-        const group = namespace.data.group || '';
+    namespaces.filter((namespace) => namespace.group !== 'common').forEach((namespace) => {
+        const group = namespace.group || '';
         const providerData = storeState.providers[group];
         if (namespaceMap[group]) {
             namespaceMap[group].subItems.push({
                 label: namespace.name,
-                name: namespace.key,
-                group: namespace.data.group,
-                category: namespace.data.category,
-                icon: namespace.data.icon,
+                name: namespace.namespace_id,
+                group: namespace.group,
+                category: namespace.category,
+                icon: namespace.icon,
             });
         } else {
             const label = providerData ? providerData.label : customSnakeToTitleCase(group);
@@ -224,10 +227,10 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceIte
                 initialCollapsed: true,
                 subItems: [{
                     label: namespace.name,
-                    name: namespace.key,
-                    group: namespace.data.group,
-                    category: namespace.data.category,
-                    icon: namespace.data.icon,
+                    name: namespace.namespace_id,
+                    group: namespace.group,
+                    category: namespace.category,
+                    icon: namespace.icon,
                 }],
             };
         }
@@ -262,14 +265,14 @@ watch(() => route.params, async () => {
     state.loading = true;
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
-        const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
+        const targetNamespace = namespaceList.value?.find((item) => item.namespace_id === namespaceState.selectedMetric?.data.namespace_id);
         metricExplorerPageStore.setSelectedNamespace({
-            label: targetNamespace?.name,
+            label: targetNamespace?.name || '',
             name: namespaceState.selectedMetric?.data.namespace_id,
-            group: targetNamespace?.data.group,
-            category: targetNamespace.data.category,
-            icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
-            resourceType: targetNamespace.data.resource_type,
+            group: targetNamespace?.group || '',
+            category: targetNamespace?.category || undefined,
+            icon: targetNamespace?.group === 'common' ? 'COMMON' : targetNamespace?.icon || '',
+            resourceType: targetNamespace?.resource_type,
         });
     } else metricExplorerPageStore.setSelectedNamespace(undefined);
     state.loading = false;
