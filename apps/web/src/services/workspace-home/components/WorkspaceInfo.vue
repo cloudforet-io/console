@@ -36,11 +36,13 @@ import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/works
 interface Props {
     accessUserMenu: boolean;
     accessAppMenu: boolean;
+    appTotalCount: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     accessUserMenu: false,
     accessAppMenu: false,
+    appTotalCount: 0,
 });
 
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -54,12 +56,10 @@ const authorizationStore = useAuthorizationStore();
 
 const router = useRouter();
 
-
 const storeState = reactive({
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
-    appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
@@ -97,12 +97,8 @@ const actionWorkspace = (type: string, workspaceId: string) => {
 const routerToCreateApp = (isOpenModal: boolean) => {
     router.push({ name: IAM_ROUTE.APP._NAME }).catch(() => {});
     if (isOpenModal) {
-        appPageStore.$patch((_state) => {
-            _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
-            _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
-            _state.modal.visible.form = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
+        appPageStore.setModalInfo(APP_DROPDOWN_MODAL_TYPE.CREATE, i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string);
+        appPageStore.setModalVisible('form', true);
     }
 };
 const routerToWorkspaceUser = (isOpenModal: boolean) => {
@@ -176,7 +172,7 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                  color="inherit"
                             />
                             <p-text-button @click="handleActionButton('app')">
-                                {{ storeState.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
+                                {{ props.appTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
                             </p-text-button>
                         </div>
                     </div>
