@@ -136,6 +136,7 @@ const createAccount = async (): Promise<string|undefined> => {
                 sync_options: {
                     skip_project_group: serviceAccountPageFormState.skipProjectGroup,
                     single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                    use_management_group_as_workspace: serviceAccountPageFormState.useManagementGroupAsWorkspace ?? undefined, // only for Azure
                 },
                 plugin_options: serviceAccountPageFormState.additionalOptions,
             });

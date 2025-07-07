@@ -13,6 +13,7 @@ export interface TrustedAccountModel {
     sync_options?: {
         skip_project_group: boolean;
         single_workspace_id: string;
+        use_management_group_as_workspace?: boolean; // only for Azure
     };
     plugin_options?: Record<string, any>;
     tags: Tags;

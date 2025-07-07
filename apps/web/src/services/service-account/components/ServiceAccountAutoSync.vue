@@ -77,6 +77,7 @@ const handleClickSaveButton = async () => {
             sync_options: {
                 skip_project_group: serviceAccountPageFormState.skipProjectGroup,
                 single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                use_management_group_as_workspace: serviceAccountPageFormState.useManagementGroupAsWorkspace ?? undefined,
             },
             plugin_options: serviceAccountPageFormState.additionalOptions,
         });
