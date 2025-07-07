@@ -2,22 +2,16 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type {
     CollectorModel,
-
 } from '@/api-clients/inventory/collector/schema/model';
 import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
-import type { PluginGetVersionsParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get-versions';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { Tag } from '@/common/modules/tags/type';
 
 /**
@@ -52,7 +46,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         attachedServiceAccountType: 'all' as AttachedServiceAccountType,
         selectedServiceAccountFilterOption: 'include' as ServiceAccountFilterOption,
         options: {} as CollectorOptions,
-        versions: [] as string[],
         isScheduleError: false,
 
         // getters
@@ -115,17 +108,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
         setOptions(options: CollectorOptions) {
             state.options = options;
         },
-        async getVersions(pluginId: string) {
-            try {
-                const res = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
-                    plugin_id: pluginId,
-                });
-                state.versions = res.results ?? [];
-            } catch (e) {
-                state.versions = [];
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
-            }
-        },
         resetState() {
             state.repositoryPlugin = null;
             state.provider = undefined;
@@ -139,7 +121,6 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
             state.attachedServiceAccountType = 'all';
             state.selectedServiceAccountFilterOption = 'include';
             state.options = {};
-            state.versions = [];
             state.isScheduleError = false;
         },
     };

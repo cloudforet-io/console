@@ -18,7 +18,7 @@ export const usePluginApi = () => {
         disable: SpaceConnector.clientV2.repository.plugin.disable<PluginDisableParameters, PluginModel>,
         enable: SpaceConnector.clientV2.repository.plugin.enable<PluginEnableParameters, PluginModel>,
         get: SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>,
-        getVersions: SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, PluginModel>,
+        getVersions: SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string>>,
         list: SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>,
         register: SpaceConnector.clientV2.repository.plugin.register<PluginRegisterParameters, PluginModel>,
         stat: SpaceConnector.clientV2.repository.plugin.stat<PluginStatParameters, any>,
