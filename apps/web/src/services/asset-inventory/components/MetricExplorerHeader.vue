@@ -159,9 +159,7 @@ const getDuplicatedMetricName = (name: string): string => {
 };
 
 /* Query */
-const { data: namespaceList } = useNamespaceListQuery({
-    params: computed(() => ({})),
-});
+const { data: namespaceList } = useNamespaceListQuery({});
 
 /* Api */
 const duplicateMetric = async () => {

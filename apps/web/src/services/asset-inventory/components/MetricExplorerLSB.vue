@@ -182,9 +182,7 @@ const guidePopoverState = reactive({
 });
 
 /* Query */
-const { data: namespaceList } = useNamespaceListQuery({
-    params: computed(() => ({})),
-});
+const { data: namespaceList } = useNamespaceListQuery({});
 
 /* Helper */
 const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {

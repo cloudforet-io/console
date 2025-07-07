@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import { computed, type ComputedRef } from 'vue';
 
 import { useNamespaceApi } from '@/api-clients/inventory/namespace/composables/use-namespace-api';
 import type { NamespaceListParameters } from '@/api-clients/inventory/namespace/schema/api-verbs/list';
@@ -6,7 +6,7 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseNamespaceListQueryOptions {
-    params: ComputedRef<NamespaceListParameters>;
+    params?: ComputedRef<NamespaceListParameters>;
 }
 
 export const useNamespaceListQuery = ({
@@ -14,7 +14,7 @@ export const useNamespaceListQuery = ({
 }: UseNamespaceListQueryOptions) => {
     const { namespaceAPI } = useNamespaceApi();
     const { key, params: namespaceParams } = useServiceQueryKey('inventory', 'namespace', 'list', {
-        params,
+        params: computed(() => params?.value ?? {}),
     });
 
     return useScopedQuery({
