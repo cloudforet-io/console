@@ -28,6 +28,8 @@ export const useWorkspaceListPaginationQuery = ({ params, thisPage, pageSize }: 
         queryKey: workspaceListPaginationQueryKey,
         queryFn: workspaceAPI.list,
         params: workspaceListPaginationQueryParams,
+        gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 30,
         enabled: true,
     }, {
         thisPage,
