@@ -10,11 +10,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { MetricExampleListParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/list';
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import type { MetricGetParameters } from '@/api-clients/inventory/metric/schema/api-verbs/get';
 import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
-import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

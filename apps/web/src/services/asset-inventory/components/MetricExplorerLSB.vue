@@ -11,7 +11,7 @@ import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

@@ -10,8 +10,8 @@ import {
     PDivider,
 } from '@cloudforet/mirinae';
 
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
 
 import { queryStringToArray, queryStringToObject, queryStringToString } from '@/lib/router-query-string';
