@@ -270,7 +270,7 @@ watch(() => route.params, async () => {
             label: targetNamespace?.name || '',
             name: namespaceState.selectedMetric?.data.namespace_id,
             group: targetNamespace?.group || '',
-            category: targetNamespace?.category || undefined,
+            category: targetNamespace?.category,
             icon: targetNamespace?.group === 'common' ? 'COMMON' : targetNamespace?.icon || '',
             resourceType: targetNamespace?.resource_type,
         });
