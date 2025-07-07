@@ -53,11 +53,7 @@ const userStore = useUserStore();
 const { appAPI } = useAppApi();
 const queryClient = useQueryClient();
 const { key: appListBaseQueryKey } = useServiceQueryKey('identity', 'app', 'list');
-const { mutate: deleteAppMutate } = useAppDeleteMutation({
-    onSettled: () => {
-        handleClose();
-    },
-});
+const { mutate: deleteAppMutate } = useAppDeleteMutation();
 const { mutate: enableAppMutate } = useMutation({
     mutationFn: (params: AppEnableParameters) => appAPI.enable(params),
     onSuccess: () => {
@@ -66,9 +62,6 @@ const { mutate: enableAppMutate } = useMutation({
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
-    },
-    onSettled: () => {
-        handleClose();
     },
 });
 const { mutate: disableAppMutate } = useMutation({
@@ -80,9 +73,6 @@ const { mutate: disableAppMutate } = useMutation({
     onError: (error) => {
         ErrorHandler.handleError(error, true);
     },
-    onSettled: () => {
-        handleClose();
-    },
 });
 const { mutate: generateClientSecretMutate } = useMutation({
     mutationFn: (params: AppGenerateClientSecretParameters) => appAPI.generateClientSecret(params),
@@ -93,9 +83,6 @@ const { mutate: generateClientSecretMutate } = useMutation({
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);
-    },
-    onSettled: () => {
-        handleClose();
     },
 });
 
@@ -166,14 +153,15 @@ const handleClose = () => {
 /* API */
 const checkModalConfirm = async () => {
     if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
-        deleteAppMutate({ app_id: props.selectedApp.app_id });
+        await deleteAppMutate({ app_id: props.selectedApp.app_id });
     } else if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
-        enableAppMutate({ app_id: props.selectedApp.app_id });
+        await enableAppMutate({ app_id: props.selectedApp.app_id });
     } else if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
-        disableAppMutate({ app_id: props.selectedApp.app_id });
+        await disableAppMutate({ app_id: props.selectedApp.app_id });
     } else if (appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
-        generateClientSecretMutate({ app_id: props.selectedApp.app_id });
+        await generateClientSecretMutate({ app_id: props.selectedApp.app_id });
     }
+    await handleClose();
 };
 </script>
 

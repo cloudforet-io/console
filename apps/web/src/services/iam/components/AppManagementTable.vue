@@ -276,7 +276,7 @@ const clickStatusModal = ({ name, title, theme }) => {
 const handleChangeModalVisible = (value) => {
     appPageStore.setModalVisible('apiKey', value);
 };
-const handleConfirmButton = (value: AppModel) => {
+const handleConfirmButton = (value?: AppModel) => {
     if (value) {
         modalState.item = value;
     }
