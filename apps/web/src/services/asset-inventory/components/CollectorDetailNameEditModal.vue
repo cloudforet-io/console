@@ -24,6 +24,7 @@ import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -55,12 +56,14 @@ const queryClient = useQueryClient();
 const { data: originCollectorData, collectorGetQueryKey } = useCollectorGetQuery({
     collectorId: computed(() => collectorFormState.collectorId),
 });
+const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collector', 'list');
 
 /* Mutation */
 const { mutate: updateCollectorName, isPending: isUpdating } = useMutation({
     mutationFn: (params: CollectorUpdateParameters) => collectorAPI.update(params),
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: collectorGetQueryKey });
+        await queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_CHANGE_COLLECTOR_NAME'), '');
         emits('update:visible', false);
     },
