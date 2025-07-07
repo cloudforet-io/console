@@ -20,6 +20,12 @@ import type { ServiceAccountStoreFormState } from '@/services/service-account/st
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
 type FormData = Partial<Pick<ServiceAccountStoreFormState, 'selectedSingleWorkspace' | 'skipProjectGroup' | 'useManagementGroupAsWorkspace'>>;
+type MappingMethodOptionType = {
+    label: string;
+    value: any;
+    info?: string;
+};
+
 const props = withDefaults(defineProps<{mode:'UPDATE'|'READ'}>(), {
     mode: 'UPDATE',
 });
@@ -30,19 +36,20 @@ const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
+
 const state = reactive({
     selectedWorkspace: computed<string|undefined>(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? undefined),
-    additionalOptionUiByProvider: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider] ?? {}),
-    workspaceMappingOptions: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].workspaceMappingOptions),
-    projectGroupMappingOptions: computed(() => [
+    mappingMethodProviderLabel: computed<string|undefined>(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider]?.name ?? ''),
+    workspaceMappingOptions: computed<MappingMethodOptionType[]>(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].workspaceMappingOptions),
+    projectGroupMappingOptions: computed<MappingMethodOptionType[]>(() => [
         ...CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].projectGroupMappingOptions,
         {
             label: i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SKIP_PROJECT_GROUP_MAPPING'),
             value: false,
         },
     ]),
-    workspaceMapping: 'multi',
-    projectGroupMapping: true,
+    workspaceMapping: 'multi' as (typeof WORKSPACE_MAPPING_OPTIONS_MAP)[keyof typeof WORKSPACE_MAPPING_OPTIONS_MAP],
+    projectGroupMapping: true as boolean,
 
     formData: computed<FormData>(() => (state.isDomainForm ? {
         selectedSingleWorkspace: state.workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE ? state.selectedWorkspace : undefined,
@@ -126,7 +133,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                         class="mb-6"
         >
             <template #provider>
-                <p>{{ state.additionalOptionUiByProvider.name }}</p>
+                <p>{{ state.mappingMethodProviderLabel }}</p>
             </template>
             <template #workspace>
                 <div>
