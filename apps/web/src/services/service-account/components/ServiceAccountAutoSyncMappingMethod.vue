@@ -142,7 +142,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                      :selected="state.workspaceMapping"
                                      @change="handleWorkspaceMappingChange"
                             >
-                                {{ `${option.label} ➔ ${(option.value === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE || option.value === WORKSPACE_MAPPING_OPTIONS_MAP.MULTI_MANAGEMENT_GROUP_FOR_AZURE) ?
+                                {{ `${option.label} ➔ ${(option.value === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE) ?
                                     'Single Workspace' : 'Multiple Workspaces'}` }}
                             </p-radio>
                         </div>
