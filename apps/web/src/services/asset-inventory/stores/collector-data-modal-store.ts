@@ -1,17 +1,8 @@
+import { reactive } from 'vue';
+
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type {
-    CollectorModel,
-} from '@/api-clients/inventory/collector/schema/model';
-import type { JobListParameters } from '@/api-clients/inventory/job/schema/api-verbs/list';
-import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import type { CollectDataType } from '@/services/asset-inventory/types/collector-data-modal-type';
@@ -30,37 +21,44 @@ import type { CollectDataType } from '@/services/asset-inventory/types/collector
  * const collectorDataModalStore = useCollectorDataModalStore();
  */
 
-export const useCollectorDataModalStore = defineStore('collector-data-modal', {
-    state: () => ({
-        initLoading: true,
-        recentJob: undefined as JobModel|null|undefined,
+export const useCollectorDataModalStore = defineStore('collector-data-modal', () => {
+    const state = reactive({
         // Required
         visible: false, // Determine the visibility of the collector-data-modal.
-        selectedCollector: undefined as CollectorModel|null|undefined, // This state is used for API.
+        selectedCollectorId: undefined as string|undefined,
         collectDataType: COLLECT_DATA_TYPE.ENTIRE as CollectDataType, // This is the state for distinguishing between overall collection and collection per account.
 
         // Optional
         selectedSecret: undefined as SecretModel|undefined, // In detail page, This state is used for API.
-    }),
-    actions: {
-        async getJobs(collectorId: string) {
-            this.initLoading = true;
-            try {
-                const { results } = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({ collector_id: collectorId });
-                if ((results ?? []).length > 0 && results) {
-                    if (this.selectedSecret) {
-                        const filteredJobs = results.filter((job) => job.secret_id);
-                        this.recentJob = filteredJobs[0];
-                    } else {
-                        const filteredJobs = results.filter((job) => !job.secret_id);
-                        this.recentJob = filteredJobs[0];
-                    }
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                this.initLoading = false;
-            }
+    });
+
+    const mutations = {
+        setVisible: (visible: boolean) => {
+            state.visible = visible;
         },
-    },
+        setSelectedCollectorId: (collectorId?: string) => {
+            state.selectedCollectorId = collectorId;
+        },
+        setCollectDataType: (collectDataType: CollectDataType) => {
+            state.collectDataType = collectDataType;
+        },
+        setSelectedSecret: (secret?: SecretModel) => {
+            state.selectedSecret = secret;
+        },
+    };
+
+    const actions = {
+        reset: () => {
+            state.visible = false;
+            state.selectedCollectorId = undefined;
+            state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
+            state.selectedSecret = undefined;
+        },
+    };
+
+    return {
+        state,
+        ...actions,
+        ...mutations,
+    };
 });

@@ -4,7 +4,7 @@
                     size="md"
                     fade
                     backdrop
-                    :visible="collectorPageState.visible.scheduleModal"
+                    :visible="collectorMainPageState.scheduleModalVisible"
                     :hide-footer-close-button="state.isViewMode"
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
@@ -22,37 +22,47 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import { useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal } from '@cloudforet/mirinae';
 
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
-import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n as i18nTranslator } from '@/translations';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorScheduleForm
     from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
+const collectorMainPageStore = useCollectorMainPageStore();
+const collectorMainPageState = collectorMainPageStore.state;
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
-const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
-    isViewMode: computed(() => collectorPageState.scheduleModalMode === 'view'),
+    isViewMode: computed(() => collectorMainPageState.scheduleModalMode === 'view'),
 });
 
-/* Components */
+/* Query */
+const queryClient = useQueryClient();
+const { data: originCollectorData, isLoading: isOriginCollectorLoading, collectorGetQueryKey } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
 
+/* Events */
 const closeScheduleModal = () => {
-    collectorPageState.visible.scheduleModal = false;
+    collectorMainPageStore.setScheduleModalVisible(false);
 };
 
 const handleCloseModal = () => {
@@ -66,15 +76,14 @@ const handleConfirm = async () => {
     try {
         await fetchCollectorUpdate();
         handleCloseModal();
-        emit('refresh-collector-list');
     } catch (e) {
-        collectorFormStore.resetSchedulePower();
+        collectorFormStore.resetSchedulePower(originCollectorData.value);
         ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
 
 /* API */
-const fetchCollectorUpdate = async (): Promise<CollectorModel|undefined> => {
+const fetchCollectorUpdate = async () => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is not defined');
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormState.collectorId,
@@ -83,11 +92,14 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel|undefined> => {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
         },
     };
-    return collectorPageStore.updateCollectorSchedule(params);
+    await collectorAPI.update(params);
+    queryClient.invalidateQueries({ queryKey: collectorGetQueryKey });
 };
 
 /* Watcher */
-watch(() => collectorPageState.selectedCollector, async (value) => {
-    await collectorFormStore.setOriginCollector(value);
+watch([() => collectorFormState.collectorId, () => isOriginCollectorLoading.value], async ([collectorId, isLoading]) => {
+    if (!collectorId || isLoading) return;
+    collectorFormStore.resetSchedule(originCollectorData.value);
+    collectorFormStore.resetSchedulePower(originCollectorData.value);
 }, { immediate: true });
 </script>

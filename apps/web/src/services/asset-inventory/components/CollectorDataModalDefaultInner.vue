@@ -28,7 +28,7 @@ import {
 
 
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorDataModalState = collectorDataModalStore.$state;
+const collectorDataModalState = collectorDataModalStore.state;
 
 interface Props {
     name: string;

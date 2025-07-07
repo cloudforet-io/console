@@ -65,6 +65,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
@@ -96,9 +97,14 @@ const state = reactive({
     timezoneAppliedHoursDisplayText: computed(() => state.timezoneAppliedHours.map((hour) => `${hour}:00`).join(', ')),
     loading: computed<boolean>(() => {
         if (props.disableLoading) return false;
-        return collectorFormState.originCollector === null;
+        return isOriginCollectorLoading.value;
     }),
     isScheduleError: computed<boolean>(() => collectorFormState.isScheduleError),
+});
+
+/* Query */
+const { data: originCollectorData, isLoading: isOriginCollectorLoading } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
 const updateSelectedHours = () => {
@@ -109,7 +115,7 @@ const updateSelectedHours = () => {
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is not defined');
-    const hours = collectorFormState.originCollector?.schedule?.hours ?? [];
+    const hours = originCollectorData.value?.schedule?.hours ?? [];
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormState.collectorId,
         schedule: {
@@ -126,11 +132,10 @@ const handleChangeToggle = async (value: boolean) => {
     });
     if (props.callApiOnPowerChange) {
         try {
-            const collector = await fetchCollectorUpdate();
-            collectorFormStore.setOriginCollector(collector);
+            await fetchCollectorUpdate();
             showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
         } catch (e) {
-            collectorFormStore.resetSchedulePower();
+            collectorFormStore.resetSchedulePower(originCollectorData.value);
             ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
         }
     }
@@ -169,7 +174,7 @@ const handleClickHour = (hour: number) => {
 
 watch([() => collectorFormState.collectorId, () => props.hoursReadonly], ([collectorId]) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
-    collectorFormStore.resetSchedule();
+    collectorFormStore.resetSchedule(originCollectorData.value);
     selectedUtcHoursSet.clear();
     collectorFormState.scheduleHours.forEach((hour) => {
         selectedUtcHoursSet.add(hour);

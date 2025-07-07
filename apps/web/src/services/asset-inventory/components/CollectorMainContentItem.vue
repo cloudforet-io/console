@@ -5,12 +5,14 @@ import {
     PButton, PCard, PLazyImg, PBadge,
 } from '@cloudforet/mirinae';
 
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -21,9 +23,7 @@ import RecentCollectorJobList from '@/services/asset-inventory/components/Recent
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
-import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
+import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 
 
 interface Props {
@@ -33,10 +33,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
-const collectorFormStore = useCollectorFormStore();
+const { collectorAPI } = useCollectorApi();
 
 const appContextStore = useAppContextStore();
 
@@ -45,10 +43,6 @@ const state = reactive({
         const plugin = props.item.plugin;
         if (plugin) return { name: plugin.name, version: plugin.info.version };
         return null;
-    }),
-    recentJob: computed<JobAnalyzeStatus|undefined>(() => {
-        if (!props.item) return undefined;
-        return props.item.recentJobAnalyze?.[0];
     }),
     isScheduleActivated: false,
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -59,6 +53,7 @@ const state = reactive({
     }),
 });
 
+/* Events */
 const handleChangeToggle = async () => {
     try {
         state.isScheduleActivated = !state.isScheduleActivated;
@@ -69,22 +64,27 @@ const handleChangeToggle = async () => {
                 state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
             },
         };
-        const response = await collectorPageStore.updateCollectorSchedule(params);
-        if (response) await collectorFormStore.setOriginCollector(response);
+        await updateCollectorSchedule(params);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
-
-/* API */
 const handleClickCollectData = () => {
     if (!props.item) return;
-    collectorPageStore.setSelectedCollector(props.item.collectorId);
-    collectorDataModalStore.$patch((_state) => {
-        if (!props.item) return;
-        _state.visible = true;
-        _state.selectedCollector = collectorPageState.selectedCollector;
-    });
+    collectorDataModalStore.setSelectedCollectorId(props.item.collectorId);
+    collectorDataModalStore.setVisible(true);
+};
+
+/* API */
+const updateCollectorSchedule = async (params: CollectorUpdateParameters) => {
+    try {
+        const response = await collectorAPI.update(params);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        return response;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+        return undefined;
+    }
 };
 
 /* Watcher */
@@ -128,10 +128,10 @@ watch(() => props.item.schedule, (schedule) => {
                          class="collector-info-view"
                     >
                         <collector-current-status :hours="props.item.schedule?.hours"
-                                                  :recent-job="state.recentJob"
+                                                  :collector-id="props.item.collectorId"
                                                   :is-schedule-activated="state.isScheduleActivated"
                         />
-                        <recent-collector-job-list :recent-jobs="props.item.recentJobAnalyze"
+                        <recent-collector-job-list :collector-id="props.item.collectorId"
                                                    :history-link="props.item.historyLink"
                                                    class="collector-info-view-recent-collector"
                         />

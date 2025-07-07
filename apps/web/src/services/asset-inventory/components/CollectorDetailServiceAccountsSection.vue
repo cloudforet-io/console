@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !isEditableCollector"
                                          :total-count="state.totalCount"
                                          @click-edit="handleClickEdit"
         />
@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import {
-    reactive,
+    reactive, computed,
 } from 'vue';
 
 import {
@@ -59,6 +59,8 @@ import type {
 } from '@/api-clients/inventory/collector/schema/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -67,10 +69,13 @@ import AttachedServiceAccounts
     from '@/services/asset-inventory/components/CollectorDetailAttachedServiceAccounts.vue';
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const appContextStore = useAppContextStore();
 const { collectorAPI } = useCollectorApi();
 
 const props = defineProps<{
@@ -85,11 +90,18 @@ const state = reactive({
     updateLoading: false,
 });
 
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
 
 /* api fetchers */
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
+    const originSecretFilter = originCollectorData.value?.secret_filter ?? {};
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormState.collectorId,
         secret_filter: {
@@ -111,7 +123,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 
 /* event handlers */
 const handleClickEdit = () => {
-    const isExcludeOption = !!collectorFormState.originCollector?.secret_filter?.exclude_service_accounts?.length;
+    const isExcludeOption = !!originCollectorData.value?.secret_filter?.exclude_service_accounts?.length;
     if (isExcludeOption) {
         collectorFormStore.$patch((_state) => {
             _state.state.selectedServiceAccountFilterOption = 'exclude';
@@ -132,8 +144,7 @@ const handleClickCancel = () => {
 const handleClickSave = async () => {
     try {
         state.updateLoading = true;
-        const collector = await fetchCollectorUpdate();
-        collectorFormStore.setOriginCollector(collector);
+        await fetchCollectorUpdate();
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SERVICE_ACCOUNTS'), '');
         state.isEditMode = false;
     } catch (error) {

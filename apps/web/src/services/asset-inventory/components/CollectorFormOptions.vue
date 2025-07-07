@@ -80,6 +80,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red } from '@/styles/colors';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -90,7 +91,7 @@ const collectorFormState = collectorFormStore.state;
 const userStore = useUserStore();
 
 const props = defineProps<{
-    hasMetadata?: boolean; // MEMO: if true, use metadata(state.schema) of collectorFormState.originCollector. And if false, call api for get metadata(state.schema).
+    hasMetadata?: boolean; // MEMO: if true, use metadata(state.schema) of originCollectorData. And if false, call api for get metadata(state.schema).
     showTitleOnEmptySchema?: boolean;
     resetOnCollectorIdChange?: boolean;
 }>();
@@ -103,6 +104,11 @@ const state = reactive({
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     schema: null as null|JsonSchema|object,
     language: computed<string|undefined>(() => userStore.state.language),
+});
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
 const fetchGetPluginMetadata = (provider: string|undefined): Promise<GetPluginMetadataResponse> => {
@@ -127,7 +133,7 @@ const getPluginMetadata = async (provider: string|undefined) => {
                 emit('update:isValid', true);
             }
         } else {
-            state.schema = collectorFormState.originCollector?.plugin_info?.metadata?.options_schema ?? {};
+            state.schema = originCollectorData.value?.plugin_info?.metadata?.options_schema ?? {};
         }
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -162,7 +168,7 @@ watch(() => collectorFormState.collectorId, async (collectorId) => {
 watch(() => collectorFormState.provider, async (provider) => {
     // CAUTION: Do not change the order of the following two lines. The form data(options) must be reset after the schema has been updated.
     await getPluginMetadata(provider);
-    collectorFormStore.resetOptions();
+    collectorFormStore.setOptions(originCollectorData.value?.plugin_info?.options ?? {});
 });
 
 </script>
