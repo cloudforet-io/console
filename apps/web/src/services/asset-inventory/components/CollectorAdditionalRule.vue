@@ -77,7 +77,7 @@ const queryClient = useQueryClient();
 const { data: originCollectorData } = useCollectorGetQuery({
     collectorId: computed(() => props.collectorId),
 });
-const { data: originCollectorRules, collectorRuleQueryKey } = useCollectorRuleListQuery({
+const { data: originCollectorRules, collectorRuleListQueryKey } = useCollectorRuleListQuery({
     collectorId: computed(() => props.collectorId),
 });
 
@@ -92,7 +92,7 @@ const { mutate: updateCollectorRule } = useMutation({
     onSuccess: async () => {
         state.editModeCardOrder = undefined;
         state.collectorRuleForm = undefined;
-        queryClient.invalidateQueries({ queryKey: collectorRuleQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_UPDATE_COLLECTOR_RULE'), '');
     },
     onError: (e) => {
@@ -109,7 +109,7 @@ const { mutate: createCollectorRule } = useMutation({
     onSuccess: async () => {
         state.editModeCardOrder = undefined;
         state.collectorRuleForm = undefined;
-        queryClient.invalidateQueries({ queryKey: collectorRuleQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_CREATE_COLLECTOR_RULE'), '');
     },
     onError: (e) => {
@@ -124,7 +124,7 @@ const { mutate: changeCollectorRuleOrder } = useMutation({
         return collectorRuleAPI.changeOrder(params);
     },
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: collectorRuleQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
     },
     onError: (e) => {
@@ -139,7 +139,7 @@ const { mutate: deleteCollectorRule } = useMutation({
         return collectorRuleAPI.delete(params);
     },
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: collectorRuleQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
     },
     onError: (e) => {

@@ -19,14 +19,19 @@ export const useCollectorGetQuery = ({
             collector_id: collectorId?.value as string,
         })),
     });
+
+    const query = useScopedQuery({
+        queryKey: key,
+        queryFn: () => collectorAPI.get(collectorParams.value),
+        enabled: computed(() => !!collectorId?.value),
+        staleTime: 1000 * 60 * 2, // 2 minutes
+        gcTime: 1000 * 60 * 2, // 2 minutes
+    }, ['DOMAIN', 'WORKSPACE']);
+
     return {
-        ...useScopedQuery({
-            queryKey: key,
-            queryFn: () => collectorAPI.get(collectorParams.value),
-            enabled: computed(() => !!collectorId?.value),
-            staleTime: 1000 * 60 * 2, // 2 minutes
-            gcTime: 1000 * 60 * 2, // 2 minutes
-        }, ['DOMAIN', 'WORKSPACE']),
+        data: query.data,
+        isLoading: query.isLoading,
+        error: query.error,
         collectorGetQueryKey: key,
     };
 };
