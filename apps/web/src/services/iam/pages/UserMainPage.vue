@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 
 import { PHorizontalLayout } from '@cloudforet/mirinae';
@@ -37,24 +37,6 @@ const storeState = reactive({
     grantInfo: computed(() => authorizationStore.state.currentGrantInfo),
 });
 
-const totalCount = ref(0);
-
-// const userListApiQueryHelper = new ApiQueryHelper()
-//     .setSort('name', true);
-
-/* API */
-// const refreshUserList = async () => {
-//     try {
-//         if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
-//             await userPageStore.listUsers({ query: userListApiQueryHelper.data });
-//         } else if (storeState.grantInfo.scope === 'WORKSPACE') {
-//             await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
-//         }
-//     } finally {
-//         userPageState.loading = false;
-//     }
-// };
-
 /* Watcher */
 watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
     if (globalGrantLoading) return;
@@ -63,7 +45,6 @@ watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
 
 const init = async () => {
     await userPageStore.listRoles();
-    // await refreshUserList();
 };
 const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], init);
 callApiWithGrantGuard();
@@ -76,14 +57,11 @@ onUnmounted(() => {
 
 <template>
     <section class="user-page">
-        <user-management-header :has-read-write-access="hasReadWriteAccess"
-                                :total-count="totalCount"
-        />
+        <user-management-header :has-read-write-access="hasReadWriteAccess" />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height"
                                        :has-read-write-access="hasReadWriteAccess"
-                                       @update="e => totalCount = e"
                 />
             </template>
         </p-horizontal-layout>
