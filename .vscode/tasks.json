@@ -1,0 +1,51 @@
+// .vscode/tasks.json
+{
+    "version": "2.0.0",
+    "tasks": [
+      // web
+      {
+        "label": "web:dev",
+        "type": "shell",
+        "command": "npm run dev -- --filter=web",
+      },
+      {
+        "label": "start:web",
+        "type": "shell",
+        "command": "npm run start:web",
+      },
+      // mirinae
+      {
+        "label": "mirinae:build",
+        "type": "shell",
+        "command": "npm run build -- --filter=@cloudforet/mirinae",
+      },
+      {
+        "label": "mirinae:dev",
+        "type": "shell",
+        "command": "npm run dev -- --filter=@cloudforet/mirinae",
+      },
+      // core-lib, util
+      {
+        "label": "core-lib:build",
+        "type": "shell",
+        "command": "npm run build -- --filter=@cloudforet/core-lib",
+      },
+      {
+        "label": "utils:build",
+        "type": "shell",
+        "command": "npm run build -- --filter=@cloudforet/utils",
+      },
+      // storybook
+      {
+        "label": "mirinae-storybook:dev",
+        "type": "shell",
+        "command": "npm run dev -- --filter=mirinae-storybook",
+      },
+      // api-doc
+      {
+        "label": "api-doc",
+        "type": "shell",
+        "command": "npm run api-doc -- --filter=web",
+      },
+    ]
+  }
