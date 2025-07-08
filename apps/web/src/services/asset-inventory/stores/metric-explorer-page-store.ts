@@ -50,7 +50,10 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             });
             return results;
         }),
-        isRealtimeChart: computed<boolean>(() => ![CHART_TYPE.LINE, CHART_TYPE.LINE_AREA].includes(state.selectedChartType)),
+        isRealtimeChart: computed<boolean>(() => {
+            const realtimeChartTypes: ChartType[] = [CHART_TYPE.LINE, CHART_TYPE.LINE_AREA];
+            return !realtimeChartTypes.includes(state.selectedChartType);
+        }),
     });
 
     /* Mutations */
@@ -121,7 +124,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             state.relativePeriod = _options?.relative_period;
         } else state.relativePeriod = undefined;
         if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
-        if (_options?.filters) state.filters = cloneDeep(metricExample?.options?.filters);
+        if (_options?.filters) state.filters = cloneDeep(_options?.filters);
         if (_options?.operator) state.selectedOperator = _options?.operator;
         state.refreshMetricPeriodDropdown = true;
     };
