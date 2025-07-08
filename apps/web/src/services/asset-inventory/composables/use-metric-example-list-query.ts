@@ -6,15 +6,15 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 interface UseMetricExampleListQueryOptions {
-    params: ComputedRef<MetricExampleListParameters>;
+    params?: ComputedRef<MetricExampleListParameters>;
 }
 
 export const useMetricExampleListQuery = ({
     params,
-}: UseMetricExampleListQueryOptions) => {
+}: UseMetricExampleListQueryOptions = {}) => {
     const { metricExampleAPI } = useMetricExampleApi();
     const { key, params: metricExampleParams } = useServiceQueryKey('inventory', 'metric-example', 'list', {
-        params: computed(() => params.value),
+        params: computed(() => params?.value ?? {}),
     });
 
     return useScopedQuery({
