@@ -2,7 +2,6 @@
 // @ts-nocheck
 import { computed, reactive } from 'vue';
 
-import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -33,14 +32,11 @@ export const useUserPageStore = defineStore('page-user', () => {
 
     const state = reactive({
         isAdminMode: false,
-        loading: true,
-        users: [] as UserListItemType[],
         selectedUser: {} as UserListItemType,
+        selectedUserIds: [] as string[],
+        users: [] as UserListItemType[],
         roles: [] as RoleModel[],
-        totalCount: 0,
         selectedIndices: [],
-        pageStart: 1,
-        pageLimit: 15,
         searchFilters: [] as ConsoleFilter[],
         // This is for workspace created case in admin mode
         afterWorkspaceCreated: false,
@@ -51,18 +47,11 @@ export const useUserPageStore = defineStore('page-user', () => {
             themeColor: 'primary',
             visible: undefined,
         } as ModalState,
+        // Store the selected users from API call (single source of truth for selected users)
+        selectedUsers: [] as UserListItemType[],
     });
     const getters = reactive({
         isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-        selectedUsers: computed(():UserListItemType[] => {
-            if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
-            const users: UserListItemType[] = [];
-            state.selectedIndices.forEach((d:number) => {
-                users.push(state.users[d]);
-            });
-            return users ?? [];
-        }),
-        selectedOnlyWorkspaceUsers: computed(():UserListItemType[] => state.users.filter((user) => !user.role_binding_info?.workspace_group_id)),
         roleMap: computed(() => {
             const map: Record<string, RoleModel> = {};
             state.roles.forEach((role) => {
