@@ -11,7 +11,7 @@ interface UseNamespaceListQueryOptions {
 
 export const useNamespaceListQuery = ({
     params,
-}: UseNamespaceListQueryOptions) => {
+}: UseNamespaceListQueryOptions = {}) => {
     const { namespaceAPI } = useNamespaceApi();
     const { key, params: namespaceParams } = useServiceQueryKey('inventory', 'namespace', 'list', {
         params: computed(() => params?.value ?? {}),
