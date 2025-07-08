@@ -33,14 +33,11 @@ export const useUserPageStore = defineStore('page-user', () => {
 
     const state = reactive({
         isAdminMode: false,
-        loading: true,
-        users: [] as UserListItemType[],
         selectedUser: {} as UserListItemType,
+        selectedUserIds: [] as string[],
+        users: [] as UserListItemType[],
         roles: [] as RoleModel[],
-        totalCount: 0,
         selectedIndices: [],
-        pageStart: 1,
-        pageLimit: 15,
         searchFilters: [] as ConsoleFilter[],
         // This is for workspace created case in admin mode
         afterWorkspaceCreated: false,

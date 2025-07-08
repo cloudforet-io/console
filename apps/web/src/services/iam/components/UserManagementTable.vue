@@ -3,8 +3,9 @@ import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
@@ -12,36 +13,37 @@ import {
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
-import type { RoleBindingUpdateRoleParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/update-role';
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
+
 
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import UserManagementTableToolbox from '@/services/iam/components/UserManagementTableToolbox.vue';
 import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
 } from '@/services/iam/composables/refined-table-data';
+import { useRoleBindingDeleteMutation } from '@/services/iam/composables/use-role-binding-delete-mutation';
+import { useRoleBindingUpdateRoleMutation } from '@/services/iam/composables/use-role-binding-update-role-mutation';
+import { useUserListPaginationQuery } from '@/services/iam/composables/use-user-list-pagination-query';
 import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
 
-import { useUserListPaginationQuery } from '../composables/use-user-list-pagination-query';
+
 
 interface Props {
     tableHeight: number;
@@ -160,8 +162,14 @@ const queryState = reactive({
 
 /* Component */
 const handleSelect = async (index) => {
-    userPageState.selectedIndices = index;
+    const selectedUserIds = index.map((i) => state.refinedUserItems[i].user_id);
+
+    userPageStore.$patch((_state) => {
+        _state.state.selectedUserIds = selectedUserIds;
+        _state.state.selectedIndices = index;
+    });
 };
+
 const handleClickButton = async (value: RoleBindingModel|undefined) => {
     if (!value) return;
     state.selectedRemoveItem = value.role_binding_id;
@@ -177,9 +185,18 @@ const handleChange = (options: any = {}) => {
         queryState.sortDesc = options.sortDesc;
     }
 };
+const handleRefresh = async () => {
+    await userRefresh();
+    userPageStore.$patch((_state) => {
+        _state.state.selectedIndices = [];
+    });
+};
 const closeRemoveModal = () => {
     modalState.visible = false;
 };
+
+const { roleAPI } = useRoleApi();
+
 /* API */
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     dropdownState.loading = true;
@@ -196,7 +213,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         });
     }
     try {
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+        const { results } = await roleAPI.list({
             query: {
                 ...roleListApiQueryHelper.data,
                 filter: [
@@ -221,23 +238,24 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     };
 };
 
-const handleSelectDropdownItem = async (value: string, rowIndex: number) => {
-    try {
-        const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: state.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
-            role_id: value || '',
-        });
+const queryClient = useQueryClient();
+const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
+
+const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
-        userPageStore.$patch((_state) => {
-            _state.state.users[rowIndex].role_binding = {
-                name: roleName,
-                type: response.role_type,
-            };
-        });
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
-    }
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, error.message);
+    },
+});
+
+const handleSelectDropdownItem = async (value: string, rowIndex: number) => {
+    await updateRoleBinding({
+        role_binding_id: state.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
+        role_id: value || '',
+    });
 };
 
 const {
@@ -246,7 +264,7 @@ const {
     params: computed(() => {
         userListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
 
-        userListApiQueryHelper.addFilter(...queryTagHelper.filters.value);
+        userListApiQueryHelper.setFilters([...queryTagHelper.filters.value]);
 
         return {
             query: userListApiQueryHelper.data,
@@ -281,21 +299,26 @@ const getUserGroupPerUser = (userId: string) => {
     return userGroupNames;
 };
 
-const handleRemoveButton = async () => {
-    modalState.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
-            role_binding_id: state.selectedRemoveItem,
-        });
+const { mutateAsync: deleteRoleBinding, isPending: isDeletingRoleBinding } = useRoleBindingDeleteMutation({
+    onSuccess: async () => {
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
         closeRemoveModal();
         await userRefresh();
-    } catch (e) {
-        showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
-        ErrorHandler.handleError(e);
-    } finally {
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, error.message);
+    },
+    onSettled: () => {
         modalState.loading = false;
-    }
+    },
+});
+
+const handleRemoveButton = async () => {
+    modalState.loading = true;
+
+    await deleteRoleBinding({
+        role_binding_id: state.selectedRemoveItem,
+    });
 };
 
 const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_binding_info?.workspace_group_id;
@@ -323,7 +346,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
             :page-size.sync="tableState.pageLimit"
             @select="handleSelect"
             @change="handleChange"
-            @refresh="handleChange()"
+            @refresh="handleRefresh()"
         >
             <template v-if="props.hasReadWriteAccess && storeState.isAdminMode"
                       #toolbox-left
@@ -495,7 +518,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
         <user-management-remove-modal v-if="modalState.visible"
                                       :visible.sync="modalState.visible"
                                       :title="modalState.title"
-                                      :loading="modalState.loading"
+                                      :loading="isDeletingRoleBinding"
                                       @confirm="handleRemoveButton"
         />
     </section>
