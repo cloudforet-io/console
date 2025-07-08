@@ -7,20 +7,19 @@ import { useRoute } from 'vue-router/composables';
 
 import { isEmpty, startCase, toLower } from 'lodash';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import type { NamespaceModel } from '@/api-clients/inventory/namespace/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
@@ -28,41 +27,36 @@ import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vu
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
+import { useMetricExampleListQuery } from '@/services/asset-inventory/composables/use-metric-example-list-query';
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
+import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { useNamespaceListQuery } from '@/services/asset-inventory/composables/use-namespace-list-query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
+
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
 
 const route = useRoute();
 
+const referenceMap = useAllReferenceDataModel();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-const gnbStore = useGnbStore();
-const gnbGetters = gnbStore.getters;
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
     providers: computed(() => allReferenceStore.getters.provider),
-    favoriteItems: computed(() => [
-        ...favoriteGetters.metricItems,
-        ...favoriteGetters.metricExampleItems,
-    ]),
-    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
@@ -71,7 +65,6 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     currentMetricIdByUrl: computed(() => route.params.metricId),
     isDetailPage: computed(() => !!state.currentMetricIdByUrl),
-    currentMetrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
     menuSet: computed(() => {
         const baseMenuSet = storeState.isAdminMode ? [] : [
             {
@@ -87,26 +80,28 @@ const state = reactive({
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
-        const metricMenuList: LSBItem[] = Object.values(storeState.metrics).map((metric) => ({
+        if (favoriteMetricItemsLoading.value || favoriteMetricExampleItemsLoading.value) return [];
+        const metricMenuList: LSBItem[] = favoriteMetricItems.value?.map((metric) => ({
             type: 'item',
-            id: metric.key,
+            id: metric.metric_id,
             label: metric.name,
             icon: {
-                name: metric.key.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
+                name: metric.metric_id.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
                 color: gray[500],
             },
             to: {
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                 params: {
-                    metricId: metric.key,
+                    metricId: metric.metric_id,
                 },
             },
             favoriteOptions: {
                 type: FAVORITE_TYPE.METRIC,
-                id: metric.key,
+                id: metric.metric_id,
             },
-        }));
-        const metricExampleList: LSBItem[] = storeState.metricExamples.map((example) => ({
+        })) ?? [];
+
+        const metricExampleList: LSBItem[] = favoriteMetricExampleItems.value?.map((example) => ({
             type: 'item',
             id: example.example_id,
             label: example.name,
@@ -122,12 +117,12 @@ const state = reactive({
                 type: FAVORITE_TYPE.METRIC_EXAMPLE,
                 id: example.example_id,
             },
-        }));
+        })) ?? [];
 
         return [
             ...metricMenuList,
             ...metricExampleList,
-        ].filter((menu) => menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]);
+        ];
     }),
     namespaceMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
@@ -142,19 +137,11 @@ const state = reactive({
         type: MENU_ITEM_TYPE.SLOT,
         id: 'metric',
     })),
-    favoriteItemMap: computed(() => {
-        const result: Record<string, FavoriteConfig> = {};
-        storeState.favoriteItems?.forEach((d) => {
-            result[d.itemId] = d;
-        });
-        return result;
-    }),
 });
 
 const namespaceState = reactive({
     inputValue: '',
     collapsed: true,
-    selectedMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
         if (!keyword) return namespaceList.value ?? [];
@@ -182,7 +169,37 @@ const guidePopoverState = reactive({
 });
 
 /* Query */
-const { data: namespaceList } = useNamespaceListQuery({});
+const { data: namespaceList } = useNamespaceListQuery({
+    params: computed(() => ({})),
+});
+const { data: currentMetrics } = useMetricListQuery({
+    params: computed(() => ({
+        namespace_id: metricExplorerPageState.selectedNamespace?.name,
+    })),
+});
+const favoriteMetricItemsApiQueryHelper = new ApiQueryHelper();
+const { data: favoriteMetricItems, isLoading: favoriteMetricItemsLoading } = useMetricListQuery({
+    params: computed(() => {
+        const _favoriteMetricIds = favoriteGetters.metricItems.map((item) => item.itemId);
+        favoriteMetricItemsApiQueryHelper.setFilters([{ k: 'metric_id', v: _favoriteMetricIds, o: '=' }]);
+        return {
+            query: favoriteMetricItemsApiQueryHelper.data,
+        };
+    }),
+});
+const metricExampleListApiQueryHelper = new ApiQueryHelper();
+const { data: favoriteMetricExampleItems, isLoading: favoriteMetricExampleItemsLoading } = useMetricExampleListQuery({
+    params: computed(() => {
+        const _favoriteMetricExampleIds = favoriteGetters.metricExampleItems.map((item) => item.itemId);
+        metricExampleListApiQueryHelper.setFilters([{ k: 'metric_id', v: _favoriteMetricExampleIds, o: '=' }]);
+        return {
+            query: metricExampleListApiQueryHelper.data,
+        };
+    }),
+});
+const { data: currentMetric, isLoading: currentMetricLoading } = useMetricGetQuery({
+    metricId: computed(() => state.currentMetricIdByUrl),
+});
 
 /* Helper */
 const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
@@ -236,9 +253,9 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LS
     return Object.values(namespaceMap);
 };
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
-    if (!storeState.selectedNamespace) return false;
-    return storeState.selectedNamespace.name === namespace.name
-        && storeState.selectedNamespace.group === namespace.group;
+    if (!metricExplorerPageState.selectedNamespace) return false;
+    return metricExplorerPageState.selectedNamespace?.name === namespace.name
+        && metricExplorerPageState.selectedNamespace?.group === namespace.group;
 };
 
 const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
@@ -259,14 +276,15 @@ const handleConfirmMetricGuide = () => {
     guidePopoverState.noMore = false;
 };
 
-watch(() => route.params, async () => {
+watch(() => currentMetricLoading.value, async (_currentMetricLoading) => {
+    if (_currentMetricLoading) return;
     state.loading = true;
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
-        const targetNamespace = namespaceList.value?.find((item) => item.namespace_id === namespaceState.selectedMetric?.data.namespace_id);
+        const targetNamespace = namespaceList.value?.find((item) => item.namespace_id === currentMetric.value?.namespace_id);
         metricExplorerPageStore.setSelectedNamespace({
             label: targetNamespace?.name || '',
-            name: namespaceState.selectedMetric?.data.namespace_id,
+            name: currentMetric.value?.namespace_id || '',
             group: targetNamespace?.group || '',
             category: targetNamespace?.category,
             icon: targetNamespace?.group === 'common' ? 'COMMON' : targetNamespace?.icon || '',
@@ -277,10 +295,10 @@ watch(() => route.params, async () => {
 }, { immediate: true });
 
 // Whether to show metric-select-guide popover
-watch(() => storeState.selectedNamespace, (selectedNamespace) => {
+watch(() => metricExplorerPageState.selectedNamespace, (selectedNamespace) => {
     if (selectedNamespace
         && state.isDetailPage
-        && !state.currentMetrics.map((metric) => metric.key).includes(state.currentMetricIdByUrl)
+        && !currentMetrics.value?.map((_metric) => _metric.metric_id).includes(state.currentMetricIdByUrl)
         && !assetInventorySettingsStore.getNotShowMetricSelectGuidePopover
     ) {
         guidePopoverState.metricGuideVisible = true;
@@ -308,7 +326,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                         <p-tooltip v-for="(item, idx) of state.starredMenuSet"
                                    :key="`asset-analysis-starred-${idx}`"
                                    position="bottom"
-                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId
+                                   :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${referenceMap.metric[item.to?.params?.metricId
                                        || '']?.name} > ${item.label}` : item.label"
                         >
                             <l-s-b-router-menu-item :item="item"
@@ -410,9 +428,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                     </p-data-loader>
                 </template>
                 <template #slot-metric>
-                    <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
-                                                  :metrics="state.currentMetrics"
-                    />
+                    <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage" />
                 </template>
             </l-s-b>
             <template #content>

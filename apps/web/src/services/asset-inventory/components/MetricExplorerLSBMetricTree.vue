@@ -37,9 +37,9 @@ watch(() => props.metricItems, (updatedMetricItems) => {
             return true;
         }
         if (storeState.isAdminMode) {
-            return metricItem.data.data.resource_group === 'DOMAIN';
+            return metricItem.data.resource_group === 'DOMAIN';
         }
-        return metricItem.data.data.resource_group === 'WORKSPACE';
+        return metricItem.data.resource_group === 'WORKSPACE';
     }));
 }, { immediate: true, deep: true });
 
