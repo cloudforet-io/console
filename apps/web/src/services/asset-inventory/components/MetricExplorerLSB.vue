@@ -172,7 +172,7 @@ const guidePopoverState = reactive({
 const { data: namespaceList } = useNamespaceListQuery({
     params: computed(() => ({})),
 });
-const { data: currentMetrics } = useMetricListQuery({
+const { data: currentNamespaceMetrics } = useMetricListQuery({
     params: computed(() => ({
         namespace_id: metricExplorerPageState.selectedNamespace?.name,
     })),
@@ -298,7 +298,7 @@ watch(() => currentMetricLoading.value, async (_currentMetricLoading) => {
 watch(() => metricExplorerPageState.selectedNamespace, (selectedNamespace) => {
     if (selectedNamespace
         && state.isDetailPage
-        && !currentMetrics.value?.map((_metric) => _metric.metric_id).includes(state.currentMetricIdByUrl)
+        && !currentNamespaceMetrics.value?.map((_metric) => _metric.metric_id).includes(state.currentMetricIdByUrl)
         && !assetInventorySettingsStore.getNotShowMetricSelectGuidePopover
     ) {
         guidePopoverState.metricGuideVisible = true;

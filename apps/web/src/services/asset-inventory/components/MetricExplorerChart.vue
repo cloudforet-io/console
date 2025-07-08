@@ -21,6 +21,7 @@ import MetricExplorerHorizontalColumnChart
     from '@/services/asset-inventory/components/MetricExplorerHorizontalColumnChart.vue';
 import MetricExplorerLineChart from '@/services/asset-inventory/components/MetricExplorerLineChart.vue';
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerMapChart.vue';
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     getFilteredRealtimeData,
@@ -60,10 +61,15 @@ const state = reactive({
         }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
     }),
-    chartGroupByMenuItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys
+    chartGroupByMenuItems: computed(() => labelKeys.value
         .filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key))
         .map((d) => ({ name: d.key, label: d.name }))),
     showHideAll: computed(() => Object.values(state.legend).some((d) => d)),
+});
+
+/* Query */
+const { labelKeys } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
 });
 
 /* Util */

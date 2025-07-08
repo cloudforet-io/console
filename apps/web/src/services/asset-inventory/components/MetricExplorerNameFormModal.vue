@@ -10,7 +10,6 @@ import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
-
 import type { MetricExampleCreateParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/create';
 import type { MetricExampleUpdateParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/update';
 import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
@@ -25,6 +24,8 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
+import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -48,7 +49,6 @@ const route = useRoute();
 const gnbStore = useGnbStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
@@ -61,11 +61,11 @@ const state = reactive({
                 .map((d) => d.name);
         }
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
-            return metricExplorerPageGetters.metrics.map((d) => d.name);
+            return currentNamespaceMetrics.value?.map((d) => d.name) || [];
         }
-        return metricExplorerPageGetters.metrics
-            .filter((d) => d.key !== metricExplorerPageState.metric?.metric_id)
-            .map((metric) => metric.name);
+        return currentNamespaceMetrics.value
+            ?.filter((d) => d.metric_id !== currentMetric.value?.metric_id)
+            .map((metric) => metric.name) || [];
     }),
     headerTitle: computed<TranslateResult>(() => {
         if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
@@ -96,11 +96,21 @@ const {
     },
 });
 
+/* Query */
+const { data: currentMetric } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
+});
+const { data: currentNamespaceMetrics } = useMetricListQuery({
+    params: computed(() => ({
+        namespace_id: currentMetric.value?.namespace_id,
+    })),
+});
+
 /* Api */
 const createMetricExample = async () => {
     try {
         const metricExample = await SpaceConnector.clientV2.inventory.metricExample.create<MetricExampleCreateParameters, MetricExampleModel>({
-            metric_id: metricExplorerPageState.metric?.metric_id || '',
+            metric_id: currentMetric.value?.metric_id || '',
             name: name.value,
             options: {
                 granularity: metricExplorerPageState.granularity,
@@ -113,7 +123,7 @@ const createMetricExample = async () => {
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        await metricExplorerPageStore.loadMetricExamples(currentMetric.value?.namespace_id);
         await gnbStore.fetchMetricExample();
         await router.replace({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
@@ -133,7 +143,7 @@ const updateMetricName = async () => {
             name: name.value,
         });
         state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        // await metricExplorerPageStore.loadMetric(state.currentMetricId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
@@ -146,7 +156,7 @@ const updateMetricExampleName = async () => {
             name: name.value,
         });
         state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        await metricExplorerPageStore.loadMetricExamples(currentMetric.value?.namespace_id);
         await gnbStore.fetchMetricExample();
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
@@ -177,7 +187,7 @@ watch(() => state.proxyVisible, (visible) => {
         if (state.currentMetricExampleId) {
             setForm('name', state.currentMetricExample?.name);
         } else {
-            setForm('name', metricExplorerPageState.metric?.name);
+            setForm('name', currentMetric.value?.name);
         }
     } else {
         initForm();

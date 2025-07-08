@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { xor } from 'lodash';
 
@@ -7,19 +8,26 @@ import {
     PSelectButton,
 } from '@cloudforet/mirinae';
 
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
+const route = useRoute();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const state = reactive({
-    groupByItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+    groupByItems: computed(() => labelKeys.value.map((d) => ({
         name: d.key,
         label: d.name,
     }))),
 });
+
+/* Query */
+const { data: currentMetric, isLoading: currentMetricLoading, labelKeys } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
+});
+
 /* Event */
 const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: boolean) => {
     if (isSelected) {
@@ -49,11 +57,11 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
                 {{ item.label }}
             </p-select-button>
         </div>
-        <div v-if="!metricExplorerPageState.metricLoading"
+        <div v-if="!currentMetricLoading"
              class="right-part"
         >
             <strong>{{ $t('INVENTORY.METRIC_EXPLORER.UNIT') }}:</strong>
-            <span class="ml-1">{{ metricExplorerPageState.metric?.unit || '--' }}</span>
+            <span class="ml-1">{{ currentMetric?.unit || '--' }}</span>
         </div>
     </div>
 </template>

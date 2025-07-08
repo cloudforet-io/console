@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import bytes from 'bytes';
 import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -21,17 +22,21 @@ import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import type { ReferenceMap } from '@/store/reference/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { GRANULARITY, SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     getAssetAnalysisDataTableDateFields,
@@ -51,10 +56,6 @@ import {
 } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 
-
-
-
-
 const DATE_FORMAT_MAP = {
     [GRANULARITY.DAILY]: 'M/D',
     [GRANULARITY.MONTHLY]: 'MMM',
@@ -62,6 +63,7 @@ const DATE_FORMAT_MAP = {
 
 const router = useRouter();
 const route = useRoute();
+const referenceMap = useAllReferenceDataModel();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -78,7 +80,7 @@ const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     realtimeDate: undefined as string|undefined,
     groupByFields: computed<DataTableFieldType[]>(() => {
-        const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
+        const filteredLabelKeys = labelKeys.value.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
         return filteredLabelKeys.map((d) => ({
             name: d.key.replace('labels.', ''), label: d.name,
         }));
@@ -111,9 +113,28 @@ const state = reactive({
     thisPage: 1,
     pageSize: 15,
     more: false,
-    metricResourceType: computed<string|undefined>(() => metricExplorerPageState.metric?.resource_type),
-    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => metricExplorerPageState.metric?.labels_info.filter((d) => !!d.search_key?.length) ?? []),
-    metricAdditionalFilter: computed(() => (metricExplorerPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key ?? d.k, v: d.value ?? d.v, o: d.operator ?? d.o })) ?? []),
+    metricResourceType: computed<string|undefined>(() => currentMetric.value?.resource_type),
+    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => labelKeys.value.filter((d) => !!d.search_key?.length) ?? []),
+    metricAdditionalFilter: computed(() => (currentMetric.value?.query_options?.filter ?? []).map((d) => ({ k: d.key ?? d.k, v: d.value ?? d.v, o: d.operator ?? d.o })) ?? []),
+});
+const labelKeysReferenceMap = computed<Record<string, ReferenceMap>>(() => {
+    const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
+    currentMetric.value?.labels_info?.filter((d) => !isEmpty(d.reference)).forEach((d) => {
+        const _fieldName = d.key.replace('labels.', '');
+        _labelKeysMap[_fieldName] = d;
+    });
+
+    const _storeMap: Record<string, ReferenceMap> = {};
+    Object.values(_labelKeysMap).forEach((labelKey) => {
+        const _resourceType = labelKey.reference?.resource_type;
+        const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS)
+            .find((d) => (d.meta?.resourceType === _resourceType));
+        if (targetModelConfig) {
+            const _refinedKey = labelKey.key.replace('labels.', '');
+            _storeMap[_refinedKey] = referenceMap[targetModelConfig.key];
+        }
+    });
+    return _storeMap; // e.g. { 'Region': {...}, 'project_id': {...} }
 });
 
 /* Util */
@@ -124,16 +145,21 @@ const getRefinedColumnValue = (field, value) => {
             if (dayjs.utc().format(_dateFormat) === field.label) return '--';
             return 0;
         }
-        const _unit = metricExplorerPageState.metric?.unit;
+        const _unit = currentMetric.value?.unit;
         const _originalVal = bytes.parse(`${value}${_unit}`);
         if (_unit && SIZE_UNITS.includes(_unit)) {
             return byteFormatter(_originalVal);
         }
         return numberFormatter(value, { notation: 'compact' }) || 0;
     }
-    const _label = metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
+    const _label = labelKeysReferenceMap.value?.[field.name]?.[value]?.label || value;
     return getReferenceLabel(storeState.allReferenceTypeInfo, field.name, _label);
 };
+
+/* Query */
+const { data: currentMetric, labelKeys } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
+});
 
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
