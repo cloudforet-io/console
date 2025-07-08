@@ -8,7 +8,6 @@ import {
     PFieldGroup, PTextInput, PCodeEditor, PButton, POverlayLayout,
 } from '@cloudforet/mirinae';
 
-
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { MetricCreateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/create';
 import type { MetricUpdateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/update';
@@ -23,6 +22,8 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
+import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -33,11 +34,10 @@ const route = useRoute();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    metricNameList: computed(() => metricExplorerPageGetters.metrics.map((metric) => metric.name)),
+    metricNameList: computed<string[]>(() => currentNamespaceMetrics.value?.map((metric) => metric.name) || []),
 });
 
 const state = reactive({
@@ -100,6 +100,16 @@ const {
     },
 });
 
+/* Query */
+const { data: currentMetric } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
+});
+const { data: currentNamespaceMetrics } = useMetricListQuery({
+    params: computed(() => ({
+        namespace_id: currentMetric.value?.namespace_id,
+    })),
+});
+
 /* Api */
 const createCustomMetric = async () => {
     try {
@@ -115,7 +125,7 @@ const createCustomMetric = async () => {
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        // await metricExplorerPageStore.loadMetric(state.currentMetricId);
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
@@ -139,7 +149,7 @@ const updateCustomMetric = async () => {
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        // await metricExplorerPageStore.loadMetric(state.currentMetricId);
         metricExplorerPageStore.setRefreshMetricData(true);
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
@@ -163,8 +173,8 @@ const handleSaveCustomMetric = async () => {
 watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
         if (metricExplorerPageState.metricQueryFormMode !== 'CREATE') {
-            setForm('code', JSON.stringify(metricExplorerPageState.metric?.query_options));
-            setForm('unit', metricExplorerPageState.metric?.unit);
+            setForm('code', JSON.stringify(currentMetric.value?.query_options));
+            setForm('unit', currentMetric.value?.unit);
         }
     } else {
         initForm();
@@ -225,7 +235,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                     <p v-else
                        class="text-label-md"
                     >
-                        {{ metricExplorerPageState.metric?.unit }}
+                        {{ currentMetric?.unit }}
                     </p>
                 </p-field-group>
                 <p-field-group class="query-field"

@@ -29,10 +29,10 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
-
 
 
 const props = defineProps<{
@@ -42,14 +42,13 @@ const props = defineProps<{
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     loading: true,
     randomId: getRandomId(),
     refinedMetricLabelKeysWithProjectGroup: computed<MetricLabelKey[]>(() => {
-        const _labelKeys = cloneDeep(metricExplorerPageGetters.refinedMetricLabelKeys);
+        const _labelKeys = cloneDeep(labelKeys.value);
         const _projectLabelInfoIndex = _labelKeys.findIndex((d) => d.key === 'project_id');
         if (_projectLabelInfoIndex > -1) {
             _labelKeys.splice(_projectLabelInfoIndex, 0, PROJECT_GROUP_LABEL_INFO);
@@ -71,6 +70,11 @@ const state = reactive({
         });
         return handlerMaps;
     }),
+});
+
+/* Query */
+const { labelKeys } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
 });
 
 /* Util */
