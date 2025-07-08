@@ -18,15 +18,14 @@ import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
-import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-
 import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
+import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -36,7 +35,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 interface Props {
     isDetailPage?: boolean;
-    metrics: MetricReferenceItem[];
 }
 
 const props = defineProps<Props>();
@@ -80,26 +78,26 @@ const state = reactive({
     inputValue: '',
     metricItems: computed<TreeNode[]>(() => {
         const sortedMetrics = [
-            ...props.metrics.filter((metric) => metric.key.startsWith('metric-managed-')),
-            ...props.metrics.filter((metric) => !metric.key.startsWith('metric-managed-')),
+            ...metrics.value?.filter((metric) => metric.metric_id.startsWith('metric-managed-')) ?? [],
+            ...metrics.value?.filter((metric) => !metric.metric_id.startsWith('metric-managed-')) ?? [],
         ];
         return sortedMetrics.map((metric) => {
             const metricTreeNode = {
-                id: metric.key,
+                id: metric.metric_id,
                 depth: 0,
                 data: {
                     ...metric,
                     type: 'metric',
-                    is_managed: metric.data.is_managed,
+                    is_managed: metric.is_managed,
                     to: {
                         name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
                         params: {
-                            metricId: metric.key,
+                            metricId: metric.metric_id,
                         },
                     },
                 },
             };
-            const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
+            const examples = state.metricExamples.filter((example) => example.metric_id === metric.metric_id);
             if (examples.length) {
                 return {
                     ...metricTreeNode,
@@ -112,7 +110,7 @@ const state = reactive({
                             to: {
                                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
                                 params: {
-                                    metricId: metric.key,
+                                    metricId: metric.metric_id,
                                     metricExampleId: example.example_id,
                                 },
                             },
@@ -139,6 +137,14 @@ const state = reactive({
         });
         return displayMap;
     }),
+});
+
+/* Query */
+const { data: metrics } = useMetricListQuery({
+    enabled: computed(() => !!metricExplorerPageState.selectedNamespace),
+    params: computed(() => ({
+        namespace_id: metricExplorerPageState.selectedNamespace?.name,
+    })),
 });
 
 /* Event */

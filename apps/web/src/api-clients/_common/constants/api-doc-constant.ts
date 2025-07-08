@@ -541,6 +541,13 @@ export const API_DOC = {
             'run',
             'update',
         ],
+        'metric-example': [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+        ],
         'metric-data': [
             'analyze',
         ],
