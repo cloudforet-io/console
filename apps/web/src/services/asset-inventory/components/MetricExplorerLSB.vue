@@ -61,7 +61,6 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    loading: false,
     currentPath: computed(() => route.fullPath),
     currentMetricIdByUrl: computed(() => route.params.metricId),
     isDetailPage: computed(() => !!state.currentMetricIdByUrl),
@@ -76,7 +75,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        if (!metricExplorerPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
+        if (!metricExplorerPageState.selectedNamespaceId) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
@@ -167,14 +166,15 @@ const guidePopoverState = reactive({
     metricGuideVisible: false,
     noMore: false,
 });
+const isLsbLoading = computed(() => namespaceListLoading.value || currentNamespaceMetricsLoading.value || currentMetricLoading.value);
 
 /* Query */
-const { data: namespaceList } = useNamespaceListQuery({
+const { data: namespaceList, isLoading: namespaceListLoading } = useNamespaceListQuery({
     params: computed(() => ({})),
 });
-const { data: currentNamespaceMetrics } = useMetricListQuery({
+const { data: currentNamespaceMetrics, isLoading: currentNamespaceMetricsLoading } = useMetricListQuery({
     params: computed(() => ({
-        namespace_id: metricExplorerPageState.selectedNamespace?.name,
+        namespace_id: metricExplorerPageState.selectedNamespaceId,
     })),
 });
 const favoriteMetricItemsApiQueryHelper = new ApiQueryHelper();
@@ -252,10 +252,9 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LS
     });
     return Object.values(namespaceMap);
 };
-const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
-    if (!metricExplorerPageState.selectedNamespace) return false;
-    return metricExplorerPageState.selectedNamespace?.name === namespace.name
-        && metricExplorerPageState.selectedNamespace?.group === namespace.group;
+const isSelectedNamespace = (namespace: NamespaceModel): boolean => {
+    if (!metricExplorerPageState.selectedNamespaceId) return false;
+    return metricExplorerPageState.selectedNamespaceId === namespace.namespace_id;
 };
 
 const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
@@ -266,7 +265,7 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
-    metricExplorerPageStore.setSelectedNamespace(namespace);
+    metricExplorerPageStore.setSelectedNamespaceId(namespace.name);
 };
 const handleConfirmMetricGuide = () => {
     if (guidePopoverState.noMore) {
@@ -278,25 +277,16 @@ const handleConfirmMetricGuide = () => {
 
 watch(() => currentMetricLoading.value, async (_currentMetricLoading) => {
     if (_currentMetricLoading) return;
-    state.loading = true;
-    await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
-        const targetNamespace = namespaceList.value?.find((item) => item.namespace_id === currentMetric.value?.namespace_id);
-        metricExplorerPageStore.setSelectedNamespace({
-            label: targetNamespace?.name || '',
-            name: currentMetric.value?.namespace_id || '',
-            group: targetNamespace?.group || '',
-            category: targetNamespace?.category,
-            icon: targetNamespace?.group === 'common' ? 'COMMON' : targetNamespace?.icon || '',
-            resourceType: targetNamespace?.resource_type,
-        });
-    } else metricExplorerPageStore.setSelectedNamespace(undefined);
-    state.loading = false;
+        metricExplorerPageStore.setSelectedNamespaceId(currentMetric.value?.namespace_id);
+    } else {
+        metricExplorerPageStore.setSelectedNamespaceId(undefined);
+    }
 }, { immediate: true });
 
 // Whether to show metric-select-guide popover
-watch(() => metricExplorerPageState.selectedNamespace, (selectedNamespace) => {
-    if (selectedNamespace
+watch(() => metricExplorerPageState.selectedNamespaceId, (selectedNamespaceId) => {
+    if (!!selectedNamespaceId
         && state.isDetailPage
         && !currentNamespaceMetrics.value?.map((_metric) => _metric.metric_id).includes(state.currentMetricIdByUrl)
         && !assetInventorySettingsStore.getNotShowMetricSelectGuidePopover
@@ -349,7 +339,7 @@ watch(() => metricExplorerPageState.selectedNamespace, (selectedNamespace) => {
                     </span>
                 </template>
                 <template #slot-namespace>
-                    <p-data-loader :loading="state.loading"
+                    <p-data-loader :loading="isLsbLoading"
                                    :loader-backdrop-opacity="0.5"
                                    :loader-backdrop-color="gray[100]"
                                    class="namespace-data-loader"

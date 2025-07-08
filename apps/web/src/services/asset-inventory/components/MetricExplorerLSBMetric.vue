@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { clone, isEmpty } from 'lodash';
+import { clone } from 'lodash';
 
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
@@ -26,10 +26,10 @@ import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
 import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
+import { useNamespaceGetQuery } from '@/services/asset-inventory/composables/use-namespace-get-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
@@ -56,7 +56,6 @@ const storeState = reactive({
         });
         return res;
     }),
-    selectedNamespace: computed<NamespaceSubItemType|undefined>(() => metricExplorerPageState.selectedNamespace),
 });
 const state = reactive({
     selectedMenuId: computed(() => {
@@ -78,8 +77,8 @@ const state = reactive({
     inputValue: '',
     metricItems: computed<TreeNode[]>(() => {
         const sortedMetrics = [
-            ...metrics.value?.filter((metric) => metric.metric_id.startsWith('metric-managed-')) ?? [],
-            ...metrics.value?.filter((metric) => !metric.metric_id.startsWith('metric-managed-')) ?? [],
+            ...namespaceMetrics.value?.filter((metric) => metric.metric_id.startsWith('metric-managed-')) ?? [],
+            ...namespaceMetrics.value?.filter((metric) => !metric.metric_id.startsWith('metric-managed-')) ?? [],
         ];
         return sortedMetrics.map((metric) => {
             const metricTreeNode = {
@@ -138,18 +137,23 @@ const state = reactive({
         return displayMap;
     }),
 });
+const isLsbMetricLoading = computed(() => namespaceMetricsLoading.value);
 
 /* Query */
-const { data: metrics } = useMetricListQuery({
-    enabled: computed(() => !!metricExplorerPageState.selectedNamespace),
+const { data: namespaceMetrics, isLoading: namespaceMetricsLoading } = useMetricListQuery({
+    enabled: computed(() => !!metricExplorerPageState.selectedNamespaceId),
     params: computed(() => ({
-        namespace_id: metricExplorerPageState.selectedNamespace?.name,
+        namespace_id: metricExplorerPageState.selectedNamespaceId,
     })),
 });
+const { data: currentNamespace, namespaceIcon } = useNamespaceGetQuery({
+    namespaceId: computed(() => metricExplorerPageState.selectedNamespaceId || ''),
+});
+
 
 /* Event */
 const handleClickBackToNamespace = () => {
-    metricExplorerPageStore.setSelectedNamespace(undefined);
+    metricExplorerPageStore.setSelectedNamespaceId(undefined);
 };
 const handleOpenAddCustomMetricModal = () => {
     metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
@@ -167,18 +171,10 @@ watch(() => route.params, () => {
         };
     }
 }, { immediate: true });
-
-/* Watcher */
-watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
-    if (!isEmpty(selectedNamespace)) {
-        await allReferenceStore.load('metric', { force: true });
-        await metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
-    }
-}, { immediate: true });
 </script>
 
 <template>
-    <p-data-loader :loading="false"
+    <p-data-loader :loading="isLsbMetricLoading"
                    :loader-backdrop-opacity="0.5"
                    :loader-backdrop-color="gray[100]"
                    class="metric-explorer-l-s-b-metric-menu"
@@ -191,26 +187,26 @@ watch(() => storeState.selectedNamespace, async (selectedNamespace) => {
                                    size="sm"
                                    @click="handleClickBackToNamespace"
                     />
-                    <img v-if="storeState.selectedNamespace?.group === 'common'"
+                    <img v-if="currentNamespace?.group === 'common'"
                          class="namespace-image"
                          src="@/assets/images/img_common-asset@2x.png"
                          alt="common-namespace-image"
                     >
                     <p-lazy-img v-else
                                 class="namespace-image"
-                                :src="storeState.selectedNamespace?.icon"
+                                :src="namespaceIcon"
                                 width="1.25rem"
                                 height="1.25rem"
                     />
                     <p-tooltip class="title"
-                               :contents="storeState.selectedNamespace?.label || ''"
+                               :contents="currentNamespace?.name || ''"
                     >
-                        <span>{{ storeState.selectedNamespace?.label.split('/')[0] }}</span>
+                        <span>{{ currentNamespace?.name.split('/')[0] }}</span>
                         <span class="divider">/</span>
-                        <span class="type">{{ storeState.selectedNamespace?.label.split('/')[1] }}</span>
+                        <span class="type">{{ currentNamespace?.name.split('/')[1] }}</span>
                     </p-tooltip>
                 </div>
-                <p-icon-button v-if="state.hasReadWriteAccess && storeState.selectedNamespace?.group !== 'common'"
+                <p-icon-button v-if="state.hasReadWriteAccess && currentNamespace?.group !== 'common'"
                                style-type="tertiary"
                                name="ic_plus"
                                shape="square"
