@@ -262,7 +262,7 @@ const {
     params: computed(() => {
         userListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
 
-        userListApiQueryHelper.setFilters([...queryTagHelper.filters.value]);
+        userListApiQueryHelper.setFilters(queryTagHelper.filters.value);
 
         return {
             query: userListApiQueryHelper.data,
