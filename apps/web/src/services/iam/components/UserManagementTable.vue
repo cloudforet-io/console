@@ -162,10 +162,8 @@ const queryState = reactive({
 const handleSelect = async (index) => {
     const selectedUserIds = index.map((i) => state.refinedUserItems[i].user_id);
 
-    userPageStore.$patch((_state) => {
-        _state.state.selectedUserIds = selectedUserIds;
-        _state.state.selectedIndices = index;
-    });
+    userPageStore.setSelectedUsers(userList.value.filter((user) => selectedUserIds.includes(user.user_id)));
+    userPageStore.setSelectedIndices(index);
 };
 
 const handleClickButton = async (value: RoleBindingModel|undefined) => {
@@ -185,9 +183,7 @@ const handleChange = (options: any = {}) => {
 };
 const handleRefresh = async () => {
     await userRefresh();
-    userPageStore.$patch((_state) => {
-        _state.state.selectedIndices = [];
-    });
+    userPageStore.setSelectedIndices([]);
 };
 const closeRemoveModal = () => {
     modalState.visible = false;
