@@ -121,7 +121,7 @@ const createCustomMetric = async () => {
             metric_type: METRIC_TYPE.GAUGE,
             resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: jsonParsedQuery,
-            namespace_id: metricExplorerPageState.selectedNamespace?.name || '',
+            namespace_id: metricExplorerPageState.selectedNamespaceId || '',
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);

@@ -15,7 +15,6 @@ import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/co
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
 import type {
     Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter, ChartType,
-    NamespaceSubItemType,
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
 import type { MetricExampleModel } from '@/api-clients/inventory/metric-selectedGroupByListexample/schema/model';
@@ -23,7 +22,7 @@ import type { MetricExampleModel } from '@/api-clients/inventory/metric-selected
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
     const state = reactive({
-        selectedNamespace: undefined as NamespaceSubItemType|undefined,
+        selectedNamespaceId: undefined as string|undefined,
         // data
         refreshMetricData: false,
         metricExamples: [] as MetricExampleModel[],
@@ -62,8 +61,8 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     });
 
     /* Mutations */
-    const setSelectedNamespace = (namespace?: NamespaceSubItemType) => {
-        state.selectedNamespace = namespace;
+    const setSelectedNamespaceId = (namespaceId?: string) => {
+        state.selectedNamespaceId = namespaceId;
     };
     const setSelectedChartType = (chartType: ChartType) => {
         state.selectedChartType = chartType;
@@ -157,7 +156,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         initMetricExampleOptions,
     };
     const mutations = {
-        setSelectedNamespace,
+        setSelectedNamespaceId,
         setGranularity,
         setPeriod,
         setRelativePeriod,
