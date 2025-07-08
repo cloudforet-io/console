@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, onMounted, reactive, ref,
 } from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
@@ -54,8 +54,6 @@ const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
     hasReadWriteAccess: true,
 });
-
-const emit = defineEmits<{(e: 'update', value: number): void; }>();
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
@@ -273,10 +271,6 @@ const {
     thisPage: computed(() => tableState.thisPage),
     pageSize: computed(() => tableState.pageLimit),
 });
-
-watch(userTotalCount, () => {
-    emit('update', userTotalCount.value);
-}, { immediate: true });
 
 const { userGroupAPI } = useUserGroupApi();
 const userGroupPerUser = ref<UserGroupModel[]>();
