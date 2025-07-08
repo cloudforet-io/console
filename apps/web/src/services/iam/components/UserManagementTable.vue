@@ -181,10 +181,11 @@ const handleChange = (options: any = {}) => {
         queryState.sortDesc = options.sortDesc;
     }
 };
+
 const handleRefresh = async () => {
     await userRefresh();
-    userPageStore.setSelectedIndices([]);
 };
+
 const closeRemoveModal = () => {
     modalState.visible = false;
 };
