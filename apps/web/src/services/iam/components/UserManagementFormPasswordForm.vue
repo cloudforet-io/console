@@ -26,7 +26,7 @@ const userPageStore = useUserPageStore();
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     passwordStatus: 0,
     passwordTypeArr: computed(() => {

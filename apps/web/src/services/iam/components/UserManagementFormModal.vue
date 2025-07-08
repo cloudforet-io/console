@@ -60,7 +60,7 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 const state = reactive({
     loading: false,
     mfaLoading: false,
-    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     mfa: computed<UserMfa|undefined>(() => userStore.state.mfa),
     loginUserId: computed<string|undefined>(() => userStore.state.userId),

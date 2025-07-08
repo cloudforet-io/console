@@ -26,7 +26,7 @@ const userPageStore = useUserPageStore();
 const emit = defineEmits<{(e: 'update:is-changed-toggle'): void }>();
 
 const storeState = reactive({
-    mfaData: computed<UserMfa|undefined>(() => userPageStore.getters.selectedUsers[0]?.mfa),
+    mfaData: computed<UserMfa|undefined>(() => userPageStore.state.selectedUsers[0]?.mfa),
 });
 const state = reactive({
     proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),

@@ -11,15 +11,8 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
-import type { UserGroupListParameters } from '@/api-clients/identity/user-group/schema/api-verbs/list';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
-import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-verbs/get';
-import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
-import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import type { FindWorkspaceUserParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/find';
-import type { WorkspaceUserGetParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/get';
-import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
-import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
+import type { SummaryWorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
@@ -64,14 +57,9 @@ export const useUserPageStore = defineStore('page-user', () => {
         // User
         reset() {
             state.isAdminMode = false;
-            state.loading = true;
-            state.users = [] as UserListItemType[];
             state.selectedUser = {} as UserListItemType;
             state.roles = [] as RoleModel[];
-            state.totalCount = 0;
             state.selectedIndices = [];
-            state.pageStart = 1;
-            state.pageLimit = 15;
             state.searchFilters = [] as ConsoleFilter[];
             state.afterWorkspaceCreated = false;
             state.createdWorkspaceId = undefined as string | undefined;
@@ -82,83 +70,11 @@ export const useUserPageStore = defineStore('page-user', () => {
                 visible: undefined,
             } as ModalState;
         },
-        async listUsers(params: UserListParameters) {
-            try {
-                const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
-                state.users = res.results || [];
-                state.totalCount = res.total_count ?? 0;
-                state.selectedIndices = [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.users = [];
-                state.totalCount = 0;
-                throw e;
-            }
+        setSelectedUsers(users: UserListItemType[]) {
+            state.selectedUsers = users;
         },
-        async getUser(params: UserGetParameters) {
-            try {
-                state.selectedUser = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, e.message);
-                throw e;
-            }
-        },
-        // Workspace User
-        async listWorkspaceUsers(params: WorkspaceUserListParameters) {
-            try {
-                const { results = [], total_count = 0 } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
-
-                const userIdToGroupMap = await this.fetchUserGroups(results.map((result) => result.user_id));
-
-                state.users = results.map((item) => ({
-                    ...item,
-                    role_type: item.role_type,
-                    role_binding: {
-                        type: item.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-                        name: state.roles?.find((role) => role.role_id === item.role_binding_info?.role_id)?.name ?? '',
-                    },
-                    user_group: userIdToGroupMap[item.user_id] || [],
-                }));
-
-                state.totalCount = total_count;
-                state.selectedIndices = [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.users = [];
-                state.totalCount = 0;
-                throw e;
-            }
-        },
-
-        async fetchUserGroups(userIds: string[]): Promise<Record<string, { user_group_id: string; name: string; }[]>> {
-            const userGroupPromises = userIds.map(async (userId) => {
-                const { results = [] } = await SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>({ user_id: userId });
-                return { userId, userGroups: results.map((group) => ({ user_group_id: group.user_group_id, name: group.name })) };
-            });
-
-            const results = await Promise.all(userGroupPromises);
-            return results.reduce((acc, { userId, userGroups }) => {
-                acc[userId] = userGroups;
-                return acc;
-            }, {} as Record<string, { user_group_id: string; name: string; }[]>);
-        },
-
-
-        async getWorkspaceUser(params: WorkspaceUserGetParameters) {
-            try {
-                const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
-                return {
-                    ...res,
-                    role_type: res.role_type,
-                    role_binding: {
-                        type: res.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-                        name: state.roles?.find((role) => role.role_id === res.role_binding_info?.role_id)?.name ?? '',
-                    },
-                };
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, e.message);
-                throw e;
-            }
+        setSelectedIndices(indices: number[]) {
+            state.selectedIndices = indices;
         },
         async findWorkspaceUser(params?: FindWorkspaceUserParameters) {
             try {

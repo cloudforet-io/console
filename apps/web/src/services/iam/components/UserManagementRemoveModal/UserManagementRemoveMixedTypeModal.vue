@@ -18,11 +18,10 @@ import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userPageGetters = userPageStore.getters;
 
 const state = reactive({
     loading: false,
-    refinedTableData: computed(() => userPageGetters.selectedUsers.map((user) => ({
+    refinedTableData: computed(() => userPageState.selectedUsers.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
     }))),
