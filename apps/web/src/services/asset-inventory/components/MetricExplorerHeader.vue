@@ -35,6 +35,7 @@ import { gray } from '@/styles/colors';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
 import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
+import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
 import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { useNamespaceListQuery } from '@/services/asset-inventory/composables/use-namespace-list-query';
@@ -76,7 +77,6 @@ const state = reactive({
         return namespaceList.value.find((d) => d.namespace_id === currentMetric.value?.namespace_id)?.group !== 'common';
     }),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     isManagedMetric: computed<boolean>(() => (currentMetric.value?.is_managed && !state.currentMetricExampleId) || false),
     metricNameFormModalVisible: false,
     metricDeleteModalVisible: false,
@@ -90,12 +90,7 @@ const state = reactive({
             label: `${i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS')}...`,
         },
     ] : [])),
-    pageTitle: computed<string|TranslateResult>(() => {
-        if (currentMetric.value) {
-            return state.currentMetricExample?.name || currentMetric.value.name;
-        }
-        return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
-    }),
+    pageTitle: computed<string|TranslateResult>(() => currentMetricExample.value?.name || currentMetric.value?.name || i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')),
     deleteModalTitle: computed(() => {
         if (state.currentMetricExampleId) {
             return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC_EXAMPLE');
@@ -167,6 +162,9 @@ const { data: currentNamespaceMetrics } = useMetricListQuery({
         namespace_id: currentMetric.value?.namespace_id,
     })),
 });
+const { data: currentMetricExample } = useMetricExampleGetQuery({
+    metricExampleId: computed(() => route.params.metricExampleId),
+});
 
 /* Api */
 const duplicateMetric = async () => {
@@ -219,7 +217,6 @@ const deleteMetricExample = async () => {
         await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
             example_id: state.currentMetricExampleId as string,
         });
-        await metricExplorerPageStore.loadMetricExamples(currentMetric.value?.namespace_id);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
