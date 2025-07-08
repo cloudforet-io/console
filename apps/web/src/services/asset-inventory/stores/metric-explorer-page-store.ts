@@ -7,23 +7,9 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { MetricExampleListParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/list';
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
-import type { MetricGetParameters } from '@/api-clients/inventory/metric/schema/api-verbs/get';
-import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
-import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { ReferenceMap } from '@/store/reference/type';
-
-// import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-
-import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
@@ -32,20 +18,14 @@ import type {
     NamespaceSubItemType,
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-selectedGroupByListexample/schema/model';
+
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
-    const appContextStore = useAppContextStore();
-    const allReferenceStore = useAllReferenceStore();
-    const _state = reactive({
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    });
     const state = reactive({
         selectedNamespace: undefined as NamespaceSubItemType|undefined,
         // data
-        metricLoading: false,
         refreshMetricData: false,
-        metric: undefined as MetricModel|undefined,
         metricExamples: [] as MetricExampleModel[],
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
@@ -65,39 +45,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metricInitiated: false,
     });
     const getters = reactive({
-        namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
-        metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
-        refinedMetricLabelKeys: computed<MetricLabelKey[]>(() => {
-            if (!state.metric?.labels_info?.length) return [];
-            if (_state.isAdminMode) {
-                return state.metric.labels_info;
-            }
-            return state.metric.labels_info?.filter((d) => d.key !== 'workspace_id');
-        }),
-        defaultMetricGroupByList: computed<string[]>(() => {
-            const defaultLabelKeys = state.metric?.labels_info?.filter((d) => d.default) ?? [];
-            return defaultLabelKeys.map((d) => d.key);
-        }),
-        // below is the map of reference store for each reference label key
-        labelKeysReferenceMap: computed<Record<string, ReferenceMap>>(() => {
-            const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
-            state.metric?.labels_info?.filter((d) => !isEmpty(d.reference)).forEach((d) => {
-                const _fieldName = d.key.replace('labels.', '');
-                _labelKeysMap[_fieldName] = d;
-            });
-
-            const _storeMap: Record<string, ReferenceMap> = {};
-            Object.values(_labelKeysMap).forEach((labelKey) => {
-                const _resourceType = labelKey.reference?.resource_type;
-                const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS)
-                    .find((d) => (d.meta?.resourceType === _resourceType));
-                if (targetModelConfig) {
-                    const _refinedKey = labelKey.key.replace('labels.', '');
-                    _storeMap[_refinedKey] = allReferenceStore.getters[targetModelConfig.key];
-                }
-            });
-            return _storeMap; // e.g. { 'Region': {...}, 'project_id': {...} }
-        }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([groupBy, filterItems]) => {
@@ -160,7 +107,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
 
     /* Actions */
     const reset = () => {
-        state.metric = undefined;
         state.refreshMetricPeriodDropdown = false;
         state.metricInitiated = false;
         //
@@ -187,23 +133,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         if (_options?.operator) state.selectedOperator = _options?.operator;
         state.refreshMetricPeriodDropdown = true;
     };
-    const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
-    const loadMetric = async (metricId: string) => {
-        state.metricLoading = true;
-        try {
-            const { status, response } = await loadMetricFetcher<MetricGetParameters, MetricModel>({
-                metric_id: metricId,
-            });
-            if (status === 'succeed') {
-                state.metric = response;
-                state.metricLoading = false;
-            }
-        } catch (e) {
-            state.metric = undefined;
-            state.metricLoading = false;
-            console.error(e);
-        }
-    };
     const loadMetricExamples = async (namespaceId?: string) => {
         if (!namespaceId) return;
         try {
@@ -223,7 +152,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
 
     const actions = {
         reset,
-        loadMetric,
         loadMetricExamples,
         openMetricQueryFormSidebar,
         initMetricExampleOptions,
