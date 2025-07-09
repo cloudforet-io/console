@@ -32,7 +32,7 @@ interface Getters {
 interface State {
     selectedProvider: string;
     serviceAccountType: AccountType;
-    originServiceAccountItem: (TrustedAccountModel & ServiceAccountModel) | undefined; // for detail page
+    originServiceAccountItem: (TrustedAccountModel | ServiceAccountModel) | undefined; // for detail page
     syncJobList: IdentityJobModel[];
 }
 
@@ -103,7 +103,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     });
 
     const mutations = {
-        setOriginServiceAccountItem: (item: TrustedAccountModel & ServiceAccountModel) => {
+        setOriginServiceAccountItem: (item: TrustedAccountModel | ServiceAccountModel) => {
             state.originServiceAccountItem = item;
         },
         setServiceAccountType: (type: AccountType) => {
