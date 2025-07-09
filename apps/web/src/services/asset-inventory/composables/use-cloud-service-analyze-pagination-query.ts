@@ -24,7 +24,7 @@ export const useCloudServiceAnalyzePaginationQuery = ({ params, thisPage, pageSi
         queryFn: cloudServiceAPI.analyze,
         params: queryParams,
         staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60 * 10,
+        gcTime: 1000 * 60 * 5,
         enabled: computed(() => !!params.value),
     }, {
         thisPage,

@@ -3,12 +3,17 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
 } from '@cloudforet/mirinae';
 
 
+import { useAgentApi } from '@/api-clients/identity/agent/composables/use-agent-api';
+import type { AgentCreateParameters } from '@/api-clients/identity/agent/schema/api-verbs/create';
 import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -23,10 +28,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { red, violet } from '@/styles/colors';
 
 import ServiceAccountAddClusterScriptField from '@/services/service-account/components/ServiceAccountAddClusterScriptField.vue';
+import { useServiceAccountAgent } from '@/services/service-account/composables/use-service-account-agent';
 import { OPEN_COST_OPTIONS } from '@/services/service-account/constants/service-account-constant';
-import { useServiceAccountAgentStore } from '@/services/service-account/stores/service-account-agent-store';
-
-
 
 interface Props {
     visible: boolean;
@@ -41,14 +44,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
 }>();
-const serviceAccountAgentStore = useServiceAccountAgentStore();
 const userStore = useUserStore();
 
-const storeState = reactive({
-    appToken: computed(() => serviceAccountAgentStore.getters.currentAppToken),
-    loading: computed(() => serviceAccountAgentStore.state.loading),
-    language: computed<string|undefined>(() => userStore.state.language),
+
+const {
+    agentData,
+    isLoading: isLoadingAgent,
+} = useServiceAccountAgent({
+    serviceAccountId: computed(() => props.serviceAccountId),
 });
+
+
+const language = computed<string|undefined>(() => userStore.state.language);
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -118,7 +125,7 @@ const scriptState = reactive({
     thirdScript: computed(() => "curl -X 'GET' \\\n"
         + `  '${scriptState.endPoint}/console-api/extension/agent/kubernetes?service_account_id=${props.serviceAccountId}' \\\n`
         + "  -H 'accept: application/json' \\\n"
-        + `  -H 'Authorization: Bearer ${storeState.appToken}' > agent.yaml && \\\n`
+        + `  -H 'Authorization: Bearer ${agentData.value?.client_secret}' > agent.yaml && \\\n`
         + '  helm upgrade -i spaceone-agent spaceone-agent/k8s-monitoring -n spaceone-agent --create-namespace -f agent.yaml && \\\n'
         + '  rm agent.yaml'),
 });
@@ -134,7 +141,6 @@ const handleClickContinueButton = async () => {
     } else if (state.step === 2) {
         await createAgentApp();
     } else if (state.step === 3) {
-        await serviceAccountAgentStore.getAgent(props.serviceAccountId);
         closeModal();
         state.step = 1;
     }
@@ -164,20 +170,32 @@ const goStep = (n?: number) => {
     else if (n) state.step = n;
     else state.step += 1;
 };
+
+const { agentAPI } = useAgentApi();
+const queryClient = useQueryClient();
+const { withSuffix } = useServiceQueryKey('identity', 'agent', 'get');
+const { mutateAsync: createAgent, isPending: isCreatingAgent } = useMutation({
+    mutationFn: (params: AgentCreateParameters) => agentAPI.create(params),
+    onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: withSuffix(data.service_account_id) });
+        goStep();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+        showErrorMessage(error.message, error);
+        formState.commonValidForDelay = true;
+    },
+});
 const createAgentApp = async () => {
     const options: AgentModel['options'] = {
         cluster_name: clusterName.value,
         kube_state_metrics: formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics],
         prometheus_node_exporter: formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter],
     };
-    try {
-        await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
-        goStep();
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        showErrorMessage(e.message, e);
-        formState.commonValidForDelay = true;
-    }
+    await createAgent({
+        service_account_id: props.serviceAccountId,
+        options,
+    });
 };
 
 watch(() => state.step, () => {
@@ -301,7 +319,7 @@ watch(() => props.visible, (visible) => {
                             <p>
                                 {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONFLICT_INFO') }}
                             </p>
-                            <p-link :href="`https://cloudforet.io/${storeState.language}/docs/guides/account-hierarchy/kubernetes`"
+                            <p-link :href="`https://cloudforet.io/${language}/docs/guides/account-hierarchy/kubernetes`"
                                     highlight
                                     action-icon="external-link"
                             >
@@ -361,7 +379,7 @@ watch(() => props.visible, (visible) => {
                      class="third-section"
                 >
                     <div class="script-wrapper">
-                        <div v-if="storeState.loading"
+                        <div v-if="isLoadingAgent || isCreatingAgent"
                              class="loader"
                         >
                             <p-spinner style-type="gray"
@@ -384,7 +402,7 @@ watch(() => props.visible, (visible) => {
                 <p-button class="continue-button"
                           :style-type="state.step === 3 ? 'primary' : 'substitutive'"
                           :icon-right="state.step === 3 ? undefined :'ic_arrow-right'"
-                          :disabled="!formState.isValid || !formState.commonValidForDelay || storeState.loading"
+                          :disabled="!formState.isValid || !formState.commonValidForDelay || isLoadingAgent || isCreatingAgent"
                           @click="handleClickContinueButton"
                 >
                     {{ state.step === 3 ? $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.DONE_BUTTON') : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONTINUE_BUTTON') }}

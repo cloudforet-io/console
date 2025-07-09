@@ -6,9 +6,11 @@ import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trus
 import type { TrustedAccountGetParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/get';
 import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
 import type { TrustedAccountStatParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/stat';
+import type { TrustedAccountSyncParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/sync';
 import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
 import type { TrustedAccountUpdateSecretDataParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update-secret-data';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+
 
 
 export const useTrustedAccountApi = () => {
@@ -20,6 +22,7 @@ export const useTrustedAccountApi = () => {
         list: SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>,
         stat: SpaceConnector.clientV2.identity.trustedAccount.stat<TrustedAccountStatParameters, any>,
         updateSecretData: SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>,
+        sync: SpaceConnector.clientV2.identity.trustedAccount.sync<TrustedAccountSyncParameters>,
     };
 
     return {

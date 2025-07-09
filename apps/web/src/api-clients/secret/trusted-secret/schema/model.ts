@@ -13,3 +13,20 @@ export interface TrustedSecretModel {
     domain_id: string;
     created_at: string;
 }
+
+export type TrustedSecretDataModel = TrustedSecretEncryptedDataModel | TrustedSecretUnncryptedDataModel;
+
+
+export interface TrustedSecretEncryptedDataModel {
+    encrypted: true;
+    encrypted_options: Record<string, any>;
+    data: {
+        encrypted_data: string;
+        trusted_encrypted_data: string;
+    };
+}
+
+export interface TrustedSecretUnncryptedDataModel {
+    encrypted: false;
+    encrypted_options: Record<string, any>;
+}

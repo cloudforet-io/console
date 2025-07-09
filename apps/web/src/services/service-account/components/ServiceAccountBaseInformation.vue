@@ -2,18 +2,12 @@
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
-import type { ServiceAccountUpdateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
-import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
-import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
-import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -24,11 +18,14 @@ import ServiceAccountBaseInformationDetail
     from '@/services/service-account/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/service-account/components/ServiceAccountBaseInformationForm.vue';
+import { useServiceAccountUpdateMutation } from '@/services/service-account/composables/mutations/use-service-account-update-mutation';
+import { useTrustedAccountUpdateMutation } from '@/services/service-account/composables/mutations/use-trusted-account-update-mutation';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
-import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 import type {
     BaseInformationForm, PageMode,
 } from '@/services/service-account/types/service-account-page-type';
+
 
 interface Props {
     serviceAccountId?: string;
@@ -42,42 +39,52 @@ const props = withDefaults(defineProps<Props>(), {
     serviceAccountLoading: false,
 });
 
-const emit = defineEmits<{(e: 'refresh'): void; }>();
-const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 
+const {
+    generalAccountSchema,
+    trustedAccountSchema,
+} = useServiceAccountProviderSchema();
+
 interface State {
-    loading: boolean;
     isTrustedAccount: ComputedRef<boolean>;
     mode: PageMode;
     isFormValid: ComputedRef<boolean|undefined>;
-    baseInformationSchema: ComputedRef<Partial<SchemaModel>>;
+    baseInformationSchema: ComputedRef<SchemaModel|undefined>;
     baseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
 }
 const state = reactive<State>({
-    loading: false,
     isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     mode: 'READ',
     isFormValid: computed(() => serviceAccountPageStore.formState.isBaseInformationFormValid),
-    // baseInformationSchema: {},
-    baseInformationSchema: computed(() => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema)),
+    baseInformationSchema: computed(() => (state.isTrustedAccount ? trustedAccountSchema.value : generalAccountSchema.value)),
     baseInformationForm: computed(() => serviceAccountPageStore.formState.baseInformation),
 });
 
 /* Api */
+const { mutateAsync: updateServiceAccount, isPending: isUpdateServiceAccountPending } = useServiceAccountUpdateMutation();
+const { mutateAsync: updateTrustedAccount, isPending: isUpdateTrustedAccountPending } = useTrustedAccountUpdateMutation();
+const isLoading = computed(() => isUpdateServiceAccountPending.value || isUpdateTrustedAccountPending.value);
 
-const updateServiceAccount = async () => {
+/* Event */
+const handleClickEditButton = () => {
+    state.mode = 'UPDATE';
+};
+const handleClickCancelButton = () => {
+    state.mode = 'READ';
+};
+const handleClickSaveButton = async () => {
+    if (!state.isFormValid) return;
     try {
-        state.loading = true;
         if (state.isTrustedAccount) {
-            await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
+            await updateTrustedAccount({
                 trusted_account_id: props.serviceAccountId ?? '',
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,
             });
         } else {
-            await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
+            await updateServiceAccount({
                 service_account_id: props.serviceAccountId ?? '',
                 service_account_mgr_id: state.baseInformationForm.serviceAccountManagerId,
                 name: state.baseInformationForm.accountName,
@@ -90,22 +97,8 @@ const updateServiceAccount = async () => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
     } finally {
-        state.loading = false;
+        state.mode = 'READ';
     }
-};
-
-/* Event */
-const handleClickEditButton = () => {
-    state.mode = 'UPDATE';
-};
-const handleClickCancelButton = () => {
-    state.mode = 'READ';
-};
-const handleClickSaveButton = async () => {
-    if (!state.isFormValid) return;
-    await updateServiceAccount();
-    state.mode = 'READ';
-    emit('refresh');
 };
 const handleChangeForm = (form) => {
     state.baseInformationForm = form;
@@ -136,11 +129,13 @@ const handleChangeForm = (form) => {
         </p-heading-layout>
         <div class="content-wrapper">
             <service-account-base-information-detail v-show="state.mode === 'READ'"
-                                                     :loading="props.serviceAccountLoading || state.loading"
+                                                     :service-account-id="props.serviceAccountId"
+                                                     :loading="props.serviceAccountLoading || isLoading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
                                                    mode="UPDATE"
                                                    :schema="state.baseInformationSchema.schema"
+                                                   :service-account-id="props.serviceAccountId"
                                                    @change="handleChangeForm"
             />
             <div v-if="state.mode === 'UPDATE'"
@@ -153,7 +148,7 @@ const handleChangeForm = (form) => {
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
-                          :loading="state.loading"
+                          :loading="isLoading"
                           :disabled="!state.isFormValid"
                           @click="handleClickSaveButton"
                 >

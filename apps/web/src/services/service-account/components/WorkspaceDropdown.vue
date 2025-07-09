@@ -61,6 +61,7 @@ const state = reactive({
     pageLimit: PAGE_SIZE,
 });
 
+// TODO: apply resource menu handler query
 const fetchWorkspace = async (searchText?:string) => {
     try {
         state.loading = true;

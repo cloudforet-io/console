@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, reactive, ref,
 } from 'vue';
 
 import dayjs from 'dayjs';
 
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PPaneLayout,
@@ -28,10 +28,9 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import { SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
@@ -48,10 +47,15 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { green, red } from '@/styles/colors';
 
+import { useTrustedAccountSyncMutation } from '@/services/service-account/composables/mutations/use-trusted-account-sync-mutation';
+import { useServiceAccountJobListQuery } from '@/services/service-account/composables/queries/use-service-account-job-list-query';
+import { useServiceAccountPaginationQuery } from '@/services/service-account/composables/queries/use-service-account-pagination-query';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 import { getAccountFields, stateFormatter } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
-import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
+
+
 
 const props = withDefaults(defineProps<{
     serviceAccountId: string;
@@ -62,47 +66,45 @@ const props = withDefaults(defineProps<{
     attachedGeneralAccounts: () => ([]),
 });
 
-const serviceAccountPageStore = useServiceAccountPageStore();
-const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
 const { getReferenceLocation } = useReferenceRouter();
 
-const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
-}>();
-
 const referenceMap = useAllReferenceDataModel();
 
+const {
+    serviceAccountData,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
+const { generalAccountSchema } = useServiceAccountProviderSchema();
+
 const state = reactive({
-    loading: true,
-    syncReqLoading: false,
-    items: [] as any,
-    sortBy: 'created_at',
-    sortDesc: true,
-    totalCount: 0,
-    pageLimit: 15,
+    isOriginAutoSyncEnabled: computed(() => (serviceAccountData.value as TrustedAccountModel|undefined)?.schedule?.state === 'ENABLED'),
     isSyncEnabled: computed(() => {
-        const isDomainScope = serviceAccountPageStore.state.originServiceAccountItem.resource_group === 'DOMAIN';
+        const isDomainScope = (serviceAccountData.value as TrustedAccountModel|undefined)?.resource_group === 'DOMAIN';
         const isAdminMode = appContextStore.getters.isAdminMode;
         if (isDomainScope) {
             return isAdminMode;
-        } return serviceAccountPageStore.getters.isOriginAutoSyncEnabled;
+        }
+        return state.isOriginAutoSyncEnabled;
     }),
-    trustedAccountId: computed(() => serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id),
+    trustedAccountId: computed<string|undefined>(() => (serviceAccountData.value as TrustedAccountModel|undefined)?.trusted_account_id),
     timezone: computed<string|undefined>(() => userStore.state.timezone),
-    lastSuccessSynced: computed(() => serviceAccountPageStore.getters.lastSuccessSynced),
+    lastSuccessSynced: computed(() => (syncJobList.value ?? []).find((job) => job.status === 'SUCCESS')?.finished_at ?? ''),
     errorModalVisible: false,
-    isSyncing: computed(() => ['IN_PROGRESS', 'PENDING'].includes(serviceAccountPageStore.getters.lastJob?.status)),
+    isSyncing: computed(() => ['IN_PROGRESS', 'PENDING'].includes(syncJobList.value?.[0]?.status ?? '')),
     lastSyncJob: computed(() => {
         if (state.isSyncing) {
-            return serviceAccountPageStore.getters.secondToLastJob;
+            return syncJobList.value?.find((job) => ['SUCCESS', 'FAILURE'].includes(job.status)) ?? {};
         }
-        return serviceAccountPageStore.getters.lastJob;
+        return syncJobList.value?.[0] ?? {};
     }),
     fields: computed<DataTableFieldType[]>(() => {
-        const generalAccountField = getAccountFields(serviceAccountSchemaStore.getters.generalAccountSchema);
+        const generalAccountField = getAccountFields(generalAccountSchema.value);
         return [
             { name: 'name', label: 'Account Name' },
             ...generalAccountField.map((field) => ({
@@ -127,67 +129,78 @@ const state = reactive({
     selectedType: 'ALL',
 });
 
-const apiQueryHelper = new ApiQueryHelper().setSort(state.sortBy, state.sortDesc).setPageLimit(state.pageLimit).setFilters([
+const { data: syncJobList, refetch: refetchSyncJobList } = useServiceAccountJobListQuery({
+    params: computed(() => ({
+        trusted_account_id: props.serviceAccountId,
+    })),
+    refetchInterval: (query) => {
+        const lastJob = query.data?.value?.results?.[0];
+        if (['IN_PROGRESS', 'PENDING'].includes(lastJob?.status ?? '')) return 10000;
+        return false;
+    },
+    enabled: computed(() => !!props.serviceAccountId),
+});
+
+
+const paginationOptions = reactive({
+    sortBy: 'created_at',
+    sortDesc: true,
+    pageStart: 1,
+    pageLimit: 15,
+});
+const apiQueryHelper = new ApiQueryHelper().setSort(paginationOptions.sortBy, paginationOptions.sortDesc).setPageLimit(paginationOptions.pageLimit).setFilters([
     { k: 'trusted_account_id', v: props.serviceAccountId, o: '=' }]);
-let apiQuery = apiQueryHelper.data;
-const getAttachedGeneralAccountList = async () => {
-    state.loading = true;
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-            query: apiQuery,
-        });
-        state.items = results;
-        state.totalCount = total_count ?? 0;
-        if (results) emit('update:attached-general-accounts', results);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.totalCount = 0;
-    } finally {
-        state.loading = false;
-    }
-};
+const apiQuery = ref(apiQueryHelper.data);
+
+const {
+    totalCount, data: attachedGeneralAccountsData, isLoading, query: attachedGeneralAccountsQuery,
+} = useServiceAccountPaginationQuery({
+    params: computed(() => ({
+        query: apiQuery.value,
+    })),
+    thisPage: computed(() => getThisPage(paginationOptions.pageStart, paginationOptions.pageLimit)),
+    pageSize: computed(() => paginationOptions.pageLimit),
+});
+
+const { mutate: syncTrustedAccount, isPending: isSyncing } = useTrustedAccountSyncMutation({
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.START_SYNC'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+    onSettled: () => {
+        if (state.trustedAccountId) refetchSyncJobList();
+    },
+});
+
 const getProjectDetailLocation = (id: string) => getReferenceLocation(id, { resource_type: 'identity.Project' });
 const handleChange = async (options?: ToolboxOptions) => {
-    try {
-        state.loading = true;
-        await userWorkspaceStore.load();
-        const convertOptions = {
-            ...options,
-            sortBy: state.sortBy,
-            sortDesc: state.sortDesc,
-        };
-        apiQuery = getApiQueryWithToolboxOptions(apiQueryHelper, convertOptions) ?? apiQuery;
-        await getAttachedGeneralAccountList();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
+    await userWorkspaceStore.load();
+    const convertOptions = {
+        ...options,
+        sortBy: paginationOptions.sortBy,
+        sortDesc: paginationOptions.sortDesc,
+    };
+    apiQuery.value = getApiQueryWithToolboxOptions(apiQueryHelper, convertOptions) ?? apiQuery.value;
+    if (options?.pageStart) paginationOptions.pageStart = options.pageStart;
+    if (options?.pageLimit) paginationOptions.pageLimit = options.pageLimit;
 };
 const handleSort = async (sortBy, sortDesc) => {
-    state.sortBy = sortBy;
-    state.sortDesc = sortDesc;
-    try {
-        apiQuery = getApiQueryWithToolboxOptions(apiQueryHelper, { sortBy, sortDesc }) ?? apiQuery;
-        await getAttachedGeneralAccountList();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+    paginationOptions.sortBy = sortBy;
+    paginationOptions.sortDesc = sortDesc;
+    apiQuery.value = getApiQueryWithToolboxOptions(apiQueryHelper, { sortBy, sortDesc }) ?? apiQuery.value;
 };
-const handleSync = async () => {
-    try {
-        state.syncReqLoading = true;
-        await SpaceConnector.clientV2.identity.trustedAccount.sync({
-            trusted_account_id: serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id,
-        });
-        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.START_SYNC'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
-        state.syncReqLoading = false;
+const handleRefresh = async () => {
+    attachedGeneralAccountsQuery.refetch();
+};
+const handleSync = () => {
+    if (!state.trustedAccountId) {
+        console.warn('trustedAccountId is not found');
     }
+    syncTrustedAccount({
+        trusted_account_id: state.trustedAccountId,
+    });
 };
 
 const handleViewSyncError = () => {
@@ -198,50 +211,21 @@ const handleCloseErrorModal = () => {
 };
 const handleSelectType = async (value: string) => {
     state.selectedType = value;
-    const statusFilterIndex = apiQuery.filter?.findIndex((filter) => filter.k === 'state') || -1;
+    const statusFilterIndex = apiQuery.value.filter?.findIndex((filter) => filter.k === 'state') || -1;
 
     const isAllSelected = value === 'ALL';
 
     if (statusFilterIndex === -1 && !isAllSelected) {
-        apiQuery.filter?.push({ k: 'state', v: value, o: 'eq' });
-    } else if (apiQuery.filter && statusFilterIndex !== -1) {
+        apiQuery.value.filter?.push({ k: 'state', v: value, o: 'eq' });
+    } else if (apiQuery.value.filter && statusFilterIndex !== -1) {
         if (isAllSelected) {
-            apiQuery.filter?.splice(statusFilterIndex, 1);
+            apiQuery.value.filter?.splice(statusFilterIndex, 1);
         } else {
-            apiQuery.filter[statusFilterIndex].v = value;
+            apiQuery.value.filter[statusFilterIndex].v = value;
         }
     }
-    await getAttachedGeneralAccountList();
 };
 
-const init = async () => {
-    await getAttachedGeneralAccountList();
-};
-
-
-let syncCheckInterval;
-watch(() => state.isSyncing, async (isSyncing) => {
-    if (isSyncing) {
-        syncCheckInterval = setInterval(async () => {
-            if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
-        }, 10000);
-    }
-    if (!isSyncing) {
-        if (syncCheckInterval) clearInterval(syncCheckInterval);
-    }
-}, { immediate: true });
-
-onUnmounted(() => {
-    if (syncCheckInterval) clearInterval(syncCheckInterval);
-});
-
-watch(() => state.trustedAccountId, async (ta) => {
-    if (ta) await serviceAccountPageStore.fetchSyncJobList(ta);
-});
-
-(async () => {
-    await init();
-})();
 </script>
 
 <template>
@@ -252,7 +236,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                            heading-type="sub"
                            :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')"
                            use-total-count
-                           :total-count="state.totalCount"
+                           :total-count="totalCount"
                 />
             </template>
             <template v-if="props.hasReadWriteAccess"
@@ -264,10 +248,10 @@ watch(() => state.trustedAccountId, async (ta) => {
                     >
                         <p-button :disabled="!state.isSyncEnabled"
                                   style-type="secondary"
-                                  :loading="state.isSyncing || state.syncReqLoading"
+                                  :loading="state.isSyncing || isSyncing"
                                   @click="handleSync"
                         >
-                            {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                            {{ (state.isSyncing || isSyncing) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
                         </p-button>
                     </p-tooltip>
                 </div>
@@ -291,7 +275,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                     <p-divider vertical
                                class="divider"
                     />
-                    <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+                    <div v-if="state.isOriginAutoSyncEnabled"
                          class="auto-sync-wrapper"
                     >
                         <span v-if="state.lastSuccessSynced">
@@ -315,19 +299,19 @@ watch(() => state.trustedAccountId, async (ta) => {
                     </div>
                 </div>
                 <p-toolbox :searchable="false"
-                           :total-count="state.totalCount"
-                           :page-size.sync="state.pageLimit"
+                           :total-count="totalCount"
+                           :page-size.sync="paginationOptions.pageLimit"
                            :page-size-options="[15,30,45]"
                            @change="handleChange"
-                           @refresh="handleChange()"
+                           @refresh="handleRefresh"
                 />
             </div>
             <p-data-table :fields="state.fields"
-                          :items="state.items"
+                          :items="attachedGeneralAccountsData?.results || []"
                           sortable
-                          :loading="state.loading"
-                          :sort-by="state.sortBy"
-                          :sort-desc="state.sortDesc"
+                          :loading="isLoading"
+                          :sort-by="paginationOptions.sortBy"
+                          :sort-desc="paginationOptions.sortDesc"
                           @changeSort="handleSort"
             >
                 <template #col-name-format="{value, item}">

@@ -2,14 +2,9 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal, PDoubleCheckModal, PLink } from '@cloudforet/mirinae';
 
-import type { ServiceAccountDeleteParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
-import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
-import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
-import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
@@ -22,22 +17,24 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { useServiceAccountDeleteMutation } from '@/services/service-account/composables/mutations/use-service-account-delete-mutation';
+import { useTrustedAccountDeleteMutation } from '@/services/service-account/composables/mutations/use-trusted-account-delete-mutation';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
 import { ADMIN_SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/admin/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
+
 interface Props {
     visible: boolean;
-    serviceAccountType: AccountType;
-    serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
+    serviceAccountId?: string;
     attachedGeneralAccounts: ServiceAccountModel[];
     isAgentMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    serviceAccountType: 'GENERAL',
-    serviceAccountData: undefined,
+    serviceAccountId: undefined,
 });
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
@@ -48,36 +45,45 @@ const router = useRouter();
 
 const referenceMap = useAllReferenceDataModel();
 
+const {
+    serviceAccountData,
+    isTrustedAccount,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     fields: [
         { label: 'Service Account Name', name: 'name' },
         { label: 'Service Account ID', name: 'service_account_id' },
     ],
-    isGeneralAccount: computed(() => props.serviceAccountType === 'GENERAL'),
-    serviceAccountData: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     relatedTrustedAccount: computed(() => {
-        if (!state.serviceAccountData?.trusted_account_id) return {};
-        return referenceMap.trustedAccount[state.serviceAccountData.trusted_account_id]?.data ?? {};
+        if (!serviceAccountData.value?.trusted_account_id) return {};
+        return referenceMap.trustedAccount[serviceAccountData.value.trusted_account_id]?.data ?? {};
     }),
-    isSyncedAccount: computed(() => state.serviceAccountData.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
+    isSyncedAccount: computed(() => serviceAccountData.value?.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
     accountDeleteWarningInAgentMode: computed(() => _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_WARNING')),
 });
 
 /* Api */
-const deleteServiceAccount = async () => {
+
+const { mutateAsync: deleteServiceAccount } = useServiceAccountDeleteMutation();
+const { mutateAsync: deleteTrustedAccount } = useTrustedAccountDeleteMutation();
+
+const handleConfirmDelete = async () => {
     try {
-        if (state.isGeneralAccount && props.serviceAccountData && ('service_account_id' in props.serviceAccountData)) {
-            await SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>({
-                service_account_id: props.serviceAccountData?.service_account_id ?? '',
+        if (!isTrustedAccount.value && props.serviceAccountId && serviceAccountData.value && ('service_account_id' in serviceAccountData.value)) {
+            await deleteServiceAccount({
+                service_account_id: props.serviceAccountId ?? '',
             });
             await recentStore.deleteRecent({
                 type: RECENT_TYPE.SERVICE_ACCOUNT,
-                itemId: props.serviceAccountData?.service_account_id ?? '',
+                itemId: props.serviceAccountId ?? '',
             });
         } else {
-            await SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>({
-                trusted_account_id: props.serviceAccountData?.trusted_account_id ?? '',
+            await deleteTrustedAccount({
+                trusted_account_id: props.serviceAccountId ?? '',
             });
         }
         showSuccessMessage(_i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '');
@@ -85,17 +91,13 @@ const deleteServiceAccount = async () => {
         ErrorHandler.handleRequestError(e, _i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
     } finally {
         state.proxyVisible = false;
+        router.push({
+            name: appContextStore.getters.isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE._NAME : SERVICE_ACCOUNT_ROUTE._NAME,
+            query: { provider: serviceAccountPageStore.state.selectedProvider },
+        }).catch(() => {});
     }
 };
 
-/* Event */
-const handleConfirmDelete = async () => {
-    await deleteServiceAccount();
-    await router.push({
-        name: appContextStore.getters.isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE._NAME : SERVICE_ACCOUNT_ROUTE._NAME,
-        query: { provider: serviceAccountPageStore.state.selectedProvider },
-    }).catch(() => {});
-};
 </script>
 
 <template>
@@ -103,7 +105,7 @@ const handleConfirmDelete = async () => {
         <p-double-check-modal v-if="state.proxyVisible && !props.attachedGeneralAccounts.length && !state.isSyncedAccount"
                               :visible.sync="state.proxyVisible"
                               :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
-                              :verification-text="props.serviceAccountData?.name ?? ''"
+                              :verification-text="serviceAccountData?.name ?? ''"
                               modal-size="sm"
                               @confirm="handleConfirmDelete"
         >

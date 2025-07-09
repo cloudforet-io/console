@@ -23,6 +23,7 @@ export const useCloudServicePaginationQuery = ({
         pagination: true,
     });
 
+
     return useScopedPaginationQuery({
         queryKey: key,
         queryFn: cloudServiceAPI.list,
