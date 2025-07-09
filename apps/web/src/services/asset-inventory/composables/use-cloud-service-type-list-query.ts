@@ -2,10 +2,13 @@ import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/core';
 import { computed } from 'vue';
 
+import { uniqBy } from 'lodash';
+
 import { useCloudServiceTypeApi } from '@/api-clients/inventory/cloud-service-type/composables/use-cloud-service-type-api';
 import type { CloudServiceTypeListParameters } from '@/api-clients/inventory/cloud-service-type/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
+
 
 const DEFAULT_LIST_DATA = { results: [] };
 interface UseCloudServiceTypeListQueryOptions {
@@ -24,7 +27,7 @@ export const useCloudServiceTypeListQuery = ({ params, enabled }: UseCloudServic
     return useScopedQuery({
         queryKey: key,
         queryFn: () => cloudServiceTypeAPI.list(queryParams.value),
-        select: (data) => data.results || [],
+        select: (data) => uniqBy(data.results || [], 'cloud_service_type_key'),
         initialData: DEFAULT_LIST_DATA,
         initialDataUpdatedAt: 0,
         staleTime: 1000 * 60 * 5,

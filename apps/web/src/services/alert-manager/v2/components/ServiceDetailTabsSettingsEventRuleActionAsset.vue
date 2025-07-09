@@ -6,8 +6,6 @@ import {
     PFieldGroup,
     PFieldTitle,
     PI,
-    PRadio,
-    PRadioGroup,
     PBadge,
     PSelectDropdown, PTextInput,
     PToggleButton, screens,
@@ -152,12 +150,12 @@ const handleUpdateToggle = (action: string, value: boolean) => {
 
 watch([
     () => state.selectedActions, () => state.key, () => state.selectedAssetList, () => state.selectedTempAssetRadio, () => state.period,
-], ([selectedActions, key, assetList, tempAsset, period]) => {
+], ([selectedActions, key, assetList, period]) => {
     emit('change-form', {
         match_asset: selectedActions.match_asset ? {
             key,
             asset_types: assetList?.map((asset) => asset.name),
-            create_temporary_asset: tempAsset === 'CREATE',
+            // create_temporary_asset: tempAsset === 'CREATE',
         } : undefined,
         merge_asset_labels: selectedActions.merge_asset_labels ? {
             period,
@@ -284,7 +282,8 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                     />
                                 </p-field-group>
                             </div>
-                            <div class="field-group flex items-center">
+                            <!-- TODO: used when adding temporary asset functionality -->
+                            <!-- <div class="field-group flex items-center">
                                 <p-field-title font-weight="regular"
                                                class="field-title toggle-wrapper"
                                 >
@@ -312,7 +311,7 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                         <span>{{ $t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET_DESC') }}</span>
                                     </p>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <div v-if="action.name === 'merge_asset_labels'"
                              class="field-group flex items-center pt-3 pr-3 pl-3 merge-asset-wrapper"

@@ -108,10 +108,10 @@ const state = reactive({
         }
 
         if (state.actions) {
-            if (state.actions.match_asset?.create_temporary_asset) {
-                const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && state.actions.match_asset.key !== '';
-                if (!matchAssetValid) return false;
-            }
+            // if (state.actions.match_asset?.create_temporary_asset) {
+            //     const matchAssetValid = state.actions.match_asset.asset_types.length > 0 && state.actions.match_asset.key !== '';
+            //     if (!matchAssetValid) return false;
+            // }
             if (state.actions.merge_asset_labels?.period !== undefined) {
                 return state.actions.merge_asset_labels?.period !== '';
             }

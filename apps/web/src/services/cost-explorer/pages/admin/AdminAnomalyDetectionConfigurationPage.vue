@@ -61,9 +61,9 @@ const state = reactive<State>({
         { label: 'Fixed Amount', name: 'FIXED_AMOUNT' },
     ]),
     variationMenu: computed(() => [
-        { label: 'All', name: 'all' },
+        // { label: 'All', name: 'all' },
         { label: 'Increase (>=)', name: JSON.stringify(['gte']) },
-        { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
+        // { label: 'Decrease (<=)', name: JSON.stringify(['lte']) },
     ]),
     notifyLevelMenu: computed(() => Object.values(NOTIFY_LEVEL_MAP).map((level) => ({
         label: level.label,
@@ -217,7 +217,7 @@ onMounted(async () => {
                              class="notification-align notification-rules-content"
                         >
                             <p-text-input :value="rule.threshold"
-                                          :placeholder="$t('COST_EXPLORER.ANOMALY_DETECTION.NOTIFICATION_RULES.AMOUNT')"
+                                          type="number"
                                           :disabled="!hasReadWriteAccess"
                                           block
                                           @update:value="handleUpdateNotificationRules('threshold', $event, index)"

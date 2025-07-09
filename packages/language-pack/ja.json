@@ -1264,6 +1264,8 @@
 			"TITLE": "プロセス終了"
 		},
 		"COST_REPORT": {
+			"ADJUSTING_REPORT_DESCRIPTION": "このレポートはまだ確定していないため、費用が変更される可能性があります。",
+			"ADJUSTING_REPORT_TITLE": "レポート未確定",
 			"COLLAPSE_ALL": "すべて折りたたむ",
 			"COST_REPORT": "コストレポート",
 			"CURRENCY_REFERENCE": "通貨リファレンス",
@@ -1271,6 +1273,8 @@
 			"DETAILS_BY_PROJECT": "プロジェクト別詳細",
 			"DETAILS_BY_PROVIDER": "プロバイダ別詳細",
 			"DETAILS_BY_SERVICE_ACCOUNT": "サービスアカウント別詳細",
+			"EXPIRED_REPORT_DESCRIPTION": "このレポートは有効期限が切れており、情報が無効になっている可能性があります。",
+			"EXPIRED_REPORT_TITLE": "レポートの有効期限切れ",
 			"FROM": "発信者",
 			"INDEX": "Index",
 			"ISSUE_DATE": "発行日",

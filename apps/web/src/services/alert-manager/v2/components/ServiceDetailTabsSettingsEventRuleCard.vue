@@ -93,11 +93,11 @@ const state = reactive({
                                 value: matchAssetValue.key,
                             });
                         }
-                        result[type].push({
-                            label: i18n.t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET'),
-                            name: 'create_temporary_asset',
-                            value: matchAssetValue.create_temporary_asset ? i18n.t('ALERT_MANAGER.CREATE') : i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'),
-                        });
+                        // result[type].push({
+                        //     label: i18n.t('ALERT_MANAGER.EVENT_RULE.TEMP_ASSET'),
+                        //     name: 'create_temporary_asset',
+                        //     value: matchAssetValue.create_temporary_asset ? i18n.t('ALERT_MANAGER.CREATE') : i18n.t('ALERT_MANAGER.EVENT_RULE.DO_NOT_CREATE'),
+                        // });
                     } else if (actionKey === 'merge_asset_labels' && typeof actionValue === 'object') {
                         const matchAssetValue = actionValue as EventRuleActionsMergeAssetLabelsType;
                         if (matchAssetValue.period) {

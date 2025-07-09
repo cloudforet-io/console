@@ -10,8 +10,6 @@ import { PPaneLayout } from '@cloudforet/mirinae';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleType } from '@/api-clients/identity/role/type';
 
-import { useMenuStore } from '@/store/menu/menu-store';
-
 import { PAGE_ACCESS } from '@/lib/access-control/config';
 import { getPageAccessMapFromRawData } from '@/lib/access-control/page-access-helper';
 
@@ -19,6 +17,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import RoleUpdateFormAccess from '@/services/iam/components/RoleUpdateFormAccess.vue';
 import RoleUpdateFormPolicy from '@/services/iam/components/RoleUpdateFormPolicy.vue';
+import { useRoleBasedMenus } from '@/services/iam/composables/role-based-menus';
 import { FORM_TYPE } from '@/services/iam/constants/role-constant';
 import { getPageAccessList, getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
 import type { PageAccessMenuItem, RoleFormData } from '@/services/iam/types/role-type';
@@ -40,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
     formType: FORM_TYPE.CREATE,
 });
 
-const menuStore = useMenuStore();
+const { roleBasedMenus } = useRoleBasedMenus();
 
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void,
     (e: 'update:is-page-access-valid', value: boolean): void,
@@ -54,6 +53,7 @@ const state = reactive({
     policy: '' as string|undefined,
     proxyPolicyValid: useProxyValue('isPolicyValid', props, emit),
     selectedRadioIdx: 0,
+    menuList: computed(() => roleBasedMenus.value),
 });
 
 /* Components */
@@ -96,7 +96,7 @@ const handleUpdateEditor = (value: string) => {
 const setPageAccessPermissionsData = () => {
     if (!props.initialPageAccess) return;
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: props.initialPageAccess, isRolePage: true, menuList: menuStore.getters.menuList,
+        pageAccessPermissions: props.initialPageAccess, menuList: state.menuList,
     });
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
@@ -132,7 +132,7 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessP
     emit('update-form', { page_access: pageAccessPermissions });
 });
 watch([() => props.roleType, () => props.initialPageAccess], ([roleType]) => {
-    menuItems.value = getPageAccessMenuListByRoleType(roleType);
+    menuItems.value = getPageAccessMenuListByRoleType(roleType, state.menuList);
     setPageAccessPermissionsData();
 }, { immediate: true });
 </script>

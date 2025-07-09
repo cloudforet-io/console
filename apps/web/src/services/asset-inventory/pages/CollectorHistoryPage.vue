@@ -170,14 +170,19 @@ const getJobs = async () => {
             const plugin = storeState.plugins[job.plugin_id];
             let progress;
             if (job.total_tasks === 0 || job.total_tasks === undefined) {
-                if (job.status === JOB_STATE.SUCCESS) progress = { succeededPercentage: 100, failedPercentage: 0 };
-                else if (job.status === JOB_STATE.FAILURE) progress = { succeededPercentage: 0, failedPercentage: 100 };
-                else progress = { succeededPercentage: 0, failedPercentage: 0 };
+                if (job.status === JOB_STATE.SUCCESS) progress = { succeededPercentage: 100, failedPercentage: 0, processPercentage: 100 };
+                else if (job.status === JOB_STATE.FAILURE) progress = { succeededPercentage: 0, failedPercentage: 100, processPercentage: 100 };
+                else progress = { succeededPercentage: 0, failedPercentage: 0, processPercentage: 100 };
             } else {
+                const remainedTasks = job.remained_tasks ?? 0;
+                const totalTasks = job.total_tasks ?? 0;
+                const successTasks = job.success_tasks ?? 0;
+                const failureTasks = job.failure_tasks ?? 0;
                 progress = {
-                    succeededPercentage: ((job.success_tasks ?? 0) / job.total_tasks) * 100,
-                    failedPercentage: ((job.failure_tasks ?? 0) / job.total_tasks) * 100,
+                    succeededPercentage: ((successTasks / totalTasks) * 100),
+                    failedPercentage: ((failureTasks / totalTasks) * 100),
                     isCanceled: job.status === JOB_STATE.CANCELED,
+                    processPercentage: ((totalTasks - remainedTasks) / totalTasks) * 100,
                 };
             }
             return {
@@ -291,7 +296,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                               :style="{ width: `${value.failedPercentage}%` }"
                         />
                     </div>
-                    <span class="succeeded-text">{{ Math.floor(value.succeededPercentage) }}%</span>
+                    <span class="succeeded-text">{{ Math.floor(value.processPercentage) }}%</span>
                 </template>
             </p-toolbox-table>
             <div v-if="state.items.length > 0"

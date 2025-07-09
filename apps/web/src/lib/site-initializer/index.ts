@@ -80,7 +80,7 @@ const initI18n = () => {
 };
 
 const initOpsFlowTaskManagementTemplate = async (mergedConfig: GlobalServiceConfig) => {
-    if (!mergedConfig.OPS_FLOW.ENABLED) return;
+    if (!mergedConfig?.OPS_FLOW?.ENABLED) return;
     const taskManagementTemplateStore = useTaskManagementTemplateStore(pinia);
     await Promise.allSettled([
         taskManagementTemplateStore.setInitialTemplateId(),

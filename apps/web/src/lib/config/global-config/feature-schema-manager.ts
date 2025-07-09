@@ -1,3 +1,4 @@
+import { DEFAULT_VERSION } from '@/lib/config/global-config/constants/constants';
 import dynamicSchemaManager from '@/lib/config/global-config/dynamic-schema-manager';
 import { getFeatureConfigurator } from '@/lib/config/global-config/helpers/get-feature-configurator';
 import type {
@@ -46,7 +47,7 @@ export class FeatureSchemaManager {
             if (this.config[feature]?.ENABLED) {
                 const configurator = getFeatureConfigurator(feature);
                 if (configurator) {
-                    const currentVersion = this.config[feature]?.VERSION || 'V1';
+                    const currentVersion = this.config[feature]?.VERSION || DEFAULT_VERSION;
                     configurator.initialize(currentVersion);
                     results.push(callback(feature, configurator, currentVersion));
                 }
@@ -109,7 +110,7 @@ export class FeatureSchemaManager {
                     const targetFeature = uiAffect.feature;
                     const targetVersion = targetFeature === feature
                         ? currentVersion
-                        : (this.config[targetFeature]?.VERSION || 'V1');
+                        : (this.config[targetFeature]?.VERSION || DEFAULT_VERSION);
 
                     if (!featureMethodMap[targetFeature]) {
                         featureMethodMap[targetFeature] = {};

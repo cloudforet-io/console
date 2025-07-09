@@ -24,33 +24,42 @@ import { useUserReferenceDataModel } from '@/query/resource-query/reference-mode
 import { useWorkspaceGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-group-reference-data-model';
 import { useWorkspaceReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-reference-data-model';
 import { useWorkspaceUserReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-user-reference-data-model';
+import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 
-export const useAllReferenceDataModel = () => ({
-    app: useAppReferenceDataModel().map,
-    workspace: useWorkspaceReferenceDataModel().map,
-    workspaceGroup: useWorkspaceGroupReferenceDataModel().map,
-    user: useUserReferenceDataModel().map,
-    workspaceUser: useWorkspaceUserReferenceDataModel().map,
-    userGroup: useUserGroupReferenceDataModel().map,
-    provider: useProvodierReferenceDataModel().map,
-    protocol: useProtocolReferenceDataModel().map,
-    cloudServiceType: useCloudServiceTypeReferenceDataModel().map,
-    collector: useCollectorReferenceDataModel().map,
-    costDataSource: useCostDataSourceReferenceModel().map,
-    metric: useMetricReferenceDataModel().map,
-    namespace: useNamespaceReferenceDataModel().map,
-    project: useProjectReferenceDataModel().map,
-    projectGroup: useProjectGroupReferenceDataModel().map,
-    role: useRoleReferenceDataModel().map,
-    region: useRegionReferenceDataModel().map,
-    secret: useSecretReferenceDataModel().map,
-    plugin: usePluginReferenceDataModel().map,
-    serviceAccount: useServiceAccountReferenceDataModel().map,
-    trustedAccount: useTrustedAccountReferenceDataModel().map,
-    alertManagerWebhook: useAlertManagerWebhookReferenceDataModel().map,
-    monitoringWebhook: useMonitoringWebhookReferenceDataModel().map,
-    service: useServiceReferenceDataModel().map,
-    alertManagerEscalationPolicy: useAlertManagerEscalationPolicyReferenceDataModel().map,
-    monitoringEscalationPolicy: useMonitoringEscalationPolicyReferenceDataModel().map,
+const referenceDataModelMap = {
+    app: useAppReferenceDataModel,
+    workspace: useWorkspaceReferenceDataModel,
+    workspaceGroup: useWorkspaceGroupReferenceDataModel,
+    user: useUserReferenceDataModel,
+    workspaceUser: useWorkspaceUserReferenceDataModel,
+    userGroup: useUserGroupReferenceDataModel,
+    provider: useProvodierReferenceDataModel,
+    protocol: useProtocolReferenceDataModel,
+    cloudServiceType: useCloudServiceTypeReferenceDataModel,
+    collector: useCollectorReferenceDataModel,
+    costDataSource: useCostDataSourceReferenceModel,
+    metric: useMetricReferenceDataModel,
+    namespace: useNamespaceReferenceDataModel,
+    project: useProjectReferenceDataModel,
+    projectGroup: useProjectGroupReferenceDataModel,
+    role: useRoleReferenceDataModel,
+    region: useRegionReferenceDataModel,
+    secret: useSecretReferenceDataModel,
+    plugin: usePluginReferenceDataModel,
+    serviceAccount: useServiceAccountReferenceDataModel,
+    trustedAccount: useTrustedAccountReferenceDataModel,
+    alertManagerWebhook: useAlertManagerWebhookReferenceDataModel,
+    monitoringWebhook: useMonitoringWebhookReferenceDataModel,
+    service: useServiceReferenceDataModel,
+    alertManagerEscalationPolicy: useAlertManagerEscalationPolicyReferenceDataModel,
+    monitoringEscalationPolicy: useMonitoringEscalationPolicyReferenceDataModel,
+} as const;
+
+const proxy = makeReferenceProxy(referenceDataModelMap, (target, prop) => {
+    if (!(prop in target)) {
+        throw new Error(`[all-reference-data-model] Reference Data Model for "${prop}" not found`);
+    }
+    return target[prop]().map;
 });
 
+export const useAllReferenceDataModel = () => proxy;

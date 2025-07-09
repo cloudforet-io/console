@@ -8,7 +8,7 @@ import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type'
 import ReferenceRepository from '@/query/resource-query/reference-model/core/reference-repository';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
-const repositoryRegistry = new Map<ResourceKeyType, ReferenceRepository<any>>();
+const repositoryRegistry = new Map<string, ReferenceRepository<any>>();
 
 
 export const getRepository = <T extends Record<string, any>>(
@@ -18,9 +18,9 @@ export const getRepository = <T extends Record<string, any>>(
     listFetcher: (params: any) => Promise<ListResponse<T>>,
     listQuery?: Query,
 ): ReferenceRepository<T> => {
-    if (!repositoryRegistry.has(resourceKey)) {
+    if (!repositoryRegistry.has(JSON.stringify(queryKey))) {
         if (import.meta.env.DEV) {
-            console.log(`Creating new Reference Repository for: [${resourceKey}] Resource`);
+            console.log(`Creating new Reference Repository for QueryKey: ${JSON.stringify(queryKey)}`);
         }
         const repository = new ReferenceRepository<T>(
             resourceKey,
@@ -29,7 +29,7 @@ export const getRepository = <T extends Record<string, any>>(
             listFetcher,
             listQuery,
         );
-        repositoryRegistry.set(resourceKey, repository);
+        repositoryRegistry.set(JSON.stringify(queryKey), repository);
     }
-    return repositoryRegistry.get(resourceKey) as ReferenceRepository<T>;
+    return repositoryRegistry.get(JSON.stringify(queryKey)) as ReferenceRepository<T>;
 };

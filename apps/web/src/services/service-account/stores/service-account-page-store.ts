@@ -26,12 +26,13 @@ interface Getters {
     lastJobStatus: ComputedRef<IdentityJobStatus>;
     autoSyncDocsLink: ComputedRef<string>;
     isTrustedAccount: ComputedRef<boolean>;
+    isOriginAutoSyncEnabled: ComputedRef<boolean>;
 }
 
 interface State {
     selectedProvider: string;
     serviceAccountType: AccountType;
-    originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel> | undefined; // for detail page
+    originServiceAccountItem: (TrustedAccountModel & ServiceAccountModel) | undefined; // for detail page
     syncJobList: IdentityJobModel[];
 }
 
@@ -62,7 +63,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const state = reactive<State>({
         selectedProvider: '',
         serviceAccountType: ACCOUNT_TYPE.GENERAL,
-        originServiceAccountItem: {},
+        originServiceAccountItem: undefined,
         syncJobList: [],
     });
 
@@ -98,10 +99,11 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             return `https://cloudforet.io/${language}docs/guides/asset-inventory/service-account/`;
         }),
         isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+        isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem as TrustedAccountModel)?.schedule?.state === 'ENABLED'),
     });
 
     const mutations = {
-        setOriginServiceAccountItem: (item: Partial<TrustedAccountModel & ServiceAccountModel>) => {
+        setOriginServiceAccountItem: (item: TrustedAccountModel & ServiceAccountModel) => {
             state.originServiceAccountItem = item;
         },
         setServiceAccountType: (type: AccountType) => {
@@ -111,7 +113,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const actions = {
         initState: () => {
             state.selectedProvider = '';
-            state.originServiceAccountItem = {};
+            state.originServiceAccountItem = undefined;
             formState.baseInformation = {};
             formState.isBaseInformationFormValid = true;
             formState.isAutoSyncFormValid = true;
