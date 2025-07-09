@@ -80,7 +80,7 @@ const state = reactive({
     items: [] as TableItem[],
     sortBy: 'workspace_id',
     sortDesc: true,
-    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
+    selectedUser: computed(() => userPageStore.state.selectedUsers[0]),
     selectedRemoveItem: '',
 });
 const tableState = reactive({

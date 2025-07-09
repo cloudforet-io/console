@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive, watch, ref,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PEmpty, PStatus, PTab, PDataTable, PBadge, PTooltip, PSelectDropdown, PTag,
@@ -14,12 +15,9 @@ import type {
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingUpdateRoleParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/update-role';
-import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -37,9 +35,12 @@ import {
     useRoleFormatter,
     userStateFormatter,
 } from '@/services/iam/composables/refined-table-data';
+import { useRoleBindingUpdateRoleMutation } from '@/services/iam/composables/use-role-binding-update-role-mutation';
+import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
 import { USER_TABS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
+import type { ExtendUserListItemType, UserListItemType } from '@/services/iam/types/user-type';
+
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -51,6 +52,8 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 const userStore = useUserStore();
+
+const selectedUsers = ref<UserListItemType[]>([]);
 
 const storeState = reactive({
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
@@ -85,18 +88,41 @@ const singleItemTabState = reactive({
     ])),
     activeTab: USER_TABS.DETAIL,
     selectedIndex: computed(() => userPageState.selectedIndices[0]),
-    selectedUserId: computed(() => userPageState.users[singleItemTabState.selectedIndex].user_id),
 });
+
+const { userGroupListData } = useUserGroupListQuery({
+    params: computed(() => ({
+        query: {
+            filter: [
+                { k: 'user_id', v: userPageState.selectedUsers.map((user) => user.user_id), o: 'in' },
+            ],
+        },
+    })),
+});
+
 const multiItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
     ])),
     activeTab: USER_TABS.DATA,
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageGetters.selectedUsers.map((user) => ({
-        ...user,
-        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-        last_accessed_at: user?.last_accessed_at,
-    }))),
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.selectedUsers.map((user) => {
+        let additionalFields: Record<string, any> = {};
+        if (!userPageState.isAdminMode) {
+            additionalFields = {
+                role_binding: {
+                    name: userPageGetters.roleMap[user?.role_binding_info?.role_id ?? '']?.name ?? '',
+                    type: user?.role_binding_info?.role_type ?? '',
+                },
+                user_group: userGroupListData.value.filter((group) => group.users?.includes(user.user_id ?? '')).map((group) => group.name),
+            };
+        }
+        return {
+            ...user,
+            type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+            last_accessed_at: user?.last_accessed_at,
+            ...additionalFields,
+        };
+    })),
 });
 
 const dropdownState = reactive({
@@ -106,19 +132,10 @@ const dropdownState = reactive({
     menuItems: [] as SelectDropdownMenuItem[],
 });
 
+
+
 /* API */
-const initUserData = async (user_id?: string) => {
-    if (!user_id) return;
-    if (userPageState.isAdminMode) {
-        await userPageStore.getUser({
-            user_id: user_id || '',
-        });
-    } else {
-        await userPageStore.getWorkspaceUser({
-            user_id: user_id || '',
-        });
-    }
-};
+const { roleAPI } = useRoleApi();
 const roleListApiQueryHelper = new ApiQueryHelper();
 
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
@@ -136,7 +153,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         });
     }
     try {
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+        const { results } = await roleAPI.list({
             query: {
                 ...roleListApiQueryHelper.data,
                 filter: [
@@ -160,32 +177,41 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         results: dropdownState.menuItems,
     };
 };
-const handleSelectDropdownItem = async (value, rowIndex:number) => {
-    try {
-        const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
-            role_id: value || '',
-        });
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'role-binding', 'list');
+const queryClient = useQueryClient();
+
+const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
+    onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userGroupListQueryKey });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, e.message);
+    },
+});
+const handleSelectDropdownItem = async (value, rowIndex:number) => {
+    updateRoleBinding({
+        role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
+        role_id: value || '',
+    }).then((response) => {
         const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
         const originTableIndex = userPageState.selectedIndices[rowIndex];
-        userPageState.users[originTableIndex] = {
-            ...userPageState.users[originTableIndex],
+        userPageState.selectedUsers[originTableIndex] = {
+            ...userPageState.selectedUsers[originTableIndex],
             role_binding: {
                 name: roleName,
                 type: response.role_type,
             },
         };
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
-    }
+    });
 };
 
-/* Watcher */
-watch(() => userPageState.selectedIndices[0], (index) => {
-    const user_id = userPageState.users[index]?.user_id;
-    initUserData(user_id);
-});
+/* Watch */
+watch(() => userPageState.selectedUsers, (val) => {
+    selectedUsers.value = val;
+}, { immediate: true });
 </script>
 
 <template>
@@ -196,7 +222,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
         >
             <template #detail>
                 <user-management-tab-detail :has-read-write-access="props.hasReadWriteAccess"
-                                            @refresh="initUserData"
+                                            :selected-user="selectedUsers[0]"
                 />
             </template>
             <template #workspace>
@@ -305,7 +331,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                                    :key="`${v}-${i}`"
                                    :deletable="false"
                             >
-                                {{ v.name }}
+                                {{ v }}
                             </p-tag>
                         </div>
                         <div v-else />

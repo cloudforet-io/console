@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, ref, watchEffect,
 } from 'vue';
 
 import {
@@ -25,12 +25,15 @@ import {
     useRoleFormatter,
     userStateFormatter,
 } from '@/services/iam/composables/refined-table-data';
+import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
 
+
 interface Props {
     hasReadWriteAccess?: boolean;
+    selectedUser: UserListItemType;
 }
 
 const props = defineProps<Props>();
@@ -48,15 +51,37 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    selectedUser: computed<UserListItemType>(() => userPageGetters.selectedUsers[0]),
-    isWorkspaceGroupUser: computed<boolean>(() => !!state.selectedUser?.role_binding_info?.workspace_group_id),
+    selectedUser: computed<UserListItemType>(() => userPageState.selectedUsers[0] ?? {}),
+    selectedUserId: computed<string>(() => userPageState.selectedUserIds[0] ?? ''),
+    isWorkspaceGroupUser: computed<boolean>(() => !!props.selectedUser?.role_binding_info?.workspace_group_id),
+});
+
+const refinedUserItems = ref<ExtendUserListItemType | undefined>(undefined);
+
+const { userGroupListData } = useUserGroupListQuery({
+    params: computed(() => ({
+        query: {
+            filter: [
+                { k: 'user_id', v: userPageState.selectedUsers.map((user) => user.user_id), o: 'in' },
+            ],
+        },
+    })),
+});
+
+watchEffect(() => {
+    if (!state.selectedUser) return;
+    refinedUserItems.value = {
+        ...state.selectedUser,
+        role_binding: {
+            name: userPageGetters.roleMap[state.selectedUser.role_binding_info?.role_id ?? '']?.name ?? '',
+            type: state.selectedUser.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+        },
+        last_accessed_at: state.selectedUser.last_accessed_at,
+        user_group: userGroupListData.value.filter((group) => group.users?.includes(state.selectedUser.user_id ?? '')),
+    };
 });
 
 const tableState = reactive({
-    refinedUserItems: computed<ExtendUserListItemType>(() => ({
-        ...state.selectedUser,
-        last_accessed_at: state.selectedUser.last_accessed_at,
-    })),
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
         const additionalRoleFields: DefinitionField[] = [];
@@ -69,7 +94,7 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
             );
-            if (state.selectedUser?.role_id) {
+            if (props.selectedUser?.role_id) {
                 additionalRoleFields.push(
                     {
                         name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
@@ -82,6 +107,9 @@ const tableState = reactive({
                 label: i18n.t('IAM.USER.MAIN.ROLE'),
                 disableCopy: true,
             });
+            additionalFields.push({
+                name: 'user_group', label: i18n.t('IAM.USER.MAIN.ASSIGNED_USER_GROUP'), disableCopy: true,
+            });
         }
 
         return [
@@ -92,7 +120,6 @@ const tableState = reactive({
             { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
             ...additionalRoleFields,
-            { name: 'user_group', label: i18n.t('IAM.USER.MAIN.ASSIGNED_USER_GROUP'), disableCopy: true },
             { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE'), disableCopy: true },
             { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE'), disableCopy: true },
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
@@ -141,13 +168,13 @@ const handleClickButton = (type: string) => {
 const handleClickVerifyButton = async () => {
     state.verifyEmailLoading = true;
     try {
-        if (tableState.refinedUserItems.email_verified) return;
+        if (refinedUserItems.value?.email_verified) return;
         await postUserValidationEmail({
-            user_id: tableState.refinedUserItems.user_id || '',
-            email: tableState.refinedUserItems.email || '',
+            user_id: refinedUserItems.value?.user_id || '',
+            email: refinedUserItems.value?.email || '',
         });
-        emit('refresh', tableState.refinedUserItems.user_id || '');
-        await userStore.updateUser({ email: tableState.refinedUserItems.email });
+        emit('refresh', refinedUserItems.value?.user_id || '');
+        await userStore.updateUser({ email: refinedUserItems.value?.email || '' });
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
@@ -171,7 +198,7 @@ const handleClickVerifyButton = async () => {
                     <div v-if="userPageState.isAdminMode"
                          class="toolbox"
                     >
-                        <p-button v-if="tableState.refinedUserItems.state === 'ENABLED'"
+                        <p-button v-if="refinedUserItems?.state === 'ENABLED'"
                                   style-type="tertiary"
                                   @click="handleClickButton(USER_MODAL_TYPE.DISABLE)"
                         >
@@ -198,7 +225,7 @@ const handleClickVerifyButton = async () => {
                     </div>
                     <p-button v-else-if="userPageGetters.isWorkspaceOwner && !state.isWorkspaceGroupUser"
                               style-type="negative-secondary"
-                              :disabled="userPageGetters.selectedUsers.length === 0"
+                              :disabled="userPageState.selectedUsers.length === 0"
                               @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                     >
                         {{ $t('IAM.USER.REMOVE') }}
@@ -207,7 +234,7 @@ const handleClickVerifyButton = async () => {
             </template>
         </p-heading-layout>
         <p-definition-table :fields="tableState.fields"
-                            :data="tableState.refinedUserItems"
+                            :data="refinedUserItems"
                             :loading="state.loading"
                             :skeleton-rows="7"
                             class="user-definition-table"
@@ -247,28 +274,28 @@ const handleClickVerifyButton = async () => {
                 </div>
             </template>
             <template #data-last_accessed_at="{data}">
-                <span v-if="calculateTime(data, state.selectedUser.timezone) === -1">
+                <span v-if="calculateTime(data, props.selectedUser.timezone) === -1">
                     -
                 </span>
-                <span v-else-if="calculateTime(data, state.selectedUser.timezone) === 0">
+                <span v-else-if="calculateTime(data, props.selectedUser.timezone) === 0">
                     {{ $t('IAM.USER.MAIN.TODAY') }}
                 </span>
-                <span v-else-if="calculateTime(data, state.selectedUser.timezone) === 1">
+                <span v-else-if="calculateTime(data, props.selectedUser.timezone) === 1">
                     {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ calculateTime(data, state.selectedUser.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
+                    {{ calculateTime(data, props.selectedUser.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, userStore.state.timezone) }}
+                {{ iso8601Formatter(data, userStore?.state?.timezone || 'UTC') }}
             </template>
             <template #data-email="{data}">
                 <div v-if="data && data !== ''"
                      class="col-email"
                 >
-                    <span :class="tableState.refinedUserItems.email_verified && 'verified-text'">{{ data }}</span>
-                    <span v-if="tableState.refinedUserItems.email_verified">
+                    <span :class="refinedUserItems?.email_verified && 'verified-text'">{{ data }}</span>
+                    <span v-if="refinedUserItems?.email_verified">
                         <p-i name="ic_verified"
                              height="1rem"
                              width="1rem"
@@ -283,7 +310,9 @@ const handleClickVerifyButton = async () => {
                     </span>
                 </div>
             </template>
-            <template #data-user_group="{data}">
+            <template v-if="!userPageState.isAdminMode"
+                      #data-user_group="{data}"
+            >
                 <div v-if="data.length > 0">
                     <p-tag v-for="(d, i) in data"
                            :key="`${d}-${i}`"
@@ -295,9 +324,9 @@ const handleClickVerifyButton = async () => {
             </template>
             <template #extra="{label}">
                 <p-button v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
-                              && !tableState.refinedUserItems.email_verified
-                              && tableState.refinedUserItems.email
-                              && tableState.refinedUserItems.email !== ''
+                              && !refinedUserItems?.email_verified
+                              && refinedUserItems?.email
+                              && refinedUserItems?.email !== ''
                               && props.hasReadWriteAccess"
                           style-type="primary"
                           size="sm"

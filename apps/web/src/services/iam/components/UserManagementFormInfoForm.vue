@@ -22,7 +22,7 @@ const userPageStore = useUserPageStore();
 const emit = defineEmits<{(e: 'update:name', value: string): void}>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.getters.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
     proxyName: useProxyValue('name', props, emit),
 });
 
