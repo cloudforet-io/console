@@ -134,7 +134,7 @@ export const useCostReportPageStore = defineStore('page-cost-report', () => {
             });
             const reportMonthList: string[] = results?.map((report) => report.report_month) ?? [];
             const issueDateList: string[] = results?.map((report) => report.issue_date) ?? [];
-            state.recentReportMonth = reportMonthList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
+            state.recentReportMonth = reportMonthList.sort((a, b) => dayjs.utc(b).valueOf() - dayjs.utc(a).valueOf())[0];
             state.recentIssueDate = issueDateList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
             state.hasReport = (total_count ?? 0) > 0;
         } catch (e) {

@@ -62,7 +62,7 @@ export const useAuthorizationStore = defineStore('authorization', () => {
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
             const pagePermissionMap = getPageAccessMapFromRawData({
                 pageAccessPermissions: roleBasePagePermissions,
-                menuList: menuStore.getters.menuList,
+                menuList: menuStore.getters.activeModeMenuList,
             });
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
             const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
@@ -85,7 +85,7 @@ export const useAuthorizationStore = defineStore('authorization', () => {
             const roleBasePagePermissions = state.currentRoleInfo?.pageAccess ?? ['my_page.*'];
             const pagePermissionMap = getPageAccessMapFromRawData({
                 pageAccessPermissions: roleBasePagePermissions,
-                menuList: menuStore.getters.menuList,
+                menuList: menuStore.getters.activeModeMenuList,
             });
             const minimalPagePermissionList = getMinimalPageAccessPermissionList(roleType);
 

@@ -32,7 +32,7 @@ export const useAllMenuList = () => {
         const isMyPage = route?.path.startsWith('/my-page');
         let _allGnbMenuList: DisplayMenu[];
 
-        _allGnbMenuList = _getDisplayMenuList(menuStore.getters.menuList, _isAdminMode.value);
+        _allGnbMenuList = _getDisplayMenuList(menuStore.getters.activeModeMenuList, _isAdminMode.value);
         _allGnbMenuList = _filterMenuByRoute(_allGnbMenuList, router, _currentWorkspaceId.value);
         if (!_isAdminMode.value) {
             _allGnbMenuList = _filterMenuByAccessPermission(_allGnbMenuList, authorizationStore.getters.pageAccessPermissionList);

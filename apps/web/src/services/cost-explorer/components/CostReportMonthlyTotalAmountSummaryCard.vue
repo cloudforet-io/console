@@ -10,14 +10,14 @@ import type { PieSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import {
-    debounce, isEmpty, sum, sumBy, throttle,
+    debounce, isEmpty, sum, throttle,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectButton, PDatePagination, PDataTable, PTextButton, PI, PTooltip, PDataLoader,
 } from '@cloudforet/mirinae';
-import type { SelectButtonType } from '@cloudforet/mirinae/types/controls/buttons/select-button-group/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
@@ -56,7 +56,15 @@ import {
 
 type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
-    value_sum: number;
+    value_sum: Array<{
+        [key: string]: number;
+    }>;
+    _total_value_sum: number;
+};
+type RefinedCostReportDataAnalyzeResult = {
+    [groupBy: string]: string | any;
+    amount: number;
+    adjusted_amount?: number;
 };
 
 const OTHER_CATEGORY = 'Others';
@@ -75,92 +83,84 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
-    targetSelectItems: computed(() => ([
-        { name: GROUP_BY.WORKSPACE_NAME, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
-        { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
-    ] as SelectButtonType[])),
-    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE_NAME : GROUP_BY.PROVIDER,
-    totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
+    rawData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
+    refinedData: [] as RefinedCostReportDataAnalyzeResult[],
+    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     currentDate: undefined as Dayjs | undefined,
-    currentDateRangeText: computed<string>(() => {
-        if (!state.currentDate) return '';
-        return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
-    }),
     currentReportId: undefined as string|undefined,
-    //
     chart: null as EChartsType | null,
-    chartData: [],
-    chartOptions: computed<PieSeriesOption>(() => ({
-        color: MASSIVE_CHART_COLORS,
-        grid: {
-            containLabel: true,
-        },
-        tooltip: {
-            trigger: 'item',
-            position: 'inside',
-            formatter: (params) => {
-                const _name = getReferenceLabel(storeState.allReferenceTypeInfo, state.selectedTarget, params.name);
-                const _value = numberFormatter(params.value) || '';
-                return `${params.marker} ${_name}: <b>${_value}</b>`;
-            },
-        },
-        legend: {
-            show: false,
-        },
-        series: [
-            {
-                type: 'pie',
-                radius: ['30%', '70%'],
-                center: ['30%', '50%'],
-                data: state.chartData,
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
-                },
-                avoidLabelOverlap: false,
-                label: {
-                    show: false,
-                },
-            },
-        ],
-    })),
-    tableFields: computed<DataTableFieldType[]>(() => ([
-        { name: state.selectedTarget, label: COST_REPORT_GROUP_BY_ITEM_MAP[state.selectedTarget].label },
-        { name: 'value_sum', label: 'Amount', textAlign: 'right' },
-    ])),
+    chartData: [] as PieSeriesOption['data'],
 });
 
+/* Computed */
+const currentDateRangeText = computed<string>(() => {
+    if (!state.currentDate) return '';
+    return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
+});
+const totalAmount = computed<number>(() => sum(state.rawData?.results?.map((d) => d._total_value_sum) ?? []));
+const targetSelectItems = computed<MenuItem[]>(() => ([
+    { name: GROUP_BY.WORKSPACE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
+    { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
+]));
+const chartOptions = computed<PieSeriesOption>(() => ({
+    color: MASSIVE_CHART_COLORS,
+    grid: {
+        containLabel: true,
+    },
+    tooltip: {
+        trigger: 'item',
+        position: 'inside',
+        formatter: (params) => {
+            const _name = getReferenceLabel(storeState.allReferenceTypeInfo, state.selectedTarget, params.name);
+            const _value = numberFormatter(params.value) || '';
+            return `${params.marker} ${_name}: <b>${_value}</b>`;
+        },
+    },
+    legend: {
+        show: false,
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: ['30%', '70%'],
+            center: ['30%', '50%'],
+            data: state.chartData,
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                },
+            },
+            avoidLabelOverlap: false,
+            label: {
+                show: false,
+            },
+        },
+    ],
+}));
+const tableFields = computed<DataTableFieldType[]>(() => ([
+    { name: state.selectedTarget, label: COST_REPORT_GROUP_BY_ITEM_MAP[state.selectedTarget].label },
+    { name: 'amount', label: 'Amount', textAlign: 'right' },
+    { name: 'adjusted_amount', label: 'Adjustment', textAlign: 'right' },
+]));
+
+
 /* Util */
-const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>): AnalyzeResponse<CostReportDataAnalyzeResult> => {
-    const _results: CostReportDataAnalyzeResult[] = [];
-    const _totalAmount = sumBy(res.results, 'value_sum');
-    const _thresholdValue = _totalAmount * 0.02;
-    let _othersValueSum = 0;
+const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>): RefinedCostReportDataAnalyzeResult[] => {
+    const _results: RefinedCostReportDataAnalyzeResult[] = [];
     res.results?.forEach((d) => {
-        if (d.value_sum < _thresholdValue) {
-            _othersValueSum += d.value_sum;
-        } else {
-            _results.push(d);
-        }
-    });
-    if (_othersValueSum > 0) {
         _results.push({
-            [state.selectedTarget]: OTHER_CATEGORY,
-            value_sum: _othersValueSum,
+            [state.selectedTarget]: d[state.selectedTarget],
+            amount: d._total_value_sum,
+            adjusted_amount: d.value_sum.find((v) => !!v?.is_adjusted)?.value,
         });
-    }
-    return {
-        more: res.more,
-        results: _results,
-    };
+    });
+    return _results;
 };
 const getLegendColor = (field: string, value: string, rowIndex: number) => {
     if (value === OTHER_CATEGORY) return gray[500];
-    if (field === GROUP_BY.WORKSPACE_NAME) {
+    if (field === GROUP_BY.WORKSPACE) {
         return MASSIVE_CHART_COLORS[rowIndex];
     }
     return storeState.providers[value]?.color ?? MASSIVE_CHART_COLORS[rowIndex];
@@ -178,7 +178,7 @@ const analyzeCostReportData = debounce(async () => {
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: {
-                group_by: [state.selectedTarget],
+                group_by: [state.selectedTarget, 'is_adjusted'],
                 start: _period.start,
                 end: _period.end,
                 fields: {
@@ -187,15 +187,17 @@ const analyzeCostReportData = debounce(async () => {
                         operator: 'sum',
                     },
                 },
+                field_group: ['is_adjusted'],
                 sort: [{
                     key: 'value_sum',
                     desc: true,
                 }],
             },
         });
-        state.data = getRefinedAnalyzeData(res);
+        state.rawData = res;
+        state.refinedData = getRefinedAnalyzeData(res);
     } catch (e) {
-        state.data = {};
+        state.rawData = { results: [] };
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
@@ -220,16 +222,17 @@ const listCostReport = async () => {
 };
 
 /* Util */
-const drawChart = (rawData: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
+const drawChart = (rawData?: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
     if (isEmpty(rawData)) return;
 
-    const _seriesData: any[] = [];
+    const _seriesData: PieSeriesOption['data'] = [];
     rawData.results?.forEach((d) => {
-        let _color = state.selectedTarget === 'provider' ? storeState.providers[d[state.selectedTarget]]?.color : undefined;
+        let _color = state.selectedTarget === GROUP_BY.PROVIDER ? storeState.providers[d[state.selectedTarget]]?.color : undefined;
         if (d[state.selectedTarget] === OTHER_CATEGORY) _color = gray[500];
+        const _value = sum(d.value_sum.map((v) => v.value));
         _seriesData.push({
             name: d[state.selectedTarget],
-            value: d.value_sum,
+            value: _value,
             itemStyle: {
                 color: _color,
             },
@@ -238,7 +241,7 @@ const drawChart = (rawData: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
     state.chartData = _seriesData;
 
     state.chart = init(chartContext.value);
-    state.chart.setOption(state.chartOptions, true);
+    state.chart.setOption(chartOptions.value, true);
 };
 
 /* Event */
@@ -262,9 +265,9 @@ const handleChangeDate = (date: Dayjs) => {
 };
 
 /* Watcher */
-watch([() => chartContext.value, () => state.loading, () => state.data], async ([_chartContext, loading, data]) => {
+watch([() => chartContext.value, () => state.loading, () => state.rawData], async ([_chartContext, loading, rawData]) => {
     if (_chartContext && !loading) {
-        drawChart(data);
+        drawChart(rawData);
     }
 });
 watch(() => costReportPageState.recentReportMonth, async (after) => {
@@ -297,7 +300,7 @@ useResizeObserver(chartContext, throttle(() => {
                   #right-extra
         >
             <div class="select-button-wrapper">
-                <p-select-button v-for="item in state.targetSelectItems"
+                <p-select-button v-for="item in targetSelectItems"
                                  :key="`cost-trend-select-button-${item.name}`"
                                  :value="item.name"
                                  :selected="state.selectedTarget"
@@ -311,7 +314,7 @@ useResizeObserver(chartContext, throttle(() => {
         </template>
         <template #content>
             <p-data-loader :loading="state.loading"
-                           :data="state.data"
+                           :data="state.rawData"
                            :min-loading-time="500"
             >
                 <div class="grid grid-cols-12 gap-4">
@@ -321,7 +324,7 @@ useResizeObserver(chartContext, throttle(() => {
                                            @update:date="handleChangeDate"
                         />
                         <div class="date-range-text">
-                            {{ state.currentDateRangeText }}
+                            {{ currentDateRangeText }}
                         </div>
                         <div class="summary-wrapper">
                             <div class="summary-label">
@@ -329,7 +332,7 @@ useResizeObserver(chartContext, throttle(() => {
                             </div>
                             <div class="summary-value">
                                 <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                                <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
+                                <span class="value">{{ currencyMoneyFormatter(totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
                             </div>
                         </div>
                         <p-text-button v-if="!storeState.isAdminMode && state.currentReportId"
@@ -353,14 +356,14 @@ useResizeObserver(chartContext, throttle(() => {
                         </div>
                     </div>
                     <div class="right-part">
-                        <p-data-table :fields="state.tableFields"
-                                      :items="state.data?.results ?? []"
+                        <p-data-table :fields="tableFields"
+                                      :items="state.refinedData"
                                       :loading="state.loading"
                                       table-style-type="simple"
                                       class="summary-data-table"
                         >
                             <template #col-format="{field, value, rowIndex}">
-                                <span v-if="field.name === GROUP_BY.WORKSPACE_NAME">
+                                <span v-if="field.name === GROUP_BY.WORKSPACE">
                                     <span class="toggle-button"
                                           :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
                                     />
@@ -381,7 +384,7 @@ useResizeObserver(chartContext, throttle(() => {
                                     </p-tooltip>
                                 </span>
                             </template>
-                            <template #col-value_sum-format="{ value }">
+                            <template #col-amount-format="{ value }">
                                 <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? ''"
                                            position="bottom"
                                 >
@@ -389,6 +392,17 @@ useResizeObserver(chartContext, throttle(() => {
                                           class="amount-col"
                                     >
                                         {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
+                                    </span>
+                                </p-tooltip>
+                            </template>
+                            <template #col-adjusted_amount-format="{ value }">
+                                <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency })"
+                                           position="bottom"
+                                >
+                                    <span v-if="costReportPageGetters.currency"
+                                          class="amount-col"
+                                    >
+                                        {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? '-' }}
                                     </span>
                                 </p-tooltip>
                             </template>

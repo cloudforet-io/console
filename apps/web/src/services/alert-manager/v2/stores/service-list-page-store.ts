@@ -5,7 +5,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 export const useServiceListPageStore = defineStore('page-service-list', {
     state: () => ({
         unhealthyThisPage: 1,
-        unhealthyPageSize: 10,
+        unhealthyPageSize: 12,
         healthyThisPage: 1,
         healthyPageSize: 6,
         searchFilters: [] as ConsoleFilter[],
@@ -19,6 +19,9 @@ export const useServiceListPageStore = defineStore('page-service-list', {
         },
         setSearchFilters(filters: ConsoleFilter[]) {
             this.searchFilters = filters;
+        },
+        setHealthyPageSize(size: number) {
+            this.healthyPageSize = size;
         },
     },
 });

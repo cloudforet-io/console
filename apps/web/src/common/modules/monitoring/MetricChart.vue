@@ -83,6 +83,7 @@ const state = reactive({
         },
         series: state.chartData,
     })),
+    chartDataForDataLoader: computed<ChartData[]|undefined>(() => state.chartData?.filter((item) => !isEmpty(item?.data)) ?? undefined),
 });
 
 const drawChart = (rawData) => {
@@ -125,7 +126,7 @@ useResizeObserver(chartContext, throttle(() => {
             <p-spinner v-if="props.loading && state.chart" />
         </div>
         <p-data-loader :loading="loading && !state.chart"
-                       :data="state.chartData"
+                       :data="state.chartDataForDataLoader"
                        class="chart-wrapper"
                        show-data-from-scratch
         >

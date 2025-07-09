@@ -8,3 +8,32 @@ export const SERVICE_FEATURES = {
     OPS_FLOW: 'OPS_FLOW',
     IAM: 'IAM',
 } as const;
+
+export const DEFAULT_VERSION = 'V1';
+
+export const DEFAULT_CONFIG = {
+    DASHBOARDS: {
+        ENABLED: true,
+        VERSION: DEFAULT_VERSION,
+    },
+    PROJECT: {
+        ENABLED: true,
+        VERSION: DEFAULT_VERSION,
+    },
+    SERVICE_ACCOUNT: {
+        ENABLED: true,
+        VERSION: DEFAULT_VERSION,
+    },
+    ASSET_INVENTORY: {
+        ENABLED: true,
+        VERSION: DEFAULT_VERSION,
+    },
+    COST_ANALYSIS: {
+        ENABLED: true,
+        VERSION: DEFAULT_VERSION,
+    },
+    ALERT_MANAGER: {
+        ENABLED: true,
+        VERSION: DEFAULT_VERSION,
+    },
+};

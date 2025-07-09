@@ -1,8 +1,7 @@
 import type { RoleType } from '@/api-clients/identity/role/type';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
-import { getDefaultPageAccessPermissionList, getEnabledMenus } from '@/lib/access-control/page-access-helper';
-import config from '@/lib/config';
+import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -29,11 +28,10 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
     return results;
 };
 
-export const getPageAccessMenuListByRoleType = (roleType: RoleType): PageAccessMenuItem[] => {
-    const globalConfig = config.get('SERVICES') || {};
+export const getPageAccessMenuListByRoleType = (roleType: RoleType, menuList: Menu[]): PageAccessMenuItem[] => {
     const results: PageAccessMenuItem[] = [];
     const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
-    const menuListByVersion = getEnabledMenus(globalConfig);
+    const menuListByVersion = menuList;
     menuListByVersion.forEach((menu) => {
         if (defaultMenuIdsByRoleType.includes(menu.id)) {
             if (menu.id === MENU_ID.WORKSPACE_HOME) return;
