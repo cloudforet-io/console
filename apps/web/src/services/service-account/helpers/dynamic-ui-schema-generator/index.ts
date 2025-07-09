@@ -10,7 +10,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ACCOUNT_STATE_COLOR } from '@/services/service-account/constants/service-account-constant';
 import type { ResourceType, QuerySearchTableLayout } from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
 
-const getCustomTableSchemaKey = (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string) => {
+export const getCustomTableSchemaKey = (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string) => {
     const { userType, userId } = userData;
     return `console:${userType}:${userId}:page-schema:${resourceType}?provider=${provider}:table`;
 };
