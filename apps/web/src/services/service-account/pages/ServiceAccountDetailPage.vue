@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { render } from 'ejs';
 import { clone } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { ServiceAccountGetParameters } from '@/api-clients/identity/service-account/schema/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
-import type { TrustedAccountGetParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/get';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
@@ -25,8 +22,6 @@ import { useAuthorizationStore } from '@/store/authorization/authorization-store
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import ServiceAccountAttachedGeneralAccounts
@@ -40,15 +35,18 @@ import ServiceAccountCredentials
 import ServiceAccountDeleteModal
     from '@/services/service-account/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountEditModal from '@/services/service-account/components/ServiceAccountEditModal.vue';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 import { ADMIN_SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/admin/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 
+
 const router = useRouter();
 
 const props = defineProps<{
-    serviceAccountId?: string;
+    serviceAccountId: string;
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
@@ -59,15 +57,29 @@ const authorizationStore = useAuthorizationStore();
 const route = useRoute();
 
 const referenceMap = useAllReferenceDataModel();
+
+const {
+    serviceAccountData,
+    isLoading,
+    refetch,
+    isTrustedAccount,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
+const {
+    generalAccountSchema,
+    trustedAccountSchema,
+} = useServiceAccountProviderSchema();
+
 const storeState = reactive({
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
-        ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
-        : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
+        ? trustedAccountSchema.value?.options?.external_link
+        : generalAccountSchema.value?.options?.external_link)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
 });
 const state = reactive({
-    loading: true,
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
@@ -78,13 +90,11 @@ const state = reactive({
         return targetMenuId;
     }),
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
-    originServiceAccountItem: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
-    isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
-    providerId: computed(() => state.originServiceAccountItem?.provider),
+    providerId: computed(() => serviceAccountData.value?.provider),
     provider: computed(() => {
-        if (!state.loading) {
+        if (!isLoading.value) {
             return referenceMap.provider[state.providerId] || undefined;
         }
         return undefined;
@@ -94,7 +104,7 @@ const state = reactive({
     isKubernetesAgentMode: computed(() => state.providerKey === 'kubernetes'),
     consoleLink: computed(() => {
         try {
-            if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.originServiceAccountItem);
+            if (storeState.providerExternalLink) return render(storeState.providerExternalLink, serviceAccountData.value);
         } catch (e) {
             console.warn('Failed to render external link. Please check the accountID value.');
             return '';
@@ -103,36 +113,9 @@ const state = reactive({
     }),
     deleteModalVisible: false,
     editModalVisible: false,
-    isManagedTrustedAccount: computed(() => state.originServiceAccountItem.workspace_id === '*'),
+    isManagedTrustedAccount: computed(() => (serviceAccountData.value as TrustedAccountModel)?.workspace_id === '*'),
     isEditable: computed<boolean>(() => state.hasReadWriteAccess && (!state.isManagedTrustedAccount || storeState.isAdminMode)),
 });
-
-/* Api */
-const getAccount = async (serviceAccountId: string) => {
-    state.loading = true;
-    try {
-        let item;
-        if (state.isTrustedAccount) {
-            item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
-                trusted_account_id: serviceAccountId,
-            });
-        } else {
-            item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
-                service_account_id: serviceAccountId,
-            });
-        }
-        serviceAccountPageStore.$patch((_state) => {
-            _state.state.originServiceAccountItem = item;
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        serviceAccountPageStore.$patch((_state) => {
-            _state.state.originServiceAccountItem = {};
-        });
-    } finally {
-        state.loading = false;
-    }
-};
 
 /* Event */
 const handleOpenDeleteModal = () => {
@@ -143,7 +126,8 @@ const handleClickEditButton = () => {
     state.editModalVisible = true;
 };
 const handleRefresh = () => {
-    if (props.serviceAccountId) getAccount(props.serviceAccountId);
+    if (!props.serviceAccountId) return;
+    refetch();
 };
 const handleClickBackbutton = () => {
     router.push({
@@ -151,24 +135,24 @@ const handleClickBackbutton = () => {
     }).catch(() => {});
 };
 
-onMounted(async () => {
-    if (storeState.isWorkspaceMember) return;
-    await serviceAccountPageStore.fetchCostReportConfig();
-});
-
 watch(() => state.providerId, async (providerId) => {
     serviceAccountPageStore.setProvider(providerId ?? '');
-    await serviceAccountSchemaStore.setProviderSchema(providerId ?? '');
+    serviceAccountSchemaStore.setCurrentProvider(providerId ?? '');
 });
 /* Watcher */
 watch(() => props.serviceAccountId, async (serviceAccountId) => {
     if (serviceAccountId) {
         const serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
-        serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountType = serviceAccountType;
-        });
-        await getAccount(serviceAccountId);
+        serviceAccountPageStore.setServiceAccountType(serviceAccountType);
     }
+}, { immediate: true });
+
+watch([
+    () => props.serviceAccountId,
+    () => serviceAccountData.value,
+], ([, serviceAccount]) => {
+    if (!props.serviceAccountId || !serviceAccount) return;
+    serviceAccountPageStore.setOriginServiceAccountItem(serviceAccount);
 }, { immediate: true });
 
 </script>
@@ -177,14 +161,14 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
     <div class="service-account-detail-page">
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading :title="state.originServiceAccountItem.name"
+                <p-heading :title="serviceAccountData?.name ?? ''"
                            show-back-button
                            class="page-title"
                            @click-back-button="handleClickBackbutton"
                 >
                     <template #title-left-extra>
                         <p-lazy-img :src="state.providerIcon"
-                                    :loading="state.loading"
+                                    :loading="isLoading"
                                     error-icon="ic_cloud-filled"
                         />
                     </template>
@@ -219,12 +203,12 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             </template>
         </p-heading-layout>
         <div class="content-wrapper">
-            <service-account-base-information :service-account-loading="state.loading"
+            <service-account-base-information :service-account-loading="isLoading"
                                               :service-account-id="props.serviceAccountId"
                                               :editable="state.isEditable"
                                               @refresh="handleRefresh"
             />
-            <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
+            <service-account-attached-general-accounts v-if="isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
                                                        :has-read-write-access="state.hasReadWriteAccess"
@@ -233,12 +217,12 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                      :service-account-id="props.serviceAccountId"
             />
             <service-account-credentials v-else
-                                         :service-account-loading="state.loading"
                                          :service-account-id="props.serviceAccountId"
                                          :editable="state.isEditable"
                                          @refresh="handleRefresh"
             />
-            <service-account-auto-sync v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
+            <service-account-auto-sync v-if="isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
+                                       :service-account-id="props.serviceAccountId"
                                        :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
@@ -249,16 +233,15 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <!--            />-->
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
-                                      :service-account-type="state.serviceAccountType"
-                                      :service-account-data="state.originServiceAccountItem"
+                                      :service-account-id="props.serviceAccountId"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
                                       :is-agent-mode="state.isKubernetesAgentMode"
         />
-        <service-account-edit-modal v-if="state.originServiceAccountItem?.name"
-                                    :key="state.originServiceAccountItem?.name"
+        <service-account-edit-modal v-if="serviceAccountData?.name ?? ''"
+                                    :key="serviceAccountData?.name ?? ''"
+                                    :service-account-id="props.serviceAccountId"
                                     :visible.sync="state.editModalVisible"
-                                    :is-trusted-account="state.isTrustedAccount"
-                                    :service-account="state.originServiceAccountItem"
+                                    :is-trusted-account="isTrustedAccount"
         />
     </div>
 </template>

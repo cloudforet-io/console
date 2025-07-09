@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg, PStatus, PTooltip, PI,
@@ -21,13 +21,10 @@ import type {
 import type { DynamicLayoutOptions, SearchSchema } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
-import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
-import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
+import type { AccountType, ServiceAccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
@@ -48,26 +45,25 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import AutoSyncState from '@/common/components/badge/auto-sync-state/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import CustomFieldModalForDynamicLayout from '@/common/modules/custom-table/custom-field-modal/CustomFieldModalForDynamicLayout.vue';
 import ProviderButtonList from '@/common/modules/provider-list/ProviderButtonList.vue';
 
 import { gray } from '@/styles/colors';
 
-import {
-    useServiceAccountProviderListQuery,
-} from '@/services/service-account/composables/use-service-account-provider-list-query';
+import { useServiceAccountPaginationQuery } from '@/services/service-account/composables/queries/use-service-account-pagination-query';
+import { useServiceAccountProviderListQuery } from '@/services/service-account/composables/queries/use-service-account-provider-list-query';
+import { useTrustedAccountPaginationQuery } from '@/services/service-account/composables/queries/use-trusted-account-pagination-query';
+import { useAccountTableSchema } from '@/services/service-account/composables/use-account-table-schema';
+import { useServiceAccountCostReportConfig } from '@/services/service-account/composables/use-service-account-cost-report-config';
 import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/service-account/constants/service-account-constant';
 import { convertAgentModeOptions } from '@/services/service-account/helpers/agent-mode-helper';
 import { stateFormatter } from '@/services/service-account/helpers/dynamic-ui-schema-generator';
-import type { QuerySearchTableLayout } from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
 import { ADMIN_SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/admin/route-constant';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 
 const { width } = useWindowSize();
@@ -77,8 +73,6 @@ const route = useRoute();
 const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
-const serviceAccountPageStore = useServiceAccountPageStore();
-const serviceAccountPageGetters = serviceAccountPageStore.getters;
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -91,9 +85,14 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
 
-const storeState = reactive({
-    currency: computed<Currency|undefined>(() => serviceAccountPageGetters.currency),
+const { accountTableSchema, refetch: refetchAccountTableSchema } = useAccountTableSchema({
+    isTrustedAccount: computed(() => serviceAccountSchemaState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
 });
+
+const { data: costReportConfig } = useServiceAccountCostReportConfig();
+
+const currency = computed<Currency|undefined>(() => costReportConfig?.value?.currency);
+
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     selectedProvider: undefined,
@@ -104,34 +103,11 @@ const state = reactive({
     isAgentModeAccount: computed(() => state.selectedProvider === 'kubernetes'),
 });
 
-const { data: providerList } = useServiceAccountProviderListQuery();
-
-/** States for Dynamic Layout(search table type) * */
-const fetchOptionState = reactive({
-    pageStart: 1,
-    pageLimit: 15,
-    sortDesc: true,
-    sortBy: 'created_at',
-    queryTags: queryHelper.setFiltersAsRawQueryString(query.filters).queryTags,
-});
-
-const typeOptionState = reactive({
-    loading: true,
-    totalCount: 0,
-    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
-    selectable: false,
-    colCopy: false,
-    settingsVisible: true,
-});
-
 const tableState = reactive({
     isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    items: [] as ServiceAccountModel[] | TrustedAccountModel[],
-    schema: computed<QuerySearchTableLayout|undefined>(() => (tableState.isTrustedAccount
-        ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
     schemaOptions: computed<DynamicLayoutOptions>(() => {
         // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
-        const _schemaOptions = tableState.schema?.options ?? {};
+        const _schemaOptions = accountTableSchema.value?.options as DynamicLayoutOptions ?? {};
         return state.isAgentModeAccount ? convertAgentModeOptions(_schemaOptions) : _schemaOptions;
     }),
     visibleCustomFieldModal: false,
@@ -157,7 +133,7 @@ const tableState = reactive({
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => serviceAccountSchemaState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
-    adminModeFilter: computed(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
+    adminModeFilter: computed<ConsoleFilter[]>(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALL') as string, name: 'ALL' },
         { label: i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVE') as string, name: SERVICE_ACCOUNT_STATE.ACTIVE },
@@ -165,18 +141,18 @@ const tableState = reactive({
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.PENDING') as string, name: SERVICE_ACCOUNT_STATE.PENDING },
         { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE') as string, name: SERVICE_ACCOUNT_STATE.DELETED },
     ])),
-    selectedType: 'ALL',
+    selectedType: 'ALL' as ServiceAccountType | 'ALL',
 });
 
-const searchFilter = new ApiQueryHelper();
-const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
-    computed<SearchSchema>(() => tableState.schema?.options?.search as unknown as SearchSchema ?? []),
-    'identity.ServiceAccount',
-    computed(() => searchFilter.setFilters([
-        { k: 'provider', v: state.selectedProvider, o: '=' },
-    ]).apiQuery.filter),
-);
-    /** Handling API with SpaceConnector * */
+
+/** States for Dynamic Layout(search table type) * */
+const fetchOptionState = reactive({
+    pageStart: 1,
+    pageLimit: 15,
+    sortDesc: true,
+    sortBy: 'created_at',
+    queryTags: queryHelper.setFiltersAsRawQueryString(query.filters).queryTags,
+});
 
 const apiQuery = new ApiQueryHelper();
 const getQuery = () => {
@@ -184,11 +160,11 @@ const getQuery = () => {
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
-            tableState.selectedType !== 'ALL' && { k: 'state', v: tableState.selectedType, o: '=' },
+            ...(tableState.selectedType !== 'ALL' ? [{ k: 'state', v: tableState.selectedType, o: '=' }] : []) as ConsoleFilter[],
             ...tableState.adminModeFilter,
             ...tableState.searchFilters,
         ]);
-    const fields = tableState.schema?.options?.fields;
+    const fields = accountTableSchema.value?.options?.fields;
     if (fields) {
         apiQuery.setOnly(
             ...fields.map((d) => d.key),
@@ -199,29 +175,70 @@ const getQuery = () => {
     return apiQuery.data;
 };
 
-const listServiceAccountData = async () => {
-    typeOptionState.loading = true;
-    try {
-        let res: ListResponse<TrustedAccountModel> | ListResponse<ServiceAccountModel>;
-        if (tableState.isTrustedAccount) {
-            res = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
-                query: getQuery(),
-            });
-        } else {
-            res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-                query: getQuery(),
-            });
-        }
-        tableState.items = res.results || [];
-        typeOptionState.totalCount = res.total_count ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        tableState.items = [];
-        typeOptionState.totalCount = 0;
-    } finally {
-        typeOptionState.loading = false;
-    }
-};
+const {
+    data: trustedAccountList,
+    totalCount: trustedAccountTotalCount,
+    isLoading: trustedAccountLoading,
+    query: trustedAccountQuery,
+} = useTrustedAccountPaginationQuery({
+    params: computed(() => ({
+        query: getQuery(),
+    })),
+    enabled: computed(() => {
+        console.log('tableState.isTrustedAccount', tableState.isTrustedAccount);
+        return tableState.isTrustedAccount;
+    }),
+    thisPage: computed(() => getThisPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)),
+    pageSize: computed(() => fetchOptionState.pageLimit),
+});
+const {
+    data: serviceAccountList,
+    totalCount: serviceAccountTotalCount,
+    isLoading: serviceAccountLoading,
+    query: serviceAccountQuery,
+} = useServiceAccountPaginationQuery({
+    params: computed(() => ({
+        query: getQuery(),
+    })),
+    enabled: computed(() => !tableState.isTrustedAccount),
+    thisPage: computed(() => getThisPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)),
+    pageSize: computed(() => fetchOptionState.pageLimit),
+});
+
+const accountList = computed(() => {
+    if (tableState.isTrustedAccount) return trustedAccountList.value?.results ?? [];
+    return serviceAccountList.value?.results ?? [];
+});
+const accountTotalCount = computed(() => {
+    if (tableState.isTrustedAccount) return trustedAccountTotalCount.value;
+    return serviceAccountTotalCount.value;
+});
+const accountLoading = computed(() => {
+    if (tableState.isTrustedAccount) return trustedAccountLoading.value;
+    return serviceAccountLoading.value;
+});
+
+
+const { data: providerList } = useServiceAccountProviderListQuery();
+
+
+const typeOptionState = reactive({
+    timezone: computed<string>(() => userStore.state.timezone || 'UTC'),
+    selectable: false,
+    colCopy: false,
+    settingsVisible: true,
+});
+
+
+
+const searchFilter = new ApiQueryHelper();
+const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+    computed<SearchSchema>(() => accountTableSchema.value?.options?.search as unknown as SearchSchema ?? []),
+    'identity.ServiceAccount',
+    computed(() => searchFilter.setFilters([
+        { k: 'provider', v: state.selectedProvider, o: '=' },
+    ]).apiQuery.filter),
+);
 
 /** Change Detection of Main Table * */
 const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
@@ -238,7 +255,6 @@ const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
     if (changed.queryTags !== undefined) {
         fetchOptionState.queryTags = changed.queryTags;
     }
-    listServiceAccountData();
 };
 
 /** API for Excel export * */
@@ -246,7 +262,7 @@ const exportServiceAccountData = async () => {
     await downloadExcel({
         url: `/identity/${tableState.isTrustedAccount ? 'trusted-account' : 'service-account'}/list`,
         param: { query: getQuery() },
-        fields: dynamicFieldsToExcelDataFields(tableState.schema?.options?.fields ?? []),
+        fields: dynamicFieldsToExcelDataFields(accountTableSchema.value?.options?.fields ?? []),
         file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
         timezone: state.timezone,
     });
@@ -273,35 +289,38 @@ const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
 
-const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
+const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaStore.setSelectedAccountType(accountType); };
 const handleClickRow = (index) => {
-    const item = tableState.items[index];
+    const item = accountList.value[index];
     router.push({
         name: state.isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
-        params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
+        params: {
+            serviceAccountId: tableState.isTrustedAccount
+                ? (item as TrustedAccountModel).trusted_account_id
+                : (item as ServiceAccountModel).service_account_id,
+        },
     }).catch(() => {});
 };
 const handleDynamicLayoutFetch = (changed) => {
-    if (tableState.schema === null) return;
+    if (accountTableSchema.value === null) return;
     fetchTableData(changed);
 };
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
 };
-const handleSelectType = async (value: string) => {
+const handleSelectType = async (value: ServiceAccountType | 'ALL') => {
     tableState.selectedType = value;
-    await listServiceAccountData();
 };
 
 /** ******* Page Init ******* */
 
 const reloadTable = async () => {
+    await refetchAccountTableSchema();
     if (tableState.isTrustedAccount) {
-        await serviceAccountSchemaStore.setTrustedAccountTableSchema();
+        await trustedAccountQuery.refetch();
     } else {
-        await serviceAccountSchemaStore.setGeneralAccountTableSchema();
+        await serviceAccountQuery.refetch();
     }
-    await listServiceAccountData();
 };
 
 const replaceQueryHelper = new QueryHelper();
@@ -314,9 +333,9 @@ watch(providerList, (providers) => {
 watch([() => state.selectedProvider, () => state.grantLoading], async ([after], [before]) => {
     if (state.currentGrantInfo.scope === 'USER') return;
     if (after && after !== before) {
-        await serviceAccountSchemaStore.setProviderSchema(after);
+        serviceAccountSchemaStore.setCurrentProvider(after);
         await replaceUrlQuery('provider', after);
-        if (tableState.accountTypeList.length === 1) serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
+        if (tableState.accountTypeList.length === 1) serviceAccountSchemaStore.setSelectedAccountType(tableState.accountTypeList[0].name);
         await reloadTable();
     }
 }, { immediate: true });
@@ -327,19 +346,9 @@ watch(() => tableState.searchFilters, (searchFilters) => {
         replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
     }
 });
-watch([() => serviceAccountSchemaState.selectedAccountType, () => state.grantLoading], () => {
-    if (state.currentGrantInfo.scope === 'USER') return;
-    listServiceAccountData();
-}, { immediate: true });
-
-onMounted(async () => {
-    if (tableState.isWorkspaceMember) return;
-    await serviceAccountPageStore.fetchCostReportConfig();
-});
 
 (async () => {
-    serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
-    if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
+    serviceAccountSchemaStore.setSelectedAccountType(tableState.accountTypeList[0].name);
 })();
 
 </script>
@@ -375,7 +384,7 @@ onMounted(async () => {
                     <p-heading use-total-count
                                class="service-account-table-heading"
                                :title="tableState.tableTitle"
-                               :total-count="typeOptionState.totalCount"
+                               :total-count="accountTotalCount"
                                heading-type="sub"
                     >
                         <template #title-left-extra>
@@ -396,14 +405,16 @@ onMounted(async () => {
                     </p-button>
                 </template>
             </p-heading-layout>
-            <p-dynamic-layout v-if="tableState.schema"
+            <p-dynamic-layout v-if="accountTableSchema"
                               class="service-account-table"
                               type="query-search-table"
                               :options="tableState.schemaOptions"
-                              :data="tableState.items"
+                              :data="accountList"
                               :fetch-options="fetchOptionState"
                               :type-options="{
                                   ...typeOptionState,
+                                  loading: accountLoading,
+                                  totalCount: accountTotalCount,
                                   keyItemSets,
                                   valueHandlerMap,
                               }"
@@ -457,7 +468,7 @@ onMounted(async () => {
                           #col-cost_info-format="{value}"
                 >
                     <p>
-                        <span>{{ CURRENCY_SYMBOL[storeState.currency] }}</span>
+                        <span>{{ CURRENCY_SYMBOL[currency] }}</span>
                         {{ numberFormatter(value?.month) || 0 }}
                     </p>
                 </template>
