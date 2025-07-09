@@ -61,7 +61,6 @@ const referenceMap = useAllReferenceDataModel();
 const {
     serviceAccountData,
     isLoading,
-    refetch,
     isTrustedAccount,
 } = useServiceAccountDetail({
     serviceAccountId: computed(() => props.serviceAccountId),
@@ -125,10 +124,7 @@ const handleOpenDeleteModal = () => {
 const handleClickEditButton = () => {
     state.editModalVisible = true;
 };
-const handleRefresh = () => {
-    if (!props.serviceAccountId) return;
-    refetch();
-};
+
 const handleClickBackbutton = () => {
     router.push({
         name: storeState.isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE._NAME : SERVICE_ACCOUNT_ROUTE._NAME, query: { provider: state.providerKey },
@@ -206,7 +202,6 @@ watch([
             <service-account-base-information :service-account-loading="isLoading"
                                               :service-account-id="props.serviceAccountId"
                                               :editable="state.isEditable"
-                                              @refresh="handleRefresh"
             />
             <service-account-attached-general-accounts v-if="isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
@@ -219,12 +214,10 @@ watch([
             <service-account-credentials v-else
                                          :service-account-id="props.serviceAccountId"
                                          :editable="state.isEditable"
-                                         @refresh="handleRefresh"
             />
             <service-account-auto-sync v-if="isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                                        :service-account-id="props.serviceAccountId"
                                        :editable="state.isEditable"
-                                       @refresh="handleRefresh"
             />
             <!--            TODO: To be implemented after further discussion-->
             <!--            <service-account-usage-overview v-if="!state.isTrustedAccount"-->

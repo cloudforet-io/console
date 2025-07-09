@@ -47,7 +47,6 @@ const {
     serviceAccountData,
     isTrustedAccount,
     isLoading,
-    refetch,
 } = useServiceAccountDetail({
     serviceAccountId: computed(() => props.serviceAccountId),
 });
@@ -135,7 +134,6 @@ const handleClickSaveButton = async () => {
         });
     }
     state.mode = 'READ';
-    await refetch();
 };
 
 const { credentialData, isLoading: isCredentialDataLoading } = useServiceAccountCredentialData({
