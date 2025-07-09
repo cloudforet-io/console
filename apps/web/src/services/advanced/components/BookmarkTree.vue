@@ -6,7 +6,6 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView, PTextButton } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -17,6 +16,7 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/v-shared/tree/type';
@@ -27,8 +27,9 @@ const bookmarkPageState = bookmarkPageStore.state;
 
 const route = useRoute();
 
+const { workspaceListData } = useWorkspaceListQuery();
+
 const storeState = reactive({
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
 });
 
@@ -42,7 +43,7 @@ const state = reactive({
     bookmarkGroupNavigation: computed<Breadcrumb[]>(() => {
         const allPaths: Breadcrumb[] = [];
         if (state.group) {
-            const workspaceItem = storeState.workspaceList.find((item) => item.workspace_id === state.group);
+            const workspaceItem = workspaceListData.value.find((item) => item.workspace_id === state.group);
             allPaths.push({
                 name: state.group === 'global' ? i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : workspaceItem?.name || '',
                 to: {
@@ -85,7 +86,7 @@ const state = reactive({
 });
 
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
-    const workspaceMap: { [key: string]: TreeNode } = storeState.workspaceList.flatMap((item) => item.workspace_id)
+    const workspaceMap: { [key: string]: TreeNode } = workspaceListData.value.flatMap((item) => item.workspace_id)
         .reduce((acc, cur) => {
             acc[cur] = {
                 id: cur,
@@ -208,12 +209,12 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                                  height="0.875rem"
                             />
                             <workspace-logo-icon v-else
-                                                 :text="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.tags?.theme"
+                                                 :text="getWorkspaceInfo(node.data.id, workspaceListData)?.name || ''"
+                                                 :theme="getWorkspaceInfo(node.data.id, workspaceListData)?.tags?.theme"
                                                  size="xxs"
                                                  class="workspace-logo-icon"
                             />
-                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, storeState.workspaceList)?.name || '' }}</span>
+                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, workspaceListData)?.name || '' }}</span>
                         </div>
                         <div v-else
                              class="bookmark"

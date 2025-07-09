@@ -9,7 +9,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
@@ -27,6 +26,7 @@ import {
 import {
     getWorkspaceInfo,
 } from '@/services/advanced/composables/refined-table-data';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
@@ -47,11 +47,12 @@ const bookmarkPageGetters = bookmarkPageStore.getters;
 const route = useRoute();
 const router = useRouter();
 
+const { workspaceListData } = useWorkspaceListQuery();
+
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
@@ -297,7 +298,7 @@ watch(() => route.params, async () => {
                             />
                             <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
                         </div>
-                        <p-link v-else-if="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.state === WORKSPACE_STATE.ENABLE"
+                        <p-link v-else-if="getWorkspaceInfo(item.workspaceId, workspaceListData)?.state === WORKSPACE_STATE.ENABLE"
                                 :to="{
                                     name: WORKSPACE_HOME_ROUTE._NAME,
                                     params: {
@@ -308,20 +309,20 @@ watch(() => route.params, async () => {
                                 new-tab
                                 class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, workspaceListData)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, workspaceListData)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, workspaceListData)?.name }}</span>
                         </p-link>
                         <div v-else
                              class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, workspaceListData)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, workspaceListData)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, workspaceListData)?.name }}</span>
                         </div>
                         <div v-if="item.folder"
                              class="folder-wrapper"

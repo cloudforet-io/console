@@ -12,7 +12,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { SharedConfigListParameters } from '@/api-clients/config/shared-config/schema/api-verbs/list';
 import type { SharedConfigModel } from '@/api-clients/config/shared-config/schema/model';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
@@ -74,6 +73,9 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     });
 
     const mutation = {
+        setWorkspaceList: (workspaceList: WorkspaceModel[]) => {
+            state.workspaceList = workspaceList;
+        },
         setBookmarkListPageStart: (pageStart: number) => {
             state.pageStart = pageStart;
         },
@@ -108,19 +110,6 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             state.pageLimit = 30;
             state.searchFilter = [];
             state.selectedIndices = [];
-        },
-        fetchWorkspaceList: async () => {
-            try {
-                const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-                    query: {
-                        filter: [{ k: 'state', v: 'ENABLED', o: 'eq' }],
-                    },
-                });
-                state.workspaceList = sortBy((results ?? []), (i) => i.name.toLowerCase());
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.workspaceList = [];
-            }
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()

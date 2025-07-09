@@ -25,6 +25,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
@@ -43,8 +44,6 @@ const router = useRouter();
 
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
-
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
@@ -73,8 +72,10 @@ const state = reactive({
         }
         return state.workspaceInfo?.name || '';
     }),
-    workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, storeState.workspaceList)),
+    workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, workspaceListData.value)),
 });
+
+const { workspaceListData } = useWorkspaceListQuery();
 
 const hideMenu = () => {
     state.visibleMenu = false;
