@@ -4,12 +4,13 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
+import { capitalize } from 'lodash';
 
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton, PHeadingLayout,
+    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton, PHeadingLayout, PStatus,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
@@ -31,6 +32,8 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
+
+import { green, gray } from '@/styles/colors';
 
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
 import { useCostReportListQuery } from '@/services/cost-explorer/composables/use-cost-report-list-query';
@@ -74,6 +77,7 @@ const tableState = reactive({
         { label: 'Report Number', name: 'report_number' },
         ...(isAdminMode.value ? [{ label: 'Workspace', name: 'workspace_id' }] : []),
         { label: 'Cost', name: 'cost', textAlign: 'right' },
+        { label: 'Status', name: 'status' },
         { label: ' ', name: 'extra' },
     ],
     keyItemSets: [
@@ -106,6 +110,16 @@ const getCustomPeriodText = (start?: string, end?: string): string => {
     const startDate = dayjs.utc(start);
     const endDate = dayjs.utc(end);
     return `${startDate.format('MMM YYYY')} ~ ${endDate.format('MMM YYYY')}`;
+};
+const getStatusIcon = (status: string): string => {
+    if (status === 'DONE') return 'ic_check';
+    if (status === 'EXPIRED') return 'ic_limit-filled';
+    return 'ic_peacock-gradient-circle';
+};
+const getStatusIconColor = (status: string): string | undefined => {
+    if (status === 'DONE') return green[500];
+    if (status === 'EXPIRED') return gray[400];
+    return undefined;
 };
 
 /* Event */
@@ -167,7 +181,11 @@ const { costReportListData, isLoading: isCostReportListLoading, totalCount } = u
     params: computed<CostReportListParameters>(() => {
         costReportListApiQueryHelper.setFilters(queryTagHelper.filters.value);
         costReportListApiQueryHelper.addFilter({ k: 'cost_report_config_id', v: costReportPageState.costReportConfig?.cost_report_config_id || '', o: '=' });
-        costReportListApiQueryHelper.addFilter({ k: 'status', v: ['DONE'], o: '=' });
+        if (!isAdminMode.value) {
+            costReportListApiQueryHelper.setFilters([
+                { k: 'status', v: ['DONE'], o: '' },
+            ]);
+        }
         return {
             query: {
                 ...costReportListApiQueryHelper.data,
@@ -246,15 +264,19 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                     </template>
                 </p-heading-layout>
             </template>
-            <template #col-workspace_id-format="{value}">
-                {{ workspaces[value]?.name || value }}
-            </template>
-            <template #col-issue_date-format="{value}">
-                <div class="date-text">
-                    {{ value }}
+            <template #col-workspace_id-format="{value, item}">
+                <div :class="{ 'expired-row': item.status === 'EXPIRED' }">
+                    {{ workspaces[value]?.name || value }}
                 </div>
-                <div class="date-range-text">
-                    {{ getDateRangeText(value) }}
+            </template>
+            <template #col-issue_date-format="{value, item}">
+                <div :class="{ 'expired-row': item.status === 'EXPIRED' }">
+                    <div class="date-text">
+                        {{ value }}
+                    </div>
+                    <div class="date-range-text">
+                        {{ getDateRangeText(value) }}
+                    </div>
                 </div>
             </template>
             <template #col-report_number-format="{value, item}">
@@ -273,9 +295,17 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                 </p-text-button>
             </template>
             <template #col-cost-format="{value, item}">
-                <span class="currency-symbol">{{ CURRENCY_SYMBOL[item.currency] }}</span>
-                <span class="text">{{ currencyMoneyFormatter(value[item.currency], { currency: state.currency, style: 'decimal' }) || 0 }}</span>
-                <span class="currency-text">{{ item.currency }}</span>
+                <div :class="{ 'expired-row': item.status === 'EXPIRED' }">
+                    <span class="currency-symbol">{{ CURRENCY_SYMBOL[item.currency] }}</span>
+                    <span class="text">{{ currencyMoneyFormatter(value[item.currency], { currency: state.currency, style: 'decimal' }) || 0 }}</span>
+                    <span class="currency-text">{{ item.currency }}</span>
+                </div>
+            </template>
+            <template #col-status-format="{value}">
+                <p-status :icon="getStatusIcon(value)"
+                          :icon-color="getStatusIconColor(value)"
+                          :text="capitalize(value)"
+                />
             </template>
             <template #col-extra-format="{item}">
                 <div v-if="item.status === 'DONE'"
@@ -348,6 +378,9 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
     .report-link {
         @apply flex items-center text-blue-700;
         gap: 0.25rem;
+    }
+    .expired-row {
+        opacity: 0.4;
     }
 }
 

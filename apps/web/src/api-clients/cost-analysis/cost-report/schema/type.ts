@@ -1,1 +1,1 @@
-export type CostReportStatus = 'IN_PROGRESS' | 'ADJUSTING' | 'DONE';
+export type CostReportStatus = 'IN_PROGRESS' | 'ADJUSTING' | 'DONE' | 'EXPIRED';
