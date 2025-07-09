@@ -74,7 +74,7 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
     requiredScopes: [GrantScope, ...GrantScope[]],
 ) => {
     const queryClient = useQueryClient();
-    const { thisPage, pageSize, verb } = pageOptions;
+    const { thisPage, pageSize, verb = 'list' } = pageOptions;
     const {
         queryFn, params, initialPageParam = 1, ...restOptions
     } = options;
@@ -99,10 +99,6 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
             if (verb === 'analyze') return lastPage?.more ? loadedCount + 1 : undefined;
             return loadedCount < (lastPage?.total_count || 0) ? loadedCount + 1 : undefined;
         },
-        // getPreviousPageParam: (firstPage, allPages) => {
-        //     const prevStart = allPages[0]?.results?.length ?? 0;
-        //     return prevStart > 1 ? Math.max(1, prevStart - pageSize.value) : undefined;
-        // },
     }, requiredScopes);
 
     // Watches the `thisPage` ref and automatically fetches all pages up to that index

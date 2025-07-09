@@ -2,6 +2,8 @@
 import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
+import { cloneDeep } from 'lodash';
+
 import {
     PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
 } from '@cloudforet/mirinae';
@@ -183,21 +185,18 @@ const { data: cloudServiceTableSchemaWithIncludeOptionalFields, isFetching: isFe
 });
 
 const { data: cloudServiceTableSchemaWithoutIncludeOptionalFields, isFetching: isFetchingCloudServiceTableSchemaWithoutIncludeOptionalFields } = useCloudServicePageSchemaGetQuery({
-    params: computed(() => {
-        console.debug('[[[[FALSEFLASES params]]]]');
-        return {
-            resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType ?? '',
-            schema: 'table',
-            options: {
-                provider: props.options?.provider,
-                cloud_service_group: props.options?.cloudServiceGroup,
-                cloud_service_type: props.options?.cloudServiceType,
-                include_workspace_info: props.options?.include_workspace_info,
-                include_optional_fields: false,
-                isAdminMode: appContextGetters.isAdminMode,
-            },
-        };
-    }),
+    params: computed(() => ({
+        resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType ?? '',
+        schema: 'table',
+        options: {
+            provider: props.options?.provider,
+            cloud_service_group: props.options?.cloudServiceGroup,
+            cloud_service_type: props.options?.cloudServiceType,
+            include_workspace_info: props.options?.include_workspace_info,
+            include_optional_fields: false,
+            isAdminMode: appContextGetters.isAdminMode,
+        },
+    })),
     enabled: computed(() => !state.isServiceAccountTable || !props.resourceType),
 });
 
@@ -220,7 +219,7 @@ const schemaDataExcludeOptionalFields = computed<QuerySearchTableLayout| undefin
         isTrustedAccount: props.resourceType === 'identity.TrustedAccount',
         isAdminMode: appContextGetters.isAdminMode,
     });
-    if (serviceAccountTableSchema.value?.provider && customTableSchema.value) schema = customTableSchema.value;
+    if (serviceAccountTableSchema.value?.provider && customTableSchema.value) schema = cloneDeep(customTableSchema.value);
     if (schema.options) schema.options.search = getDefaultSearchSchema(fields, props.resourceType === 'identity.TrustedAccount').search;
     if (props.options?.provider === 'kubernetes') schema.options = convertAgentModeOptions(schema.options as DynamicLayoutOptions);
     return schema;
@@ -258,13 +257,7 @@ const { updateCustomTableSchema: updateCustomTableSchemaMutation, isPending: isP
     provider: computed(() => props.options.provider ?? ''),
 });
 
-const { mutateAsync: updateCloudServicePageSchema, isPending: isPendingUpdateCloudServicePageSchema } = useCloudServicePageSchemaUpdateMutation({
-    onSuccess: () => {
-        showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
-        emit('complete');
-        state.proxyVisible = false;
-    },
-});
+const { mutateAsync: updateCloudServicePageSchema, isPending: isPendingUpdateCloudServicePageSchema } = useCloudServicePageSchemaUpdateMutation();
 const updatePageSchema = async () => {
     const data: QuerySearchTableLayout = {
         ...(schemaDataExcludeOptionalFields.value ?? {}),
