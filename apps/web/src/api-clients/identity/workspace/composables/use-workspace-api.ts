@@ -5,6 +5,8 @@ import type { WorkspaceAddPackageParameters } from '@/api-clients/identity/works
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceCreateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/create';
 import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/schema/api-verbs/delete';
+import type { WorkspaceDisableParameters } from '@/api-clients/identity/workspace/schema/api-verbs/disable';
+import type { WorkspaceEnableParameters } from '@/api-clients/identity/workspace/schema/api-verbs/enable';
 import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceRemovePackageParameters } from '@/api-clients/identity/workspace/schema/api-verbs/remove-package';
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
@@ -15,6 +17,8 @@ export const useWorkspaceApi = () => {
         create: SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>,
         update: SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters, WorkspaceModel>,
         delete: SpaceConnector.clientV2.identity.workspace.delete<WorkspaceDeleteParameters>,
+        enable: SpaceConnector.clientV2.identity.workspace.enable<WorkspaceEnableParameters>,
+        disable: SpaceConnector.clientV2.identity.workspace.disable<WorkspaceDisableParameters>,
         list: SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>,
         addPackage: SpaceConnector.clientV2.identity.workspace.addPackage<WorkspaceAddPackageParameters, WorkspaceModel>,
         removePackage: SpaceConnector.clientV2.identity.workspace.removePackage<WorkspaceRemovePackageParameters, WorkspaceModel>,

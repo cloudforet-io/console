@@ -26,8 +26,12 @@
 
 export const API_DOC = {
     'add-ons': {
+        autocomplete: [
+            'distinct',
+        ],
         'page-schema': [
             'get',
+            'update',
         ],
     },
     'alert-manager': {
@@ -462,6 +466,8 @@ export const API_DOC = {
             'change-workspace-group',
             'create',
             'delete',
+            'disable',
+            'enable',
             'list',
             'remove-package',
             'update',
@@ -520,10 +526,11 @@ export const API_DOC = {
             'update',
         ],
         'collector-rule': [
-            'list',
             'change-order',
             'create',
             'delete',
+            'get',
+            'list',
             'update',
         ],
         job: [
@@ -541,15 +548,16 @@ export const API_DOC = {
             'run',
             'update',
         ],
+        'metric-data': [
+            'analyze',
+            'list',
+        ],
         'metric-example': [
             'create',
             'delete',
             'get',
             'list',
             'update',
-        ],
-        'metric-data': [
-            'analyze',
         ],
         namespace: [
             'get',
