@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PDoubleCheckModal, PButtonModal, PLink, PStatus,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/schema/api-verbs/delete';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
@@ -49,15 +52,26 @@ const state = reactive({
     isSyncedAccount: computed(() => storeState.selectedWorkspace?.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
 });
 
-const handleConfirm = async () => {
-    try {
-        await SpaceConnector.clientV2.identity.workspace.delete<WorkspaceDeleteParameters>({
-            workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
-        });
-        state.proxyVisible = false;
-    } catch (e) {
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { mutate: deleteWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceDeleteParameters) => workspaceAPI.delete(params),
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+    },
+    onError: (e) => {
         ErrorHandler.handleError(e, true);
-    }
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+
+const handleConfirm = () => {
+    deleteWorkspaceMutation({
+        workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
+    });
 };
 </script>
 

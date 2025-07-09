@@ -90,7 +90,6 @@ const validationState = reactive({
 const queryClient = useQueryClient();
 const { workspaceAPI } = useWorkspaceApi();
 const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
-
 const { mutate: createWorkspaceMutation } = useMutation({
     mutationFn: (params: WorkspaceCreateParameters) => workspaceAPI.create(params),
     onSuccess: async (data) => {
