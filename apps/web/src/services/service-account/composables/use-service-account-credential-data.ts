@@ -1,8 +1,8 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { useServiceAccountSecretQuery } from './queries/use-service-account-secret-query';
-import { useServiceAccountTrustedSecretQuery } from './queries/use-service-account-trusted-secret-query';
+import { useServiceAccountSecretQuery } from '@/services/service-account/composables/queries/use-service-account-secret-query';
+import { useServiceAccountTrustedSecretQuery } from '@/services/service-account/composables/queries/use-service-account-trusted-secret-query';
 
 interface UseServiceAccountCredentialDataOptions {
     secretId: ComputedRef<string|undefined>;
