@@ -24,8 +24,8 @@ import ServiceAccountBaseInformationDetail
     from '@/services/service-account/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/service-account/components/ServiceAccountBaseInformationForm.vue';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
-import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 import type {
     BaseInformationForm, PageMode,
 } from '@/services/service-account/types/service-account-page-type';
@@ -43,15 +43,19 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'refresh'): void; }>();
-const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
+
+const {
+    generalAccountSchema,
+    trustedAccountSchema,
+} = useServiceAccountProviderSchema();
 
 interface State {
     loading: boolean;
     isTrustedAccount: ComputedRef<boolean>;
     mode: PageMode;
     isFormValid: ComputedRef<boolean|undefined>;
-    baseInformationSchema: ComputedRef<Partial<SchemaModel>>;
+    baseInformationSchema: ComputedRef<SchemaModel|undefined>;
     baseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
 }
 const state = reactive<State>({
@@ -60,7 +64,7 @@ const state = reactive<State>({
     mode: 'READ',
     isFormValid: computed(() => serviceAccountPageStore.formState.isBaseInformationFormValid),
     // baseInformationSchema: {},
-    baseInformationSchema: computed(() => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema)),
+    baseInformationSchema: computed(() => (state.isTrustedAccount ? trustedAccountSchema.value : generalAccountSchema.value)),
     baseInformationForm: computed(() => serviceAccountPageStore.formState.baseInformation),
 });
 
@@ -136,11 +140,13 @@ const handleChangeForm = (form) => {
         </p-heading-layout>
         <div class="content-wrapper">
             <service-account-base-information-detail v-show="state.mode === 'READ'"
+                                                     :service-account-id="props.serviceAccountId"
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
                                                    mode="UPDATE"
                                                    :schema="state.baseInformationSchema.schema"
+                                                   :service-account-id="props.serviceAccountId"
                                                    @change="handleChangeForm"
             />
             <div v-if="state.mode === 'UPDATE'"

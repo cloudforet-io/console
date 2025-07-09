@@ -3,15 +3,10 @@ import { computed, reactive, watch } from 'vue';
 
 import { isEmpty, isEqual } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PJsonSchemaForm, PTextInput,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
-import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
-import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -22,25 +17,43 @@ import type { Tag } from '@/common/modules/tags/type';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
 import ServiceAccountProjectForm from '@/services/service-account/components/ServiceAccountProjectForm.vue';
+import { useServiceAccountListQuery } from '@/services/service-account/composables/queries/use-service-account-list-query';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 import type { BaseInformationForm, ProjectForm } from '@/services/service-account/types/service-account-page-type';
-
-
 
 interface Props {
     schema: any;
     mode: 'CREATE' | 'UPDATE';
+    serviceAccountId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     schema: () => ({}),
     mode: 'CREATE',
+    serviceAccountId: undefined,
 });
 
 const userStore = useUserStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
-const serviceAccountPageGetters = serviceAccountPageStore.getters;
 
+
+const {
+    serviceAccountData,
+    isTrustedAccount,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
+const {
+    data: serviceAccountList,
+} = useServiceAccountListQuery({
+    params: computed(() => ({
+        query: { only: ['name'] },
+    })),
+});
+
+const serviceAccountNames = computed(() => serviceAccountList.value?.map((v) => v.name) ?? []);
 const {
     forms: { serviceAccountName },
     invalidState,
@@ -52,7 +65,7 @@ const {
     serviceAccountName: (val: string) => {
         if (val?.length < 2) {
             return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
-        } if (state.serviceAccountNames.includes(val)) {
+        } if (serviceAccountNames.value.includes(val)) {
             if (state.originForm?.accountName === val) return true;
             return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
         }
@@ -61,17 +74,15 @@ const {
 });
 const state = reactive({
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
-    originServiceAccountData: computed<Partial<TrustedAccountModel & ServiceAccountModel>>(() => serviceAccountPageStore.state.originServiceAccountItem),
     originForm: computed(() => ({
-        accountName: state.originServiceAccountData?.name,
-        customSchemaForm: state.originServiceAccountData?.data,
-        tags: state.originServiceAccountData?.tags,
-        serviceAccountManagerId: state.originServiceAccountData?.service_account_mgr_id,
-        ...((!serviceAccountPageGetters.isTrustedAccount && state.originServiceAccountData && ('project_id' in state.originServiceAccountData)) && {
-            projectForm: { selectedProjectId: state.originServiceAccountData?.project_id ?? '' },
+        accountName: serviceAccountData.value?.name,
+        customSchemaForm: serviceAccountData.value?.data,
+        tags: serviceAccountData.value?.tags,
+        serviceAccountManagerId: serviceAccountData.value?.service_account_mgr_id,
+        ...((!isTrustedAccount.value && serviceAccountData.value && ('project_id' in serviceAccountData.value)) && {
+            projectForm: { selectedProjectId: serviceAccountData.value?.project_id ?? '' },
         }),
     })),
-    serviceAccountNames: [] as string[],
     customSchemaForm: {},
     isCustomSchemaFormValid: undefined,
     tags: {},
@@ -83,13 +94,13 @@ const state = reactive({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
         serviceAccountManagerId: state.serviceAccountManagerId,
-        ...(!serviceAccountPageGetters.isTrustedAccount && { projectForm: state.projectForm }),
+        ...(!isTrustedAccount.value && { projectForm: state.projectForm }),
         tags: state.tags,
     })),
     isSameValueWithOrigin: computed(() => isEqual(state.formData, state.originForm)),
     isAllValid: computed(() => ((invalidState.serviceAccountName === false)
         && !state.isSameValueWithOrigin
-        && (serviceAccountPageGetters.isTrustedAccount ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
+        && (isTrustedAccount.value ? true : (state.isProjectFormValid || state.originForm?.projectForm?.selectedProjectId))
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
     language: computed<string|undefined>(() => userStore.state.language),
@@ -104,16 +115,6 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
     state.isCustomSchemaFormValid = true;
     state.projectForm.selectedProjectId = originForm?.projectForm?.selectedProjectId;
     state.serviceAccountManagerId = originForm?.serviceAccountManagerId ?? '';
-};
-
-/* Api */
-const listServiceAccounts = async () => {
-    const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-        query: {
-            only: ['name'],
-        },
-    });
-    state.serviceAccountNames = (results ?? []).map((v) => v.name);
 };
 
 /* Event */
@@ -141,11 +142,6 @@ const handleFormatSelectedIds = (value: Record<string, any>) => {
         state.serviceAccountManagerId = '';
     }
 };
-
-/* Init */
-(async () => {
-    await listServiceAccounts();
-})();
 
 /* Watcher */
 watch(() => state.isAllValid, (isAllValid) => {
@@ -181,7 +177,7 @@ watch(() => state.originForm, (originForm) => {
                 />
             </template>
         </p-field-group>
-        <p-field-group v-if="!serviceAccountPageGetters.isTrustedAccount"
+        <p-field-group v-if="!isTrustedAccount"
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SERVICE_ACCOUNT_MANAGER')"
         >
             <user-select-dropdown class="account-name block"
@@ -200,7 +196,7 @@ watch(() => state.originForm, (originForm) => {
                             :language="state.language"
                             @validate="handleAccountValidate"
         />
-        <p-field-group v-if="!serviceAccountPageGetters.isTrustedAccount"
+        <p-field-group v-if="!isTrustedAccount"
                        class="project-field"
                        required
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
