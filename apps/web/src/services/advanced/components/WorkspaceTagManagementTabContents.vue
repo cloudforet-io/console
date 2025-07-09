@@ -22,6 +22,7 @@ import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vu
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
+const workspacePageState = workspacePageStore.state;
 
 interface TableItem {
     project_id?: string;
@@ -43,7 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     items: [] as TableItem[],
-    selectedWorkspace: computed(() => workspacePageStore.selectedWorkspace),
+    selectedWorkspace: computed(() => workspacePageState.selectedWorkspace),
     sortBy: 'key',
     sortDesc: true,
     tags: {} as Tags,

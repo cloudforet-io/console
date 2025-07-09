@@ -25,6 +25,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/top-bar/constants/constant';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 
 interface Props {
@@ -42,7 +43,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
+const workspacePageState = workspacePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const bookmarkStore = useBookmarkStore();
 
@@ -61,23 +62,22 @@ const state = reactive({
 const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
-            const isChanged = state.name !== workspacePageStore.selectedWorkspace.name
-                || state.description !== workspacePageStore.selectedWorkspace.tags?.description
-                || state.selectedTheme !== workspacePageStore.selectedWorkspace.tags?.theme;
+            const isChanged = state.name !== workspacePageState.selectedWorkspace.name
+                || state.description !== workspacePageState.selectedWorkspace.tags?.description
+                || state.selectedTheme !== workspacePageState.selectedWorkspace.tags?.theme;
             return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
         }
         return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
     }),
-    // TODO: 중복 체크 로직 추가
     isDuplicatedName: computed(() => {
         if (props.createType === 'EDIT') {
-            return workspacePageState.workspaces.filter((workspace) => workspace.name !== workspacePageStore.selectedWorkspace.name).some((workspace) => workspace.name === state.name);
+            return workspaceListData.value.filter((workspace) => workspace.name !== workspacePageState.selectedWorkspace.name).some((workspace) => workspace.name === state.name);
         }
-        return workspacePageState.workspaces.some((workspace) => workspace.name === state.name);
+        return workspaceListData.value.some((workspace) => workspace.name === state.name);
     }),
     nameInvalidText: computed(() => {
         if (props.createType === 'EDIT') {
-            if (state.name === workspacePageStore.selectedWorkspace.name) return undefined;
+            if (state.name === workspacePageState.selectedWorkspace.name) return undefined;
         }
         if (!state.name?.trim()) return i18n.t('IAM.WORKSPACES.FORM.REQUIRED_NAME');
         if (validationState.isDuplicatedName) return i18n.t('IAM.WORKSPACES.FORM.DUPLICATED_NAME');
@@ -90,6 +90,7 @@ const validationState = reactive({
 const queryClient = useQueryClient();
 const { workspaceAPI } = useWorkspaceApi();
 const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { workspaceListData } = useWorkspaceListQuery();
 const { mutate: createWorkspaceMutation } = useMutation({
     mutationFn: (params: WorkspaceCreateParameters) => workspaceAPI.create(params),
     onSuccess: async (data) => {
@@ -133,10 +134,10 @@ const handleClickTheme = (theme: string) => {
 const handleConfirm = async () => {
     if (props.createType === 'EDIT') {
         await updateWorkspaceMutation({
-            workspace_id: workspacePageStore.selectedWorkspace.workspace_id,
+            workspace_id: workspacePageState.selectedWorkspace.workspace_id,
             name: state.name ?? '',
             tags: {
-                ...workspacePageStore.selectedWorkspace.tags,
+                ...workspacePageState.selectedWorkspace.tags,
                 description: state.description ?? '',
                 theme: state.selectedTheme ?? 'blue',
             },
@@ -159,9 +160,9 @@ watch(() => props.visible, (visible) => {
         state.description = '';
         state.selectedTheme = 'blue';
     } else {
-        state.name = workspacePageStore.selectedWorkspace.name;
-        state.description = workspacePageStore.selectedWorkspace.tags?.description ?? '';
-        state.selectedTheme = workspacePageStore.selectedWorkspace.tags?.theme ?? 'blue';
+        state.name = workspacePageState.selectedWorkspace.name;
+        state.description = workspacePageState.selectedWorkspace.tags?.description ?? '';
+        state.selectedTheme = workspacePageState.selectedWorkspace.tags?.theme ?? 'blue';
     }
 }, { immediate: true });
 

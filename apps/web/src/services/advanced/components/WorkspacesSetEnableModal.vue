@@ -16,6 +16,8 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -39,6 +41,7 @@ const emit = defineEmits<{(e: ':update:visible'): void,
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
+const workspacePageState = workspacePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 
@@ -60,7 +63,7 @@ const state = reactive({
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
-    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspace),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageState.selectedWorkspace),
 });
 
 const queryClient = useQueryClient();
@@ -70,6 +73,9 @@ const { mutate: enableWorkspaceMutation, isPending: isEnableWorkspacePending } =
     mutationFn: (params: WorkspaceEnableParameters) => workspaceAPI.enable(params),
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_ENABLE_WORKSPACE'), '');
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
         state.proxyVisible = false;
     },
     onError: (e) => {
@@ -84,6 +90,9 @@ const { mutate: disableWorkspaceMutation, isPending: isDisableWorkspacePending }
     mutationFn: (params: WorkspaceDisableParameters) => workspaceAPI.disable(params),
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_DISABLE_WORKSPACE'), '');
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
         state.proxyVisible = false;
     },
     onError: (e) => {

@@ -19,7 +19,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
+const workspacePageState = workspacePageStore.state;
 
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => ([

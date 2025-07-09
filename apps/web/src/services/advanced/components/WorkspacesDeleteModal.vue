@@ -14,6 +14,8 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -35,9 +37,10 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
+const workspacePageState = workspacePageStore.state;
 
 const storeState = reactive({
-    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspace),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageState.selectedWorkspace),
 });
 
 const referenceMap = useAllReferenceDataModel();
@@ -59,6 +62,9 @@ const { mutate: deleteWorkspaceMutation } = useMutation({
     mutationFn: (params: WorkspaceDeleteParameters) => workspaceAPI.delete(params),
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        showSuccessMessage(_i18n.t('IAM.WORKSPACES.ALT_S_DELETE_WORKSPACE'), '');
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
     },
     onError: (e) => {
         ErrorHandler.handleError(e, true);
