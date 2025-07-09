@@ -34,6 +34,7 @@ class IamConfigurator implements FeatureConfigurator {
     }
 
     getMenu(config?: GlobalServiceConfig): GeneratedMenuConfig {
+        const isEnabledAlertManager = config?.ALERT_MANAGER?.ENABLED;
         const alertManagerVersion = config?.ALERT_MANAGER?.VERSION;
         const baseMenu: Menu = {
             id: MENU_ID.IAM,
@@ -53,7 +54,7 @@ class IamConfigurator implements FeatureConfigurator {
             { id: MENU_ID.ROLE },
         ];
 
-        if (alertManagerVersion === 'V2') {
+        if (isEnabledAlertManager && alertManagerVersion === 'V2') {
             workspaceSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP, needPermissionByRole: true });
             adminSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP });
         }
