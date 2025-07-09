@@ -51,8 +51,8 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    selectedUser: computed<UserListItemType>(() => userPageState.selectedUsers[0]),
-    selectedUserId: computed<string>(() => userPageState.selectedUserIds[0]),
+    selectedUser: computed<UserListItemType>(() => userPageState.selectedUsers[0] ?? {}),
+    selectedUserId: computed<string>(() => userPageState.selectedUserIds[0] ?? ''),
     isWorkspaceGroupUser: computed<boolean>(() => !!props.selectedUser?.role_binding_info?.workspace_group_id),
 });
 

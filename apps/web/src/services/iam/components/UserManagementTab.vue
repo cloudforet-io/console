@@ -138,10 +138,6 @@ const dropdownState = reactive({
 const { roleAPI } = useRoleApi();
 const roleListApiQueryHelper = new ApiQueryHelper();
 
-watch(() => userPageState.selectedUsers, (val) => {
-    selectedUsers.value = val;
-}, { immediate: true });
-
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     dropdownState.loading = true;
 
@@ -211,6 +207,11 @@ const handleSelectDropdownItem = async (value, rowIndex:number) => {
         };
     });
 };
+
+/* Watch */
+watch(() => userPageState.selectedUsers, (val) => {
+    selectedUsers.value = val;
+}, { immediate: true });
 </script>
 
 <template>

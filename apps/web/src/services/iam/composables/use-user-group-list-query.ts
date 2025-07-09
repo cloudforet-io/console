@@ -16,6 +16,7 @@ export const useUserGroupListQuery = ({ params }: { params: ComputedRef<UserGrou
     const { data: userGroupListData, isFetching: userGroupListFetching } = useScopedQuery({
         queryKey: userGroupListQueryKey,
         queryFn: () => userGroupAPI.list(userGroupListQueryParams.value),
+        select: (data) => data.results ?? [],
         initialData: {
             results: [],
             total_count: 0,
