@@ -37,6 +37,7 @@ export const useReferenceDataModel = <T extends Record<string, any>, R extends R
     });
 
     const { referenceMapRefs } = useReferenceReactiveCache(queryKey, referenceAdaptor);
+
     const referenceMap = makeReferenceProxy<Record<string, R|undefined>>({}, (_, id: string) => {
         if (!(id in referenceMapRefs)) {
             referenceMapRefs[id] = ref(undefined);

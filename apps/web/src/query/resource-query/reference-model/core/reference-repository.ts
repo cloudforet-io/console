@@ -47,7 +47,6 @@ class ReferenceRepository<T extends Record<string, any>> {
         });
     }
 
-
     private getFetchAndCache() {
         const _queryClient = this.queryClient;
         const _queryKey = this.queryKey;
@@ -58,7 +57,6 @@ class ReferenceRepository<T extends Record<string, any>> {
             const idsToFetch = ids.filter((id) => !cachedIds.has(id));
 
             if (idsToFetch.length === 0) return;
-
 
             try {
                 const params = {

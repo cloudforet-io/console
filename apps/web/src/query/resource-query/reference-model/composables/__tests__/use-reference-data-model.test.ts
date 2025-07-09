@@ -58,7 +58,6 @@ describe('useReferenceDataModel', () => {
     it('should fetch reference data when the reference data is not in the cache', async () => {
         mockListFetcher.mockResolvedValue({ results: [{ project_id: MOCK_PROJECT_ID }] });
 
-
         const div = document.createElement('div');
         div.id = 'root';
         document.body.appendChild(div);
@@ -88,11 +87,9 @@ describe('useReferenceDataModel', () => {
             attachTo: '#root',
         });
 
-
         await vi.advanceTimersByTimeAsync(500);
 
         await localVue.nextTick();
-
 
         expect(mockListFetcher).toHaveBeenCalledTimes(1);
         expect(mockListFetcher).toHaveBeenCalledWith(expect.objectContaining({
