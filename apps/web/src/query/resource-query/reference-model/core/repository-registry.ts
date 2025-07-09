@@ -1,4 +1,5 @@
-import type { QueryClient } from '@tanstack/query-core/build/modern';
+
+import type { QueryClient } from '@tanstack/query-core';
 
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
@@ -7,9 +8,7 @@ import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type'
 import ReferenceRepository from '@/query/resource-query/reference-model/core/reference-repository';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
-
-
-const repositoryRegistry = new Map<Record<string, ReferenceRepository>>();
+const repositoryRegistry = new Map<ResourceKeyType, ReferenceRepository<any>>();
 
 
 export const getRepository = <T extends Record<string, any>>(
