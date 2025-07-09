@@ -22,6 +22,7 @@ export const useServiceAccountProviderListQuery = () => {
             const ADMIN_MODE_PROVIDER_KEYS = ['aws', 'google_cloud', 'azure'];
             return providers.filter((item) => ADMIN_MODE_PROVIDER_KEYS.includes(item.provider));
         },
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 1,
     }, ['DOMAIN', 'WORKSPACE']);
 };
