@@ -1,41 +1,48 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive, watchEffect,
+    ref, watch,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PStatus, PButtonModal, PDataTable, PBadge,
+    PButtonModal, PDataTable, PBadge, PStatus,
 } from '@cloudforet/mirinae';
 
-import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
 import type { UserDeleteParameters } from '@/api-clients/identity/user/schema/api-verbs/delete';
 import type { UserDisableParameters } from '@/api-clients/identity/user/schema/api-verbs/disable';
 import type { UserEnableParameters } from '@/api-clients/identity/user/schema/api-verbs/enable';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleBindingDeleteMutation } from '@/services/iam/composables/use-role-binding-delete-mutation';
 import { useServiceListQuery } from '@/services/iam/composables/use-service-list-query';
+import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
+import { useWorkspaceUserListQuery } from '@/services/iam/composables/use-workspace-user-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
+
+import { useRoleFormatter, userStateFormatter } from '../composables/refined-table-data';
+
 
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 
+const selectedOnlyWorkspaceUsers = ref<UserListItemType[] | any[]>([]);
+
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const storeState = reactive({
-    selectedUsers: computed(() => userPageGetters.selectedUsers),
-});
+const { data: workspaceUserList } = useWorkspaceUserListQuery();
 
 const state = reactive({
     loading: false,
@@ -59,13 +66,46 @@ const state = reactive({
     filteredServices: undefined,
     filteredItems: [],
     filteredUniqueItems: [],
+    selectedOnlyWorkspaceUsers,
 });
+
+watch(
+    [
+        () => workspaceUserList.value,
+        () => userGroupListData.value,
+        () => state.filteredUniqueItems,
+        () => serviceListQuery.data.value,
+    ],
+    ([workspaceUsers, userGroups, filteredItems, serviceList]) => {
+        if (!workspaceUsers || !userGroups || !filteredItems?.length || !serviceList) return;
+
+        selectedOnlyWorkspaceUsers.value = workspaceUsers
+            .filter((user) => !user.role_binding_info?.workspace_group_id
+                && filteredItems.map((item: any) => item.user_id).includes(user.user_id))
+            .map((user) => {
+                const userServiceNames: string[] = [];
+                Object.values(serviceList).forEach((service: any) => {
+                    if (service?.members?.USER?.includes(user.user_id)) {
+                        userServiceNames.push(service.name);
+                    }
+                });
+                return {
+                    ...user,
+                    user_group: userGroups
+                        .filter((group) => group.users?.includes(user.user_id ?? ''))
+                        .map((group) => group.name),
+                    service: userServiceNames,
+                };
+            });
+    },
+    { immediate: true, deep: true },
+);
 
 /* Component */
 const checkModalConfirm = async () => {
     let responses: boolean[] = [];
     let languagePrefix = 'DELETE';
-    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
+    const items = state.isRemoveOnlyWorkspace ? state.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
     state.loading = true;
 
     try {
@@ -108,11 +148,22 @@ const handleClose = () => {
     });
 };
 
+const queryClient = useQueryClient();
+const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
+
+const { mutate: deleteRoleBinding } = useRoleBindingDeleteMutation({
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        userPageStore.setSelectedIndices([]);
+    },
+});
+
 /* API */
+// TODO: need to refactor
 const removeUser = async (role_binding_id?: string): Promise<boolean> => {
     try {
         if (!role_binding_id) return false;
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
+        deleteRoleBinding({
             role_binding_id,
         });
         return true;
@@ -157,12 +208,24 @@ const disableUser = async (userId?: string): Promise<boolean> => {
 
 const serviceListQuery = useServiceListQuery();
 
+const { userGroupListData } = useUserGroupListQuery({
+    params: computed(() => ({
+        query: {
+            filter: [
+                { k: 'user_id', v: userPageState.selectedUsers.map((user) => user.user_id), o: 'in' },
+            ],
+        },
+    })),
+});
+
 /* Watcher */
-watch([serviceListQuery.data, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
-    if (nv_service_list) {
-        const list: UserListItemType[] | (UserListItemType & { service: string; })[] = [];
-        nv_selected_users.forEach((selectedUser) => {
-            Object.values(nv_service_list).forEach((service) => {
+watchEffect(() => {
+    const serviceList = serviceListQuery.data.value;
+
+    if (serviceList) {
+        const list: any[] = [];
+        userPageState.selectedUsers?.forEach((selectedUser) => {
+            Object.values(serviceList).forEach((service) => {
                 if (service && service.members) {
                     if (Object.keys(service.members).includes('USER')) {
                         if (selectedUser.user_id && service.members.USER.includes(selectedUser.user_id)) {
@@ -172,7 +235,11 @@ watch([serviceListQuery.data, () => storeState.selectedUsers], ([nv_service_list
                             });
                         }
                     } else {
-                        list.push(selectedUser);
+                        list.push({
+                            ...selectedUser,
+                            user_group: userGroupListData.value.filter((group) => group.users?.includes(selectedUser.user_id ?? '')).map((group) => group.name),
+                            service: service.name,
+                        });
                     }
                 }
             });
@@ -185,20 +252,28 @@ watch([serviceListQuery.data, () => storeState.selectedUsers], ([nv_service_list
                     acc[cur.user_id] = {
                         user_id,
                         service: [],
+                        user_group: [],
                         ...rest,
                     };
                 }
+
                 if (cur.service !== undefined) {
                     if (!Array.isArray(acc[cur.user_id].service)) {
                         acc[cur.user_id].service = [];
                     }
                     acc[cur.user_id].service.push(cur.service);
                 }
+                if (cur.user_group !== undefined) {
+                    if (!Array.isArray(acc[cur.user_id].user_group)) {
+                        acc[cur.user_id].user_group = [];
+                    }
+                    acc[cur.user_id].user_group = cur.user_group;
+                }
                 return acc;
             }, {}));
         }
     }
-}, { deep: true, immediate: true });
+});
 </script>
 
 <template>
@@ -214,8 +289,9 @@ watch([serviceListQuery.data, () => storeState.selectedUsers], ([nv_service_list
         <template #body>
             <p-data-table
                 :fields="state.fields"
-                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
+                :items="state.isRemoveOnlyWorkspace ? state.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
             >
+                {{ state.selectedOnlyWorkspaceUsers.length }}
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"
                               class="capitalize"
@@ -254,7 +330,7 @@ watch([serviceListQuery.data, () => storeState.selectedUsers], ([nv_service_list
                                      badge-type="gray200"
                                      shape="square"
                             >
-                                {{ userGroup.name }}
+                                {{ userGroup }}
                             </p-badge>
                             <p-badge v-else-if="i === 3"
                                      badge-type="blue300"
