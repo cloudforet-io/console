@@ -11,12 +11,10 @@ import {
 
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
-import type { ServiceAccountCreateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/create';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import { useTrustedAccountApi } from '@/api-clients/identity/trusted-account/composables/use-trusted-account-api';
-import type { TrustedAccountCreateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/create';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
@@ -109,14 +107,14 @@ const formState = reactive({
 
 
 const { mutateAsync: createServiceAccountMutation } = useMutation({
-    mutationFn: (params: ServiceAccountCreateParameters) => serviceAccountAPI.create(params),
+    mutationFn: serviceAccountAPI.create,
     onError: (error) => {
         ErrorHandler.handleError(error);
         throw error;
     },
 });
 const { mutateAsync: createTrustedAccountMutation } = useMutation({
-    mutationFn: (params: TrustedAccountCreateParameters) => trustedAccountAPI.create(params),
+    mutationFn: trustedAccountAPI.create,
     onError: (error) => {
         ErrorHandler.handleError(error);
         throw error;

@@ -184,10 +184,7 @@ const {
     params: computed(() => ({
         query: getQuery(),
     })),
-    enabled: computed(() => {
-        console.log('tableState.isTrustedAccount', tableState.isTrustedAccount);
-        return tableState.isTrustedAccount;
-    }),
+    enabled: computed(() => tableState.isTrustedAccount),
     thisPage: computed(() => getThisPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)),
     pageSize: computed(() => fetchOptionState.pageLimit),
 });

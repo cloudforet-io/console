@@ -28,7 +28,7 @@ export const useServiceAccountJobListQuery = ({ params, refetchInterval, enabled
         select: (data) => data.results ?? [],
         refetchInterval: refetchInterval ? (query) => refetchInterval(query) : false,
         enabled: computed(() => {
-            if (!enabled) return true;
+            if (enabled === undefined) return true;
             return enabled.value;
         }),
     }, ['DOMAIN', 'WORKSPACE']);

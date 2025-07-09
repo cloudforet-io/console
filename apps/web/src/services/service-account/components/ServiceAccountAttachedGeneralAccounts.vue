@@ -199,7 +199,7 @@ const handleSync = () => {
         console.warn('trustedAccountId is not found');
     }
     syncTrustedAccount({
-        trusted_account_id: (serviceAccountData.value as TrustedAccountModel).trusted_account_id,
+        trusted_account_id: state.trustedAccountId,
     });
 };
 
