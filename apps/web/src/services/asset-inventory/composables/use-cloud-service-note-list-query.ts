@@ -19,6 +19,7 @@ export const useCloudServiceNoteListQuery = ({ params, enabled }: UseCloudServic
     const { key: noteListKey, params: noteListQueryParams } = useServiceQueryKey('inventory', 'note', 'list', {
         params: computed<NoteListParameters>(() => params.value),
     });
+
     const { data: noteListData, isFetching } = useScopedQuery({
         queryKey: noteListKey,
         queryFn: () => noteAPI.list(noteListQueryParams.value),

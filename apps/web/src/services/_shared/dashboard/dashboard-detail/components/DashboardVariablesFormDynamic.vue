@@ -145,7 +145,7 @@ const state = reactive({
                         type: 'item',
                         name: providerData.key,
                         label: providerData.label,
-                        imageUrl: providerData.data.icon,
+                        imageUrl: providerData.data?.icon,
                     });
                 }
             }

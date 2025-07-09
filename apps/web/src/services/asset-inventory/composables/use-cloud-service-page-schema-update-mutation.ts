@@ -11,7 +11,7 @@ interface UseCloudServicePageSchemaUpdateMutationOptions {
     onSettled?: (data: PageSchemaModel|undefined, error: Error|null, variables: PageSchemaUpdateParameters) => void;
 }
 
-export const useCloudServicePageSchemaUpdateMutation = (options: UseCloudServicePageSchemaUpdateMutationOptions) => {
+export const useCloudServicePageSchemaUpdateMutation = (options: UseCloudServicePageSchemaUpdateMutationOptions = {}) => {
     const { onSuccess, onError, onSettled } = options;
     const { pageSchemaAPI } = usePageSchemaApi();
     const queryClient = useQueryClient();
