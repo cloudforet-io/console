@@ -8,7 +8,7 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 interface UseServiceAccountUpdateMutationOptions {
     onSuccess?: (data: ServiceAccountModel, variables: ServiceAccountUpdateParameters) => void | Promise<void>;
     onError?: (error: Error, variables: ServiceAccountUpdateParameters) => void | Promise<void>;
-    onSettled?: (data: ServiceAccountModel, error: Error | null, variables: ServiceAccountUpdateParameters) => void | Promise<void>;
+    onSettled?: (data: ServiceAccountModel | undefined, error: Error | null, variables: ServiceAccountUpdateParameters) => void | Promise<void>;
 }
 
 export const useServiceAccountUpdateMutation = ({
@@ -24,16 +24,16 @@ export const useServiceAccountUpdateMutation = ({
             if (!params.service_account_id) { throw new Error('service_account_id is required'); }
             return serviceAccountAPI.update(params);
         },
-        onSuccess: (data, variables) => {
+        onSuccess: async (data, variables) => {
             queryClient.invalidateQueries({ queryKey: withSuffixGet(variables.service_account_id) });
             queryClient.invalidateQueries({ queryKey: withSuffixList(variables.service_account_id) });
-            if (onSuccess) onSuccess(data, variables);
+            if (onSuccess) await onSuccess(data, variables);
         },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
         },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
         },
     });
 };

@@ -23,16 +23,16 @@ export const useTrustedAccountSyncMutation = ({
             if (!params.trusted_account_id) { throw new Error('trusted_account_id is required'); }
             return trustedAccountAPI.sync(params);
         },
-        onSuccess: (data, variables) => {
+        onSuccess: async (data, variables) => {
             queryClient.invalidateQueries({ queryKey: withSuffixGet(variables.trusted_account_id) });
             queryClient.invalidateQueries({ queryKey: withSuffixList(variables.trusted_account_id) });
-            if (onSuccess) onSuccess(data, variables);
+            if (onSuccess) await onSuccess(data, variables);
         },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
         },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
         },
     });
 };

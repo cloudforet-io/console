@@ -19,15 +19,15 @@ export const useServiceAccountAgentDeleteMutation = ({ onSuccess, onError, onSet
             if (!params.service_account_id) throw new Error('Service Account ID is required');
             return agentAPI.delete(params);
         },
-        onSuccess: (data, variables) => {
+        onSuccess: async (data, variables) => {
             queryClient.resetQueries({ queryKey: withSuffix(variables.service_account_id) });
-            if (onSuccess) onSuccess(data, variables);
+            if (onSuccess) await onSuccess(data, variables);
         },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
         },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
         },
     });
 };

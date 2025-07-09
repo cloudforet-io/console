@@ -8,7 +8,7 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 interface UseServiceAccountAgentDisableMutationOptions {
     onSuccess?: (data: AgentModel, variables: AgentDisableParameters) => void|Promise<void>;
     onError?: (error: Error, variables: AgentDisableParameters) => void|Promise<void>;
-    onSettled?: (data: AgentModel, error: Error|null, variables: AgentDisableParameters) => void|Promise<void>;
+    onSettled?: (data: AgentModel | undefined, error: Error|null, variables: AgentDisableParameters) => void|Promise<void>;
 }
 
 export const useServiceAccountAgentDisableMutation = ({ onSuccess, onError, onSettled }: UseServiceAccountAgentDisableMutationOptions = {}) => {
@@ -20,15 +20,15 @@ export const useServiceAccountAgentDisableMutation = ({ onSuccess, onError, onSe
             if (!params.service_account_id) throw new Error('Service Account ID is required');
             return agentAPI.disable(params);
         },
-        onSuccess: (data, variables) => {
+        onSuccess: async (data, variables) => {
             queryClient.invalidateQueries({ queryKey: withSuffix(variables.service_account_id) });
-            if (onSuccess) onSuccess(data, variables);
+            if (onSuccess) await onSuccess(data, variables);
         },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
         },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
         },
     });
 };
