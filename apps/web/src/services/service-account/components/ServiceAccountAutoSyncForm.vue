@@ -19,9 +19,7 @@ import ServiceAccountAutoSyncMappingMethod
     from '@/services/service-account/components/ServiceAccountAutoSyncMappingMethod.vue';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
-
 const MAX_TIME_COUNT = 2;
-
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
@@ -39,7 +37,7 @@ const state = reactive({
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;
-        return serviceAccountPageStore.formState.scheduleHours.map((utcHour) => dayjs.utc()
+        return serviceAccountPageFormState.scheduleHours.map((utcHour) => dayjs.utc()
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
@@ -110,7 +108,7 @@ watch(() => state.isAllValid, (isAllValid) => {
                              @change-toggle="handleChangeToggle"
             /><p>
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAIN_DESCRIPTION', {
-                    provider: referenceMap.provider[serviceAccountPageState.selectedProvider]?.label || serviceAccountPageStore.state.selectedProvider,
+                    provider: referenceMap.provider[serviceAccountPageState.selectedProvider]?.label || serviceAccountPageState.selectedProvider,
                 }) }}
             </p>
         </div>

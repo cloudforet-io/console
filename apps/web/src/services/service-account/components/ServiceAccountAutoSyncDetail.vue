@@ -6,6 +6,7 @@ import { range } from 'lodash';
 
 import { PFieldGroup, PFieldTitle } from '@cloudforet/mirinae';
 
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
@@ -13,14 +14,28 @@ import { useUserStore } from '@/store/user/user-store';
 
 import ServiceAccountAutoSyncMappingMethod
     from '@/services/service-account/components/ServiceAccountAutoSyncMappingMethod.vue';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
+
+
+interface Props {
+    serviceAccountId?: string;
+}
+
+const props = defineProps<Props>();
+
+const {
+    serviceAccountData,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const userStore = useUserStore();
 const hoursMatrix: number[] = range(24);
 const referenceMap = useAllReferenceDataModel();
-
 
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
@@ -33,6 +48,8 @@ const state = reactive({
     }),
 });
 
+const isOriginAutoSyncEnabled = computed(() => (serviceAccountData.value as TrustedAccountModel|undefined)?.schedule?.state === 'ENABLED');
+
 
 </script>
 
@@ -44,11 +61,12 @@ const state = reactive({
             }) }}
         </p>
 
-        <service-account-auto-sync-mapping-method v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+        <service-account-auto-sync-mapping-method v-if="isOriginAutoSyncEnabled"
                                                   mode="READ"
+                                                  :service-account-id="props.serviceAccountId"
         />
 
-        <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled">
+        <div v-if="isOriginAutoSyncEnabled">
             <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.HOURLY_SYNC_SCHEDULE')"
                            size="lg"
                            class="mb-1"

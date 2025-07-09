@@ -4,6 +4,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -13,6 +14,7 @@ import MappingMethod from '@/common/components/mapping-method/MappingMethod.vue'
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import WorkspaceDropdown from '@/services/service-account/components/WorkspaceDropdown.vue';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
 const cspAdditionalOptionMap = {
@@ -75,8 +77,14 @@ const cspAdditionalOptionMap = {
     },
 };
 
-const props = withDefaults(defineProps<{mode:'UPDATE'|'READ'}>(), {
+interface Props {
+    mode: 'UPDATE'|'READ';
+    serviceAccountId?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
     mode: 'UPDATE',
+    serviceAccountId: undefined,
 });
 
 const serviceAccountPageStore = useServiceAccountPageStore();
@@ -87,6 +95,13 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const referenceMap = useAllReferenceDataModel();
 
+
+const {
+    serviceAccountData,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
 const state = reactive({
     selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
     additionalOptionUiByProvider: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider] ?? {}),
@@ -94,8 +109,8 @@ const state = reactive({
     projectGroupMapping: 'projectGroups',
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
-    isCreatePage: computed(() => serviceAccountPageState.originServiceAccountItem?.resource_group === undefined),
+    isResourceGroupDomain: computed<boolean>(() => (serviceAccountData.value as TrustedAccountModel)?.resource_group === 'DOMAIN'),
+    isCreatePage: computed<boolean>(() => (serviceAccountData.value as TrustedAccountModel)?.resource_group === undefined),
     isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
     mappingItems: computed(() => (state.isDomainForm ? [
         {
@@ -139,10 +154,10 @@ watch(() => state.formData, (formData) => {
     });
 });
 
-watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
-    if (item) {
-        state.workspaceMapping = item.sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
-        state.projectGroupMapping = item.sync_options?.skip_project_group ? 'skip' : 'projectGroups';
+watch(serviceAccountData, (_serviceAccountData) => {
+    if (_serviceAccountData) {
+        state.workspaceMapping = (_serviceAccountData as TrustedAccountModel).sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
+        state.projectGroupMapping = (_serviceAccountData as TrustedAccountModel).sync_options?.skip_project_group ? 'skip' : 'projectGroups';
     }
 }, { immediate: true });
 

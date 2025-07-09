@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout, PHeading, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
 import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
-import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
-import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
@@ -21,38 +17,56 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ServiceAccountAutoSyncDetail from '@/services/service-account/components/ServiceAccountAutoSyncDetail.vue';
 import ServiceAccountAutoSyncForm from '@/services/service-account/components/ServiceAccountAutoSyncForm.vue';
+import { useTrustedAccountUpdateMutation } from '@/services/service-account/composables/mutations/use-trusted-account-update-mutation';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 import type { PageMode } from '@/services/service-account/types/service-account-page-type';
 
-
-const emit = defineEmits<{(e: 'refresh'): void; }>();
 const serviceAccountPageStore = useServiceAccountPageStore();
-const serviceAccountPageState = serviceAccountPageStore.state;
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 
 interface Props {
     editable: boolean;
+    serviceAccountId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     editable: false,
+    serviceAccountId: undefined,
 });
 
 interface State {
     loading: boolean;
-    isTrustedAccount: ComputedRef<boolean>;
     mode: PageMode;
     providerData: Partial<ProviderModel>;
 }
+
+
+const {
+    serviceAccountData,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
+
 const state = reactive<State>({
     loading: false,
-    isTrustedAccount: computed(() => serviceAccountPageState.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     providerData: {},
     mode: 'READ',
 });
 
-/* Api */
+const isOriginAutoSyncEnabled = computed(() => (serviceAccountData.value as TrustedAccountModel|undefined)?.schedule?.state === 'ENABLED');
 
+const { mutateAsync: updateTrustedAccount } = useTrustedAccountUpdateMutation({
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.UPDATE_SUCCESS'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+    onSettled: () => {
+        state.mode = 'READ';
+    },
+});
 
 /* Event */
 const handleClickEditButton = () => {
@@ -63,29 +77,44 @@ const handleClickCancelButton = () => {
     state.mode = 'READ';
 };
 const handleClickSaveButton = async () => {
-    if (!serviceAccountPageState.originServiceAccountItem.trusted_account_id) return;
-    try {
-        await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
-            trusted_account_id: serviceAccountPageState.originServiceAccountItem.trusted_account_id,
-            name: serviceAccountPageState.originServiceAccountItem.name,
-            data: serviceAccountPageState.originServiceAccountItem.data,
-            tags: serviceAccountPageState.originServiceAccountItem.tags,
-            schedule: {
-                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
-                hours: serviceAccountPageFormState.scheduleHours,
-            },
-            sync_options: {
-                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
-                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
-            },
-            plugin_options: serviceAccountPageFormState.additionalOptions,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.UPDATE_SUCCESS'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-    state.mode = 'READ';
-    emit('refresh');
+    if (!serviceAccountData.value?.trusted_account_id) return;
+    await updateTrustedAccount({
+        trusted_account_id: serviceAccountData.value?.trusted_account_id,
+        name: serviceAccountData.value?.name,
+        data: serviceAccountData.value?.data,
+        tags: serviceAccountData.value?.tags,
+        schedule: {
+            state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+            hours: serviceAccountPageFormState.scheduleHours,
+        },
+        sync_options: {
+            skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+            single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+        },
+        plugin_options: serviceAccountPageFormState.additionalOptions,
+    });
+    // try {
+    //     await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
+    //         trusted_account_id: serviceAccountData.value?.trusted_account_id,
+    //         name: serviceAccountData.value?.name,
+    //         data: serviceAccountData.value?.data,
+    //         tags: serviceAccountData.value?.tags,
+    //         schedule: {
+    //             state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+    //             hours: serviceAccountPageFormState.scheduleHours,
+    //         },
+    //         sync_options: {
+    //             skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+    //             single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+    //         },
+    //         plugin_options: serviceAccountPageFormState.additionalOptions,
+    //     });
+    //     showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.UPDATE_SUCCESS'), '');
+    // } catch (e) {
+    //     ErrorHandler.handleError(e);
+    // }
+    // state.mode = 'READ';
+    // emit('refresh');
 };
 
 </script>
@@ -100,7 +129,7 @@ const handleClickSaveButton = async () => {
                 >
                     <template #title-right-extra>
                         <auto-sync-state v-if="state.mode==='READ'"
-                                         :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
+                                         :state="isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
                                          size="lg"
                                          class="ml-2"
                         />
@@ -131,7 +160,9 @@ const handleClickSaveButton = async () => {
         <div class="content-wrapper"
              :class="{'ml-4': state.mode === 'READ'}"
         >
-            <service-account-auto-sync-detail v-if="state.mode === 'READ'" />
+            <service-account-auto-sync-detail v-if="state.mode === 'READ'"
+                                              :service-account-id="props.serviceAccountId"
+            />
             <service-account-auto-sync-form v-if="state.mode === 'UPDATE'" />
             <div v-if="state.mode === 'UPDATE'"
                  class="button-wrapper"
