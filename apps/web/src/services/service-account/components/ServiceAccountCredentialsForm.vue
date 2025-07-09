@@ -6,7 +6,6 @@ import {
 
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PFieldGroup, PRadio, PCodeEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
@@ -15,20 +14,17 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { SchemaListParameters } from '@/api-clients/identity/schema/schema/api-verbs/list';
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
-import type { TrustedAccountListParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/list';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useServiceAccountSchemaListQuery } from '@/services/service-account/composables/queries/use-service-account-schema-list-query';
+import { useTrustedAccountListQuery } from '@/services/service-account/composables/queries/use-trusted-account-list-query';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 import type { ActiveDataType, CredentialForm } from '@/services/service-account/types/service-account-page-type';
@@ -50,23 +46,24 @@ const userStore = useUserStore();
 interface State {
     showTrustedAccount: ComputedRef<boolean>;
     isTrustedAccount: ComputedRef<boolean>;
-    trustedAccounts: TrustedAccountModel[];
+    // trustedAccounts: TrustedAccountModel[];
     trustedAccountMenuItems: ComputedRef<SelectDropdownMenuItem[]>;
     selectedTrustedAccountDataList: ComputedRef<Array<{ key: string|undefined; value: string }>>;
-    secretTypes: SchemaModel[];
+    // secretTypes: SchemaModel[];
     credentialSchema: ComputedRef<JsonSchema>;
     trustedAccountInfoLink: ComputedRef<string>;
     baseInformationSchema: ComputedRef<JsonSchema|undefined>;
 }
 
+const {
+    generalAccountSchema,
+    trustedAccountSchema,
+    trustingSecretSchemaList,
+} = useServiceAccountProviderSchema();
+
 const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
     language: computed<string|undefined>(() => userStore.state.language),
-    currentProviderSchemaList: computed<SchemaModel[]>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList),
-    trustingSecretSchemaList: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustingSecretSchemaList),
-    trustedAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustedAccountSchema),
-    generalAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.generalAccountSchema),
-    secretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.secretSchema),
     providerName: computed(() => {
         if (!serviceAccountSchemaStore.state.currentProvider) return '';
         return referenceMap.provider[serviceAccountSchemaStore.state.currentProvider]?.name || serviceAccountSchemaStore.state.currentProvider || '';
@@ -74,17 +71,16 @@ const storeState = reactive({
     provider: computed(() => serviceAccountPageStore.state.selectedProvider),
 });
 const state = reactive<State>({
-    showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchemaList),
+    showTrustedAccount: computed<boolean>(() => !!trustingSecretSchemaList.value),
     isTrustedAccount: computed<boolean>(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
-    trustedAccounts: [],
-    trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
+    trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => (trustedAccountList.value ?? [])?.map((d) => ({
         name: d.trusted_account_id,
         label: d.name,
     }))),
     selectedTrustedAccountDataList: computed<Array<{ key: string|undefined; value: string }>>(() => {
-        const selectedTrustedAccount = state.trustedAccounts.find((d) => d.trusted_account_id === formState.attachedTrustedAccountId);
+        const selectedTrustedAccount = (trustedAccountList.value ?? [])?.find((d) => d.trusted_account_id === formState.attachedTrustedAccountId);
         if (!selectedTrustedAccount) return [];
-        const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
+        const baseInfoProperties: Record<string, JsonSchema> | undefined = state.baseInformationSchema?.properties;
         let entries: Array<[string, JsonSchema]> = [];
         if (baseInfoProperties) entries = Object.entries(baseInfoProperties);
         return entries.map(([k, v]) => ({
@@ -92,13 +88,12 @@ const state = reactive<State>({
             value: selectedTrustedAccount.data[k],
         }));
     }),
-    secretTypes: [],
     credentialSchema: computed<JsonSchema>(() => formState.selectedSecretType?.schema ?? null),
     trustedAccountInfoLink: computed<string>(() => {
         const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
         return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
     }),
-    baseInformationSchema: computed<JsonSchema|undefined>(() => storeState.generalAccountSchema?.schema),
+    baseInformationSchema: computed<JsonSchema|undefined>(() => generalAccountSchema.value?.schema),
 });
 const formState = reactive({
     hasCredentialKey: true,
@@ -122,7 +117,7 @@ const formState = reactive({
         if (!state.isTrustedAccount) {
             if (formState.attachTrustedAccount && !formState.attachedTrustedAccountId) return false;
         }
-        if (state.secretTypes.length) {
+        if (schemaList.value?.length) {
             if (tabState.activeTab === 'input') return formState.isCustomSchemaFormValid;
             return checkJsonStringAvailable(formState.credentialJson);
         }
@@ -141,7 +136,7 @@ const tabState = reactive({
 const initForm = () => {
     formState.hasCredentialKey = true;
     formState.attachTrustedAccount = false;
-    formState.selectedSecretType = state.secretTypes[0];
+    formState.selectedSecretType = schemaList.value?.[0];
     formState.credentialJson = '{}';
     formState.customSchemaForm = {};
     formState.attachedTrustedAccountId = undefined;
@@ -162,23 +157,16 @@ const checkJsonStringAvailable = (str: string): boolean => {
     }
 };
 
-/* Api */
-const listTrustAccounts = async () => {
-    try {
-        if (!storeState.provider) return;
-        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>(
-            {
-                query: new ApiQueryHelper().setFilters([{ k: 'provider', v: storeState.provider, o: '=' }]).data,
-            },
-        );
-        state.trustedAccounts = results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.trustedAccounts = [];
-    }
-};
+const { data: trustedAccountList } = useTrustedAccountListQuery({
+    params: computed(() => ({
+        query: new ApiQueryHelper().setFilters([{ k: 'provider', v: storeState.provider, o: '=' }]).data,
+    })),
+    enabled: computed(() => !!storeState.provider),
+});
+
+
 const getTrustedAccountCredentialData = (trustedAccountId: string) => {
-    const trustedAccount:TrustedAccountModel|undefined = state.trustedAccounts.find((d:TrustedAccountModel) => d.trusted_account_id === trustedAccountId);
+    const trustedAccount:TrustedAccountModel|undefined = trustedAccountList.value?.find((d:TrustedAccountModel) => d.trusted_account_id === trustedAccountId);
     if (!trustedAccount) return;
     formState.credentialJson = JSON.stringify(trustedAccount.data, null, 2);
 };
@@ -205,7 +193,7 @@ const handleChangeAttachTrustedAccount = (val: boolean) => {
         formState.credentialJson = '{}';
         formState.customSchemaForm = {};
         formState.attachTrustedAccount = val;
-        if (val) formState.attachedTrustedAccountId = state.trustedAccounts?.[0]?.trusted_account_id;
+        if (val) formState.attachedTrustedAccountId = trustedAccountList.value?.[0]?.trusted_account_id;
     }
 };
 const handleChangeAttachedTrustedAccountId = (val?: string) => {
@@ -214,10 +202,21 @@ const handleChangeAttachedTrustedAccountId = (val?: string) => {
     }
 };
 
-/* Init */
-(async () => {
-    await listTrustAccounts();
-})();
+const schemaApiQueryHelper = new ApiQueryHelper();
+
+const { data: schemaList } = useServiceAccountSchemaListQuery({
+    params: computed(() => {
+        const trustedAccountRelatedSchemas = formState.attachTrustedAccount ? trustingSecretSchemaList.value : (trustedAccountSchema.value?.related_schemas ?? []);
+        const generalAccountRelatedSchemas = generalAccountSchema.value?.related_schemas ?? [];
+        schemaApiQueryHelper.setFilters([
+            { k: 'schema_type', v: formState.attachTrustedAccount ? 'TRUSTING_SECRET' : 'SECRET', o: '=' },
+            { k: 'schema_id', v: state.isTrustedAccount ? trustedAccountRelatedSchemas : generalAccountRelatedSchemas, o: '=' },
+        ]);
+        return {
+            query: schemaApiQueryHelper.data,
+        };
+    }),
+});
 
 /* Mounted */
 onMounted(async () => {
@@ -225,8 +224,8 @@ onMounted(async () => {
 });
 
 /* Watcher */
-watch(() => state.secretTypes, (secretTypes) => {
-    if (secretTypes.length) formState.selectedSecretType = secretTypes[0];
+watch(schemaList, (_schemaList) => {
+    if (_schemaList?.length) formState.selectedSecretType = _schemaList[0];
 }, { immediate: true });
 watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
     getTrustedAccountCredentialData(attachedTrustedAccountId);
@@ -242,33 +241,6 @@ watch(() => formState.isAllValid, (isAllValid) => {
         _state.formState.isCredentialFormValid = isAllValid;
     });
 });
-const schemaApiQueryHelper = new ApiQueryHelper();
-const getSecretSchema = async (isTrustingSchema:boolean) => {
-    const trustedAccountRelatedSchemas = isTrustingSchema ? serviceAccountSchemaStore.getters.trustingSecretSchemaList : (storeState.trustedAccountSchema?.related_schemas ?? []);
-    const generalAccountRelatedSchemas = storeState.generalAccountSchema?.related_schemas ?? [];
-    schemaApiQueryHelper.setFilters([
-        { k: 'schema_type', v: isTrustingSchema ? 'TRUSTING_SECRET' : 'SECRET', o: '=' },
-        { k: 'schema_id', v: state.isTrustedAccount ? trustedAccountRelatedSchemas : generalAccountRelatedSchemas, o: '=' },
-    ]);
-    try {
-        const result = await SpaceConnector.clientV2.identity.schema.list<SchemaListParameters, ListResponse<SchemaModel>>({
-            query: schemaApiQueryHelper.data,
-        });
-        state.secretTypes = result.results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.secretTypes = [];
-    }
-};
-
-watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
-    getSecretSchema(attachTrustedAccount);
-}, { immediate: true });
-
-
-watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
-    if (props.createMode) getSecretSchema(formState.attachTrustedAccount);
-}, { immediate: true });
 
 </script>
 
@@ -359,7 +331,7 @@ watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
                            class="mb-8 mt-6"
             >
                 <div class="flex">
-                    <p-radio v-for="(type, idx) in state.secretTypes"
+                    <p-radio v-for="(type, idx) in schemaList"
                              :key="idx"
                              :selected="formState.selectedSecretType"
                              :value="type"
