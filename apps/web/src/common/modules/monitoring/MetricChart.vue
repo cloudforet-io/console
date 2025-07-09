@@ -83,7 +83,7 @@ const state = reactive({
         },
         series: state.chartData,
     })),
-    chartDataForDataLoader: computed<ChartData[]|undefined>(() => state.chartData?.filter((item) => item?.data?.length > 0) ?? undefined),
+    chartDataForDataLoader: computed<ChartData[]|undefined>(() => state.chartData?.filter((item) => !isEmpty(item?.data)) ?? undefined),
 });
 
 const drawChart = (rawData) => {
