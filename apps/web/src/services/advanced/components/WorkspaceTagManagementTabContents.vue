@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButton, PDataTable, PHeading, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
 import type { Tags, TimeStamp } from '@/api-clients/_common/schema/model';
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -44,16 +46,35 @@ const state = reactive({
     selectedWorkspace: computed(() => workspacePageStore.selectedWorkspace),
     sortBy: 'key',
     sortDesc: true,
+    tags: {} as Tags,
 });
 const tableState = reactive({
     fields: computed(() => [
         { name: 'key', label: i18n.t('COMMON.TAGS.KEY') },
         { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') },
     ]),
-    loading: false,
     tags: {} as Tags,
     tagEditPageVisible: false,
 });
+
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { mutate: updateWorkspaceMutation, isPending: isUpdateWorkspacePending } = useMutation({
+    mutationFn: (params: WorkspaceUpdateParameters) => workspaceAPI.update(params),
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
+        tableState.tagEditPageVisible = false;
+        state.items = convertUserTagsToKeyValueArray(state.tags);
+        // TODO: get query tag
+        tableState.tags = state.tags;
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
+    },
+});
+
 const convertUserTagsToKeyValueArray = (tags: Tags) => Object.entries(tags).map(([k, v]) => ({
     key: k,
     value: v,
@@ -73,22 +94,11 @@ const handleCloseTag = async () => {
     tableState.tagEditPageVisible = false;
 };
 const handleTagUpdate = async (newTags:Tags) => {
-    try {
-        tableState.loading = true;
-        await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters, WorkspaceModel>({
-            workspace_id: state.selectedWorkspace.workspace_id || '',
-            tags: newTags,
-        });
-        showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
-        tableState.tagEditPageVisible = false;
-        state.items = convertUserTagsToKeyValueArray(newTags);
-        // TODO: get query tag
-        tableState.tags = newTags;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
-    } finally {
-        tableState.loading = false;
-    }
+    state.tags = newTags;
+    await updateWorkspaceMutation({
+        workspace_id: state.selectedWorkspace.workspace_id || '',
+        tags: newTags,
+    });
 };
 
 watch([() => props.activeTab, () => state.selectedWorkspace], async () => {
@@ -133,7 +143,7 @@ watch([() => props.activeTab, () => state.selectedWorkspace], async () => {
                           :resource-id="state.selectedWorkspace?.workspace_id"
                           resource-type="identity.User"
                           resource-key="user_id"
-                          :loading="tableState.loading"
+                          :loading="isUpdateWorkspacePending"
                           @close="handleCloseTag"
                           @confirm="handleTagUpdate"
             />
