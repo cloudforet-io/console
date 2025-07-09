@@ -113,13 +113,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.WORKSPACES.EDIT'),
-        disabled: !!workspacePageState.selectedWorkspace,
+        disabled: !workspacePageState.selectedWorkspace,
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.WORKSPACES.DELETE'),
-        disabled: !!workspacePageState.selectedWorkspace,
+        disabled: !workspacePageState.selectedWorkspace,
     },
 ]));
 

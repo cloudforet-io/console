@@ -3508,6 +3508,8 @@
 		"WORKSPACES": {
 			"ACTION": "작업",
 			"ALL": "전체",
+			"ALT_S_CREATE_WORKSPACE": "워크스페이스가 성공적으로 생성되었습니다.",
+			"ALT_S_UPDATE_WORKSPACE": "워크스페이스가 성공적으로 업데이트되었습니다",
 			"CREATE": "생성",
 			"CREATE_WORKSPACE": "워크스페이스 생성",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "워크스페이스명은 최대 80글자까지 입력 가능합니다. ",

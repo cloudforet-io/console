@@ -3,14 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextarea, PTextInput,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceCreateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -56,10 +58,6 @@ const state = reactive({
     themes: WORKSPACE_LOGO_ICON_THEMES,
 });
 
-const handleClickTheme = (theme: string) => {
-    state.selectedTheme = theme;
-};
-
 const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
@@ -89,42 +87,69 @@ const validationState = reactive({
     nameInvalid: computed(() => state.name !== undefined && !!validationState.nameInvalidText),
 });
 
-const handleConfirm = async () => {
-    try {
-        if (props.createType === 'EDIT') {
-            await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters>({
-                workspace_id: workspacePageStore.selectedWorkspace.workspace_id,
-                name: state.name ?? '',
-                tags: {
-                    ...workspacePageStore.selectedWorkspace.tags,
-                    description: state.description ?? '',
-                    theme: state.selectedTheme ?? 'blue',
-                },
-            });
-            showSuccessMessage(i18n.t('Workspace successfully updated'), '');
-        } else {
-            const response = await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>({
-                name: state.name ?? '',
-                tags: {
-                    description: state.description ?? '',
-                    theme: state.selectedTheme ?? 'blue',
-                },
-            });
-            showSuccessMessage(i18n.t('Workspace successfully created'), '');
-            await bookmarkStore.createDefaultBookmark({
-                workspaceId: response.workspace_id,
-            });
-            emit('confirm', {
-                id: response.workspace_id,
-                name: response.name,
-            });
-        }
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+
+const { mutate: createWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceCreateParameters) => workspaceAPI.create(params),
+    onSuccess: async (data) => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_CREATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        emit('refresh');
+        await bookmarkStore.createDefaultBookmark({
+            workspaceId: data?.workspace_id,
+        });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        emit('confirm', {
+            id: data.workspace_id,
+            name: data.name,
+        });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
         state.proxyVisible = false;
+    },
+});
+const { mutate: updateWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceUpdateParameters) => workspaceAPI.update(params),
+    onSuccess: async () => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_UPDATE_WORKSPACE'), '');
+        await userWorkspaceStore.load();
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+
+const handleClickTheme = (theme: string) => {
+    state.selectedTheme = theme;
+};
+
+const handleConfirm = async () => {
+    if (props.createType === 'EDIT') {
+        await updateWorkspaceMutation({
+            workspace_id: workspacePageStore.selectedWorkspace.workspace_id,
+            name: state.name ?? '',
+            tags: {
+                ...workspacePageStore.selectedWorkspace.tags,
+                description: state.description ?? '',
+                theme: state.selectedTheme ?? 'blue',
+            },
+        });
+    } else {
+        await createWorkspaceMutation({
+            name: state.name ?? '',
+            tags: {
+                description: state.description ?? '',
+                theme: state.selectedTheme ?? 'blue',
+            },
+        });
     }
 };
 
