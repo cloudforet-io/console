@@ -24,6 +24,8 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
+import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
+import { useMetricExampleListQuery } from '@/services/asset-inventory/composables/use-metric-example-list-query';
 import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
@@ -52,12 +54,11 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     existingNameList: computed<string[]>(() => {
         if (state.currentMetricExampleId) {
-            return metricExplorerPageState.metricExamples
-                .filter((d) => d.example_id !== state.currentMetricExampleId)
+            return namespaceMetricExamples.value
+                ?.filter((d) => d.example_id !== state.currentMetricExampleId)
                 .map((d) => d.name);
         }
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
@@ -100,6 +101,14 @@ const {
 const { data: currentMetric } = useMetricGetQuery({
     metricId: computed(() => route.params.metricId),
 });
+const { data: currentMetricExample } = useMetricExampleGetQuery({
+    metricExampleId: computed(() => route.params.metricExampleId),
+});
+const { data: namespaceMetricExamples } = useMetricExampleListQuery({
+    params: computed(() => ({
+        namespace_id: metricExplorerPageState.selectedNamespaceId,
+    })),
+});
 const { data: currentNamespaceMetrics } = useMetricListQuery({
     params: computed(() => ({
         namespace_id: currentMetric.value?.namespace_id,
@@ -123,7 +132,6 @@ const createMetricExample = async () => {
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(currentMetric.value?.namespace_id);
         await gnbStore.fetchMetricExample();
         await router.replace({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
@@ -143,7 +151,6 @@ const updateMetricName = async () => {
             name: name.value,
         });
         state.proxyVisible = false;
-        // await metricExplorerPageStore.loadMetric(state.currentMetricId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
@@ -156,7 +163,6 @@ const updateMetricExampleName = async () => {
             name: name.value,
         });
         state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(currentMetric.value?.namespace_id);
         await gnbStore.fetchMetricExample();
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
@@ -185,7 +191,7 @@ const handleFormConfirm = async () => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible && props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         if (state.currentMetricExampleId) {
-            setForm('name', state.currentMetricExample?.name);
+            setForm('name', currentMetricExample.value?.name);
         } else {
             setForm('name', currentMetric.value?.name);
         }

@@ -1,15 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { MetricExampleListParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/list';
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 
 import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
@@ -17,15 +13,12 @@ import type {
     Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter, ChartType,
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-selectedGroupByListexample/schema/model';
-
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
     const state = reactive({
         selectedNamespaceId: undefined as string|undefined,
         // data
         refreshMetricData: false,
-        metricExamples: [] as MetricExampleModel[],
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.DAILY)[0] as Period|undefined,
@@ -57,7 +50,10 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             });
             return results;
         }),
-        isRealtimeChart: computed<boolean>(() => ![CHART_TYPE.LINE, CHART_TYPE.LINE_AREA].includes(state.selectedChartType)),
+        isRealtimeChart: computed<boolean>(() => {
+            const realtimeChartTypes: ChartType[] = [CHART_TYPE.LINE, CHART_TYPE.LINE_AREA];
+            return !realtimeChartTypes.includes(state.selectedChartType);
+        }),
     });
 
     /* Mutations */
@@ -128,21 +124,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             state.relativePeriod = _options?.relative_period;
         } else state.relativePeriod = undefined;
         if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
-        if (_options?.filters) state.filters = cloneDeep(metricExample?.options?.filters);
+        if (_options?.filters) state.filters = cloneDeep(_options?.filters);
         if (_options?.operator) state.selectedOperator = _options?.operator;
         state.refreshMetricPeriodDropdown = true;
-    };
-    const loadMetricExamples = async (namespaceId?: string) => {
-        if (!namespaceId) return;
-        try {
-            const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>({
-                namespace_id: namespaceId,
-            });
-            state.metricExamples = res.results || [];
-        } catch (e) {
-            state.metricExamples = [];
-            console.error(e);
-        }
     };
     const openMetricQueryFormSidebar = (mode: QueryFormMode) => {
         state.metricQueryFormMode = mode;
@@ -151,7 +135,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
 
     const actions = {
         reset,
-        loadMetricExamples,
         openMetricQueryFormSidebar,
         initMetricExampleOptions,
     };

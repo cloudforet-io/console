@@ -10,7 +10,6 @@ import type {
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -29,6 +28,7 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
 import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { PROJECT_GROUP_LABEL_INFO } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -43,8 +43,6 @@ const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
-    currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     loading: true,
     randomId: getRandomId(),
     refinedMetricLabelKeysWithProjectGroup: computed<MetricLabelKey[]>(() => {
@@ -75,6 +73,9 @@ const state = reactive({
 /* Query */
 const { labelKeys } = useMetricGetQuery({
     metricId: computed(() => route.params.metricId),
+});
+const { data: currentMetricExample } = useMetricExampleGetQuery({
+    metricExampleId: computed(() => route.params.metricExampleId),
 });
 
 /* Util */
@@ -144,8 +145,8 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropd
     });
 };
 const handleClickResetFilters = () => {
-    if (state.currentMetricExampleId) {
-        const _originalFilters = cloneDeep(state.currentMetricExample?.options?.filters);
+    if (currentMetricExample.value) {
+        const _originalFilters = cloneDeep(currentMetricExample.value?.options?.filters);
         initSelectedFilters(_originalFilters);
         metricExplorerPageStore.setFilters(_originalFilters);
     } else {

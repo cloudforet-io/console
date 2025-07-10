@@ -25,6 +25,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
+import { useMetricExampleListQuery } from '@/services/asset-inventory/composables/use-metric-example-list-query';
 import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { useNamespaceGetQuery } from '@/services/asset-inventory/composables/use-namespace-get-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
@@ -96,7 +97,7 @@ const state = reactive({
                     },
                 },
             };
-            const examples = state.metricExamples.filter((example) => example.metric_id === metric.metric_id);
+            const examples = metricExamples.value?.filter((example) => example.metric_id === metric.metric_id) ?? [];
             if (examples.length) {
                 return {
                     ...metricTreeNode,
@@ -124,7 +125,6 @@ const state = reactive({
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
     }),
-    metricExamples: computed(() => metricExplorerPageState.metricExamples),
     metricTreeDisplayMap: undefined,
     metricTreeDisplayMapWithSearchKeyword: computed<TreeDisplayMap|undefined>(() => {
         if (!state.inputValue) return undefined;
@@ -137,11 +137,16 @@ const state = reactive({
         return displayMap;
     }),
 });
-const isLsbMetricLoading = computed(() => namespaceMetricsLoading.value);
+const isLsbMetricLoading = computed<boolean>(() => namespaceMetricsLoading.value || metricExamplesLoading.value);
 
 /* Query */
 const { data: namespaceMetrics, isLoading: namespaceMetricsLoading } = useMetricListQuery({
     enabled: computed(() => !!metricExplorerPageState.selectedNamespaceId),
+    params: computed(() => ({
+        namespace_id: metricExplorerPageState.selectedNamespaceId,
+    })),
+});
+const { data: metricExamples, isLoading: metricExamplesLoading } = useMetricExampleListQuery({
     params: computed(() => ({
         namespace_id: metricExplorerPageState.selectedNamespaceId,
     })),
