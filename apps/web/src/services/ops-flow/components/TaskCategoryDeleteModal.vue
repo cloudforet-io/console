@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { PButtonModal } from '@cloudforet/mirinae/';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
