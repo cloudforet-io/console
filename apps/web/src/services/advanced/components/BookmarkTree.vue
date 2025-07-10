@@ -16,26 +16,21 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
-import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/v-shared/tree/type';
 
 const gnbStore = useGnbStore();
-const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageState = bookmarkPageStore.state;
 
 const route = useRoute();
 
 const { workspaceListData } = useWorkspaceListQuery();
-
-const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-});
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
 
 const state = reactive({
     showMorePage: 1,
-    convertedList: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
+    convertedList: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(bookmarkFolderListData.value)),
     bookmarkTreeData: computed<TreeNode[]>(() => state.convertedList.slice(0, 20 * state.showMorePage)),
     selectedTreeId: undefined as string|undefined,
     group: computed<string>(() => route.params.group),
@@ -173,7 +168,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
 watch(() => state.bookmarkGroupNavigation, async (bookmarkGroupNavigation) => {
     gnbStore.setBreadcrumbs(bookmarkGroupNavigation);
 }, { immediate: true });
-watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookmarkFolderList]) => {
+watch([() => route.params, () => bookmarkFolderListData.value], ([params, bookmarkFolderList]) => {
     let selectedTreeId: string|undefined = '';
     if (params.folder) {
         const selectedFolder = bookmarkFolderList.find((item) => item.name === params.folder);

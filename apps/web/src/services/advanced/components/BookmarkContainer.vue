@@ -13,6 +13,7 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
 
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
@@ -30,7 +31,6 @@ const router = useRouter();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
     isTableItem: computed<boolean>(() => bookmarkPageState.isTableItem),
@@ -38,10 +38,11 @@ const storeState = reactive({
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
 });
 const state = reactive({
-    globalFolderList: computed<BookmarkItem[]>(() => storeState.bookmarkFolderList.filter((item) => item.isGlobal)),
+    globalFolderList: computed<BookmarkItem[]>(() => bookmarkFolderListData.value.filter((item) => item.isGlobal)),
 });
 
 const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
 
 const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
     if (isEdit && name) {
@@ -56,7 +57,6 @@ const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
         }
         bookmarkPageStore.setIsTableItem(false);
     }
-    await bookmarkPageStore.fetchBookmarkFolderList();
     await bookmarkPageStore.fetchBookmarkList();
 };
 const handleCreateLink = (selectedFolder?: BookmarkItem) => {
@@ -85,7 +85,6 @@ const handleConfirmDelete = (isFolder?: boolean) => {
         }
         bookmarkPageStore.setIsTableItem(false);
     }
-    bookmarkPageStore.fetchBookmarkFolderList();
     bookmarkPageStore.fetchBookmarkList(storeState.selectedType);
     bookmarkPageStore.setSelectedBookmarkIndices([]);
 };
@@ -93,7 +92,6 @@ const handleConfirmDelete = (isFolder?: boolean) => {
 // TODO: will be checked
 watch(() => workspaceListData.value, async (list) => {
     await bookmarkPageStore.setWorkspaceList(list);
-    await bookmarkPageStore.fetchBookmarkFolderList();
 }, { immediate: true });
 
 onUnmounted(() => {

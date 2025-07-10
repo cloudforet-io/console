@@ -111,41 +111,6 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
             state.searchFilter = [];
             state.selectedIndices = [];
         },
-        fetchBookmarkFolderList: async () => {
-            const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('updated_at', true)
-                .setFilters([
-                    { k: 'name', v: 'console:bookmark', o: '' },
-                    { k: 'data.link', v: null, o: '=' },
-                ]);
-            try {
-                const { results } = await SpaceConnector.clientV2.config.sharedConfig.list<SharedConfigListParameters, ListResponse<SharedConfigModel>>({
-                    query: bookmarkListApiQuery.data,
-                });
-
-                const list = (results ?? []).map((i) => ({
-                    ...i.data,
-                    workspaceId: i.data.workspaceId,
-                    id: i.name,
-                    updatedAt: i.updated_at,
-                } as BookmarkItem));
-
-                const enabledWorkspaceBookmark: BookmarkItem[] = [];
-                forEach(list, (item) => {
-                    const workspace = state.workspaceList.find((w) => w.workspace_id === item.workspaceId);
-                    if (workspace?.state === 'ENABLED') {
-                        enabledWorkspaceBookmark.push(item);
-                    } else if (item.isGlobal) {
-                        enabledWorkspaceBookmark.push(item);
-                    }
-                });
-
-                state.bookmarkFolderList = enabledWorkspaceBookmark;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.bookmarkFolderList = [];
-            }
-        },
         fetchBookmarkList: async (selectedType?: string) => {
             const defaultFilters: ConsoleFilter[] = [
                 ...state.searchFilter,

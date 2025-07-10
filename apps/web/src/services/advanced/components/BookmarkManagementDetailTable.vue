@@ -23,6 +23,7 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import { gray } from '@/styles/colors';
 
 import { makeSearchQueryTagsHandler, makeValueHandler } from '@/services/advanced/composables/bookmark-data-helper';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
@@ -37,8 +38,9 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const route = useRoute();
 const router = useRouter();
 
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
+
 const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
@@ -182,7 +184,7 @@ const handleChange = (options: any = {}) => {
     }
 };
 
-watch([() => route.params, () => storeState.bookmarkFolderList], async ([params, bookmarkFolderList]) => {
+watch([() => route.params, () => bookmarkFolderListData.value], async ([params, bookmarkFolderList]) => {
     if (!bookmarkFolderList || bookmarkFolderList?.length === 0) return;
     await bookmarkPageStore.setParams(params);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);

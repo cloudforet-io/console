@@ -26,6 +26,7 @@ import {
 import {
     getWorkspaceInfo,
 } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
@@ -48,9 +49,9 @@ const route = useRoute();
 const router = useRouter();
 
 const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
 
 const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
@@ -110,7 +111,7 @@ const state = reactive({
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
-    return storeState.bookmarkFolderList.find((i) => i.id === id);
+    return bookmarkFolderListData.value.find((i) => i.id === id);
 };
 const handleSelectType = (value: string) => {
     bookmarkPageStore.setSelectedType(value);

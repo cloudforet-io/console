@@ -24,15 +24,12 @@ import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-st
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageState = bookmarkPageStore.state;
 const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
-
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     selectedIndices: computed<number[]>(() => bookmarkPageGetters.selectedIndices),
 });
