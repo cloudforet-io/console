@@ -17,11 +17,17 @@ export const useMetricExampleListQuery = ({
         params: computed(() => params?.value ?? {}),
     });
 
-    return useScopedQuery({
+    const query = useScopedQuery({
         queryKey: key,
         queryFn: async () => metricExampleAPI.list(metricExampleParams.value),
         select: (data) => data?.results ?? [],
         staleTime: 1000 * 60 * 2, // 2 minutes
         gcTime: 1000 * 60 * 2, // 2 minutes
     }, ['DOMAIN', 'WORKSPACE']);
+
+    return {
+        data: query.data,
+        isLoading: query.isLoading,
+        metricExampleListQueryKey: key,
+    };
 };

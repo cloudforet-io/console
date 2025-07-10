@@ -19,7 +19,7 @@ export const useMetricListQuery = ({
         params: computed(() => params.value),
     });
 
-    return useScopedQuery({
+    const query = useScopedQuery({
         queryKey: key,
         queryFn: async () => metricAPI.list(metricParams.value),
         select: (data) => data?.results ?? [],
@@ -27,4 +27,10 @@ export const useMetricListQuery = ({
         gcTime: 1000 * 60 * 2, // 2 minutes
         enabled: computed(() => !!enabled?.value),
     }, ['DOMAIN', 'WORKSPACE']);
+
+    return {
+        data: query.data,
+        isLoading: query.isLoading,
+        metricListQueryKey: key,
+    };
 };
