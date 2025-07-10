@@ -36,7 +36,6 @@ export const useBookmarkFolderListQuery = (): UseBookmarkFolderListQueryReturn =
     const { data: sharedConfigData } = useScopedQuery({
         queryKey: sharedConfigQueryKey,
         queryFn: () => sharedConfigAPI.list(sharedConfigParams.value),
-        enabled: computed(() => workspaceListData.value.length > 0),
         select: (data) => data.results?.map((i) => ({
             ...i.data,
             workspaceId: i.data.workspaceId,
