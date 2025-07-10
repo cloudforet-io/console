@@ -108,31 +108,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        createBookmarkFolder: async (name: string, type?: string) => {
-            try {
-                let fetcher;
-                let resource_group: undefined|string;
-                if (type === BOOKMARK_TYPE.USER) {
-                    fetcher = SpaceConnector.clientV2.config.userConfig.set;
-                    resource_group = undefined;
-                } else if (_getters.isAdminMode || type === BOOKMARK_TYPE.WORKSPACE || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.sharedConfig.create;
-                    resource_group = _getters.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
-                }
-                await fetcher({
-                    name: `console:bookmark:${name}`,
-                    data: {
-                        workspaceId: _getters.currentWorkspaceId,
-                        name,
-                        isGlobal: _getters.isAdminMode,
-                    },
-                    resource_group,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
         createBookmarkLink: async ({
             name, link, folder, imgIcon, type, isDefault, workspaceId,
         }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string, type?: BookmarkType, isDefault?: boolean, workspaceId?: string}) => {

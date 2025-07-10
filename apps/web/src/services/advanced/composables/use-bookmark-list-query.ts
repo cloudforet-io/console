@@ -35,7 +35,10 @@ export const useBookmarkListQuery = (): UseBookmarkListQueryReturn => {
     const { sharedConfigAPI } = useSharedConfigApi();
     const { key: sharedConfigQueryKey, params: sharedConfigParams } = useServiceQueryKey('config', 'shared-config', 'list', {
         params: computed(() => {
-            BookmarkListApiQueryHelper.setFilters(bookmarkPageStore.getters.bookmarkFilters);
+            BookmarkListApiQueryHelper.setFilters([
+                ...bookmarkPageStore.getters.bookmarkFilters,
+                { k: 'name', v: 'console:bookmark', o: '' },
+            ]);
             return {
                 query: BookmarkListApiQueryHelper.data,
             };

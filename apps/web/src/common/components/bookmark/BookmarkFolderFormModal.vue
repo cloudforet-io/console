@@ -6,12 +6,15 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadioGroup, PRadio,
 } from '@cloudforet/mirinae';
 
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
+import { useBookmarkFolderCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-create-mutation';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
@@ -39,18 +42,20 @@ const bookmarkState = bookmarkStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const authorizationStore = useAuthorizationStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 
 const emit = defineEmits<{(e: 'confirm', isEdit?: boolean, name?: string): void; }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     isWorkspaceMember: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
 
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
-    loading: false,
     bookmark: computed<string|undefined|TranslateResult>(() => props.selectedBookmark?.name || props.filterByFolder),
     radioMenuList: computed<RadioType[]>(() => {
         const menu: RadioType[] = [{
@@ -93,27 +98,43 @@ const {
     },
 });
 
+const { mutate: createBookmarkFolder, isPending: isCreatingBookmarkFolder } = useBookmarkFolderCreateMutation({
+    type: computed(() => state.scope),
+    onSuccess: () => {
+        emit('confirm', storeState.modal.isEdit, name.value);
+        handleClose();
+    },
+});
+
 const handleClose = () => {
     bookmarkStore.setModalType(undefined, false, false);
     initForm();
 };
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        if (storeState.modal.isEdit) {
-            await bookmarkStore.updateBookmarkFolder({
-                id: props.selectedBookmark?.id,
-                name: name.value,
-                bookmarkList: props.bookmarkList,
-            });
-        } else {
-            await bookmarkStore.createBookmarkFolder(name.value, state.scope);
+const handleConfirm = () => {
+    if (storeState.modal.isEdit) {
+        bookmarkStore.updateBookmarkFolder({
+            id: props.selectedBookmark?.id,
+            name: name.value,
+            bookmarkList: props.bookmarkList,
+        });
+    } else {
+        let resource_group: ResourceGroupType|undefined;
+        if (state.scope !== BOOKMARK_TYPE.USER) {
+            resource_group = storeState.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
         }
-        emit('confirm', storeState.modal.isEdit, name.value);
-        await handleClose();
-    } finally {
-        state.loading = false;
+        const params = {
+            name: `console:bookmark:${name.value}`,
+            data: {
+                workspaceId: storeState.currentWorkspaceId || '',
+                name: name.value,
+                isGlobal: storeState.isAdminMode,
+            },
+        };
+        createBookmarkFolder({
+            ...params,
+            resource_group,
+        });
     }
 };
 
@@ -143,7 +164,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.FOLDER"
                     :disabled="(name === '' || invalidState.name)"
-                    :loading="state.loading"
+                    :loading="isCreatingBookmarkFolder"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

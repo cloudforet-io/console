@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -10,6 +9,7 @@ import {
     PButton, PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
+import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
@@ -24,6 +24,7 @@ import {
     convertUrlProtocol,
     generateNewFolderName,
 } from '@/common/components/bookmark/composables/use-bookmark';
+import { useBookmarkFolderCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-create-mutation';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
@@ -101,6 +102,12 @@ const {
     },
 });
 
+const { mutate: createBookmarkFolder } = useBookmarkFolderCreateMutation({
+    type: computed(() => state.scope),
+    onSuccess: () => {
+        state.selectedFolderIdx = 0;
+    },
+});
 
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
@@ -112,15 +119,25 @@ const handleDeselectButton = () => {
 };
 
 const handleClickNewFolderButton = async () => {
-    try {
-        const newFolder = generateNewFolderName(state.bookmarkFolderList);
-        await bookmarkStore.createBookmarkFolder(newFolder, state.scope);
-        await fetchBookmarkFolderList();
-        state.selectedFolderIdx = 0;
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
+    const newFolder = await generateNewFolderName(state.bookmarkFolderList);
+    let resource_group: ResourceGroupType|undefined;
+    if (state.scope !== BOOKMARK_TYPE.USER) {
+        resource_group = storeState.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
     }
+    const params = {
+        name: `console:bookmark:${newFolder}`,
+        data: {
+            workspaceId: storeState.currentWorkspaceId || '',
+            name: newFolder,
+            isGlobal: storeState.isAdminMode,
+        },
+    };
+    await createBookmarkFolder({
+        ...params,
+        resource_group,
+    });
 };
+
 const fetchBookmarkFolderList = async () => {
     const defaultFilter: ConsoleFilter[] = [
         { k: 'name', v: 'console:bookmark', o: '' },
