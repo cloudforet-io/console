@@ -3,14 +3,16 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextarea, PTextInput,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceCreateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -23,6 +25,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/top-bar/constants/constant';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 
 interface Props {
@@ -40,7 +43,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
+const workspacePageState = workspacePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const bookmarkStore = useBookmarkStore();
 
@@ -56,30 +59,25 @@ const state = reactive({
     themes: WORKSPACE_LOGO_ICON_THEMES,
 });
 
-const handleClickTheme = (theme: string) => {
-    state.selectedTheme = theme;
-};
-
 const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
-            const isChanged = state.name !== workspacePageStore.selectedWorkspace.name
-                || state.description !== workspacePageStore.selectedWorkspace.tags?.description
-                || state.selectedTheme !== workspacePageStore.selectedWorkspace.tags?.theme;
+            const isChanged = state.name !== workspacePageState.selectedWorkspace.name
+                || state.description !== workspacePageState.selectedWorkspace.tags?.description
+                || state.selectedTheme !== workspacePageState.selectedWorkspace.tags?.theme;
             return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
         }
         return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
     }),
-    // TODO: 중복 체크 로직 추가
     isDuplicatedName: computed(() => {
         if (props.createType === 'EDIT') {
-            return workspacePageState.workspaces.filter((workspace) => workspace.name !== workspacePageStore.selectedWorkspace.name).some((workspace) => workspace.name === state.name);
+            return workspaceListData.value.filter((workspace) => workspace.name !== workspacePageState.selectedWorkspace.name).some((workspace) => workspace.name === state.name);
         }
-        return workspacePageState.workspaces.some((workspace) => workspace.name === state.name);
+        return workspaceListData.value.some((workspace) => workspace.name === state.name);
     }),
     nameInvalidText: computed(() => {
         if (props.createType === 'EDIT') {
-            if (state.name === workspacePageStore.selectedWorkspace.name) return undefined;
+            if (state.name === workspacePageState.selectedWorkspace.name) return undefined;
         }
         if (!state.name?.trim()) return i18n.t('IAM.WORKSPACES.FORM.REQUIRED_NAME');
         if (validationState.isDuplicatedName) return i18n.t('IAM.WORKSPACES.FORM.DUPLICATED_NAME');
@@ -89,42 +87,69 @@ const validationState = reactive({
     nameInvalid: computed(() => state.name !== undefined && !!validationState.nameInvalidText),
 });
 
-const handleConfirm = async () => {
-    try {
-        if (props.createType === 'EDIT') {
-            await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters>({
-                workspace_id: workspacePageStore.selectedWorkspace.workspace_id,
-                name: state.name ?? '',
-                tags: {
-                    ...workspacePageStore.selectedWorkspace.tags,
-                    description: state.description ?? '',
-                    theme: state.selectedTheme ?? 'blue',
-                },
-            });
-            showSuccessMessage(i18n.t('Workspace successfully updated'), '');
-        } else {
-            const response = await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>({
-                name: state.name ?? '',
-                tags: {
-                    description: state.description ?? '',
-                    theme: state.selectedTheme ?? 'blue',
-                },
-            });
-            showSuccessMessage(i18n.t('Workspace successfully created'), '');
-            await bookmarkStore.createDefaultBookmark({
-                workspaceId: response.workspace_id,
-            });
-            emit('confirm', {
-                id: response.workspace_id,
-                name: response.name,
-            });
-        }
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { workspaceListData } = useWorkspaceListQuery();
+const { mutate: createWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceCreateParameters) => workspaceAPI.create(params),
+    onSuccess: async (data) => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_CREATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        emit('refresh');
+        await bookmarkStore.createDefaultBookmark({
+            workspaceId: data?.workspace_id,
+        });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        emit('confirm', {
+            id: data.workspace_id,
+            name: data.name,
+        });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
         state.proxyVisible = false;
+    },
+});
+const { mutate: updateWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceUpdateParameters) => workspaceAPI.update(params),
+    onSuccess: async () => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_UPDATE_WORKSPACE'), '');
+        await userWorkspaceStore.load();
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+
+const handleClickTheme = (theme: string) => {
+    state.selectedTheme = theme;
+};
+
+const handleConfirm = async () => {
+    if (props.createType === 'EDIT') {
+        await updateWorkspaceMutation({
+            workspace_id: workspacePageState.selectedWorkspace.workspace_id,
+            name: state.name ?? '',
+            tags: {
+                ...workspacePageState.selectedWorkspace.tags,
+                description: state.description ?? '',
+                theme: state.selectedTheme ?? 'blue',
+            },
+        });
+    } else {
+        await createWorkspaceMutation({
+            name: state.name ?? '',
+            tags: {
+                description: state.description ?? '',
+                theme: state.selectedTheme ?? 'blue',
+            },
+        });
     }
 };
 
@@ -135,9 +160,9 @@ watch(() => props.visible, (visible) => {
         state.description = '';
         state.selectedTheme = 'blue';
     } else {
-        state.name = workspacePageStore.selectedWorkspace.name;
-        state.description = workspacePageStore.selectedWorkspace.tags?.description ?? '';
-        state.selectedTheme = workspacePageStore.selectedWorkspace.tags?.theme ?? 'blue';
+        state.name = workspacePageState.selectedWorkspace.name;
+        state.description = workspacePageState.selectedWorkspace.tags?.description ?? '';
+        state.selectedTheme = workspacePageState.selectedWorkspace.tags?.theme ?? 'blue';
     }
 }, { immediate: true });
 

@@ -23,6 +23,7 @@ import WorkspacesCreateModal from '@/services/advanced/components/WorkspacesCrea
 import WorkspacesDeleteModal from '@/services/advanced/components/WorkspacesDeleteModal.vue';
 import WorkspacesSetEnableModal from '@/services/advanced/components/WorkspacesSetEnableModal.vue';
 import WorkspacesUserManagementTab from '@/services/advanced/components/WorkspacesUserManagementTab.vue';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
@@ -30,6 +31,7 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
+
 const userPageStore = useUserPageStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
@@ -42,6 +44,7 @@ const { key: workspaceListQueryKey, params: workspaceListQueryParams } = useServ
         query: workspaceListQueryHelper.data,
     })),
 });
+const { workspaceListData } = useWorkspaceListQuery();
 
 const { data: workspaceListQueryData } = useScopedQuery({
     queryKey: workspaceListQueryKey,
@@ -93,7 +96,7 @@ const handleSelectAction = (name: string) => {
         modalState.setEnableModalVisible = true;
         break;
     case 'disable':
-        if (workspacePageStore.$state.workspaces.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
+        if (workspaceListData.value.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
             Vue.notify({
                 group: 'toastTopCenter',
                 type: 'alert',
@@ -123,8 +126,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    workspacePageStore.$dispose();
-    workspacePageStore.$reset();
+    workspacePageStore.init();
 });
 
 </script>

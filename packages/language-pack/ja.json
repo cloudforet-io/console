@@ -3512,6 +3512,11 @@
 		"WORKSPACES": {
 			"ACTION": "作業",
 			"ALL": "すべて",
+			"ALT_S_CREATE_WORKSPACE": "ワークスペースが正常に作成されました。",
+			"ALT_S_DELETE_WORKSPACE": "ワークスペースが削除されました。",
+			"ALT_S_DISABLE_WORKSPACE": "ワークスペースが無効化されました。",
+			"ALT_S_ENABLE_WORKSPACE": "ワークスペースが有効化されました。",
+			"ALT_S_UPDATE_WORKSPACE": "ワークスペースが正常に更新されました。",
 			"CREATE": "作成",
 			"CREATE_WORKSPACE": "ワークスペースの作成",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "ワークスペース名の最大長は80文字です。",

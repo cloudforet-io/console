@@ -31,6 +31,7 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
 const userStore = useUserStore();
 const workspacePageStore = useWorkspacePageStore();
+const workspacePageState = workspacePageStore.state;
 
 const router = useRouter();
 
@@ -43,13 +44,13 @@ const { key: roleBindingListQueryKey, params: roleBindingListQueryParams } = use
 const { data: roleBindingListQueryData } = useScopedQuery({
     queryKey: roleBindingListQueryKey,
     queryFn: async () => roleBindingAPI.list(roleBindingListQueryParams.value),
-    enabled: computed(() => !!workspacePageStore.selectedWorkspace),
+    enabled: computed(() => !!workspacePageState.selectedWorkspace),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
 }, ['DOMAIN']);
 
 const storeState = reactive({
-    currentWorkspace: computed(() => workspacePageStore.selectedWorkspace),
+    currentWorkspace: computed(() => workspacePageState.selectedWorkspace),
 });
 const state = reactive({
     currentWorkspaceId: computed(() => storeState.currentWorkspace?.workspace_id),
@@ -138,7 +139,7 @@ const handleClickButton = () => {
     }).href, '_blank');
 };
 
-watch(() => workspacePageStore.selectedWorkspace, async () => {
+watch(() => workspacePageState.selectedWorkspace, async () => {
     await handleChange();
 }, { immediate: true });
 

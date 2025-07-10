@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PStatus,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
+import type { WorkspaceDisableParameters } from '@/api-clients/identity/workspace/schema/api-verbs/disable';
+import type { WorkspaceEnableParameters } from '@/api-clients/identity/workspace/schema/api-verbs/enable';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -34,12 +41,12 @@ const emit = defineEmits<{(e: ':update:visible'): void,
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
+const workspacePageState = workspacePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    loading: false,
     headerTitle: computed(() => {
         if (props.enableModalType === WORKSPACE_STATE.ENABLE) {
             return i18n.t('IAM.WORKSPACES.ENABLE_WORKSPACE');
@@ -56,26 +63,56 @@ const state = reactive({
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
-    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspace),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageState.selectedWorkspace),
+});
+
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { mutate: enableWorkspaceMutation, isPending: isEnableWorkspacePending } = useMutation({
+    mutationFn: (params: WorkspaceEnableParameters) => workspaceAPI.enable(params),
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_ENABLE_WORKSPACE'), '');
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
+        state.proxyVisible = false;
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+        throw e;
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+const { mutate: disableWorkspaceMutation, isPending: isDisableWorkspacePending } = useMutation({
+    mutationFn: (params: WorkspaceDisableParameters) => workspaceAPI.disable(params),
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_DISABLE_WORKSPACE'), '');
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
+        state.proxyVisible = false;
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+        throw e;
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
 });
 
 const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        if (props.enableModalType === WORKSPACE_STATE.ENABLE) {
-            await SpaceConnector.clientV2.identity.workspace.enable({
-                workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
-            });
-        } else {
-            await SpaceConnector.clientV2.identity.workspace.disable({
-                workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
-            });
-        }
-        state.proxyVisible = false;
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    } finally {
-        state.loading = false;
+    if (props.enableModalType === WORKSPACE_STATE.ENABLE) {
+        await enableWorkspaceMutation({
+            workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
+        });
+    } else {
+        await disableWorkspaceMutation({
+            workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
+        });
     }
 };
 
@@ -93,7 +130,7 @@ const handleClose = () => {
                     :backdrop="true"
                     :visible.sync="state.proxyVisible"
                     :theme-color="enableModalType === WORKSPACE_STATE.ENABLE ? 'primary' : 'alert'"
-                    :loading="state.loading"
+                    :loading="isEnableWorkspacePending || isDisableWorkspacePending"
                     @confirm="handleConfirm"
                     @close="handleClose"
                     @cancel="handleClose"

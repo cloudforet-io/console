@@ -467,6 +467,8 @@ export const API_DOC = {
             'change-workspace-group',
             'create',
             'delete',
+            'disable',
+            'enable',
             'list',
             'remove-package',
             'update',

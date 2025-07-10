@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
-
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -15,6 +13,7 @@ import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/const
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
 
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 
@@ -31,8 +30,6 @@ const router = useRouter();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
-
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
@@ -43,6 +40,8 @@ const storeState = reactive({
 const state = reactive({
     globalFolderList: computed<BookmarkItem[]>(() => storeState.bookmarkFolderList.filter((item) => item.isGlobal)),
 });
+
+const { workspaceListData } = useWorkspaceListQuery();
 
 const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
     if (isEdit && name) {
@@ -91,17 +90,15 @@ const handleConfirmDelete = (isFolder?: boolean) => {
     bookmarkPageStore.setSelectedBookmarkIndices([]);
 };
 
-watch(() => storeState.workspaceList, () => {
-    bookmarkPageStore.fetchBookmarkFolderList();
-});
+// TODO: will be checked
+watch(() => workspaceListData.value, async (list) => {
+    await bookmarkPageStore.setWorkspaceList(list);
+    await bookmarkPageStore.fetchBookmarkFolderList();
+}, { immediate: true });
 
 onUnmounted(() => {
     bookmarkPageStore.resetState();
     bookmarkStore.resetState();
-});
-
-onMounted(() => {
-    bookmarkPageStore.fetchWorkspaceList();
 });
 </script>
 

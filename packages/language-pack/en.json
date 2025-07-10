@@ -3512,6 +3512,11 @@
 		"WORKSPACES": {
 			"ACTION": "Action",
 			"ALL": "All",
+			"ALT_S_CREATE_WORKSPACE": "Workspace successfully created",
+			"ALT_S_DELETE_WORKSPACE": "Workspace successfully deleted",
+			"ALT_S_DISABLE_WORKSPACE": "Workspace successfully disabled",
+			"ALT_S_ENABLE_WORKSPACE": "Workspace successfully enabled",
+			"ALT_S_UPDATE_WORKSPACE": "Workspace successfully updated",
 			"CREATE": "Create",
 			"CREATE_WORKSPACE": "Create Workspace",
 			"CREATE_WORKSPACE_TEXT_LENGTH": "80 characters is the max length of a workspace name.",
