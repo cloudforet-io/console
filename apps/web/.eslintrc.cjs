@@ -1,6 +1,6 @@
 module.exports = {
     root: false,
-    extends: ["custom"],
+    extends: ['custom'],
 
     rules: {
         // eslint-plugin-import rules
@@ -77,10 +77,13 @@ module.exports = {
     ignorePatterns: ['src/assets/**', '**/node_modules/**', 'public/lottie.js'],
     settings: {
         'import/parsers': {
-            '@typescript-eslint/parser': ['.ts'],
+            '@typescript-eslint/parser': ['.ts', '.tsx'],
+            'vue-eslint-parser': ['.vue'],
         },
         'import/resolver': {
-            typescript: {},
+            node: {
+                extensions: ['.js', '.ts', '.vue'],
+            },
         },
     },
 };

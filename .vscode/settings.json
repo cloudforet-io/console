@@ -1,0 +1,21 @@
+{
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "eslint.format.enable": true,
+    "eslint.workingDirectories": [{ "mode": "auto" }],
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "vue.server.hybridMode": "typeScriptPluginOnly",
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    }
+}

@@ -8,7 +8,10 @@ node_modules.nosync/
 
 # Dev tools
 .DS_Store
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+
 .idea
 *.swp
 *.bak
@@ -16,6 +19,9 @@ node_modules.nosync/
 ## Cursor rules : Ignore all files in .cursor directory except specific file (rules)
 .cursor/*
 !.cursor/generate-new-api-clients.mdc
+
+# VS Code workspace files
+*.code-workspace
 
 # Turborepo
 .turbo
