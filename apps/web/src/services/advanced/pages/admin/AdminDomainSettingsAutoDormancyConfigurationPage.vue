@@ -4,21 +4,22 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { isEmpty } from 'lodash';
+
 import {
     PPaneLayout, PDivider, PTextButton, PCheckbox, PToggleButton, PFieldGroup, PTextInput, PButton, PTooltip, PI,
 } from '@cloudforet/mirinae';
 import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { DomainConfigListParameters } from '@/api-clients/config/domain-config/schema/api-verbs/list';
+import { useDomainConfigApi } from '@/api-clients/config/domain-config/composables/use-domain-config-api';
+import type { DomainConfigCreateParameters } from '@/api-clients/config/domain-config/schema/api-verbs/create';
 import type { DomainConfigUpdateParameters } from '@/api-clients/config/domain-config/schema/api-verbs/update';
 import { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
-import type { DomainConfigModel } from '@/api-clients/config/domain-config/schema/model';
-import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
-import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
+import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n as _i18n } from '@/translations';
-
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 import type { Currency } from '@/store/display/type';
@@ -43,15 +44,56 @@ const state = reactive({
         : 'IAM.DOMAIN_SETTINGS.AUTO_DORMANCY_CONFIGURATION_TOGGLE_DISABLED'
     )),
     attributes: { type: 'number' },
-
-    dormancyConfig: {} as DormancyConfig,
     isChanged: computed<boolean>(() => {
-        if ([cost.value, state.dormancyConfig].every((d) => !d)) return false;
-        return (getNumberFromString(cost.value) !== state.dormancyConfig?.cost)
-            || (state.checkbox !== state.dormancyConfig?.send_email);
+        if ([cost.value, dormancyConfigData.value].every((d) => !d)) return false;
+        return (getNumberFromString(cost.value) !== dormancyConfigData.value?.cost)
+            || (state.checkbox !== dormancyConfigData.value?.send_email);
     }),
     statusToggle: false,
     checkbox: false,
+});
+
+const queryClient = useQueryClient();
+const { domainConfigAPI } = useDomainConfigApi();
+const { costReportConfigAPI } = useCostReportConfigApi();
+
+const { key: domainConfigListQueryKey, params: domainConfigListParams } = useServiceQueryKey('config', 'domain-config', 'list', {
+    params: computed(() => ({
+        name: DOMAIN_CONFIG_NAMES.DORMANCY_WORKSPACE,
+    })),
+});
+const { key: costReportConfigQueryKey } = useServiceQueryKey('cost-analysis', 'cost-report-config', 'list');
+
+const { data: dormancyConfigData } = useScopedQuery({
+    queryKey: domainConfigListQueryKey,
+    queryFn: async () => domainConfigAPI.list(domainConfigListParams.value),
+    select: (data) => data.results?.[0]?.data as DormancyConfig ?? null,
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+}, ['DOMAIN']);
+const { data: currencyData } = useScopedQuery({
+    queryKey: costReportConfigQueryKey,
+    queryFn: () => costReportConfigAPI.list({}),
+    select: (data) => data.results?.[0]?.currency as Currency ?? CURRENCY_SYMBOL.USD,
+}, ['DOMAIN']);
+
+const { mutate: createDomainDormancyMutation } = useMutation({
+    mutationFn: (params: DomainConfigCreateParameters) => domainConfigAPI.create(params),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: domainConfigListQueryKey });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e);
+    },
+});
+const { mutate: updateDomainDormancyMutation } = useMutation({
+    mutationFn: (params: DomainConfigUpdateParameters) => domainConfigAPI.update(params),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: domainConfigListQueryKey });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e);
+    },
 });
 
 const {
@@ -62,7 +104,7 @@ const {
     initForm,
     isAllValid,
 } = useFormValidator({
-    cost: undefined as string|undefined,
+    cost: numberFormatter(dormancyConfigData.value?.cost) as string|undefined,
 }, {
     cost: (val?: string) => {
         if (state.statusToggle && !val?.trim()) return _i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_EMPTY_COST');
@@ -83,8 +125,8 @@ const handleChangeToggleButton = async (value: boolean) => {
     try {
         await updateDomainDormancy({
             enabled: value,
-            cost: state.dormancyConfig?.cost || 0,
-            send_email: state.dormancyConfig?.send_email || false,
+            cost: dormancyConfigData.value?.cost || 0,
+            send_email: dormancyConfigData.value?.send_email || false,
         });
         if (value) {
             showSuccessMessage(_i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_DORMANCY_TOGGLE_ENABLE'), '');
@@ -108,52 +150,25 @@ const handleSaveConfig = async () => {
     }
 };
 
-const createDomainDormancy = async (data: DormancyConfig) => {
-    await SpaceConnector.client.config.domainConfig.create<DomainConfigUpdateParameters, DomainConfigModel>({
+const createDomainDormancy = (data: DormancyConfig) => {
+    createDomainDormancyMutation({
         name: DOMAIN_CONFIG_NAMES.DORMANCY_WORKSPACE,
         data,
     });
 };
-const updateDomainDormancy = async (data: DormancyConfig) => {
-    if (!state.dormancyConfig) {
-        await createDomainDormancy(data);
+const updateDomainDormancy = (data: DormancyConfig) => {
+    if (!dormancyConfigData.value) {
+        createDomainDormancy(data);
     } else {
-        await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
+        updateDomainDormancyMutation({
             name: DOMAIN_CONFIG_NAMES.DORMANCY_WORKSPACE,
             data,
         });
     }
-
-    await fetchDomainSettings();
-};
-const fetchDomainSettings = async () => {
-    try {
-        const res = await SpaceConnector.client.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
-            name: DOMAIN_CONFIG_NAMES.DORMANCY_WORKSPACE,
-        });
-        state.dormancyConfig = res.results?.[0].data ?? null;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.dormancyConfig = null;
-    }
-};
-const fetchCostReportConfig = async () => {
-    if (!state.currency) return;
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
-            query: {
-                sort: [{ key: 'created_at', desc: false }],
-            },
-        });
-        state.currency = results?.[0]?.currency;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.currency = undefined;
-    }
 };
 
-watch(() => state.dormancyConfig, (config) => {
-    if (!config) return;
+watch(() => dormancyConfigData.value, (config) => {
+    if (isEmpty(config)) return;
     state.statusToggle = config?.enabled || false;
     state.checkbox = config?.send_email || false;
     setForm('cost', numberFormatter(config?.cost));
@@ -161,8 +176,6 @@ watch(() => state.dormancyConfig, (config) => {
 
 onMounted(async () => {
     await initForm();
-    await fetchDomainSettings();
-    await fetchCostReportConfig;
 });
 </script>
 
@@ -231,7 +244,7 @@ onMounted(async () => {
                                               class="cost-input"
                                               @update:value="handleUpdateCost"
                                 />
-                                <span class="placeholder">{{ CURRENCY_SYMBOL[state.currency] }} {{ state.currency }}</span>
+                                <span class="placeholder">{{ CURRENCY_SYMBOL[currencyData] }} {{ currencyData }}</span>
                             </div>
                         </template>
                     </p-field-group>
