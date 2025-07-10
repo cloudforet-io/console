@@ -26,7 +26,7 @@ export const useUserGroupListQuery = ({ params }: { params: ComputedRef<UserGrou
 
     return {
         userGroupAPI,
-        userGroupListData: computed(() => userGroupListData?.value?.results || []),
+        userGroupListData: computed(() => userGroupListData?.value || []),
         userGroupListFetching,
         userGroupListQueryKey,
     };

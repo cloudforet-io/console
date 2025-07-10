@@ -15,17 +15,18 @@ import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-con
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
-
-
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userPageGetters = userPageStore.getters;
 const userStore = useUserStore();
+
+const selectedUsers = computed(() => userPageState.selectedUsers);
+
+
 
 const state = reactive({
     loading: false,
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
-    refinedTableData: computed(() => userPageGetters.selectedUsers.map((user) => ({
+    refinedTableData: computed(() => selectedUsers.value?.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
     }))),
