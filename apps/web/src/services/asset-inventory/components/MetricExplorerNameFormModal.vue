@@ -166,7 +166,7 @@ const { mutate: updateMetricName } = useMutation({
 const handleFormConfirm = async () => {
     if (!isAllValid) return;
     if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
-        await createMetricExample({
+        createMetricExample({
             metric_id: currentMetric.value?.metric_id || '',
             name: name.value,
             options: {
