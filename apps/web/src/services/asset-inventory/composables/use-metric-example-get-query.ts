@@ -15,6 +15,7 @@ export const useMetricExampleGetQuery = ({ metricExampleId }: UseMetricExampleGe
 
     const { key, params: queryParams } = useServiceQueryKey('inventory', 'metric-example', 'get', {
         params: computed<MetricExampleGetParameters>(() => ({ example_id: metricExampleId.value })),
+        contextKey: metricExampleId,
     });
 
     const query = useScopedQuery({
