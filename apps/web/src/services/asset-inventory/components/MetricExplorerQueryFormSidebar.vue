@@ -3,16 +3,15 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PFieldGroup, PTextInput, PCodeEditor, PButton, POverlayLayout,
 } from '@cloudforet/mirinae';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { MetricCreateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/create';
-import type { MetricUpdateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/update';
+import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
 import { METRIC_TYPE } from '@/api-clients/inventory/metric/schema/constant';
-import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -49,15 +48,15 @@ const state = reactive({
         return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.VIEW_TITLE');
     }),
     disableConfirmButton: computed<boolean>(() => {
-        if (state.loading) return true;
+        if (isLoading.value) return true;
         if (metricExplorerPageState.metricQueryFormMode === 'CREATE') {
             return !isAllValid.value;
         }
         return !!invalidState.name;
-        // || !!invalidState.resourceType;
     }),
     visibleSaveModal: false,
 });
+const isLoading = computed<boolean>(() => createCustomMetricLoading.value || updateCustomMetricLoading.value);
 
 const {
     forms: {
@@ -101,73 +100,73 @@ const {
 });
 
 /* Query */
-const { data: currentMetric } = useMetricGetQuery({
+const { data: currentMetric, metricGetQueryKey } = useMetricGetQuery({
     metricId: computed(() => route.params.metricId),
 });
-const { data: currentNamespaceMetrics } = useMetricListQuery({
+const { data: currentNamespaceMetrics, metricListQueryKey } = useMetricListQuery({
     params: computed(() => ({
         namespace_id: currentMetric.value?.namespace_id,
     })),
 });
 
-/* Api */
-const createCustomMetric = async () => {
-    try {
-        state.loading = true;
-        const jsonParsedQuery = JSON.parse(code.value.trim());
-        const createdMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
-            name: name.value,
-            unit: unit.value,
-            metric_type: METRIC_TYPE.GAUGE,
-            resource_group: RESOURCE_GROUP.WORKSPACE,
-            query_options: jsonParsedQuery,
-            namespace_id: metricExplorerPageState.selectedNamespaceId || '',
-        });
+/* Mutation */
+const { metricAPI } = useMetricApi();
+const queryClient = useQueryClient();
+const { mutate: createCustomMetric, isPending: createCustomMetricLoading } = useMutation({
+    mutationFn: metricAPI.create,
+    onSuccess: async (data) => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        // await metricExplorerPageStore.loadMetric(state.currentMetricId);
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
-                metricId: createdMetric.metric_id,
+                metricId: data.metric_id,
             },
         }).catch(() => {});
-    } catch (e) {
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
+    },
+    onError: (e) => {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
-    } finally {
-        state.loading = false;
-    }
-};
-const updateCustomMetric = async () => {
-    try {
-        state.loading = true;
-        const jsonParsedQuery = JSON.parse(code.value.trim());
-        await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: state.currentMetricId,
-            unit: unit.value,
-            query_options: jsonParsedQuery,
-        });
+    },
+});
+const { mutate: updateCustomMetric, isPending: updateCustomMetricLoading } = useMutation({
+    mutationFn: metricAPI.update,
+    onSuccess: () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        // await metricExplorerPageStore.loadMetric(state.currentMetricId);
         metricExplorerPageStore.setRefreshMetricData(true);
-    } catch (e) {
+        queryClient.resetQueries({ queryKey: metricGetQueryKey });
+    },
+    onError: (e) => {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
-    } finally {
-        state.loading = false;
-    }
-};
+    },
+    onSettled: () => {
+        state.visibleSaveModal = false;
+    },
+});
 
 /* Event */
 const handleClose = () => {
     metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
 };
 const handleCreateCustomMetric = async () => {
-    await createCustomMetric();
+    const jsonParsedQuery = JSON.parse(code.value.trim());
+    createCustomMetric({
+        name: name.value,
+        unit: unit.value,
+        metric_type: METRIC_TYPE.GAUGE,
+        resource_group: RESOURCE_GROUP.WORKSPACE,
+        query_options: jsonParsedQuery,
+        namespace_id: metricExplorerPageState.selectedNamespaceId || '',
+    });
 };
 const handleSaveCustomMetric = async () => {
-    await updateCustomMetric();
-    state.visibleSaveModal = false;
+    const jsonParsedQuery = JSON.parse(code.value.trim());
+    updateCustomMetric({
+        metric_id: state.currentMetricId,
+        unit: unit.value,
+        query_options: jsonParsedQuery,
+    });
 };
 
 watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
@@ -278,7 +277,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
         </p-overlay-layout>
         <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_TITLE')"
                       :visible.sync="state.visibleSaveModal"
-                      :disabled="state.loading"
+                      :disabled="isLoading"
                       @confirm="handleSaveCustomMetric"
         >
             {{ $t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_DESC') }}

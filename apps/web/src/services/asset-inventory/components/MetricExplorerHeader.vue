@@ -4,21 +4,18 @@ import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { clone } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { MetricExampleDeleteParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/delete';
-import type { MetricExampleUpdateParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/update';
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
-import type { MetricCreateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/create';
-import type { MetricDeleteParameters } from '@/api-clients/inventory/metric/schema/api-verbs/delete';
-import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
+import { useMetricExampleApi } from '@/api-clients/inventory/metric-example/composables/use-metric-example-api';
+import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -38,7 +35,7 @@ import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/component
 import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
 import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
-import { useNamespaceListQuery } from '@/services/asset-inventory/composables/use-namespace-list-query';
+import { useNamespaceGetQuery } from '@/services/asset-inventory/composables/use-namespace-get-query';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -73,8 +70,8 @@ const state = reactive({
     hasReadWriteAccess: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[state.selectedMenuId]?.write),
     currentMetricId: computed<string>(() => route.params.metricId),
     isDuplicateEnabled: computed<boolean>(() => {
-        if (!namespaceList.value) return false;
-        return namespaceList.value.find((d) => d.namespace_id === currentMetric.value?.namespace_id)?.group !== 'common';
+        if (!currentNamespace.value) return false;
+        return currentNamespace.value.group !== 'common';
     }),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     isManagedMetric: computed<boolean>(() => (currentMetric.value?.is_managed && !state.currentMetricExampleId) || false),
@@ -153,11 +150,13 @@ const getDuplicatedMetricName = (name: string): string => {
 };
 
 /* Query */
-const { data: namespaceList } = useNamespaceListQuery();
 const { data: currentMetric, isLoading: currentMetricLoading } = useMetricGetQuery({
     metricId: computed(() => route.params.metricId),
 });
-const { data: currentNamespaceMetrics } = useMetricListQuery({
+const { data: currentNamespace } = useNamespaceGetQuery({
+    namespaceId: computed(() => currentMetric.value?.namespace_id || ''),
+});
+const { data: currentNamespaceMetrics, metricListQueryKey } = useMetricListQuery({
     params: computed(() => ({
         namespace_id: currentMetric.value?.namespace_id,
     })),
@@ -165,38 +164,105 @@ const { data: currentNamespaceMetrics } = useMetricListQuery({
 const { data: currentMetricExample } = useMetricExampleGetQuery({
     metricExampleId: computed(() => route.params.metricExampleId),
 });
+const { key: metricExampleListQueryKey } = useServiceQueryKey('inventory', 'metric-example', 'list', {
+    params: computed(() => ({
+        namespace_id: currentMetric.value?.namespace_id,
+    })),
+});
 
-/* Api */
-const duplicateMetric = async () => {
-    if (!currentMetric.value) return;
-    state.loadingDuplicate = true;
-    try {
-        const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
-            name: getDuplicatedMetricName(currentMetric.value.name),
-            namespace_id: currentMetric.value.namespace_id || '',
-            unit: currentMetric.value.unit,
-            metric_type: currentMetric.value.metric_type,
-            resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
-            query_options: currentMetric.value.query_options,
-        });
+/* Mutation */
+const { metricAPI } = useMetricApi();
+const { metricExampleAPI } = useMetricExampleApi();
+const queryClient = useQueryClient();
+const { mutate: duplicateMetric } = useMutation({
+    mutationFn: metricAPI.create,
+    onMutate: () => {
+        state.loadingDuplicate = true;
+    },
+    onSuccess: async (data) => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { metricId: duplicatedMetric.metric_id },
+            params: { metricId: data.metric_id },
         }).catch(() => {});
-    } catch (e) {
+    },
+    onError: async (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
-    } finally {
+    },
+    onSettled: () => {
         state.loadingDuplicate = false;
-    }
-};
-const deleteCustomMetric = async () => {
+    },
+});
+const { mutateAsync: deleteMetric } = useMutation({
+    mutationFn: metricAPI.delete,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
+    },
+});
+const { mutate: deleteMetricExample } = useMutation({
+    mutationFn: metricExampleAPI.delete,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
+        await router.replace({
+            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: { metricId: state.currentMetricId },
+        }).catch(() => {});
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
+    },
+});
+const { mutate: updateMetricExample } = useMutation({
+    mutationFn: metricExampleAPI.update,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_EXAMPLE'));
+    },
+});
+
+/* Event */
+const handleDuplicate = () => {
     if (!currentMetric.value) return;
-    try {
-        await SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>({
+    duplicateMetric({
+        name: getDuplicatedMetricName(currentMetric.value.name),
+        namespace_id: currentMetric.value.namespace_id || '',
+        unit: currentMetric.value.unit,
+        metric_type: currentMetric.value.metric_type,
+        resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+        query_options: currentMetric.value.query_options,
+    });
+};
+const handleSaveMetricExample = () => {
+    updateMetricExample({
+        example_id: state.currentMetricExampleId,
+        options: {
+            granularity: metricExplorerPageState.granularity,
+            period: metricExplorerPageState.period,
+            relative_period: metricExplorerPageState.relativePeriod,
+            group_by: metricExplorerPageState.selectedGroupByList,
+            filters: metricExplorerPageState.filters,
+            operator: metricExplorerPageState.selectedOperator,
+        },
+    });
+};
+const handleDeleteMetric = async () => {
+    if (state.currentMetricExampleId) {
+        deleteMetricExample({
+            example_id: state.currentMetricExampleId,
+        });
+    } else {
+        if (!currentMetric.value) return;
+        await deleteMetric({
             metric_id: currentMetric.value.metric_id,
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
         const otherMetricId = currentNamespaceMetrics.value?.[0]?.metric_id;
         if (otherMetricId) {
             await router.replace({
@@ -208,55 +274,6 @@ const deleteCustomMetric = async () => {
                 name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
             }).catch(() => {});
         }
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
-    }
-};
-const deleteMetricExample = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
-            example_id: state.currentMetricExampleId as string,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
-        await router.replace({
-            name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { metricId: state.currentMetricId },
-        }).catch(() => {});
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
-    }
-};
-const updateMetricExample = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
-            example_id: state.currentMetricExampleId as string,
-            options: {
-                granularity: metricExplorerPageState.granularity,
-                period: metricExplorerPageState.period,
-                relative_period: metricExplorerPageState.relativePeriod,
-                group_by: metricExplorerPageState.selectedGroupByList,
-                filters: metricExplorerPageState.filters,
-                operator: metricExplorerPageState.selectedOperator,
-            },
-        });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_EXAMPLE'));
-    }
-};
-
-/* Event */
-const handleDuplicate = async () => {
-    await duplicateMetric();
-};
-const handleSaveMetricExample = async () => {
-    await updateMetricExample();
-};
-const handleDeleteMetric = async () => {
-    if (state.currentMetricExampleId) {
-        await deleteMetricExample();
-    } else {
-        await deleteCustomMetric();
     }
     state.metricDeleteModalVisible = false;
 };
