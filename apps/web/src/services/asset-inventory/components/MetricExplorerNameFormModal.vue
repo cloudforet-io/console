@@ -5,16 +5,14 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
-import type { MetricExampleCreateParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/create';
-import type { MetricExampleUpdateParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/update';
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
-import type { MetricUpdateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/update';
-import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
+import { useMetricExampleApi } from '@/api-clients/inventory/metric-example/composables/use-metric-example-api';
+import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -98,27 +96,77 @@ const {
 });
 
 /* Query */
-const { data: currentMetric } = useMetricGetQuery({
+const { data: currentMetric, metricGetQueryKey } = useMetricGetQuery({
     metricId: computed(() => route.params.metricId),
 });
-const { data: currentMetricExample } = useMetricExampleGetQuery({
+const { data: currentMetricExample, metricExampleGetQueryKey } = useMetricExampleGetQuery({
     metricExampleId: computed(() => route.params.metricExampleId),
 });
-const { data: namespaceMetricExamples } = useMetricExampleListQuery({
+const { data: namespaceMetricExamples, metricExampleListQueryKey } = useMetricExampleListQuery({
     params: computed(() => ({
         namespace_id: metricExplorerPageState.selectedNamespaceId,
     })),
 });
-const { data: currentNamespaceMetrics } = useMetricListQuery({
+const { data: currentNamespaceMetrics, metricListQueryKey } = useMetricListQuery({
     params: computed(() => ({
         namespace_id: currentMetric.value?.namespace_id,
     })),
 });
 
-/* Api */
-const createMetricExample = async () => {
-    try {
-        const metricExample = await SpaceConnector.clientV2.inventory.metricExample.create<MetricExampleCreateParameters, MetricExampleModel>({
+/* Mutations */
+const { metricAPI } = useMetricApi();
+const { metricExampleAPI } = useMetricExampleApi();
+const queryClient = useQueryClient();
+const { mutate: createMetricExample } = useMutation({
+    mutationFn: metricExampleAPI.create,
+    onSuccess: async (data) => {
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
+        state.proxyVisible = false;
+        await gnbStore.fetchMetricExample();
+        await router.replace({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+            params: {
+                metricId: data.metric_id,
+                metricExampleId: data.example_id,
+            },
+        }).catch(() => {});
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
+    },
+});
+const { mutate: updateMetricExampleName } = useMutation({
+    mutationFn: metricExampleAPI.update,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricExampleGetQueryKey });
+        state.proxyVisible = false;
+        await gnbStore.fetchMetricExample();
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    },
+});
+const { mutate: updateMetricName } = useMutation({
+    mutationFn: metricAPI.update,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricGetQueryKey });
+        state.proxyVisible = false;
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    },
+});
+
+/* Event */
+const handleFormConfirm = async () => {
+    if (!isAllValid) return;
+    if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
+        createMetricExample({
             metric_id: currentMetric.value?.metric_id || '',
             name: name.value,
             options: {
@@ -130,56 +178,17 @@ const createMetricExample = async () => {
                 operator: metricExplorerPageState.selectedOperator,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
-        state.proxyVisible = false;
-        await gnbStore.fetchMetricExample();
-        await router.replace({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
-            params: {
-                metricId: metricExample.metric_id,
-                metricExampleId: metricExample.example_id,
-            },
-        }).catch(() => {});
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
-    }
-};
-const updateMetricName = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: state.currentMetricId,
-            name: name.value,
-        });
-        state.proxyVisible = false;
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
-    }
-};
-const updateMetricExampleName = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
-            example_id: state.currentMetricExampleId,
-            name: name.value,
-        });
-        state.proxyVisible = false;
-        await gnbStore.fetchMetricExample();
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
-    }
-};
-
-/* Event */
-const handleFormConfirm = async () => {
-    if (!isAllValid) return;
-    if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
-        await createMetricExample();
     } else if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         if (state.currentMetricExampleId) {
-            await updateMetricExampleName();
+            updateMetricExampleName({
+                example_id: state.currentMetricExampleId,
+                name: name.value,
+            });
         } else {
-            await updateMetricName();
+            updateMetricName({
+                metric_id: state.currentMetricId,
+                name: name.value,
+            });
         }
     } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
         emit('save-as', name.value);

@@ -15,6 +15,7 @@ export const useNamespaceGetQuery = ({ namespaceId }: UseNamespaceGetQueryOption
 
     const { key, params: queryParams } = useServiceQueryKey('inventory', 'namespace', 'get', {
         params: computed<NamespaceGetParameters>(() => ({ namespace_id: namespaceId.value })),
+        contextKey: namespaceId,
     });
 
     const namespaceIcon = computed<string>(() => {
