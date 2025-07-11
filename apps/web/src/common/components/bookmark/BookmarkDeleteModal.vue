@@ -9,11 +9,15 @@ import { i18n } from '@/translations';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 
+import { useBookmarkFolderDeleteMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-delete-mutation';
+import { useBookmarkLinkDeleteMutation } from '@/common/components/bookmark/composables/use-bookmark-link-delete-mutation';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
 import { gray } from '@/styles/colors';
+
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 interface Props {
     bookmarkList: BookmarkItem[]
@@ -27,6 +31,14 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
 const emit = defineEmits<{(e: 'confirm', isFolder?: boolean): void; }>();
+
+const { mutate: deleteBookmarkFolder } = useBookmarkFolderDeleteMutation({
+    type: computed(() => bookmarkState.bookmarkType || BOOKMARK_TYPE.WORKSPACE),
+    bookmarkList: computed(() => props.bookmarkList),
+});
+const { mutate: deleteBookmarkLink } = useBookmarkLinkDeleteMutation({
+    type: computed(() => bookmarkState.bookmarkType || BOOKMARK_TYPE.WORKSPACE),
+});
 
 const storeState = reactive({
     type: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
@@ -58,13 +70,14 @@ const state = reactive({
 });
 
 const deleteFolder = async (id?: string) => {
-    await bookmarkStore.deleteBookmarkFolder({
-        id,
-        bookmarkList: props.bookmarkList,
+    await deleteBookmarkFolder({
+        name: id || '',
     });
 };
 const deleteLink = async (id?: string) => {
-    await bookmarkStore.deleteBookmarkLink(id);
+    await deleteBookmarkLink({
+        name: id || '',
+    });
 };
 const handleConfirm = async () => {
     state.loading = true;

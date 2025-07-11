@@ -139,44 +139,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 throw e;
             }
         },
-        deleteBookmarkFolder: async ({
-            id, bookmarkList,
-        }: { id?: string, bookmarkList: BookmarkItem[] }) => {
-            try {
-                let fetcher;
-                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
-                    fetcher = SpaceConnector.clientV2.config.userConfig.delete;
-                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.sharedConfig.delete;
-                }
-                await fetcher({
-                    name: id || '',
-                });
-                const foldersLinkItems = bookmarkList.filter((i) => i.folder === id);
-                await Promise.all(foldersLinkItems.map(async (item) => {
-                    await actions.deleteBookmarkLink(item.id || '');
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
-        deleteBookmarkLink: async (id?: string) => {
-            try {
-                let fetcher;
-                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
-                    fetcher = SpaceConnector.clientV2.config.userConfig.delete;
-                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.sharedConfig.delete;
-                }
-                await fetcher({
-                    name: id || '',
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
     };
 
     return {
