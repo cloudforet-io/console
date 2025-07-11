@@ -13,6 +13,7 @@ import { useWorkspaceListQuery } from './use-workspace-list-query';
 
 interface UseBookmarkFolderListQueryReturn {
     bookmarkFolderListData: Ref<BookmarkItem[]>;
+    refresh: () => void;
 }
 
 export const useBookmarkFolderListQuery = (): UseBookmarkFolderListQueryReturn => {
@@ -24,7 +25,6 @@ export const useBookmarkFolderListQuery = (): UseBookmarkFolderListQueryReturn =
             { k: 'name', v: 'console:bookmark', o: '' },
             { k: 'data.link', v: null, o: '=' },
         ]);
-
 
     const { sharedConfigAPI } = useSharedConfigApi();
     const { key: sharedConfigQueryKey, params: sharedConfigParams } = useServiceQueryKey('config', 'shared-config', 'list', {

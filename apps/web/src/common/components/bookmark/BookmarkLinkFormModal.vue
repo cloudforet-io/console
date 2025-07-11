@@ -18,6 +18,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import getRandomId from '@/lib/random-id-generator';
 
 import {
     checkValidUrl,
@@ -25,6 +26,7 @@ import {
     generateNewFolderName,
 } from '@/common/components/bookmark/composables/use-bookmark';
 import { useBookmarkFolderCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-create-mutation';
+import { useBookmarkLinkCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-create-mutation';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
@@ -108,6 +110,14 @@ const { mutate: createBookmarkFolder } = useBookmarkFolderCreateMutation({
         state.selectedFolderIdx = 0;
     },
 });
+const { mutate: createBookmarkLink } = useBookmarkLinkCreateMutation({
+    type: computed(() => state.scope),
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
+        emit('confirm', state.selectedFolder, state.scope);
+        handleClose();
+    },
+});
 
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
@@ -187,13 +197,21 @@ const handleConfirm = async () => {
                 folder: state.selectedFolder?.id,
             });
         } else {
-            await bookmarkStore.createBookmarkLink({
-                name: name.value,
-                link: convertedLink,
-                folder: state.selectedFolder?.id,
-                type: state.scope,
+            let resource_group: undefined|ResourceGroupType;
+            if (state.scope !== BOOKMARK_TYPE.USER) {
+                resource_group = storeState.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
+            }
+            createBookmarkLink({
+                name: `console:bookmark:${state.selectedFolder?.id}:${name.value}-${getRandomId()}`,
+                data: {
+                    workspaceId: storeState.currentWorkspaceId || '',
+                    name: name.value,
+                    folder: state.selectedFolder?.id,
+                    link: convertedLink,
+                    isGlobal: resource_group === 'DOMAIN',
+                },
+                resource_group,
             });
-            showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
         emit('confirm', state.selectedFolder, state.scope);
         await handleClose();
@@ -202,6 +220,9 @@ const handleConfirm = async () => {
     }
 };
 
+watch(() => props.bookmarkFolderList, (newVal) => {
+    state.bookmarkFolderList = newVal;
+}, { immediate: true });
 watch(() => storeState.bookmarkType, (bookmarkType) => {
     if (storeState.isWorkspaceMember) {
         state.selectedRadioIdx = 0;
@@ -221,11 +242,11 @@ watch(() => storeState.modal.type, (type) => {
     if (storeState.modal.isEdit) {
         setForm('name', storeState.selectedBookmark?.name as string || '');
         setForm('link', storeState.selectedBookmark?.link || '');
-        state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
+        state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
         return;
     }
     if (!storeState.modal.isNew && storeState.selectedBookmark) {
-        state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
+        state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
     }
 }, { immediate: true });
 </script>

@@ -15,17 +15,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
-type BookmarkFolderCreateResult = UserConfigModel<Record<string, any>> | SharedConfigModel<Record<string, any>>;
-type BookmarkFolderCreateParameters = Partial<UserConfigCreateParameters | SharedConfigCreateParameters>;
+type BookmarkLinkCreateResult = UserConfigModel<Record<string, any>> | SharedConfigModel<Record<string, any>>;
+type BookmarkLinkCreateParameters = Partial<UserConfigCreateParameters | SharedConfigCreateParameters>;
 
-interface UseBookmarkFolderCreateMutationOptions {
+interface UseBookmarkLinkCreateMutationOptions {
     type?: ComputedRef<BookmarkType>;
-    onSuccess?: (data: BookmarkFolderCreateResult, variables: BookmarkFolderCreateParameters) => void|Promise<void>;
-    onError?: (error: Error, variables: BookmarkFolderCreateParameters) => void|Promise<void>;
-    onSettled?: (data: BookmarkFolderCreateResult | undefined, error: Error|null, variables: BookmarkFolderCreateParameters) => void|Promise<void>;
+    onSuccess?: (data: BookmarkLinkCreateResult, variables: BookmarkLinkCreateParameters) => void|Promise<void>;
+    onError?: (error: Error, variables: BookmarkLinkCreateParameters) => void|Promise<void>;
+    onSettled?: (data: BookmarkLinkCreateResult | undefined, error: Error|null, variables: BookmarkLinkCreateParameters) => void|Promise<void>;
 }
 
-export const useBookmarkFolderCreateMutation = (options?: UseBookmarkFolderCreateMutationOptions) => {
+export const useBookmarkLinkCreateMutation = (options?: UseBookmarkLinkCreateMutationOptions) => {
     const queryClient = useQueryClient();
     const { userConfigAPI } = useUserConfigApi();
     const { sharedConfigAPI } = useSharedConfigApi();
@@ -33,8 +33,8 @@ export const useBookmarkFolderCreateMutation = (options?: UseBookmarkFolderCreat
     const { key: userConfigListQueryKey } = useServiceQueryKey('config', 'user-config', 'list');
     const { key: sharedConfigListQueryKey } = useServiceQueryKey('config', 'shared-config', 'list');
 
-    return useMutation<BookmarkFolderCreateResult, Error, BookmarkFolderCreateParameters>({
-        mutationFn: (params: BookmarkFolderCreateParameters) => {
+    return useMutation<BookmarkLinkCreateResult, Error, BookmarkLinkCreateParameters>({
+        mutationFn: (params: BookmarkLinkCreateParameters) => {
             if (options?.type?.value === BOOKMARK_TYPE.USER) {
                 return userConfigAPI.set(params as UserConfigCreateParameters);
             }

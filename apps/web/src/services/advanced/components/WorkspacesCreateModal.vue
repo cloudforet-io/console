@@ -18,8 +18,10 @@ import { i18n } from '@/translations';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import getRandomId from '@/lib/random-id-generator';
 
-import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
+import { useBookmarkLinkCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-create-mutation';
+import { DEFAULT_BOOKMARK } from '@/common/components/bookmark/constant/constant';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/top-bar/constants/constant';
@@ -27,6 +29,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 interface Props {
     visible: boolean;
@@ -45,7 +48,6 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
-const bookmarkStore = useBookmarkStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -96,9 +98,7 @@ const { mutate: createWorkspaceMutation } = useMutation({
     onSuccess: async (data) => {
         showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_CREATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
-        await bookmarkStore.createDefaultBookmark({
-            workspaceId: data?.workspace_id,
-        });
+        createDefaultBookmark(data.workspace_id);
         queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
         emit('confirm', {
             id: data.workspace_id,
@@ -126,7 +126,31 @@ const { mutate: updateWorkspaceMutation } = useMutation({
         state.proxyVisible = false;
     },
 });
+const { mutate: createBookmarkLink } = useBookmarkLinkCreateMutation({
+    type: computed(() => BOOKMARK_TYPE.WORKSPACE),
+});
 
+const createDefaultBookmark = async (workspaceId: string) => {
+    try {
+        DEFAULT_BOOKMARK.map(async (item) => {
+            await createBookmarkLink({
+                name: `console:bookmark:undefined:${item.name as string || ''}-${getRandomId()}`,
+                data: {
+                    name: item.name as string || '',
+                    folder: undefined,
+                    link: item.link || '',
+                    imgIcon: item.imgIcon,
+                    workspaceId,
+                    isGlobal: false,
+                },
+                resource_group: 'WORKSPACE',
+                workspace_id: workspaceId,
+            });
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 const handleClickTheme = (theme: string) => {
     state.selectedTheme = theme;
 };
