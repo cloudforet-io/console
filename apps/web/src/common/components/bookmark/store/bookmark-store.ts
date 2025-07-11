@@ -82,38 +82,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             state.selectedBookmark = undefined;
             state.selectedBookmarks = [];
         },
-        updateBookmarkFolder: async ({
-            id, name, bookmarkList,
-        }: { id?: string, name: string, bookmarkList: BookmarkItem[] }) => {
-            try {
-                let fetcher;
-                if (state.bookmarkType === BOOKMARK_TYPE.USER) {
-                    fetcher = SpaceConnector.clientV2.config.userConfig.update;
-                } else if (_getters.isAdminMode || state.bookmarkType === BOOKMARK_TYPE.WORKSPACE) {
-                    fetcher = SpaceConnector.clientV2.config.sharedConfig.update;
-                }
-                await fetcher({
-                    name: id || '',
-                    data: {
-                        workspaceId: _getters.currentWorkspaceId,
-                        name,
-                        isGlobal: _getters.isAdminMode,
-                    },
-                });
-                const foldersLinkItems = bookmarkList.filter((i) => i.folder === id);
-                await Promise.all(foldersLinkItems.map(async (item) => {
-                    await actions.updateBookmarkLink({
-                        id: item.id || '',
-                        name: item.name as string || '',
-                        link: item.link || '',
-                        folder: item.folder,
-                    });
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
         updateBookmarkLink: async ({
             id, name, link, folder,
         }: { id: string, name?: string|TranslateResult, link?: string, folder?: string}) => {

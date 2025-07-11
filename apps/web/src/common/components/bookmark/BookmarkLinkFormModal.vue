@@ -27,6 +27,7 @@ import {
 } from '@/common/components/bookmark/composables/use-bookmark';
 import { useBookmarkFolderCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-create-mutation';
 import { useBookmarkLinkCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-create-mutation';
+import { useBookmarkLinkUpdateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-update-mutation';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
@@ -64,7 +65,6 @@ const storeState = reactive({
     bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
-    loading: false,
     bookmarkFolderList: [] as BookmarkItem[],
     selectedFolderIdx: undefined as number|undefined,
     selectedFolder: computed<BookmarkItem|undefined>(() => (state.bookmarkFolderList ? state.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
@@ -110,10 +110,17 @@ const { mutate: createBookmarkFolder } = useBookmarkFolderCreateMutation({
         state.selectedFolderIdx = 0;
     },
 });
-const { mutate: createBookmarkLink } = useBookmarkLinkCreateMutation({
+const { mutate: createBookmarkLink, isPending: isCreatingBookmarkLink } = useBookmarkLinkCreateMutation({
     type: computed(() => state.scope),
     onSuccess: () => {
         showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
+        emit('confirm', state.selectedFolder, state.scope);
+        handleClose();
+    },
+});
+const { mutate: updateBookmarkLink, isPending: isUpdatingBookmarkLink } = useBookmarkLinkUpdateMutation({
+    type: computed(() => state.scope),
+    onSuccess: () => {
         emit('confirm', state.selectedFolder, state.scope);
         handleClose();
     },
@@ -182,42 +189,41 @@ const fetchBookmarkFolderList = async () => {
     }
 };
 const handleConfirm = async () => {
-    state.loading = true;
     let convertedLink = link.value;
     if (!checkValidUrl(link.value)) {
         convertedLink = convertUrlProtocol(link.value);
     }
 
-    try {
-        if (storeState.modal.isEdit) {
-            await bookmarkStore.updateBookmarkLink({
-                id: storeState.selectedBookmark?.id || '',
+    if (storeState.modal.isEdit) {
+        await updateBookmarkLink({
+            name: storeState.selectedBookmark?.id || '',
+            data: {
+                workspaceId: storeState.currentWorkspaceId || '',
                 name: name.value,
-                link: convertedLink,
                 folder: state.selectedFolder?.id,
-            });
-        } else {
-            let resource_group: undefined|ResourceGroupType;
-            if (state.scope !== BOOKMARK_TYPE.USER) {
-                resource_group = storeState.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
-            }
-            createBookmarkLink({
-                name: `console:bookmark:${state.selectedFolder?.id}:${name.value}-${getRandomId()}`,
-                data: {
-                    workspaceId: storeState.currentWorkspaceId || '',
-                    name: name.value,
-                    folder: state.selectedFolder?.id,
-                    link: convertedLink,
-                    isGlobal: resource_group === 'DOMAIN',
-                },
-                resource_group,
-            });
+                link: convertedLink,
+                isGlobal: storeState.isAdminMode,
+            },
+        });
+    } else {
+        let resource_group: undefined|ResourceGroupType;
+        if (state.scope !== BOOKMARK_TYPE.USER) {
+            resource_group = storeState.isAdminMode ? 'DOMAIN' : 'WORKSPACE';
         }
-        emit('confirm', state.selectedFolder, state.scope);
-        await handleClose();
-    } finally {
-        state.loading = false;
+        await createBookmarkLink({
+            name: `console:bookmark:${state.selectedFolder?.id}:${name.value}-${getRandomId()}`,
+            data: {
+                workspaceId: storeState.currentWorkspaceId || '',
+                name: name.value,
+                folder: state.selectedFolder?.id,
+                link: convertedLink,
+                isGlobal: resource_group === 'DOMAIN',
+            },
+            resource_group,
+        });
     }
+    emit('confirm', state.selectedFolder, state.scope);
+    await handleClose();
 };
 
 watch(() => props.bookmarkFolderList, (newVal) => {
@@ -259,7 +265,7 @@ watch(() => storeState.modal.type, (type) => {
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.LINK"
                     :disabled="!isAllValid"
-                    :loading="state.loading"
+                    :loading="isCreatingBookmarkLink || isUpdatingBookmarkLink"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

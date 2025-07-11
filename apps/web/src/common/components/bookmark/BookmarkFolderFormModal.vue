@@ -15,6 +15,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
 import { useBookmarkFolderCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-create-mutation';
+import { useBookmarkFolderUpdateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-update-mutation';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
@@ -105,6 +106,14 @@ const { mutate: createBookmarkFolder, isPending: isCreatingBookmarkFolder } = us
         handleClose();
     },
 });
+const { mutate: updateBookmarkFolder, isPending: isUpdatingBookmarkFolder } = useBookmarkFolderUpdateMutation({
+    type: computed(() => state.scope),
+    bookmarkList: computed(() => props.bookmarkList),
+    onSuccess: () => {
+        emit('confirm', storeState.modal.isEdit, name.value);
+        handleClose();
+    },
+});
 
 const handleClose = () => {
     bookmarkStore.setModalType(undefined, false, false);
@@ -113,10 +122,13 @@ const handleClose = () => {
 
 const handleConfirm = () => {
     if (storeState.modal.isEdit) {
-        bookmarkStore.updateBookmarkFolder({
-            id: props.selectedBookmark?.id,
-            name: name.value,
-            bookmarkList: props.bookmarkList,
+        updateBookmarkFolder({
+            name: props.selectedBookmark?.id || '',
+            data: {
+                workspaceId: storeState.currentWorkspaceId || '',
+                name: name.value,
+                isGlobal: storeState.isAdminMode,
+            },
         });
     } else {
         let resource_group: ResourceGroupType|undefined;
@@ -164,7 +176,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.FOLDER"
                     :disabled="(name === '' || invalidState.name)"
-                    :loading="isCreatingBookmarkFolder"
+                    :loading="isCreatingBookmarkFolder || isUpdatingBookmarkFolder"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
