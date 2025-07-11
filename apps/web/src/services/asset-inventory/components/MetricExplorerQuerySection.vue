@@ -7,6 +7,8 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPopover, PBadge, PTooltip, PIconButton,
@@ -28,6 +30,7 @@ import type { Granularity } from '@/services/asset-inventory/types/asset-analysi
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -44,6 +47,14 @@ const state = reactive({
         });
         return count;
     }),
+});
+const periodText = computed<string>(() => {
+    if (isEmpty(metricExplorerPageState.period)) {
+        return '';
+    } if (metricExplorerPageGetters.isRealtimeChart) {
+        return metricExplorerPageState.period.start;
+    }
+    return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
 });
 
 /* Api */
@@ -115,7 +126,7 @@ watch(() => route.params, async () => {
             </div>
             <div class="right-part">
                 <span class="period-text">
-                    {{ metricExplorerPageState.periodText }}
+                    {{ periodText }}
                 </span>
                 <p-tooltip :contents="$t('INVENTORY.METRIC_EXPLORER.UPDATE_WITH_THE_LATEST_DATA')"
                            position="bottom"
