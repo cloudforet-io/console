@@ -181,7 +181,7 @@ const drawChart = (rawData?: AnalyzeResponse<MetricDataAnalyzeResult>) => {
         state.proxyLegend = d.selected;
     });
 };
-watch([() => chartContext.value, () => props.loading, () => props.data], async ([_chartContext, loading, data]) => {
+watch([() => chartContext.value, () => props.loading, () => props.data, () => props.stacked], async ([_chartContext, loading, data]) => {
     if (_chartContext && !loading) {
         drawChart(data);
     }
