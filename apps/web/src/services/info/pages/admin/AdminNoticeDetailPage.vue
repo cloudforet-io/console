@@ -4,14 +4,15 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButton, PButtonModal, PHeading, PHeadingLayout, PDataTable, PStatus,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { PostSendParameters } from '@/api-clients/board/post/schema/api-verbs/send';
+import { usePostApi } from '@/api-clients/board/post/composables/use-post-api';
 import type { PostModel } from '@/api-clients/board/post/schema/model';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
@@ -60,7 +61,6 @@ const state = reactive({
     deleteModalVisible: false,
     allSendingEmailModalVisible: false,
     specificSendingEmailModalVisible: false,
-    sendLoading: false,
     isAllWorkspace: computed<boolean>(() => (!storeState.post?.workspaces || storeState.post?.workspaces?.includes('*')) ?? true),
     scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
         if (state.isAllWorkspace) return undefined;
@@ -68,7 +68,7 @@ const state = reactive({
     }),
 });
 
-const tableField:DataTableField = [
+const tableField:DataTableField[] = [
     { name: 'name', label: 'Workspace' },
     { name: 'state', label: 'State' },
 ];
@@ -108,32 +108,38 @@ const handleOpenEmailSendingModal = () => {
     }
     state.specificSendingEmailModalVisible = true;
 };
+const { postAPI } = usePostApi();
+const { mutate: sendEmailMutation, isPending: isSendingEmail } = useMutation({
+    mutationFn: postAPI.send,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
+    },
+    onError: (e) => {
+        showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
+    },
+    onSettled: () => {
+        state.allSendingEmailModalVisible = false;
+        state.specificSendingEmailModalVisible = false;
+    },
+});
 const handleClickSendEmail = async () => {
-    state.sendLoading = true;
     const loadingMessageId = showLoadingMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SENDING'), '');
-
     try {
         const delayHideLoadingMessage = new Promise((resolve) => {
             setTimeout(resolve, 1500);
         });
 
         await Promise.all([
-            SpaceConnector.clientV2.board.post.send<PostSendParameters>({
+            sendEmailMutation({
                 post_id: props.postId,
             }),
             delayHideLoadingMessage,
         ]);
 
         hideLoadingMessage(loadingMessageId);
-        showSuccessMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_S_SEND_EMAIL'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
         hideLoadingMessage(loadingMessageId);
-        showErrorMessage(i18n.t('INFO.NOTICE.DETAIL.ALT_E_SEND_EMAIL'), e);
-    } finally {
-        state.allSendingEmailModalVisible = false;
-        state.specificSendingEmailModalVisible = false;
-        state.sendLoading = false;
     }
 };
 
@@ -168,7 +174,7 @@ onBeforeMount(async () => {
                     <p-button v-if="storeState.post?.resource_group !== RESOURCE_GROUP.SYSTEM"
                               style-type="tertiary"
                               icon-left="ic_paper-airplane"
-                              :loading="state.sendLoading"
+                              :loading="isSendingEmail"
                               @click="handleOpenEmailSendingModal"
                     >
                         {{ $t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE') }}
