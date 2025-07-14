@@ -15,9 +15,9 @@ import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
-import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { PostModel } from '@/schema/board/post/model';
+import type { PostListParameters } from '@/api-clients/board/post/schema/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
+import type { PostModel } from '@/api-clients/board/post/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

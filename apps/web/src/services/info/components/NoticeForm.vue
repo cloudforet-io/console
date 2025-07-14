@@ -17,10 +17,10 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { ContentsType, ResourceGroupType } from '@/api-clients/_common/schema/type';
+import type { PostUpdateParameters } from '@/api-clients/board/post/schema/api-verbs/update';
+import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { SpaceRouter } from '@/router';
-import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
-import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

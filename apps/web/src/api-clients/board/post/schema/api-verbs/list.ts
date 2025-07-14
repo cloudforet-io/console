@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { PostBoardType } from '@/schema/board/post/type';
+import type { PostBoardType } from '@/api-clients/board/post/schema/type';
 
 export interface PostListParameters {
     query?: Query;

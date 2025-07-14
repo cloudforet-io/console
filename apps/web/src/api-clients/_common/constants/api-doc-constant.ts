@@ -129,6 +129,16 @@ export const API_DOC = {
             'verify-plugin',
         ],
     },
+    board: {
+        post: [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'send',
+            'update',
+        ],
+    },
     config: {
         'domain-config': [
             'create',

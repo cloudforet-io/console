@@ -4,11 +4,11 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { PostCreateParameters } from '@/schema/board/post/api-verbs/create';
-import type { PostDeleteParameters } from '@/schema/board/post/api-verbs/delete';
-import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
-import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
-import type { PostModel } from '@/schema/board/post/model';
+import type { PostCreateParameters } from '@/api-clients/board/post/schema/api-verbs/create';
+import type { PostDeleteParameters } from '@/api-clients/board/post/schema/api-verbs/delete';
+import type { PostGetParameters } from '@/api-clients/board/post/schema/api-verbs/get';
+import type { PostUpdateParameters } from '@/api-clients/board/post/schema/api-verbs/update';
+import type { PostModel } from '@/api-clients/board/post/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

@@ -13,10 +13,10 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { PostListParameters } from '@/api-clients/board/post/schema/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
+import type { PostModel } from '@/api-clients/board/post/schema/model';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
-import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { PostModel } from '@/schema/board/post/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
