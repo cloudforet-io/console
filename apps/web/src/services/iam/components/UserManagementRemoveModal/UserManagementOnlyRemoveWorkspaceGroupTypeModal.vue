@@ -19,14 +19,10 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userStore = useUserStore();
 
-const selectedUsers = computed(() => userPageState.selectedUsers);
-
-
-
 const state = reactive({
     loading: false,
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
-    refinedTableData: computed(() => selectedUsers.value?.map((user) => ({
+    refinedTableData: computed(() => userPageState.selectedUsers?.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
     }))),

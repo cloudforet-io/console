@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watchEffect,
-    ref, watch,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, map } from 'lodash';
@@ -29,16 +26,11 @@ import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group
 import { useWorkspaceUserListQuery } from '@/services/iam/composables/use-workspace-user-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { UserListItemType } from '@/services/iam/types/user-type';
-
-
 
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
-
-const selectedOnlyWorkspaceUsers = ref<UserListItemType[] | any[]>([]);
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -65,21 +57,73 @@ const state = reactive({
     isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
     filteredServices: undefined,
     filteredItems: [],
-    filteredUniqueItems: [],
-    selectedOnlyWorkspaceUsers,
-});
+    filteredUniqueItems: computed(() => {
+        const serviceList = serviceListQuery.data.value;
+        const userGroups = userGroupListData.value;
+        const selectedUsers = userPageState.selectedUsers;
 
-watch(
-    [
-        () => workspaceUserList.value,
-        () => userGroupListData.value,
-        () => state.filteredUniqueItems,
-        () => serviceListQuery.data.value,
-    ],
-    ([workspaceUsers, userGroups, filteredItems, serviceList]) => {
-        if (!workspaceUsers || !userGroups || !filteredItems?.length || !serviceList) return;
+        if (!serviceList || !userGroups || !selectedUsers?.length) return [];
 
-        selectedOnlyWorkspaceUsers.value = workspaceUsers
+        const list: any[] = [];
+
+        selectedUsers.forEach((selectedUser) => {
+            Object.values(serviceList).forEach((service) => {
+                if (service && service.members) {
+                    if (Object.keys(service.members).includes('USER')) {
+                        if (selectedUser.user_id && service.members.USER.includes(selectedUser.user_id)) {
+                            list.push({
+                                ...selectedUser,
+                                service: service.name,
+                            });
+                        }
+                    } else {
+                        list.push({
+                            ...selectedUser,
+                            user_group: userGroups
+                                .filter((group) => group.users?.includes(selectedUser.user_id ?? ''))
+                                .map((group) => group.name),
+                        });
+                    }
+                }
+            });
+            list.push(selectedUser);
+        });
+
+        return Object.values(list.reduce((acc, cur) => {
+            if (!acc[cur.user_id]) {
+                const { user_id, ...rest } = cur;
+                acc[cur.user_id] = {
+                    user_id,
+                    service: [],
+                    user_group: [],
+                    ...rest,
+                };
+            }
+
+            if (cur.service !== undefined) {
+                if (!Array.isArray(acc[cur.user_id].service)) {
+                    acc[cur.user_id].service = [];
+                }
+                acc[cur.user_id].service.push(cur.service);
+            }
+            if (cur.user_group !== undefined) {
+                if (!Array.isArray(acc[cur.user_id].user_group)) {
+                    acc[cur.user_id].user_group = [];
+                }
+                acc[cur.user_id].user_group = cur.user_group;
+            }
+            return acc;
+        }, {}));
+    }),
+    selectedOnlyWorkspaceUsers: computed(() => {
+        const workspaceUsers = workspaceUserList.value;
+        const userGroups = userGroupListData.value;
+        const filteredItems = state.filteredUniqueItems;
+        const serviceList = serviceListQuery.data.value;
+
+        if (!workspaceUsers || !userGroups || !filteredItems?.length || !serviceList) return [];
+
+        return workspaceUsers
             .filter((user) => !user.role_binding_info?.workspace_group_id
                 && filteredItems.map((item: any) => item.user_id).includes(user.user_id))
             .map((user) => {
@@ -97,9 +141,10 @@ watch(
                     service: userServiceNames,
                 };
             });
-    },
-    { immediate: true, deep: true },
-);
+    }),
+});
+
+
 
 /* Component */
 const checkModalConfirm = async () => {
@@ -218,62 +263,6 @@ const { userGroupListData } = useUserGroupListQuery({
     })),
 });
 
-/* Watcher */
-watchEffect(() => {
-    const serviceList = serviceListQuery.data.value;
-
-    if (serviceList) {
-        const list: any[] = [];
-        userPageState.selectedUsers?.forEach((selectedUser) => {
-            Object.values(serviceList).forEach((service) => {
-                if (service && service.members) {
-                    if (Object.keys(service.members).includes('USER')) {
-                        if (selectedUser.user_id && service.members.USER.includes(selectedUser.user_id)) {
-                            list.push({
-                                ...selectedUser,
-                                service: service.name,
-                            });
-                        }
-                    } else {
-                        list.push({
-                            ...selectedUser,
-                            user_group: userGroupListData.value.filter((group) => group.users?.includes(selectedUser.user_id ?? '')).map((group) => group.name),
-                            service: service.name,
-                        });
-                    }
-                }
-            });
-            list.push(selectedUser);
-        });
-        if (list.length > 0) {
-            state.filteredUniqueItems = Object.values(list.reduce((acc, cur) => {
-                if (!acc[cur.user_id]) {
-                    const { user_id, ...rest } = cur;
-                    acc[cur.user_id] = {
-                        user_id,
-                        service: [],
-                        user_group: [],
-                        ...rest,
-                    };
-                }
-
-                if (cur.service !== undefined) {
-                    if (!Array.isArray(acc[cur.user_id].service)) {
-                        acc[cur.user_id].service = [];
-                    }
-                    acc[cur.user_id].service.push(cur.service);
-                }
-                if (cur.user_group !== undefined) {
-                    if (!Array.isArray(acc[cur.user_id].user_group)) {
-                        acc[cur.user_id].user_group = [];
-                    }
-                    acc[cur.user_id].user_group = cur.user_group;
-                }
-                return acc;
-            }, {}));
-        }
-    }
-});
 </script>
 
 <template>

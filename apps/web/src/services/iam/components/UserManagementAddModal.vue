@@ -48,7 +48,8 @@ const domainStore = useDomainStore();
 const route = useRoute();
 
 const queryClient = useQueryClient();
-const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
 
 
 const storeState = reactive({
@@ -139,12 +140,14 @@ const handleClose = () => {
 const { mutateAsync: createUser } = useUserCreateMutation({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
         userPageStore.setSelectedIndices([]);
     },
 });
 const { mutateAsync: createWorkspaceUser } = useWorkspaceUserCreateMutation({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
         userPageStore.setSelectedIndices([]);
     },
 });
@@ -173,29 +176,26 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
         }
     };
 
-    try {
-        if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
-            await createUser({
-                ...userInfoParams,
-                tags: state.tags,
-            });
-            await createRoleBinding();
-        } else if (item.isNew) {
-            await createWorkspaceUser({
-                ...userInfoParams,
-                role_id: state.role.name || '',
-            });
-        } else {
-            await createRoleBinding();
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
+        await createUser({
+            ...userInfoParams,
+            tags: state.tags,
+        });
+        await createRoleBinding();
+    } else if (item.isNew) {
+        await createWorkspaceUser({
+            ...userInfoParams,
+            role_id: state.role.name || '',
+        });
+    } else {
+        await createRoleBinding();
     }
 };
 
 const { mutateAsync: createRoleBinding } = useRoleBindingCreateMutation({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
     },
 });
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
@@ -225,6 +225,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
 const { mutateAsync: addUserToWorkspaceGroup } = useWorkspaceGroupAddUsersMutation({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
     },
 });
 
