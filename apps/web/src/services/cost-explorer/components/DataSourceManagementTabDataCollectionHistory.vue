@@ -25,9 +25,10 @@ import {
 
 import DataSourceManagementTabDataCollectionHistoryModal
     from '@/services/cost-explorer/components/DataSourceManagementTabDataCollectionHistoryModal.vue';
+import { useDataSourceGetQuery } from '@/services/cost-explorer/composables/use-data-source-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type {
-    DataSourceItem, CostJobItem, CostJobStatusInfo, DataCollectionHistoryModalType,
+    CostJobItem, CostJobStatusInfo, DataCollectionHistoryModalType,
 } from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
@@ -35,12 +36,8 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
-    dataSourceLoading: computed<boolean>(() => dataSourcesPageState.dataSourceLoading),
-    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
-    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
-    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
 });
 const state = reactive({
     loading: false,
@@ -72,8 +69,8 @@ const tableState = reactive({
     valueHandlerMap: computed<ValueHandlerMap>(() => {
         const resourceType = 'cost_analysis.Job';
         return {
-            job_id: makeDistinctValueHandler(resourceType, 'job_id', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
-            created_at: makeDistinctValueHandler(resourceType, 'created_at', 'datetime', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
+            job_id: makeDistinctValueHandler(resourceType, 'job_id', 'string', [{ k: 'data_source_id', v: dataSourcesPageState.selectedDataSourceId, o: 'eq' }]),
+            created_at: makeDistinctValueHandler(resourceType, 'created_at', 'datetime', [{ k: 'data_source_id', v: dataSourcesPageState.selectedDataSourceId, o: 'eq' }]),
         };
     }),
     searchFilters: [] as ConsoleFilter[],
@@ -87,6 +84,9 @@ const tableState = reactive({
     ]),
     selectedStatusFilter: 'ALL',
 });
+
+/* Query */
+const { dataSourceData, isLoading } = useDataSourceGetQuery(computed(() => dataSourcesPageState.selectedDataSourceId));
 
 const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
     let info = {} as CostJobStatusInfo;
@@ -201,7 +201,7 @@ const fetchJobList = async () => {
         jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit)
             .setFilters(tableState.searchFilters);
         await dataSourcesPageStore.fetchJobList({
-            data_source_id: storeState.selectedItem?.data_source_id || '',
+            data_source_id: dataSourcesPageState.selectedDataSourceId,
             query: jobListApiQueryHelper.data,
         });
     } finally {
@@ -218,8 +218,8 @@ watch(() => tableState.selectedStatusFilter, async (selectedStatusFilter) => {
 
     await fetchJobList();
 });
-watch(() => storeState.selectedItem, () => {
-    if (storeState.dataSourceLoading) return;
+watch(() => dataSourcesPageState.selectedDataSourceId, () => {
+    if (isLoading.value) return;
     state.loading = true;
     tableState.selectedStatusFilter = 'ALL';
     initJobTableData();
@@ -244,7 +244,7 @@ onUnmounted(() => {
                            :total-count="storeState.totalCount"
                 />
             </template>
-            <template v-if="storeState.selectedDataSourceItem.schedule.state === 'ENABLED'"
+            <template v-if="dataSourceData?.schedule.state === 'ENABLED'"
                       #extra
             >
                 <p-button style-type="tertiary"
@@ -300,7 +300,7 @@ onUnmounted(() => {
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND') }}
                     </p-button>
-                    <p-button v-if="storeState.selectedDataSourceItem.schedule.state === 'ENABLED' && value === 'IN_PROGRESS'"
+                    <p-button v-if="dataSourceData?.schedule.state === 'ENABLED' && value === 'IN_PROGRESS'"
                               size="sm"
                               style-type="tertiary"
                               class="ml-2"
