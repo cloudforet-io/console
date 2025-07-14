@@ -6,6 +6,7 @@ import {
 import { useQueryClient } from '@tanstack/vue-query';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
@@ -14,8 +15,8 @@ import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mi
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
-import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
@@ -38,12 +39,11 @@ import {
 } from '@/services/iam/composables/refined-table-data';
 import { useRoleBindingDeleteMutation } from '@/services/iam/composables/use-role-binding-delete-mutation';
 import { useRoleBindingUpdateRoleMutation } from '@/services/iam/composables/use-role-binding-update-role-mutation';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import { useUserListPaginationQuery } from '@/services/iam/composables/use-user-list-pagination-query';
 import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
-
-
 
 interface Props {
     tableHeight: number;
@@ -63,14 +63,27 @@ const appContextStore = useAppContextStore();
 
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper();
-// const userListApiQuery = userListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: USER_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
+
+const queryClient = useQueryClient();
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+const { key: workspaceUserGetQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'get');
+
+const { roleListData } = useRoleListQuery();
 
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
     timezone: computed<string|undefined>(() => userStore.state.timezone),
+});
+const roleMap = computed(() => {
+    const map: Record<string, RoleModel> = {};
+    roleListData.value?.forEach((role) => {
+        map[role.role_id] = role;
+    });
+    return map;
 });
 const state = reactive({
     selectedRemoveItem: '',
@@ -83,7 +96,7 @@ const state = reactive({
             additionalItems.type = user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace';
             additionalItems.role_binding = {
                 type: user?.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-                name: userPageGetters.roleMap[user?.role_binding_info?.role_id]?.name ?? '',
+                name: roleMap.value[user?.role_binding_info?.role_id]?.name ?? '',
             };
             additionalItems.user_group = getUserGroupPerUser(user?.user_id);
         }
@@ -161,8 +174,7 @@ const queryState = reactive({
 /* Component */
 const handleSelect = async (index) => {
     const selectedUserIds = index.map((i) => state.refinedUserItems[i].user_id);
-
-    userPageStore.setSelectedUsers(userList.value.filter((user) => selectedUserIds.includes(user.user_id)));
+    userPageStore.setSelectedUserIds(selectedUserIds);
     userPageStore.setSelectedIndices(index);
 };
 
@@ -190,55 +202,60 @@ const closeRemoveModal = () => {
     modalState.visible = false;
 };
 
-const { roleAPI } = useRoleApi();
-
 /* API */
-const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
-    dropdownState.loading = true;
-
-    roleListApiQueryHelper.setFilters([
-        { k: 'role_type', v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER], o: '=' },
-        { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
-    ]);
-    if (inputText) {
-        roleListApiQueryHelper.addFilter({
-            k: 'name',
-            v: inputText,
-            o: '',
-        });
-    }
-    try {
-        const { results } = await roleAPI.list({
+const {
+    roleListData: _roleListData,
+    roleListIsLoading,
+    refetchRoleList,
+} = useRoleListQuery(
+    computed(() => {
+        const filters: ConsoleFilter[] = [
+            { k: 'role_type', v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER], o: '=' },
+            { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
+        ];
+        if (dropdownState.searchText?.trim()) {
+            filters.push({
+                k: 'name',
+                v: dropdownState.searchText.trim(),
+                o: '',
+            });
+        }
+        roleListApiQueryHelper.setFilters(filters as ConsoleFilter[]);
+        return {
             query: {
                 ...roleListApiQueryHelper.data,
-                filter: [
-                    ...(roleListApiQueryHelper.data?.filter || []),
-                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-                ],
+                only: ['role_id', 'name', 'role_type'],
             },
-        });
-        dropdownState.menuItems = (results ?? []).map((role) => ({
+        };
+    }),
+);
+
+const dropdownMenuHandler: AutocompleteHandler = async () => {
+    try {
+        await refetchRoleList();
+        dropdownState.menuItems = (_roleListData.value ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
         }));
     } catch (e) {
         ErrorHandler.handleError(e);
-    } finally {
-        dropdownState.loading = false;
     }
 
     return {
-        results: dropdownState.menuItems,
+        results: (_roleListData.value ?? []).map((role) => ({
+            label: role.name,
+            name: role.role_id,
+            role_type: role.role_type,
+        })),
     };
 };
-
-const queryClient = useQueryClient();
-const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
 
 const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserGetQueryKey });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
     },
     onError: (error) => {
@@ -350,14 +367,14 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 />
             </template>
             <template #col-role_id-format="{value}">
-                <div v-if="userPageGetters.roleMap[value]?.name"
+                <div v-if="roleMap[value]?.name"
                      class="role-type-wrapper"
                 >
-                    <img :src="useRoleFormatter(userPageGetters.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
+                    <img :src="useRoleFormatter(roleMap[value]?.role_type || ROLE_TYPE.USER).image"
                          alt="Role Type Icon"
                          class="role-type-icon"
                     >
-                    <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
+                    <span class="pr-4">{{ roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
             <template #col-role_binding-format="{value, rowIndex, item:fieldItem}">
@@ -367,7 +384,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                                        use-fixed-menu-style
                                        style-type="transparent"
                                        :visible-menu="dropdownState.visibleMenu"
-                                       :loading="dropdownState.loading"
+                                       :loading="roleListIsLoading"
                                        :search-text.sync="dropdownState.searchText"
                                        :handler="dropdownMenuHandler"
                                        :disabled="!props.hasReadWriteAccess || isWorkspaceGroupUser(fieldItem)"
