@@ -23,7 +23,9 @@ export const useDataSourceListQuery = ({
         pagination: true,
     });
 
-    const { data, isLoading, totalCount } = useScopedPaginationQuery({
+    const {
+        data, isLoading, totalCount, query,
+    } = useScopedPaginationQuery({
         queryKey: key,
         queryFn: dataSourceAPI.list,
         params: queryParams,
@@ -39,5 +41,6 @@ export const useDataSourceListQuery = ({
         dataSourceListData: data,
         isLoading,
         totalCount,
+        refetch: query.refetch,
     };
 };
