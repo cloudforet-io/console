@@ -4,22 +4,18 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { RoleCreateParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/create';
-import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
 import type { UserCreateParameters } from '@/api-clients/identity/user/schema/api-verbs/create';
-import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import type { AuthType } from '@/api-clients/identity/user/schema/type';
-import type { WorkspaceGroupAddUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/add-users';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import type { WorkspaceUserCreateParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/create';
-import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';
@@ -34,10 +30,15 @@ import UserManagementAddPassword from '@/services/iam/components/UserManagementA
 import UserManagementAddRole from '@/services/iam/components/UserManagementAddRole.vue';
 import UserManagementAddTag from '@/services/iam/components/UserManagementAddTag.vue';
 import UserManagementAddUser from '@/services/iam/components/UserManagementAddUser.vue';
+import { useRoleBindingCreateMutation } from '@/services/iam/composables/use-role-binding-create-mutation';
+import { useUserCreateMutation } from '@/services/iam/composables/use-user-create-mutation';
+import { useWorkspaceGroupAddUsersMutation } from '@/services/iam/composables/use-workspace-group-add-users-mutation';
+import { useWorkspaceUserCreateMutation } from '@/services/iam/composables/use-workspace-user-create-mutation';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
+
 
 
 const userPageStore = useUserPageStore();
@@ -45,6 +46,11 @@ const userPageState = userPageStore.state;
 const domainStore = useDomainStore();
 
 const route = useRoute();
+
+const queryClient = useQueryClient();
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+
 
 const storeState = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
@@ -130,6 +136,21 @@ const handleClose = () => {
         _state.state.afterWorkspaceCreated = false;
     });
 };
+/* Mutation */
+const { mutateAsync: createUser } = useUserCreateMutation({
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        userPageStore.setSelectedIndices([]);
+    },
+});
+const { mutateAsync: createWorkspaceUser } = useWorkspaceUserCreateMutation({
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        userPageStore.setSelectedIndices([]);
+    },
+});
 /* API */
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     const domainSettings = domainStore.state.config?.settings;
@@ -155,25 +176,28 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
         }
     };
 
-    try {
-        if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
-            await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
-                ...userInfoParams,
-                tags: state.tags,
-            });
-            await createRoleBinding();
-        } else if (item.isNew) {
-            await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
-                ...userInfoParams,
-                role_id: state.role.name || '',
-            });
-        } else {
-            await createRoleBinding();
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
+        await createUser({
+            ...userInfoParams,
+            tags: state.tags,
+        });
+        await createRoleBinding();
+    } else if (item.isNew) {
+        await createWorkspaceUser({
+            ...userInfoParams,
+            role_id: state.role.name || '',
+        });
+    } else {
+        await createRoleBinding();
     }
 };
+
+const { mutateAsync: createRoleBinding } = useRoleBindingCreateMutation({
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+    },
+});
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
     let roleParams: RoleCreateParameters;
     const baseRoleParams = {
@@ -195,12 +219,19 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
         };
     }
 
-    await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
+    await createRoleBinding(roleParams);
 };
+
+const { mutateAsync: addUserToWorkspaceGroup } = useWorkspaceGroupAddUsersMutation({
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+    },
+});
 
 const fetchAddUserToWorkspaceGroup = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
     if (!userItem.user_id) return;
-    await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
+    await addUserToWorkspaceGroup({
         workspace_group_id: item?.name || '',
         users: [{
             user_id: userItem.user_id, role_id: state.role.name || '',
