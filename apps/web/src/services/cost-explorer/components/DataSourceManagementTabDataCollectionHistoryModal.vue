@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { CostJobItem, DataCollectionHistoryModalType, DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import type { CostJobItem, DataCollectionHistoryModalType } from '@/services/cost-explorer/types/data-sources-type';
 
 interface DateOption {
     minDate?: string;
@@ -33,16 +33,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const dataSourcesPageStore = useDataSourcesPageStore();
-const dataSourcesPageGetters = dataSourcesPageStore.getters;
+const dataSourcesPageState = dataSourcesPageStore.state;
 
 const emit = defineEmits<{(e: 'update:modal-visible'): void,
     (e: 'confirm'): void
 }>();
 
-const storeState = reactive({
-    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-    jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
-});
 const state = reactive({
     proxyVisible: useProxyValue('modalVisible', props, emit),
     loading: false,
@@ -100,7 +96,7 @@ const handleConfirmButton = async () => {
         case 'RE-SYNC':
             await dataSourcesPageStore.fetchSyncDatasource({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
-                data_source_id: storeState.selectedDataSourceItem.data_source_id,
+                data_source_id: dataSourcesPageState.selectedDataSourceId || '',
             });
             break;
 

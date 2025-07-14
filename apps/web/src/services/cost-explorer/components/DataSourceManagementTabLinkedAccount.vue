@@ -21,7 +21,7 @@ import DataSourceManagementModal from '@/services/cost-explorer/components/DataS
 import DataSourceManagementTabLinkedAccountTable
     from '@/services/cost-explorer/components/DataSourceManagementTabLinkedAccountTable.vue';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { CostLinkedAccountModalType, DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import type { CostLinkedAccountModalType } from '@/services/cost-explorer/types/data-sources-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -31,22 +31,13 @@ const props = defineProps<Props>();
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
-const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 let linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 let linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
-const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
     modalVisible: computed<boolean>(() => dataSourcesPageState.modal.visible),
     type: computed<CostLinkedAccountModalType|undefined>(() => dataSourcesPageState.modal.type),
-
-    dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
-    dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
-    dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
-    dataSourceListSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.dataSourceListSearchFilters),
-    selectedDataSourceIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
-    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
 
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
     linkedAccountsTotalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
@@ -112,27 +103,20 @@ const fetchLinkedAccountList = async () => {
     linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
         .addFilter(...storeState.linkedAccountsSearchFilters);
 
-    if (storeState.selectedDataSourceIndices === undefined) return;
+    if (dataSourcesPageState.selectedDataSourceId === undefined) return;
 
     try {
         await dataSourcesPageStore.fetchLinkedAccount({
-            data_source_id: storeState.dataSourceList[storeState.selectedDataSourceIndices]?.data_source_id || '',
+            data_source_id: dataSourcesPageState.selectedDataSourceId,
             query: linkedAccountListApiQueryHelper.data,
         });
     } finally {
         dataSourcesPageStore.setLinkedAccountsLoading(false);
-        await fetchDataSourceList();
+        // await fetchDataSourceList();
     }
 };
-const fetchDataSourceList = async () => {
-    datasourceListApiQueryHelper.setPage(storeState.dataSourceListPageStart, storeState.dataSourceListPageLimit)
-        .setFilters(storeState.dataSourceListSearchFilters);
-    await dataSourcesPageStore.fetchDataSourceList({
-        query: datasourceListApiQueryHelper.data,
-    });
-};
 
-watch([() => state.selectedStatusFilter, () => storeState.selectedDataSourceIndices], async ([selectedStatusFilter]) => {
+watch([() => state.selectedStatusFilter, () => dataSourcesPageState.selectedDataSourceId], async ([selectedStatusFilter]) => {
     if (selectedStatusFilter === 'all') {
         linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
     } else {
@@ -141,7 +125,7 @@ watch([() => state.selectedStatusFilter, () => storeState.selectedDataSourceIndi
 
     await fetchLinkedAccountList();
 }, { immediate: true });
-watch(() => storeState.selectedDataSourceIndices, async () => {
+watch(() => dataSourcesPageState.selectedDataSourceId, async () => {
     await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
 }, { immediate: true });
 
