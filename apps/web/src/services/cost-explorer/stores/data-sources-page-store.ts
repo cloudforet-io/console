@@ -9,15 +9,11 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { DataSourceAccountAnalyzeParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/analyze';
 import type { CostDataSourceAccountListParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/list';
 import type { CostDataSourceAccountResetParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/reset';
 import type { CostDataSourceAccountUpdateParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/update';
-import type { CostDataSourceAccountModel, CostDataSourceAnalyzeModel } from '@/api-clients/cost-analysis/data-source-account/schema/model';
-import type { CostDataSourceGetParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/get';
-import type { CostDataSourceListParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/list';
+import type { CostDataSourceAccountModel } from '@/api-clients/cost-analysis/data-source-account/schema/model';
 import type { CostDataSourceSyncParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/sync';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { CostJobCancelParameters } from '@/api-clients/cost-analysis/job/schema/api-verbs/cancel';
@@ -27,14 +23,11 @@ import type { CostJobModel } from '@/api-clients/cost-analysis/job/schema/model'
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
     CostJobItem,
     CostLinkedAccountModalType,
-    DataSourceItem,
 } from '@/services/cost-explorer/types/data-sources-type';
 
 
@@ -44,16 +37,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const userStore = useUserStore();
 
     const state = reactive({
-        activeTab: 'detail',
-
-        dataSourceListPageStart: 0,
-        dataSourceListPageLimit: 15,
-        dataSourceList: [] as DataSourceItem[],
-        dataSourceListTotalCount: 0,
-        dataSourceListSearchFilters: [] as ConsoleFilter[],
-        selectedDataSourceIndices: undefined as number|undefined,
-        selectedDataSourceItem: {} as DataSourceItem,
-        dataSourceLoading: false,
+        selectedDataSourceId: undefined as string|undefined,
 
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
@@ -78,14 +62,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     });
 
     const getters = reactive({
-        dataSourceList: computed<DataSourceItem[]>(() => state.dataSourceList.map((i) => {
-            const icon = _getters.plugin[i.plugin_info?.plugin_id || '']?.icon;
-            return {
-                ...i,
-                icon: assetUrlConverter(icon),
-                created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
-            };
-        })),
         jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
             ...i,
             total_tasks: i.total_tasks || 0,
@@ -97,36 +73,14 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             ...i,
             updated_at: dayjs.utc(i.updated_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
         })))),
-        selectedDataSourceItem: computed<DataSourceItem>(() => {
-            if (state.selectedDataSourceIndices === undefined) return {} as DataSourceItem;
-            if (!state.selectedDataSourceItem) return {} as DataSourceItem;
-            const pluginItem = _getters.plugin[state.selectedDataSourceItem.plugin_info?.plugin_id || ''];
-            return {
-                ...state.selectedDataSourceItem,
-                icon: assetUrlConverter(pluginItem?.icon),
-                description: pluginItem?.description || '',
-            };
-        }),
     });
 
     const mutation = {
-        setDataSourceListPageStart: (pageStart: number) => {
-            state.dataSourceListPageStart = pageStart;
-        },
-        setDataSourceListPageLimit: (pageLimit: number) => {
-            state.dataSourceListPageLimit = pageLimit;
-        },
-        setDataSourceListSearchFilters: (filters: ConsoleFilter[]) => {
-            state.dataSourceListSearchFilters = filters;
-        },
-        setSelectedDataSourceIndices: (indices: number) => {
-            state.selectedDataSourceIndices = indices;
+        setSelectedDataSourceId: (id: string|undefined) => {
+            state.selectedDataSourceId = id;
         },
         setSelectedLinkedAccountsIndices: (indices: number[]) => {
             state.selectedLinkedAccountsIndices = indices;
-        },
-        setActiveTab: (tab: string) => {
-            state.activeTab = tab;
         },
         setLinkedAccountsLoading: (loading: boolean) => {
             state.linkedAccountsLoading = loading;
@@ -150,12 +104,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
     const actions = {
         reset: () => {
-            state.activeTab = 'detail';
-
-            state.dataSourceList = [];
-            state.dataSourceListTotalCount = 0;
-            state.selectedDataSourceIndices = undefined;
-
+            state.selectedDataSourceId = undefined;
             state.jobList = [];
             state.jobListTotalCount = 0;
 
@@ -178,39 +127,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         jobReset: () => {
             state.jobList = [];
             state.jobListTotalCount = 0;
-        },
-        fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
-            try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>(params);
-                const analyzeDataList = await actions.fetchLinkedAccountAnalyze();
-                state.dataSourceList = (results || []).map((item) => {
-                    const matchingItem = analyzeDataList?.find((entry) => entry.data_source_id === item.data_source_id);
-                    if (matchingItem) {
-                        const linkedCount = matchingItem.workspaceList?.filter((id) => id !== null).length;
-                        return {
-                            ...item,
-                            linked_count: linkedCount,
-                        };
-                    }
-                    return item;
-                });
-                state.dataSourceListTotalCount = total_count || 0;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dataSourceList = [];
-                state.dataSourceListTotalCount = 0;
-            }
-        },
-        fetchDataSourceItem: async (params?: CostDataSourceListParameters) => {
-            try {
-                state.dataSourceLoading = true;
-                state.selectedDataSourceItem = await SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.selectedDataSourceItem = {} as DataSourceItem;
-            } finally {
-                state.dataSourceLoading = false;
-            }
         },
         fetchJobList: async (params: CostJobListParameters) => {
             try {
@@ -254,25 +170,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, e.message);
                 throw e;
-            }
-        },
-        fetchLinkedAccountAnalyze: async (): Promise<CostDataSourceAnalyzeModel | undefined> => {
-            try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.analyze<DataSourceAccountAnalyzeParameters, AnalyzeResponse<CostDataSourceAnalyzeModel>>({
-                    query: {
-                        group_by: ['data_source_id'],
-                        fields: {
-                            workspaceList: {
-                                key: 'workspace_id',
-                                operator: 'push',
-                            },
-                        },
-                    },
-                });
-                return results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
             }
         },
         fetchSyncDatasource: async (params: CostDataSourceSyncParameters) => {
