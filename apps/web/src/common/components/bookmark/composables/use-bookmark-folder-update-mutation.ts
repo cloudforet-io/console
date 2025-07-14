@@ -1,4 +1,4 @@
-import { computed, type ComputedRef } from 'vue';
+import { type ComputedRef } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -10,11 +10,6 @@ import type { UserConfigUpdateParameters } from '@/api-clients/config/user-confi
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import { useBookmarkLinkUpdateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-update-mutation';
-import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -25,25 +20,15 @@ type BookmarkFolderUpdateParameters = Partial<UserConfigUpdateParameters | Share
 
 interface UseBookmarkFolderUpdateMutationOptions {
     type?: ComputedRef<BookmarkType>;
-    bookmarkList?: ComputedRef<BookmarkItem[]>;
     onSuccess?: (data: BookmarkFolderUpdateResult, variables: BookmarkFolderUpdateParameters) => void|Promise<void>;
     onError?: (error: Error, variables: BookmarkFolderUpdateParameters) => void|Promise<void>;
     onSettled?: (data: BookmarkFolderUpdateResult | undefined, error: Error|null, variables: BookmarkFolderUpdateParameters) => void|Promise<void>;
 }
 
 export const useBookmarkFolderUpdateMutation = (options?: UseBookmarkFolderUpdateMutationOptions) => {
-    const userWorkspaceStore = useUserWorkspaceStore();
-    const appContextStore = useAppContextStore();
-
     const queryClient = useQueryClient();
     const { userConfigAPI } = useUserConfigApi();
     const { sharedConfigAPI } = useSharedConfigApi();
-    const { mutate: updateBookmarkLink } = useBookmarkLinkUpdateMutation({
-        type: options?.type,
-    });
-
-    const currentWorkspaceId = computed(() => userWorkspaceStore.getters.currentWorkspaceId);
-    const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
     const { key: userConfigListQueryKey } = useServiceQueryKey('config', 'user-config', 'list');
     const { key: sharedConfigListQueryKey } = useServiceQueryKey('config', 'shared-config', 'list');
@@ -60,21 +45,6 @@ export const useBookmarkFolderUpdateMutation = (options?: UseBookmarkFolderUpdat
                 queryClient.invalidateQueries({ queryKey: userConfigListQueryKey.value });
             } else {
                 queryClient.invalidateQueries({ queryKey: sharedConfigListQueryKey.value });
-            }
-            const foldersLinkItems = options?.bookmarkList?.value?.filter((i) => i.folder === variables?.name);
-            if (foldersLinkItems) {
-                await Promise.all(foldersLinkItems.map(async (item) => {
-                    await updateBookmarkLink({
-                        name: item.id || '',
-                        data: {
-                            workspaceId: currentWorkspaceId.value || '',
-                            name: item.name as string || '',
-                            folder: item.folder,
-                            link: item.link || '',
-                            isGlobal: isAdminMode.value,
-                        },
-                    });
-                }));
             }
             if (options?.onSuccess) await options.onSuccess(data, variables);
         },

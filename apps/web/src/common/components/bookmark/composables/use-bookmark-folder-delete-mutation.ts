@@ -10,8 +10,6 @@ import type { UserConfigDeleteParameters } from '@/api-clients/config/user-confi
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
-import { useBookmarkLinkDeleteMutation } from '@/common/components/bookmark/composables/use-bookmark-link-delete-mutation';
-import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -22,7 +20,6 @@ type BookmarkFolderDeleteParameters = Partial<UserConfigDeleteParameters | Share
 
 interface UseBookmarkFolderDeleteMutationOptions {
     type?: ComputedRef<BookmarkType>;
-    bookmarkList?: ComputedRef<BookmarkItem[]>;
     onSuccess?: (data: BookmarkFolderDeleteResult, variables: BookmarkFolderDeleteParameters) => void|Promise<void>;
     onError?: (error: Error, variables: BookmarkFolderDeleteParameters) => void|Promise<void>;
     onSettled?: (data: BookmarkFolderDeleteResult | undefined, error: Error|null, variables: BookmarkFolderDeleteParameters) => void|Promise<void>;
@@ -32,9 +29,6 @@ export const useBookmarkFolderDeleteMutation = (options?: UseBookmarkFolderDelet
     const queryClient = useQueryClient();
     const { userConfigAPI } = useUserConfigApi();
     const { sharedConfigAPI } = useSharedConfigApi();
-    const { mutate: deleteBookmarkLink } = useBookmarkLinkDeleteMutation({
-        type: options?.type,
-    });
 
     const { key: userConfigListQueryKey } = useServiceQueryKey('config', 'user-config', 'list');
     const { key: sharedConfigListQueryKey } = useServiceQueryKey('config', 'shared-config', 'list');
@@ -51,14 +45,6 @@ export const useBookmarkFolderDeleteMutation = (options?: UseBookmarkFolderDelet
                 queryClient.invalidateQueries({ queryKey: userConfigListQueryKey.value });
             } else {
                 queryClient.invalidateQueries({ queryKey: sharedConfigListQueryKey.value });
-            }
-            const foldersLinkItems = options?.bookmarkList?.value?.filter((i) => i.folder === variables?.name);
-            if (foldersLinkItems) {
-                await Promise.all(foldersLinkItems.map(async (item) => {
-                    await deleteBookmarkLink({
-                        name: item.id || '',
-                    });
-                }));
             }
             if (options?.onSuccess) await options.onSuccess(data, variables);
         },

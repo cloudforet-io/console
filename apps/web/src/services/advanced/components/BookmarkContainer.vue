@@ -14,7 +14,6 @@ import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-st
 import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
-import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 
@@ -40,7 +39,6 @@ const state = reactive({
 });
 
 const { bookmarkFolderListData } = useBookmarkFolderListQuery();
-const { bookmarkList } = useBookmarkListQuery();
 
 const handleCreateFolder = async (isEdit?: boolean, name?: string) => {
     if (isEdit && name) {
@@ -95,19 +93,16 @@ onUnmounted(() => {
         <router-view />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="state.globalFolderList"
-                                    :bookmark-list="bookmarkList"
                                     :selected-bookmark="storeState.selectedBookmark"
                                     @confirm="handleCreateFolder"
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
-                                  :bookmark-folder-list="state.globalFolderList"
                                   @confirm="handleCreateLink"
         />
         <bookmark-delete-modal
             v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER
                 || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK
                 || storeState.modalType === BOOKMARK_MODAL_TYPE.MULTI_DELETE"
-            :bookmark-list="bookmarkList"
             @confirm="handleConfirmDelete"
         />
     </div>

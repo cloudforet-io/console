@@ -119,20 +119,17 @@ onUnmounted(() => {
         />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="storeState.bookmarkFolderList"
-                                    :bookmark-list="storeState.bookmarkList"
                                     :filter-by-folder="storeState.filterByFolder"
                                     :selected-bookmark="storeState.selectedBookmark"
                                     @confirm="handleCreateFolder"
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
-                                  :bookmark-folder-list="storeState.bookmarkFolderList"
                                   @confirm="handleCreateLink"
         />
         <bookmark-delete-modal
             v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER
                 || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK
                 || storeState.modalType === BOOKMARK_MODAL_TYPE.MULTI_DELETE"
-            :bookmark-list="storeState.bookmarkList"
             @confirm="handleConfirmDelete"
         />
     </div>

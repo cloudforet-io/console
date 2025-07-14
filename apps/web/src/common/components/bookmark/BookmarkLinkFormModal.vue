@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
 } from '@cloudforet/mirinae';
@@ -28,22 +24,15 @@ import {
 import { useBookmarkFolderCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-folder-create-mutation';
 import { useBookmarkLinkCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-create-mutation';
 import { useBookmarkLinkUpdateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-update-mutation';
+import { useSharedBookmarkFolderListQuery } from '@/common/components/bookmark/composables/use-shared-bookmark-folder-list-query';
+import { useUserBookmarkFolderListQuery } from '@/common/components/bookmark/composables/use-user-bookmark-folder-list-query';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType, RadioType } from '@/common/components/bookmark/type/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
-
-interface Props {
-    bookmarkFolderList?: BookmarkItem[],
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    bookmarkFolderList: undefined,
-});
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -65,7 +54,12 @@ const storeState = reactive({
     bookmarkType: computed<BookmarkType|undefined>(() => bookmarkState.bookmarkType),
 });
 const state = reactive({
-    bookmarkFolderList: [] as BookmarkItem[],
+    bookmarkFolderList: computed<BookmarkItem[]>(() => {
+        if (state.scope === BOOKMARK_TYPE.USER) {
+            return userBookmarkFolderList.value;
+        }
+        return sharedBookmarkFolderList.value;
+    }),
     selectedFolderIdx: undefined as number|undefined,
     selectedFolder: computed<BookmarkItem|undefined>(() => (state.bookmarkFolderList ? state.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
     radioMenuList: computed<RadioType[]>(() => {
@@ -102,6 +96,13 @@ const {
         if (value.length < 2) return i18n.t('HOME.ALT_E_VALIDATION_NAME');
         return true;
     },
+});
+
+const { bookmarkFolderList: sharedBookmarkFolderList, refresh: refreshSharedConfig } = useSharedBookmarkFolderListQuery({
+    scope: computed(() => state.scope),
+});
+const { bookmarkFolderList: userBookmarkFolderList, refresh: refreshUserConfig } = useUserBookmarkFolderListQuery({
+    scope: computed(() => state.scope),
 });
 
 const { mutate: createBookmarkFolder } = useBookmarkFolderCreateMutation({
@@ -155,39 +156,6 @@ const handleClickNewFolderButton = async () => {
     });
 };
 
-const fetchBookmarkFolderList = async () => {
-    const defaultFilter: ConsoleFilter[] = [
-        { k: 'name', v: 'console:bookmark', o: '' },
-        { k: 'data.link', v: null, o: '=' },
-    ];
-    if (!storeState.isAdminMode) {
-        defaultFilter.push({ k: 'data.workspaceId', v: storeState.currentWorkspaceId || '', o: '=' });
-    }
-    const bookmarkListApiQuery = new ApiQueryHelper()
-        .setSort('updated_at', true)
-        .setFilters(defaultFilter);
-    try {
-        let fetcher;
-        if (state.scope === BOOKMARK_TYPE.USER) {
-            fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.userConfig.list);
-        } else if (storeState.isAdminMode || state.scope === BOOKMARK_TYPE.WORKSPACE) {
-            fetcher = getCancellableFetcher(SpaceConnector.clientV2.config.sharedConfig.list);
-        }
-        const { status, response } = await fetcher({
-            query: bookmarkListApiQuery.data,
-        });
-        if (status === 'succeed') {
-            const list = (response.results ?? []).map((i) => ({
-                ...i.data,
-                id: i.name,
-            } as BookmarkItem));
-            state.bookmarkFolderList = storeState.isAdminMode ? list.filter((i) => i.isGlobal) : list;
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.bookmarkFolderList = [];
-    }
-};
 const handleConfirm = async () => {
     let convertedLink = link.value;
     if (!checkValidUrl(link.value)) {
@@ -226,9 +194,6 @@ const handleConfirm = async () => {
     await handleClose();
 };
 
-watch(() => props.bookmarkFolderList, (newVal) => {
-    state.bookmarkFolderList = newVal;
-}, { immediate: true });
 watch(() => storeState.bookmarkType, (bookmarkType) => {
     if (storeState.isWorkspaceMember) {
         state.selectedRadioIdx = 0;
@@ -241,18 +206,26 @@ watch(() => storeState.bookmarkType, (bookmarkType) => {
     }
 }, { immediate: true });
 watch(() => state.selectedRadioIdx, () => {
-    fetchBookmarkFolderList();
+    if (state.scope === BOOKMARK_TYPE.USER) {
+        refreshUserConfig();
+    } else {
+        refreshSharedConfig();
+    }
 }, { immediate: true });
 watch(() => storeState.modal.type, (type) => {
     if (type !== BOOKMARK_MODAL_TYPE.LINK) return;
     if (storeState.modal.isEdit) {
         setForm('name', storeState.selectedBookmark?.name as string || '');
         setForm('link', storeState.selectedBookmark?.link || '');
-        state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
+    }
+}, { immediate: true });
+watch(() => state.bookmarkFolderList, (bookmarkFolderList) => {
+    if (storeState.modal.isEdit) {
+        state.selectedFolderIdx = bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
         return;
     }
     if (!storeState.modal.isNew && storeState.selectedBookmark) {
-        state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
+        state.selectedFolderIdx = bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
     }
 }, { immediate: true });
 </script>

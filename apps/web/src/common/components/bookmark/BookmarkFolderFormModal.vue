@@ -26,14 +26,12 @@ import type { BookmarkType } from '@/services/workspace-home/types/workspace-hom
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
-    bookmarkList: BookmarkItem[],
     filterByFolder?: TranslateResult,
     selectedBookmark?: BookmarkItem,
 }
 
 const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
-    bookmarkList: () => [],
     filterByFolder: undefined,
     selectedBookmark: undefined,
 });
@@ -108,7 +106,6 @@ const { mutate: createBookmarkFolder, isPending: isCreatingBookmarkFolder } = us
 });
 const { mutate: updateBookmarkFolder, isPending: isUpdatingBookmarkFolder } = useBookmarkFolderUpdateMutation({
     type: computed(() => state.scope),
-    bookmarkList: computed(() => props.bookmarkList),
     onSuccess: () => {
         emit('confirm', storeState.modal.isEdit, name.value);
         handleClose();

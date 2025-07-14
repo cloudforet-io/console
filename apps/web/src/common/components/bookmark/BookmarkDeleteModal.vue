@@ -19,14 +19,6 @@ import { gray } from '@/styles/colors';
 
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
-interface Props {
-    bookmarkList: BookmarkItem[]
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    bookmarkList: () => [],
-});
-
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
@@ -34,7 +26,6 @@ const emit = defineEmits<{(e: 'confirm', isFolder?: boolean): void; }>();
 
 const { mutate: deleteBookmarkFolder } = useBookmarkFolderDeleteMutation({
     type: computed(() => bookmarkState.bookmarkType || BOOKMARK_TYPE.WORKSPACE),
-    bookmarkList: computed(() => props.bookmarkList),
 });
 const { mutate: deleteBookmarkLink } = useBookmarkLinkDeleteMutation({
     type: computed(() => bookmarkState.bookmarkType || BOOKMARK_TYPE.WORKSPACE),
