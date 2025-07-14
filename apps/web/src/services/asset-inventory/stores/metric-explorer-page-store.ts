@@ -17,7 +17,6 @@ import type {
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
     const state = reactive({
         selectedNamespaceId: undefined as string|undefined,
-        // data
         refreshMetricData: false,
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
@@ -32,7 +31,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
         refreshMetricPeriodDropdown: false,
-        periodText: undefined as string|undefined,
         // trigger
         metricInitiated: false,
     });
@@ -96,9 +94,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setRefreshMetricPeriodDropdown = (refresh: boolean) => {
         state.refreshMetricPeriodDropdown = refresh;
     };
-    const setPeriodText = (periodText: string) => {
-        state.periodText = periodText;
-    };
 
     /* Actions */
     const reset = () => {
@@ -151,7 +146,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setShowMetricQueryFormSidebar,
         setRefreshMetricPeriodDropdown,
         setSelectedChartType,
-        setPeriodText,
         setMetricInitiated,
     };
 

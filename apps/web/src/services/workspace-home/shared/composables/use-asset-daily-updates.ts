@@ -6,7 +6,10 @@ import {
     groupBy, map, sumBy,
 } from 'lodash';
 
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
 import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composables/use-metric-data-api';
+import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
@@ -42,11 +45,11 @@ const useDailyUpdateAnalyzeQuery = (label: UpdateLabel, opts: {
 
     const { key, params } = useServiceQueryKey('inventory', 'metric-data', 'analyze', {
         contextKey: [mode?.value, metricId],
-        params: computed(() => {
+        params: computed<MetricDataAnalyzeParameters>(() => {
             const today = dayjs.utc().format('YYYY-MM-DD');
-            const filter = projectIds?.value?.length ? [{
+            const filter: ApiFilter[] = projectIds?.value?.length ? [{
                 k: 'project_id', v: projectIds.value, o: 'in',
-            }] : undefined;
+            }] : [];
 
             return {
                 metric_id: metricId,

@@ -8,18 +8,14 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PTextPagination, PToolboxTable } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -36,6 +32,7 @@ import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-con
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getReferenceLabel } from '@/common/modules/widgets/_helpers/widget-date-helper';
 
+import { useMetricDataAnalyzePaginationQuery, useMetricDataAnalyzeQuery } from '@/services/asset-inventory/composables/use-metric-data-analyze-query';
 import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { GRANULARITY, SIZE_UNITS } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
@@ -76,9 +73,7 @@ const storeState = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
 const state = reactive({
-    loading: false,
     currentMetricId: computed<string>(() => route.params.metricId),
-    realtimeDate: undefined as string|undefined,
     groupByFields: computed<DataTableFieldType[]>(() => {
         const filteredLabelKeys = labelKeys.value.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
         return filteredLabelKeys.map((d) => ({
@@ -89,7 +84,7 @@ const state = reactive({
         metricExplorerPageState.granularity,
         metricExplorerPageState.period ?? {},
         !!metricExplorerPageState.selectedGroupByList.length,
-        state.realtimeDate,
+        realtimeDate.value,
     )),
     fields: computed<DataTableFieldType[]>(() => [
         ...state.groupByFields,
@@ -112,10 +107,20 @@ const state = reactive({
     items: [] as any[],
     thisPage: 1,
     pageSize: 15,
-    more: false,
     metricResourceType: computed<string|undefined>(() => currentMetric.value?.resource_type),
     hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => labelKeys.value.filter((d) => !!d.search_key?.length) ?? []),
     metricAdditionalFilter: computed(() => (currentMetric.value?.query_options?.filter ?? []).map((d) => ({ k: d.key ?? d.k, v: d.value ?? d.v, o: d.operator ?? d.o })) ?? []),
+});
+const realtimeDate = computed<string|undefined>(() => {
+    if (metricExplorerPageGetters.isRealtimeChart) {
+        return metricDataAnalyzeData.value?.results?.[0]?.date;
+    }
+    return undefined;
+});
+const refinedDataTableData = computed<MetricDataAnalyzeResult[]>(() => {
+    const _results = metricDataAnalyzeData.value?.results ?? [];
+    if (!_results.length) return [];
+    return getRefinedAssetAnalysisTableData(_results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, realtimeDate.value);
 });
 const labelKeysReferenceMap = computed<Record<string, ReferenceMap>>(() => {
     const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
@@ -136,22 +141,46 @@ const labelKeysReferenceMap = computed<Record<string, ReferenceMap>>(() => {
     });
     return _storeMap; // e.g. { 'Region': {...}, 'project_id': {...} }
 });
+const analyzeQueryParams = computed<MetricDataAnalyzeParameters>(() => {
+    analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
+    const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+    const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
+    return {
+        metric_id: state.currentMetricId,
+        query: {
+            granularity: metricExplorerPageState.granularity,
+            group_by: metricExplorerPageState.selectedGroupByList,
+            start: metricExplorerPageState.period?.start,
+            end: metricExplorerPageState.period?.end,
+            fields: {
+                count: {
+                    key: 'value',
+                    operator: metricExplorerPageState.selectedOperator,
+                },
+            },
+            sort: _sort,
+            field_group: _fieldGroup,
+            ...analyzeApiQueryHelper.data,
+        },
+    };
+});
 
 /* Util */
-const getRefinedColumnValue = (field, value) => {
-    if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
-        if (typeof value !== 'number') {
-            const _dateFormat = DATE_FORMAT_MAP[metricExplorerPageState.granularity];
-            if (dayjs.utc().format(_dateFormat) === field.label) return '--';
-            return 0;
-        }
-        const _unit = currentMetric.value?.unit;
-        const _originalVal = bytes.parse(`${value}${_unit}`);
-        if (_unit && SIZE_UNITS.includes(_unit)) {
-            return byteFormatter(_originalVal);
-        }
-        return numberFormatter(value, { notation: 'compact' }) || 0;
+const isByteOrNumber = (field: DataTableFieldType) => field.name?.startsWith('count.') && field.name?.endsWith('.value');
+const getRefinedColumnValue = (field: DataTableFieldType, value: any): number|string => {
+    if (typeof value !== 'number') {
+        const _dateFormat = DATE_FORMAT_MAP[metricExplorerPageState.granularity];
+        if (dayjs.utc().format(_dateFormat) === field.label) return '--';
+        return 0;
     }
+    const _unit = currentMetric.value?.unit;
+    const _originalVal = bytes.parse(`${value}${_unit}`);
+    if (_unit && SIZE_UNITS.includes(_unit)) {
+        return byteFormatter(_originalVal);
+    }
+    return numberFormatter(value, { notation: 'compact' }) || 0;
+};
+const getRefinedReferenceValue = (field: DataTableFieldType, value: any): string => {
     const _label = labelKeysReferenceMap.value?.[field.name]?.[value]?.label || value;
     return getReferenceLabel(storeState.allReferenceTypeInfo, field.name, _label);
 };
@@ -162,68 +191,29 @@ const { data: currentMetric, labelKeys } = useMetricGetQuery({
 });
 
 /* Api */
-const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<MetricDataAnalyzeResult>|undefined> => {
-    try {
-        analyzeApiQueryHelper
-            .setFilters(metricExplorerPageGetters.consoleFilters)
-            .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
-        const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
-        const { status, response } = await fetcher({
-            metric_id: state.currentMetricId,
-            query: {
-                granularity: metricExplorerPageState.granularity,
-                group_by: metricExplorerPageState.selectedGroupByList,
-                start: metricExplorerPageState.period?.start,
-                end: metricExplorerPageState.period?.end,
-                fields: {
-                    count: {
-                        key: 'value',
-                        operator: metricExplorerPageState.selectedOperator,
-                    },
-                },
-                sort: _sort,
-                field_group: _fieldGroup,
-                ...(setPage ? analyzeApiQueryHelper.data : { filter: analyzeApiQueryHelper.apiQuery.filter }),
-            },
-        });
-        if (status === 'succeed') {
-            if (metricExplorerPageGetters.isRealtimeChart) {
-                state.realtimeDate = response.results?.[0]?.date;
-            } else {
-                state.realtimeDate = undefined;
-            }
-            return response;
-        }
-        return undefined;
-    } catch (e) {
-        return { more: false, results: [] };
-    }
-};
-const setDataTableData = async () => {
-    state.loading = true;
-    const res = await analyzeMetricData();
-    if (!res) return;
-    state.items = getRefinedAssetAnalysisTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
-    state.more = res.more;
-    state.loading = false;
-};
+const analyzeApiQueryHelper = new ApiQueryHelper();
+const { data: metricDataAnalyzeData, isLoading: analyzeLoading, query: metricDataAnalyzeQuery } = useMetricDataAnalyzePaginationQuery({
+    params: analyzeQueryParams,
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageSize),
+});
+const { data: exportData, refetch: fetchExportData } = useMetricDataAnalyzeQuery({
+    params: analyzeQueryParams,
+    enabled: computed(() => false),
+});
 
 /* Event */
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
-    await setDataTableData();
 };
-const handleUpdateThisPage = async () => {
-    await setDataTableData();
+const handleRefresh = async () => {
+    await metricDataAnalyzeQuery.refetch();
 };
 const handleExport = async () => {
     try {
-        const res = await analyzeMetricData(false);
-        if (!res) return;
-        const refinedData = getRefinedAssetAnalysisTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
+        await fetchExportData();
+        if (!exportData.value) return;
+        const refinedData = getRefinedAssetAnalysisTableData(exportData.value?.results ?? [], metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, realtimeDate.value);
         await downloadExcel({
             data: refinedData,
             fields: state.excelFields,
@@ -293,16 +283,13 @@ watch(
     async ([metricId, metricInitiated]) => {
         if (!metricId || !metricInitiated) return;
         state.thisPage = 1;
-        await setDataTableData();
+        // await setDataTableData();
     },
     { immediate: true, deep: true },
 );
-watch(() => metricExplorerPageGetters.isRealtimeChart, async () => {
-    await setDataTableData();
-});
 watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     if (refresh) {
-        await setDataTableData();
+        await metricDataAnalyzeQuery.refetch();
         metricExplorerPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
@@ -311,9 +298,9 @@ const reduce = (arr: (number | undefined)[] | any) => arr.reduce((acc, value) =>
 </script>
 
 <template>
-    <p-toolbox-table :loading="state.loading"
+    <p-toolbox-table :loading="analyzeLoading"
                      :fields="state.fields"
-                     :items="state.items"
+                     :items="refinedDataTableData"
                      :searchable="false"
                      :show-footer="true"
                      :page-size.sync="state.pageSize"
@@ -321,24 +308,26 @@ const reduce = (arr: (number | undefined)[] | any) => arr.reduce((acc, value) =>
                      row-cursor-pointer
                      exportable
                      @change="handleChange"
-                     @refresh="handleChange()"
+                     @refresh="handleRefresh"
                      @export="handleExport"
                      @rowLeftClick="handleClickRow"
     >
         <template #pagination-area>
             <p-text-pagination :this-page.sync="state.thisPage"
-                               :disable-next-page="state.loading"
-                               :has-next-page="state.more"
-                               @update:thisPage="handleUpdateThisPage"
+                               :disable-next-page="analyzeLoading"
+                               :has-next-page="metricDataAnalyzeData?.more"
             />
         </template>
         <template #col-format="{field, value}">
-            <span v-if="state.loading" />
+            <span v-if="analyzeLoading" />
             <span v-else-if="field.name === 'totalCount'">
                 {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
-            <span v-else>
+            <span v-else-if="isByteOrNumber(field)">
                 {{ getRefinedColumnValue(field, value) }}
+            </span>
+            <span v-else>
+                {{ getRefinedReferenceValue(field, value) }}
             </span>
         </template>
 
