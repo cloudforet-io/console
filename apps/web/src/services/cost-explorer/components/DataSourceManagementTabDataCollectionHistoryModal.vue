@@ -2,18 +2,22 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
 import {
     PButtonModal, PCodeEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useCostJobGetQuery } from '@/services/cost-explorer/composables/use-cost-job-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { CostJobItem, DataCollectionHistoryModalType } from '@/services/cost-explorer/types/data-sources-type';
+import type { DataCollectionHistoryModalType } from '@/services/cost-explorer/types/data-sources-type';
+
 
 interface DateOption {
     minDate?: string;
@@ -23,20 +27,20 @@ interface DateOption {
 interface Props {
     modalVisible: boolean;
     modalType: DataCollectionHistoryModalType;
-    selectedJobItem?: CostJobItem;
+    selectedJobId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     modalVisible: false,
     modalType: 'ERROR',
-    selectedJobItem: undefined,
+    selectedJobId: undefined,
 });
 
+const queryClient = useQueryClient();
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 
-const emit = defineEmits<{(e: 'update:modal-visible'): void,
-    (e: 'confirm'): void
+const emit = defineEmits<{(e: 'update:modal-visible'): void;
 }>();
 
 const state = reactive({
@@ -76,6 +80,11 @@ const state = reactive({
     }),
 });
 
+/* Query */
+const { costJob, isLoading: isCostJobLoading } = useCostJobGetQuery(computed(() => props.selectedJobId));
+const { key: costJobListQueryKey } = useServiceQueryKey('cost-analysis', 'job', 'list');
+
+/* Event Handler */
 const handleUpdateSelectedDates = (selectedDates: string[]) => {
     if (!selectedDates.length) return;
 
@@ -101,9 +110,9 @@ const handleConfirmButton = async () => {
             break;
 
         case 'CANCEL':
-            if (props.selectedJobItem) {
+            if (props.selectedJobId) {
                 await dataSourcesPageStore.fetchCancelJob({
-                    job_id: props.selectedJobItem?.job_id,
+                    job_id: props.selectedJobId,
                 });
             }
             break;
@@ -111,7 +120,7 @@ const handleConfirmButton = async () => {
         default: break;
         }
 
-        await emit('confirm');
+        queryClient.invalidateQueries({ queryKey: costJobListQueryKey });
     } finally {
         state.loading = false;
         state.proxyVisible = false;
@@ -126,7 +135,7 @@ const handleConfirmButton = async () => {
         :size="props.modalType === 'ERROR' ? 'md' : 'sm'"
         fade
         backdrop
-        :loading="state.loading"
+        :loading="state.loading || isCostJobLoading"
         :disabled="state.modalValidation"
         :hide-footer-close-button="props.modalType === 'RESTART' || props.modalType === 'ERROR'"
         :theme-color="props.modalType === 'CANCEL' || props.modalType === 'RESTART' ? 'alert' : 'primary'"
@@ -201,11 +210,11 @@ const handleConfirmButton = async () => {
                 <p class="error-info">
                     {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_CODE') }}:
                     <span class="error-code">
-                        {{ props.selectedJobItem.error_code }}
+                        {{ costJob?.error_code }}
                     </span>
                 </p>
                 <p-code-editor read-only
-                               :code="props.selectedJobItem.error_message"
+                               :code="costJob?.error_message"
                 />
             </div>
         </template>

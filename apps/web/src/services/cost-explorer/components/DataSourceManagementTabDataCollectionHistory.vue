@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PToolboxTable, PHeading, PHeadingLayout, PSelectStatus, PProgressBar, PStatus,
@@ -25,31 +23,28 @@ import {
 
 import DataSourceManagementTabDataCollectionHistoryModal
     from '@/services/cost-explorer/components/DataSourceManagementTabDataCollectionHistoryModal.vue';
+import { useCostJobListQuery } from '@/services/cost-explorer/composables/use-cost-job-list-query';
 import { useDataSourceGetQuery } from '@/services/cost-explorer/composables/use-data-source-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type {
     CostJobItem, CostJobStatusInfo, DataCollectionHistoryModalType,
 } from '@/services/cost-explorer/types/data-sources-type';
 
+
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
-const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const storeState = reactive({
-    jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
-    totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
-});
 const state = reactive({
-    loading: false,
     modalVisible: false,
     modalType: '' as DataCollectionHistoryModalType,
     selectedJobId: '',
-    selectedJobItem: computed<CostJobItem|undefined>(() => storeState.jobList.find((item) => item.job_id === state.selectedJobId)),
-    hasInProgressItem: computed<boolean>(() => storeState.jobList.some((item) => item.status === 'IN_PROGRESS')),
+    hasInProgressItem: computed<boolean>(() => costJobListData.value?.results?.some((item) => item.status === 'IN_PROGRESS') || false),
 });
 const tableState = reactive({
-    pageStart: 0,
-    pageLimit: 15,
+    thisPage: 1,
+    pageSize: 15,
+    sortBy: 'created_at',
+    sortDesc: true,
     fields: computed<DefinitionField[]>(() => [
         { name: 'job_id', label: 'Job ID', sortable: false },
         { name: 'status', label: 'Status', sortable: false },
@@ -73,7 +68,6 @@ const tableState = reactive({
             created_at: makeDistinctValueHandler(resourceType, 'created_at', 'datetime', [{ k: 'data_source_id', v: dataSourcesPageState.selectedDataSourceId, o: 'eq' }]),
         };
     }),
-    searchFilters: [] as ConsoleFilter[],
     filterFields: computed(() => [
         { name: 'ALL', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALL') },
         { name: 'IN_PROGRESS', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.IN_PROGRESS') },
@@ -85,8 +79,33 @@ const tableState = reactive({
     selectedStatusFilter: 'ALL',
 });
 
+const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
+const { queryTags } = queryTagHelper;
+
 /* Query */
 const { dataSourceData, isLoading } = useDataSourceGetQuery(computed(() => dataSourcesPageState.selectedDataSourceId));
+
+let jobListApiQueryHelper = new ApiQueryHelper();
+const {
+    costJobListData, isLoading: isJobListLoading, refetch: refetchJobList, totalCount,
+} = useCostJobListQuery({
+    params: computed(() => {
+        if (tableState.selectedStatusFilter === 'ALL') {
+            jobListApiQueryHelper = new ApiQueryHelper();
+        } else {
+            jobListApiQueryHelper.setOrFilters([{ k: 'status', v: tableState.selectedStatusFilter, o: '=' }]);
+        }
+        jobListApiQueryHelper
+            .setFilters(queryTagHelper.filters.value)
+            .setSort(tableState.sortBy, tableState.sortDesc);
+        return {
+            data_source_id: dataSourcesPageState.selectedDataSourceId,
+            query: jobListApiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => tableState.thisPage),
+    pageSize: computed(() => tableState.pageSize),
+});
 
 const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
     let info = {} as CostJobStatusInfo;
@@ -147,6 +166,7 @@ const getRemainedTasksPercentage = (item: CostJobItem) => {
     return 0;
 };
 
+
 const handleClickCancelDetail = (jobId: string) => {
     state.modalVisible = true;
     state.modalType = 'CANCEL';
@@ -164,73 +184,19 @@ const handleClickResyncButton = () => {
 };
 const handleSelectStatus = (selected: string) => {
     tableState.selectedStatusFilter = selected;
+    tableState.thisPage = 1;
 };
-const handleConfirmModal = () => {
-    fetchJobList();
-};
-const initJobTableData = async () => {
-    tableState.pageStart = 0;
-    tableState.pageLimit = 15;
-    tableState.selectedStatusFilter = 'ALL';
-    await fetchJobList();
-};
-
-let jobListApiQueryHelper = new ApiQueryHelper();
-let jobListApiQuery = jobListApiQueryHelper.data;
-const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
-const { queryTags } = queryTagHelper;
 
 const handleChangeToolbox = async (options: ToolboxOptions) => {
-    if (options) {
-        jobListApiQuery = getApiQueryWithToolboxOptions(jobListApiQueryHelper, options) ?? jobListApiQuery;
-
-        if (options.sortBy !== undefined) {
-            jobListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
-        }
-        if (options.queryTags !== undefined) {
-            tableState.searchFilters = jobListApiQueryHelper.filters;
-        }
-        if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
-        if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
-    }
-    await fetchJobList();
-};
-const fetchJobList = async () => {
-    state.loading = true;
-    try {
-        jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit)
-            .setFilters(tableState.searchFilters);
-        await dataSourcesPageStore.fetchJobList({
-            data_source_id: dataSourcesPageState.selectedDataSourceId,
-            query: jobListApiQueryHelper.data,
-        });
-    } finally {
-        state.loading = false;
+    if (options?.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
     }
 };
 
-watch(() => tableState.selectedStatusFilter, async (selectedStatusFilter) => {
-    if (selectedStatusFilter === 'ALL') {
-        jobListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
-    } else {
-        jobListApiQueryHelper.setOrFilters([{ k: 'status', v: selectedStatusFilter, o: '=' }]);
-    }
-
-    await fetchJobList();
-});
 watch(() => dataSourcesPageState.selectedDataSourceId, () => {
     if (isLoading.value) return;
-    state.loading = true;
     tableState.selectedStatusFilter = 'ALL';
-    initJobTableData();
-});
-
-onMounted(() => {
-    tableState.selectedStatusFilter = 'ALL';
-    initJobTableData();
-});
-onUnmounted(() => {
-    dataSourcesPageStore.jobReset();
+    tableState.thisPage = 1;
 });
 </script>
 
@@ -241,7 +207,7 @@ onUnmounted(() => {
                 <p-heading heading-type="sub"
                            use-total-count
                            :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_HISTORY')"
-                           :total-count="storeState.totalCount"
+                           :total-count="totalCount"
                 />
             </template>
             <template v-if="dataSourceData?.schedule.state === 'ENABLED'"
@@ -255,19 +221,21 @@ onUnmounted(() => {
             </template>
         </p-heading-layout>
         <p-toolbox-table :fields="tableState.fields"
-                         :items="storeState.jobList"
-                         :loading="state.loading"
-                         :total-count="storeState.totalCount"
+                         :items="costJobListData?.results || []"
+                         :loading="isJobListLoading"
+                         :total-count="totalCount"
                          class="data-source-definition-table"
                          searchable
                          search-type="query"
                          sortable
-                         sort-by="created_at"
-                         :sort-desc="false"
+                         :this-page.sync="tableState.thisPage"
+                         :page-size.sync="tableState.pageSize"
+                         :sort-by.sync="tableState.sortBy"
+                         :sort-desc.sync="tableState.sortDesc"
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
-                         @refresh="fetchJobList()"
+                         @refresh="refetchJobList()"
                          @change="handleChangeToolbox"
         >
             <template #toolbox-bottom>
@@ -324,8 +292,7 @@ onUnmounted(() => {
         <data-source-management-tab-data-collection-history-modal v-if="state.modalVisible"
                                                                   :modal-visible.sync="state.modalVisible"
                                                                   :modal-type="state.modalType"
-                                                                  :selected-job-item="state.selectedJobItem"
-                                                                  @confirm="handleConfirmModal"
+                                                                  :selected-job-id="state.selectedJobId"
         />
     </div>
 </template>

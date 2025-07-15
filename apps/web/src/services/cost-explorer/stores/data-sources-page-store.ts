@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import dayjs from 'dayjs';
@@ -7,7 +5,6 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { durationFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostDataSourceAccountListParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/list';
@@ -26,7 +23,6 @@ import { useUserStore } from '@/store/user/user-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
-    CostJobItem,
     CostLinkedAccountModalType,
 } from '@/services/cost-explorer/types/data-sources-type';
 
@@ -38,9 +34,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
     const state = reactive({
         selectedDataSourceId: undefined as string|undefined,
-
-        jobList: [] as CostJobModel[],
-        jobListTotalCount: 0,
 
         linkedAccountsLoading: false,
         linkedAccountsPageStart: 0,
@@ -62,13 +55,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     });
 
     const getters = reactive({
-        jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
-            ...i,
-            total_tasks: i.total_tasks || 0,
-            finished_at: i.status === 'IN_PROGRESS' ? '--' : dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
-            created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
-            duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
-        })))),
         linkedAccounts: computed<CostDataSourceAccountModel[]>(() => (state.linkedAccounts.map((i) => ({
             ...i,
             updated_at: dayjs.utc(i.updated_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
@@ -105,8 +91,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const actions = {
         reset: () => {
             state.selectedDataSourceId = undefined;
-            state.jobList = [];
-            state.jobListTotalCount = 0;
 
             actions.linkedAccountsReset();
         },
@@ -123,21 +107,6 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 visible: false,
                 type: undefined as CostLinkedAccountModalType|undefined,
             };
-        },
-        jobReset: () => {
-            state.jobList = [];
-            state.jobListTotalCount = 0;
-        },
-        fetchJobList: async (params: CostJobListParameters) => {
-            try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>(params);
-                state.jobList = results || [];
-                state.jobListTotalCount = total_count || 0;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.jobList = [];
-                state.jobListTotalCount = 0;
-            }
         },
         fetchLinkedAccount: async (params: CostJobListParameters) => {
             try {
