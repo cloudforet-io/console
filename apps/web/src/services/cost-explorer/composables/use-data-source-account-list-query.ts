@@ -1,24 +1,24 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import { useCostJobApi } from '@/api-clients/cost-analysis/job/composables/use-job-api';
-import type { CostJobListParameters } from '@/api-clients/cost-analysis/job/schema/api-verbs/list';
+import { useDataSourceAccountApi } from '@/api-clients/cost-analysis/data-source-account/composables/use-data-source-account-api';
+import type { CostDataSourceAccountListParameters } from '@/api-clients/cost-analysis/data-source-account/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 
 
-interface UseCostJobListQueryOptions {
-    params?: ComputedRef<CostJobListParameters>;
+interface UseDataSourceAccountListQueryOptions {
+    params?: ComputedRef<CostDataSourceAccountListParameters>;
     thisPage: ComputedRef<number>;
     pageSize: ComputedRef<number>;
 }
-export const useCostJobListQuery = ({
+export const useDataSourceAccountListQuery = ({
     params,
     thisPage,
     pageSize,
-}: UseCostJobListQueryOptions) => {
-    const { costJobAPI } = useCostJobApi();
-    const { key, params: queryParams } = useServiceQueryKey('cost-analysis', 'job', 'list', {
+}: UseDataSourceAccountListQueryOptions) => {
+    const { dataSourceAccountAPI } = useDataSourceAccountApi();
+    const { key, params: queryParams } = useServiceQueryKey('cost-analysis', 'data-source-account', 'list', {
         params: computed(() => params?.value || {}),
         pagination: true,
     });
@@ -27,7 +27,7 @@ export const useCostJobListQuery = ({
         data, isLoading, totalCount, query,
     } = useScopedPaginationQuery({
         queryKey: key,
-        queryFn: costJobAPI.list,
+        queryFn: dataSourceAccountAPI.list,
         params: queryParams,
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 1, // 1 minutes
@@ -38,7 +38,7 @@ export const useCostJobListQuery = ({
     }, ['DOMAIN', 'WORKSPACE']);
 
     return {
-        costJobListData: data,
+        dataSourceAccountListData: data,
         isLoading,
         totalCount,
         refetch: query.refetch,
