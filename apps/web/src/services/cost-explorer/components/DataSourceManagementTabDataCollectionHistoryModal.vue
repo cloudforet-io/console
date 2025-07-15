@@ -2,12 +2,14 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
 import {
     PButtonModal, PCodeEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -15,6 +17,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useCostJobGetQuery } from '@/services/cost-explorer/composables/use-cost-job-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataCollectionHistoryModalType } from '@/services/cost-explorer/types/data-sources-type';
+
 
 interface DateOption {
     minDate?: string;
@@ -33,11 +36,11 @@ const props = withDefaults(defineProps<Props>(), {
     selectedJobId: undefined,
 });
 
+const queryClient = useQueryClient();
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 
-const emit = defineEmits<{(e: 'update:modal-visible'): void,
-    (e: 'confirm'): void
+const emit = defineEmits<{(e: 'update:modal-visible'): void;
 }>();
 
 const state = reactive({
@@ -79,6 +82,7 @@ const state = reactive({
 
 /* Query */
 const { costJob, isLoading: isCostJobLoading } = useCostJobGetQuery(computed(() => props.selectedJobId));
+const { key: costJobListQueryKey } = useServiceQueryKey('cost-analysis', 'job', 'list');
 
 /* Event Handler */
 const handleUpdateSelectedDates = (selectedDates: string[]) => {
@@ -116,7 +120,7 @@ const handleConfirmButton = async () => {
         default: break;
         }
 
-        await emit('confirm');
+        queryClient.invalidateQueries({ queryKey: costJobListQueryKey });
     } finally {
         state.loading = false;
         state.proxyVisible = false;

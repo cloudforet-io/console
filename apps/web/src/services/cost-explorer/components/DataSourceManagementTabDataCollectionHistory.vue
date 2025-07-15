@@ -30,6 +30,7 @@ import type {
     CostJobItem, CostJobStatusInfo, DataCollectionHistoryModalType,
 } from '@/services/cost-explorer/types/data-sources-type';
 
+
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 
@@ -185,9 +186,6 @@ const handleSelectStatus = (selected: string) => {
     tableState.selectedStatusFilter = selected;
     tableState.thisPage = 1;
 };
-const handleConfirmModal = () => {
-    refetchJobList();
-};
 
 const handleChangeToolbox = async (options: ToolboxOptions) => {
     if (options?.queryTags !== undefined) {
@@ -295,7 +293,6 @@ watch(() => dataSourcesPageState.selectedDataSourceId, () => {
                                                                   :modal-visible.sync="state.modalVisible"
                                                                   :modal-type="state.modalType"
                                                                   :selected-job-id="state.selectedJobId"
-                                                                  @confirm="handleConfirmModal"
         />
     </div>
 </template>

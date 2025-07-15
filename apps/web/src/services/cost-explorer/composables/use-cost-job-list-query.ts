@@ -39,6 +39,7 @@ export const useCostJobListQuery = ({
 
     return {
         costJobListData: data,
+        costJobListQueryKey: key,
         isLoading,
         totalCount,
         refetch: query.refetch,
