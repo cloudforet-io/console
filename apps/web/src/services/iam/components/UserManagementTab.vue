@@ -93,7 +93,9 @@ const singleItemTabState = reactive({
     activeTab: USER_TABS.DETAIL,
     selectedIndex: computed(() => userPageState.selectedIndices[0]),
 });
-const { userListData, workspaceUserListData } = useUserListQuery(computed(() => userPageState.selectedUserIds ?? []));
+
+const selectedUserIds = computed(() => userPageState.selectedUserIds ?? []);
+const { userListData, workspaceUserListData } = useUserListQuery(selectedUserIds);
 
 
 const { userGroupListData } = useUserGroupListQuery({

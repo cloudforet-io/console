@@ -54,9 +54,9 @@ const storeState = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
 
-const { userData, workspaceUserData } = useUserGetQuery(
-    computed(() => userPageState.selectedUserIds[0] ?? ''),
-);
+const selectedUserId = computed(() => userPageState.selectedUserIds[0] ?? '');
+const { userData, workspaceUserData } = useUserGetQuery(selectedUserId);
+
 const { roleListData } = useRoleListQuery();
 
 const roleMap = computed(() => {

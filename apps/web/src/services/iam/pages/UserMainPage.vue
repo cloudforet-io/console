@@ -42,12 +42,6 @@ watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
     userPageState.isAdminMode = storeState.isAdminMode;
 }, { immediate: true });
 
-// const init = async () => {
-//     await userPageStore.listRoles();
-// };
-// const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], init);
-// callApiWithGrantGuard();
-
 /* Unmount */
 onUnmounted(() => {
     userPageStore.reset();

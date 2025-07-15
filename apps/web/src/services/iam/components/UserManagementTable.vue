@@ -69,7 +69,7 @@ const { queryTags } = queryTagHelper;
 const queryClient = useQueryClient();
 const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
 const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
-const { key: workspaceUserGetQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'get');
+const { withSuffix: workspaceUserGetQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'get');
 
 const { roleListData } = useRoleListQuery();
 
@@ -78,7 +78,7 @@ const storeState = reactive({
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
     timezone: computed<string|undefined>(() => userStore.state.timezone),
 });
-const roleMap = computed(() => {
+const roleMap = computed<Record<string, RoleModel>>(() => {
     const map: Record<string, RoleModel> = {};
     roleListData.value?.forEach((role) => {
         map[role.role_id] = role;
@@ -252,10 +252,14 @@ const dropdownMenuHandler: AutocompleteHandler = async () => {
 };
 
 const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
-    onSuccess: () => {
+    onSuccess: (variables) => {
         queryClient.invalidateQueries({ queryKey: userListQueryKey });
         queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
-        queryClient.invalidateQueries({ queryKey: workspaceUserGetQueryKey });
+        queryClient.invalidateQueries({
+            queryKey: workspaceUserGetQueryKey({
+                user_id: variables.user_id,
+            }),
+        });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
     },
     onError: (error) => {
