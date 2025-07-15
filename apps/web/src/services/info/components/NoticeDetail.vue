@@ -5,18 +5,18 @@ import {
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PDataLoader, PDivider, PI, PPaneLayout, PBadge, PPopover, PTextButton,
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PostListParameters } from '@/api-clients/board/post/schema/api-verbs/list';
+import { usePostApi } from '@/api-clients/board/post/composables/use-post-api';
 import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
 import type { PostModel } from '@/api-clients/board/post/schema/model';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -25,7 +25,6 @@ import { useUserStore } from '@/store/user/user-store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
@@ -44,6 +43,8 @@ const noticeDetailState = noticeDetailStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
+const noticeStore = useNoticeStore();
+
 const router = useRouter();
 
 const storeState = reactive({
@@ -54,7 +55,11 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     noticePostData: computed<PostModel|undefined>(() => noticeDetailState.post),
-    prevNoticePost: undefined as PostModel | undefined,
+    currentPostIndex: computed<number>(() => {
+        if (!state.noticePostData) return 0;
+        return postList.value?.results?.findIndex((post) => post.post_id === state.noticePostData?.post_id) ?? 0;
+    }),
+    prevNoticePost: computed<PostModel|undefined>(() => postList.value?.results?.[state.currentPostIndex + 1]),
     prevPostRoute: computed<Location|undefined>(() => {
         if (!state.prevNoticePost) return undefined;
         const noticeDetailRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE.DETAIL._NAME : INFO_ROUTE.NOTICE.DETAIL._NAME;
@@ -63,7 +68,7 @@ const state = reactive({
             params: { postId: state.prevNoticePost.post_id },
         };
     }),
-    nextNoticePost: undefined as PostModel | undefined,
+    nextNoticePost: computed<PostModel|undefined>(() => postList.value?.results?.[state.currentPostIndex - 1]),
     nextPostRoute: computed<Location|undefined>(() => {
         if (!state.nextNoticePost) return undefined;
         const noticeDetailRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE.DETAIL._NAME : INFO_ROUTE.NOTICE.DETAIL._NAME;
@@ -91,51 +96,24 @@ const {
 });
 
 /* Api */
-const getNextPostData = async (createdAt: string) => {
-    try {
-        const nextPostApiQueryHelper = new ApiQueryHelper()
-            .setPage(1, 1)
-            .setSort('created_at', false)
-            .setTimezone('UTC')
-            .setFilters([{ k: 'created_at', v: createdAt, o: '>t' }]);
-        const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
-            query: nextPostApiQueryHelper.data,
-            board_type: POST_BOARD_TYPE.NOTICE,
-        });
-        state.nextNoticePost = results?.length ? results[0] : undefined;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.nextNoticePost = undefined;
-    }
-};
-const getPrevPostData = async (createdAt: string) => {
-    try {
-        const prevPostApiQueryHelper = new ApiQueryHelper()
-            .setPage(1, 1)
-            .setSort('created_at', true)
-            .setTimezone('UTC')
-            .setFilters([{ k: 'created_at', v: createdAt, o: '<t' }]);
-        const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
-            query: prevPostApiQueryHelper.data,
-            board_type: POST_BOARD_TYPE.NOTICE,
-        });
-        state.prevNoticePost = results?.length ? results[0] : undefined;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.prevNoticePost = undefined;
-    }
-};
-
-const noticeStore = useNoticeStore();
+const noticeApiHelper = new ApiQueryHelper().setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+const { postAPI } = usePostApi();
+const { key: postListQueryKey, params: postListQueryParams } = useServiceQueryKey('board', 'post', 'list', {
+    params: computed(() => ({
+        query: noticeApiHelper.data,
+        board_type: POST_BOARD_TYPE.NOTICE,
+    })),
+});
+const { data: postList } = useScopedQuery({
+    queryKey: postListQueryKey,
+    queryFn: () => postAPI.list(postListQueryParams.value),
+}, ['DOMAIN']);
 
 /* Event */
 const handleBackToListButtonClick = () => {
     const noticeRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE._NAME : INFO_ROUTE.NOTICE._NAME;
     router.push({ name: noticeRouteName });
 };
-
-
-
 
 const handlePostClick = (direction: 'next'|'prev') => {
     if (direction === 'next') {
@@ -150,10 +128,6 @@ const handlePostClick = (direction: 'next'|'prev') => {
 const initPage = async (postId: string) => {
     state.loading = true;
     await noticeDetailStore.getNoticePost(postId);
-    if (state.noticePostData?.created_at) {
-        await getNextPostData(state.noticePostData.created_at);
-        await getPrevPostData(state.noticePostData.created_at);
-    }
     const isGetPostSuccess = !!state.noticePostData?.post_id;
     if (isGetPostSuccess) {
         await noticeStore.updateNoticeReadState(postId);
