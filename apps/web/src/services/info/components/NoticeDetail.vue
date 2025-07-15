@@ -108,7 +108,7 @@ const { key: postListQueryKey, params: postListQueryParams } = useServiceQueryKe
 const { data: postList } = useScopedQuery({
     queryKey: postListQueryKey,
     queryFn: () => postAPI.list(postListQueryParams.value),
-}, ['DOMAIN']);
+}, ['DOMAIN', 'WORKSPACE']);
 
 /* Event */
 const handleBackToListButtonClick = () => {
