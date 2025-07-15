@@ -34,7 +34,7 @@ export const usePostListPaginationQuery = ({ params, thisPage, pageSize }: UsePo
         thisPage,
         pageSize,
         verb: 'list',
-    }, ['DOMAIN']);
+    }, ['DOMAIN', 'WORKSPACE']);
 
     const refresh = async () => {
         await queryClient.resetQueries({ queryKey: postListPaginationQueryKey.value });

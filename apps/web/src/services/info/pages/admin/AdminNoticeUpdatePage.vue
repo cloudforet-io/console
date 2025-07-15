@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import { onBeforeMount } from 'vue';
-
 import { PHeading } from '@cloudforet/mirinae';
 
 import NoticeForm from '@/services/info/components/NoticeForm.vue';
-import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 const props = withDefaults(defineProps<{
     postId: string;
 }>(), {});
-const noticeDetailStore = useNoticeDetailStore();
-
-onBeforeMount(async () => {
-    noticeDetailStore.reset();
-    await noticeDetailStore.getNoticePost(props.postId);
-});
 </script>
 
 <template>
@@ -24,6 +15,8 @@ onBeforeMount(async () => {
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
-        <notice-form type="EDIT" />
+        <notice-form type="EDIT"
+                     :post-id="props.postId"
+        />
     </div>
 </template>

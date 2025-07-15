@@ -28,9 +28,9 @@ import { useEditorContentTransformer } from '@/common/composables/editor-content
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
+import { usePostGetQuery } from '@/services/info/composables/use-post-get-query';
 import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
-import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 const props = defineProps<{
     postId?: string;
@@ -38,14 +38,16 @@ const props = defineProps<{
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
-const noticeDetailStore = useNoticeDetailStore();
-const noticeDetailState = noticeDetailStore.state;
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 const userStore = useUserStore();
 const noticeStore = useNoticeStore();
 
 const router = useRouter();
+
+const postId = computed(() => props.postId ?? '');
+
+const { postData } = usePostGetQuery(postId);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
@@ -54,10 +56,9 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    noticePostData: computed<PostModel|undefined>(() => noticeDetailState.post),
     currentPostIndex: computed<number>(() => {
-        if (!state.noticePostData) return 0;
-        return postList.value?.results?.findIndex((post) => post.post_id === state.noticePostData?.post_id) ?? 0;
+        if (!postData.value) return 0;
+        return postList.value?.results?.findIndex((post) => post.post_id === postData.value?.post_id) ?? 0;
     }),
     prevNoticePost: computed<PostModel|undefined>(() => postList.value?.results?.[state.currentPostIndex + 1]),
     prevPostRoute: computed<Location|undefined>(() => {
@@ -78,19 +79,19 @@ const state = reactive({
         };
     }),
     hasDomainRoleUser: computed<boolean>(() => userStore.getters.isDomainAdmin),
-    isAllWorkspace: computed<boolean>(() => (!state.noticePostData?.workspaces || state.noticePostData?.workspaces?.includes('*')) ?? true),
+    isAllWorkspace: computed<boolean>(() => (!postData.value?.workspaces || postData.value?.workspaces?.includes('*')) ?? true),
     scopedWorkspaceList: computed<WorkspaceModel[]|undefined>(() => {
         if (state.isAllWorkspace) return undefined;
-        return storeState.workspaceList.filter((workspace) => state.noticePostData?.workspaces.includes(workspace.workspace_id));
+        return storeState.workspaceList.filter((workspace) => postData.value?.workspaces?.includes(workspace.workspace_id));
     }),
     popoverVisible: false,
 });
 
-const contentsType = computed(() => state.noticePostData?.contents_type ?? 'markdown');
+const contentsType = computed(() => postData.value?.contents_type ?? 'markdown');
 const {
     editorContents,
 } = useEditorContentTransformer({
-    contents: computed(() => state.noticePostData?.contents ?? ''),
+    contents: computed(() => postData.value?.contents ?? ''),
     contentsType,
     resourceGroup: 'DOMAIN',
 });
@@ -125,17 +126,16 @@ const handlePostClick = (direction: 'next'|'prev') => {
     }
 };
 
-const initPage = async (postId: string) => {
+const initPage = async (id: string) => {
     state.loading = true;
-    await noticeDetailStore.getNoticePost(postId);
-    const isGetPostSuccess = !!state.noticePostData?.post_id;
+    const isGetPostSuccess = !!postData.value?.post_id;
     if (isGetPostSuccess) {
-        await noticeStore.updateNoticeReadState(postId);
+        await noticeStore.updateNoticeReadState(id);
     }
     state.loading = false;
 };
-watch(() => props.postId, (postId) => {
-    if (postId) initPage(postId);
+watch(() => props.postId, (id) => {
+    if (id) initPage(id);
 }, { immediate: true });
 
 </script>
@@ -144,19 +144,19 @@ watch(() => props.postId, (postId) => {
     <section class="notice-detail">
         <p-pane-layout class="notice-detail-layout">
             <p-data-loader :loading="state.loading"
-                           :data="state.noticePostData"
+                           :data="postData"
             >
-                <div v-if="state.noticePostData"
+                <div v-if="postData"
                      class="post-title"
                 >
                     <span>
-                        {{ iso8601Formatter(state.noticePostData.created_at, storeState.timezone) }}
+                        {{ iso8601Formatter(postData?.created_at || '', storeState.timezone) }}
                     </span>
-                    <p-i v-if="state.noticePostData.writer"
+                    <p-i v-if="postData?.writer"
                          width="0.125rem"
                          name="ic_dot"
                     />
-                    <span v-if="state.noticePostData.writer"> {{ state.noticePostData.writer }}</span>
+                    <span v-if="postData?.writer"> {{ postData.writer }}</span>
                     <p-i v-if="state.hasDomainRoleUser"
                          width="0.125rem"
                          name="ic_dot"
@@ -166,7 +166,7 @@ watch(() => props.postId, (postId) => {
                     >
                         <p-i name="ic_eye"
                              width="1.125rem"
-                        /> {{ state.noticePostData.view_count }}
+                        /> {{ postData?.view_count }}
                     </span>
                     <p-i v-if="storeState.isAdminMode"
                          width="0.125rem"
@@ -218,7 +218,7 @@ watch(() => props.postId, (postId) => {
                     </div>
                 </div>
                 <p-divider />
-                <div v-if="state.noticePostData"
+                <div v-if="postData"
                      class="text-editor-wrapper"
                 >
                     <text-editor-viewer :contents="editorContents"
