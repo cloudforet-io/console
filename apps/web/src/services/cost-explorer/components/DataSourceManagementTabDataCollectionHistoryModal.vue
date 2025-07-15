@@ -9,6 +9,8 @@ import {
     PButtonModal, PCodeEditor, PFieldTitle, PToggleButton, PTextInput, PDatetimePicker, PScopedNotification,
 } from '@cloudforet/mirinae';
 
+import { useDataSourceApi } from '@/api-clients/cost-analysis/data-source/composables/use-data-source-api';
+import { useCostJobApi } from '@/api-clients/cost-analysis/job/composables/use-job-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -39,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
 const queryClient = useQueryClient();
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
+const { dataSourceAPI } = useDataSourceApi();
+const { costJobAPI } = useCostJobApi();
 
 const emit = defineEmits<{(e: 'update:modal-visible'): void;
 }>();
@@ -103,7 +107,7 @@ const handleConfirmButton = async () => {
             return;
 
         case 'RE-SYNC':
-            await dataSourcesPageStore.fetchSyncDatasource({
+            await dataSourceAPI.sync({
                 start: state.toggleValue ? undefined : dayjs(state.startDates[0]).format('YYYY-MM'),
                 data_source_id: dataSourcesPageState.selectedDataSourceId || '',
             });
@@ -111,7 +115,7 @@ const handleConfirmButton = async () => {
 
         case 'CANCEL':
             if (props.selectedJobId) {
-                await dataSourcesPageStore.fetchCancelJob({
+                await costJobAPI.cancel({
                     job_id: props.selectedJobId,
                 });
             }
