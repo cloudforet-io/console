@@ -2,7 +2,6 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PButton, PBadge, PStatus,
@@ -28,6 +27,7 @@ import RoleDeleteModal
     from '@/services/iam/components/RoleDeleteModal.vue';
 import RoleStateUpdateModal from '@/services/iam/components/RoleStateUpdateModal.vue';
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleListPaginationQuery } from '@/services/iam/composables/use-role-list-pagination-query';
 import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
@@ -50,12 +50,39 @@ const rolePageState = rolePageStore.$state;
 
 const router = useRouter();
 
-const roleListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(rolePageState.pageStart).setPageLimit(rolePageState.pageLimit)
-    .setSort('is_managed', true);
+const roleListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ROLE_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
-let roleListApiQuery = roleListApiQueryHelper.data;
+
+/* Query */
+const queryState = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+
+const pageState = reactive({
+    thisPage: 1,
+    pageLimit: 15,
+});
+
+const {
+    data: roleList,
+    totalCount: roleTotalCount,
+    isLoading: isRoleListLoading,
+    refresh: refreshRoleList,
+} = useRoleListPaginationQuery({
+    params: computed(() => {
+        roleListApiQueryHelper
+            .setSort('is_managed', true)
+            .setFilters(queryTagHelper.filters.value);
+        roleListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
+        return {
+            query: roleListApiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => pageState.thisPage),
+    pageSize: computed(() => pageState.pageLimit),
+});
 
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
@@ -140,26 +167,16 @@ const handleSelect = (index: number[]) => {
     rolePageStore.$patch({ selectedIndices: index });
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    roleListApiQuery = getApiQueryWithToolboxOptions(roleListApiQueryHelper, options) ?? roleListApiQuery;
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
-    if (options.pageStart !== undefined) rolePageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) rolePageStore.$patch({ pageLimit: options.pageLimit });
-    await getListRoles();
+    if (options.sortBy !== undefined && options.sortDesc !== undefined) {
+        queryState.sortKey = options.sortBy;
+        queryState.sortDesc = options.sortDesc;
+    }
 };
 
 /* API */
-const getListRoles = async () => {
-    modalState.loading = true;
-    try {
-        roleListApiQueryHelper
-            .setFilters(queryTagHelper.filters.value);
-        await rolePageStore.listRoles({ query: roleListApiQuery });
-    } finally {
-        modalState.loading = false;
-    }
-};
 const handleExport = async () => {
     try {
         await downloadExcel({
@@ -175,11 +192,6 @@ const handleExport = async () => {
         ErrorHandler.handleError(e);
     }
 };
-
-/* Init */
-(() => {
-    getListRoles();
-})();
 </script>
 
 <template>
@@ -189,22 +201,24 @@ const handleExport = async () => {
                          selectable
                          sortable
                          exportable
-                         :loading="modalState.loading"
+                         :loading="isRoleListLoading"
                          disabled
-                         :items="rolePageState.roles"
+                         :items="roleList"
                          :select-index="rolePageState.selectedIndices"
                          :fields="state.fields"
                          sort-by="name"
                          :sort-desc="true"
-                         :total-count="rolePageState.totalCount"
+                         :total-count="roleTotalCount"
                          :key-item-sets="ROLE_SEARCH_HANDLERS.keyItemSets"
                          :value-handler-map="ROLE_SEARCH_HANDLERS.valueHandlerMap"
                          :query-tags="queryTags"
                          :style="{height: `${props.tableHeight}px`}"
                          :get-row-selectable="getRowSelectable"
+                         :this-page.sync="pageState.thisPage"
+                         :page-size.sync="pageState.pageLimit"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refreshRoleList"
                          @export="handleExport"
         >
             <template v-if="props.hasReadWriteAccess"
