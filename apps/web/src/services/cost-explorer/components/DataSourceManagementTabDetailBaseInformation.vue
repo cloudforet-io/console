@@ -8,15 +8,14 @@ import {
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
+import { useDataSourceGetQuery } from '@/services/cost-explorer/composables/use-data-source-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
-const dataSourcesPageGetters = dataSourcesPageStore.getters;
-
-const storeState = reactive({
-    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-});
+const dataSourcesPageState = dataSourcesPageStore.state;
+const referenceMap = useAllReferenceDataModel();
 
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
@@ -26,6 +25,9 @@ const tableState = reactive({
         { name: 'created_at', label: 'Registered Time' },
     ]),
 });
+
+/* Query */
+const { dataSourceData, isLoading } = useDataSourceGetQuery(computed(() => dataSourcesPageState.selectedDataSourceId));
 </script>
 
 <template>
@@ -35,8 +37,9 @@ const tableState = reactive({
                    class="pt-8 px-4 pb-4"
         />
         <p-definition-table :fields="tableState.fields"
-                            :data="storeState.selectedItem"
+                            :data="dataSourceData"
                             :skeleton-rows="4"
+                            :loading="isLoading"
                             style-type="white"
                             class="data-source-definition-table"
                             v-on="$listeners"
@@ -44,11 +47,11 @@ const tableState = reactive({
             <template #data-name>
                 <div class="col-name">
                     <p-lazy-img class="left-icon"
-                                :src="storeState.selectedItem?.icon"
+                                :src="referenceMap.plugin[dataSourceData?.plugin_info?.plugin_id || '']?.icon"
                                 width="1.5rem"
                                 height="1.5rem"
                     />
-                    <span>{{ storeState.selectedItem?.name }}</span>
+                    <span>{{ dataSourceData?.name }}</span>
                 </div>
             </template>
         </p-definition-table>

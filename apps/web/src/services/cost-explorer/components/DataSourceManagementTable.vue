@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
+import dayjs from 'dayjs';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PLazyImg, PI, PStatus,
 } from '@cloudforet/mirinae';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+
+import { useUserStore } from '@/store/user/user-store';
+
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { red } from '@/styles/colors';
 
 import { datasourceStateFormatter } from '@/services/cost-explorer/composables/data-source-handler';
+import { useDataSourceAccountAnalyzeQuery } from '@/services/cost-explorer/composables/use-data-source-account-analyze-query';
+import { useDataSourceListQuery } from '@/services/cost-explorer/composables/use-data-source-list-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 interface Props {
     tableHeight: number;
@@ -27,19 +32,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const dataSourcesPageStore = useDataSourcesPageStore();
-const dataSourcesPageState = dataSourcesPageStore.state;
-const dataSourcesPageGetters = dataSourcesPageStore.getters;
+const referenceMap = useAllReferenceDataModel();
+const userStore = useUserStore();
 
-const storeState = reactive({
-    dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
-    dataSourceListTotalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
-    selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
-    dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
-    dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
-    dataSourceListSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.dataSourceListSearchFilters),
-});
 const state = reactive({
-    loading: false,
+    sortKey: 'name',
+    sortDesc: false,
+    pageSize: 15,
+    thisPage: 1,
+    selectedIndex: undefined as number|undefined,
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -95,35 +96,63 @@ const tableState = reactive({
         created_at: makeDistinctValueHandler('cost_analysis.DataSource', 'created_at'),
     })),
 });
+const selectedIndex = computed<number[]>(() => {
+    if (state.selectedIndex === undefined) return [];
+    return [state.selectedIndex];
+});
 
 const datasourceListApiQueryHelper = new ApiQueryHelper();
-let datasourceListApiQuery = datasourceListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const handleUpdateSelectIndex = async (indices: number[]) => {
-    dataSourcesPageStore.setSelectedDataSourceIndices(indices[0]);
-    const item = storeState.dataSourceList[indices[0]];
-    await dataSourcesPageStore.fetchDataSourceItem({
-        data_source_id: item.data_source_id,
-    });
-};
-const handleChange = (options: any = {}) => {
-    datasourceListApiQuery = getApiQueryWithToolboxOptions(datasourceListApiQueryHelper, options) ?? datasourceListApiQuery;
-    if (options.queryTags !== undefined) {
-        dataSourcesPageStore.setDataSourceListSearchFilters(datasourceListApiQueryHelper.filters);
+/* Query */
+const {
+    dataSourceListData, totalCount, isLoading, refetch,
+} = useDataSourceListQuery({
+    params: computed(() => {
+        datasourceListApiQueryHelper
+            .setFilters(queryTagHelper.filters.value)
+            .setSort(state.sortKey, state.sortDesc);
+        return {
+            query: datasourceListApiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageSize),
+});
+const { costDataSourceAccountAnalyzeData, isLoading: isAnalyzeLoading } = useDataSourceAccountAnalyzeQuery({
+    query: {
+        group_by: ['data_source_id'],
+        fields: {
+            workspaceList: {
+                key: 'workspace_id',
+                operator: 'push',
+            },
+        },
+    },
+});
+
+/* Util */
+const getLinkedAccountCount = (dataSourceId: string): string => {
+    const analyzeDataResults = costDataSourceAccountAnalyzeData.value?.results || [];
+    const matchingItem = analyzeDataResults.find((entry) => entry.data_source_id === dataSourceId);
+    if (matchingItem) {
+        const linkedCount = matchingItem.workspaceList?.filter((id) => id !== null).length;
+        return `${linkedCount || 0} / `;
     }
-    if (options.pageStart !== undefined) dataSourcesPageStore.setDataSourceListPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) dataSourcesPageStore.setDataSourceListPageLimit(options.pageLimit);
-    fetchDataSourceList();
+    return '';
 };
 
-const fetchDataSourceList = async () => {
-    datasourceListApiQueryHelper.setPage(storeState.dataSourceListPageStart, storeState.dataSourceListPageLimit)
-        .setFilters(storeState.dataSourceListSearchFilters);
-    await dataSourcesPageStore.fetchDataSourceList({
-        query: datasourceListApiQueryHelper.data,
-    });
+/* Event Handler */
+const handleUpdateSelectIndex = async (indices: number[]) => {
+    const item = dataSourceListData.value?.results?.[indices[0]];
+    state.selectedIndex = indices[0];
+    dataSourcesPageStore.setSelectedDataSourceId(item?.data_source_id);
+};
+const handleChange = (options: any = {}) => {
+    if (options?.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
+    }
 };
 </script>
 
@@ -134,31 +163,36 @@ const fetchDataSourceList = async () => {
                          searchable
                          selectable
                          sortable
-                         sort-by="name"
+                         :sort-by.sync="state.sortKey"
+                         :sort-desc.sync="state.sortDesc"
                          :multi-select="false"
-                         :sort-desc="true"
-                         :select-index="[storeState.selectedIndices]"
+                         :select-index="selectedIndex"
                          :fields="tableState.fields"
-                         :items="storeState.dataSourceList"
+                         :items="dataSourceListData?.results || []"
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
-                         :loading="state.loading"
-                         :total-count="storeState.dataSourceListTotalCount"
+                         :loading="isLoading"
+                         :total-count="totalCount"
+                         :this-page.sync="state.thisPage"
+                         :page-size.sync="state.pageSize"
                          :style="{height: `${props.tableHeight}px`}"
                          @change="handleChange"
-                         @refresh="fetchDataSourceList"
+                         @refresh="refetch()"
                          @update:select-index="handleUpdateSelectIndex"
         >
             <template #col-name-format="{value, item}">
                 <div class="col-name">
                     <p-lazy-img class="left-icon"
-                                :src="item.icon"
+                                :src="referenceMap.plugin[item.plugin_info?.plugin_id || '']?.icon"
                                 width="1.5rem"
                                 height="1.5rem"
                     />
                     <span>{{ value }}</span>
                 </div>
+            </template>
+            <template #col-created_at-format="{value}">
+                <span>{{ dayjs.utc(value).tz(userStore.state.timezone).format('YYYY-MM-DD HH:mm:ss') }}</span>
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="datasourceStateFormatter(value)"
@@ -168,7 +202,7 @@ const fetchDataSourceList = async () => {
             <template #col-data_source_account_count-format="{value, item}">
                 <div class="col-data-source-account-count">
                     <p>
-                        <span v-if="item.linked_count !== undefined">{{ item.linked_count || 0 }} / </span>
+                        <span v-if="!isAnalyzeLoading">{{ getLinkedAccountCount(item.data_source_id) }}</span>
                         <span>{{ value || 0 }}</span>
                     </p>
                     <p-i v-if="item.linked_count !== item.data_source_account_count"

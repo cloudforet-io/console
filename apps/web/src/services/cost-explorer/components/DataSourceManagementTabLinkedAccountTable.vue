@@ -6,6 +6,7 @@ import { isObject } from 'lodash';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolboxTable, PBadge, PSelectDropdown, PI, PTooltip, PSelectStatus, PStatus,
 } from '@cloudforet/mirinae';
@@ -38,7 +39,6 @@ import {
     makeDataSourceDistinctValueHandler, makeDataSourceSyncValueHandler,
 } from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -64,7 +64,6 @@ const storeState = reactive({
     linkedAccounts: computed<CostDataSourceAccountModel[]>(() => dataSourcesPageGetters.linkedAccounts),
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
     linkedAccountsLoading: computed<boolean>(() => dataSourcesPageState.linkedAccountsLoading),
-    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
 });
 const dropdownState = reactive({
     visible: false,
@@ -90,13 +89,16 @@ const tableState = reactive({
         { name: 'is_sync', label: 'Sync' },
         { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
-    valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
-        account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
-        workspace_id: makeDataSourceDistinctValueHandler([{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }], storeState.workspaceList),
-        is_linked: makeDataSourceSyncValueHandler('is_linked', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
-        is_sync: makeDataSourceSyncValueHandler('is_sync', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
-    })),
+    valueHandlerMap: computed<ValueHandlerMap>(() => {
+        const filters: ApiFilter[] = [{ k: 'data_source_id', v: dataSourcesPageState.selectedDataSourceId, o: 'eq' }];
+        return {
+            name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name', 'string', filters),
+            account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id', 'string', filters),
+            workspace_id: makeDataSourceDistinctValueHandler(filters, storeState.workspaceList),
+            is_linked: makeDataSourceSyncValueHandler('is_linked', filters),
+            is_sync: makeDataSourceSyncValueHandler('is_sync', filters),
+        };
+    }),
     filterFields: computed(() => [
         { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALL') },
         { name: 'linked', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.LINKED') },
