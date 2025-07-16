@@ -1,4 +1,4 @@
-import type { NotificationLevel, NotificationMessage, NotificationType } from '@/schema/notification/notification/type';
+import type { NotificationLevel, NotificationMessage, NotificationType } from '@/api-clients/notification/notification/schema/type';
 
 export interface NotificationModel {
     notification_id: string;

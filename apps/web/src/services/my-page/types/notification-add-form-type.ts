@@ -1,4 +1,4 @@
-import type { NotificationLevel } from '@/schema/notification/notification/type';
+import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 import type { ChannelSchedule } from '@/schema/notification/type';
 
 export interface NotificationAddFormDataPayload {

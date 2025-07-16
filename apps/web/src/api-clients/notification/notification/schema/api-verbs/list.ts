@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { NotificationLevel, NotificationType } from '@/schema/notification/notification/type';
+import type { NotificationLevel, NotificationType } from '@/api-clients/notification/notification/schema/type';
 
 export interface NotificationListParameters {
     query?: Query;

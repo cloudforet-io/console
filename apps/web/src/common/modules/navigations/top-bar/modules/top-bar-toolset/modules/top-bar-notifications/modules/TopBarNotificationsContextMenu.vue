@@ -18,10 +18,10 @@ import {
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationDeleteParameters } from '@/schema/notification/notification/api-verbs/delete';
-import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
-import type { NotificationSetReadParameters } from '@/schema/notification/notification/api-verbs/set-read';
-import type { NotificationModel } from '@/schema/notification/notification/model';
+import type { NotificationDeleteParameters } from '@/api-clients/notification/notification/schema/api-verbs/delete';
+import type { NotificationListParameters } from '@/api-clients/notification/notification/schema/api-verbs/list';
+import type { NotificationSetReadParameters } from '@/api-clients/notification/notification/schema/api-verbs/set-read';
+import type { NotificationModel } from '@/api-clients/notification/notification/schema/model';
 import { i18n } from '@/translations';
 
 import { useDisplayStore } from '@/store/display/display-store';

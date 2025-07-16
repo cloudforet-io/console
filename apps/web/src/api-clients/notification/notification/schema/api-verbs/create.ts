@@ -1,6 +1,6 @@
 import type {
     NotificationLevel, NotificationMessage, NotificationResourceType, NotificationType,
-} from '@/schema/notification/notification/type';
+} from '@/api-clients/notification/notification/schema/type';
 
 export interface NotificationCreateParameters {
     resource_type: NotificationResourceType;

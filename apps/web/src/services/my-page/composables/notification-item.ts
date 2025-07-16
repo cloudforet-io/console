@@ -9,8 +9,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/composables/use-user-channel-api';
 import type { UserChannelUpdateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/update';
+import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProjectChannelUpdateParameters } from '@/schema/notification/project-channel/api-verbs/update';
 import type { UserChannelUpdateParameters as UserChannelUpdateParametersV1 } from '@/schema/notification/user-channel/api-verbs/update';
 import { i18n } from '@/translations';
