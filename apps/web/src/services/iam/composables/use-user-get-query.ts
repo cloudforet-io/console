@@ -22,6 +22,7 @@ export const useUserGetQuery = (userId: Ref<string>) => {
     });
 
     const { key: workspaceUserQueryKey, params: workspaceUserQueryParams } = useServiceQueryKey('identity', 'workspace-user', 'get', {
+        contextKey: userId,
         params: computed(() => ({
             user_id: userId.value,
         })),

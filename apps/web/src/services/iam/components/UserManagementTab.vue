@@ -110,7 +110,7 @@ const { userGroupListData } = useUserGroupListQuery({
 
 const { roleListData } = useRoleListQuery();
 
-const roleMap = computed(() => {
+const roleMap = computed<Record<string, RoleModel>>(() => {
     const map: Record<string, RoleModel> = {};
     roleListData.value?.forEach((role) => {
         map[role.role_id] = role;

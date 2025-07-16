@@ -28,7 +28,7 @@ export const useRoleListQuery = (
         })),
     });
 
-    const { data: roleListData, isLoading, refetch } = useScopedQuery({
+    const { data: roleListData, isFetching, refetch } = useScopedQuery({
         queryKey: roleListQueryKey,
         queryFn: () => roleAPI.list(roleListQueryParams.value),
         select: (data) => data?.results || [],
@@ -39,7 +39,7 @@ export const useRoleListQuery = (
 
     return {
         roleListData: computed<RoleModel[]>(() => roleListData.value ?? []),
-        roleListIsLoading: computed(() => isLoading.value),
+        roleListIsLoading: isFetching,
         roleListQueryKey,
         roleListQueryParams,
         refetchRoleList: refetch,

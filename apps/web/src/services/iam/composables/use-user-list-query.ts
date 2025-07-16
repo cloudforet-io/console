@@ -2,7 +2,9 @@ import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
+import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
 import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/composables/use-workspace-user-api';
+import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
@@ -36,16 +38,7 @@ export const useUserListQuery = (userIds?: Ref<string[]>) => {
 
     const { data: userListData } = useScopedQuery({
         queryKey: userListKey,
-        queryFn: () => userAPI.list({
-            ...userListParams.value,
-            query: {
-                ...userListParams.value.query,
-                filter: userListParams.value.query.filter.map((f) => ({
-                    ...f,
-                    o: f.o as any,
-                })),
-            },
-        }),
+        queryFn: () => userAPI.list(userListParams.value as UserListParameters),
         select: (data) => data?.results || [],
         staleTime: 1000 * 60 * 5,
         enabled: computed(() => isAdminMode.value && userIds && userIds.value.length > 0),
@@ -53,16 +46,7 @@ export const useUserListQuery = (userIds?: Ref<string[]>) => {
 
     const { data: workspaceUserListData } = useScopedQuery({
         queryKey: workspaceUserListKey,
-        queryFn: () => workspaceUserAPI.list({
-            ...workspaceUserListParams.value,
-            query: {
-                ...workspaceUserListParams.value.query,
-                filter: workspaceUserListParams.value.query.filter.map((f) => ({
-                    ...f,
-                    o: f.o as any,
-                })),
-            },
-        }),
+        queryFn: () => workspaceUserAPI.list(workspaceUserListParams.value as WorkspaceUserListParameters),
         select: (data) => data?.results || [],
         staleTime: 1000 * 60 * 5,
         enabled: computed(() => !isAdminMode.value && userIds && userIds.value.length > 0),
