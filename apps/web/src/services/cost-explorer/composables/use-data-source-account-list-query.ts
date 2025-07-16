@@ -38,9 +38,10 @@ export const useDataSourceAccountListQuery = ({
     }, ['DOMAIN', 'WORKSPACE']);
 
     return {
-        dataSourceAccountListData: data,
+        data,
         isLoading,
         totalCount,
         refetch: query.refetch,
+        key,
     };
 };

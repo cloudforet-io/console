@@ -153,6 +153,8 @@ const handleChange = (options: any = {}) => {
     if (options?.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
+    state.selectedIndex = undefined;
+    dataSourcesPageStore.setSelectedDataSourceId(undefined);
 };
 </script>
 
