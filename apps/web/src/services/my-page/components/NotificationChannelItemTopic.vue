@@ -9,8 +9,7 @@ import {
 
 import type {
     ProjectChannelSetSubscriptionParameters,
-} from '@/schema/notification/project-channel/api-verbs/set-subscriptiokn';
-import type { UserChannelSetSubscriptionParameters } from '@/schema/notification/user-channel/api-verbs/set-subscriptiokn';
+} from '@/api-clients/notification/project-channel/schema/api-verbs/set-subscription';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +20,8 @@ import NotificationAddTopic from '@/services/my-page/components/NotificationAddT
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotificationAddFormTopicPayload } from '@/services/my-page/types/notification-add-form-type';
 import type { NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
+
+import type { UserChannelSetSubscriptionParameters } from '@/api-clients/notification/user-channel/schema/api-verbs/set-subscription';
 
 
 const props = withDefaults(defineProps<{

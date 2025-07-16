@@ -1,5 +1,5 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-export type ProjectChannelQueryParameters = {
+export type ProjectChannelStatParameters = {
     query: Query
 };

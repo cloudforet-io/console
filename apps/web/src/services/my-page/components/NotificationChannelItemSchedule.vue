@@ -12,7 +12,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ProjectChannelSetScheduleParameters } from '@/schema/notification/project-channel/api-verbs/set-schedule';
+import type { ProjectChannelSetScheduleParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/set-schedule';
 import type { UserChannelSetScheduleParameters } from '@/schema/notification/user-channel/api-verbs/set-schedule';
 import { i18n } from '@/translations';
 

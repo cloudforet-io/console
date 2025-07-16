@@ -15,8 +15,8 @@ import {
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { EscalationPolicyRule } from '@/api-clients/monitoring/escalation-policy/schema/type';
-import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
-import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
+import type { ProjectChannelListParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/list';
+import type { ProjectChannelModel } from '@/api-clients/notification/project-channel/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
