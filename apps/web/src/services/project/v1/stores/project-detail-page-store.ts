@@ -12,8 +12,8 @@ import type { AlertState } from '@/api-clients/monitoring/alert/schema/type';
 import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
 import type { PluginListParameters } from '@/api-clients/repository/plugin/schema/api-verbs/list';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
+import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
+import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
 
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';

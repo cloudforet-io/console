@@ -72,7 +72,7 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type {
     GetPluginMetadataParameters,
     GetPluginMetadataResponse,
-} from '@/schema/plugin/plugin/api-verbs/get-plugin-metadata';
+} from '@/api-clients/plugin/plugin/api-verbs/get-plugin-metadata';
 
 import { useUserStore } from '@/store/user/user-store';
 

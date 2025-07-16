@@ -13,8 +13,8 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 
-import type { ResourceSearchParameters, ResourceSearchResponse } from '@/schema/search/resource/api-verbs/search';
-import type { ResourceModel } from '@/schema/search/resource/model';
+import type { ResourceSearchParameters, ResourceSearchResponse } from '@/api-clients/search/resource/schema/api-verbs/search';
+import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 

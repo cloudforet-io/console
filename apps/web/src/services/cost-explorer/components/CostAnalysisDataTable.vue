@@ -397,7 +397,6 @@ const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, {
         queryTags: true,
     });
-    // Query will automatically refetch when dependencies change
 };
 const handleExcelDownload = async () => {
     try {

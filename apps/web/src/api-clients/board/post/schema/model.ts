@@ -1,6 +1,6 @@
 import type { ResourceGroupType, ContentsType } from '@/api-clients/_common/schema/type';
 import type { PostBoardType } from '@/api-clients/board/post/schema/type';
-import type { FileModel } from '@/schema/file-manager/model';
+import type { FileModel } from '@/api-clients/file-manager/schema/model';
 
 export interface PostModel {
     board_type: PostBoardType;

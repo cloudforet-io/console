@@ -9,8 +9,8 @@ import {
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { PluginListParameters } from '@/api-clients/repository/plugin/schema/api-verbs/list';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
+import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
+import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

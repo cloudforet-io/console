@@ -23,7 +23,9 @@ export const useCostJobListQuery = ({
         pagination: true,
     });
 
-    const { data, isLoading, totalCount } = useScopedPaginationQuery({
+    const {
+        data, isLoading, totalCount, query,
+    } = useScopedPaginationQuery({
         queryKey: key,
         queryFn: costJobAPI.list,
         params: queryParams,
@@ -37,7 +39,9 @@ export const useCostJobListQuery = ({
 
     return {
         costJobListData: data,
+        costJobListQueryKey: key,
         isLoading,
         totalCount,
+        refetch: query.refetch,
     };
 };

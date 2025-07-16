@@ -15,8 +15,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useDataSourceGetQuery } from '@/services/cost-explorer/composables/use-data-source-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 type DataType = {
     label: TranslateResult|string;
@@ -31,17 +31,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const dataSourcesPageStore = useDataSourcesPageStore();
-const dataSourcesPageGetters = dataSourcesPageStore.getters;
+const dataSourcesPageState = dataSourcesPageStore.state;
 
-const storeState = reactive({
-    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-});
 const state = reactive({
     loading: false,
-    costInfo: computed(() => storeState.selectedItem.plugin_info?.metadata?.cost_info || {}),
+    costInfo: computed(() => dataSourceData.value?.plugin_info?.metadata?.cost_info || {}),
     dataType: computed<DataType[]>(() => {
         const costDataSourceCostInfo = state.costInfo;
-        const costDataKeys = storeState.selectedItem.cost_data_keys || [];
+        const costDataKeys = dataSourceData.value?.cost_data_keys || [];
 
         const customDataType = costDataKeys.map((key) => ({
             label: key.replace(/([A-Z])/g, ' $1').trim(),
@@ -61,16 +58,19 @@ const state = reactive({
     },
     dataTypeEnable: computed(() => ({
         ...state.fixedDataTypeEnable,
-        ...convertDataKey(storeState.selectedItem.cost_data_keys || []),
+        ...convertDataKey(dataSourceData.value?.cost_data_keys || []),
     })),
     selectedDataType: '',
     modalVisible: false,
 });
 
+/* Query */
+const { dataSourceData } = useDataSourceGetQuery(computed(() => dataSourcesPageState.selectedDataSourceId));
+
 const convertDataKey = (keys: string[]) => {
     const result = {};
     keys.forEach((key) => {
-        result[key] = !storeState.selectedItem.permissions?.deny?.includes(`data.${key}`);
+        result[key] = !dataSourceData.value?.permissions?.deny?.includes(`data.${key}`);
     });
     return result;
 };
@@ -82,11 +82,11 @@ const handleChangeToggle = async (item: string, value: boolean) => {
     } else {
         try {
             const permissions = [
-                ...storeState.selectedItem.permissions?.deny || [],
+                ...dataSourceData.value?.permissions?.deny || [],
                 `data.${state.selectedDataType}`,
             ];
             await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
-                data_source_id: storeState.selectedItem.data_source_id,
+                data_source_id: dataSourcesPageState.selectedDataSourceId || '',
                 permissions: {
                     deny: permissions,
                 },
@@ -105,14 +105,14 @@ const handleClose = () => {
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        const denyList = storeState.selectedItem.permissions?.deny || [];
-        const costDataKeys = storeState.selectedItem.cost_data_keys || [];
+        const denyList = dataSourceData.value?.permissions?.deny || [];
+        const costDataKeys = dataSourceData.value?.cost_data_keys || [];
         const updatedDenyList = denyList.filter((denyItem) => {
             const key = denyItem.replace('data.', '');
             return !costDataKeys.includes(key);
         });
         await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
-            data_source_id: storeState.selectedItem.data_source_id,
+            data_source_id: dataSourcesPageState.selectedDataSourceId || '',
             permissions: {
                 deny: updatedDenyList,
             },
