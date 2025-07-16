@@ -13,6 +13,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
 import MappingMethod from '@/common/components/mapping-method/MappingMethod.vue';
+import type { MappingItem } from '@/common/components/mapping-method/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import WorkspaceDropdown from '@/services/service-account/components/WorkspaceDropdown.vue';
@@ -62,25 +63,30 @@ const state = reactive({
     isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
     isCreatePage: computed(() => serviceAccountPageState.originServiceAccountItem?.resource_group === undefined),
     isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
-    mappingItems: computed(() => (state.isDomainForm ? [
-        {
-            imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
-            name: 'provider',
-        },
-        {
-            icon: 'ic_workspaces',
-            name: 'workspace',
-        },
-        ...(state.projectGroupMappingDisabled ? [] : [{
-            icon: 'ic_document-filled',
-            name: 'project_group',
-        }]),
-    ] : [
-        {
-            icon: 'ic_document-filled',
-            name: 'project_group',
-        },
-    ])),
+    mappingItems: computed<MappingItem[]>(() => {
+        if (state.isDomainForm) {
+            return [
+                {
+                    imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
+                    name: 'provider',
+                },
+                {
+                    icon: 'ic_workspaces',
+                    name: 'workspace',
+                },
+                {
+                    icon: 'ic_document-filled',
+                    name: 'project_group',
+                },
+            ].filter((item) => (state.projectGroupMappingDisabled ? item.name !== 'project_group' : true));
+        }
+        return [
+            {
+                icon: 'ic_document-filled',
+                name: 'project_group',
+            },
+        ];
+    }),
     selectedWorkspaceMappingOptionLabel: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].workspaceMappingOptions
         .find((option) => (option.value === state.workspaceMapping))?.label),
     selectedProjectGroupMappingOptionLabel: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].projectGroupMappingOptions[0].label),
@@ -155,7 +161,7 @@ const convertToMappingMethodClientEntity = (originServiceAccountItem: TrustedAcc
     // Azure Multi Management Group Workspace
     } else if (azureManagementGroupMappingType) {
         state.workspaceMapping = azureManagementGroupMappingType;
-        state.projectGroupMapping = azureManagementGroupMappingType === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING ? undefined : !skipProjectGroup;
+        state.projectGroupMapping = azureManagementGroupMappingType === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING ? true : !skipProjectGroup;
     // Single Workspace
     } else if (singleWorkspaceId) {
         state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE;
