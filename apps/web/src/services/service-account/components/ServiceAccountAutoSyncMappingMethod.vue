@@ -5,6 +5,7 @@ import { computed, reactive, watch } from 'vue';
 import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
 
+import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -19,12 +20,14 @@ import { CSP_AUTO_SYNC_OPTIONS_MAP, WORKSPACE_MAPPING_OPTIONS_MAP } from '@/serv
 import type { ServiceAccountStoreFormState } from '@/services/service-account/stores/service-account-page-store';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
-type FormData = Partial<Pick<ServiceAccountStoreFormState, 'selectedSingleWorkspace' | 'skipProjectGroup' | 'useManagementGroupAsWorkspace'>>;
+type FormData = Partial<Pick<ServiceAccountStoreFormState, 'selectedSingleWorkspace' | 'skipProjectGroup' | 'azureManagementGroupMappingType'>>;
 type MappingMethodOptionType = {
     label: string;
     value: any;
     info?: string;
 };
+
+type WorkspaceMapping = (typeof WORKSPACE_MAPPING_OPTIONS_MAP)[keyof typeof WORKSPACE_MAPPING_OPTIONS_MAP];
 
 const props = withDefaults(defineProps<{mode:'UPDATE'|'READ'}>(), {
     mode: 'UPDATE',
@@ -48,17 +51,12 @@ const state = reactive({
             value: false,
         },
     ]),
-    workspaceMapping: 'multi' as (typeof WORKSPACE_MAPPING_OPTIONS_MAP)[keyof typeof WORKSPACE_MAPPING_OPTIONS_MAP],
+    workspaceMapping: 'multi' as WorkspaceMapping,
+    projectGroupMappingDisabled: computed<boolean>(() => serviceAccountPageState.selectedProvider === 'azure'
+    && state.workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING),
     projectGroupMapping: true as boolean,
 
-    formData: computed<FormData>(() => (state.isDomainForm ? {
-        selectedSingleWorkspace: state.workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE ? state.selectedWorkspace : undefined,
-        skipProjectGroup: !state.projectGroupMapping,
-        useManagementGroupAsWorkspace: state.workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.MULTI_MANAGEMENT_GROUP_FOR_AZURE ? true : undefined,
-    } : {
-        skipProjectGroup: !state.projectGroupMapping,
-    })),
-
+    formData: computed<FormData>(() => convertToMappingMethodDTO(state.isDomainForm, state.workspaceMapping, state.projectGroupMapping, state.selectedWorkspace)),
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
@@ -73,10 +71,10 @@ const state = reactive({
             icon: 'ic_workspaces',
             name: 'workspace',
         },
-        {
+        ...(state.projectGroupMappingDisabled ? [] : [{
             icon: 'ic_document-filled',
             name: 'project_group',
-        },
+        }]),
     ] : [
         {
             icon: 'ic_document-filled',
@@ -88,14 +86,98 @@ const state = reactive({
     selectedProjectGroupMappingOptionLabel: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].projectGroupMappingOptions[0].label),
 });
 
+
+/* Utils */
+/*
+* This functions are used to convert the mapping method form data to the service account form data.
+* And also, convert the service account form data to the mapping method form data.
+*
+* 1. convertToMappingMethodDTO
+* 2. convertToMappingMethodClientEntity
+*
+* Azure Account has additional mapping method options (Top Node Management Group, Leaf Node Management Group).
+*/
+const convertToMappingMethodDTO = (isDomainForm: boolean, workspaceMapping: WorkspaceMapping, projectGroupMapping: boolean, selectedWorkspace: string) => {
+    // In Workspace Tenant
+    if (!isDomainForm) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+        };
+    }
+    // In Admin Mode : Multi Workspace
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.MULTI) {
+        return {
+            azureManagementGroupMappingType: undefined,
+            skipProjectGroup: !projectGroupMapping,
+            selectedSingleWorkspace: undefined,
+        };
+    }
+    // In Admin Mode : Single Workspace
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+            azureManagementGroupMappingType: undefined,
+            selectedSingleWorkspace: selectedWorkspace,
+        };
+    }
+    // In Admin Mode : (Only Azure) Top Node Management Group
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.TOP_AZURE_MANAGEMENT_GROUP_MAPPING) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+            azureManagementGroupMappingType: workspaceMapping,
+            selectedSingleWorkspace: undefined,
+        };
+    }
+    // In Admin Mode : (Only Azure) Leaf Node Management Group
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+            azureManagementGroupMappingType: workspaceMapping,
+            selectedSingleWorkspace: undefined,
+        };
+    }
+    // default
+    return {
+        skipProjectGroup: !projectGroupMapping,
+        selectedSingleWorkspace: undefined,
+        azureManagementGroupMappingType: undefined,
+    };
+};
+const convertToMappingMethodClientEntity = (originServiceAccountItem: TrustedAccountModel) => {
+    const skipProjectGroup = originServiceAccountItem.sync_options?.skip_project_group;
+    const singleWorkspaceId = originServiceAccountItem.sync_options?.single_workspace_id;
+    const azureManagementGroupMappingType = originServiceAccountItem.sync_options?.azure_management_group_mapping_type;
+
+    // Multi Workspace
+    if (!singleWorkspaceId && !azureManagementGroupMappingType) {
+        state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.MULTI;
+        state.projectGroupMapping = !skipProjectGroup;
+    // Azure Multi Management Group Workspace
+    } else if (azureManagementGroupMappingType) {
+        state.workspaceMapping = azureManagementGroupMappingType;
+        state.projectGroupMapping = azureManagementGroupMappingType === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING ? undefined : !skipProjectGroup;
+    // Single Workspace
+    } else if (singleWorkspaceId) {
+        state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE;
+        state.projectGroupMapping = !skipProjectGroup;
+    // Default (Workspace Tenant)
+    } else {
+        state.projectGroupMapping = !skipProjectGroup;
+    }
+};
+
+
+
+/* Event */
 const handleUpdateWorkspace = (workspaceId:string) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.selectedSingleWorkspace = workspaceId;
     });
 };
 
-const handleWorkspaceMappingChange = (value: (typeof WORKSPACE_MAPPING_OPTIONS_MAP)[keyof typeof WORKSPACE_MAPPING_OPTIONS_MAP]) => {
+const handleWorkspaceMappingChange = (value: WorkspaceMapping) => {
     state.workspaceMapping = value;
+    if (value === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING) state.projectGroupMapping = false;
 };
 
 const handleProjectGroupMappingChange = (value: boolean) => {
@@ -110,14 +192,8 @@ watch(() => state.formData, (formData) => {
 
 watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
     if (item) {
-        if (!item.sync_options?.single_workspace_id && !item.sync_options?.use_management_group_as_workspace) { // normal multi workspace case
-            state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.MULTI;
-        } else if (item.sync_options?.use_management_group_as_workspace) { // Azure multi management group workspace case
-            state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.MULTI_MANAGEMENT_GROUP_FOR_AZURE;
-        } else { // normal single workspace case
-            state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE;
-        }
-        state.projectGroupMapping = !item.sync_options?.skip_project_group;
+        const _item = item as TrustedAccountModel;
+        convertToMappingMethodClientEntity(_item);
     }
 }, { immediate: true });
 
