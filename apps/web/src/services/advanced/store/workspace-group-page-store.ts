@@ -29,8 +29,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         loading: false,
         workspaceGroups: [] as WorkspaceGroupModel[],
         selectedIndices: [] as number[],
-        pageStart: 1,
-        pageLimit: 15,
         totalCount: 0,
         searchFilters: [] as ConsoleFilter[],
 
@@ -99,7 +97,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     };
 
     const workspaceGroupListApiQueryHelper = new ApiQueryHelper()
-        .setPageStart(state.pageStart).setPageLimit(state.pageLimit)
+        .setPageStart(1).setPageLimit(15)
         .setSort('name', true);
     const workspaceGroupListApiQuery = workspaceGroupListApiQueryHelper.data;
     const actions = {
@@ -145,8 +143,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.loading = false;
             state.workspaceGroups = [] as WorkspaceGroupModel[];
             state.selectedIndices = [] as number[];
-            state.pageStart = 1;
-            state.pageLimit = 15;
             state.totalCount = 0;
 
             actions.resetGroupUser();

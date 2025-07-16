@@ -30,7 +30,7 @@ export const WORKSPACE_GROUP_SEARCH_HANDLERS = {
                 { name: 'name', label: 'Name' },
                 // { name: 'workspaces', label: 'Workspace' },
                 // { name: 'users', label: 'Group User' },
-                { name: 'create', label: 'Created', dataType: 'datetime' },
+                { name: 'created_at', label: 'Created', dataType: 'datetime' },
             ],
         },
         // {
