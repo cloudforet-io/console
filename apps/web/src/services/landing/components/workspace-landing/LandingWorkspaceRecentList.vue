@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
@@ -17,27 +17,23 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import type { RecentConfig } from '@/common/modules/navigations/type';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
-interface Props {
-    boardSets: WorkspaceBoardSet[],
-    isDomainAdmin?: boolean,
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    boardSets: () => ([]),
-    isDomainAdmin: undefined,
-});
 
 const landingPageStore = useLandingPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const recentStore = useRecentStore();
+const recentState = recentStore.state;
 
 const router = useRouter();
 
@@ -45,7 +41,32 @@ const state = reactive({
     popoverVisible: false,
     selectedPopoverItem: '',
 });
+const recentWorkspace = computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
+    itemType: i.data.type,
+    workspaceId: i.data.workspace_id,
+    itemId: i.data.id,
+})));
 
+const recentBoardSets = computed<WorkspaceBoardSet[]>(() => {
+    if (isRecentWorkspaceListLoading.value) return [];
+    const orderList: WorkspaceBoardSet[] = [];
+    recentWorkspace.value.forEach((recentItem) => {
+        const matchingObj = recentWorkspaceListData.value.find((workspaceItem) => !workspaceItem.is_dormant && workspaceItem.workspace_id === recentItem.itemId);
+        if (matchingObj) {
+            orderList.push({
+                ...matchingObj,
+                rounded: true,
+            });
+        }
+    });
+    return orderList;
+});
+
+/* Query */
+const { data: recentWorkspaceListData, isLoading: isRecentWorkspaceListLoading } = useUserProfileGetWorkspacesQuery();
+
+
+/* Util */
 const roleTypeImageFormatter = (roleType: RoleType): string => {
     switch (roleType) {
     case ROLE_TYPE.WORKSPACE_OWNER:
@@ -57,6 +78,7 @@ const roleTypeImageFormatter = (roleType: RoleType): string => {
     }
 };
 
+/* Event */
 const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     if (item.is_dormant) {
         state.popoverVisible = true;
@@ -71,7 +93,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
 
 <template>
     <div class="landing-workspace-recent-list">
-        <p-board-item v-for="(board, index) in props.boardSets"
+        <p-board-item v-for="(board, index) in recentBoardSets"
                       :key="`board-${board.value}-${index}`"
                       :value="board.value"
                       :left-icon="board.leftIcon"
@@ -118,17 +140,12 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                                             /images/domain-settings/img_auto-dormancy-configuration_cost-threshold-chart@3x.png 3x"
                                              class="cost-threshold-chart"
                                         >
-                                        <i18n :path="props.isDomainAdmin ? 'LADING.DORMANT_WORKSPACE_POPOVER_ADMIN' : 'LADING.DORMANT_WORKSPACE_POPOVER'"
+                                        <i18n path="LADING.DORMANT_WORKSPACE_POPOVER"
                                               tag="span"
                                               class="desc"
                                         >
                                             <template #date>
                                                 <span class="date">{{ dayjs(board?.dormant_updated_at).format('YYYY-MM-DD') }}</span>
-                                            </template>
-                                            <template v-if="props.isDomainAdmin"
-                                                      #name
-                                            >
-                                                <span>{{ board.name }}</span>
                                             </template>
                                         </i18n>
                                         <p-link :text="$t('LADING.GO_TO_DORMANT_CONFIG')"
