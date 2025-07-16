@@ -20,6 +20,8 @@ import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/comp
 import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { ProjectChannelListParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/list';
 import type { ProjectChannelModel } from '@/api-clients/notification/project-channel/schema/model';
+import type { ProtocolListParameters } from '@/api-clients/notification/protocol/schema/api-verbs/list';
+import type { ProtocolModel } from '@/api-clients/notification/protocol/schema/model';
 import type { UserChannelModel as UserChannelModelV1 } from '@/api-clients/notification/user-channel/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
@@ -38,8 +40,6 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import type { NotiChannelItem, NotiChannelItemV1 } from '@/services/my-page/types/notification-channel-item-type';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
-import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
-import type { ProtocolModel } from '@/schema/notification/protocol/model';
 
 interface EnrichedProtocolItem extends ProtocolModel {
     label: TranslateResult;
