@@ -2,7 +2,7 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 
 import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { ProjectChannelModel } from '@/api-clients/notification/project-channel/schema/model';
-import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
+import type { UserChannelModel as UserChannelModelV1 } from '@/api-clients/notification/user-channel/schema/model';
 
 interface ExtraChannelData {
     protocol_name: string;

@@ -20,10 +20,10 @@ import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/comp
 import type { UserChannelModel } from '@/api-clients/alert-manager/user-channel/schema/model';
 import type { ProjectChannelListParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/list';
 import type { ProjectChannelModel } from '@/api-clients/notification/project-channel/schema/model';
+import type { UserChannelModel as UserChannelModelV1 } from '@/api-clients/notification/user-channel/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
-import type { UserChannelModel as UserChannelModelV1 } from '@/schema/notification/user-channel/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

@@ -9,7 +9,6 @@ import type { ProjectChannelGetParameters } from '@/api-clients/notification/pro
 import type { ProjectChannelListParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/list';
 import type { ProjectChannelSetScheduleParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/set-schedule';
 import type { ProjectChannelSetSubscriptionParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/set-subscription';
-import type { ProjectChannelStatParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/stat';
 import type { ProjectChannelUpdateParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/update';
 import type { ProjectChannelModel } from '@/api-clients/notification/project-channel/schema/model';
 
@@ -25,7 +24,6 @@ export const useProjectChannelApi = () => {
         list: SpaceConnector.clientV2.notification.projectChannel.list<ProjectChannelListParameters, ListResponse<ProjectChannelModel>>,
         setSchedule: SpaceConnector.clientV2.notification.projectChannel.setSchedule<ProjectChannelSetScheduleParameters, ProjectChannelModel>,
         setSubscription: SpaceConnector.clientV2.notification.projectChannel.setSubscription<ProjectChannelSetSubscriptionParameters, ProjectChannelModel>,
-        stat: SpaceConnector.clientV2.notification.projectChannel.stat<ProjectChannelStatParameters, ProjectChannelModel>,
         update: SpaceConnector.clientV2.notification.projectChannel.update<ProjectChannelUpdateParameters, ProjectChannelModel>,
     };
     return {
