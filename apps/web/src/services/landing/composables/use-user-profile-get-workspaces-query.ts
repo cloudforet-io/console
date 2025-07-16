@@ -13,7 +13,7 @@ export const useUserProfileGetWorkspacesQuery = () => {
         queryFn: () => userProfileAPI.getWorkspaces(),
         select: (d) => d.results?.filter((workspace) => workspace.state === 'ENABLED') || [],
         staleTime: 1000 * 60 * 5, // 5 minutes
-        gcTime: 1000 * 60 * 1, // 1 minutes
+        gcTime: 1000 * 60 * 1, // 1 minute
         enabled: true,
     }, ['USER']);
 
