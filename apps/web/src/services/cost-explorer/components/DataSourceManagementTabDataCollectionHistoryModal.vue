@@ -14,6 +14,7 @@ import { useCostJobApi } from '@/api-clients/cost-analysis/job/composables/use-j
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useCostJobGetQuery } from '@/services/cost-explorer/composables/use-cost-job-get-query';
@@ -125,6 +126,8 @@ const handleConfirmButton = async () => {
         }
 
         queryClient.invalidateQueries({ queryKey: costJobListQueryKey });
+    } catch (e) {
+        ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
         state.proxyVisible = false;
