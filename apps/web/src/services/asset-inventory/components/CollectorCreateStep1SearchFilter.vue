@@ -123,8 +123,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
+import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
+import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';

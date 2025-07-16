@@ -23,11 +23,11 @@ import type { WebhookModel, WebhookListErrorsModel } from '@/api-clients/alert-m
 import type { WebhookMessageFormatType } from '@/api-clients/alert-manager/webhook/schema/type';
 import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
+import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
+import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
-import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';

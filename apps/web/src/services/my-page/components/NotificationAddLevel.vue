@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PFieldGroup, PSelectDropdown } from '@cloudforet/mirinae';
 
-import type { NotificationLevel } from '@/schema/notification/notification/type';
+import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 
 const LEVEL_LIST = Object.freeze([
     { label: 'Level 1', name: 'LV1', type: 'item' },

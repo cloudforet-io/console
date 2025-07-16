@@ -3,7 +3,7 @@ import {
     PBadge, PButton, PI,
 } from '@cloudforet/mirinae';
 
-import type { NotificationLevel } from '@/schema/notification/notification/type';
+import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 
 import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';

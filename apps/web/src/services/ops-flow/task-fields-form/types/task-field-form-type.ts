@@ -1,5 +1,5 @@
+import type { FileModel } from '@/api-clients/file-manager/schema/model';
 import type { TaskField } from '@/api-clients/opsflow/_types/task-field-type';
-import type { FileModel } from '@/schema/file-manager/model';
 
 export interface References {
   project_id?: string;

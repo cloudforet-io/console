@@ -11,11 +11,11 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
 import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 import { useProtocolApi } from '@/api-clients/notification/protocol/composables/use-protocol-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
-import type { NotificationLevel } from '@/schema/notification/notification/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

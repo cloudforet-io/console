@@ -13,13 +13,13 @@ import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/comp
 import type { UserChannelDeleteParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/delete';
 import type { UserChannelDisableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/disable';
 import type { UserChannelEnableParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/enable';
+import type { ProjectChannelDeleteParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/delete';
+import type { ProjectChannelDisableParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/disable';
+import type { ProjectChannelEnableParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/enable';
+import type { UserChannelDeleteParameters as UserChannelDeleteParametersV1 } from '@/api-clients/notification/user-channel/schema/api-verbs/delete';
+import type { UserChannelDisableParameters as UserChannelDisableParametersV1 } from '@/api-clients/notification/user-channel/schema/api-verbs/disable';
+import type { UserChannelEnableParameters as UserChannelEnableParametersV1 } from '@/api-clients/notification/user-channel/schema/api-verbs/enable';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
-import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
-import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
-import type { UserChannelDeleteParameters as UserChannelDeleteParametersV1 } from '@/schema/notification/user-channel/api-verbs/delete';
-import type { UserChannelDisableParameters as UserChannelDisableParametersV1 } from '@/schema/notification/user-channel/api-verbs/disable';
-import type { UserChannelEnableParameters as UserChannelEnableParametersV1 } from '@/schema/notification/user-channel/api-verbs/enable';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

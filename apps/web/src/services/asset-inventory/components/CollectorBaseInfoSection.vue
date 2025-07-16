@@ -70,9 +70,9 @@ import { useCollectorApi } from '@/api-clients/inventory/collector/composables/u
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import { UPGRADE_MODE } from '@/api-clients/plugin/plugin/constant';
 import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

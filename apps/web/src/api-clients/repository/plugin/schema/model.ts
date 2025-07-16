@@ -1,6 +1,6 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { Capability, PluginState, RegistryType } from '@/api-clients/repository/plugin/schema/type';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
+import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
 
 export interface PluginModel {
     plugin_id: string;
