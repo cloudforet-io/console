@@ -1,4 +1,4 @@
-import type { UpgradeMode } from '@/schema/plugin/plugin/type';
+import type { UpgradeMode } from '@/api-clients/plugin/plugin/type';
 
 export interface GetPluginMetadataParameters {
     plugin_id: string;
