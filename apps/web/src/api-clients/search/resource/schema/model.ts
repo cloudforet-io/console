@@ -1,4 +1,4 @@
-import type { ResourceType } from '@/schema/search/resource/type';
+import type { ResourceType } from '@/api-clients/search/resource/schema/type';
 
 
 export type ResourceModel = {

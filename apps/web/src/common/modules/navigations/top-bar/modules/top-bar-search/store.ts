@@ -6,8 +6,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-import type { ResourceSearchParameters, ResourceSearchResponse } from '@/schema/search/resource/api-verbs/search';
-import type { ResourceModel } from '@/schema/search/resource/model';
+import type { ResourceSearchParameters, ResourceSearchResponse } from '@/api-clients/search/resource/schema/api-verbs/search';
+import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -1,5 +1,5 @@
-import type { ResourceModel } from '@/schema/search/resource/model';
-import type { ResourceType } from '@/schema/search/resource/type';
+import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
+import type { ResourceType } from '@/api-clients/search/resource/schema/type';
 
 export interface ResourceSearchParameters {
     resource_type: ResourceType;
