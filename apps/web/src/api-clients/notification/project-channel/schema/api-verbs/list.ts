@@ -1,7 +1,7 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
-import type { ChannelState } from '@/schema/notification/type';
+import type { ChannelState } from '@/api-clients/notification/type';
 
 export type ProjectChannelListParameters = {
     query?: Query

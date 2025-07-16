@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { ChannelSchedule } from '@/schema/notification/type';
+import type { ChannelSchedule } from '@/api-clients/notification/type';
 
 export type UserChannelCreateParameters = {
     protocol_id: string

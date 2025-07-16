@@ -13,9 +13,9 @@ import { useUserChannelApi } from '@/api-clients/alert-manager/user-channel/comp
 import type { UserChannelCreateParameters } from '@/api-clients/alert-manager/user-channel/schema/api-verbs/create';
 import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 import type { ProjectChannelCreateParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/create';
+import type { ChannelSchedule } from '@/api-clients/notification/type';
 import type { UserChannelCreateParameters as UserChannelCreateParametersV1 } from '@/api-clients/notification/user-channel/schema/api-verbs/create';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import type { ChannelSchedule } from '@/schema/notification/type';
 import { i18n } from '@/translations';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';

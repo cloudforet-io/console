@@ -1,6 +1,6 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
-import type { ChannelSchedule } from '@/schema/notification/type';
+import type { ChannelSchedule } from '@/api-clients/notification/type';
 
 export type ProjectChannelCreateParameters = {
     protocol_id: string

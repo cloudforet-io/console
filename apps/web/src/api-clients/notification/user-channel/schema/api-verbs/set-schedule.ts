@@ -1,4 +1,4 @@
-import type { ChannelSchedule } from '@/schema/notification/type';
+import type { ChannelSchedule } from '@/api-clients/notification/type';
 
 export type UserChannelSetScheduleParameters = {
     user_channel_id: string
