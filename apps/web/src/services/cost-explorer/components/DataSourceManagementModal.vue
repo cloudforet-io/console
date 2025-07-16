@@ -102,7 +102,7 @@ const { mutate: updateOrResetLinkedAccount } = useMutation<void, Error>({
                 workspace_id: dropdownState.selectedMenuId,
             });
         });
-        await Promise.all([Promise.all(promises), delayHideLoadingMessage]);
+        await Promise.allSettled([Promise.allSettled(promises), delayHideLoadingMessage]);
     },
     onSuccess: async () => {
         if (loadingMessageId) {
@@ -135,8 +135,8 @@ const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
     if (!id) return undefined;
     return storeState.workspaceList.find((i) => i.workspace_id === id);
 };
-const handleSelectDropdownItem = (menuItem: string) => {
-    dropdownState.selectedMenuId = menuItem;
+const handleSelectDropdownItem = (item: string) => {
+    dropdownState.selectedMenuId = item;
 };
 
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
