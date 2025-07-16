@@ -1,6 +1,6 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { FileReference } from '@/schema/file-manager/type';
+import type { FileReference } from '@/api-clients/file-manager/schema/type';
 
 export interface FileAddParameters {
     name: string;

@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { FileState } from '@/schema/file-manager/type';
+import type { FileState } from '@/api-clients/file-manager/schema/type';
 
 export interface FileListParameters {
     query?: Query;
