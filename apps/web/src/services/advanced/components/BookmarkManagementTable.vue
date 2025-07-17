@@ -26,6 +26,8 @@ import {
 import {
     getWorkspaceInfo,
 } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
@@ -42,21 +44,20 @@ const props = defineProps<Props>();
 const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
-const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 
 const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
+const {
+    refresh: refreshBookmarkList, entireBookmarkList, bookmarkList, isFetchingSharedConfig,
+} = useBookmarkListQuery();
 
 const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
-    entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
-    loading: computed<boolean>(() => bookmarkPageState.loading),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
     searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
@@ -94,9 +95,9 @@ const tableState = reactive({
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeValueHandler(storeState.entireBookmarkList, 'name'),
-        scope: makeValueHandler(storeState.entireBookmarkList, 'scope'),
-        link: makeValueHandler(storeState.entireBookmarkList, 'link'),
+        name: makeValueHandler(entireBookmarkList.value, 'name'),
+        scope: makeValueHandler(entireBookmarkList.value, 'scope'),
+        link: makeValueHandler(entireBookmarkList.value, 'link'),
     })),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IAM.BOOKMARK.ALL') as string, name: 'All' },
@@ -110,15 +111,10 @@ const state = reactive({
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
-    return storeState.bookmarkFolderList.find((i) => i.id === id);
+    return bookmarkFolderListData.value.find((i) => i.id === id);
 };
 const handleSelectType = (value: string) => {
     bookmarkPageStore.setSelectedType(value);
-    if (value === 'All') {
-        fetchBookmarkList();
-    } else {
-        fetchBookmarkList(value);
-    }
 };
 const handleUpdateSelectIndex = async (indices: number[]) => {
     bookmarkPageStore.setSelectedBookmarkIndices(indices);
@@ -127,7 +123,6 @@ const handleChange = (options: any = {}) => {
     if (options.queryTags !== undefined) {
         const filters = makeSearchQueryTagsHandler(options.queryTags);
         bookmarkPageStore.setBookmarkListSearchFilters(filters);
-        fetchBookmarkList();
     }
     if (options.pageStart !== undefined) {
         bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
@@ -201,22 +196,17 @@ const getDropdownMenu = (item: BookmarkItem) => {
     return defaultSets;
 };
 
-const fetchBookmarkList = async (selectedType?: string) => {
-    await bookmarkPageStore.fetchBookmarkList(selectedType);
-};
-
-watch(() => route.params, async () => {
-    bookmarkPageStore.setParams(undefined);
+watch(() => route.params, async (params) => {
+    bookmarkPageStore.setParams(params);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);
     await bookmarkPageStore.setBookmarkListPageStart(0);
     await bookmarkPageStore.setSelectedType('All');
-    await fetchBookmarkList();
 }, { immediate: true });
 </script>
 
 <template>
     <section class="bookmark-management-table">
-        <p-data-loader :loading="storeState.loading"
+        <p-data-loader :loading="isFetchingSharedConfig"
                        class="data-loader-wrapper"
                        :data="true"
         >
@@ -231,13 +221,13 @@ watch(() => route.params, async () => {
                              :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
-                             :total-count="bookmarkPageGetters.entireBookmarkList.length"
-                             :items="storeState.bookmarkList"
+                             :total-count="entireBookmarkList.length"
+                             :items="bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :get-row-selectable="getRowSelectable"
                              @change="handleChange"
-                             @refresh="fetchBookmarkList"
+                             @refresh="refreshBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"
             >
                 <template v-if="!state.folder"

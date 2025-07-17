@@ -25,6 +25,8 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
@@ -35,9 +37,12 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
-const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
+const { bookmarkList } = useBookmarkListQuery();
 
 const route = useRoute();
 const router = useRouter();
@@ -45,8 +50,6 @@ const router = useRouter();
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
 });
 const state = reactive({
     visibleMenu: false,
@@ -62,7 +65,7 @@ const state = reactive({
     ])),
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    selectedFolder: computed<BookmarkItem|undefined>(() => storeState.bookmarkFolderList.find((item) => item.name === state.folder)),
+    selectedFolder: computed<BookmarkItem|undefined>(() => bookmarkFolderListData.value.find((item) => item.name === state.folder)),
     headingTitle: computed<TranslateResult|string>(() => {
         if (state.folder) {
             return state.folder;
@@ -74,8 +77,6 @@ const state = reactive({
     }),
     workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, workspaceListData.value)),
 });
-
-const { workspaceListData } = useWorkspaceListQuery();
 
 const hideMenu = () => {
     state.visibleMenu = false;
@@ -110,7 +111,7 @@ const handleClickWorkspaceButton = () => {
     }).href, '_blank');
 };
 const handleClickDeleteButton = () => {
-    const selectedItems = at(storeState.bookmarkList, storeState.selectedIndices);
+    const selectedItems = at(bookmarkList.value, storeState.selectedIndices);
     bookmarkStore.setSelectedBookmarks(selectedItems);
     bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.MULTI_DELETE);
 };
