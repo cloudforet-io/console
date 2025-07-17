@@ -32,7 +32,7 @@ export const useEventRuleGetQuery = (): UseEventRuleGetQueryReturn => {
         queryFn: () => eventRuleAPI.get(eventRuleQueryParams.value),
         enabled: computed(() => !!eventRuleId.value),
         gcTime: 1000 * 60 * 2,
-        staleTime: 1000 * 30,
+        staleTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 
     return {

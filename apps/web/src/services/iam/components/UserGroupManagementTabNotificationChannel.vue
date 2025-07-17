@@ -98,6 +98,7 @@ const { data: userGroupChannelListData, totalCount: userGroupChannelListTotalCou
     queryFn: userGroupChannelAPI.list,
     params: userGroupChannelListQueryParams,
     gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
     enabled: computed(() => userGroupPageGetters.selectedUserGroups.length > 0 && !!userGroupPageGetters.selectedUserGroups[0]?.user_group_id),
 }, {
     thisPage: computed(() => paginationState.thisPage),

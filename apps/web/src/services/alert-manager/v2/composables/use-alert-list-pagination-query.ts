@@ -42,6 +42,7 @@ export const useAlertListPaginationQuery = ({ params, thisPage, pageSize }: UseA
         queryFn: alertAPI.list,
         params: alertListPaginationQueryParams,
         gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 60 * 2,
         enabled: true,
     }, {
         thisPage,

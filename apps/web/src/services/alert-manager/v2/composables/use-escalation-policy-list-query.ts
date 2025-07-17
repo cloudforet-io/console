@@ -26,10 +26,7 @@ export const useEscalationPolicyListQuery = ({ params }: UseEscalationPolicyList
     const { data: escalationPolicyListData, isFetching: escalationPolicyListFetching } = useScopedQuery({
         queryKey: escalationPolicyListQueryKey,
         queryFn: async () => escalationPolicyAPI.list(escalationPolicyListQueryParams.value),
-        initialData: {
-            results: [],
-            total_count: 0,
-        },
+        staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 

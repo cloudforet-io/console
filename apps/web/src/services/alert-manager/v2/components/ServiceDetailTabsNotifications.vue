@@ -169,6 +169,7 @@ const { data: serviceChannelListData, isLoading: serviceChannelListFetching, tot
     queryKey: serviceChannelListQueryKey,
     queryFn: serviceChannelAPI.list,
     params: serviceChannelListQueryParams,
+    staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
     enabled: true,
 }, {

@@ -30,6 +30,7 @@ export const useAppListPaginationQuery = ({ params, thisPage, pageSize }: UseApp
         queryFn: appAPI.list,
         params: appListPaginationQueryParams,
         gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 60 * 2,
         enabled: true,
     }, {
         thisPage,
