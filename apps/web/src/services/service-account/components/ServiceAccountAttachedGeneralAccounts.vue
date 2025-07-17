@@ -31,7 +31,7 @@ import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/
 import { SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

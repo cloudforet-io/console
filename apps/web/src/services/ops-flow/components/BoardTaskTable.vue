@@ -18,7 +18,7 @@ import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/sche
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { i18n } from '@/translations';
 

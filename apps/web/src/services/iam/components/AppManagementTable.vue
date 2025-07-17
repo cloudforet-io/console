@@ -18,7 +18,7 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { APP_STATUS_TYPE } from '@/api-clients/identity/app/schema/constant';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

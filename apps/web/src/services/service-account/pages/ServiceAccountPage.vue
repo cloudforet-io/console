@@ -26,7 +26,7 @@ import { ACCOUNT_TYPE, SERVICE_ACCOUNT_STATE } from '@/api-clients/identity/serv
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { AccountType, ServiceAccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

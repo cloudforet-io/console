@@ -16,7 +16,7 @@ import type { ServiceAccountModel } from '@/api-clients/identity/service-account
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import { useTrustedAccountApi } from '@/api-clients/identity/trusted-account/composables/use-trusted-account-api';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 

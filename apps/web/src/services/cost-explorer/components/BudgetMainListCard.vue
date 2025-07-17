@@ -8,8 +8,8 @@ import {
 
 import type { BudgetUsageAnalyzeResult } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { ProjectReferenceItem } from '@/query/resource-query/reference-model/use-project-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -24,6 +24,8 @@ import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constan
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+
+import type { ProjectReferenceItem } from '@/query/resource-query/reference-model/use-project-reference-data-model';
 
 
 interface Props {

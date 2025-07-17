@@ -13,7 +13,7 @@ import {
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import ProjectCard from '@/services/project/v2/components/ProjectCard.vue';

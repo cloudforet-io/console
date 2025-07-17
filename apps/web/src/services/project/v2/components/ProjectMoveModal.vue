@@ -10,7 +10,7 @@ import type { ProjectGroupModel } from '@/api-clients/identity/project-group/sch
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
