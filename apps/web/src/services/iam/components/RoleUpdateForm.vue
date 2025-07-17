@@ -75,9 +75,6 @@ const handleUpdateForm = (formData: RoleFormData) => {
     }
     if (Array.isArray(formData.page_access)) {
         state.changedPageAccessFormData = formData.page_access;
-        state.isPageAccessValid = formData.page_access.length > 0;
-    } else {
-        state.isPageAccessValid = false;
     }
     if (formData.permissions) state.permissionsData = formData.permissions;
 };

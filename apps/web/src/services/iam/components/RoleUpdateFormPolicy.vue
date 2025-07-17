@@ -62,10 +62,10 @@ const handleCodeUpdate = (modifiedCode: string) => {
 };
 
 /* Watcher */
-watch(() => roleData, (initialData) => {
-    if (initialData.value?.permissions && initialData.value.permissions.length > 0) {
+watch(roleData, (initialData) => {
+    if (initialData?.permissions && initialData.permissions.length > 0) {
         state.proxySelectedRadioIdx = 1;
-        state.code = initialData.value.permissions.join('\n');
+        state.code = initialData.permissions.join('\n');
     }
 }, { deep: true, immediate: true });
 </script>

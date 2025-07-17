@@ -62,7 +62,7 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions) => {
 
 <template>
     <p-pane-layout class="role-create-page-permission-form">
-        <role-update-form-access :proxy-page-access-valid.sync="state.proxyPageAccessValid"
+        <role-update-form-access :is-page-access-valid.sync="state.proxyPageAccessValid"
                                  @update-form="handleUpdatePageAccess"
         />
         <role-update-form-policy

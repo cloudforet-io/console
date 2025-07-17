@@ -28,13 +28,14 @@ import type { PageAccessMenuItem, RoleFormData, TableItem } from '@/services/iam
 
 interface Props {
     menuItems?: PageAccessMenuItem[]
-    proxyPageAccessValid?: boolean;
+    isPageAccessValid?: boolean;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{(e: 'update', value: string[]): void,
     (e: 'update-form', formData: RoleFormData): void,
+    (e: 'update:page-access-valid', value: boolean): void,
 }>();
 
 const router = useRouter();
@@ -47,7 +48,7 @@ const { roleBasedMenus } = useRoleBasedMenus();
 const menuItems = ref([] as PageAccessMenuItem[]);
 const state = reactive({
     pageAccessPermissions: computed(() => getPageAccessList(menuItems.value)),
-    proxyPageAccessValid: useProxyValue('proxyPageAccessValid', props, emit),
+    proxyPageAccessValid: useProxyValue('isPageAccessValid', props, emit),
     menuList: computed(() => roleBasedMenus.value),
     accessibleMenuList: computed<PageAccessMenuItem[]>(() => menuItems.value.flatMap((i) => i.subMenuList || [])),
     isReadOnly: false,
