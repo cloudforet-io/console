@@ -135,8 +135,6 @@ onUnmounted(() => {
                                         @create="handleClickButton"
                 />
                 <landing-group-workspaces v-if="!state.isSearchMode"
-                                          :favorite-list="storeState.favoriteList"
-                                          :is-domain-admin="storeState.isDomainAdmin"
                                           :has-read-write-access="hasReadWriteAccess"
                                           @create="handleClickButton"
                 />
