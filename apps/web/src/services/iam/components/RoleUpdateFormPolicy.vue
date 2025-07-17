@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PI, PRadioGroup, PRadio, PCodeEditor,
 } from '@cloudforet/mirinae';
 
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleType } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useRoleGetQuery } from '@/services/iam/composables/use-role-get-query';
 
 const POLICY_TYPE = {
     DEFAULT: 'default',
@@ -23,20 +24,21 @@ type RadioType = {
 };
 
 interface Props {
-    roleType?: RoleType
-    initialPermissions?: string[];
     selectedRadioIdx?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    roleType: ROLE_TYPE.DOMAIN_ADMIN,
-    initialPermissions: undefined,
     selectedRadioIdx: 0,
 });
 
 const emit = defineEmits<{(e: 'update', value: string): void,
     (e: 'update:selected-radio-idx', value: number): void,
 }>();
+
+const router = useRouter();
+const roleId: string = router.currentRoute.params.id;
+
+const { roleData } = useRoleGetQuery(roleId);
 
 const state = reactive({
     code: '',
@@ -60,12 +62,12 @@ const handleCodeUpdate = (modifiedCode: string) => {
 };
 
 /* Watcher */
-watch(() => props.initialPermissions, (value) => {
-    if (value && value.length > 0) {
+watch(() => roleData, (initialData) => {
+    if (initialData.value?.permissions && initialData.value.permissions.length > 0) {
         state.proxySelectedRadioIdx = 1;
-        state.code = value.join('\n');
+        state.code = initialData.value.permissions.join('\n');
     }
-}, { immediate: true });
+}, { deep: true, immediate: true });
 </script>
 
 <template>

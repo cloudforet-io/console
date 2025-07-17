@@ -36,6 +36,7 @@ export const useRoleListPaginationQuery = ({ params, thisPage, pageSize }: UseRo
         queryFn: roleAPI.list,
         params: roleListPaginationQueryParams,
         gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 30,
         enabled: true,
     }, {
         thisPage,

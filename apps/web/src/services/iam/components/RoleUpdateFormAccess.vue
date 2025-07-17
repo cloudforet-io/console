@@ -1,53 +1,70 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { filter } from 'lodash';
+import { filter, find, isEqual } from 'lodash';
 
 import {
     PI, PToggleButton, PDataTable, PSelectDropdown, PCheckboxGroup, PCheckbox, PHeading,
+    useProxyValue,
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleType } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
+import { getPageAccessMapFromRawData } from '@/lib/access-control/page-access-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { gray, green } from '@/styles/colors';
 
-import type { PageAccessMenuItem, TableItem } from '@/services/iam/types/role-type';
+import { useRoleBasedMenus } from '@/services/iam/composables/role-based-menus';
+import { useRoleGetQuery } from '@/services/iam/composables/use-role-get-query';
+import { getPageAccessList, getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
+import type { PageAccessMenuItem, RoleFormData, TableItem } from '@/services/iam/types/role-type';
+
 
 interface Props {
     menuItems?: PageAccessMenuItem[]
-    roleType?: RoleType
+    proxyPageAccessValid?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    menuItems: undefined,
-    roleType: ROLE_TYPE.DOMAIN_ADMIN,
-});
+const props = defineProps<Props>();
 
-const emit = defineEmits<{(e: 'update', value: PageAccessMenuItem): void,
+const emit = defineEmits<{(e: 'update', value: string[]): void,
+    (e: 'update-form', formData: RoleFormData): void,
 }>();
 
+const router = useRouter();
+const roleId: string = router.currentRoute.params.id;
+
+const { roleData } = useRoleGetQuery(roleId);
+
+const { roleBasedMenus } = useRoleBasedMenus();
+
+const menuItems = ref([] as PageAccessMenuItem[]);
 const state = reactive({
-    menuItems: [] as PageAccessMenuItem[],
-    accessibleMenuList: computed<PageAccessMenuItem[]>(() => state.menuItems.flatMap((i) => i.subMenuList)),
+    pageAccessPermissions: computed(() => getPageAccessList(menuItems.value)),
+    proxyPageAccessValid: useProxyValue('proxyPageAccessValid', props, emit),
+    menuList: computed(() => roleBasedMenus.value),
+    accessibleMenuList: computed<PageAccessMenuItem[]>(() => menuItems.value.flatMap((i) => i.subMenuList || [])),
     isReadOnly: false,
 });
+
 const tableState = reactive({
     fields: computed(() => [
         { name: 'service', label: i18n.t('IAM.ROLE.FORM.SERVICE'), width: '150px' },
         { name: 'page_access', label: i18n.t('IAM.ROLE.FORM.ACCESS'), width: '190px' },
         { name: 'accessible_menu_list', label: i18n.t('IAM.ROLE.FORM.ACCESSIBLE_MENU') },
     ]),
-    items: computed<TableItem[]|undefined>(() => state.menuItems?.map((i) => ({
+    items: computed<TableItem[]|undefined>(() => menuItems.value?.map((i) => ({
         id: i.id,
         service: i.translationIds ? i.translationIds[0] : '',
         page_access: i.isParent ? i.accessType : undefined,
         accessible_menu_list: i?.subMenuList,
-        isInValid: i?.subMenuList.every((j) => !j.isAccessible),
+        isInValid: i?.subMenuList?.every((j) => !j.isAccessible),
     }))),
     selectedMenuIds: [] as PageAccessMenuItem[],
 });
@@ -73,37 +90,110 @@ const handleChangeSelectedMenu = (values: PageAccessMenuItem[]) => {
 
     state.accessibleMenuList?.forEach((i) => {
         const isAccessible = valueIds.has(i.id);
-        emit('update', {
+        handleUpdateForm({
             ...i,
             isAccessible,
         });
     });
+
+    menuItems.value.forEach((menuItem) => {
+        if (menuItem?.subMenuList?.length) {
+            menuItem.isValid = !menuItem?.subMenuList.every((d) => !d.isAccessible);
+        }
+    });
+
+    state.proxyPageAccessValid = menuItems.value.every((i) => i.isValid);
 };
 const handleChangeSelectedAccess = (value: string, item: TableItem) => {
-    emit('update', {
+    handleUpdateForm({
         ...item,
         accessType: value,
         isAccessible: true,
     });
 
-    tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
+    tableState.selectedMenuIds = menuItems.value.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
 };
 const handleChangeToggle = (value: boolean) => {
     state.isReadOnly = value;
-    state.menuItems.forEach((menu) => {
-        emit('update', {
+    menuItems.value.forEach((menu) => {
+        handleUpdateForm({
             ...menu,
             accessType: value ? PAGE_ACCESS.READONLY : PAGE_ACCESS.WRITABLE,
         });
     });
 };
+const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
+    const { id: menuId, isAccessible, accessType } = value;
+    const item = find(menuItems.value, { id: menuId });
+    if (item) {
+        if (accessType) {
+            item.accessType = accessType;
+            item.subMenuList?.forEach((d) => {
+                d.isAccessible = true;
+            });
+        }
+        if (isInit && item.subMenuList?.length === 0) {
+            item.subMenuList?.push({
+                id: item.id,
+                isAccessible: item.isAccessible,
+                translationIds: item.translationIds,
+            });
+        }
+    }
+    menuItems.value.forEach((menuItem) => {
+        if (menuItem?.subMenuList?.length) {
+            menuItem.isValid = !menuItem?.subMenuList.every((d) => !d.isAccessible);
+
+            const subItem = find(menuItem.subMenuList, { id: menuId });
+            if (subItem) {
+                subItem.isAccessible = menuItem.accessType !== PAGE_ACCESS.RESTRICTED ? isAccessible : true;
+            }
+        }
+    });
+
+    state.proxyPageAccessValid = menuItems.value.every((i) => i.isValid);
+};
+
+const setPageAccessPermissionsData = () => {
+    if (!roleData.value?.page_access) return;
+    const pageAccessPermissionMap = getPageAccessMapFromRawData({
+        pageAccessPermissions: roleData.value?.page_access, menuList: state.menuList,
+    });
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
+        if (!itemId) return;
+        let accessType = '';
+        if (accessible.read && accessible.write) {
+            accessType = PAGE_ACCESS.WRITABLE;
+        } else if (accessible.read && !accessible.write) {
+            accessType = PAGE_ACCESS.READONLY;
+        } else {
+            accessType = PAGE_ACCESS.RESTRICTED;
+        }
+        handleUpdateForm({
+            id: itemId,
+            isAccessible: accessible.access,
+            accessType,
+        }, true);
+    }
+};
 
 /* Watcher */
-watch(() => props.menuItems, (menuItems) => {
-    state.menuItems = menuItems || [];
-    state.isReadOnly = state.menuItems.every((i) => i.accessType === PAGE_ACCESS.READONLY);
-    tableState.selectedMenuIds = state.menuItems.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
-}, { immediate: true });
+watch(() => roleData, () => {
+    if (!roleData.value?.role_type) return;
+    menuItems.value = getPageAccessMenuListByRoleType(roleData.value.role_type, state.menuList);
+    setPageAccessPermissionsData();
+}, { deep: true, immediate: true });
+
+watch(() => menuItems, () => {
+    state.isReadOnly = menuItems.value.every((i) => i.accessType === PAGE_ACCESS.READONLY);
+    tableState.selectedMenuIds = menuItems.value.flatMap((i) => filter(i.subMenuList, { isAccessible: true }));
+}, { deep: true, immediate: true });
+
+watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessPermissions) => {
+    if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
+    emit('update-form', { page_access: pageAccessPermissions });
+});
 </script>
 
 <template>
@@ -112,7 +202,7 @@ watch(() => props.menuItems, (menuItems) => {
                    heading-type="sub"
                    :title="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
         />
-        <div v-if="props.roleType === ROLE_TYPE.DOMAIN_ADMIN">
+        <div v-if="roleData?.role_type === ROLE_TYPE.DOMAIN_ADMIN">
             <div class="page-access-info-wrapper">
                 <p-i name="ic_settings"
                      width="2rem"

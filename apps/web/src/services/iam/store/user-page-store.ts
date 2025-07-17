@@ -9,7 +9,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { FindWorkspaceUserParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/find';
 import type { SummaryWorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
@@ -102,18 +101,6 @@ export const useUserPageStore = defineStore('page-user', () => {
                 themeColor,
                 visible: modalVisibleType ?? undefined,
             };
-        },
-        // Role
-        async listRoles() {
-            try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>();
-                state.roles = results || [];
-                return results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.roles = [];
-                throw e;
-            }
         },
     };
     return {
