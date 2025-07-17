@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@cloudforet/mirinae';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

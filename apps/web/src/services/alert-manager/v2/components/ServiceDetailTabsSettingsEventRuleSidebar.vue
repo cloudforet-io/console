@@ -15,7 +15,7 @@ import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type'
 import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
 import type { EventRuleChangeOrderParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/change-order';
 import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';

@@ -5,7 +5,7 @@ import { sortBy } from 'lodash';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { CostDataSourceReferenceItem } from '@/query/resource-query/reference-model/use-cost-data-source-reference-data-model';
+import type { CostDataSourceReferenceItem } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-cost-data-source-reference-data-model';
 
 import type { CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 

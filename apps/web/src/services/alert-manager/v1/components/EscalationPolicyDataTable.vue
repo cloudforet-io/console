@@ -12,7 +12,7 @@ import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-
 import type {
     EscalationPolicyFinishCondition,
 } from '@/api-clients/monitoring/escalation-policy/schema/type';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

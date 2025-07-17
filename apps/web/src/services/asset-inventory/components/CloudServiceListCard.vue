@@ -11,7 +11,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLazyImg, PDivider, PTooltip } from '@cloudforet/mirinae';
 
 import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 

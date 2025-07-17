@@ -12,7 +12,7 @@ import { useCollectorApi } from '@/api-clients/inventory/collector/composables/u
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

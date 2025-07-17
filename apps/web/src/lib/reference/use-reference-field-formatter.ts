@@ -2,7 +2,7 @@ import { computed } from 'vue';
 
 import type { DynamicFieldProps } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

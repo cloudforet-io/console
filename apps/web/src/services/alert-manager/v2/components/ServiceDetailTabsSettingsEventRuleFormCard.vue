@@ -27,7 +27,7 @@ import { EVENT_RULE_CONDITIONS_POLICY, EVENT_RULE_SCOPE } from '@/api-clients/al
 import type {
     EventRuleScopeType, EventRuleConditionsPolicyType, EventRuleActionsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

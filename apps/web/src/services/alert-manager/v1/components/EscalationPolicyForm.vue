@@ -13,7 +13,7 @@ import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/api-clients/monitoring/escalation-policy/schema/constants';
 import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
 import type { EscalationPolicyFinishCondition } from '@/api-clients/monitoring/escalation-policy/schema/type';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

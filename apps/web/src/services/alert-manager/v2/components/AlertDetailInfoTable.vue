@@ -15,7 +15,7 @@ import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constan
 import type { AlertSeverityType } from '@/api-clients/alert-manager/alert/schema/type';
 import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

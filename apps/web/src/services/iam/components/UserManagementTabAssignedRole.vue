@@ -14,11 +14,11 @@ import {
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { UserGetParameters } from '@/api-clients/identity/user/schema/api-verbs/get';
 import type { UserModel } from '@/api-clients/identity/user/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import type {
     ProjectGroupReferenceItem,
-} from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
-import type { ProjectReferenceItem } from '@/query/resource-query/reference-model/use-project-reference-data-model';
+} from '@/query/resource-query/reference-data-model/adaptors/implementations/use-project-group-reference-data-model';
+import type { ProjectReferenceItem } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-project-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { gray, green } from '@/styles/colors';
