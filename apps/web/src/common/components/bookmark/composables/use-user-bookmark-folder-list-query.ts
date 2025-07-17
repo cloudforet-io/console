@@ -37,21 +37,23 @@ export const useUserBookmarkFolderListQuery = ({ scope }: UseUserBookmarkFolderL
     const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
     const currentWorkspaceId = computed(() => userWorkspaceStore.getters.currentWorkspaceId);
 
-    const defaultFilter: ConsoleFilter[] = [
-        { k: 'name', v: 'console:bookmark', o: '' },
-        { k: 'data.link', v: null, o: '=' },
-    ];
-    if (!isAdminMode.value) {
-        defaultFilter.push({ k: 'data.workspaceId', v: currentWorkspaceId.value || '', o: '=' });
-    }
-
-    const bookmarkFolderListApiQuery = new ApiQueryHelper()
-        .setSort('updated_at', true)
-        .setFilters(defaultFilter);
-
     const { userConfigAPI } = useUserConfigApi();
     const { key: userConfigQueryKey, params: userConfigParams } = useServiceQueryKey('config', 'user-config', 'list', {
-        params: computed(() => ({ query: bookmarkFolderListApiQuery.data })),
+        params: computed(() => {
+            const defaultFilter: ConsoleFilter[] = [
+                { k: 'name', v: 'console:bookmark', o: '' },
+                { k: 'data.link', v: null, o: '=' },
+            ];
+            if (!isAdminMode.value) {
+                defaultFilter.push({ k: 'data.workspaceId', v: currentWorkspaceId.value || '', o: '=' });
+            }
+
+            const bookmarkFolderListApiQuery = new ApiQueryHelper()
+                .setSort('updated_at', true)
+                .setFilters(defaultFilter);
+
+            return { query: bookmarkFolderListApiQuery.data };
+        }),
     });
 
     const {
@@ -73,7 +75,7 @@ export const useUserBookmarkFolderListQuery = ({ scope }: UseUserBookmarkFolderL
     const bookmarkFolderList = computed(() => (isAdminMode.value ? refinedBookmarkFolderList.value?.filter((i) => i.isGlobal) : refinedBookmarkFolderList.value));
 
     const refresh = () => {
-        queryClient.invalidateQueries({ queryKey: userConfigQueryKey });
+        queryClient.invalidateQueries({ queryKey: userConfigQueryKey.value });
     };
 
     return {

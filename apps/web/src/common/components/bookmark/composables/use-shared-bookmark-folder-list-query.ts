@@ -37,21 +37,22 @@ export const useSharedBookmarkFolderListQuery = ({ scope }: UseSharedBookmarkFol
     const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
     const currentWorkspaceId = computed(() => userWorkspaceStore.getters.currentWorkspaceId);
 
-    const defaultFilter: ConsoleFilter[] = [
-        { k: 'name', v: 'console:bookmark', o: '' },
-        { k: 'data.link', v: null, o: '=' },
-    ];
-    if (!isAdminMode.value) {
-        defaultFilter.push({ k: 'data.workspaceId', v: currentWorkspaceId.value || '', o: '=' });
-    }
-
-    const bookmarkFolderListApiQuery = new ApiQueryHelper()
-        .setSort('updated_at', true)
-        .setFilters(defaultFilter);
-
     const { sharedConfigAPI } = useSharedConfigApi();
     const { key: sharedConfigQueryKey, params: sharedConfigParams } = useServiceQueryKey('config', 'shared-config', 'list', {
-        params: computed(() => ({ query: bookmarkFolderListApiQuery.data })),
+        params: computed(() => {
+            const defaultFilter: ConsoleFilter[] = [
+                { k: 'name', v: 'console:bookmark', o: '' },
+                { k: 'data.link', v: null, o: '=' },
+            ];
+            if (!isAdminMode.value) {
+                defaultFilter.push({ k: 'data.workspaceId', v: currentWorkspaceId.value || '', o: '=' });
+            }
+
+            const bookmarkFolderListApiQuery = new ApiQueryHelper()
+                .setSort('updated_at', true)
+                .setFilters(defaultFilter);
+            return { query: bookmarkFolderListApiQuery.data };
+        }),
     });
 
     const {
@@ -73,7 +74,7 @@ export const useSharedBookmarkFolderListQuery = ({ scope }: UseSharedBookmarkFol
     const bookmarkFolderList = computed(() => (isAdminMode.value ? refinedBookmarkFolderList.value?.filter((i) => i.isGlobal) : refinedBookmarkFolderList.value));
 
     const refresh = () => {
-        queryClient.invalidateQueries({ queryKey: sharedConfigQueryKey });
+        queryClient.invalidateQueries({ queryKey: sharedConfigQueryKey.value });
     };
 
     return {
