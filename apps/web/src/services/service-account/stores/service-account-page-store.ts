@@ -16,6 +16,7 @@ import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/cons
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import type { AzureManagementGroupMappingType } from '@/api-clients/identity/trusted-account/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { Currency } from '@/store/display/type';
@@ -53,7 +54,7 @@ interface State {
     costReportConfig: CostReportConfigModel|null|undefined,
 }
 
-interface FormState {
+export interface ServiceAccountStoreFormState {
     isBaseInformationFormValid: boolean;
     baseInformation: Partial<BaseInformationForm>;
     isCredentialFormValid: boolean;
@@ -62,6 +63,7 @@ interface FormState {
     isAutoSyncEnabled: boolean;
     additionalOptions: { [key: string]: any };
     selectedSingleWorkspace: string;
+    azureManagementGroupMappingType: AzureManagementGroupMappingType|undefined; // only for Azure
     skipProjectGroup: boolean;
     scheduleHours: number[];
 }
@@ -86,7 +88,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         costReportConfig: null,
     });
 
-    const formState = reactive<FormState>({
+    const formState = reactive<ServiceAccountStoreFormState>({
         // baseInformation
         isBaseInformationFormValid: true,
         baseInformation: {},
@@ -98,6 +100,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
+        azureManagementGroupMappingType: undefined, // only for Azure
         skipProjectGroup: false,
         scheduleHours: [] as number[],
     });
@@ -134,6 +137,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.isAutoSyncEnabled = false;
             formState.additionalOptions = {};
             formState.selectedSingleWorkspace = '';
+            formState.azureManagementGroupMappingType = undefined;
             formState.skipProjectGroup = false;
             formState.scheduleHours = [];
             state.syncJobList = [];
@@ -143,6 +147,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.isAutoSyncEnabled = state.originServiceAccountItem?.schedule?.state === 'ENABLED';
             formState.scheduleHours = state.originServiceAccountItem?.schedule?.hours ?? [];
             formState.selectedSingleWorkspace = state.originServiceAccountItem?.sync_options?.single_workspace_id ?? '';
+            formState.azureManagementGroupMappingType = state.originServiceAccountItem?.sync_options?.azure_management_group_mapping_type ?? undefined;
             formState.skipProjectGroup = state.originServiceAccountItem?.sync_options?.skip_project_group ?? false;
             formState.additionalOptions = state.originServiceAccountItem?.plugin_options ?? {};
         },
@@ -184,12 +189,14 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.scheduleHours = item?.schedule?.hours ?? [];
             formState.selectedSingleWorkspace = item?.sync_options?.single_workspace_id ?? '';
             formState.skipProjectGroup = item?.sync_options?.skip_project_group ?? false;
+            formState.azureManagementGroupMappingType = item?.sync_options?.azure_management_group_mapping_type ?? undefined;
             formState.additionalOptions = item?.plugin_options ?? {};
         } else {
             formState.isAutoSyncEnabled = false;
             formState.scheduleHours = [];
             formState.selectedSingleWorkspace = '';
             formState.skipProjectGroup = false;
+            formState.azureManagementGroupMappingType = undefined;
             formState.additionalOptions = {};
         }
     });
