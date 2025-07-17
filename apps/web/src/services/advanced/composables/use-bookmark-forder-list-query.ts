@@ -13,7 +13,6 @@ import { useWorkspaceListQuery } from './use-workspace-list-query';
 
 interface UseBookmarkFolderListQueryReturn {
     bookmarkFolderListData: Ref<BookmarkItem[]>;
-    refresh: () => void;
 }
 
 export const useBookmarkFolderListQuery = (): UseBookmarkFolderListQueryReturn => {

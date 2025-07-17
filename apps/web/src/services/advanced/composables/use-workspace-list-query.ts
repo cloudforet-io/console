@@ -27,10 +27,7 @@ export const useWorkspaceListQuery = (): UseWorkspaceListQueryReturn => {
     const { data: queryData } = useScopedQuery({
         queryKey: workspaceListQueryKey,
         queryFn: async () => workspaceAPI.list(workspaceListQueryParams.value),
-        initialData: {
-            results: [],
-            total_count: 0,
-        },
+        staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 60 * 2,
     }, ['DOMAIN']);
 
