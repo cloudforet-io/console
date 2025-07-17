@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { PluginDeregisterParameters } from '@/api-clients/repository/plugin/schema/api-verbs/deregister';
 import type { PluginDisableParameters } from '@/api-clients/repository/plugin/schema/api-verbs/disable';
 import type { PluginEnableParameters } from '@/api-clients/repository/plugin/schema/api-verbs/enable';
@@ -21,7 +22,7 @@ export const usePluginApi = () => {
         getVersions: SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string>>,
         list: SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>,
         register: SpaceConnector.clientV2.repository.plugin.register<PluginRegisterParameters, PluginModel>,
-        stat: SpaceConnector.clientV2.repository.plugin.stat<PluginStatParameters, any>,
+        stat: SpaceConnector.clientV2.repository.plugin.stat<PluginStatParameters, StatResponse>,
         update: SpaceConnector.clientV2.repository.plugin.update<PluginUpdateParameters, PluginModel>,
     };
     return {

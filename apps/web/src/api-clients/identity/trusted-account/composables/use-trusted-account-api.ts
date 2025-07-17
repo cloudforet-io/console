@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { TrustedAccountCreateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/create';
 import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
 import type { TrustedAccountGetParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/get';
@@ -20,7 +21,7 @@ export const useTrustedAccountApi = () => {
         delete: SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>,
         get: SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>,
         list: SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>,
-        stat: SpaceConnector.clientV2.identity.trustedAccount.stat<TrustedAccountStatParameters, any>,
+        stat: SpaceConnector.clientV2.identity.trustedAccount.stat<TrustedAccountStatParameters, StatResponse>,
         updateSecretData: SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>,
         sync: SpaceConnector.clientV2.identity.trustedAccount.sync<TrustedAccountSyncParameters>,
     };
