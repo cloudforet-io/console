@@ -15,7 +15,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { useUserGroupUserListQuery } from '@/services/iam/composables/use-user-list-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -25,18 +25,18 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const { data: userList } = useUserGroupUserListQuery();
+const { userListData } = useUserListQuery();
 
 const state = reactive({
     loading: false,
     selectedUserIds: undefined,
-    excludedSelectedIds: [],
+    excludedSelectedIds: [] as string[],
     formattedMemberItems: {} as Record<MembersType, string[]>,
     userPool: [] as string[],
 });
 
 /* Watcher */
-watch(userList, (_userList) => {
+watch(userListData, (_userList) => {
     if (!_userList) return;
     state.userPool = _userList.map((user) => user.user_id);
 }, { deep: true, immediate: true });
