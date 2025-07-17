@@ -86,7 +86,7 @@ const handleClickButton = () => {
 onMounted(async () => {
     try {
         landingPageStore.setLoading(true);
-        await userWorkspaceStore.load();
+        // await userWorkspaceStore.load();
         await recentStore.fetchRecent({
             type: RECENT_TYPE.WORKSPACE,
             limit: 6,
