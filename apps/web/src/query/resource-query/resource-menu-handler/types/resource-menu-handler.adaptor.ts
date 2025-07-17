@@ -7,7 +7,7 @@ export interface GetResourceMenuHandlerOptions {
 }
 
 export interface GetResourceMenuHandler {
-    (options: GetResourceMenuHandlerOptions): MenuAttachHandler;
+    (options?: GetResourceMenuHandlerOptions): MenuAttachHandler;
 }
 
 export interface UseBaseResourceMenuHandlerReturnType {

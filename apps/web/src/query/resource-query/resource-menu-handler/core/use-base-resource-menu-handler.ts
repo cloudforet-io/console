@@ -34,7 +34,7 @@ export const useBaseResourceMenuHandler = <TModelData extends Record<string, any
     } = generateMenuQueryHandler(_queryClient);
 
 
-    const getResourceMenuHandler = ({ dataKey, fixedFilters }: GetResourceMenuHandlerOptions): MenuAttachHandler => {
+    const getResourceMenuHandler = ({ dataKey, fixedFilters }: GetResourceMenuHandlerOptions = {}): MenuAttachHandler => {
         let resultHandler: MenuAttachHandler;
 
         if (dataKey && fetchConfig.stat) {
