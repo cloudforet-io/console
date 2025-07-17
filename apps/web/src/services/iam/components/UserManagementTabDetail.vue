@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, ref, watchEffect,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -10,6 +10,7 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
 import { i18n } from '@/translations';
 
@@ -25,10 +26,14 @@ import {
     useRoleFormatter,
     userStateFormatter,
 } from '@/services/iam/composables/refined-table-data';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
+import { useUserGetQuery } from '@/services/iam/composables/use-user-get-query';
 import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
+
+
 
 
 interface Props {
@@ -48,37 +53,47 @@ const emit = defineEmits<{(e: 'refresh', id: string): void }>();
 const storeState = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
+
+const selectedUserId = computed(() => userPageState.selectedUserIds[0] ?? '');
+const { userData, workspaceUserData } = useUserGetQuery(selectedUserId);
+
+const { roleListData } = useRoleListQuery();
+
+const roleMap = computed(() => {
+    const map: Record<string, RoleModel> = {};
+    roleListData.value?.forEach((role) => {
+        map[role.role_id] = role;
+    });
+    return map;
+});
+
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    selectedUser: computed<UserListItemType>(() => userPageState.selectedUsers[0] ?? {}),
-    selectedUserId: computed<string>(() => userPageState.selectedUserIds[0] ?? ''),
     isWorkspaceGroupUser: computed<boolean>(() => !!props.selectedUser?.role_binding_info?.workspace_group_id),
+    refinedUserItems: computed<ExtendUserListItemType>(() => {
+        const selectedUser: UserListItemType = userData.value ?? workspaceUserData.value ?? {};
+        return {
+            ...selectedUser,
+            role_binding: {
+                name: roleMap.value[selectedUser?.role_binding_info?.role_id ?? '']?.name ?? '',
+                type: selectedUser?.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+            },
+            last_accessed_at: selectedUser?.last_accessed_at,
+            user_group: userGroupListData.value.filter((group) => group.users?.includes(selectedUser?.user_id ?? '')),
+        };
+    }),
 });
 
-const refinedUserItems = ref<ExtendUserListItemType | undefined>(undefined);
 
 const { userGroupListData } = useUserGroupListQuery({
     params: computed(() => ({
         query: {
             filter: [
-                { k: 'user_id', v: userPageState.selectedUsers.map((user) => user.user_id), o: 'in' },
+                { k: 'user_id', v: userPageState.selectedUserIds, o: 'in' },
             ],
         },
     })),
-});
-
-watchEffect(() => {
-    if (!state.selectedUser) return;
-    refinedUserItems.value = {
-        ...state.selectedUser,
-        role_binding: {
-            name: userPageGetters.roleMap[state.selectedUser.role_binding_info?.role_id ?? '']?.name ?? '',
-            type: state.selectedUser.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-        },
-        last_accessed_at: state.selectedUser.last_accessed_at,
-        user_group: userGroupListData.value.filter((group) => group.users?.includes(state.selectedUser.user_id ?? '')),
-    };
 });
 
 const tableState = reactive({
@@ -168,13 +183,13 @@ const handleClickButton = (type: string) => {
 const handleClickVerifyButton = async () => {
     state.verifyEmailLoading = true;
     try {
-        if (refinedUserItems.value?.email_verified) return;
+        if (state.refinedUserItems.email_verified) return;
         await postUserValidationEmail({
-            user_id: refinedUserItems.value?.user_id || '',
-            email: refinedUserItems.value?.email || '',
+            user_id: state.refinedUserItems.user_id || '',
+            email: state.refinedUserItems.email || '',
         });
-        emit('refresh', refinedUserItems.value?.user_id || '');
-        await userStore.updateUser({ email: refinedUserItems.value?.email || '' });
+        emit('refresh', state.refinedUserItems.user_id || '');
+        await userStore.updateUser({ email: state.refinedUserItems.email || '' });
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
@@ -198,7 +213,7 @@ const handleClickVerifyButton = async () => {
                     <div v-if="userPageState.isAdminMode"
                          class="toolbox"
                     >
-                        <p-button v-if="refinedUserItems?.state === 'ENABLED'"
+                        <p-button v-if="state.refinedUserItems?.state === 'ENABLED'"
                                   style-type="tertiary"
                                   @click="handleClickButton(USER_MODAL_TYPE.DISABLE)"
                         >
@@ -225,7 +240,7 @@ const handleClickVerifyButton = async () => {
                     </div>
                     <p-button v-else-if="userPageGetters.isWorkspaceOwner && !state.isWorkspaceGroupUser"
                               style-type="negative-secondary"
-                              :disabled="userPageState.selectedUsers.length === 0"
+                              :disabled="userPageState.selectedUserIds.length === 0"
                               @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                     >
                         {{ $t('IAM.USER.REMOVE') }}
@@ -234,7 +249,7 @@ const handleClickVerifyButton = async () => {
             </template>
         </p-heading-layout>
         <p-definition-table :fields="tableState.fields"
-                            :data="refinedUserItems"
+                            :data="state.refinedUserItems"
                             :loading="state.loading"
                             :skeleton-rows="7"
                             class="user-definition-table"
@@ -254,11 +269,11 @@ const handleClickVerifyButton = async () => {
             <template #data-role_id="{value, data}">
                 <span class="role-wrapper">
                     <div class="role-menu-item">
-                        <img :src="useRoleFormatter(userPageGetters.roleMap[data]?.role_type || ROLE_TYPE.USER).image"
+                        <img :src="useRoleFormatter(roleMap[data]?.role_type || ROLE_TYPE.USER).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >
-                        <span class="pr-4">{{ userPageGetters.roleMap[value]?.name ?? '' }}</span>
+                        <span class="pr-4">{{ roleMap[value]?.name ?? '' }}</span>
                     </div>
                 </span>
             </template>
@@ -294,8 +309,8 @@ const handleClickVerifyButton = async () => {
                 <div v-if="data && data !== ''"
                      class="col-email"
                 >
-                    <span :class="refinedUserItems?.email_verified && 'verified-text'">{{ data }}</span>
-                    <span v-if="refinedUserItems?.email_verified">
+                    <span :class="state.refinedUserItems?.email_verified && 'verified-text'">{{ data }}</span>
+                    <span v-if="state.refinedUserItems?.email_verified">
                         <p-i name="ic_verified"
                              height="1rem"
                              width="1rem"
@@ -324,9 +339,9 @@ const handleClickVerifyButton = async () => {
             </template>
             <template #extra="{label}">
                 <p-button v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
-                              && !refinedUserItems?.email_verified
-                              && refinedUserItems?.email
-                              && refinedUserItems?.email !== ''
+                              && !state.refinedUserItems?.email_verified
+                              && state.refinedUserItems?.email
+                              && state.refinedUserItems?.email !== ''
                               && props.hasReadWriteAccess"
                           style-type="primary"
                           size="sm"

@@ -8,7 +8,6 @@ import { PHorizontalLayout } from '@cloudforet/mirinae';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import UserAssignToGroupModal from '@/services/iam/components/UserAssignToGroupModal.vue';
@@ -42,12 +41,6 @@ watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
     if (globalGrantLoading) return;
     userPageState.isAdminMode = storeState.isAdminMode;
 }, { immediate: true });
-
-const init = async () => {
-    await userPageStore.listRoles();
-};
-const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], init);
-callApiWithGrantGuard();
 
 /* Unmount */
 onUnmounted(() => {

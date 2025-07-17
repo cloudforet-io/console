@@ -17,6 +17,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -36,10 +37,13 @@ import {
     userStateFormatter,
 } from '@/services/iam/composables/refined-table-data';
 import { useRoleBindingUpdateRoleMutation } from '@/services/iam/composables/use-role-binding-update-role-mutation';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_TABS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { ExtendUserListItemType, UserListItemType } from '@/services/iam/types/user-type';
+
 
 
 interface Props {
@@ -90,14 +94,28 @@ const singleItemTabState = reactive({
     selectedIndex: computed(() => userPageState.selectedIndices[0]),
 });
 
+const selectedUserIds = computed(() => userPageState.selectedUserIds ?? []);
+const { userListData, workspaceUserListData } = useUserListQuery(selectedUserIds);
+
+
 const { userGroupListData } = useUserGroupListQuery({
     params: computed(() => ({
         query: {
             filter: [
-                { k: 'user_id', v: userPageState.selectedUsers.map((user) => user.user_id), o: 'in' },
+                { k: 'user_id', v: userPageState.selectedUserIds, o: 'in' },
             ],
         },
     })),
+});
+
+const { roleListData } = useRoleListQuery();
+
+const roleMap = computed<Record<string, RoleModel>>(() => {
+    const map: Record<string, RoleModel> = {};
+    roleListData.value?.forEach((role) => {
+        map[role.role_id] = role;
+    });
+    return map;
 });
 
 const multiItemTabState = reactive({
@@ -105,24 +123,27 @@ const multiItemTabState = reactive({
         { label: i18n.t('IAM.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
     ])),
     activeTab: USER_TABS.DATA,
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.selectedUsers.map((user) => {
-        let additionalFields: Record<string, any> = {};
-        if (!userPageState.isAdminMode) {
-            additionalFields = {
-                role_binding: {
-                    name: userPageGetters.roleMap[user?.role_binding_info?.role_id ?? '']?.name ?? '',
-                    type: user?.role_binding_info?.role_type ?? '',
-                },
-                user_group: userGroupListData.value.filter((group) => group.users?.includes(user.user_id ?? '')).map((group) => group.name),
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => {
+        const _selectedUsers = userPageState.isAdminMode ? userListData.value : workspaceUserListData.value;
+        return _selectedUsers?.map((user) => {
+            let additionalFields: Record<string, any> = {};
+            if (!userPageState.isAdminMode) {
+                additionalFields = {
+                    role_binding: {
+                        name: roleMap.value[user?.role_binding_info?.role_id ?? '']?.name ?? '',
+                        type: user?.role_binding_info?.role_type ?? '',
+                    },
+                    user_group: userGroupListData.value.filter((group) => group.users?.includes(user.user_id ?? '')).map((group) => group.name),
+                };
+            }
+            return {
+                ...user,
+                type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+                last_accessed_at: user?.last_accessed_at,
+                ...additionalFields,
             };
-        }
-        return {
-            ...user,
-            type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-            last_accessed_at: user?.last_accessed_at,
-            ...additionalFields,
-        };
-    })),
+        }) ?? [];
+    }),
 });
 
 const dropdownState = reactive({
@@ -196,7 +217,7 @@ const handleSelectDropdownItem = async (value, rowIndex:number) => {
         role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
         role_id: value || '',
     }).then((response) => {
-        const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
+        const roleName = roleMap.value[response.role_id]?.name ?? '';
         const originTableIndex = userPageState.selectedIndices[rowIndex];
         userPageState.selectedUsers[originTableIndex] = {
             ...userPageState.selectedUsers[originTableIndex],
