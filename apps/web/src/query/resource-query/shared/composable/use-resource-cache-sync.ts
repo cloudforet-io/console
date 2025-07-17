@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/vue-query';
 import { useQueryClient } from '@tanstack/vue-query';
 
-import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
+import { useResourceQueryKey } from '@/query/core/query-key/use-resource-query-key';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 import type { ResourceCacheType, ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
@@ -25,7 +25,7 @@ export const useResourceCacheSync = <T extends Record<string, any>>(resourceType
         mutationCallback: callbackForReferenceRefresh,
     ): Promise<void> => {
         await mutationCallback();
-        const { key: referenceQueryKey } = useReferenceQueryKey(resourceType);
+        const { key: referenceQueryKey } = useResourceQueryKey(resourceType);
         await queryClient.invalidateQueries({ queryKey: referenceQueryKey.value });
     };
 
@@ -38,7 +38,7 @@ const _updateResourceCache = async <T extends Record<string, any>>(
     newData: T,
     queryClient: QueryClient,
 ) => {
-    const { key: referenceQueryKey, withSuffix } = useReferenceQueryKey(resourceType);
+    const { key: referenceQueryKey, withSuffix } = useResourceQueryKey(resourceType);
 
     const idKey = RESOURCE_CONFIG_MAP[resourceType].idKey;
 

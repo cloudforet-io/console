@@ -8,8 +8,9 @@ import { useQueryClient, type UseInfiniteQueryOptions } from '@tanstack/vue-quer
 
 import type { GrantScope } from '@/api-clients/identity/token/schema/type';
 import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
-import { addPageToVerbParams } from '@/query/service-query/pagination/pagination-query-helper';
 import { useScopedInfiniteQuery } from '@/query/service-query/use-scoped-infinite-query';
+import type { PaginatableBaseData } from '@/query/shared/types/pagination-type';
+import { addPageToVerbParams } from '@/query/shared/utils/pagination-query-helper';
 
 
 /**
@@ -46,12 +47,6 @@ import { useScopedInfiniteQuery } from '@/query/service-query/use-scoped-infinit
 * }
 */
 
-type PaginatableBaseData = {
-    results?: any[];
-    more?: boolean; // for 'analyze' verb without 'total_count'
-    total_count?: number;
-};
-
 type UsePaginationQueryOptions<TParams extends object, TPageData, TError> = Omit<
     UseInfiniteQueryOptions<TPageData, TError, InfiniteData<TPageData>, TPageData, QueryKeyArray, number>,
     'initialPageParam' | 'queryFn' | 'getNextPageParam' | 'select'
@@ -68,7 +63,7 @@ interface UsePaginationQueryPageOptions {
     verb: 'list' | 'load' | 'get-data' | 'analyze';
 }
 
-export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData, TError = unknown>(
+export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData<TPageData>, TError = unknown>(
     options: UsePaginationQueryOptions<TParams, TPageData, TError>,
     pageOptions: UsePaginationQueryPageOptions,
     requiredScopes: [GrantScope, ...GrantScope[]],

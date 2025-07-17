@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 
 import { useQuery } from '@tanstack/vue-query';
 
-import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
+import { useResourceQueryKey } from '@/query/core/query-key/use-resource-query-key';
 import type { ReferenceFetchInfo, ReferenceKeyType } from '@/query/reference/types/reference-type';
 
 
@@ -12,7 +12,7 @@ export const useReferenceFullList = <T, R extends Record<string, any>>(
     transform: (item: T) => R,
 ) => {
     const { listFetchFn } = fetchInfo;
-    const { key: queryKey } = useReferenceQueryKey(resourceKey);
+    const { key: queryKey } = useResourceQueryKey(resourceKey);
     const hasTriggered = ref(false);
 
     const {

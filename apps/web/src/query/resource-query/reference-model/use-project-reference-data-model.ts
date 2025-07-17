@@ -7,8 +7,8 @@ import type {
     ReferenceItem, ReferenceMap,
 } from '@/query/resource-query/reference-model/types/reference-type';
 import { useProjectGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
-import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
+import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
 
 
 interface ProjectResourceItemData {
@@ -53,7 +53,7 @@ export const useProjectReferenceDataModel = () => {
     );
 
 
-    const projectReferenceProxyMap = makeReferenceProxy<ProjectReferenceMap>({} as ProjectReferenceMap, (_, id: string) => {
+    const projectReferenceProxyMap = makeResourceProxy<ProjectReferenceMap>({} as ProjectReferenceMap, (_, id: string) => {
         const project = referenceMap[id];
         if (!project) return project;
         const projectGroupId = project.data?.projectGroupId;

@@ -8,7 +8,7 @@ import { isEqual } from 'lodash';
 
 import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
 import type { ReferenceItem } from '@/query/resource-query/reference-model/types/reference-type';
-import { useWatchedQueryCache } from '@/query/shared/use-watched-query-cache';
+import { useWatchedQueryCache } from '@/query/shared/composables/use-watched-query-cache';
 
 
 export const useReferenceReactiveCache = <T extends Record<string, any>, R extends ReferenceItem>(

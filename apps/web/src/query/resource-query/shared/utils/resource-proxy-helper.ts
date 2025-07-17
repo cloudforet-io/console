@@ -17,10 +17,10 @@ const IGNORED_KEYS = new Set([
     Symbol.iterator,
 ]);
 
-export const makeReferenceProxy = <T extends object>(
-    target: T,
-    baseGet: (target: T, prop: string) => any,
-) => new Proxy(target, {
+export const makeResourceProxy = <TTarget extends Record<string, any>, TResult = any>(
+    target: TTarget,
+    baseGet: (target: TTarget, prop: string) => TResult,
+): Record<keyof TTarget, TResult> => new Proxy(target, {
         get(_, id: string) {
             if (IGNORED_KEYS.has(id) || typeof id !== 'string' || id === 'undefined' || id === 'null') return undefined;
             return baseGet(_, id);

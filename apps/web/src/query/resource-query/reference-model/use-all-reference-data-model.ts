@@ -24,7 +24,7 @@ import { useUserReferenceDataModel } from '@/query/resource-query/reference-mode
 import { useWorkspaceGroupReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-group-reference-data-model';
 import { useWorkspaceReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-reference-data-model';
 import { useWorkspaceUserReferenceDataModel } from '@/query/resource-query/reference-model/use-workspace-user-reference-data-model';
-import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
+import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
 
 const referenceDataModelMap = {
     app: useAppReferenceDataModel,
@@ -55,7 +55,7 @@ const referenceDataModelMap = {
     monitoringEscalationPolicy: useMonitoringEscalationPolicyReferenceDataModel,
 } as const;
 
-const proxy = makeReferenceProxy(referenceDataModelMap, (target, prop) => {
+const proxy = makeResourceProxy<typeof referenceDataModelMap>(referenceDataModelMap, (target, prop) => {
     if (!(prop in target)) {
         throw new Error(`[all-reference-data-model] Reference Data Model for "${prop}" not found`);
     }

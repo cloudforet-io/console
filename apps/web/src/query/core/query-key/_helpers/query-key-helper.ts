@@ -1,4 +1,7 @@
-import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
+import type {
+    QueryKeyArray, ResourceName, ServiceName, Verb,
+} from '@/query/core/query-key/types/query-key-type';
+import { omitPageFromLoadParams, omitPageQueryParams } from '@/query/shared/utils/pagination-query-helper';
 
 export const createImmutableObjectKeyItem = <T>(obj: T): T => {
     if (obj === null || typeof obj !== 'object') {
@@ -22,4 +25,11 @@ export const normalizeQueryKeyPart = (key: unknown): QueryKeyArray => {
         return key;
     }
     return [key];
+};
+
+
+export const omitPageParamsByVerb = <S extends ServiceName, R extends ResourceName<S>>(verb: Verb<S, R>, params = {}) => {
+    if (verb === 'load') return omitPageFromLoadParams(params);
+    if (verb === 'list' || verb === 'analyze' || verb === 'stat') return omitPageQueryParams(params);
+    return params;
 };

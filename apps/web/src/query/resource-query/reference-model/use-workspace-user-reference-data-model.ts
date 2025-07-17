@@ -6,8 +6,8 @@ import type {
     ReferenceItem, ReferenceMap,
 } from '@/query/resource-query/reference-model/types/reference-type';
 import { useRoleReferenceDataModel } from '@/query/resource-query/reference-model/use-role-reference-data-model';
-import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
+import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
 
 
 export type WorkspaceUserReferenceItem = ReferenceItem<WorkspaceUserModel>;
@@ -40,7 +40,7 @@ export const useWorkspaceUserReferenceDataModel = () => {
         fetchConfig,
     );
 
-    const userReferenceProxyMap = makeReferenceProxy<WorkspaceUserReferenceMap>({} as WorkspaceUserReferenceMap, (_, id: string) => {
+    const userReferenceProxyMap = makeResourceProxy<WorkspaceUserReferenceMap>({} as WorkspaceUserReferenceMap, (_, id: string) => {
         const _userInfo = referenceMap[id];
         if (!_userInfo || !_userInfo.data?.role_binding_info?.role_id) return _userInfo;
         const roleInfo = roleReferenceMap[_userInfo.data?.role_binding_info?.role_id]?.data;

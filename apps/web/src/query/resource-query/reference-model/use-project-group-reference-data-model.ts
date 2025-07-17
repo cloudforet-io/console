@@ -2,8 +2,8 @@ import { useProjectGroupApi } from '@/api-clients/identity/project-group/composa
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-model/composables/use-reference-data-model';
 import type { ReferenceDataModelFetchConfig, ReferenceItem, ReferenceMap } from '@/query/resource-query/reference-model/types/reference-type';
-import { makeReferenceProxy } from '@/query/resource-query/reference-model/utils/reference-proxy-helper';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
+import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
 
 
 interface ProjectGroupResourceItemData {
@@ -41,7 +41,7 @@ export const useProjectGroupReferenceDataModel = () => {
         fetchConfig,
     );
 
-    const projectGroupReferenceProxyMap = makeReferenceProxy<ProjectGroupReferenceMap>({} as ProjectGroupReferenceMap, (_, id: string) => {
+    const projectGroupReferenceProxyMap = makeResourceProxy<ProjectGroupReferenceMap>({} as ProjectGroupReferenceMap, (_, id: string) => {
         const projectGroup = referenceMap[id];
         if (!projectGroup) return projectGroup;
 
